@@ -971,7 +971,7 @@ namespace HVACUnitarySystem {
 	);
 
 	void
-	ControlCoolingSystem(
+	ControlCoolingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -980,7 +980,7 @@ namespace HVACUnitarySystem {
 	);
 
 	void
-	ControlHeatingSystem(
+	ControlHeatingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag

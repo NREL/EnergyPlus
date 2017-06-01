@@ -119,10 +119,10 @@ namespace HVACUnitarySystem {
 	//    IF(SetPointBased Control)THEN
 	//      ControlUnitarySystemToSP   ---->  SimFan (if exists and blowthru)
 	//                                        UpdateUnitarySystemControl (cooling coil if exists)
-	//                                        ControlCoolingSystem ---> Sim*CoolingCoil
+	//                                        ControlCoolingSystemToSP ---> Sim*CoolingCoil
 	//                                        CalcUnitaryCoolingSystem
 	//                                        UpdateUnitarySystemControl (heating coil if exists)
-	//                                        ControlHeatingSystem ---> Sim*HeatingCoil
+	//                                        ControlHeatingSystemToSP ---> Sim*HeatingCoil
 	//                                        CalcUnitaryHeatingSystem
 	//                                        SimFan (if exists and drawthru)
 	//                                        UpdateUnitarySystemControl (supp heating coil if exists)
@@ -6437,7 +6437,7 @@ namespace HVACUnitarySystem {
 
 			if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp );
-				ControlCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn );
+				ControlCoolingSystemToSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac;
 				CompOn = 0;
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
@@ -6445,7 +6445,7 @@ namespace HVACUnitarySystem {
 			}
 			if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
-				ControlHeatingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn );
+				ControlHeatingSystemToSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac;
 				CompOn = 0;
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
@@ -6456,7 +6456,7 @@ namespace HVACUnitarySystem {
 
 			if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
-				ControlHeatingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn );
+				ControlHeatingSystemToSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac;
 				CompOn = 0;
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
@@ -6464,7 +6464,7 @@ namespace HVACUnitarySystem {
 			}
 			if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp );
-				ControlCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn );
+				ControlCoolingSystemToSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac;
 				CompOn = 0;
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
@@ -8933,7 +8933,7 @@ namespace HVACUnitarySystem {
 	}
 
 	void
-	ControlCoolingSystem(
+	ControlCoolingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -9082,10 +9082,12 @@ namespace HVACUnitarySystem {
 		}
 
 		// IF DXCoolingSystem is scheduled on and there is flow
-		if ( ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 ) && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr ) > 0.0 && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) && UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac == 0.0 ) {
+		if ( ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 ) && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr ) > 0.0 && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
-			// Determine if there is a sensible load on this system (aren't the first 2 tests redundant?)
-			if ( ( Node( InletNode ).Temp > DesOutTemp ) && ( std::abs( Node( InletNode ).Temp - DesOutTemp ) > TempControlTol ) ) SensibleLoad = true;
+			// Determine if there is a sensible load on this system
+			if ( Node( InletNode ).Temp - DesOutTemp > TempControlTol ) SensibleLoad = true;
+			// if a heat pump and other coil is on, disable this coil
+			if ( UnitarySystem( UnitarySysNum ).HeatPump && UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac > 0.0 ) SensibleLoad = false;
 
 			// Determine if there is a latent load on this system - for future use to serve latent-only loads
 			if ( Node( InletNode ).HumRat > DesOutHumRat ) LatentLoad = true;
@@ -9497,7 +9499,7 @@ namespace HVACUnitarySystem {
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
-							ShowFatalError( "ControlCoolingSystem: Invalid cooling coil type = " + cAllCoilTypes( CoilType_Num ) );
+							ShowFatalError( "ControlCoolingSystemToSP: Invalid cooling coil type = " + cAllCoilTypes( CoilType_Num ) );
 
 						}
 
@@ -9959,7 +9961,7 @@ namespace HVACUnitarySystem {
 	}
 
 	void
-	ControlHeatingSystem(
+	ControlHeatingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -10110,11 +10112,12 @@ namespace HVACUnitarySystem {
 		}
 
 		// IF DXHeatingSystem is scheduled on and there is flow
-		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr ) > 0.0 && Node( InletNode ).MassFlowRate > MinAirMassFlow && UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac == 0.0 ) {
+		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr ) > 0.0 && Node( InletNode ).MassFlowRate > MinAirMassFlow ) {
 
 			// Determine if there is a sensible load on this system
-			//    IF((Node(InletNode)%Temp < Node(ControlNode)%TempSetPoint) .AND. &
-			if ( ( Node( InletNode ).Temp < DesOutTemp ) && ( std::abs( Node( InletNode ).Temp - DesOutTemp ) > TempControlTol ) ) SensibleLoad = true;
+			if ( DesOutTemp - Node( InletNode ).Temp > TempControlTol ) SensibleLoad = true;
+			// if a heat pump and other coil is on, disable this coil
+			if ( UnitarySystem( UnitarySysNum ).HeatPump && UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac > 0.0) SensibleLoad = false;
 
 			// IF DXHeatingSystem runs with a heating load then set PartLoadFrac on Heating System
 			if ( SensibleLoad ) {
@@ -10408,7 +10411,7 @@ namespace HVACUnitarySystem {
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
-							ShowFatalError( "ControlHeatingSystem: Invalid heating coil type = " + cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) );
+							ShowFatalError( "ControlHeatingSystemToSP: Invalid heating coil type = " + cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) );
 
 						}}
 					}
