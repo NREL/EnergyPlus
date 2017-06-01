@@ -6316,8 +6316,8 @@ namespace SimAirServingZones {
 				FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow = FinalSysSizing( AirLoopNum ).DesCoolVolFlow * FractionOfAutosize;
 			} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
 				if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity || FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity == DataSizing::AutoSize ) {
-					FractionOfAutosize = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity;
-					if ( FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity == DataSizing::AutoSize ) FractionOfAutosize = 1.0;
+					// FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity = AutoSize represents autosized cooling capacity				
+					if ( FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity != DataSizing::AutoSize ) FractionOfAutosize = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 					if ( PrimaryAirSystem( AirLoopNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
 						CoilInTemp = FinalSysSizing( AirLoopNum ).MixTempAtCoolPeak;
 						CoilInHumRat = FinalSysSizing( AirLoopNum ).MixHumRatAtCoolPeak;
@@ -6339,6 +6339,8 @@ namespace SimAirServingZones {
 					TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * AutosizedCapacity * FractionOfAutosize;
 				} else if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity > 0 ) {
 					TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity;
+				} else if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == CapacityPerFloorArea ) {
+					TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 				} else {
 					// incorrect input
 				}
@@ -6362,8 +6364,8 @@ namespace SimAirServingZones {
 				FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow = FinalSysSizing( AirLoopNum ).DesHeatVolFlow * FractionOfAutosize;
 			} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
 				if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity || FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity == DataSizing::AutoSize ) {
-					FractionOfAutosize = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity;
-					if ( FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity == DataSizing::AutoSize ) FractionOfAutosize = 1.0;
+					// FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity = AutoSize represents autosized heating capacity				
+					if ( FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity != DataSizing::AutoSize ) FractionOfAutosize = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity;
 					if ( FinalSysSizing( AirLoopNum ).HeatOAOption == MinOA ) {
 						if ( FinalSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
 							OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesHeatVolFlow;
@@ -6385,6 +6387,8 @@ namespace SimAirServingZones {
 					TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * AutosizedCapacity * FractionOfAutosize;
 				} else if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == HeatingDesignCapacity && FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity > 0 ) {
 					TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity;
+				} else if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == CapacityPerFloorArea ) {
+					TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 				} else {
 					// incorrect input
 				}
@@ -6402,7 +6406,7 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = 0.0;  // autosized, set to zero initially
 				}
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity * CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
+				FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 			} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {
 				CalcSysSizing( AirLoopNum ).FractionOfAutosizedCoolingCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 				FinalSysSizing( AirLoopNum ).FractionOfAutosizedCoolingCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
@@ -6417,7 +6421,8 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = 0.0; // autosized, set to zero initially
 				}
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity * CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated;
+				// even for heating capacity we use cooled zones floor area ( *.FloorAreaOnAirLoopCooled ) served by the airloop 
+				FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity ) {
 				FinalSysSizing( AirLoopNum ).FractionOfAutosizedHeatingCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity;
 			}}
