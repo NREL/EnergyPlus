@@ -23700,6 +23700,7 @@ AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
  A1 , \field Name
       \required-field
       \type object-list
+	  \reference SurfaceAirflowLeakageNames	  
       \object-list FansZoneExhaust
       \reference SurfaceAirflowLeakageNames
       \note Enter the name of a Fan:ZoneExhaust object.
