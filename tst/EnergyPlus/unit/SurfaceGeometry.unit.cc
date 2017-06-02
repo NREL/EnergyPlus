@@ -1950,7 +1950,7 @@ TEST( SurfaceGeometryUnitTests, makeListOfUniqueVertices_test )
 	std::vector<Vector>  uniqueVertices;
 	makeListOfUniqueVertices( zonePoly, uniqueVertices );
 
-	EXPECT_EQ(8, uniqueVertices.size() );
+	EXPECT_EQ( size_t( 8 ), uniqueVertices.size() );
 	EXPECT_EQ( Vector( 0., 0., 3. ), uniqueVertices.at( 0 ) );
 	EXPECT_EQ( Vector( 0., 0., 0. ), uniqueVertices.at( 1 ) );
 	EXPECT_EQ( Vector( 10., 0., 0. ), uniqueVertices.at( 2 ) );
@@ -2095,7 +2095,7 @@ TEST( SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test )
 	std::vector<Vector>  uniqueVertices;
 	makeListOfUniqueVertices( zonePoly, uniqueVertices );
 
-	EXPECT_EQ( 8, uniqueVertices.size() );
+	EXPECT_EQ( size_t( 8 ), uniqueVertices.size() );
 
 	EXPECT_EQ ( 0, numberOfEdgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices ));
 
@@ -2104,7 +2104,7 @@ TEST( SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test )
 	zonePoly.SurfaceFace( 6 ).FacePoints( 4 ).z = 0.;
 
 	makeListOfUniqueVertices( zonePoly, uniqueVertices );
-	EXPECT_EQ( 8, uniqueVertices.size() );
+	EXPECT_EQ( size_t( 8 ), uniqueVertices.size() );
 
 	EXPECT_EQ( 4, numberOfEdgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices ) );
 
@@ -2266,7 +2266,7 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	std::vector<Vector>  uniqueVertices;
 	makeListOfUniqueVertices( zonePoly, uniqueVertices );
 
-	EXPECT_EQ( 10, uniqueVertices.size() );
+	EXPECT_EQ( size_t( 10 ), uniqueVertices.size() );
 
 	EXPECT_EQ( 6, numberOfEdgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices ) );
 
