@@ -1131,16 +1131,12 @@ namespace TranspiredCollector {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataEnvironment::IsRain;
 		using DataEnvironment::OutBaroPress;
-		using DataEnvironment::OutEnthalpy;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using Psychrometrics::PsyCpAirFnWTdb;
+		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdbTwbPb;
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceData;
-		using DataHVACGlobals::TimeStepSys;
-		using ConvectionCoefficients::InitExteriorConvectionCoeff;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1199,7 +1195,7 @@ namespace TranspiredCollector {
 		UTSC( UTSCNum ).PlenumVelocity = 0.0;
 		UTSC( UTSCNum ).SupOutTemp = Tamb;
 		UTSC( UTSCNum ).SupOutHumRat = OutHumRatAmb;
-		UTSC( UTSCNum ).SupOutEnth = OutEnthalpy;
+		UTSC( UTSCNum ).SupOutEnth = PsyHFnTdbW( Tamb, OutHumRatAmb );
 		UTSC( UTSCNum ).SupOutMassFlow = 0.0;
 		UTSC( UTSCNum ).SensHeatingRate = 0.0;
 		UTSC( UTSCNum ).SensHeatingEnergy = 0.0;
