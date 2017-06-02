@@ -1825,6 +1825,10 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
        PLF = 1.0 + 0.0(PLR)
 \end{lstlisting}
 
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the default value is -25 C.
+
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin}
 
 The nominal time (in seconds) after startup for condensate to begin leaving the coil's condensate drain line at the coil's rated airflow and temperature conditions, starting with a dry coil. Nominal time is equal to the ratio of the energy of the coil's maximum condensate holding capacity (J) to the coil's steady-state latent capacity (W). Suggested value is 1000; zero value means the latent degradation model is disabled. The default value for this field is zero. The supply air fan operating mode must be continuous (i.e., the supply air fan operating mode may be specified in other parent objects and is assumed continuous in some objects (e.g., CoilSystem:Cooling:DX) or can be scheduled in other objects {[}e.g., AirloopHVAC:UnitaryHeatCool{]}), and this field as well as the next three input fields for this object must have positive values in order to model latent capacity degradation.

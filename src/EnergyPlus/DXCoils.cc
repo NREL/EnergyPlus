@@ -1230,13 +1230,16 @@ namespace DXCoils {
 				}
 			}
 
-			DXCoil( DXCoilNum ).Twet_Rated( 1 ) = Numbers( 6 );
-			DXCoil( DXCoilNum ).Gamma_Rated( 1 ) = Numbers( 7 );
-			DXCoil( DXCoilNum ).MaxONOFFCyclesperHour( 1 ) = Numbers( 8 );
-			DXCoil( DXCoilNum ).LatentCapacityTimeConstant( 1 ) = Numbers( 9 );
+			//Set minimum OAT for heat pump compressor operation
+			DXCoil( DXCoilNum ).MinOATCompressor = Numbers(6);
 
-			// Numbers (6) through (9) must all be greater than zero to use the latent capacity degradation model
-			if ( ( Numbers( 6 ) > 0.0 || Numbers( 7 ) > 0.0 || Numbers( 8 ) > 0.0 || Numbers( 9 ) > 0.0 ) && ( Numbers( 6 ) <= 0.0 || Numbers( 7 ) <= 0.0 || Numbers( 8 ) <= 0.0 || Numbers( 9 ) <= 0.0 ) ) {
+			DXCoil( DXCoilNum ).Twet_Rated( 1 ) = Numbers( 7 );
+			DXCoil( DXCoilNum ).Gamma_Rated( 1 ) = Numbers( 8 );
+			DXCoil( DXCoilNum ).MaxONOFFCyclesperHour( 1 ) = Numbers( 9 );
+			DXCoil( DXCoilNum ).LatentCapacityTimeConstant( 1 ) = Numbers( 10 );
+
+			// Numbers (7) through (10) must all be greater than zero to use the latent capacity degradation model
+			if ( ( Numbers( 7 ) > 0.0 || Numbers( 8 ) > 0.0 || Numbers( 9 ) > 0.0 || Numbers( 10 ) > 0.0 ) && ( Numbers( 7 ) <= 0.0 || Numbers( 8 ) <= 0.0 || Numbers( 9 ) <= 0.0 || Numbers( 10 ) <= 0.0 ) ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\":" );
 				ShowContinueError( "...At least one of the four input parameters for the latent capacity degradation model" );
 				ShowContinueError( "...is set to zero. Therefore, the latent degradation model will not be used for this simulation." );
@@ -1267,41 +1270,41 @@ namespace DXCoils {
 				ErrorsFound = true;
 			}
 
-			DXCoil( DXCoilNum ).EvapCondEffect( 1 ) = Numbers( 10 );
+			DXCoil( DXCoilNum ).EvapCondEffect( 1 ) = Numbers( 11 );
 			if ( DXCoil( DXCoilNum ).EvapCondEffect( 1 ) < 0.0 || DXCoil( DXCoilNum ).EvapCondEffect( 1 ) > 1.0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-				ShowContinueError( "..." + cNumericFields( 10 ) + " cannot be < 0.0 or > 1.0." );
-				ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 10 ), 2 ) + "]." );
-				ErrorsFound = true;
-			}
-
-			DXCoil( DXCoilNum ).EvapCondAirFlow( 1 ) = Numbers( 11 );
-			if ( DXCoil( DXCoilNum ).EvapCondAirFlow( 1 ) < 0.0 && DXCoil( DXCoilNum ).EvapCondAirFlow( 1 ) != AutoSize ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-				ShowContinueError( "..." + cNumericFields( 11 ) + " cannot be < 0.0." );
+				ShowContinueError( "..." + cNumericFields( 11 ) + " cannot be < 0.0 or > 1.0." );
 				ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 11 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
-			DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) = Numbers( 12 );
-			if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) < 0.0 && DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) != AutoSize ) {
+			DXCoil( DXCoilNum ).EvapCondAirFlow( 1 ) = Numbers( 12 );
+			if ( DXCoil( DXCoilNum ).EvapCondAirFlow( 1 ) < 0.0 && DXCoil( DXCoilNum ).EvapCondAirFlow( 1 ) != AutoSize ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 				ShowContinueError( "..." + cNumericFields( 12 ) + " cannot be < 0.0." );
 				ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 12 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
-			//Set crankcase heater capacity
-			DXCoil( DXCoilNum ).CrankcaseHeaterCapacity = Numbers( 13 );
-			if ( DXCoil( DXCoilNum ).CrankcaseHeaterCapacity < 0.0 ) {
+			DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) = Numbers( 13 );
+			if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) < 0.0 && DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( 1 ) != AutoSize ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 				ShowContinueError( "..." + cNumericFields( 13 ) + " cannot be < 0.0." );
 				ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 13 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
+			//Set crankcase heater capacity
+			DXCoil( DXCoilNum ).CrankcaseHeaterCapacity = Numbers( 14 );
+			if ( DXCoil( DXCoilNum ).CrankcaseHeaterCapacity < 0.0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
+				ShowContinueError( "..." + cNumericFields( 14 ) + " cannot be < 0.0." );
+				ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 14 ), 2 ) + "]." );
+				ErrorsFound = true;
+			}
+
 			//Set crankcase heater cutout temperature
-			DXCoil( DXCoilNum ).MaxOATCrankcaseHeater = Numbers( 14 );
+			DXCoil( DXCoilNum ).MaxOATCrankcaseHeater = Numbers( 15 );
 
 			if ( DXCoil( DXCoilNum ).RatedCOP( 1 ) > 0.0 ) {
 				DXCoil( DXCoilNum ).RatedEIR( 1 ) = 1.0 / DXCoil( DXCoilNum ).RatedCOP( 1 );
@@ -1327,23 +1330,23 @@ namespace DXCoils {
 			}
 
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
-			DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = Numbers( 15 );
-			if ( Numbers( 15 ) < 0.0 ) {
+			DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = Numbers( 16 );
+			if ( Numbers( 16 ) < 0.0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-				ShowContinueError( "..." + cNumericFields( 15 ) + " must be >= 0.0." );
-				ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 15 ), 2 ) + "]." );
+				ShowContinueError( "..." + cNumericFields( 16 ) + " must be >= 0.0." );
+				ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 16 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
-			DXCoil( DXCoilNum ).BasinHeaterSetPointTemp = Numbers( 16 );
+			DXCoil( DXCoilNum ).BasinHeaterSetPointTemp = Numbers( 17 );
 			if ( DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
-				if ( NumNumbers < 16 ) {
+				if ( NumNumbers < 17 ) {
 					DXCoil( DXCoilNum ).BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( DXCoil( DXCoilNum ).BasinHeaterSetPointTemp < 2.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", freeze possible" );
-					ShowContinueError( "..." + cNumericFields( 16 ) + " is < 2 {C}. Freezing could occur." );
-					ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 16 ), 2 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 17 ) + " is < 2 {C}. Freezing could occur." );
+					ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 17 ), 2 ) + "]." );
 				}
 			}
 
@@ -7388,7 +7391,7 @@ namespace DXCoils {
 		DXCoil( DXCoilNum ).PrintLowAmbMessage = false;
 		DXCoil( DXCoilNum ).PrintLowOutTempMessage = false;
 
-		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) && ( PartLoadRatio > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
+		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) && ( PartLoadRatio > 0.0 ) && ( CompOp == On ) && CompAmbTemp > DXCoil( DXCoilNum ).MinOATCompressor) { // criteria for coil operation
 			if ( FanOpMode == CycFanCycCoil ) {
 				AirMassFlow /= ( PartLoadRatio / DXcoolToHeatPLRRatio );
 			} else if ( FanOpMode == ContFanCycCoil && DXCoil( DXCoilNum ).DXCoilType_Num != CoilDX_CoolingTwoSpeed ) {

@@ -43304,7 +43304,11 @@ Coil:Cooling:DX:SingleSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (cooling load/steady state capacity)
-   N6, \field Nominal Time for Condensate Removal to Begin
+  N6 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+       \type real
+       \default -25.0
+       \units C
+  N7 , \field Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -43315,7 +43319,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-   N7, \field Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+  N8 , \field Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -43325,7 +43329,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note the compressor first turns off) and the coil's steady state latent capacity
        \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-   N8, \field Maximum Cycling Rate
+  N9 , \field Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -43333,7 +43337,7 @@ Coil:Cooling:DX:SingleSpeed,
        \default 0.0
        \note The maximum on-off cycling Rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation model is disabled.
-   N9, \field Latent Capacity Time Constant
+  N10, \field Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -43350,32 +43354,32 @@ Coil:Cooling:DX:SingleSpeed,
        \key AirCooled
        \key EvaporativelyCooled
        \default AirCooled
-  N10, \field Evaporative Condenser Effectiveness
+  N11, \field Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N11, \field Evaporative Condenser Air Flow Rate
+  N12, \field Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N12, \field Evaporative Condenser Pump Rated Power Consumption
+  N13, \field Evaporative Condenser Pump Rated Power Consumption
        \type real
        \units W
        \minimum 0.0
        \default 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump
-  N13, \field Crankcase Heater Capacity
+  N14, \field Crankcase Heater Capacity
        \type real
        \minimum 0.0
        \default 0.0
        \units W
        \ip-units W
-  N14, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+  N15, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
        \type real
        \minimum 0.0
        \default 10.0
@@ -43386,7 +43390,7 @@ Coil:Cooling:DX:SingleSpeed,
   A13, \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  N15, \field Basin Heater Capacity
+  N16, \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -43396,7 +43400,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note For this situation, the heater maintains the basin water temperature at the basin heater
        \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when the DX coil is off.
-  N16, \field Basin Heater Setpoint Temperature
+  N17, \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
