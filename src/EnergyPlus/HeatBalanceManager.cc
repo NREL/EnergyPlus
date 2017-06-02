@@ -68,6 +68,7 @@
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
+#include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
@@ -693,6 +694,12 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::lMinimalShadowing;
+		using DataHVACGlobals::HVACSystemRootFinding;
+		using DataHVACGlobals::RegulaFalsi;
+		using DataHVACGlobals::Bisection;
+		using DataHVACGlobals::RegulaFalsiThenBisection;
+		using DataHVACGlobals::BisectionThenRegulaFalsi;
+		using DataHVACGlobals::Alternation;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1217,6 +1224,43 @@ namespace HeatBalanceManager {
 		} else {
 			gio::write( OutputFileInits, Format_733 ) << "No" << "N/A" << "N/A" << "N/A";
 		}
+
+		// A new object is added by L. Gu, 4/17
+		CurrentModuleObject = "HVACSystemRootFindingAlgorithm";
+		NumObjects = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumObjects > 0 ) {
+			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( NumAlpha > 0 ) {
+				HVACSystemRootFinding.Algorithm = AlphaName( 1 );
+				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
+				if ( ( SELECT_CASE_var == "REGULAFALSI" ) ) {
+					HVACSystemRootFinding.TypeNum = RegulaFalsi;
+				} else if ( SELECT_CASE_var == "BiSECTION" ) {
+					HVACSystemRootFinding.TypeNum = Bisection;
+				} else if ( SELECT_CASE_var == "BISECTIONTHENREGULAFALSI" ) {
+					HVACSystemRootFinding.TypeNum = BisectionThenRegulaFalsi;
+				} else if ( SELECT_CASE_var == "REGULAFALSITHENBISECTION" ) {
+					HVACSystemRootFinding.TypeNum = RegulaFalsiThenBisection;
+				} else if ( SELECT_CASE_var == "ALTERNATION" ) {
+					HVACSystemRootFinding.TypeNum = Alternation;
+				} else {
+					HVACSystemRootFinding.TypeNum = RegulaFalsi;
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames( 1 ) + ". The default choice is assigned = " + AlphaName( 1 ) );
+					ShowContinueError( "Valid choices are: RegulaFalsi, Bisection, BisectionThenRegulaFalsi, or RegulaFalsiThenBisection." );
+				}}
+			}
+			if ( NumNumber > 0 ) {
+				HVACSystemRootFinding.NumOfIter = BuildingNumbers( 1 );
+			}
+		}
+		else {
+			HVACSystemRootFinding.TypeNum = RegulaFalsi;
+			HVACSystemRootFinding.Algorithm = "RegulaFalsi";
+		}
+
+		// Write Solution Algorithm to the initialization output file for User Verification
+		gio::write( OutputFileInits, Format_726 );
+		gio::write( OutputFileInits, Format_727 ) << AlphaName( 1 );
 
 	}
 

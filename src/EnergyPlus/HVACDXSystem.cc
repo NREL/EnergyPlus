@@ -866,7 +866,7 @@ namespace HVACDXSystem {
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DXCoils::SimDXCoil;
 		using DXCoils::SimDXCoilMultiSpeed;
@@ -1031,7 +1031,7 @@ namespace HVACDXSystem {
 							Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 							Par( 2 ) = DesOutTemp;
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
@@ -1085,7 +1085,7 @@ namespace HVACDXSystem {
 							Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 							Par( 2 ) = DesOutHumRat;
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilHumRatResidual, 0.0, 1.0, Par );
+							SolveRoot( HumRatAcc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilHumRatResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter < 1 ) {
@@ -1177,7 +1177,7 @@ namespace HVACDXSystem {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 
 								//               RegulaFalsi may not find sensible PLR when the latent degradation model is used.
@@ -1204,7 +1204,7 @@ namespace HVACDXSystem {
 								TempMinPLR = max( 0.0, ( TempMinPLR - 0.01 ) );
 								TempMaxPLR = min( 1.0, ( TempMaxPLR + 0.01 ) );
 								//               tighter boundary of solution has been found, call RegulaFalsi a second time
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).HXAssistedSensPLRIter < 1 ) {
@@ -1292,7 +1292,7 @@ namespace HVACDXSystem {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).HXAssistedLatPLRIter < 1 ) {
@@ -1348,7 +1348,7 @@ namespace HVACDXSystem {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par );
+							SolveRoot( HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 
 								//               RegulaFalsi may not find latent PLR when the latent degradation model is used.
@@ -1371,7 +1371,7 @@ namespace HVACDXSystem {
 									OutletHumRatDXCoil = HXAssistedCoilOutletHumRat( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 								}
 								//               tighter boundary of solution has been found, call RegulaFalsi a second time
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par );
+								SolveRoot( HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).HXAssistedCRLatPLRIter < 1 ) {
@@ -1429,7 +1429,7 @@ namespace HVACDXSystem {
 						if ( OutletTempHS < DesOutTemp ) {
 							Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 							Par( 2 ) = DesOutTemp;
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).MSpdSensPLRIter < 1 ) {
@@ -1450,7 +1450,7 @@ namespace HVACDXSystem {
 						SpeedRatio = 0.0;
 						Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 						Par( 2 ) = DesOutTemp;
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, CycRatio, DXCoilCyclingResidual, 0.0, 1.0, Par );
+						SolveRoot( Acc, MaxIte, SolFla, CycRatio, DXCoilCyclingResidual, 0.0, 1.0, Par );
 						if ( SolFla == -1 ) {
 							if ( ! WarmupFlag ) {
 								if ( DXCoolingSystem( DXSystemNum ).MSpdCycSensPLRIter < 1 ) {
@@ -1495,7 +1495,7 @@ namespace HVACDXSystem {
 								if ( OutletHumRatHS < DesOutHumRat ) {
 									Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 									Par( 2 ) = DesOutHumRat;
-									SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par );
+									SolveRoot( HumRatAcc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par );
 									if ( SolFla == -1 ) {
 										if ( ! WarmupFlag ) {
 											if ( DXCoolingSystem( DXSystemNum ).MSpdLatPLRIter < 1 ) {
@@ -1516,7 +1516,7 @@ namespace HVACDXSystem {
 								SpeedRatio = 0.0;
 								Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 								Par( 2 ) = DesOutHumRat;
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, CycRatio, DXCoilCyclingHumRatResidual, 0.0, 1.0, Par );
+								SolveRoot( HumRatAcc, MaxIte, SolFla, CycRatio, DXCoilCyclingHumRatResidual, 0.0, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).MSpdCycLatPLRIter < 1 ) {
@@ -1572,7 +1572,7 @@ namespace HVACDXSystem {
 							// Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
 							Par( 3 ) = double( DehumidMode );
 							Par( 4 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).MModeSensPLRIter < 1 ) {
@@ -1631,7 +1631,7 @@ namespace HVACDXSystem {
 								// Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
 								Par( 3 ) = double( DehumidMode );
 								Par( 4 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).MModeLatPLRIter < 1 ) {
@@ -1662,7 +1662,7 @@ namespace HVACDXSystem {
 								// Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
 								Par( 3 ) = double( DehumidMode );
 								Par( 4 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).MModeLatPLRIter < 1 ) {
@@ -1713,7 +1713,7 @@ namespace HVACDXSystem {
 							// Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
 							Par( 3 ) = double( DehumidMode );
 							Par( 4 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).MModeLatPLRIter2 < 1 ) {
@@ -1823,7 +1823,7 @@ namespace HVACDXSystem {
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
 								Par( 3 ) = double( SpeedNum );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
 
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
@@ -1852,7 +1852,7 @@ namespace HVACDXSystem {
 								Par( 1 ) = double( VSCoilIndex );
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
@@ -1930,7 +1930,7 @@ namespace HVACDXSystem {
 								Par( 2 ) = DesOutHumRat;
 								Par( 5 ) = double( FanOpMode );
 								Par( 3 ) = double( SpeedNum );
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedHumResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( HumRatAcc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedHumResidual, 1.0e-10, 1.0, Par );
 
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
@@ -1959,7 +1959,7 @@ namespace HVACDXSystem {
 								Par( 1 ) = double( VSCoilIndex );
 								Par( 2 ) = DesOutHumRat;
 								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingHumResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( HumRatAcc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingHumResidual, 1.0e-10, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter < 1 ) {

@@ -387,13 +387,14 @@ Three modules are revised: DataHVACGlobals, HeatBalanceManager, and General.
 	};
 
 
-#### Add 2 parameters for algorithm selection
+#### Add 5 parameters for algorithm selection
  
 	// Parameters for HVACSystemRootFindingAlgorithm
 	int const RegulaFalsi( 1 );
 	int const Bisection( 2 );
 	int const BisectionThenRegulaFalsi( 3 );
 	int const RegulaFalsiThenBisection( 4 );
+	int const Alternation( 5 );
  
 ### HeatBalanceManager
 

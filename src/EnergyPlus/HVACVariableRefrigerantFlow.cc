@@ -5901,7 +5901,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -6051,7 +6051,7 @@ namespace HVACVariableRefrigerantFlow {
 			//    Par(4) = OpMode
 			Par( 5 ) = QZnReq;
 			Par( 6 ) = OnOffAirFlowRatio;
-			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
+			SolveRoot( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
 			if ( SolFla == -1 ) {
 				//     Very low loads may not converge quickly. Tighten PLR boundary and try again.
 				TempMaxPLR = -0.1;
@@ -6087,7 +6087,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRFHeatingMode && TempOutput < QZnReq ) ContinueIter = false;
 					if ( VRFCoolingMode && TempOutput > QZnReq ) ContinueIter = false;
 				}
-				SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
+				SolveRoot( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
 				if ( SolFla == -1 ) {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						if ( VRFTU( VRFTUNum ).IterLimitExceeded == 0 ) {
@@ -7723,7 +7723,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using Psychrometrics::RhoH2O;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
@@ -8907,7 +8907,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -9037,7 +9037,7 @@ namespace HVACVariableRefrigerantFlow {
 			//    Par(4) = OpMode
 			Par( 5 ) = QZnReq;
 			Par( 6 ) = OnOffAirFlowRatio;
-			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
+			SolveRoot( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
 			if ( SolFla == -1 ) {
 				//     Very low loads may not converge quickly. Tighten PLR boundary and try again.
 				TempMaxPLR = -0.1;
@@ -9061,7 +9061,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRFHeatingMode && TempOutput < QZnReq ) ContinueIter = false;
 					if ( VRFCoolingMode && TempOutput > QZnReq ) ContinueIter = false;
 				}
-				SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
+				SolveRoot( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
 				if ( SolFla == -1 ) {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						if ( this->IterLimitExceeded == 0 ) {
@@ -9317,7 +9317,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// USE STATEMENTS:
 		using DXCoils::DXCoil;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using DataEnvironment::OutDryBulbTemp;
 
 		// Return value
@@ -9396,7 +9396,7 @@ namespace HVACVariableRefrigerantFlow {
 		Par( 7 ) = OACompOnMassFlow;
 
 		FanSpdRatioMax = 1.0;
-		SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par );
+		SolveRoot( ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par );
 		if( SolFla < 0) FanSpdRatio = FanSpdRatioMax; //over capacity
 
 		AirMassFlowRate = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
@@ -10607,7 +10607,7 @@ namespace HVACVariableRefrigerantFlow {
 		using FluidProperties::GetSupHeatEnthalpyRefrig;
 		using FluidProperties::GetSupHeatTempRefrig;
 		using FluidProperties::RefrigData;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10623,7 +10623,7 @@ namespace HVACVariableRefrigerantFlow {
 		int NumIteTe; // counter for Te calculation iterations [-]
 		int NumTUInList; // number of terminal units is list
 		int RefrigerantIndex; // Index of the refrigerant [-]
-		int SolFla; // Slove flag for SolveRegulaFalsi [-]
+		int SolFla; // Slove flag for SolveRoot [-]
 		int TUListNum; // index to TU List
 		int TUIndex; // Index to terminal unit
 		Real64 Cap_Eva0; // Evaporating capacity calculated based on physics model, used in the iterations [W]
@@ -10742,7 +10742,7 @@ namespace HVACVariableRefrigerantFlow {
 					MinOutdoorUnitPe = max( P_discharge - this->CompMaxDeltaP, MinRefriPe );
 					MinOutdoorUnitTe = GetSatTemperatureRefrig( this->RefrigerantName, max( min( MinOutdoorUnitPe, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 					
-					SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par ); // SmallLoadTe is the updated Te'
+					SolveRoot( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par ); // SmallLoadTe is the updated Te'
 					if( SolFla < 0 ) SmallLoadTe = 6; //MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
 					
 					//Get an updated Te corresponding to the updated Te'
@@ -10916,7 +10916,7 @@ namespace HVACVariableRefrigerantFlow {
 		using FluidProperties::GetSupHeatEnthalpyRefrig;
 		using FluidProperties::GetSupHeatTempRefrig;
 		using FluidProperties::RefrigData;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10930,7 +10930,7 @@ namespace HVACVariableRefrigerantFlow {
 		int NumIteCcap; // counter for Ccap calculation iterations [-]
 		int NumTUInList; // number of terminal units is list
 		int RefrigerantIndex; // Index of the refrigerant [-]
-		int SolFla; // Solve flag for SolveRegulaFalsi [-]
+		int SolFla; // Solve flag for SolveRoot [-]
 		int TUListNum; // index to TU List
 		Real64 Cap_Eva0; // Evaporating capacity calculated based on physics model, used in the iterations [W]
 		Real64 Cap_Eva1; // Evaporating capacity calculated by curves, used in the iterations [W]
@@ -11014,7 +11014,7 @@ namespace HVACVariableRefrigerantFlow {
 					Par( 2 ) = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
 					Par( 3 ) = this->OUCoolingCAPFT( CounterCompSpdTemp );
 
-					SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par );
+					SolveRoot( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par );
 					if( SolFla < 0 ) SmallLoadTe = MinOutdoorUnitTe;
 					
 					T_suction = SmallLoadTe;
@@ -11117,7 +11117,7 @@ namespace HVACVariableRefrigerantFlow {
 		using FluidProperties::GetSatPressureRefrig;
 		using FluidProperties::GetSupHeatEnthalpyRefrig;
 		using FluidProperties::RefrigData;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::TrimSigDigits;
 		
 		Array1D< Real64 > Par( 7 ); // Parameters passed to RegulaFalsi
@@ -11341,7 +11341,7 @@ namespace HVACVariableRefrigerantFlow {
 			Par( 6 ) = Q_c_TU_PL;
 			Par( 7 ) = m_air_evap_rated;
 
-			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, Tsuction_new, VRFOUTeResidual_FluidTCtrl, Tsuction_LB, Tsuction_HB, Par );
+			SolveRoot( ErrorTol, MaxIte, SolFla, Tsuction_new, VRFOUTeResidual_FluidTCtrl, Tsuction_LB, Tsuction_HB, Par );
 			if( SolFla < 0) Tsuction_new = Tsuction_LB;
 
 			// Update Q_c_tot_temp using updated Tsuction_new
@@ -11494,7 +11494,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Using/Aliasing
 		using DataGlobals::Pi;
 		using DXCoils::DXCoil;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using FluidProperties::FindRefrigerant;
 		using FluidProperties::GetSupHeatDensityRefrig;
 		using FluidProperties::RefrigData;
@@ -11641,7 +11641,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Using/Aliasing
 		using DataGlobals::Pi;
 		using DXCoils::DXCoil;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using FluidProperties::FindRefrigerant;
 		using FluidProperties::GetSatTemperatureRefrig;
 		using FluidProperties::GetSupHeatDensityRefrig;

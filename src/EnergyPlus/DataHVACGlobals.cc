@@ -309,6 +309,13 @@ namespace DataHVACGlobals {
 	// for oscillation of zone temperature to be detected.
 	Real64 const OscillateMagnitude( 0.15 );
 
+	// Parameters for HVACSystemRootFindingAlgorithm
+	int const RegulaFalsi( 1 );
+	int const Bisection( 2 );
+	int const RegulaFalsiThenBisection( 3 );
+	int const BisectionThenRegulaFalsi( 4 );
+	int const Alternation( 5 );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -508,6 +515,7 @@ namespace DataHVACGlobals {
 	Array1D< ZoneCompTypeData > ZoneComp;
 	OptStartDataType OptStartData; // For optimum start
 	Array1D< ComponentSetPtData > CompSetPtEquip;
+	HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.

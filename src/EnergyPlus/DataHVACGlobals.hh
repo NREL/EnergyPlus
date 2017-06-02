@@ -298,6 +298,13 @@ namespace DataHVACGlobals {
 	// for oscillation of zone temperature to be detected.
 	extern Real64 const OscillateMagnitude;
 
+	// Parameters for HVACSystemRootFindingAlgorithm
+	extern int const RegulaFalsi;
+	extern int const Bisection;
+	extern int const RegulaFalsiThenBisection;
+	extern int const BisectionThenRegulaFalsi;
+	extern int const Alternation;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -492,10 +499,27 @@ namespace DataHVACGlobals {
 
 	};
 
+	struct HVACSystemRootFindingAlgorithm
+	{
+		// Members
+		std::string Algorithm;           // Choice of algorithm
+		int TypeNum;                     // Type number: 1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5 Alternation
+		int NumOfIter;                   // Number of Iteration Before Algorith Switch
+
+										 // Default Constructor
+		HVACSystemRootFindingAlgorithm( ) :
+			TypeNum( 0 ),
+			NumOfIter( 5 )
+		{}
+
+	};
+
+
 	// Object Data
 	extern Array1D< ZoneCompTypeData > ZoneComp;
 	extern OptStartDataType OptStartData; // For optimum start
 	extern Array1D< ComponentSetPtData > CompSetPtEquip;
+	extern HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.
