@@ -1,6 +1,4 @@
--   ** Warning ** CalcDoe2DXCoil: Coil:Cooling:DX:SingleSpeed "PSZ-AC:1_COOLC DXCOIL" - Air-cooled condenser inlet dry-bulb temperature below 0 C. Outdoor dry-bulb temperature = -20.60
--   **   ~~~   **  ... Occurrence info = CHICAGO ANN HTG 99.6% CONDNS DB, 01/21 00:02 - 00:04
--   **   ~~~   ** ... Operation at low ambient temperatures may require special performance curves.!-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
+!-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 !SupermarketTwoStageFlashIntercooler.idf
 !
 ! Basic file description: 1 story building divided into 2 interior conditioned zones. Roof with no plenum.
