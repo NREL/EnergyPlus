@@ -860,6 +860,7 @@ namespace DXCoils {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetDXCoils: " ); // include trailing blank space
+		static Real64 const minOATCompDXCooling = -25.0; // min OAT for compressor operation for DX cooling coils
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilIndex; // loop index
@@ -1231,7 +1232,8 @@ namespace DXCoils {
 			}
 
 			//Set minimum OAT for heat pump compressor operation
-			DXCoil( DXCoilNum ).MinOATCompressor = Numbers(6);
+			DXCoil( DXCoilNum ).MinOATCompressor = Numbers( 6 );
+			if ( NumNumbers < 6 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included 
 
 			DXCoil( DXCoilNum ).Twet_Rated( 1 ) = Numbers( 7 );
 			DXCoil( DXCoilNum ).Gamma_Rated( 1 ) = Numbers( 8 );

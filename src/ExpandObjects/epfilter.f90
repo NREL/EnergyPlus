@@ -15108,6 +15108,7 @@ DO iSys = 1, numCompactSysUnitHP
      base + uhpsAirHandlerNameOff,' Cool Coil EIR-FF')
   CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
      base + uhpsAirHandlerNameOff,' Cool Coil PLF')
+  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation','')
   CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
   CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
   CALL AddToObjStr('Maximum Cycling Rate','0')

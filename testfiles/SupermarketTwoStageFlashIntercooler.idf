@@ -1,4 +1,6 @@
-!-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
+-   ** Warning ** CalcDoe2DXCoil: Coil:Cooling:DX:SingleSpeed "PSZ-AC:1_COOLC DXCOIL" - Air-cooled condenser inlet dry-bulb temperature below 0 C. Outdoor dry-bulb temperature = -20.60
+-   **   ~~~   **  ... Occurrence info = CHICAGO ANN HTG 99.6% CONDNS DB, 01/21 00:02 - 00:04
+-   **   ~~~   ** ... Operation at low ambient temperatures may require special performance curves.!-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 !SupermarketTwoStageFlashIntercooler.idf
 !
 ! Basic file description: 1 story building divided into 2 interior conditioned zones. Roof with no plenum.
@@ -1516,7 +1518,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
-    Coil:Cooling:\ingleSpeed,  !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
