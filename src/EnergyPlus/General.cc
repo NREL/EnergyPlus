@@ -96,7 +96,6 @@ namespace General {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataHVACGlobals::HVACSystemRootFinding;
-	using DataHVACGlobals::RegulaFalsi;
 	using DataHVACGlobals::Bisection;
 	using DataHVACGlobals::RegulaFalsiThenBisection;
 	using DataHVACGlobals::BisectionThenRegulaFalsi;
