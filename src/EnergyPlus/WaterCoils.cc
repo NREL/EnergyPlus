@@ -1981,16 +1981,14 @@ namespace WaterCoils {
 					PlantLoop( DataWaterLoopNum ).FluidIndex, RoutineName );
 				if ( WaterCoil( CoilNum ).DesTotWaterCoilLoad > 0.0 ) {
 					NomCapUserInp = true;
-				}
-				else if ( CurSysNum > 0 ) {
+				} else if ( CurSysNum > 0 ) {
 					if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == CapacityPerFloorArea ) {
 						NomCapUserInp = true;
 					} else if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity && 
 						FinalSysSizing( CurSysNum ).HeatingTotalCapacity > 0.0 ) {
 						NomCapUserInp = true;
 					} 
-				}
-				else {
+				} else {
 					NomCapUserInp = false;
 				}
 				bPRINT = false; // do not print this sizing request
@@ -2092,8 +2090,7 @@ namespace WaterCoils {
 					WaterCoil( CoilNum ).InletWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
 					WaterCoil( CoilNum ).MaxWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
 					WaterCoil( CoilNum ).InletWaterTemp = WaterCoil( CoilNum ).DesInletWaterTemp;
-				}
-				else if ( WaterCoil( CoilNum ).DesiccantRegenerationCoil ) {
+				} else if ( WaterCoil( CoilNum ).DesiccantRegenerationCoil ) {
 					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
 					RequestSizing( CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 					WaterCoil( CoilNum ).InletAirTemp = TempSize;
@@ -2162,7 +2159,7 @@ namespace WaterCoils {
 					ShowContinueError( " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits( DesCoilInletWaterTempUsed, 2 ) + " C" );
 					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
 				}
-				WaterCoil ( CoilNum ).UACoil = TempSize;
+				WaterCoil( CoilNum ).UACoil = TempSize;
 				WaterCoil( CoilNum ).UACoilVariable = TempSize;
 				WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
 				WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
