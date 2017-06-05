@@ -571,6 +571,20 @@ namespace CurveManager {
 	int
 	GetCurveObjectTypeNum( int const CurveIndex ); // index of curve in curve array
 
+	void
+	checkCurveIsNormalizedToOne(
+		std::string const callingRoutineObj,  // calling routine with object type
+		std::string const objectName,         // parent object where curve is used
+		int const curveIndex,                 // index to curve object
+		std::string const cFieldName,         // object field name
+		std::string const cFieldValue,        // user input curve name
+		Real64 const Var1,                    // required 1st independent variable
+		Optional <Real64 const > Var2 = _,    // 2nd independent variable
+		Optional< Real64 const > Var3 = _,    // 3rd independent variable
+		Optional< Real64 const > Var4 = _,    // 4th independent variable
+		Optional< Real64 const > Var5 = _     // 5th independent variable
+	);
+
 	//=================================================================================================!
 
 } // CurveManager
