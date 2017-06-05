@@ -16807,6 +16807,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Air Outlet Node Name',base + ussAirHandlerNameOff, TRIM(coolCoilUnitOutlet))
       CALL AddToObjFld('Condenser Air Inlet Node Name',base + ussAirHandlerNameOff,' Cooling Coil Condenser Inlet')
       CALL AddToObjStr('Condenser Type','AirCooled')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Supply Water Storage Tank Name','')
       CALL AddToObjStr('Condensate Collection Water Storage Tank Name','')
       CALL AddToObjStr('Apply Part Load Fraction to Speeds Greater than 1','No')

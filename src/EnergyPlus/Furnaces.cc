@@ -9933,15 +9933,21 @@ namespace Furnaces {
 		auto & GetMinOATDXCoilCompressor( DXCoils::GetMinOATCompressor );
 		using IntegratedHeatPump::IntegratedHeatPumps;
 		using VariableSpeedCoils::GetVSCoilMinOATCompressor;
+		using DXCoils::GetMinOATCompressorUsingIndex;
+		using HVACHXAssistedCoolingCoil::GetActualDXCoilIndex;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool errFlag;
 		std::string IHPCoilName;
+		int DXCoilIndex;
 
 		//Set minimum OAT for heat pump compressor operation in heating mode
 		errFlag = false;
 		if ( Furnace( FurnaceNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 			Furnace( FurnaceNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
+		} else if ( Furnace( FurnaceNum ).CoolingCoilType_Num == CoilDX_CoolingHXAssisted ) {
+			DXCoilIndex = GetActualDXCoilIndex( CoolingCoilType, CoolingCoilName, ErrorsFound );
+			Furnace( FurnaceNum ).MinOATCompressorCooling = GetMinOATCompressorUsingIndex( DXCoilIndex, errFlag );
 		} else if ( Furnace( FurnaceNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
 			if ( Furnace( FurnaceNum ).bIsIHP ) {
 				IHPCoilName = IntegratedHeatPumps( Furnace( FurnaceNum ).CoolingCoilIndex ).SCCoilName;

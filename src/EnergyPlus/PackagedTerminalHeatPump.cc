@@ -3232,27 +3232,6 @@ namespace PackagedTerminalHeatPump {
 			CoolingLoad = false;
 		}
 
-		//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
-		if ( PTUnit( PTUnitNum ).CondenserNodeNum > 0 ) {
-			if ( HeatingLoad && Node( PTUnit( PTUnitNum ).CondenserNodeNum ).Temp < PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
-				QZnReq = 0.0;
-				HeatingLoad = false;
-			}
-			if ( CoolingLoad && Node( PTUnit( PTUnitNum ).CondenserNodeNum ).Temp < PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
-				QZnReq = 0.0;
-				CoolingLoad = false;
-			}
-		} else {
-			if ( HeatingLoad && OutDryBulbTemp < PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
-				QZnReq = 0.0;
-				HeatingLoad = false;
-			}
-			if ( CoolingLoad && OutDryBulbTemp < PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
-				QZnReq = 0.0;
-				CoolingLoad = false;
-			}
-		}
-
 		// Initialize the operating PLR (turn coils on if needed, otherwise turn coils off)
 		if ( GetCurrentScheduleValue( PTUnit( PTUnitNum ).SchedPtr ) > 0.0 ) {
 			if ( HeatingLoad || CoolingLoad ) {
@@ -3569,30 +3548,6 @@ namespace PackagedTerminalHeatPump {
 					} else {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 					}
-				}
-			}
-			//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
-			if ( PTUnit( PTUnitNum ).CondenserNodeNum > 0 ) {
-				if ( HeatingLoad && Node( PTUnit( PTUnitNum ).CondenserNodeNum ).Temp < PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
-					QZnReq = 0.0;
-					HeatingLoad = false;
-					PartLoadFrac = 0.0;
-				}
-				if ( CoolingLoad && Node( PTUnit( PTUnitNum ).CondenserNodeNum ).Temp < PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
-					QZnReq = 0.0;
-					CoolingLoad = false;
-					PartLoadFrac = 0.0;
-				}
-			} else {
-				if ( HeatingLoad && OutDryBulbTemp < PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
-					QZnReq = 0.0;
-					HeatingLoad = false;
-					PartLoadFrac = 0.0;
-				}
-				if ( CoolingLoad && OutDryBulbTemp < PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
-					QZnReq = 0.0;
-					CoolingLoad = false;
-					PartLoadFrac = 0.0;
 				}
 			}
 			ZoneLoad = QZnReq;
@@ -7001,8 +6956,7 @@ namespace PackagedTerminalHeatPump {
 		errFlag = false;
 		if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 			PTUnit( PTUnitNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
-		}
-		else if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted ) {
+		} else if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted ) {
 			PTUnit( PTUnitNum ).MinOATCompressorCooling = GetMinOATCompressorUsingIndex( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag );
 		} else if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
 			PTUnit( PTUnitNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( CoolingCoilName, errFlag );
