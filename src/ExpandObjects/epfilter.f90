@@ -14174,7 +14174,7 @@ DO iSys = 1, numCompactSysUnit
        base + usAirHandlerNameOff,' DX Coil EIR-FF')
     CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
        base + usAirHandlerNameOff,' DX Coil PLF')
-    CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation','')
+    CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
     CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
     CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
     CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -15109,7 +15109,7 @@ DO iSys = 1, numCompactSysUnitHP
      base + uhpsAirHandlerNameOff,' Cool Coil EIR-FF')
   CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
      base + uhpsAirHandlerNameOff,' Cool Coil PLF')
-  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation','')
+  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
   CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
   CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
   CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -16147,7 +16147,7 @@ DO iSys = 1, numCompactSysUnitarySystem
          base + ussAirHandlerNameOff,' Cool Coil EIR-FF')
       CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
          base + ussAirHandlerNameOff,' Cool Coil PLF')
-      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation','')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
       CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
       CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -16711,7 +16711,7 @@ DO iSys = 1, numCompactSysUnitarySystem
          base + ussAirHandlerNameOff,' DX Coil EIR-FF')
       CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
          base + ussAirHandlerNameOff,' DX Coil PLF')
-      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation','')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
       CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
       CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -16813,6 +16813,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Apply Latent Degradation to Speeds Greater than 1','No')
       CALL AddToObjStr('Crankcase Heater Capacity {W}','0.0')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}','10.0')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Basin Heater Capacity {W/K}','')
       CALL AddToObjStr('Basin Heater Setpoint Temperature {C}','')
       CALL AddToObjStr('Basin Heater Operating Schedule Name','')
@@ -24795,7 +24796,7 @@ DO iZone = 1, numCompactPTAC
      base + ptaczNameOff,' PTAC Cooling Coil EIR-FF')
   CALL AddToObjFld('Part Load Fraction Correlation (function of part load ratio)',   &
      base + ptaczNameOff,' PTAC Cooling Coil Coil PLF')
-  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation','')
+  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
   CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
   CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
   CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -25376,7 +25377,7 @@ DO iZone = 1, numCompactPTHP
      base + pthpzNameOff,' PTHP Cooling Coil EIR-FF')
   CALL AddToObjFld('Part Load Fraction Correlation (function of part load ratio)',   &
      base + pthpzNameOff,' PTHP Cooling Coil Coil PLF')
-  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation','')
+  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
   CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
   CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
   CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -31855,7 +31856,7 @@ DO iSys = 1, numCompactDedOutAir
          base + doasNameOff,' DX Coil EIR-FF')
       CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
          base + doasNameOff,' DX Coil PLF')
-      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation','')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
       CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
       CALL AddToObjStr('Maximum Cycling Rate','0')

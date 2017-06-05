@@ -908,7 +908,7 @@ namespace PackagedTerminalHeatPump {
 			}
 
 			PTUnit( PTUnitNum ).HeatConvergenceTol = Numbers( 7 );
-			PTUnit( PTUnitNum ).MinOATCompressor = Numbers( 8 );
+//			PTUnit( PTUnitNum ).MinOATCompressorHeating = Numbers( 8 );
 			PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
 			PTUnit( PTUnitNum ).CoolConvergenceTol = Numbers( 9 );
 
@@ -965,6 +965,9 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			}
+
+			// set minimum outdoor temperature for compressor operation
+			SetMinOATCompressor( PTUnitNum, PTUnit( PTUnitNum ).Name, CurrentModuleObject, PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, ErrorsFound );
 
 			SuppHeatCoilType = Alphas( 13 );
 			SuppHeatCoilName = Alphas( 14 );
@@ -1519,9 +1522,6 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			}
 
-			//set minimum OA to something low because its not an input for PTACs
-			PTUnit( PTUnitNum ).MinOATCompressor = -100.0;
-
 			//   only check that SA flow when compressor is OFF is >= OA flow when compressor is OFF after fan mode is read in
 
 			PTUnit( PTUnitNum ).FanType = Alphas( 7 );
@@ -1704,6 +1704,8 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			}
 
+			// set minimum outdoor temperature for compressor operation
+			SetMinOATCompressor( PTUnitNum, PTUnit( PTUnitNum ).Name, CurrentModuleObject, PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, ErrorsFound );
 
 			// Get AirTerminal mixer data
 			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode );
@@ -2272,6 +2274,9 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			}
 
+			// set minimum outdoor temperature for compressor operation
+			SetMinOATCompressor( PTUnitNum, PTUnit( PTUnitNum ).Name, CurrentModuleObject, PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, ErrorsFound );
+
 			// Get supplemental heating coil information
 
 			SuppHeatCoilType = Alphas( 13 );
@@ -2836,9 +2841,6 @@ namespace PackagedTerminalHeatPump {
 			//Set maximum supply air temperature for supplemental heating coil
 			PTUnit( PTUnitNum ).MaxOATSupHeat = Numbers( 12 );
 
-			//set minimum OA temp for WSHP compressor to large negative number (field not used for a WSHP)
-			PTUnit( PTUnitNum ).MinOATCompressor = -99999.0;
-
 		} //End of the WaterToAirHeatPump Loop
 
 		//***********************************************************************************
@@ -2947,6 +2949,7 @@ namespace PackagedTerminalHeatPump {
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
 		using DataGlobals::AnyPlantInModel;
+		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::StdRhoAir;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -3227,6 +3230,27 @@ namespace PackagedTerminalHeatPump {
 		} else {
 			HeatingLoad = false;
 			CoolingLoad = false;
+		}
+
+		//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
+		if ( PTUnit( PTUnitNum ).CondenserNodeNum > 0 ) {
+			if ( HeatingLoad && Node( PTUnit( PTUnitNum ).CondenserNodeNum ).Temp < PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
+				QZnReq = 0.0;
+				HeatingLoad = false;
+			}
+			if ( CoolingLoad && Node( PTUnit( PTUnitNum ).CondenserNodeNum ).Temp < PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
+				QZnReq = 0.0;
+				CoolingLoad = false;
+			}
+		} else {
+			if ( HeatingLoad && OutDryBulbTemp < PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
+				QZnReq = 0.0;
+				HeatingLoad = false;
+			}
+			if ( CoolingLoad && OutDryBulbTemp < PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
+				QZnReq = 0.0;
+				CoolingLoad = false;
+			}
 		}
 
 		// Initialize the operating PLR (turn coils on if needed, otherwise turn coils off)
@@ -3545,6 +3569,30 @@ namespace PackagedTerminalHeatPump {
 					} else {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 					}
+				}
+			}
+			//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
+			if ( PTUnit( PTUnitNum ).CondenserNodeNum > 0 ) {
+				if ( HeatingLoad && Node( PTUnit( PTUnitNum ).CondenserNodeNum ).Temp < PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
+					QZnReq = 0.0;
+					HeatingLoad = false;
+					PartLoadFrac = 0.0;
+				}
+				if ( CoolingLoad && Node( PTUnit( PTUnitNum ).CondenserNodeNum ).Temp < PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
+					QZnReq = 0.0;
+					CoolingLoad = false;
+					PartLoadFrac = 0.0;
+				}
+			} else {
+				if ( HeatingLoad && OutDryBulbTemp < PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
+					QZnReq = 0.0;
+					HeatingLoad = false;
+					PartLoadFrac = 0.0;
+				}
+				if ( CoolingLoad && OutDryBulbTemp < PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
+					QZnReq = 0.0;
+					CoolingLoad = false;
+					PartLoadFrac = 0.0;
 				}
 			}
 			ZoneLoad = QZnReq;
@@ -4584,7 +4632,7 @@ namespace PackagedTerminalHeatPump {
 			
 		}
 
-		if ( CoolingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressor ) {
+		if ( CoolingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
 			{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
 			if ( ( SELECT_CASE_var == PTACUnit ) || ( SELECT_CASE_var == PTHPUnit ) ) {
 				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted ) {
@@ -4612,7 +4660,7 @@ namespace PackagedTerminalHeatPump {
 			} else {
 			}}
 		}
-		if ( HeatingLoad ) {
+		if ( HeatingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressorHeating ) {
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				QCoilReq = PTUnit( PTUnitNum ).ACHeatCoilCap * PartLoadFrac;
 				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
@@ -4632,27 +4680,16 @@ namespace PackagedTerminalHeatPump {
 					SimulateSteamCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, PTUnit( PTUnitNum ).ACHeatCoilIndex, QCoilReq, QActual, PTUnit( PTUnitNum ).OpMode, PartLoadFrac );
 				}
 			} else {
-				if ( OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressor ) {
-					{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
-					if ( SELECT_CASE_var == PTHPUnit ) {
-						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, On, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PartLoadFrac, OnOffAirFlowRatio );
-						SaveCompressorPLR = DXCoilPartLoadRatio( PTUnit( PTUnitNum ).DXHeatCoilIndexNum );
-					} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-						HeatPumpRunFrac( PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac );
-						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, QZnReq, dZero, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iOne, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
-						SaveCompressorPLR = PartLoadFrac;
-					} else {
-					}}
+				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
+				if ( SELECT_CASE_var == PTHPUnit ) {
+					SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, On, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PartLoadFrac, OnOffAirFlowRatio );
+					SaveCompressorPLR = DXCoilPartLoadRatio( PTUnit( PTUnitNum ).DXHeatCoilIndexNum );
+				} else if ( SELECT_CASE_var == PTWSHPUnit ) {
+					HeatPumpRunFrac( PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac );
+					SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, QZnReq, dZero, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iOne, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
+					SaveCompressorPLR = PartLoadFrac;
 				} else {
-					{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
-					if ( SELECT_CASE_var == PTHPUnit ) {
-						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, PTUnit( PTUnitNum ).OpMode, dZero, OnOffAirFlowRatio );
-					} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndexNum, dZero, dZero, OpMode, dZero, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iZero, dZero, FirstHVACIteration );
-
-					} else {
-					}}
-				}
+				}}
 			}
 		} else {
 			//   heating coil is off
@@ -6481,7 +6518,7 @@ namespace PackagedTerminalHeatPump {
 			}
 		}
 
-		if ( CoolingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressor ) {
+		if ( CoolingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
 			SimVariableSpeedCoils( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, PTUnit( PTUnitNum ).OpMode, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 			SaveCompressorPLR = PartLoadFrac;
@@ -6937,6 +6974,59 @@ namespace PackagedTerminalHeatPump {
 
 		// Set the system mass flow rates
 		SetVSHPAirFlow( PTUnitNum, ZoneNum, PartLoadRatio, OnOffAirFlowRatio );
+
+	}
+
+	void
+	SetMinOATCompressor(
+		int const PTUnitNum, // index to furnace
+		std::string const PTUnitName, // name of furnace
+		std::string const cCurrentModuleObject, // type of furnace
+		std::string const CoolingCoilType, // type of cooling coil
+		std::string const CoolingCoilName, // name of cooling coil
+		std::string const HeatingCoilType, // type of heating coil
+		std::string const HeatingCoilName, // name of heating coil
+		bool & ErrorsFound // GetInput logical that errors were found
+	) {
+		// Using/Aliasing
+		auto & GetMinOATDXCoilCompressor( DXCoils::GetMinOATCompressor );
+		using VariableSpeedCoils::GetVSCoilMinOATCompressor;
+		using DXCoils::GetMinOATCompressorUsingIndex;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool errFlag;
+		std::string IHPCoilName;
+
+		//Set minimum OAT for heat pump compressor operation in heating mode
+		errFlag = false;
+		if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed ) {
+			PTUnit( PTUnitNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
+		}
+		else if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted ) {
+			PTUnit( PTUnitNum ).MinOATCompressorCooling = GetMinOATCompressorUsingIndex( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag );
+		} else if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+			PTUnit( PTUnitNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( CoolingCoilName, errFlag );
+		} else {
+			PTUnit( PTUnitNum ).MinOATCompressorCooling = -1000.0;
+		}
+		if ( errFlag ) {
+			ShowContinueError( "...occurs in " + cCurrentModuleObject + " = " + PTUnitName );
+			ErrorsFound = true;
+		}
+
+		//Set minimum OAT for heat pump compressor operation in heating mode
+		errFlag = false;
+		if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
+			PTUnit( PTUnitNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( HeatingCoilName, errFlag );
+		} else if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == CoilDX_HeatingEmpirical ) {
+			PTUnit( PTUnitNum ).MinOATCompressorHeating = GetMinOATDXCoilCompressor( HeatingCoilType, HeatingCoilName, errFlag );
+		} else {
+			PTUnit( PTUnitNum ).MinOATCompressorHeating = -1000.0;
+		}
+		if ( errFlag ) {
+			ShowContinueError( "...occurs in " + cCurrentModuleObject + " = " + PTUnitName );
+			ErrorsFound = true;
+		}
 
 	}
 

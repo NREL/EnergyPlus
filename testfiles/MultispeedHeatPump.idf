@@ -1678,6 +1678,7 @@
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     200.0,                   !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name

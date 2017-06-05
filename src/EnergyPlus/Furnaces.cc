@@ -935,6 +935,10 @@ namespace Furnaces {
 			FanVolFlowRate = 0.0;
 			HeatingCoilInletNode = 0;
 			HeatingCoilOutletNode = 0;
+			CoolingCoilType = ' ';
+			CoolingCoilName = ' ';
+			HeatingCoilType = ' ';
+			HeatingCoilName = ' ';
 
 			//       Furnace and UnitarySystem objects are both read in here.
 			//       Will still have 2 differently named objects for the user, but read in with 1 DO loop.
@@ -1439,6 +1443,9 @@ namespace Furnaces {
 			//Set heating convergence tolerance
 			Furnace( FurnaceNum ).HeatingConvergenceTolerance = 0.001;
 
+			// set minimum outdoor temperature for compressor operation
+			SetMinOATCompressor( FurnaceNum, Alphas( 1 ), cCurrentModuleObject, CoolingCoilType, CoolingCoilName, HeatingCoilType, HeatingCoilName, ErrorsFound );
+
 		} //End of the HeatOnly Furnace Loop
 
 		// Get the data for the HeatCool Furnace or UnitarySystem
@@ -1453,6 +1460,10 @@ namespace Furnaces {
 			HeatingCoilOutletNode = 0;
 			ReheatCoilInletNode = 0;
 			ReheatCoilOutletNode = 0;
+			CoolingCoilType = ' ';
+			CoolingCoilName = ' ';
+			HeatingCoilType = ' ';
+			HeatingCoilName = ' ';
 
 			//      Furnace and UnitarySystem objects are both read in here.
 			//      Will still have 2 differently named objects for the user, but read in with 1 DO loop.
@@ -2600,6 +2611,9 @@ namespace Furnaces {
 			//Set cooling convergence tolerance
 			Furnace( FurnaceNum ).CoolingConvergenceTolerance = 0.001;
 
+			// set minimum outdoor temperature for compressor operation
+			SetMinOATCompressor( FurnaceNum, Alphas( 1 ), cCurrentModuleObject, CoolingCoilType, CoolingCoilName, HeatingCoilType, HeatingCoilName, ErrorsFound );
+
 		} //End of the HeatCool Furnace Loop
 
 		// Get the data for the Unitary System HeatPump AirToAir (UnitarySystem:HeatPump:AirToAir)
@@ -2614,6 +2628,10 @@ namespace Furnaces {
 			HeatingCoilOutletNode = 0;
 			SupHeatCoilInletNode = 0;
 			SupHeatCoilOutletNode = 0;
+			CoolingCoilType = ' ';
+			CoolingCoilName = ' ';
+			HeatingCoilType = ' ';
+			HeatingCoilName = ' ';
 
 			FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + HeatPumpNum;
 			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
@@ -3425,25 +3443,6 @@ namespace Furnaces {
 			//Set heating convergence tolerance
 			Furnace( FurnaceNum ).HeatingConvergenceTolerance = 0.001;
 
-			//Set minimum OAT for heat pump compressor operation
-			// get from coil module
-			errFlag = false;
-			if ( Furnace( FurnaceNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
-				if ( Furnace( FurnaceNum ).bIsIHP ) {
-					IHPCoilName = IntegratedHeatPumps( Furnace( FurnaceNum ).CoolingCoilIndex ).SHCoilName;
-					Furnace( FurnaceNum ).MinOATCompressor = GetVSCoilMinOATCompressor( IHPCoilName, errFlag );
-				}
-				else {
-					Furnace( FurnaceNum ).MinOATCompressor = GetVSCoilMinOATCompressor( HeatingCoilName, errFlag );
-				}
-			} else {
-				Furnace( FurnaceNum ).MinOATCompressor = GetMinOATDXCoilCompressor( HeatingCoilType, HeatingCoilName, errFlag );
-			}
-			if ( errFlag ) {
-				ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
-				ErrorsFound = true;
-			}
-
 			//       Mine heatpump outdoor condenser node from DX coil object
 			errFlag = false;
 			if ( Furnace( FurnaceNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
@@ -3505,6 +3504,9 @@ namespace Furnaces {
 			//Set maximum supply air temperature for supplemental heating coil
 			Furnace( FurnaceNum ).MaxOATSuppHeat = Numbers( 5 );
 
+			// set minimum outdoor temperature for compressor operation
+			SetMinOATCompressor( FurnaceNum, Alphas( 1 ), cCurrentModuleObject, CoolingCoilType, CoolingCoilName, HeatingCoilType, HeatingCoilName, ErrorsFound );
+
 		} //End of the Unitary System HeatPump Loop
 
 		//Get the Input for the Water to Air Heat Pump (UnitarySystem:HeatPump:WaterToAir)
@@ -3519,6 +3521,10 @@ namespace Furnaces {
 			HeatingCoilOutletNode = 0;
 			SupHeatCoilInletNode = 0;
 			SupHeatCoilOutletNode = 0;
+			CoolingCoilType = ' ';
+			CoolingCoilName = ' ';
+			HeatingCoilType = ' ';
+			HeatingCoilName = ' ';
 
 			FurnaceNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + HeatPumpNum;
 			Furnace( FurnaceNum ).iterationMode.allocate( 20 );
@@ -4255,6 +4261,9 @@ namespace Furnaces {
 			//Set maximum supply air temperature for supplemental heating coil
 			Furnace( FurnaceNum ).MaxOATSuppHeat = Numbers( 9 );
 
+			// set minimum outdoor temperature for compressor operation
+			SetMinOATCompressor( FurnaceNum, Alphas( 1 ), cCurrentModuleObject, CoolingCoilType, CoolingCoilName, HeatingCoilType, HeatingCoilName, ErrorsFound );
+
 		} //End of the Unitary System WaterToAirHeatPump Loop
 
 		Alphas.deallocate();
@@ -4401,6 +4410,7 @@ namespace Furnaces {
 		using DataSizing::AutoSize;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
 		using DataAirLoop::AirLoopControlInfo;
+		using DataEnvironment::OutDryBulbTemp;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
@@ -5238,6 +5248,26 @@ namespace Furnaces {
 		} else if ( Furnace( FurnaceNum ).iterationCounter <= 20 ) {
 			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = NoCoolHeat;
 		}
+
+		//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
+		if ( Furnace( FurnaceNum ).CondenserNodeNum > 0 ) {
+			if ( HeatingLoad && Node( Furnace(FurnaceNum ).CondenserNodeNum ).Temp < Furnace( FurnaceNum ).MinOATCompressorHeating ) {
+				ZoneLoad = 0.0;
+			}
+			if ( CoolingLoad && Node( Furnace( FurnaceNum ).CondenserNodeNum ).Temp < Furnace( FurnaceNum ).MinOATCompressorCooling ) {
+				ZoneLoad = 0.0;
+				MoistureLoad = 0.0;
+			}
+		} else {
+			if ( HeatingLoad && OutDryBulbTemp < Furnace( FurnaceNum ).MinOATCompressorHeating ) {
+				ZoneLoad = 0.0;
+			}
+			if ( CoolingLoad && OutDryBulbTemp < Furnace( FurnaceNum ).MinOATCompressorCooling ) {
+				ZoneLoad = 0.0;
+				MoistureLoad = 0.0;
+			}
+		}
+
 		// IF small loads to meet or not converging, just shut down unit
 		if ( std::abs( ZoneLoad ) < Small5WLoad ) {
 			ZoneLoad = 0.0;
@@ -6295,39 +6325,12 @@ namespace Furnaces {
 						}
 
 						Furnace( FurnaceNum ).HeatPartLoadRatio = PartLoadRatio;
-						//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
-						if ( Furnace( FurnaceNum ).CondenserNodeNum > 0 ) {
-							if ( Node( Furnace( FurnaceNum ).CondenserNodeNum ).Temp > Furnace( FurnaceNum ).MinOATCompressor ) {
-								Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
-							} else {
-								Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
-							}
-						} else {
-							if ( OutdoorDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressor ) {
-								Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
-							} else {
-								Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
-							}
-						}
+
 					} else if ( SystemSensibleLoad > FullSensibleOutput ) {
 						//       SystemSensibleLoad is greater than full DX Heating coil output so heat pump runs entire
 						//       timestep and additional supplemental heating is required
 						Furnace( FurnaceNum ).HeatPartLoadRatio = 1.0;
-						if ( Furnace( FurnaceNum ).CondenserNodeNum > 0 ) {
-							if ( Node( Furnace( FurnaceNum ).CondenserNodeNum ).Temp > Furnace( FurnaceNum ).MinOATCompressor ) {
-								//       Check to see if Heat Pump compressor was allowed to run based on outdoor temperature
-								Furnace( FurnaceNum ).CompPartLoadRatio = 1.0;
-							} else {
-								Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
-							}
-						} else {
-							if ( OutdoorDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressor ) {
-								//       Check to see if Heat Pump compressor was allowed to run based on outdoor temperature
-								Furnace( FurnaceNum ).CompPartLoadRatio = 1.0;
-							} else {
-								Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
-							}
-						}
+						Furnace( FurnaceNum ).CompPartLoadRatio = 1.0;
 					} else if ( SystemSensibleLoad < NoHeatOutput ) {
 						//       SystemSensibleLoad is less than minimum DX Heating coil output so heat pump does not run and
 						//       the load will be met by the supplemental heater
@@ -9145,7 +9148,7 @@ namespace Furnaces {
 				CalcNonDXHeatingCoils( FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace( FurnaceNum ).OpMode, QCoilActual );
 			}
 
-			if ( ( ( QZnReq < ( -1.0 * SmallLoad ) ) && ( OutDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressor ) ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) { //COOLING MODE or dehumidification mode
+			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorHeating ) ) { //COOLING MODE or dehumidification mode
 
 				if ( Furnace( FurnaceNum ).bIsIHP ) {
 					SimIHP( BlankString, Furnace( FurnaceNum ).CoolingCoilIndex, Furnace( FurnaceNum ).OpMode, Furnace( FurnaceNum ).MaxONOFFCyclesperHour, Furnace( FurnaceNum ).HPTimeConstant, Furnace( FurnaceNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq,
@@ -9208,7 +9211,7 @@ namespace Furnaces {
 				CalcNonDXHeatingCoils( FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace( FurnaceNum ).OpMode, QCoilActual );
 			}
 
-			if ( ( ( QZnReq < ( -1.0 * SmallLoad ) ) && ( OutDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressor ) ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) {
+			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorHeating ) ) {
 
 				if ( Furnace( FurnaceNum ).bIsIHP ){
 					SimIHP( BlankString, Furnace( FurnaceNum ).CoolingCoilIndex, Furnace( FurnaceNum ).OpMode, Furnace( FurnaceNum ).MaxONOFFCyclesperHour, Furnace( FurnaceNum ).HPTimeConstant, Furnace( FurnaceNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq,
@@ -9273,7 +9276,7 @@ namespace Furnaces {
 				CalcNonDXHeatingCoils( FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace( FurnaceNum ).OpMode, QCoilActual );
 			}
 
-			if ( ( ( QZnReq < ( -1.0 * SmallLoad ) ) && ( OutDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressor ) ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) {
+			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorHeating ) ) {
 
 				if ( Furnace( FurnaceNum ).bIsIHP ){
 					SimIHP( BlankString, Furnace( FurnaceNum ).CoolingCoilIndex, Furnace( FurnaceNum ).OpMode, Furnace( FurnaceNum ).MaxONOFFCyclesperHour, Furnace( FurnaceNum ).HPTimeConstant, Furnace( FurnaceNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq,
@@ -9932,6 +9935,68 @@ namespace Furnaces {
 
 		// Set the system mass flow rates
 		SetVSHPAirFlow( FurnaceNum, PartLoadRatio, OnOffAirFlowRatio );
+
+	}
+
+	void
+	SetMinOATCompressor(
+		int const FurnaceNum, // index to furnace
+		std::string const FurnaceName, // name of furnace
+		std::string const cCurrentModuleObject, // type of furnace
+		std::string const CoolingCoilType, // type of cooling coil
+		std::string const CoolingCoilName, // name of cooling coil
+		std::string const HeatingCoilType, // type of heating coil
+		std::string const HeatingCoilName, // name of heating coil
+		bool & ErrorsFound // GetInput logical that errors were found
+	) {
+		// Using/Aliasing
+		auto & GetMinOATDXCoilCompressor( DXCoils::GetMinOATCompressor );
+		using IntegratedHeatPump::IntegratedHeatPumps;
+		using VariableSpeedCoils::GetVSCoilMinOATCompressor;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool errFlag;
+		std::string IHPCoilName;
+
+		//Set minimum OAT for heat pump compressor operation in heating mode
+		errFlag = false;
+		if ( Furnace( FurnaceNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
+			Furnace( FurnaceNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
+		} else if ( Furnace( FurnaceNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+			if ( Furnace( FurnaceNum ).bIsIHP ) {
+				IHPCoilName = IntegratedHeatPumps( Furnace( FurnaceNum ).CoolingCoilIndex ).SCCoilName;
+				Furnace( FurnaceNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( IHPCoilName, errFlag );
+			}
+			else {
+				Furnace( FurnaceNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( CoolingCoilName, errFlag );
+			}
+		} else {
+			Furnace( FurnaceNum ).MinOATCompressorCooling = -1000.0;
+		}
+		if ( errFlag ) {
+			ShowContinueError( "...occurs in " + cCurrentModuleObject + " = " + FurnaceName );
+			ErrorsFound = true;
+		}
+
+		//Set minimum OAT for heat pump compressor operation in heating mode
+		errFlag = false;
+		if ( Furnace( FurnaceNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
+			if ( Furnace( FurnaceNum ).bIsIHP ) {
+				IHPCoilName = IntegratedHeatPumps( Furnace( FurnaceNum ).CoolingCoilIndex ).SHCoilName;
+				Furnace( FurnaceNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( IHPCoilName, errFlag );
+			} else {
+				Furnace( FurnaceNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( HeatingCoilName, errFlag );
+			}
+		}
+		else if ( Furnace( FurnaceNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+			Furnace( FurnaceNum ).MinOATCompressorHeating = GetMinOATDXCoilCompressor( HeatingCoilType, HeatingCoilName, errFlag );
+		} else {
+			Furnace( FurnaceNum ).MinOATCompressorHeating = -1000.0;
+		}
+		if ( errFlag ) {
+			ShowContinueError( "...occurs in " + cCurrentModuleObject + " = " + FurnaceName );
+			ErrorsFound = true;
+		}
 
 	}
 
