@@ -1712,22 +1712,6 @@ namespace HVACUnitarySystem {
 		UnitarySystem( UnitarySysNum ).SensibleLoadPredicted = ZoneLoad;
 		UnitarySystem( UnitarySysNum ).MoistureLoadPredicted = MoistureLoad;
 
-		if ( UnitarySystem( UnitarySysNum ).CondenserNodeNum != 0 ) {
-			OutdoorDryBulb = Node( UnitarySystem( UnitarySysNum ).CondenserNodeNum ).Temp;
-		} else {
-			OutdoorDryBulb = OutDryBulbTemp;
-		}
-		// disable compressor if OAT is below minimum outdoor temperature
-		if ( CoolingLoad && OutdoorDryBulb < UnitarySystem( UnitarySysNum ).MinOATCompressorCooling ) {
-			HeatingLoad = false;
-			CoolingLoad = false;
-			MoistureLoad = 0.0;
-		} else if ( HeatingLoad && OutdoorDryBulb < UnitarySystem( UnitarySysNum ).MinOATCompressorHeating ) {
-			HeatingLoad = false;
-			CoolingLoad = false;
-			MoistureLoad = 0.0;
-		}
-
 	}
 
 	// End of Initialization subroutines for the Module

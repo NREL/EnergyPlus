@@ -33653,7 +33653,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \default 0.001
         \units dimensionless
         \note Defines Heating convergence tolerance as a fraction of Heating load to be met.
-   N8 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+   N8 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
         \type real
         \minimum -20.0
         \default -8.0
@@ -43304,7 +43304,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (cooling load/steady state capacity)
-  N6 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+  N6 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
        \type real
        \default -25.0
        \units C
@@ -43610,7 +43610,7 @@ Coil:Cooling:DX:TwoSpeed,
        \key AirCooled
        \key EvaporativelyCooled
        \default AirCooled
-  N10, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+  N10, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
        \type real
        \default -25.0
        \units C
@@ -43752,6 +43752,10 @@ Coil:Cooling:DX:MultiSpeed,
        \key AirCooled
        \key EvaporativelyCooled
        \default AirCooled
+  N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+       \type real
+       \default -25.0
+       \units C
   A7 , \field Supply Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
@@ -43768,22 +43772,22 @@ Coil:Cooling:DX:MultiSpeed,
        \key Yes
        \key No
        \default No
-  N1 , \field Crankcase Heater Capacity
+  N2 , \field Crankcase Heater Capacity
        \type real
        \minimum 0.0
        \default 0.0
        \units W
        \ip-units W
-  N2 , \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+  N3 , \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
        \type real
        \minimum 0.0
        \default 10.0
        \units C
-  N3 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+  N4 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
        \type real
        \default -25.0
        \units C
-  N4 , \field Basin Heater Capacity
+  N5 , \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -43793,7 +43797,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note For this situation, the heater maintains the basin water temperature at the basin heater
        \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when the DX coil is off.
-  N5 , \field Basin Heater Setpoint Temperature
+  N6 , \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -43820,14 +43824,14 @@ Coil:Cooling:DX:MultiSpeed,
        \key FuelOil#2
        \key OtherFuel1
        \key OtherFuel2
-  N6 , \field Number of Speeds
+  N7 , \field Number of Speeds
        \required-field
        \type integer
        \minimum 2
        \maximum 4
        \note Enter the number of the following sets of data for coil capacity, SHR, COP,
        \note flow rate, and associated curves.
-  N7 , \field Speed 1 Gross Rated Total Cooling Capacity
+  N8 , \field Speed 1 Gross Rated Total Cooling Capacity
        \note Total cooling capacity not accounting for the effect of supply air fan heat
        \required-field
        \type real
@@ -43838,7 +43842,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Rating point: air entering the cooling coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the outdoor condenser coil at 35 C dry-bulb/23.9 C wet-bulb
        \note Speed 1 is defined as low speed
-  N8 , \field Speed 1 Gross Rated Sensible Heat Ratio
+  N9 , \field Speed 1 Gross Rated Sensible Heat Ratio
        \required-field
        \type real
        \minimum 0.5
@@ -43846,14 +43850,14 @@ Coil:Cooling:DX:MultiSpeed,
        \autosizable
        \note Gross Rated Sensible Heat Ratio (gross sensible capacity/gross total capacity)
        \note Sensible and total capacities do not include supply fan heat
-  N9 , \field Speed 1 Gross Rated Cooling COP
+  N10, \field Speed 1 Gross Rated Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and outdoor fan,
        \note does not include supply fan heat or supply fan electrical energy input
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.0
-  N10, \field Speed 1 Rated Air Flow Rate
+  N11, \field Speed 1 Rated Air Flow Rate
        \required-field
        \type real
        \units m3/s
@@ -43862,7 +43866,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity
-  N11, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N12, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -43913,7 +43917,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (cooling load/steady state capacity)
-  N12, \field Speed 1 Nominal Time for Condensate Removal to Begin
+  N13, \field Speed 1 Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -43924,7 +43928,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-  N13, \field Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+  N14, \field Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -43934,7 +43938,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note the compressor first turns off) and the Coil's steady state latent capacity
        \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-  N14, \field Speed 1 Maximum Cycling Rate
+  N15, \field Speed 1 Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -43943,7 +43947,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note The maximum on-off cycling rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation
        \note model is disabled.
-  N15, \field Speed 1 Latent Capacity Time Constant
+  N16, \field Speed 1 Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -43952,7 +43956,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Time constant for the cooling coil's latent capacity to reach steady state after
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
-  N16, \field Speed 1 Rated Waste Heat Fraction of Power Input
+  N17, \field Speed 1 Rated Waste Heat Fraction of Power Input
        \type real
        \units dimensionless
        \minimum> 0.0
@@ -43966,25 +43970,25 @@ Coil:Cooling:DX:MultiSpeed,
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-  N17, \field Speed 1 Evaporative Condenser Effectiveness
+  N18, \field Speed 1 Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N18, \field Speed 1 Evaporative Condenser Air Flow Rate
+  N19, \field Speed 1 Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N19, \field Speed 1 Rated Evaporative Condenser Pump Power Consumption
+  N20, \field Speed 1 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump at high speed
-  N20, \field Speed 2 Gross Rated Total Cooling Capacity
+  N21, \field Speed 2 Gross Rated Total Cooling Capacity
        \note Total cooling capacity not accounting for the effect of supply air fan heat
        \required-field
        \type real
@@ -43994,7 +43998,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Gross capacity excluding supply air fan heat
        \note Rating point: air entering the cooling coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the outdoor condenser coil at 35 C dry-bulb/23.9 C wet-bulb
-  N21, \field Speed 2 Gross Rated Sensible Heat Ratio
+  N22, \field Speed 2 Gross Rated Sensible Heat Ratio
        \required-field
        \type real
        \minimum 0.5
@@ -44002,14 +44006,14 @@ Coil:Cooling:DX:MultiSpeed,
        \autosizable
        \note Gross Rated Sensible Heat Ratio (gross sensible capacity/gross total capacity)
        \note Sensible and total capacities do not include supply fan heat
-  N22, \field Speed 2 Gross Rated Cooling COP
+  N23, \field Speed 2 Gross Rated Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and outdoor fan,
        \note does not include supply fan heat or supply fan electrical energy input
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.0
-  N23, \field Speed 2 Rated Air Flow Rate
+  N24, \field Speed 2 Rated Air Flow Rate
        \required-field
        \type real
        \units m3/s
@@ -44018,7 +44022,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 2.
-  N24, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N25, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44069,7 +44073,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (Cooling load/steady state capacity)
-  N25, \field Speed 2 Nominal Time for Condensate Removal to Begin
+  N26, \field Speed 2 Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -44080,7 +44084,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-  N26, \field Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
+  N27, \field Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -44090,7 +44094,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note the compressor first turns off) and the coil's steady state latent capacity
        \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-  N27, \field Speed 2 Maximum Cycling Rate
+  N28, \field Speed 2 Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -44099,7 +44103,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note The maximum on-off cycling rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation
        \note model is disabled.
-  N28, \field Speed 2 Latent Capacity Time Constant
+  N29, \field Speed 2 Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -44108,7 +44112,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Time constant for the cooling coil's latent capacity to reach steady state after
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
-  N29, \field Speed 2 Rated Waste Heat Fraction of Power Input
+  N30, \field Speed 2 Rated Waste Heat Fraction of Power Input
        \type real
        \units dimensionless
        \minimum> 0.0
@@ -44122,25 +44126,25 @@ Coil:Cooling:DX:MultiSpeed,
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-  N30, \field Speed 2 Evaporative Condenser Effectiveness
+  N31, \field Speed 2 Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N31, \field Speed 2 Evaporative Condenser Air Flow Rate
+  N32, \field Speed 2 Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N32, \field Speed 2 Rated Evaporative Condenser Pump Power Consumption
+  N33, \field Speed 2 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump at low speed
-  N33, \field Speed 3 Gross Rated Total Cooling Capacity
+  N34, \field Speed 3 Gross Rated Total Cooling Capacity
        \note Total cooling capacity not accounting for the effect of supply air fan heat
        \type real
        \units W
@@ -44149,21 +44153,21 @@ Coil:Cooling:DX:MultiSpeed,
        \note Gross capacity excluding supply air fan heat
        \note Rating point: air entering the cooling coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the outdoor condenser coil at 35 C dry-bulb/23.9 C wet-bulb
-  N34, \field Speed 3 Gross Rated Sensible Heat Ratio
+  N35, \field Speed 3 Gross Rated Sensible Heat Ratio
        \type real
        \minimum 0.5
        \maximum 1.0
        \autosizable
        \note Gross Rated Sensible Heat Ratio (gross sensible capacity/gross total capacity)
        \note Sensible and total capacities do not include supply fan heat
-  N35, \field Speed 3 Gross Rated Cooling COP
+  N36, \field Speed 3 Gross Rated Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and outdoor fan,
        \note does not include supply fan heat or supply fan electrical energy input
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.0
-  N36, \field Speed 3 Rated Air Flow Rate
+  N37, \field Speed 3 Rated Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -44171,7 +44175,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 3.
-  N37, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N38, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44217,7 +44221,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (Cooling load/steady state capacity)
-  N38, \field Speed 3 Nominal Time for Condensate Removal to Begin
+  N39, \field Speed 3 Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -44228,7 +44232,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-  N39, \field Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
+  N40, \field Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -44238,7 +44242,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note the compressor first turns off) and the coil's steady state latent capacity
        \note at rated air flow and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-  N40, \field Speed 3 Maximum Cycling Rate
+  N41, \field Speed 3 Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -44247,7 +44251,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note The maximum on-off cycling rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation
        \note model is disabled.
-  N41, \field Speed 3 Latent Capacity Time Constant
+  N42, \field Speed 3 Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -44256,7 +44260,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Time constant for the cooling coil's latent capacity to reach steady state after
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
-  N42, \field Speed 3 Rated Waste Heat Fraction of Power Input
+  N43, \field Speed 3 Rated Waste Heat Fraction of Power Input
        \type real
        \units dimensionless
        \minimum> 0.0
@@ -44270,25 +44274,25 @@ Coil:Cooling:DX:MultiSpeed,
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-  N43, \field Speed 3 Evaporative Condenser Effectiveness
+  N44, \field Speed 3 Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N44, \field Speed 3 Evaporative Condenser Air Flow Rate
+  N45, \field Speed 3 Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N45, \field Speed 3 Rated Evaporative Condenser Pump Power Consumption
+  N46, \field Speed 3 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump at Low speed
-  N46, \field Speed 4 Gross Rated Total Cooling Capacity
+  N47, \field Speed 4 Gross Rated Total Cooling Capacity
        \note Total cooling capacity not accounting for the effect of supply air fan heat
        \type real
        \units W
@@ -44297,21 +44301,21 @@ Coil:Cooling:DX:MultiSpeed,
        \note Gross capacity excluding supply air fan heat
        \note Rating point: air entering the cooling coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the outdoor condenser coil at 35 C dry-bulb/23.9 C wet-bulb
-  N47, \field Speed 4 Gross Rated Sensible Heat Ratio
+  N48, \field Speed 4 Gross Rated Sensible Heat Ratio
        \type real
        \minimum 0.5
        \maximum 1.0
        \autosizable
        \note Gross Rated Sensible Heat Ratio (gross sensible capacity/gross total capacity)
        \note Sensible and total capacities do not include supply fan heat
-  N48, \field Speed 4 Gross Rated Cooling COP
+  N49, \field Speed 4 Gross Rated Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and outdoor fan,
        \note does not include supply fan heat or supply fan electrical energy input
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.0
-  N49, \field Speed 4 Rated Air Flow Rate
+  N50, \field Speed 4 Rated Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -44319,7 +44323,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 4
-  N50, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N51, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44365,7 +44369,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (cooling load/steady state capacity)
-  N51, \field Speed 4 Nominal Time for Condensate Removal to Begin
+  N52, \field Speed 4 Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -44376,7 +44380,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-  N52, \field Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
+  N53, \field Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -44386,7 +44390,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note the compressor first turns off) and the coil's steady state latent capacity
        \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-  N53, \field Speed 4 Maximum Cycling Rate
+  N54, \field Speed 4 Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -44395,7 +44399,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note The maximum on-off cycling rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation
        \note model is disabled.
-  N54, \field Speed 4 Latent Capacity Time Constant
+  N55, \field Speed 4 Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -44404,7 +44408,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Time constant for the cooling coil's latent capacity to reach steady state after
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
-  N55, \field Speed 4 Rated Waste Heat Fraction of Power Input
+  N56, \field Speed 4 Rated Waste Heat Fraction of Power Input
        \type real
        \units dimensionless
        \minimum> 0.0
@@ -44418,19 +44422,19 @@ Coil:Cooling:DX:MultiSpeed,
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-  N56, \field Speed 4 Evaporative Condenser Effectiveness
+  N57, \field Speed 4 Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N57, \field Speed 4 Evaporative Condenser Air Flow Rate
+  N58, \field Speed 4 Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N58, \field Speed 4 Rated Evaporative Condenser Pump Power Consumption
+  N59, \field Speed 4 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
@@ -44529,7 +44533,7 @@ Coil:Cooling:DX:VariableSpeed,
         \minimum 0.0
         \default 10.0
         \units C
-   N10, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+   N10, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
         \type real
         \default -25.0
         \units C
@@ -45208,7 +45212,11 @@ Coil:Cooling:DX:TwoStageWithHumidityControlMode,
   A14, \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  N5,  \field Basin Heater Capacity
+  N5,  \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+       \type real
+       \default -25.0
+       \units C
+  N6,  \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -45218,7 +45226,7 @@ Coil:Cooling:DX:TwoStageWithHumidityControlMode,
        \note For this situation, the heater maintains the basin water temperature at the basin heater
        \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when the DX coil is off.
-  N6,  \field Basin Heater Setpoint Temperature
+  N7,  \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -46226,7 +46234,7 @@ Coil:Heating:DX:SingleSpeed,
        \note wb = wet-bulb temperature (C) of air entering the indoor coil
        \note oat = outdoor air dry-bulb temperature (C)
        \note only required if ReverseCycle defrost strategy is specified
-  N5 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+  N5 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
        \type real
        \minimum -20.0
        \default -8.0
@@ -46372,7 +46380,7 @@ Coil:Heating:DX:MultiSpeed,
   A4 , \field Air Outlet Node Name
        \required-field
        \type node
-  N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+  N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
        \type real
        \default -8.0
        \units C
@@ -47106,7 +47114,7 @@ Coil:Heating:DX:VariableSpeed,
         \note wb = wet-bulb temperature (C) of air entering the indoor coil
         \note oat = outdoor air dry-bulb temperature (C)
         \note only required if ReverseCycle defrost strategy is specified
-   N5,  \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+   N5,  \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
         \type real
         \minimum -50.0
         \default -8.0
@@ -55473,7 +55481,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \object-list HeatingCoilsDXMultiSpeed
         \object-list HeatingCoilsElectricMultiStage
         \object-list HeatingCoilsGasMultiStage
-   N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+   N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
         \type real
         \default -8.0
         \units C

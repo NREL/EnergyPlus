@@ -739,7 +739,6 @@ namespace Furnaces {
 		using HeatingCoils::GetHeatingCoilTypeNum;
 		using HeatingCoils::GetHeatingCoilPLFCurveIndex;
 		auto & GetDXCoilCapacity( DXCoils::GetCoilCapacity );
-		auto & GetMinOATDXCoilCompressor( DXCoils::GetMinOATCompressor );
 		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
 		auto & GetDXCoilOutletNode( DXCoils::GetCoilOutletNode );
 		auto & GetDXCoilCondenserInletNode( DXCoils::GetCoilCondenserInletNode );
@@ -5249,25 +5248,6 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).iterationMode( Furnace( FurnaceNum ).iterationCounter ) = NoCoolHeat;
 		}
 
-		//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
-		if ( Furnace( FurnaceNum ).CondenserNodeNum > 0 ) {
-			if ( HeatingLoad && Node( Furnace(FurnaceNum ).CondenserNodeNum ).Temp < Furnace( FurnaceNum ).MinOATCompressorHeating ) {
-				ZoneLoad = 0.0;
-			}
-			if ( CoolingLoad && Node( Furnace( FurnaceNum ).CondenserNodeNum ).Temp < Furnace( FurnaceNum ).MinOATCompressorCooling ) {
-				ZoneLoad = 0.0;
-				MoistureLoad = 0.0;
-			}
-		} else {
-			if ( HeatingLoad && OutDryBulbTemp < Furnace( FurnaceNum ).MinOATCompressorHeating ) {
-				ZoneLoad = 0.0;
-			}
-			if ( CoolingLoad && OutDryBulbTemp < Furnace( FurnaceNum ).MinOATCompressorCooling ) {
-				ZoneLoad = 0.0;
-				MoistureLoad = 0.0;
-			}
-		}
-
 		// IF small loads to meet or not converging, just shut down unit
 		if ( std::abs( ZoneLoad ) < Small5WLoad ) {
 			ZoneLoad = 0.0;
@@ -9148,7 +9128,7 @@ namespace Furnaces {
 				CalcNonDXHeatingCoils( FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace( FurnaceNum ).OpMode, QCoilActual );
 			}
 
-			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorHeating ) ) { //COOLING MODE or dehumidification mode
+			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorCooling ) ) { //COOLING MODE or dehumidification mode
 
 				if ( Furnace( FurnaceNum ).bIsIHP ) {
 					SimIHP( BlankString, Furnace( FurnaceNum ).CoolingCoilIndex, Furnace( FurnaceNum ).OpMode, Furnace( FurnaceNum ).MaxONOFFCyclesperHour, Furnace( FurnaceNum ).HPTimeConstant, Furnace( FurnaceNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq,
@@ -9211,7 +9191,7 @@ namespace Furnaces {
 				CalcNonDXHeatingCoils( FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace( FurnaceNum ).OpMode, QCoilActual );
 			}
 
-			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorHeating ) ) {
+			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorCooling ) ) {
 
 				if ( Furnace( FurnaceNum ).bIsIHP ){
 					SimIHP( BlankString, Furnace( FurnaceNum ).CoolingCoilIndex, Furnace( FurnaceNum ).OpMode, Furnace( FurnaceNum ).MaxONOFFCyclesperHour, Furnace( FurnaceNum ).HPTimeConstant, Furnace( FurnaceNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq,
@@ -9276,7 +9256,7 @@ namespace Furnaces {
 				CalcNonDXHeatingCoils( FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace( FurnaceNum ).OpMode, QCoilActual );
 			}
 
-			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorHeating ) ) {
+			if ( ( QZnReq < ( -1.0 * SmallLoad ) || ( QLatReq < ( -1.0 * SmallLoad ) ) ) && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorCooling ) ) {
 
 				if ( Furnace( FurnaceNum ).bIsIHP ){
 					SimIHP( BlankString, Furnace( FurnaceNum ).CoolingCoilIndex, Furnace( FurnaceNum ).OpMode, Furnace( FurnaceNum ).MaxONOFFCyclesperHour, Furnace( FurnaceNum ).HPTimeConstant, Furnace( FurnaceNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq,
@@ -9301,7 +9281,7 @@ namespace Furnaces {
 			}
 
 			if ( Furnace( FurnaceNum ).FurnaceType_Num != UnitarySys_HeatCool ) {
-				if ( QZnReq > SmallLoad ) {
+				if ( QZnReq > SmallLoad && ( OutDryBulbTemp >= Furnace( FurnaceNum ).MinOATCompressorCooling ) ) {
 
 					if (Furnace( FurnaceNum ).bIsIHP){
 						SimIHP( BlankString, Furnace( FurnaceNum ).HeatingCoilIndex, Furnace( FurnaceNum ).OpMode, Furnace( FurnaceNum ).MaxONOFFCyclesperHour, Furnace( FurnaceNum ).HPTimeConstant, Furnace( FurnaceNum ).FanDelayTime, CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq,

@@ -1827,7 +1827,7 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
-This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD. If this field is not included in the input, the default value is -25 °C.
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C). If this field is not included in the input, the default value is -25 °C.
 
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin}
 
@@ -2077,7 +2077,7 @@ The type of condenser used by the multi-speed DX cooling coil. Valid choices for
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
-This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD. If this field is not included in the input, the default value is -25 °C.
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C). If this field is not included in the input, the default value is -25 °C.
 
 \paragraph{Field: High Speed Evaporative Condenser Effectiveness}\label{field-high-speed-evaporative-condenser-effectiveness}
 
@@ -2345,6 +2345,10 @@ This field is optional. It is used to describe where the coil obtains water used
 
 This field is optional. It is used to describe where condensate from the coil is collected. If blank or omitted, then any coil condensate is discarded. Enter the name of Water Storage Tank object defined elsewhere and the condensate will then be collected in that tank.
 
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C). If this field is not included in the input, the default value is -25 °C.
+
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-2-000}
 
 This numeric field contains the capacity of the DX coil s electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
@@ -2444,7 +2448,7 @@ This numeric field defines the outdoor air dry-bulb temperature above which the 
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
-This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD. If this field is not included in the input, the default value is -25 °C.
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C).
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-3-000}
 
@@ -2966,6 +2970,10 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-3}
 
 This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
+
+\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
+
+This numeric field defines the minimum outdoor air dry-bulb temperature where the cooling coil compressor turns off. If this input field is left blank, the value defaults to that specified in the IDD (e.g., -25 °C).
 
 \paragraph{Field: Supply Water Storage Tank Name}\label{field-supply-water-storage-tank-name-4-000}
 
