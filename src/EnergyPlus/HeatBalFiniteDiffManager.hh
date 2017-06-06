@@ -136,6 +136,7 @@ namespace HeatBalFiniteDiffManager {
 		Real64 MaxNodeDelTemp; // largest change in node temps after calc
 		Real64 EnthalpyM; // Melting enthalpy at a particular temperature
 		Real64 EnthalpyF; // Freezing enthalpy at a particular temperature
+		Array1D< int > PhaseChangeState;
 
 		// Default Constructor
 		SurfaceDataFD() :
@@ -146,6 +147,7 @@ namespace HeatBalFiniteDiffManager {
 			MaxNodeDelTemp( 0.0 ),
 			EnthalpyM( 0.0 ),
 			EnthalpyF( 0.0 )
+			PhaseChangeState( 0 )
 		{}
 
 		inline
