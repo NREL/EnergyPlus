@@ -3634,9 +3634,6 @@ namespace DXCoils {
 			//Set crankcase heater cutout temperature
 			DXCoil( DXCoilNum ).MaxOATCrankcaseHeater = Numbers( 3 );
 
-			//Set minimum OAT for compressor operation
-			DXCoil( DXCoilNum ).MinOATCompressor = Numbers( 4 );
-
 			if ( SameString( Alphas( 9 ), "Yes" ) ) {
 				DXCoil( DXCoilNum ).PLRImpact = true;
 			} else if ( SameString( Alphas( 9 ), "No" ) ) {
@@ -3660,22 +3657,22 @@ namespace DXCoils {
 			}
 
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
-			DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = Numbers( 5 );
-			if ( Numbers( 5 ) < 0.0 ) {
+			DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = Numbers( 4 );
+			if ( Numbers( 4 ) < 0.0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-				ShowContinueError( "..." + cNumericFields( 5 ) + " must be >= 0.0, entered value=[" + TrimSigDigits( Numbers( 5 ), 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFields( 4 ) + " must be >= 0.0, entered value=[" + TrimSigDigits( Numbers( 4 ), 3 ) + "]." );
 				ErrorsFound = true;
 			}
 
-			DXCoil( DXCoilNum ).BasinHeaterSetPointTemp = Numbers( 6 );
+			DXCoil( DXCoilNum ).BasinHeaterSetPointTemp = Numbers( 5 );
 			if ( DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
-				if ( NumNumbers < 6 ) {
+				if ( NumNumbers < 5 ) {
 					DXCoil( DXCoilNum ).BasinHeaterSetPointTemp = 2.0;
 				}
 				if ( DXCoil( DXCoilNum ).BasinHeaterSetPointTemp < 2.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", freeze possible" );
 					ShowContinueError( "..." + cNumericFields( 5 ) + " is less than 2 {C}. Freezing could occur." );
-					ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 6 ), 2 ) + "]." );
+					ShowContinueError( "...entered value=[" + TrimSigDigits( Numbers( 5 ), 2 ) + "]." );
 				}
 			}
 
@@ -3714,10 +3711,10 @@ namespace DXCoils {
 				ErrorsFound = true;
 			}
 
-			DXCoil( DXCoilNum ).NumOfSpeeds = Numbers( 7 ); // Number of speeds
+			DXCoil( DXCoilNum ).NumOfSpeeds = Numbers( 6 ); // Number of speeds
 			if ( DXCoil( DXCoilNum ).NumOfSpeeds < 2 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-				ShowContinueError( "..." + cNumericFields( 6 ) + " must be >= 2. entered number is " + TrimSigDigits( Numbers( 7 ), 0 ) );
+				ShowContinueError( "..." + cNumericFields( 6 ) + " must be >= 2. entered number is " + TrimSigDigits( Numbers( 6 ), 0 ) );
 				ErrorsFound = true;
 			}
 
@@ -3747,11 +3744,11 @@ namespace DXCoils {
 			DXCoil( DXCoilNum ).MSFanPowerPerEvapAirFlowRate.allocate( DXCoil( DXCoilNum ).NumOfSpeeds );
 
 			for ( I = 1; I <= DXCoil( DXCoilNum ).NumOfSpeeds; ++I ) {
-				DXCoil( DXCoilNum ).MSRatedTotCap( I ) = Numbers( 8 + ( I - 1 ) * 13 );
-				DXCoil( DXCoilNum ).MSRatedSHR( I ) = Numbers( 9 + ( I - 1 ) * 13 );
-				DXCoil( DXCoilNum ).MSRatedCOP( I ) = Numbers( 10 + ( I - 1 ) * 13 );
-				DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( I ) = Numbers( 11 + ( I - 1 ) * 13 );
-				DXCoil( DXCoilNum ).MSFanPowerPerEvapAirFlowRate( I ) = Numbers( 12 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSRatedTotCap( I ) = Numbers( 7 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSRatedSHR( I ) = Numbers( 8 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSRatedCOP( I ) = Numbers( 9 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( I ) = Numbers( 10 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSFanPowerPerEvapAirFlowRate( I ) = Numbers( 11 + ( I - 1 ) * 13 );
 
 				DXCoil( DXCoilNum ).MSCCapFTemp( I ) = GetCurveIndex( Alphas( 13 + ( I - 1 ) * 6 ) ); // convert curve name to number
 				if ( DXCoil( DXCoilNum ).MSCCapFTemp( I ) == 0 ) {
@@ -3915,32 +3912,32 @@ namespace DXCoils {
 				}
 
 				// read data for latent degradation
-				DXCoil( DXCoilNum ).MSTwet_Rated( I ) = Numbers( 13 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSTwet_Rated( I ) = Numbers( 12 + ( I - 1 ) * 13 );
 				if ( DXCoil( DXCoilNum ).MSTwet_Rated( I ) < 0.0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 13 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( DXCoil( DXCoilNum ).MSTwet_Rated( I ), 4 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 12 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( DXCoil( DXCoilNum ).MSTwet_Rated( I ), 4 ) + "]." );
 					ErrorsFound = true;
 				}
-				DXCoil( DXCoilNum ).MSGamma_Rated( I ) = Numbers( 14 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSGamma_Rated( I ) = Numbers( 13 + ( I - 1 ) * 13 );
 				if ( DXCoil( DXCoilNum ).MSGamma_Rated( I ) < 0.0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 14 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( DXCoil( DXCoilNum ).MSGamma_Rated( I ), 4 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 13 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( DXCoil( DXCoilNum ).MSGamma_Rated( I ), 4 ) + "]." );
 					ErrorsFound = true;
 				}
-				DXCoil( DXCoilNum ).MSMaxONOFFCyclesperHour( I ) = Numbers( 15 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSMaxONOFFCyclesperHour( I ) = Numbers( 14 + ( I - 1 ) * 13 );
 				if ( DXCoil( DXCoilNum ).Gamma_Rated( I ) < 0.0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 15 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( DXCoil( DXCoilNum ).MSMaxONOFFCyclesperHour( I ), 2 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 14 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( DXCoil( DXCoilNum ).MSMaxONOFFCyclesperHour( I ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
-				DXCoil( DXCoilNum ).MSLatentCapacityTimeConstant( I ) = Numbers( 16 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSLatentCapacityTimeConstant( I ) = Numbers( 15 + ( I - 1 ) * 13 );
 				if ( DXCoil( DXCoilNum ).Gamma_Rated( I ) < 0.0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 16 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( DXCoil( DXCoilNum ).MSLatentCapacityTimeConstant( I ), 2 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 15 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( DXCoil( DXCoilNum ).MSLatentCapacityTimeConstant( I ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 
-				DXCoil( DXCoilNum ).MSWasteHeatFrac( I ) = Numbers( 17 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSWasteHeatFrac( I ) = Numbers( 16 + ( I - 1 ) * 13 );
 
 				// Read waste heat modifier curve name
 				DXCoil( DXCoilNum ).MSWasteHeat( I ) = GetCurveIndex( Alphas( 18 + ( I - 1 ) * 6 ) ); // convert curve name to number
@@ -3967,24 +3964,24 @@ namespace DXCoils {
 					}
 				}
 
-				DXCoil( DXCoilNum ).MSEvapCondEffect( I ) = Numbers( 18 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSEvapCondEffect( I ) = Numbers( 17 + ( I - 1 ) * 13 );
 				if ( DXCoil( DXCoilNum ).MSEvapCondEffect( I ) < 0.0 || DXCoil( DXCoilNum ).MSEvapCondEffect( I ) > 1.0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 18 + ( I - 1 ) * 13 ) + " cannot be < 0.0 or > 1.0, entered value=[" + TrimSigDigits( Numbers( 18 + ( I - 1 ) * 13 ), 3 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 17 + ( I - 1 ) * 13 ) + " cannot be < 0.0 or > 1.0, entered value=[" + TrimSigDigits( Numbers( 17 + ( I - 1 ) * 13 ), 3 ) + "]." );
 					ErrorsFound = true;
 				}
 
-				DXCoil( DXCoilNum ).MSEvapCondAirFlow( I ) = Numbers( 19 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSEvapCondAirFlow( I ) = Numbers( 18 + ( I - 1 ) * 13 );
 				if ( DXCoil( DXCoilNum ).MSEvapCondAirFlow( I ) < 0.0 && DXCoil( DXCoilNum ).MSEvapCondAirFlow( I ) != AutoSize ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 19 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( Numbers( 19 + ( I - 1 ) * 13 ), 3 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 18 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( Numbers( 18 + ( I - 1 ) * 13 ), 3 ) + "]." );
 					ErrorsFound = true;
 				}
 
-				DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( I ) = Numbers( 20 + ( I - 1 ) * 13 );
+				DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( I ) = Numbers( 19 + ( I - 1 ) * 13 );
 				if ( DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( I ) < 0.0 && DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( I ) != AutoSize ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 20 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( Numbers( 20 + ( I - 1 ) * 13 ), 3 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 19 + ( I - 1 ) * 13 ) + " cannot be < 0.0, entered value=[" + TrimSigDigits( Numbers( 19 + ( I - 1 ) * 13 ), 3 ) + "]." );
 					ErrorsFound = true;
 				}
 

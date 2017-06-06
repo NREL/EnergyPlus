@@ -6950,16 +6950,15 @@ namespace PackagedTerminalHeatPump {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool errFlag;
-		std::string IHPCoilName;
 
-		//Set minimum OAT for heat pump compressor operation in heating mode
+		//Set minimum OAT for heat pump compressor operation in cooling mode
 		errFlag = false;
 		if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 			PTUnit( PTUnitNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
 		} else if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted ) {
 			PTUnit( PTUnitNum ).MinOATCompressorCooling = GetMinOATCompressorUsingIndex( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag );
 		} else if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
-			PTUnit( PTUnitNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( CoolingCoilName, errFlag );
+			PTUnit( PTUnitNum ).MinOATCompressorCooling = GetVSCoilMinOATCompressor( CoolingCoilName, errFlag );
 		} else {
 			PTUnit( PTUnitNum ).MinOATCompressorCooling = -1000.0;
 		}

@@ -1282,7 +1282,6 @@ namespace HVACUnitarySystem {
 		int OperatingModeMinusOne;
 		int OperatingModeMinusTwo;
 		bool Oscillate; // detection of oscillating operating modes
-		Real64 OutdoorDryBulb; // local variable for OutDryBulbTemp
 
 		if ( InitLoadBasedControlOneTimeFlag ) {
 
