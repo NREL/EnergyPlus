@@ -16814,7 +16814,6 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Apply Latent Degradation to Speeds Greater than 1','No')
       CALL AddToObjStr('Crankcase Heater Capacity {W}','0.0')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}','10.0')
-      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Basin Heater Capacity {W/K}','')
       CALL AddToObjStr('Basin Heater Setpoint Temperature {C}','')
       CALL AddToObjStr('Basin Heater Operating Schedule Name','')

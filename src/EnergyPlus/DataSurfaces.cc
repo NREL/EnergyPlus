@@ -511,11 +511,11 @@ namespace DataSurfaces {
 				edges.push_back( vertices[ ( i + 1 ) % n ] - vertices[ i ] );
 			}
 			if ( shapeCat == ShapeCat::Rectangular ) { // Set side length squared for ray--surface intersection tests
-//				assert( n == 4u );
+				assert( n == 4u );
 				s1 = edges[ 0 ].magnitude_squared();
 				s3 = edges[ 3 ].magnitude_squared();
 			} else if ( ( shapeCat == ShapeCat::Nonconvex ) || ( n >= nVerticesBig ) ) { // Set up slabs
-//				assert( n >= 4u );
+				assert( n >= 4u );
 				slabYs.reserve( n );
 				for ( size_type i = 0; i < n; ++i ) slabYs.push_back( vertices[ i ].y );
 				std::sort( slabYs.begin(), slabYs.end() ); // Sort the vertex y coordinates
@@ -540,7 +540,7 @@ namespace DataSurfaces {
 						 ( ( yu <= v.y ) && ( w.y <= yl ) ) ) // Crosses downward
 						{
 							Edge const & e( edges[ i ] );
-//							assert( e.y != 0.0 );
+							assert( e.y != 0.0 );
 							Real64 const exy( e.x / e.y );
 							Real64 const xb( v.x + ( yl - v.y ) * exy ); // x_bot coordinate where edge intersects yl
 							Real64 const xt( v.x + ( yu - v.y ) * exy ); // x_top coordinate where edge intersects yu
@@ -551,7 +551,7 @@ namespace DataSurfaces {
 					}
 					slab.xl = xl;
 					slab.xu = xu;
-//					assert( crossEdges.size() >= 2u );
+					assert( crossEdges.size() >= 2u );
 					std::sort( crossEdges.begin(), crossEdges.end(),
 					 []( CrossEdge const & e1, CrossEdge const & e2 ) -> bool // Lambda to sort by x_mid
 						{
@@ -565,22 +565,22 @@ namespace DataSurfaces {
 					for ( auto const & edge: crossEdges ) { // Detect non-simple polygon with crossing edges
 						Real64 const xbe( std::get< 0 >( edge ) );
 						Real64 const xte( std::get< 1 >( edge ) );
-//						assert( xb <= xbe + tol );
-//						assert( xt <= xte + tol );
+						assert( xb <= xbe + tol );
+						assert( xt <= xte + tol );
 						xb = xbe;
 						xt = xte;
 					}
 #endif
-//					assert( ( shapeCat == ShapeCat::Nonconvex ) || ( crossEdges.size() == 2 ) );
+					assert( ( shapeCat == ShapeCat::Nonconvex ) || ( crossEdges.size() == 2 ) );
 					for ( auto const & edge: crossEdges ) {
 						size_type const iEdge( std::get< 2 >( edge ) );
 						slab.edges.push_back( iEdge ); // Add edge to slab
 						Vector2D const & e( edges[ iEdge ] );
-//						assert( e.y != 0.0 ); // Constant y edge can't be a crossing edge
+						assert( e.y != 0.0 ); // Constant y edge can't be a crossing edge
 						slab.edgesXY.push_back( e.y != 0.0 ? e.x / e.y : 0.0 ); // Edge inverse slope
 					}
-//					assert( slab.edges.size() %2 == 0u );
-//					assert( slab.edges.size() == slab.edgesXY.size() );
+					assert( slab.edges.size() %2 == 0u );
+					assert( slab.edges.size() == slab.edgesXY.size() );
 				}
 			}
 		}

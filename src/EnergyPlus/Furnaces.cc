@@ -4409,7 +4409,7 @@ namespace Furnaces {
 		using DataSizing::AutoSize;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
 		using DataAirLoop::AirLoopControlInfo;
-		using DataEnvironment::OutDryBulbTemp;
+//		using DataEnvironment::OutDryBulbTemp;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
@@ -6251,8 +6251,26 @@ namespace Furnaces {
 					OnOffFanPartLoadFraction = 1.0;
 					OnOffAirFlowRatio = 1.0;
 
-					// Get full load result
-					CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, PartLoadRatio, 0.0, 0.0, FullSensibleOutput, FullLatentOutput, OnOffAirFlowRatio, false );
+					//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
+					if ( Furnace( FurnaceNum ).CondenserNodeNum > 0 ) {
+						if ( Node( Furnace( FurnaceNum ).CondenserNodeNum ).Temp > Furnace( FurnaceNum ).MinOATCompressorHeating ) {
+							// Get full load result
+							CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, PartLoadRatio, 0.0, 0.0, FullSensibleOutput, FullLatentOutput, OnOffAirFlowRatio, false );
+							Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
+						} else {
+							FullSensibleOutput = NoHeatOutput;
+							Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+						}
+					} else {
+						if ( OutdoorDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressorHeating ) {
+							// Get full load result
+							CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, PartLoadRatio, 0.0, 0.0, FullSensibleOutput, FullLatentOutput, OnOffAirFlowRatio, false );
+							Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
+						} else {
+							FullSensibleOutput = NoHeatOutput;
+							Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+						}
+					}
 
 					// Check that SystemSensibleLoad is between FullSensibleOutput and NoHeatOutput
 					// If so then calculate PartLoadRatio for the DX Heating coil
@@ -6366,7 +6384,7 @@ namespace Furnaces {
 
 					//   HeatCool systems can have both a sensible and latent PLR in a single time step
 					//   (i.e. both cooling and heating can occur in a single time step)
-				} else { // else not a heatpump DX coil
+				} else { // else not a heatpump DX coil ** non-HP heating coils are not DX so testing if OutdoorDryBulbTemp < MinOATCompressorHeating is not necessary **
 
 					Node( FurnaceInletNode ).MassFlowRate = Furnace( FurnaceNum ).MdotFurnace;
 					HeatCoilLoad = Furnace( FurnaceNum ).DesignHeatingCapacity;
@@ -8757,7 +8775,7 @@ namespace Furnaces {
 		using DataGlobals::WarmupFlag;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using Psychrometrics::PsyCpAirFnWTdb;
-		using DataEnvironment::OutDryBulbTemp;
+//		using DataEnvironment::OutDryBulbTemp;
 		using IntegratedHeatPump::IntegratedHeatPumps;
 		using IntegratedHeatPump::GetMaxSpeedNumIHP;
 		using IntegratedHeatPump::GetCurWorkMode;
@@ -9064,7 +9082,7 @@ namespace Furnaces {
 		using Fans::SimulateFanComponents;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
-		using DataEnvironment::OutDryBulbTemp;
+//		using DataEnvironment::OutDryBulbTemp;
 		using IntegratedHeatPump::SimIHP;
 
 		// Locals

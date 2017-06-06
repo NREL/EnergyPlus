@@ -9100,7 +9100,7 @@ namespace HVACUnitarySystem {
 			if ( ( Node( InletNode ).Temp > DesOutTemp ) && ( std::abs( Node( InletNode ).Temp - DesOutTemp ) > TempControlTol ) ) SensibleLoad = true;
 
 			// Determine if there is a latent load on this system - for future use to serve latent-only loads
-			if ( Node( InletNode ).HumRat > DesOutHumRat && OutdoorDryBulb >= UnitarySystem( UnitarySysNum ).MinOATCompressorHeating ) LatentLoad = true;
+			if ( Node( InletNode ).HumRat > DesOutHumRat ) LatentLoad = true;
 
 			// disable latent dehumidification if there is no sensible load and latent only is not allowed
 			if ( UnitarySystem( UnitarySysNum ).RunOnLatentOnlyWithSensible && ! SensibleLoad ) LatentLoad = false;
