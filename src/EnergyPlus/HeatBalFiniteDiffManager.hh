@@ -137,6 +137,9 @@ namespace HeatBalFiniteDiffManager {
 		Real64 EnthalpyM; // Melting enthalpy at a particular temperature
 		Real64 EnthalpyF; // Freezing enthalpy at a particular temperature
 		Array1D< int > PhaseChangeState;
+		Array1D< int > PhaseChangeStateOld;
+		Array1D< int > PhaseChangeStateOldOld;
+		Array1D< int > PhaseChangeTemperatureReverse;
 
 		// Default Constructor
 		SurfaceDataFD() :
@@ -146,7 +149,7 @@ namespace HeatBalFiniteDiffManager {
 			GSloopErrorCount( 0 ),
 			MaxNodeDelTemp( 0.0 ),
 			EnthalpyM( 0.0 ),
-			EnthalpyF( 0.0 )
+			EnthalpyF( 0.0 ),
 			PhaseChangeState( 0 )
 		{}
 

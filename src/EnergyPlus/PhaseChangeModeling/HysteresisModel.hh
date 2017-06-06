@@ -44,9 +44,7 @@ namespace HysteresisPhaseChange {
 		Real64 deltaTempFreezingLow;
 
 		// history and state terms
-		int phaseChangeStateOld = 0;
-		int phaseChangeState = 0;
-		int phaseChangeTransition = 0;
+		int phaseChangeTransition;
 		Real64 enthOld;
 		Real64 enthNew;
 		Real64 enthRev;
@@ -68,7 +66,7 @@ namespace HysteresisPhaseChange {
 
 		Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2, Real64 deltaH, Real64 CpSolid, Real64 CpLiquid );
 
-		Real64 getCurrentSpecificHeat( Real64, Real64, int & ) override;
+		Real64 getCurrentSpecificHeat( Real64, Real64, int, int & ) override;
 
 		Real64 specHeat( Real64, Real64, Real64, Real64, Real64, Real64, Real64, Real64, Real64, Real64);
 

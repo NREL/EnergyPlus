@@ -26,7 +26,7 @@ namespace EnergyPlus {
 		std::string name;
 
 		public:
-			virtual Real64 getCurrentSpecificHeat( Real64, Real64, int & ) = 0;
+			virtual Real64 getCurrentSpecificHeat( Real64, Real64, int, int & ) = 0;
 
 		~PhaseChangeModel() {}
 	
