@@ -5443,12 +5443,16 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 					if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 						ManageHeatBalFiniteDiff( SurfNum, TempSurfInTmp( SurfNum ), TempSurfOutTmp );
 						if ( !SurfaceEnthalpyRead( SurfNum ) ) {
-							//ZnAirRpt( ZoneNum ).SumEnthalpyM = 0.0;
-							//ZnAirRpt( ZoneNum ).SumEnthalpyH = 0.0;
+							if ( ZnAirRpt.allocated() ) {
+								ZnAirRpt( ZoneNum ).SumEnthalpyM = 0.0;
+								ZnAirRpt( ZoneNum ).SumEnthalpyH = 0.0;
+							}
 							SurfaceEnthalpyRead( SurfNum ) = true;
 						}
-						// ZnAirRpt( ZoneNum ).SumEnthalpyM += SurfaceFD( SurfNum ).EnthalpyM;
-						// ZnAirRpt( ZoneNum ).SumEnthalpyH += SurfaceFD( SurfNum ).EnthalpyF;
+						if ( ZnAirRpt.allocated() ) {
+							ZnAirRpt( ZoneNum ).SumEnthalpyM += SurfaceFD( SurfNum ).EnthalpyM;
+							ZnAirRpt( ZoneNum ).SumEnthalpyH += SurfaceFD( SurfNum ).EnthalpyF;
+						}
 					}
 
 					TH11 = TempSurfOutTmp;

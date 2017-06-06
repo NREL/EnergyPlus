@@ -22,6 +22,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <PhaseChangeModeling/PhaseChangeModel.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 

@@ -277,6 +277,7 @@ namespace HysteresisPhaseChange {
 					ShowFatalError( "Error processing " + DataIPShortCuts::cCurrentModuleObject + " named \"" +DataIPShortCuts::cAlphaArgs( 1 ) + "\"" );
 				}
 				hysteresisPhaseChangeModels.push_back( thisHM );
+				SetupOutputVariable( "Phase Change State [ ]", thisHM.phaseChangeState, "Zone", "Average", thisHM.name );
 			}
 		}
 	}

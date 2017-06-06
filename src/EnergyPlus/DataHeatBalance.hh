@@ -2942,7 +2942,9 @@ namespace DataHeatBalance {
 			OABalanceMass( 0.0 ),
 			OABalanceMdot( 0.0 ),
 			OABalanceAirChangeRate( 0.0 ),
-			OABalanceFanElec( 0.0 )
+			OABalanceFanElec( 0.0 ),
+			SumEnthalpyM( 0.0 ),
+			SumEnthalpyH( 0.0 )
 		{}
 
 	};

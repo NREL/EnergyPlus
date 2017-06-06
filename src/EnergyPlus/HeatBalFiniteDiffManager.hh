@@ -134,6 +134,8 @@ namespace HeatBalFiniteDiffManager {
 		int GSloopCounter; // count of inner loop iterations
 		int GSloopErrorCount; // recurring error counter
 		Real64 MaxNodeDelTemp; // largest change in node temps after calc
+		Real64 EnthalpyM; // Melting enthalpy at a particular temperature
+		Real64 EnthalpyF; // Freezing enthalpy at a particular temperature
 
 		// Default Constructor
 		SurfaceDataFD() :
@@ -141,7 +143,9 @@ namespace HeatBalFiniteDiffManager {
 			QSource( 0.0 ),
 			GSloopCounter( 0 ),
 			GSloopErrorCount( 0 ),
-			MaxNodeDelTemp( 0.0 )
+			MaxNodeDelTemp( 0.0 ),
+			EnthalpyM( 0.0 ),
+			EnthalpyF( 0.0 )
 		{}
 
 		inline

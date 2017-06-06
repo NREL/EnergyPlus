@@ -391,6 +391,8 @@ MaterialProperty:PhaseChangeHysteresis,
 
   Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,hourly;
 
+  Output:Variable,*,Phase Change State,hourly; !- Zone Average []
+ 
   Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf:wireframe;
