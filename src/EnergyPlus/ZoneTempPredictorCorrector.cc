@@ -2770,94 +2770,6 @@ namespace ZoneTempPredictorCorrector {
 			} //Demand manager
 		}
 
-		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
-			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
-				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-			if ( TempControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
-				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-		}
-		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
-			if ( ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
-				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-			if ( ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
-				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-
-		}
-
 		if ( ErrorsFound ) {
 			ShowFatalError( "InitZoneAirSetpoints - program terminates due to previous condition." );
 		}
@@ -3455,6 +3367,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		if ( NumComfortControlledZones > 0 ) CalcZoneAirComfortSetPoints();
+		OverrideAirSetPointsforEMSCntrl( );
 
 	}
 
@@ -6817,6 +6730,148 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 	}
+
+	void
+	OverrideAirSetPointsforEMSCntrl(
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   June 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine overrides the air temperature setpoint based on EMS
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Loop; // index of temp control
+		int ZoneNum; // Zone index
+
+		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
+			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
+				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
+
+				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+			if ( TempControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
+				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
+
+				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
+			if ( ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
+				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
+				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointFanger ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+			if ( ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
+				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
+				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointFanger ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+
+		}
+
+	}
+
 
 } // ZoneTempPredictorCorrector
 
