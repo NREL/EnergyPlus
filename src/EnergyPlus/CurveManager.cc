@@ -3379,7 +3379,7 @@ namespace CurveManager {
 			if ( NumIVars > 6 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables found in external file = " + FileName );
-				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
+				ShowFatalError( "...Only 1 to  independent variables are allowed." );
 			}
 
 			gio::rewind( FileNum );

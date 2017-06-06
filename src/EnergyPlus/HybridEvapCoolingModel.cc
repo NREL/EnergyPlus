@@ -9,26 +9,422 @@
 #include <windows.h>
 #include <ScheduleManager.hh>
 #include <General.hh>
+#include <CurveManager.hh>
+#include <DataGlobals.hh>
+#include <DataGlobalConstants.hh>
+#include <DataHVACGlobals.hh>
+#include <Psychrometrics.hh>
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
+using namespace std;
 
 namespace EnergyPlus {//***************
 
 	namespace HybridEvapCoolingModel {
 		using namespace std;
+		using DataHVACGlobals::TimeStepSys;
+		using DataGlobals::SecInHour;
+		using namespace Psychrometrics;
+		using CurveManager::GetCurveIndex;
+		using CurveManager::GetCurveType;
+		using CurveManager::GetCurveMinMaxValues;
+		using CurveManager::CurveValue;
+
 		typedef int* MyType;
 		map<string, string> testop;
 		#define  DEF_Tdb 0
 		#define  DEF_RH 1
-		#define  TEMP_CURVE 0 
-		#define  W_CURVE 1
-		#define  POWER_CURVE 2
 
+#define  TEMP_CURVE 0 
+#define  W_CURVE 1
+#define  POWER_CURVE 2
 				// constructor of Model,
 
 		#include <fstream>
 		fstream logfile;
 		//ZoneHybridUnitaryACSystem
+
+		bool CMode::InitializeOutsideAirTemperatureConstraints(double min, double max)
+		{
+			//note If this field is blank, there will be no lower constraint on outside air temperature.
+			//if()
+			Minimum_Outside_Air_Temperature=min;
+			Maximum_Outside_Air_Temperature=max;
+			return true;
+		}
+		bool CMode::InitializeOutsideAirHumidityRatioConstraints(double min, double max)
+		{
+			//minimum 0.00 maximum 0.10, units kgWater / kgDryAir
+			//note Mode0 will not be considerd when outside air absolute humidity is below the value in this field.
+			//note If this field is blank, the lower constraint on outside air humidity ratio will be 0.00 kgWater / kgDryAir., default 0.00
+			//the upper constraint on outside air humidity ratio will be 0.10 kgWater / kgDryAir, default 0.10
+			Minimum_Outside_Air_Humidity_Ratio = min;
+			Maximum_Outside_Air_Humidity_Ratio = max;
+			return true;
+		}
+		bool CMode::InitializeOutsideAirRelativeHumidityConstraints(double min, double max)
+		{
+			//minimum 0.00,maximum 100.00, units percent, Mode0 will not be considered when the outside air relative humidity is below the value in this field.
+			// note If this field is blank, the lower constraint on outside air relative humidity will be 0.00% (default 0.00), the upper constraint on outside air relative humidity will be 100.00%, (default 100.00)
+
+			Minimum_Outside_Air_Relative_Humidity = min;
+			Maximum_Outside_Air_Relative_Humidity = max;
+			return true;
+		}
+		bool CMode::InitializeReturnAirTemperatureConstraints(double min, double max)
+		{
+			//will not be considered when the return air temperature is below the value in this field.
+			//If this field is blank, there will be no lower constraint on return air temperature
+			Minimum_Return_Air_Temperature = min;
+			Maximum_Return_Air_Temperature = max;
+			return true;
+		}
+		bool CMode::InitializeReturnAirHumidityRatioConstraints(double min, double max)
+		{
+			//minimum 0.00 maximum 0.10, units kgWater / kgDryAir
+			//note Mode0 will not be considerd when outside air absolute humidity is below the value in this field.
+			//note If this field is blank, the lower constraint on outside air humidity ratio will be 0.00 kgWater / kgDryAir., default 0.00
+			//the upper constraint on outside air humidity ratio will be 0.10 kgWater / kgDryAir, default 0.10
+			Minimum_Return_Air_Humidity_Ratio = min;
+			Maximum_Return_Air_Humidity_Ratio = max;
+			return true;
+		}
+		bool CMode::InitializeReturnAirRelativeHumidityConstraints(double min, double max)
+		{
+			//minimum 0.00,maximum 100.00, units percent, Mode0 will not be considered when the outside air relative humidity is below the value in this field.
+			// note If this field is blank, the lower constraint on outside air relative humidity will be 0.00% (default 0.00), the upper constraint on outside air relative humidity will be 100.00%, (default 100.00)
+			Minimum_Return_Air_Relative_Humidity = min;
+			Maximum_Return_Air_Relative_Humidity = max;
+			return true;
+		}
+
+
+		bool CMode::InitializeOSAFConstraints(double minOSAF, double maxOSAF)
+		{
+			//minimum 0.00, maximum 1.00, Outside air fractions below this value will not be considered.
+			//If this field is blank, the lower constraint on outside air fraction will be 0.00,default 0.10
+			Min_OAF=minOSAF;
+			Max_OAF=maxOSAF;
+			return true;
+		}
+		bool CMode::InitializeMsaRatioConstraints(double minMsa, double maxMsa)
+		{
+			//minimum 0.00, maximum 1.00, Supply air mass flow rate ratios below this value will not be considered.
+			//Supply air mass flow rate ratio describes supply air mass flow rate as a fraction of mass flow rate associated with the value in field : "System Maximum Supply Air Flow Rate".
+			//If this field is blank, the lower constraint on outside air fraction will be 0.00,default 0.10
+			Min_Msa=minMsa;
+			Max_Msa=maxMsa;
+			return true;
+		}
+		bool CMode::ValidPointer(int curve_pointer) {
+			if (curve_pointer >= 0) return true;
+			else  return false;
+		}
+		double CMode::CalculateCurveVal(double X_0, double X_1, double X_2, double X_3, double X_4, double X_5, double X_6, int mode_number, int curveType)
+		{
+			double Y_val = 0;
+
+			switch (curveType)
+			{
+			case TEMP_CURVE:
+				if( ValidPointer(Tsa_curve_pointer))
+				{
+					Y_val = CurveValue(Tsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+				}
+				else { Y_val = X_4;//return air temp
+				}
+				
+				break;
+			case W_CURVE:
+				
+				if (ValidPointer(HRsa_curve_pointer))
+				{
+					Y_val = CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);//0.01;//
+				}
+				else {
+					Y_val = X_5;//return HR
+				}
+				break;
+			case POWER_CURVE:
+				
+				if (ValidPointer(Psa_curve_pointer))
+				{
+					Y_val = CurveValue(Psa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+				}
+				else {
+					Y_val = 0;//or set a more reasonable default
+				}
+				break;
+			default:
+				break;
+			}
+
+			return Y_val;
+		}
+		void CMode::InitializeCurve(int curveType, int curve_ID)
+		{
+			switch (curveType)
+			{
+			case TEMP_CURVE:
+				Tsa_curve_pointer=curve_ID;
+				break;
+			case W_CURVE:
+				HRsa_curve_pointer=curve_ID;
+				break;
+			case POWER_CURVE:
+				Psa_curve_pointer=curve_ID;
+				break;
+			default:
+				break;
+			}
+		}
+
+		bool CMode::GenerateSolutionSpace(double ResolutionMsa,double ResolutionOSA)
+		{
+			double deltaMsa = Max_Msa -Min_Msa;
+			double deltaOAF = Max_OAF - Min_OAF  ;
+			double Msastep_size = (deltaMsa * ResolutionMsa);
+			double OAFsteps_size = (deltaOAF * ResolutionOSA);
+
+
+			for (double Msa_val = Min_Msa; Msa_val <= Max_Msa; Msa_val = Msa_val + Msastep_size)
+			{
+				for (double OAF_val = Min_OAF; OAF_val <= Max_OAF; OAF_val = OAF_val + OAFsteps_size)
+				{
+					//sol.PointX.push_back( i);
+					//sol.PointY.push_back(j);
+					sol.AddItem(Msa_val, OAF_val, 0);
+				}
+
+			}
+			return true;
+		}
+		bool CMode::ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject)
+		{
+			int alphas_len = Alphas.size();
+			int numbers_len = Numbers.size();
+			int OpperatingModes = Numbers(4);
+			int parmsnumber = alphas_len + numbers_len;
+			int MinimumExpectedLength = OpperatingModes*(MODE_BLOCK_OFFSET_Number + MODE_BLOCK_OFFSET_Alpha) + BLOCK_HEADER_OFFSET_Alpha + BLOCK_HEADER_OFFSET_Number;
+			if (MinimumExpectedLength > (parmsnumber)) return false;
+			if (OpperatingModes< ModeID) return false;
+			return true;
+		}
+
+
+		bool CMode::ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields,  Array1D<bool>  lAlphaBlanks,std::string cCurrentModuleObject)
+		{
+			
+			if(!ValidateArrays(Alphas, cAlphaFields, Numbers, cNumericFields, cCurrentModuleObject))
+			{
+				ShowSevereError("Mode description array does not match mode number, in"  + cCurrentModuleObject);
+				return false;
+			}
+				 
+			bool ErrorsFound=false;
+			int inter_Alpha = BLOCK_HEADER_OFFSET_Alpha + MODE_BLOCK_OFFSET_Alpha * ModeID;
+			int inter_Number = BLOCK_HEADER_OFFSET_Number + MODE_BLOCK_OFFSET_Number* ModeID;
+
+			int curveID = -1;
+			if (lAlphaBlanks(inter_Alpha)) {
+				InitializeCurve(TEMP_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+			}
+			else
+			{
+				curveID = GetCurveIndex(Alphas(inter_Alpha));
+				if (curveID == 0) {
+					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
+					ShowContinueError("Entered in " + cCurrentModuleObject );
+					ErrorsFound = true;
+					InitializeCurve(TEMP_CURVE, -1);
+				}
+				else { InitializeCurve(TEMP_CURVE, curveID); }
+
+			}
+
+			inter_Alpha = inter_Alpha + 1;
+			//ZoneHybridUnitaryAirConditioner(UnitLoop).Tsa_curve_pointer.push_back(GetCurveIndex(Alphas(19)));
+
+			//A20, \field Mode0 Supply Air Humidity Ratio Lookup Table Name
+			curveID = -1;
+			if (lAlphaBlanks(inter_Alpha)) {
+				InitializeCurve(W_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+			}
+			else
+			{
+				curveID = GetCurveIndex(Alphas(inter_Alpha));
+				if (curveID == 0) {
+					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
+					ShowContinueError("Entered in " + cCurrentModuleObject );
+					ErrorsFound = true;
+					InitializeCurve(W_CURVE, -1);
+				}
+				else { InitializeCurve(W_CURVE, curveID); }
+
+			}
+			inter_Alpha = inter_Alpha + 1;
+			//A21, \field Mode0 System Electric Power Lookup Table Name
+			curveID = -1;
+			if (lAlphaBlanks(inter_Alpha)) {
+				InitializeCurve(POWER_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+			}
+			else
+			{
+				curveID = GetCurveIndex(Alphas(inter_Alpha));
+				if (curveID == 0) {
+					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
+					ShowContinueError("Entered in " + cCurrentModuleObject );
+					ErrorsFound = true;
+					InitializeCurve(POWER_CURVE, -1);
+				}
+				else { InitializeCurve(POWER_CURVE, curveID); }
+
+			}
+			//A22, \field Mode0 Supply Fan Electric Power Lookup Table Name
+			//A23, \field Mode0 External Static Pressure Lookup Table Name
+			//A24, \field Mode0 System Second Fuel Consumption Lookup Table Name
+			//A25, \field Mode0 System Third Fuel Consumption Lookup Table Name
+			//A26, \field Mode0 System Water Use Lookup Table Name
+			//N6, \field Mode0  Minimum Outside Air Temperature
+			//N7, \field Mode0  Maximum Outside Air Temperature
+			bool ok = InitializeOutsideAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number+1)); //Numbers(6), Numbers(7));
+			if (!ok) {
+				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
+				ShowContinueError("Entered in " + cCurrentModuleObject );
+				ErrorsFound = true;
+			}
+			inter_Number = inter_Number + 2;
+			//N8, \field Mode0  Minimum Outside Air Humidity Ratio
+			//N9, \field Mode0  Maximum Outside Air Humidity Ratio
+			ok = InitializeOutsideAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));//Numbers(8), Numbers(9));
+			if (!ok) {
+				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
+				ShowContinueError("Entered in " + cCurrentModuleObject );
+				ErrorsFound = true;
+			}
+			inter_Number = inter_Number + 2;
+			//N10, \field Mode0 Minimum Outside Air Relative Humidity
+			//N11, \field Mode0 Maximum Outside Air Relative Humidity
+			ok = InitializeOutsideAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));//Numbers(10), Numbers(11));
+			if (!ok) {
+				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
+				ShowContinueError("Entered in " + cCurrentModuleObject );
+				ErrorsFound = true;
+			}
+			inter_Number = inter_Number + 2;
+			//N12, \field Mode0 Minimum Return Air Temperature
+			//N13, \field Mode0 Maximum Return Air Temperature
+			ok = InitializeReturnAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));//Numbers(12), Numbers(13));
+			if (!ok) {
+				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
+				ShowContinueError("Entered in " + cCurrentModuleObject );
+				ErrorsFound = true;
+			}
+			inter_Number = inter_Number + 2;
+			//N14, \field Mode0 Minimum Return Air Humidity Ratio 
+			//N15, \field Mode0 Maximum Return Air Humidity Ratio
+			ok = InitializeReturnAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));//Numbers(14), Numbers(15))
+			if (!ok) {
+				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
+				ShowContinueError("Entered in " + cCurrentModuleObject );
+				ErrorsFound = true;
+			}
+			inter_Number = inter_Number + 2;
+			//N16, \field Mode0 Minimum Return Air Relative HumidityInitialize
+			//N17, \field Mode0 Maximum Return Air Relative Humidity
+			ok = InitializeReturnAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));//Numbers(16), Numbers(17));
+			if (!ok) {
+				ShowSevereError("Invalid " + cAlphaFields(inter_Number) + '=' + Alphas(inter_Number) + "Or Invalid" + cAlphaFields(inter_Number + 1) + '=' + Alphas(inter_Number + 1));
+				ShowContinueError("Entered in " + cCurrentModuleObject );
+				ErrorsFound = true;
+			}
+			inter_Number = inter_Number + 2;
+			//N18, \field Mode0 Minimum Outside Air Fraction
+			//N19, \field Mode0 Maximum Outside Air Fraction
+
+			ok = InitializeOSAFConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));//Numbers(18), Numbers(19));
+			if (!ok) {
+				ShowSevereError("Error in OSAFConstraints" + cAlphaFields(inter_Number) + "through" + cAlphaFields(inter_Number+1));
+				ShowContinueError("Entered in " + cCurrentModuleObject );
+				ErrorsFound = true;
+			}
+			//N20, \field Mode0 Minimum Supply Air Mass Flow Rate Ratio
+			//N21, \field Mode0 Maximum Supply Air Mass Flow Rate Ratio
+			inter_Number = inter_Number + 2;
+			ok = InitializeMsaRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));//Numbers(20), Numbers(21));
+			if (!ok) {
+				ShowSevereError("Error in OSAFConstraints" + cAlphaFields(inter_Number) + "through" + cAlphaFields(inter_Number + 1));
+				ShowContinueError("Entered in " + cCurrentModuleObject );
+				ErrorsFound = true;
+			}
+
+			return ErrorsFound;
+		}
+		// Alpha items for object
+		 // Numeric items for object
+		  // Alpha field names
+		// Numeric field names
+
+		bool CMode::MeetsOAEnvConstraints(double Tosa, double Wosa, double RHosa)
+		{
+			bool OATempConstraintmet = false;
+			bool OARHConstraintmet = false;
+		  //	double RHosa = Part_press(101.325, Wosa) / Sat_press(Tosa);
+
+			if (Tosa >= Minimum_Outside_Air_Temperature && Tosa <= Maximum_Outside_Air_Temperature)
+			{
+				OATempConstraintmet = true;
+			}
+
+			if (Wosa >= Minimum_Outside_Air_Humidity_Ratio && Wosa <= Maximum_Outside_Air_Humidity_Ratio)
+			{
+				OARHConstraintmet = 1;
+			}
+
+			if (RHosa >=  Minimum_Outside_Air_Relative_Humidity  && RHosa <= Maximum_Outside_Air_Relative_Humidity)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		bool Model::MeetsSupplyAirTOC(double Tosa)
+		{
+			using ScheduleManager::GetCurrentScheduleValue;
+			double MinSAT = 10;
+			double MaxSAT = 20;
+			if (TsaMin_schedule_pointer > 0) {
+				MinSAT = GetCurrentScheduleValue(TsaMin_schedule_pointer);
+			}
+			if (TsaMax_schedule_pointer > 0) {
+				MaxSAT = GetCurrentScheduleValue(TsaMax_schedule_pointer);
+			}
+			if (Tosa < MinSAT || Tosa > MaxSAT)
+				return false;
+			return true;
+		}
+
+		bool Model::MeetsSupplyAirRHOC(double Wosa)
+		{
+			// implement
+			if (Wosa < 0)
+				//temp fix
+				Wosa = 0.003;
+			//return false;
+			return true;
+		}
+
 		Model::Model() :
-				Tsa_schedule_pointer(0),
+				//Tsa_curve_pointer(0), HRsa_curve_pointer(0),Psa_curve_pointer(0),
+				TsaMin_schedule_pointer(0),
+				TsaMax_schedule_pointer(0),
+				RHsaMin_schedule_pointer(0),
+				RHsaMax_schedule_pointer(0),
 				ZoneNodeNum(0),
 				MsaCapacityRatedCond(0),
 				SchedPtr(0),
@@ -71,7 +467,7 @@ namespace EnergyPlus {//***************
 				SecOutletEnthalpy(0.0),
 				SecOutletPressure(0.0),
 				SecOutletRH(0.0), 
-				Wsa(0.0),
+				Wsa(0.0), ElectricalPower(0.0), SupplyVentilationAir(0.0),
 			Initialized(false)
 		{
 			//InitializeModelParams();
@@ -83,8 +479,11 @@ namespace EnergyPlus {//***************
 			count_SAT_OC_MetOnce = 0;
 			count_DidWeMeetLoad = 0;
 			InitializeModelParams();
+
+			ModeCounter = 0;
 		}
 		//*************************************************
+	
 
 		void Model::InitializeModelParams()
 		{
@@ -123,16 +522,23 @@ namespace EnergyPlus {//***************
 			RequestedLoad_t_n6 = 0;
 			RequestedLoad_t_n7 = 0;
 			RequestedLoad_t_n8 = 0;
-
 		}
-
+			
 		Model::~Model()                 // destructor, just an example
 		{
 			list<CModeSolutionSpace*>::iterator iter;
-			for (iter = XandYPoints.begin(); iter != XandYPoints.end(); ++iter) {
+			for (iter = SolutionSpaces.begin(); iter != SolutionSpaces.end(); ++iter) {
 				CModeSolutionSpace* p = (*iter);
 				delete p;
 			}
+		}
+		CMode::~CMode()                 // destructor, just an example
+		{
+			/*list<CModeSolutionSpace*>::iterator iter;
+			for (iter = sol.begin(); iter != sol.end(); ++iter) {
+				CModeSolutionSpace* p = (*iter);
+				delete p;
+			}*/
 		}
 
 		// GetAge, Public accessor function
@@ -162,6 +568,16 @@ namespace EnergyPlus {//***************
 
 			return -Q;
 		}
+
+		CMode* Model::AddNewOperatingMode()
+		{
+			CMode* pMode = new CMode;
+			pMode->ModeID = ModeCounter;
+			ModeCounter++;
+			OperatingModes.push_back(pMode);
+	
+			return pMode;
+		}
 		void Model::Initialize(std::string fmuLocation)//, ConfigFile* pConfig)
 		{
 			if (Initialized) return;
@@ -171,37 +587,19 @@ namespace EnergyPlus {//***************
 			
 			//	Config->TrimFilename(strfmuLocation,dir);
 			//	cout<<"debug 1"<<strfmuLocation;
-			Config = new ConfigFile;
-			Config->ParseConfigFile(strfmuLocation);
+			//Config = new ConfigFile;
+	//		Config->ParseConfigFile(strfmuLocation);
 			Initialized = true;
 			//Iterate through modes of operation
-			ResolutionX = 0.02; //msa/msaRATED
-			ResolutionY = 0.02; //OSAF as absolute fraction (not %)
+			ResolutionMsa = 0.2; //msa/msaRATED
+			ResolutionOSA = 0.2; //OSAF as absolute fraction (not %)
 								// get system values
-
-			RatedH = Config->GetRatedH();
-			//	MinOA_Msa=Config->GetMinVR();
-			//	MsaRated=Config->GetRatedMsa();
-			//	Generate point matrix using Tessellate function from operatiing conditions
-			//store in  XandYPoints
-			//int OC_N=Config->OperatingConditionN;
-			vector<double>  Xvals;
-			vector<double>  Yvals;
-			while (Config->GetNextOpConst(Xvals, Yvals))//i=0,i<>OC_N,i++)
+			for each (CMode* Mode in OperatingModes)
 			{
-				try
-				{
-					CModeSolutionSpace* sol = Tessellate(Xvals, Yvals);//first pass points from 609 are zero
-					XandYPoints.push_back(sol);
-				}
-				catch (int e)
-				{
-					ShowFatalError("An exception occurred in Tessellate. Exception Nr");
-					//cout << "An exception occurred in Tessellate. Exception Nr. " << e << '\n';
-					//Sleep(100000);
-					return;
-				}
+				Mode->GenerateSolutionSpace(ResolutionMsa, ResolutionOSA);
 			}
+
+
 			Initialized = true;
 		}
 
@@ -217,362 +615,9 @@ namespace EnergyPlus {//***************
 			return floor(x + 0.5);
 		}
 
-		double Model::CalculateCurveVal(double X_0, double X_1, double X_2, double X_3, double X_4, double X_5, double X_6, int mode_number, int curve_ID)
-		{
-			double Y_val = 0;
-			vector<double> curve2;
-			int CurveNumber = 3 * mode_number + curve_ID;
-			ConfigDataItem * curve = Config->GetBcoefficientCurve(CurveNumber);
-			vector<double>  B = ((*curve).Items);
-			double B0 = B[0];
-			double t1 = B[0] * (X_0 * X_0);
-			double t2 = B[1] * (X_0 * X_1);
-			double t3 = B[2] * (X_0 * X_2);
-			double t4 = B[3] * (X_0 * X_3);
-			double t5 = B[4] * (X_0 * X_4);
-			double t6 = B[5] * (X_0 * X_5);
-			double t7 = B[6] * (X_0 * X_6);
-
-			Y_val = B[0] * (X_0 * X_0) + B[1] * (X_0 * X_1) + B[2] * (X_0 * X_2) + B[3] * (X_0 * X_3) + B[4] * (X_0 * X_4) + B[5] * (X_0 * X_5) + B[6] * (X_0 * X_6);
-			Y_val = Y_val + B[7] * (X_1 * X_1) + B[8] * (X_1 * X_2) + B[9] * (X_1 * X_3) + B[10] * (X_1 * X_4) + B[11] * (X_1 * X_5) + B[12] * (X_1 * X_6);
-			Y_val = Y_val + B[13] * (X_2 * X_2) + B[14] * (X_2 * X_3) + B[15] * (X_2 * X_4) + B[16] * (X_2 * X_5) + B[17] * (X_2 * X_6);
-			Y_val = Y_val + B[18] * (X_3 * X_3) + B[19] * (X_3 * X_4) + B[20] * (X_3 * X_5) + B[21] * (X_3 * X_6);
-			Y_val = Y_val + B[22] * (X_4 * X_4) + B[23] * (X_4 * X_5) + B[24] * (X_4 * X_6);
-			Y_val = Y_val + B[25] * (X_5 * X_5) + B[26] * (X_5 * X_6);
-			Y_val = Y_val + B[27] * (X_6 * X_6);
-			return Y_val;
-		}
-
-		CModeSolutionSpace* Model::Tessellate(vector<double>&  Xvals, vector<double>&  Yvals)
-		{
-			double X1, X2, X3, X4, Y1, Y2, Y3, Y4;
-			bool RotationFlag;
-			vector<int> AscendingOrder(4);
-			vector<double> StartY(3), EndY(3), RangeY(3), StepY(3), StartX, EndX, RangeX, StepX, PointBuffer;
-			vector<int> nY(3), nX;
-			double MaxX, MinX, dxdyLeft, dxdyRight;
-			int nMax;
-
-			X1 = Xvals[0];
-			X2 = Xvals[1];
-			X3 = Xvals[2];
-			X4 = Xvals[3];
-			Y1 = Yvals[0];
-			Y2 = Yvals[1];
-			Y3 = Yvals[2];
-			Y4 = Yvals[3];
-			CModeSolutionSpace *Solution = new CModeSolutionSpace;
-
-			if ((Y2 >= Y1 && Y2 >= Y3) || (Y3 <= Y2 && Y3 <= Y4))
-			{
-				RotationFlag = true;
-				if (X4 < X1) {
-					static const double arrX[] = { X4, X3, X2, X1 };
-					static const double arrY[] = { Y4, Y3, Y2, Y1 };
-					vector<double> vecX(arrX, arrX + sizeof(arrX) / sizeof(arrX[0]));
-					PolygonYs = vecX; //so becuase this is rotated the X's are Y's or something like that.
-
-					vector<double> vecY(arrY, arrY + sizeof(arrY) / sizeof(arrY[0]));
-					PolygonXs = vecY; //so becuase this is rotated the X's are Y's or something like that.
-				}
-				else
-				{
-					static const double arrX[] = { X1, X4, X3, X2 };
-					static const double arrY[] = { Y1, Y4, Y3, Y2 };
-					vector<double> vecX(arrX, arrX + sizeof(arrX) / sizeof(arrX[0]));
-					PolygonYs = vecX; //so becuase this is rotated the X's are Y's or something like that.
-
-					vector<double> vecY(arrY, arrY + sizeof(arrY) / sizeof(arrY[0]));
-					PolygonXs = vecY; //so becuase this is rotated the X's are Y's or something like that.
-				}
-			}
-			else
-			{
-				RotationFlag = false;
-				static const double arrX[] = { X1, X2, X3, X4 };
-				static const double arrY[] = { Y1, Y2, Y3, Y4 };
-				vector<double> vecX(arrX, arrX + sizeof(arrX) / sizeof(arrX[0]));
-				PolygonXs = vecX;
-
-				vector<double> vecY(arrY, arrY + sizeof(arrY) / sizeof(arrY[0]));
-				PolygonYs = vecY;
-			}
-			//Determine the ascending order of the points in the Y direction
-			//Store the order indices in "AscendingOrder"
-			AscendingOrder[0] = 0;
-			if (PolygonYs[1] < PolygonYs[2])
-			{
-				AscendingOrder[1] = 1;
-				AscendingOrder[2] = 2;
-			}
-			else
-			{
-				AscendingOrder[1] = 2;
-				AscendingOrder[2] = 1;
-			}
-
-			if (PolygonYs[3] < PolygonYs[AscendingOrder[1]])
-			{
-				AscendingOrder[3] = AscendingOrder[2];
-				AscendingOrder[2] = AscendingOrder[1];
-				AscendingOrder[1] = 3;
-			}
-			else if (PolygonYs[3] < PolygonYs[AscendingOrder[2]])
-			{
-				AscendingOrder[3] = AscendingOrder[2];
-				AscendingOrder[2] = 3;
-			}
-			else
-			{
-				AscendingOrder[3] = 3;
-			}
-
-			//Divide the Y direction into discrete sections separated by the polygon points
-			//First section
-			StartY[0] = PolygonYs[AscendingOrder[0]];
-			EndY[0] = PolygonYs[AscendingOrder[1]];
-			RangeY[0] = EndY[0] - StartY[0];
-			nY[0] = Round(RangeY[0] / ResolutionY); //Normally I would use mod here but VBA has a weird Mod function
-			if (nY[0] != 0)
-			{
-				StepY[0] = RangeY[0] / nY[0];
-			}
-			else
-			{
-				StepY[0] = 0;
-			}
-			//Second section
-
-			StartY[1] = PolygonYs[AscendingOrder[1]];
-			EndY[1] = PolygonYs[AscendingOrder[2]];
-			RangeY[1] = EndY[1] - StartY[1];
-			nY[1] = Round(RangeY[1] / ResolutionY);
-			if (nY[1] != 0)
-			{
-				StepY[1] = RangeY[1] / nY[1];
-			}
-			else
-			{
-				StepY[1] = 0;
-			}
-
-			//Third section
-			StartY[2] = PolygonYs[AscendingOrder[2]];
-			EndY[2] = PolygonYs[AscendingOrder[3]];
-			RangeY[2] = EndY[2] - StartY[2];
-			nY[2] = Round(RangeY[2] / ResolutionY);
-			if (nY[2] != 0)
-			{
-				StepY[2] = RangeY[2] / nY[2];
-			}
-			else
-			{
-				StepY[2] = 0;
-			}
-
-			MaxX = PolygonXs[0];
-			MinX = PolygonXs[0];
-			for (int i = 1;i != 4;i++)
-			{
-				if (PolygonXs[i] < MinX)
-				{
-					MinX = PolygonXs[i];
-				}
-				else if (PolygonXs[i] > MaxX) //why has this an if and an else if that happend if its the same.
-				{
-					MaxX = PolygonXs[i];
-				}
-			}
-			nMax = (((PolygonYs[AscendingOrder[3]] - PolygonYs[AscendingOrder[0]]) / ResolutionY) + 2) * (((MaxX - MinX) / ResolutionX) + 2);//int?
-			nMax = Round(floor(nMax + 0.5));
-
-			int newStartXsize = (nY[0] + nY[1] + nY[2] + 1);
-			StartX.resize(newStartXsize + 1);///added plus 1 (should it perhaps populate from 0 insstead? (see below)
-
-			int newEndXsize = (nY[0] + nY[1] + nY[2] + 1);
-			EndX.resize(newEndXsize + 1);///added plus 1 (should it perhaps populate from 0 insstead? 
-
-			RangeX.resize(nY[0] + nY[1] + nY[2] + 1);//added plus 1 (should it perhaps populate from 0 insstead?
-			nX.resize(nY[0] + nY[1] + nY[2] + 1); //same
-			StepX.resize(nY[0] + nY[1] + nY[2] + 1);//same
-			Solution->PointX.resize(nMax);
-			Solution->PointY.resize(nMax);
-			Solution->PointMeta.resize(nMax);
-			PointBuffer.resize(nMax);
 
 
-			//NCD-------------------------------------
-			//I removed the initialization so the values start at 0 to help with plotting
-			//initialize array
-			//For i = 0 To UBound(PointX)
-			//PointX(i) = -99
-			//Next
-
-			//'For i = 0 To UBound(PointY)
-			//'PointY(i) = -99
-			//'Next
-			//'-----------------------------------------
-			//
-			//'k will be used for the point ID
-			int k = 0;
-
-			//First Section
-
-			//If two points are at the same height calculating dxdy will cause a divide by zero error
-			if (PolygonYs[AscendingOrder[0]] == PolygonYs[AscendingOrder[1]])
-			{
-				StartX[0] = PolygonXs[AscendingOrder[0]];
-				EndX[0] = PolygonXs[AscendingOrder[1]];
-				dxdyLeft = (PolygonXs[3] - PolygonXs[0]) / (PolygonYs[3] - PolygonYs[0]);
-				dxdyRight = (PolygonXs[2] - PolygonXs[1]) / (PolygonYs[2] - PolygonYs[1]);
-			}
-			else
-			{
-				StartX[0] = PolygonXs[AscendingOrder[0]];
-				EndX[0] = PolygonXs[AscendingOrder[0]];
-				dxdyLeft = (PolygonXs[3] - PolygonXs[0]) / (PolygonYs[3] - PolygonYs[0]);
-				dxdyRight = (PolygonXs[1] - PolygonXs[0]) / (PolygonYs[1] - PolygonYs[0]);
-			}
-			//Step through the points in the first section and record their coordinates
-			for (int i = 0; i != (nY[0] + 1);i++)//check
-			{
-				RangeX[i] = EndX[i] - StartX[i];
-				nX[i] = Round(RangeX[i] / ResolutionX);
-				if (nX[i] != 0)
-				{
-					StepX[i] = RangeX[i] / nX[i];
-				}
-				else
-				{
-					StepX[i] = 0;
-				}
-
-				for (int j = 0;j != (nX[i] + 1);j++)
-				{
-					Solution->PointX[k] = StartX[i] + j * StepX[i];
-					Solution->PointY[k] = StartY[0] + i * StepY[0];
-					k = k + 1;
-				}
-
-				StartX[i + 1] = StartX[i] + dxdyLeft * StepY[0];
-				EndX[i + 1] = EndX[i] + dxdyRight * StepY[0];
-			}
-
-			//Second section
-
-			if (PolygonYs[AscendingOrder[1]] == PolygonYs[AscendingOrder[2]])
-			{
-				dxdyLeft = (PolygonXs[2] - PolygonXs[3]) / (PolygonYs[2] - PolygonYs[3]);
-				dxdyRight = (PolygonXs[2] - PolygonXs[1]) / (PolygonYs[2] - PolygonYs[1]);
-			}
-			else            //Determine weather the slope of the left or right bounding line has changed in this section
-			{
-				if (AscendingOrder[1] == 1)
-				{
-					dxdyRight = (PolygonXs[2] - PolygonXs[1]) / (PolygonYs[2] - PolygonYs[1]);
-				}
-				else        //AscendingOrder(1] must equal 3
-				{
-					dxdyLeft = (PolygonXs[2] - PolygonXs[3]) / (PolygonYs[2] - PolygonYs[3]);
-				}
-			}
-
-			//Step through the points in the second section and record their coordinates
-			for (int i = nY[0] + 1; i != (nY[0] + nY[1] + 1);i++)//is this an error should it start from 0
-			{
-				RangeX[i] = EndX[i] - StartX[i];
-				nX[i] = Round(RangeX[i] / ResolutionX);
-				if (nX[i] != 0)
-				{
-					StepX[i] = RangeX[i] / nX[i];
-				}
-				else
-				{
-					StepX[i] = 0;
-				}
-
-				for (int j = 0; j != (nX[i] + 1);j++)
-				{
-					Solution->PointX[k] = StartX[i] + j * StepX[i];
-					Solution->PointY[k] = StartY[1] + ((i - nY[0]) * StepY[1]);
-					k = k + 1;
-				}
-
-				StartX[i + 1] = StartX[i] + dxdyLeft * StepY[1];
-				EndX[i + 1] = EndX[i] + dxdyRight * StepY[1];
-			}
-
-			//Third section
-
-			if (PolygonYs[AscendingOrder[2]] == PolygonYs[AscendingOrder[3]])
-			{
-				dxdyLeft = 0;
-				dxdyRight = 0;
-			}
-			else            //Determine weather the slope of the left or right bounding line has changed in this section
-			{
-				if (AscendingOrder[3] == 1)
-				{
-					dxdyLeft = (PolygonXs[1] - PolygonXs[2]) / (PolygonYs[1] - PolygonYs[2]);
-				}
-				else if (AscendingOrder[3] == 3)
-				{
-					dxdyRight = (PolygonXs[3] - PolygonXs[2]) / (PolygonYs[3] - PolygonYs[2]);
-				}
-				else        //AscendingOrder(3) must equal 2
-				{
-					if (AscendingOrder[2] == 1)
-					{
-						dxdyRight = (PolygonXs[2] - PolygonXs[1]) / (PolygonYs[2] - PolygonYs[1]);
-					}
-					else    //AscendingOrder(2) must equal 3
-					{
-						dxdyLeft = (PolygonXs[2] - PolygonXs[3]) / (PolygonYs[2] - PolygonYs[3]);
-					}
-				}
-			}
-
-			for (int i = nY[0] + nY[1] + 1; i != (1 + nY[0] + nY[1] + nY[2]);i++)
-			{
-				RangeX[i] = EndX[i] - StartX[i];
-				nX[i] = Round(RangeX[i] / ResolutionX);
-				if (nX[i] != 0)
-				{
-					StepX[i] = RangeX[i] / nX[i];
-				}
-				else
-				{
-					StepX[i] = 0;
-				}
-
-				for (int j = 0; j != nX[i] + 1;j++)
-				{
-					Solution->PointX[k] = StartX[i] + j * StepX[i];
-					Solution->PointY[k] = StartY[2] + ((i - nY[0] - nY[1]) * StepY[2]);
-					k = k + 1;
-				}
-
-				StartX[i + 1] = StartX[i] + dxdyLeft * StepY[2];
-				EndX[i + 1] = EndX[i] + dxdyRight * StepY[2];
-			}
-
-			if (RotationFlag == true)
-			{
-				for (int i = 0; i != (k - 1 + 1);i++)
-				{
-					PointBuffer[i] = Solution->PointX[i];
-					Solution->PointX[i] = Solution->PointY[i];
-					Solution->PointY[i] = PointBuffer[i];
-				}
-			}
-
-
-
-			//	Solution->PointX.push_front(1.0);
-			//	Solution->PointY.push_front(1.0);
-			//	Solution->PointMeta.push_front(1.0);
-			return Solution;
-		}
+		
 
 		double Model::Part_press(double P, double W)
 		{
@@ -634,27 +679,7 @@ namespace EnergyPlus {//***************
 			double Hum_rat = 0.62198 * RH * Pws / (P - RH * Pws);   // Equation 22, 24, p6.8
 			return Hum_rat;
 		}
-		bool Model::MeetsSupplyAirTOC(double Tosa)
-		{
-			using ScheduleManager::GetCurrentScheduleValue;
-			double MinSAT = 10;
-			if (Tsa_schedule_pointer > 0) {
-				MinSAT = GetCurrentScheduleValue(Tsa_schedule_pointer);
-			}
-			if (Tosa < MinSAT) //implement
-				return false;
-			return true;
-		}
 
-		bool Model::MeetsSupplyAirRHOC(double Wosa)
-		{
-			// implement
-			if (Wosa < 0)
-				//temp fix
-				Wosa = 0.003;
-				//return false;
-			return true;
-		}
 		double Model::CheckVal_W(double W)
 		{
 			if ((W > 1) || (W < 0))
@@ -674,79 +699,6 @@ namespace EnergyPlus {//***************
 			return T;
 		}
 
-		bool Model::MeetsOAEnvConstraints(double Tosa, double Wosa, double RHosa, int ModeNumber)
-		{
-			bool OATempConstraintmet = false;
-			bool OARHConstraintmet = false;
-			double ToaConstrainLow = Config->GetECLow(DEF_Tdb, ModeNumber); // spencer make changes here
-			double ToaConstrainHi = Config->GetECHi(DEF_Tdb, ModeNumber);
-
-			double RHoaConstrainLow = Config->GetECLow(DEF_RH, ModeNumber);
-			double RHoaConstrainHi = Config->GetECHi(DEF_RH, ModeNumber);
-
-			//	double RHosa = Part_press(101.325, Wosa) / Sat_press(Tosa);
-
-			if (Tosa >= ToaConstrainLow && Tosa <= ToaConstrainHi)
-			{
-				OATempConstraintmet = true;
-			}
-
-			if (RHosa >= RHoaConstrainLow && RHosa <= RHoaConstrainHi)
-			{
-				OARHConstraintmet = 1;
-			}
-
-
-			if (OARHConstraintmet == 1 && OATempConstraintmet == 1)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		/*
-		void MeetsIAEnvConstraints()
-		{
-		RATempConstraintmet = 0
-		RAWConstraintmet = 0
-		TraConstrainLow = ECLow(2, ModeNumber)
-		TraConstrainHi = ECHi(2, ModeNumber)
-
-		WraConstrainLow = ECLow(3, ModeNumber)
-		WraConstrainHi = ECHi(3, ModeNumber)
-
-		If Tra > TraConstrainLow And Tra < TraConstrainHi Then
-		RATempConstraintmet = 1
-		End If
-
-		If Wra > WraConstrainLow And Wra < WraConstrainHi Then
-
-		RAWConstraintmet = 1
-		End If
-
-		If RAWConstraintmet = 1 And RATempConstraintmet = 1 Then
-		MeetsIAEnvConstraints = 1
-		Else
-		MeetsIAEnvConstraints = 0
-		End If
-
-		}*/
-		double Model::CalculateSupplyAirDBTempAtRefCon()
-		{
-			double Tosa_ref = 37.78; //these can not be hard coded and need to be from config file?
-			double wOSA_ref = 0.010058395;
-			double TdbRA_ref = 25.55555556;
-			double wRA_ref = 0.0095145622;
-			double MsaRatio_ref = 1;
-			double OSAF_ref = 0.45;
-			int modenumber = 2;
-
-			double TsaRef = CalculateCurveVal(1, Tosa_ref, wOSA_ref, TdbRA_ref, wRA_ref, MsaRatio_ref, OSAF_ref, modenumber, TEMP_CURVE); //TEMP_CURVE W_CURVE POWER_CURVE
-			return TsaRef;
-		}
 
 		double Model::CalculateMixedAirTemp()
 		{
@@ -757,7 +709,68 @@ namespace EnergyPlus {//***************
 			return MixedAirDBTempAtRefCon;
 
 		}
-		void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode) {
+
+		void Model::RunTestModel(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR)
+		{
+			//double tempHumidity = RHra;
+			OutletTemp = 12;
+			MinOA_Msa= DesignMinVR;
+			double max_Msa = MsaRated;
+			double EIR = 8;
+			Mode = 1;
+			if (RequestedLoad < 0 )
+			{
+				if (Tra != OutletTemp)
+				{
+					optimal_Msa = -RequestedLoad / (1006 * (Tra - OutletTemp));
+					if (optimal_Msa > max_Msa)
+					{
+						optimal_Msa = max_Msa;
+					}
+				}
+				else
+				{
+					optimal_Msa = max_Msa; // not sure anbout that.
+				}
+
+				if (MinOA_Msa > optimal_Msa)
+				{
+					optimal_Msa = MinOA_Msa;
+				}
+			}
+
+			SupplyVentilationAir = optimal_Msa;
+
+			
+			OutletRH = CheckVal_W(RHra);
+			OutletHumRat = PsyWFnTdbRhPb(OutletTemp, OutletRH, InletPressure);
+			OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // is the outlet presure going to be different? //InletEnthalpy - (ZoneCoolingLoad / AirMassFlow);
+			OutletMassFlowRate = optimal_Msa;
+			
+			double QTotUnitOut = 0;
+			double QSensUnitOut = 0;
+			if (OutletEnthalpy < InletEnthalpy)
+			{
+				QTotUnitOut = OutletMassFlowRate * (OutletEnthalpy - InletEnthalpy);
+				QSensUnitOut = OutletMassFlowRate * (PsyHFnTdbW(OutletTemp, OutletHumRat) - PsyHFnTdbW(InletTemp, OutletHumRat));
+			}
+			else
+			{
+				QTotUnitOut = 0;
+				QSensUnitOut = 0;
+			}
+
+			UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
+			UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * SecInHour;
+			UnitSensibleCoolingRate = std::abs(min(0.0, optimal_H_sensible_room * 1000));
+			UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour;
+
+			ElectricalPower = UnitTotalCoolingRate/ EIR;
+		
+		}
+		//void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode) {
+
+		void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double communicationStepSize) {
 			
 			using General::RoundSigDigits; 
 			int modenumber = 0;
@@ -788,73 +801,24 @@ namespace EnergyPlus {//***************
 
 			double averaged_requestedLoad = 0;
 
-			*returnVentilationAir = 0;
-			*returnSupplyAirMassFlow = 0;
-			*bpErrorCode = 0;
+		//	*returnVentilationAir = 0;
+		//	*returnSupplyAirMassFlow = 0;
+		//	*bpErrorCode = 0;
 
 			if (rTestFlag == 1)
-			{
-				double tempHumidity = RHosa;
-				Mvent = MinOA_Msa;
-				double tempSAT = Tosa;
-				optimal_Msa = Mvent;
-
-				//*use this line with dampening
-				//	averaged_requestedLoad=(RequestedLoad+RequestedLoad_t_n1+RequestedLoad_t_n2+RequestedLoad_t_n3+RequestedLoad_t_n4+RequestedLoad_t_n5+RequestedLoad_t_n6+RequestedLoad_t_n7+RequestedLoad_t_n8)/8; // with dampening
-				//use this line for no dampening
-				averaged_requestedLoad = RequestedLoad;//no dampening
-				if (RequestedLoad < 0 && averaged_requestedLoad < 0)
-				{
-					EIR = 8;
-					double max_Msa = MsaRated;
-					tempSAT = 12;
-					tempHumidity = RHra;
-					*returnQSensible = averaged_requestedLoad;
-					*returnQLatent = Tosa;
-					*FMUmode = 2;
-					*ElectricalPowerUse = -averaged_requestedLoad / EIR;
-
-					if (Tra != tempSAT)
-					{
-						optimal_Msa = -averaged_requestedLoad / (1006 * (Tra - tempSAT));
-						if (optimal_Msa > max_Msa)
-						{
-							optimal_Msa = max_Msa;
-						}
-					}
-					else
-					{
-						optimal_Msa = 0.5;
-					}
-
-					if (MinOA_Msa > optimal_Msa)
-					{
-						optimal_Msa = MinOA_Msa;
-					}
-				}
-				*returnSupplyAirMassFlow = optimal_Msa;
-				*returnSupplyAirTemp = tempSAT;
-				*returnSupplyAirRelHum = RHra;
-				*returnVentilationAir = Mvent;
-				RequestedLoad_t_n8 = RequestedLoad_t_n7;
-				RequestedLoad_t_n7 = RequestedLoad_t_n6;
-				RequestedLoad_t_n6 = RequestedLoad_t_n5;
-				RequestedLoad_t_n5 = RequestedLoad_t_n4;
-				RequestedLoad_t_n4 = RequestedLoad_t_n3;
-				RequestedLoad_t_n3 = RequestedLoad_t_n2;
-				RequestedLoad_t_n2 = RequestedLoad_t_n1;
-				RequestedLoad_t_n1 = RequestedLoad;
+			{  
+				//RunTestModel();
 				return;
 			}
 
 			if (RequestedLoad < 0)
 			{
 				RequestedCoolingLoad = -RequestedLoad / 1000; //convert to kw
-				std::list<CModeSolutionSpace*>::const_iterator iterator;
-				for (iterator = XandYPoints.begin(); iterator != XandYPoints.end(); ++iterator) // iterate though the modes.
+				std::list<CMode*>::const_iterator iterator;
+				for (iterator = OperatingModes.begin(); iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
 				{
-					CModeSolutionSpace* solutionspace = *iterator;
-
+					CMode* pMode = *iterator;
+					CModeSolutionSpace* solutionspace = &(pMode->sol);
 					int solution_map_sizeX = solutionspace->PointY.size() - 1;
 					int solution_map_sizeY = solutionspace->PointX.size() - 1;
 					int solution_map_sizeM = solutionspace->PointMeta.size() - 1;
@@ -869,7 +833,7 @@ namespace EnergyPlus {//***************
 					//Outside Air Relative Humidity(0 - 100 % )
 					//Outside Air Humidity Ratio(g / g)
 					//Outside Air Temperature(°C)
-					if (MeetsOAEnvConstraints(Tosa, Wosa, RHosa, modenumber) == true)//fix this it should not end if it does not meet contraints.
+					if (pMode->MeetsOAEnvConstraints(Tosa, Wosa, RHosa) == true)//fix this it should not end if it does not meet contraints.
 					{
 						EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
 					}
@@ -899,7 +863,7 @@ namespace EnergyPlus {//***************
 								//all these points meet the minimum VR requirement
 								solutionspace->PointMeta[point_number] = 1;
 								//'Set B_coefficients for DeltaH from lookup table for the specific mode
-								Tsa = CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, TEMP_CURVE); //TEMP_CURVE W_CURVE POWER_CURVE
+								Tsa = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, TEMP_CURVE); //TEMP_CURVE W_CURVE POWER_CURVE
 																														  //Set B_coefficients for SHR from lookup table for the specific mode
 																														  //Return Air Temperature(°C)
 								if (MeetsSupplyAirTOC(Tsa)) SAT_OC_Met = SAT_OC_MetOnce = true;
@@ -908,7 +872,7 @@ namespace EnergyPlus {//***************
 									SAT_OC_Met = false;
 								}
 
-								Wsa = CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, W_CURVE);
+								Wsa = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, W_CURVE);
 								//Return Air Relative Humidity(0 - 100 % )
 								//Return Air Humidity Ratio(g / g)
 								if (MeetsSupplyAirRHOC(Wsa)) SARH_OC_Met = SAHR_OC_MetOnce = true;
@@ -920,7 +884,7 @@ namespace EnergyPlus {//***************
 									SARH_OC_Met = false;
 								}
 
-								if (SARH_OC_Met == false || SAT_OC_Met == false)
+								if (SARH_OC_Met == true || SAT_OC_Met == true)
 								{
 									//Calculate the delta H 
 									Tma = Tra + OSAF * (Tosa - Tra);
@@ -938,7 +902,7 @@ namespace EnergyPlus {//***************
 
 										//all these points meet the sensible heating load
 										solutionspace->PointMeta[point_number] = 2;
-										double Y_val = CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, POWER_CURVE);
+										double Y_val = Msa*(pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, POWER_CURVE));
 										ElectricalPower = Y_val / 1000;  //kW
 																		 //calculate the electrical power usage
 																		 //ElectricalPower = EIR * Y_DeltaH * H_Rated 'kw?
@@ -976,7 +940,7 @@ namespace EnergyPlus {//***************
 										if (H_SENS_ROOM > PreviousMaxiumOutput)
 										{
 											PreviousMaxiumOutput = H_SENS_ROOM;
-											double Y_val = CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, POWER_CURVE);
+											double Y_val = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, POWER_CURVE);
 											ElectricalPower = Y_val / 1000;  //kW
 																			 //Calculate EIR and SHR
 											EIR = ElectricalPower / Y_DeltaH;
@@ -1011,7 +975,8 @@ namespace EnergyPlus {//***************
 				}
 				if (EnvironmentConditionsMetOnce == false)
 				{
-					*bpErrorCode = 1;
+					//*bpErrorCode = 1;
+					ErrorCode = 1;
 					count_EnvironmentConditionsMetOnce++;
 
 					//error 
@@ -1019,13 +984,13 @@ namespace EnergyPlus {//***************
 				if (SAHR_OC_MetOnce == false)
 				{
 					count_SAHR_OC_MetOnce++;
-					*bpErrorCode = 2;
+					ErrorCode = 2;
 					//error 
 				}
 				if (SAT_OC_MetOnce == false)
 				{
 					count_SAT_OC_MetOnce++;
-					*bpErrorCode = 3;
+					ErrorCode = 3;
 					//error 
 				}
 				if (DidWeMeetLoad == false)
@@ -1056,41 +1021,89 @@ namespace EnergyPlus {//***************
 					ShowWarningError("Environmental conditions exceeded model limits, called in HybridEvapCooling:dostep");
 					//cout << "Environmental conditions exceeded model limits./n";
 				}
-				if (*bpErrorCode == 0)
+				if (ErrorCode == 0)
 				{
-					*returnQSensible = -optimal_H_sensible_room * 1000;//RequestedLoad/(2);//*communicationStepSize);
+
+			/*		*returnQSensible = -optimal_H_sensible_room * 1000;//RequestedLoad/(2);//*communicationStepSize);
 					*returnQLatent = 0;
 					*returnSupplyAirMassFlow = optimal_Msa;
 					*returnSupplyAirTemp = CheckVal_T(optimal_Tsa);
 					*returnSupplyAirRelHum = CheckVal_W(optimal_Wsa);
 					*returnVentilationAir = optimal_Mvent;
 					*FMUmode = optimal_Mode;
-					*ElectricalPowerUse = optimal_power;
+					*ElectricalPowerUse = optimal_power;*/
+					SupplyVentilationAir = optimal_Mvent;
+					OutletTemp = CheckVal_T(optimal_Tsa);//PsyTdbFnHW(ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy, MinHumRat);
+					OutletRH = CheckVal_W(optimal_Wsa);
+					OutletHumRat = PsyWFnTdbRhPb(OutletTemp, OutletRH, InletPressure);
+					OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // is the outlet presure going to be different? //InletEnthalpy - (ZoneCoolingLoad / AirMassFlow);
+					OutletMassFlowRate = optimal_Msa;
+					Mode = optimal_Mode;
+					double QTotUnitOut = 0;
+					double QSensUnitOut = 0;
+					if (OutletEnthalpy < InletEnthalpy)
+					{
+						QTotUnitOut = OutletMassFlowRate * (OutletEnthalpy - InletEnthalpy);
+						QSensUnitOut = OutletMassFlowRate * (PsyHFnTdbW(OutletTemp, OutletHumRat) - PsyHFnTdbW(InletTemp, OutletHumRat));
+					}
+					else
+					{
+						QTotUnitOut = 0;
+						QSensUnitOut = 0;
+					}
+
+					UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
+					UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * SecInHour;
+					UnitSensibleCoolingRate = std::abs(min(0.0, optimal_H_sensible_room * 1000));
+					UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour;
+				
+					ElectricalPower = optimal_power;
+				
 				}
 				else
 				{
-					*returnQSensible = 0;
+					/**returnQSensible = 0;
 					*returnQLatent = 0;
 					*returnSupplyAirMassFlow = 0;
 					*returnSupplyAirTemp = Tra;
 					*returnSupplyAirRelHum = Wra;
 					*returnVentilationAir = 0;
 					*FMUmode = -2;
-					*ElectricalPowerUse = 0;
+					*ElectricalPowerUse = 0;*/
+
+					OutletRH = InletRH;
+					OutletHumRat = InletHumRat;
+					OutletEnthalpy = InletEnthalpy;
+					OutletTemp = InletTemp;
+					OutletMassFlowRate = InletMassFlowRate;
+					Mode = -2;
+
+					UnitTotalCoolingRate = 0;
+					UnitTotalCoolingEnergy = 0;
+					UnitSensibleCoolingRate = 0;
+					UnitSensibleCoolingEnergy = 0;
+
+					ElectricalPower = 0;
 
 				}
 
 			}
 			else
 			{ //current heating mode, do nothing
-				*returnQSensible = 0;
+				UnitTotalCoolingRate = 0;//std::abs(min(0.0, QTotUnitOut));
+				UnitTotalCoolingEnergy = 0;// ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingRate * TimeStepSys * SecInHour;
+				UnitSensibleCoolingRate = 0;// std::abs(min(0.0, QSensUnitOut));
+				UnitSensibleCoolingEnergy = 0;// ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingRate * TimeStepSys * SecInHour;
+				/**returnQSensible = 0;
 				*returnQLatent = 0;
 				*returnSupplyAirMassFlow = 0;
 				*returnSupplyAirTemp = Tra;
 				*returnSupplyAirRelHum = Wra;
 				*returnVentilationAir = 0;
 				*FMUmode = -1;
-				*ElectricalPowerUse = 0;
+				*ElectricalPowerUse = 0;*/
+
+				SupplyVentilationAir = 0;
 			}
 			InitializeModelParams();
 			//SetEnvironmentConditions

@@ -1,6 +1,11 @@
+
+#ifndef HybridEvapCoolingModel_hh_INCLUDED
+#define HybridEvapCoolingModel_hh_INCLUDED
 #include <iostream>  
 //#include <fmiPlatformTypes.h>
-#include <HybridModelConfigFile.hh>
+//#include <HybridModelConfigFile.hh>
+//#include <math.h>       /* floor */
+#include <fstream>
 using namespace std;
 #include <string>
 #include <list>
@@ -8,8 +13,17 @@ using namespace std;
 #include <vector>
 //#include <math.h>       /* floor */
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
+
 using namespace std;
 
+const int MODE_BLOCK_OFFSET_Alpha = 9;
+const int BLOCK_HEADER_OFFSET_Alpha =  19;
+
+const int MODE_BLOCK_OFFSET_Number = 16;
+const int BLOCK_HEADER_OFFSET_Number = 6;
 
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
@@ -17,13 +31,70 @@ using namespace std;
 namespace EnergyPlus {
 
 	namespace HybridEvapCoolingModel {
-		using namespace HybridModelConfigFile;
+
+		//using namespace HybridModelConfigFile;
+
 		class CModeSolutionSpace
 		{
 		public:
 			vector<double> PointX;
 			vector<double> PointY;
 			vector<double> PointMeta;
+			void AddItem(double X, double Y, double M)
+			{
+				PointX.push_back(X);
+				PointY.push_back(Y);
+				PointMeta.push_back(M);
+			}
+		};	 
+
+		class CMode
+		{
+			public:
+			CMode() : ModeID(0.0), Max_Msa(0.0), Min_Msa(0.0),Min_OAF(0.0), Max_OAF(0.0), Minimum_Outside_Air_Temperature(0.0), Maximum_Outside_Air_Temperature(0.0)
+			,Minimum_Outside_Air_Humidity_Ratio(0.0), Maximum_Outside_Air_Humidity_Ratio(0.0) {}
+			
+			//finish init above
+			~CMode();                  // destructor
+			int ModeID;
+			CModeSolutionSpace sol;
+			int Tsa_curve_pointer;
+			int  HRsa_curve_pointer;
+			int  Psa_curve_pointer;
+			double Max_Msa;
+			double Min_Msa;
+			double Min_OAF;
+			double Max_OAF;
+			double Minimum_Outside_Air_Temperature;
+			double Maximum_Outside_Air_Temperature;
+			double Minimum_Outside_Air_Humidity_Ratio;
+			double Maximum_Outside_Air_Humidity_Ratio;
+			double Minimum_Outside_Air_Relative_Humidity;
+			double Maximum_Outside_Air_Relative_Humidity;
+			double Minimum_Return_Air_Temperature;
+			double Maximum_Return_Air_Temperature;
+			double Minimum_Return_Air_Humidity_Ratio;
+			double Maximum_Return_Air_Humidity_Ratio;
+			double Minimum_Return_Air_Relative_Humidity;
+			double Maximum_Return_Air_Relative_Humidity;
+			bool CMode::ValidPointer(int curve_pointer);
+			bool CMode::ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
+			bool CMode::ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
+			void CMode::InitializeCurve( int curveType, int CurveID);
+			double CMode::CalculateCurveVal(double X_0, double X_1, double X_2, double X_3, double X_4, double X_5, double X_6, int mode_number, int curve_ID);
+			bool CMode::InitializeOSAFConstraints(double minOSAF, double maxOSAF);
+			bool CMode::InitializeMsaRatioConstraints(double minMsa, double maxMsa);
+			bool CMode::InitializeOutsideAirTemperatureConstraints(double min, double max);
+			bool CMode::InitializeOutsideAirHumidityRatioConstraints(double min, double max);
+			bool CMode::InitializeOutsideAirRelativeHumidityConstraints(double min, double max);
+			bool CMode::InitializeReturnAirTemperatureConstraints(double min, double max);
+			bool CMode::InitializeReturnAirHumidityRatioConstraints(double min, double max);
+			bool CMode::InitializeReturnAirRelativeHumidityConstraints(double min, double max);
+			bool CMode::GenerateSolutionSpace(double ResolutionMsa, double ResolutionOSA);
+			bool CMode::MeetsOAEnvConstraints(double Tosa, double Wosa, double RHos);
+			
+			//bool CMode::MeetsSupplyAirTOC(double Tosa);
+			//bool CMode::MeetsSupplyAirRHOC(double Wosa);
 		};
 		
 
@@ -52,13 +123,37 @@ namespace EnergyPlus {
 			Real64 UnitSensibleCoolingRate;
 			Real64 UnitSensibleCoolingEnergy;
 			Real64 RequestedLoadToCoolingSetpoint;
-			int Tsa_schedule_pointer;
+			int TsaMin_schedule_pointer;
+			int TsaMax_schedule_pointer;
+			int RHsaMin_schedule_pointer;
+			int RHsaMax_schedule_pointer;
 			int Mode;
 			int ErrorCode;
 			int InletNode;
 			int OutletNode;
 			int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
 			int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan
+			vector<int> Tsa_curve_pointer;
+			vector<int>  HRsa_curve_pointer;
+			vector<int>  Psa_curve_pointer;
+			list<CMode*> OperatingModes;
+			Real64 ElectricalPower;
+		/*	vector<double> Min_OAF;
+			vector<double> Max_OAF;
+			vector<double> Min_Msa;
+			vector<double> Max_Msa;
+			vector<double> Minimum_Outside_Air_Temperature;
+			vector<double> Maximum_Outside_Air_Temperature;
+			vector<double> Minimum_Outside_Air_Humidity_Ratio;
+			vector<double> Maximum_Outside_Air_Humidity_Ratio;
+			vector<double> Minimum_Outside_Air_Relative_Humidity;
+			vector<double> Maximum_Outside_Air_Relative_Humidity;
+			vector<double> Minimum_Return_Air_Temperature;
+			vector<double> Maximum_Return_Air_Temperature;
+			vector<double> Minimum_Return_Air_Humidity_Ratio;
+			vector<double> Maximum_Return_Air_Humidity_Ratio;
+			vector<double> Minimum_Return_Air_Relative_Humidity;
+			vector<double> Maximum_Return_Air_Relative_Humidity;*/
 			Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
 			Real64 InletTemp;
 			Real64 InletWetBulbTemp;
@@ -92,37 +187,36 @@ namespace EnergyPlus {
 
 			int Model::GetID();            // accessor function
 			void Model::SetID(int vID) { ID = vID; };    // accessor function
-			void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode);
+			void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double communicationStepSize);
+			//void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode);
 			void Model::Initialize(string fmuLocation);//, ConfigFile* pConfig);
+			CMode* Model::AddNewOperatingMode();
+			void Model::RunTestModel(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR);
 			void Model::InitializeModelParams();
 			void Model::ModelLog(std::string fmuLocation);
-			CModeSolutionSpace* Model::Tessellate(vector<double> & Xvals, vector<double> & Yvals);
 			double Model::CalcHum_ratio_W(double Tdb, double RH, double P);
-			bool Model::MeetsOAEnvConstraints(double Tosa, double Wosa, double RHosa, int ModeNumber);
 			bool Model::MeetsSupplyAirTOC(double Tosa);
 			bool Model::MeetsSupplyAirRHOC(double Wosa);
-			double Model::CalculateCurveVal(double X_0, double X_1, double X_2, double X_3, double X_4, double X_5, double X_6, int mode_number, int curve_ID);
 			double Model::EstimateQRemaining(double TroomTemp, Real64 communicationStepSize);
-			double Model::CalculateSupplyAirDBTempAtRefCon();
 			double Model::CalculateMixedAirTemp();
 			double Model::CheckVal_T(double T);
 			double Model::CheckVal_W(double W);
-			ConfigFile* Config;
-
+			
 			double Tsa;
 			Real64 Wsa;
-			
-			// void Meow();
+			Real64 SupplyVentilationAir;
+			 int ModeCounter;
+		
 		private:                   // begin private section
 			int ID;              // member variable
 			char * string;
 			//holds the X and Y points of the possible sollutions within the operating conditions. Int is the mode number
-			list<CModeSolutionSpace*> XandYPoints;
+			list<CModeSolutionSpace*> SolutionSpaces;
 			double Round(double x);
 			double Model::Sat_press(double Tdb);
 			double Model::Part_press(double P, double W);
-			double ResolutionX;
-			double ResolutionY;
+			double ResolutionMsa;
+			double ResolutionOSA;
 
 			//system parameters
 
@@ -183,3 +277,5 @@ namespace EnergyPlus {
 	
 	}
 }
+
+#endif
