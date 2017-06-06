@@ -767,6 +767,9 @@ namespace OutputReportTabular {
 	void
 	InitializeTabularMonthly();
 
+	bool
+	isInvalidAggregationOrder();
+
 	void
 	GetInputTabularTimeBins();
 

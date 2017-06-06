@@ -59,6 +59,7 @@ set( test_src
   Furnaces.unit.cc
   General.unit.cc
   GroundHeatExchangers.unit.cc
+  HeatBalanceAirManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
