@@ -67,7 +67,7 @@
 #include <DataGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <HybridEvapCoolingModel.hh>
-#include <HybridModelConfigFile.hh>
+//#include <HybridModelConfigFile.hh>
 namespace EnergyPlus {
 
 	namespace HybridUnitaryAirConditioners {
@@ -76,7 +76,7 @@ namespace EnergyPlus {
 
 		//using HybridEvapCoolingModel::ZoneHybridUnitaryACSystem;
 		using HybridEvapCoolingModel::Model;
-		
+		//Array1D< Model > ZoneHybridUnitaryAirConditioner;
 		// Data
 		// MODULE PARAMETER DEFINITIONS
 
@@ -90,7 +90,7 @@ namespace EnergyPlus {
 				);
 
 		void
-			GetInputZoneHybridUnitaryAirConditioners();
+			GetInputZoneHybridUnitaryAirConditioners(bool & Errors);
 
 		void
 			InitZoneHybridUnitaryAirConditioners(
@@ -110,6 +110,7 @@ namespace EnergyPlus {
 			ReportZoneHybridUnitaryAirConditioners(int const UnitNum); // unit number
 		double Sat_press(double Tdb);
 		double Part_press(double P, double W);
+		Model* HandelToHybridUnitaryAirConditioner(int UnitNum);
 
 	}
 }

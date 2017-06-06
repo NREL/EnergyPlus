@@ -56,6 +56,7 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -66,6 +67,8 @@
 
 // EnergyPlus Headers
 #include <HybridUnitaryAirConditioners.hh>
+// EnergyPlus Headers
+#include <HybridEvapCoolingModel.hh>
 
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
@@ -96,9 +99,11 @@
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
 
-#include <HybridModelConfigFile.hh>
+//#include <HybridModelConfigFile.hh>
 
-
+#define  TEMP_CURVE 0 
+#define  W_CURVE 1
+#define  POWER_CURVE 2
 
 namespace EnergyPlus {//***************
 
@@ -110,15 +115,19 @@ namespace EnergyPlus {//***************
 //		using HybridEvapCoolingModel::ZoneHybridUnitaryACSystem;
 		//using HybridEvapCoolingModel::ZoneEvapCoolerHybridStruct2;
 		//using HybridEvapCoolingModel::Model;
-		using HybridModelConfigFile::ConfigFile;
-		
+		//using HybridModelConfigFile::ConfigFile;
+		using CurveManager::GetCurveIndex;
+		using CurveManager::GetCurveType;
+		using CurveManager::GetCurveMinMaxValues;
+		using CurveManager::CurveValue;
+		using HybridEvapCoolingModel::CMode;
 		//Array1D<ZoneEvapCoolerHybridStruct2> ZoneHybridUnitaryAirConditioner;
 		//Array1D< ZoneHybridUnitaryACSystem > ZoneHybridUnitaryAirConditioner;
 		Array1D< Model > ZoneHybridUnitaryAirConditioner;
 		int NumZoneHybridEvap(0);
 		Array1D_bool CheckZoneHybridEvapName;
 		bool GetInputZoneHybridEvap(true);
-		ConfigFile* pConfig = new ConfigFile;
+		//ConfigFile* pConfig = new ConfigFile;
 		//Begin routines for zone HVAC Hybrid Evaporative cooler unit
 		//_______________________________________________________________________________________________________________________
 		//***************
@@ -135,9 +144,9 @@ namespace EnergyPlus {//***************
 			using General::TrimSigDigits;
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			int CompNum;
-
+			bool errorsfound = false;
 			if (GetInputZoneHybridEvap) {
-				GetInputZoneHybridUnitaryAirConditioners();
+				GetInputZoneHybridUnitaryAirConditioners(errorsfound);
 				GetInputZoneHybridEvap = false;
 			}
 
@@ -188,7 +197,12 @@ namespace EnergyPlus {//***************
 				return;
 			}
 		}
-
+		Model* HandelToHybridUnitaryAirConditioner(int UnitNum)
+		{
+			//int error=ZoneHybridUnitaryAirConditioner(UnitNum).ErrorCode;
+			Model*p = &(ZoneHybridUnitaryAirConditioner(UnitNum));
+			return &(ZoneHybridUnitaryAirConditioner(UnitNum));
+		}
 
 
 		void
@@ -205,10 +219,10 @@ namespace EnergyPlus {//***************
 			using DataGlobals::TimeStepZone;
 			using DataGlobals::WarmupFlag;
 			using DataGlobals::HourOfDay;
-			using DataZoneEquipment::ZoneEquipInputsFilled;
+			/*using DataZoneEquipment::ZoneEquipInputsFilled;
 			using DataZoneEquipment::CheckZoneEquipmentList;
 			using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
-			using DataZoneEquipment::ZoneEquipConfig;
+			using DataZoneEquipment::ZoneEquipConfig;*/
 			using DataHVACGlobals::ZoneComp;
 			using DataHVACGlobals::SysTimeElapsed;
 			using DataSizing::AutoSize;
@@ -354,6 +368,8 @@ namespace EnergyPlus {//***************
 
 		}
 
+		
+
 		void
 			CalcZoneHybridUnitaryAirConditioners(
 				int const UnitNum, // unit number
@@ -368,29 +384,32 @@ namespace EnergyPlus {//***************
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
 			Real64 ZoneCoolingLoad;
-			Real64 AirMassFlow;
-			Real64 MinHumRat, MinRH;
+			//Real64 AirMassFlow;
+			//Real64 MinHumRat, MinRH;
 			Real64 QTotUnitOut;
 			Real64 QSensUnitOut;
 			Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, RemainQ, MsaCapacityRatedCond, DesignMinVR, rTestFlag, returnQSensible, returnQLatent, returnSupplyAirMassFlow, returnSupplyAirTemp, returnSupplyAirRelHum, returnVentilationAir, ElectricalPowerUse, communicationStepSize;
-		
+			
+			//ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToCoolingSetpoint = 0;
+			//int errori = ZoneHybridUnitaryAirConditioner(0).ErrorCode;
 			int CapacityFlag, FMUmode,ErrorCode;
 			bool error;
 			error = false;
 			ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 			SensibleOutputProvided = ZoneCoolingLoad;
 			LatentOutputProvided = 0;
-			ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate = 1;
+			//ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate = 1;
 			//ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = 0.5;
-			ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate = 1;
-			FMUmode = -2;
-			AirMassFlow = ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate;
-			MinRH = 0.5;
-			double pressure_pascals = 101325;
-			MinHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat;// should do some sort of minium I gues but dont know why. min(Node(ZoneNodeNum).HumRat, Node(UnitOutletNodeNum).HumRat);
-			Real64 InletEnthalpy = PsyHFnTdbW(ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp, MinHumRat);
+			//ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate = 1;
+			//FMUmode = -2;
+			//AirMassFlow = ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate;
+			//MinRH = 0.5;
+			//double pressure_pascals = 101325;
+			//
 			if (ZoneCoolingLoad>0)
 			{//heating mode do nothing
+				Real64 MinHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat;// should do some sort of minium I gues but dont know why. min(Node(ZoneNodeNum).HumRat, Node(UnitOutletNodeNum).HumRat);
+				Real64 InletEnthalpy = PsyHFnTdbW(ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp, MinHumRat);
 				ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = InletEnthalpy;
 				ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
 				QTotUnitOut = 0;
@@ -399,12 +418,6 @@ namespace EnergyPlus {//***************
 			}
 			else
 			{
-			//	Real64 OutletTempCalculated = PsyTdbFnHW(ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy, MinHumRat);
-			//	if (OutletTempCalculated < 10)
-			//	{
-			//		ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy =  PsyHFnTdbW(10, MinHumRat); //PsyHFnTdbRhPb(
-			//		ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = 10;
-			//	}
 				
 				EnvDryBulbT = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp;// 34.95;
 				AirTempRoom = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;//23.94039067;
@@ -413,64 +426,14 @@ namespace EnergyPlus {//***************
 				RemainQ = ZoneCoolingLoad;
 				MsaCapacityRatedCond = ZoneHybridUnitaryAirConditioner(UnitNum).MsaCapacityRatedCond; //m3/s
 				CapacityFlag = 1; // boolean
-				DesignMinVR = 0.5;   //m3/s
+				DesignMinVR = 0.5;   //m3/s get from EP
 				rTestFlag = 0;
 				communicationStepSize = 60 * 10; //s
 				// slight issue here that the multplication of the max values of the "Fraction of peak Msa" and the OSAF as specified in the config must be greater than the ratio of MinVR/MsaCapacityRatedCond otherwise it will never reach minVR
 				ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToCoolingSetpoint = RemainQ;
-				ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, RemainQ, MsaCapacityRatedCond, CapacityFlag, DesignMinVR, rTestFlag, &returnQSensible, &returnQLatent, &returnSupplyAirMassFlow, &returnSupplyAirTemp, &returnSupplyAirRelHum, &returnVentilationAir, &FMUmode, &ElectricalPowerUse, communicationStepSize, &ErrorCode);
-
-				//ZoneHybridUnitaryAirConditioner(UnitNum).Hybrid_Model->doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, RemainQ, MsaCapacityRatedCond, CapacityFlag, DesignMinVR, rTestFlag, &returnQSensible, &returnQLatent, &returnSupplyAirMassFlow, &returnSupplyAirTemp, &returnSupplyAirRelHum, &returnVentilationAir, &FMUmode, &ElectricalPowerUse, communicationStepSize,&ErrorCode);
-			/*	if (returnSupplyAirTemp < 10)
-				{
-					//ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = PsyHFnTdbW(10, ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat); //PsyHFnTdbRhPb(
-					//ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = 10;
-				}*/
-				ZoneHybridUnitaryAirConditioner(UnitNum).ErrorCode = ErrorCode;
-				if (ErrorCode > 0) error = true;
-				if (error==true)
-				{ 
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletRH = ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
-					ZoneHybridUnitaryAirConditioner(UnitNum).Mode = FMUmode;
-					
-					QTotUnitOut = 0;
-					QSensUnitOut = 0;
-				
+				//ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, RemainQ, MsaCapacityRatedCond, CapacityFlag, DesignMinVR, rTestFlag, &returnQSensible, &returnQLatent, &returnSupplyAirMassFlow, &returnSupplyAirTemp, &returnSupplyAirRelHum, &returnVentilationAir, &FMUmode, &ElectricalPowerUse, communicationStepSize, &ErrorCode);
+				ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, RemainQ, MsaCapacityRatedCond, CapacityFlag, DesignMinVR, rTestFlag,communicationStepSize);
 				}
-				else
-				{ 
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletRH = returnSupplyAirRelHum;
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = PsyWFnTdbRhPb(returnSupplyAirTemp, returnSupplyAirRelHum, ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure);
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = PsyHFnTdbRhPb(returnSupplyAirTemp, returnSupplyAirRelHum, ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure); // is the outlet presure going to be different? //InletEnthalpy - (ZoneCoolingLoad / AirMassFlow);
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = returnSupplyAirTemp;//PsyTdbFnHW(ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy, MinHumRat);
-					ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate = returnSupplyAirMassFlow;
-					ZoneHybridUnitaryAirConditioner(UnitNum).Mode = FMUmode;
-					if (ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy < InletEnthalpy)
-					{
-						QTotUnitOut = returnSupplyAirMassFlow * (ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy - InletEnthalpy);
-						QSensUnitOut = returnSupplyAirMassFlow * (PsyHFnTdbW(ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp, MinHumRat) - PsyHFnTdbW(ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp, MinHumRat));
-					}
-					else 
-					{
-						QTotUnitOut =  0;
-						QSensUnitOut = 0;
-					}
-
-				}
-
-				// check power out using enthalpy
-	
-			}
-				
-			//ZoneHybridUnitaryAirConditioner(UnitNum).Mode = 1;
-			ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
-			ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingEnergy = ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingRate * TimeStepSys * SecInHour;
-			ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingRate = std::abs(min(0.0, QSensUnitOut));
-			ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingEnergy = ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingRate * TimeStepSys * SecInHour;
 
 		}
 
@@ -491,7 +454,7 @@ namespace EnergyPlus {//***************
 		}
 
 		void
-			GetInputZoneHybridUnitaryAirConditioners()
+			GetInputZoneHybridUnitaryAirConditioners(bool & Errors)
 		{
 			using BranchNodeConnections::TestCompSet;
 			using namespace ScheduleManager;
@@ -562,11 +525,10 @@ namespace EnergyPlus {//***************
 					IsBlank = false;
 					VerifyName(Alphas(1), ZoneHybridUnitaryAirConditioner, UnitLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
 
+						//A1, \field Name
 					ZoneHybridUnitaryAirConditioner(UnitLoop).Name = Alphas(1);
-
+						//A2, \field Availability Schedule Name
 					ZoneHybridUnitaryAirConditioner(UnitLoop).Schedule = Alphas(2);
-					
-				
 					if (lAlphaFieldBlanks(2)) {
 						ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = ScheduleAlwaysOn;
 					}
@@ -578,32 +540,212 @@ namespace EnergyPlus {//***************
 							ErrorsFound = true;
 						}
 					}
-					
-					ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode = GetOnlySingleNode(Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-					//ZoneEvapUnit(UnitLoop).UnitOutletNodeNum = GetOnlySingleNode(Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
-					ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode = GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-					//ZoneHybridUnitaryAirConditioner(UnitLoop).OAInletNodeNum = GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_OutsideAir, 1, ObjectIsParent);
-					ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode= GetOnlySingleNode(Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent);
-					ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode = GetOnlySingleNode(Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
+						//A3, \field Availability Manager List Name
 
-					TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Hybrid Evap Air Zone Nodes");
-					TestCompSet(CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Hybrid Evap Air Zone Secondary Nodes");
-					ZoneHybridUnitaryAirConditioner(UnitLoop).Path = Alphas(7);
-						ZoneHybridUnitaryAirConditioner(UnitLoop).Tsa_Lookup_Name = Alphas(8);
-					
-				ZoneHybridUnitaryAirConditioner(UnitLoop).Tsa_schedule_pointer = GetScheduleIndex(Alphas(8));
-					if (ZoneHybridUnitaryAirConditioner(UnitLoop).Tsa_schedule_pointer == 0) {
-						ShowSevereError("Invalid " + cAlphaFields(8) + '=' + Alphas(8));
+						//A4, \field Minimum Supply Air Temperature Schedule Name
+					//ZoneHybridUnitaryAirConditioner(UnitLoop).Tsa_Lookup_Name = Alphas(8);
+					ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer = GetScheduleIndex(Alphas(4));
+					if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer == 0) {
+						ShowSevereError("Invalid " + cAlphaFields(4) + '=' + Alphas(4));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+						//A5, \field Maximum Supply Air Temperature Schedule Name
+					ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer = GetScheduleIndex(Alphas(5));
+					if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer == 0) {
+						ShowSevereError("Invalid " + cAlphaFields(5) + '=' + Alphas(5));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+						//A6, \field Minimum Supply Air Humidity Ratio Schedule Name
+					ZoneHybridUnitaryAirConditioner(UnitLoop).Path = Alphas(6);
+						//A7, \field Maximum Supply Air Humidity Ratio Schedule Name
+
+						//A8, \field Method to Choose Value of Controlled Inputs
+
+						//A9, \field Method to determine part mode fraction
+
+						//A10, \field Return Air Node Name
+						//A11, \field Outside Air Node Name
+						//A12, \field Supply Air Node Name
+						//A13, \field Relief Node Name
+					ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode = GetOnlySingleNode(Alphas(10), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+					ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode = GetOnlySingleNode(Alphas(11), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent);
+					ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode = GetOnlySingleNode(Alphas(12), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent); 
+					ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode = GetOnlySingleNode(Alphas(13), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
+					TestCompSet(CurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Nodes");
+					TestCompSet(CurrentModuleObject, Alphas(1), Alphas(11), Alphas(13), "Hybrid Evap Air Zone Secondary Nodes");
+						//N1, \field System Maximum Supply AirFlow Rate
+					//In each time step, the result for system power, fan power, gas use, water user, or supply airflow rate will be determined as :
+					//TableValue * SysMaxSupply * ScalingFactor
+						//N2, \field External Static Pressure at System Maximum Supply Air Flow Rate
+						//N3, \field Scaling Factor
+					ZoneHybridUnitaryAirConditioner(UnitLoop).MsaCapacityRatedCond = Numbers(3);
+
+					CMode* pMode;// = ZoneHybridUnitaryAirConditioner(UnitLoop).AddNewOperatingMode();
+						//N4, \field Number of Operating Modes
+					int Numberofoperatingmodes = 0;
+					if (lNumericBlanks(4)) {
+						ShowSevereError("Invalid number of operating modes" + cNumericFields(5)  );
+						ShowFatalError(RoutineName + "Errors found in getting input.");
+						ShowContinueError("... Preceding condition causes termination.");
+					}
+					else {
+						Numberofoperatingmodes= Numbers(4)-1; //zero based count
+					}
+						//N5, \field Minimum Time Between Mode Change
+						//A14, \field First fuel type
+						//A15, \field Second fuel type
+						//A16, \field Third fuel type
+						//A17, \field Objective Function Minimizes
+						//A18, \field Mode0 Name
+						//A19, \field Mode0 Supply Air Temperature Lookup Table Name
+					for (int modeIter = 0; modeIter <= Numberofoperatingmodes; ++modeIter) {
+						pMode= ZoneHybridUnitaryAirConditioner(UnitLoop).AddNewOperatingMode();
+						ErrorsFound = pMode->ParseMode(Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
+						if (ErrorsFound) {
+							ShowFatalError(RoutineName + "Errors found parsing modes");
+							ShowContinueError("... Preceding condition causes termination.");
+							break;
+						}
+					}
+				//	test Alphas(19) add default
+					/*int curveID = -1;
+					if (lAlphaBlanks(19)) {
+						pMode->InitializeCurve(TEMP_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+					}
+					else
+					{
+						curveID = GetCurveIndex(Alphas(19));
+						if (curveID == 0) {
+							ShowSevereError("Invalid " + cAlphaFields(19) + '=' + Alphas(19));
+							ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+							ErrorsFound = true;
+							pMode->InitializeCurve(TEMP_CURVE, -1);
+						}
+						else{ pMode->InitializeCurve(TEMP_CURVE, curveID);}
+						
+					}
+					//ZoneHybridUnitaryAirConditioner(UnitLoop).Tsa_curve_pointer.push_back(GetCurveIndex(Alphas(19)));
+
+						//A20, \field Mode0 Supply Air Humidity Ratio Lookup Table Name
+					curveID = -1;
+					if (lAlphaBlanks(20)) {
+						pMode->InitializeCurve(W_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+					}
+					else
+					{
+						curveID = GetCurveIndex(Alphas(20));
+						if (curveID == 0) {
+							ShowSevereError("Invalid " + cAlphaFields(20) + '=' + Alphas(20));
+							ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+							ErrorsFound = true;
+							pMode->InitializeCurve(W_CURVE, -1);
+						}
+						else { pMode->InitializeCurve(W_CURVE, curveID); }
+
+					}
+				
+						//A21, \field Mode0 System Electric Power Lookup Table Name
+					curveID = -1;
+					if (lAlphaBlanks(21)) {
+						pMode->InitializeCurve(POWER_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+					}
+					else
+					{
+						curveID = GetCurveIndex(Alphas(21));
+						if (curveID == 0) {
+							ShowSevereError("Invalid " + cAlphaFields(21) + '=' + Alphas(21));
+							ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+							ErrorsFound = true;
+							pMode->InitializeCurve(POWER_CURVE, -1);
+						}
+						else { pMode->InitializeCurve(POWER_CURVE, curveID); }
+
+					}
+						//A22, \field Mode0 Supply Fan Electric Power Lookup Table Name
+						//A23, \field Mode0 External Static Pressure Lookup Table Name
+						//A24, \field Mode0 System Second Fuel Consumption Lookup Table Name
+						//A25, \field Mode0 System Third Fuel Consumption Lookup Table Name
+						//A26, \field Mode0 System Water Use Lookup Table Name
+						//N6, \field Mode0  Minimum Outside Air Temperature
+						//N7, \field Mode0  Maximum Outside Air Temperature
+					bool ok = pMode->InitializeOutsideAirTemperatureConstraints(Numbers(6), Numbers(7));
+					if (!ok) {
+						ShowSevereError("Invalid " + cNumericFields(6)  + "Or Invalid" + cNumericFields(7));
 						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
 						ErrorsFound = true;
 					}
 					
+					//N8, \field Mode0  Minimum Outside Air Humidity Ratio
+						//N9, \field Mode0  Maximum Outside Air Humidity Ratio
+					ok = pMode->InitializeOutsideAirHumidityRatioConstraints(Numbers(8), Numbers(9));
+					if (!ok) {
+						ShowSevereError("Invalid " + cNumericFields(8) +  "Or Invalid" + cNumericFields(9) + '=' + Alphas(9));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+						//N10, \field Mode0 Minimum Outside Air Relative Humidity
+						//N11, \field Mode0 Maximum Outside Air Relative Humidity
+					ok = pMode->InitializeOutsideAirRelativeHumidityConstraints(Numbers(10), Numbers(11));
+					if (!ok) {
+						ShowSevereError("Invalid " + cNumericFields(10)  + "Or Invalid" + cNumericFields(11) );
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+						//N12, \field Mode0 Minimum Return Air Temperature
+						//N13, \field Mode0 Maximum Return Air Temperature
+					ok = pMode->InitializeReturnAirTemperatureConstraints(Numbers(12), Numbers(13));
+					if (!ok) {
+						ShowSevereError("Invalid " + cNumericFields(12)  + "Or Invalid" + cNumericFields(13));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+						//N14, \field Mode0 Minimum Return Air Humidity Ratio 
+						//N15, \field Mode0 Maximum Return Air Humidity Ratio
+					ok = pMode->InitializeReturnAirHumidityRatioConstraints(Numbers(14), Numbers(15));
+					if (!ok) {
+						ShowSevereError("Invalid " + cNumericFields(14)  + "Or Invalid" + cNumericFields(15));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+						//N16, \field Mode0 Minimum Return Air Relative HumidityInitialize
+						//N17, \field Mode0 Maximum Return Air Relative Humidity
+					ok = pMode->InitializeReturnAirRelativeHumidityConstraints(Numbers(16), Numbers(17));
+					if (!ok) {
+						ShowSevereError("Invalid " + cAlphaFields(16) + '=' + Alphas(16) + "Or Invalid" + cAlphaFields(17) + '=' + Alphas(17));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+						//N18, \field Mode0 Minimum Outside Air Fraction
+						//N19, \field Mode0 Maximum Outside Air Fraction
+
+					ok = pMode->InitializeOSAFConstraints(Numbers(18), Numbers(19));
+					if (!ok) {
+						ShowSevereError("Error in OSAFConstraints" + cAlphaFields(18) + "through" + cAlphaFields(19));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+					//N20, \field Mode0 Minimum Supply Air Mass Flow Rate Ratio
+					//N21, \field Mode0 Maximum Supply Air Mass Flow Rate Ratio
+
+					ok = pMode->InitializeMsaRatioConstraints(Numbers(20), Numbers(21));
+					if (!ok) {
+						ShowSevereError("Error in OSAFConstraints" + cAlphaFields(20) + "through" + cAlphaFields(21));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+					//A252; \path*/
+
+					//ZoneHybridUnitaryAirConditioner(UnitLoop).Path = Alphas(252);
+					
+					//ZoneHybridUnitaryAirConditioner(UnitLoop).Tsa_curve_pointer = GetCurveIndex(Alphas(3));
 					
 					//A8, \Number of modes
 					//A9, \Mode1_Tsa_Lookup_Name
 					//A10, \Mode1_Hsa_Lookup_Name
 					//A11, \Mode1_Power_Lookup_Name
-					ZoneHybridUnitaryAirConditioner(UnitLoop).MsaCapacityRatedCond = Numbers(2);
+					
 					//A13, \Outdoor air min temperature
 					//A14, \Outdoor air max temperature
 					//A15, \ Outdoor air RH temperature
@@ -623,10 +765,19 @@ namespace EnergyPlus {//***************
 
 				SetupOutputVariable("Zone Hybrid Evaporative Cooler Total Cooling Rate [W]", ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalCoolingRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Evaporative Cooler Unit Total Cooling Energy [J]", ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalCoolingEnergy, "System", "Sum", ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
+				SetupOutputVariable("Zone Hybrid Evaporative Cooler Senible Cooling Rate [W]", ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleCoolingRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Evaporative Cooler Unit Senible Cooling Energy [J]", ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleCoolingEnergy, "System", "Sum", ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
+				
 				SetupOutputVariable("CoolingLoad []", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedLoadToCoolingSetpoint,"System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Mode []", ZoneHybridUnitaryAirConditioner(UnitLoop).Mode, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("ErrorCode []", ZoneHybridUnitaryAirConditioner(UnitLoop).ErrorCode, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("System Supply Air RH []", ZoneHybridUnitaryAirConditioner(UnitLoop).Wsa, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("System Supply Air Temperature []", ZoneHybridUnitaryAirConditioner(UnitLoop).OutletTemp, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Electrical Power Use []", ZoneHybridUnitaryAirConditioner(UnitLoop).ElectricalPower, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				
+				//Ventilation Rate
+				//Outside Air Fraction 
+
 
 				//int count_SAHR_OC_MetOnce;
 				//int count_SAT_OC_MetOnce;
@@ -645,8 +796,14 @@ namespace EnergyPlus {//***************
 				SetupOutputVariable("Zone Evaporative Cooler Unit Fan Speed Ratio []", ZoneEvapUnit(UnitLoop).UnitFanSpeedRatio, "System", "Average", ZoneEvapUnit(UnitLoop).Name);
 				SetupOutputVariable("Zone Evaporative Cooler Unit Fan Availability Status []", ZoneEvapUnit(UnitLoop).FanAvailStatus, "System", "Average", ZoneEvapUnit(UnitLoop).Name);*/
 			}
-
+			Errors = ErrorsFound;
+			if (ErrorsFound) {
+				ShowFatalError(RoutineName + "Errors found in getting input.");
+				ShowContinueError("... Preceding condition causes termination.");
+			}
 		}
+		
 
 	}
 }
+
