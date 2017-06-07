@@ -33534,7 +33534,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \memo supply fan, direct expansion (DX) cooling coil, DX heating coil (air-to-air heat
         \memo pump), supplemental heating coil (gas, electric, hot water, or steam), and
         \memo fixed-position outdoor air mixer.
-        \min-fields 27
+        \min-fields 26
    A1,  \field Name
         \required-field
         \type alpha

@@ -4409,7 +4409,6 @@ namespace Furnaces {
 		using DataSizing::AutoSize;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
 		using DataAirLoop::AirLoopControlInfo;
-//		using DataEnvironment::OutDryBulbTemp;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
@@ -6255,26 +6254,8 @@ namespace Furnaces {
 					OnOffFanPartLoadFraction = 1.0;
 					OnOffAirFlowRatio = 1.0;
 
-					//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
-					if ( Furnace( FurnaceNum ).CondenserNodeNum > 0 ) {
-						if ( Node( Furnace( FurnaceNum ).CondenserNodeNum ).Temp > Furnace( FurnaceNum ).MinOATCompressorHeating ) {
-							// Get full load result
-							CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, PartLoadRatio, 0.0, 0.0, FullSensibleOutput, FullLatentOutput, OnOffAirFlowRatio, false );
-							Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
-						} else {
-							FullSensibleOutput = NoHeatOutput;
-							Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
-						}
-					} else {
-						if ( OutdoorDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressorHeating ) {
-							// Get full load result
-							CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, PartLoadRatio, 0.0, 0.0, FullSensibleOutput, FullLatentOutput, OnOffAirFlowRatio, false );
-							Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
-						} else {
-							FullSensibleOutput = NoHeatOutput;
-							Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
-						}
-					}
+					// Get full load result
+					CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, PartLoadRatio, 0.0, 0.0, FullSensibleOutput, FullLatentOutput, OnOffAirFlowRatio, false );
 
 					// Check that SystemSensibleLoad is between FullSensibleOutput and NoHeatOutput
 					// If so then calculate PartLoadRatio for the DX Heating coil
@@ -6329,13 +6310,39 @@ namespace Furnaces {
 						}
 
 						Furnace( FurnaceNum ).HeatPartLoadRatio = PartLoadRatio;
-						Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
-
+						//       Check if Heat Pump compressor is allowed to run based on outdoor temperature
+						if ( Furnace( FurnaceNum ).CondenserNodeNum > 0 ) {
+							if ( Node( Furnace( FurnaceNum ).CondenserNodeNum ).Temp > Furnace( FurnaceNum ).MinOATCompressorHeating ) {
+								Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
+							} else {
+								Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+							}
+						} else {
+							if ( OutdoorDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressorHeating ) {
+								Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
+							} else {
+								Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+							}
+						}
 					} else if ( SystemSensibleLoad > FullSensibleOutput ) {
 						//       SystemSensibleLoad is greater than full DX Heating coil output so heat pump runs entire
 						//       timestep and additional supplemental heating is required
 						Furnace( FurnaceNum ).HeatPartLoadRatio = 1.0;
-						Furnace( FurnaceNum ).CompPartLoadRatio = 1.0;
+						if ( Furnace( FurnaceNum ).CondenserNodeNum > 0 ) {
+							if ( Node( Furnace( FurnaceNum ).CondenserNodeNum ).Temp > Furnace( FurnaceNum ).MinOATCompressorHeating ) {
+								//       Check to see if Heat Pump compressor was allowed to run based on outdoor temperature
+								Furnace( FurnaceNum ).CompPartLoadRatio = 1.0;
+							} else {
+								Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+							}
+						} else {
+							if ( OutdoorDryBulbTemp > Furnace( FurnaceNum ).MinOATCompressorHeating ) {
+								//       Check to see if Heat Pump compressor was allowed to run based on outdoor temperature
+								Furnace( FurnaceNum ).CompPartLoadRatio = 1.0;
+							} else {
+								Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+							}
+						}
 					} else if ( SystemSensibleLoad < NoHeatOutput ) {
 						//       SystemSensibleLoad is less than minimum DX Heating coil output so heat pump does not run and
 						//       the load will be met by the supplemental heater
@@ -8784,7 +8791,6 @@ namespace Furnaces {
 		using DataGlobals::WarmupFlag;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using Psychrometrics::PsyCpAirFnWTdb;
-//		using DataEnvironment::OutDryBulbTemp;
 		using IntegratedHeatPump::IntegratedHeatPumps;
 		using IntegratedHeatPump::GetMaxSpeedNumIHP;
 		using IntegratedHeatPump::GetCurWorkMode;
@@ -9091,7 +9097,6 @@ namespace Furnaces {
 		using Fans::SimulateFanComponents;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
-//		using DataEnvironment::OutDryBulbTemp;
 		using IntegratedHeatPump::SimIHP;
 
 		// Locals

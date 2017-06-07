@@ -5835,7 +5835,7 @@ namespace DXCoils {
 				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
-					FieldNum = 6 + ( DXCoil( DXCoilNum ).NumOfSpeeds - 1 ) * 13;
+					FieldNum = 7 + ( DXCoil( DXCoilNum ).NumOfSpeeds - 1 ) * 13;
 					DataTotCapCurveIndex = DXCoil ( DXCoilNum ).MSCCapFTemp ( Mode );
 					TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
 					PrintFlag = false;
@@ -6127,7 +6127,7 @@ namespace DXCoils {
 
 				if ( Mode == DXCoil( DXCoilNum ).NumOfSpeeds ) {
 					CompName = DXCoil( DXCoilNum ).Name;
-					FieldNum = 9 + ( Mode - 1) * 13;
+					FieldNum = 10 + ( Mode - 1) * 13;
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames( FieldNum ) + " [m3/s]";
 					SizingMethod = CoolingAirflowSizing;
 					CompType = DXCoil( DXCoilNum ).DXCoilType;
@@ -6143,7 +6143,7 @@ namespace DXCoils {
 				} else {
 					MSRatedAirVolFlowRateDes = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds ) * Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
 					CompName = DXCoil( DXCoilNum ).Name;
-					FieldNum = 9 + ( Mode - 1) * 13;
+					FieldNum = 10 + ( Mode - 1) * 13;
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames( FieldNum ) + " [m3/s]";
 					SizingMethod = AutoCalculateSizing;
 					CompType = DXCoil( DXCoilNum ).DXCoilType;

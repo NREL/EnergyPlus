@@ -2948,7 +2948,6 @@ namespace PackagedTerminalHeatPump {
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
 		using DataGlobals::AnyPlantInModel;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::StdRhoAir;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -6433,11 +6432,6 @@ namespace PackagedTerminalHeatPump {
 		ControlledZoneNum = PTUnit( PTUnitNum ).CtrlZoneNum;
 		ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 		OpMode = PTUnit( PTUnitNum ).OpMode;
-		//  IF(PTUnit(PTUnitNum)%CondenserNodeNum .EQ. 0)THEN
-		//    OutsideDryBulbTemp = OutDryBulbTemp
-		//  ELSE
-		//    OutsideDryBulbTemp = Node(PTUnit(PTUnitNum)%CondenserNodeNum)%Temp
-		//  END IF
 
 		OutsideDryBulbTemp = OutDryBulbTemp;
 
