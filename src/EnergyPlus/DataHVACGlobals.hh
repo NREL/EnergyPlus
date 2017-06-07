@@ -63,6 +63,13 @@ namespace DataHVACGlobals {
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
+	enum class HVACSystemRootSolverAlgorithm : int {
+		eRegulaFalsi = 0,
+		eBisection,
+		eRegulaFalsiThenBisection,
+		eBisectionThenRegulaFalsi,
+		eAlternation
+	};
 
 	// MODULE PARAMETER DEFINITIONS:
 
@@ -299,12 +306,7 @@ namespace DataHVACGlobals {
 	extern Real64 const OscillateMagnitude;
 
 	// Parameters for HVACSystemRootFindingAlgorithm
-	extern int const RegulaFalsi;
 	extern int const Bisection;
-	extern int const RegulaFalsiThenBisection;
-	extern int const BisectionThenRegulaFalsi;
-	extern int const Alternation;
-
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -503,13 +505,12 @@ namespace DataHVACGlobals {
 	{
 		// Members
 		std::string Algorithm;           // Choice of algorithm
-		int TypeNum;                     // Type number: 1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5 Alternation
 		int NumOfIter;                   // Number of Iteration Before Algorith Switch
-
+		HVACSystemRootSolverAlgorithm HVACSystemRootSolver; //1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5 Alternation
 										 // Default Constructor
 		HVACSystemRootFindingAlgorithm( ) :
-			TypeNum( 0 ),
-			NumOfIter( 5 )
+			NumOfIter( 5 ),
+			HVACSystemRootSolver( HVACSystemRootSolverAlgorithm::eRegulaFalsi )
 		{}
 
 	};

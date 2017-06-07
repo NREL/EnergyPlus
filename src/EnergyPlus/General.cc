@@ -97,9 +97,6 @@ namespace General {
 	using namespace DataPrecisionGlobals;
 	using DataHVACGlobals::HVACSystemRootFinding;
 	using DataHVACGlobals::Bisection;
-	using DataHVACGlobals::RegulaFalsiThenBisection;
-	using DataHVACGlobals::BisectionThenRegulaFalsi;
-	using DataHVACGlobals::Alternation;
 
 	// Data
 	// This module should not contain variables in the module sense as it is
@@ -209,19 +206,47 @@ namespace General {
 			DY = Y0 - Y1;
 			if ( std::abs( DY ) < SMALL ) DY = SMALL;
 			// new estimation
-			if ( ( HVACSystemRootFinding.TypeNum == Bisection ) ||
-				( HVACSystemRootFinding.TypeNum == Alternation && AltIte > HVACSystemRootFinding.NumOfIter ) ||
-				( HVACSystemRootFinding.TypeNum == RegulaFalsiThenBisection && NIte > HVACSystemRootFinding.NumOfIter ) ||
-				( HVACSystemRootFinding.TypeNum == BisectionThenRegulaFalsi && NIte <= HVACSystemRootFinding.NumOfIter ) ) {
-				if ( HVACSystemRootFinding.TypeNum == Alternation ) {
-					if ( AltIte >= 2 * HVACSystemRootFinding.NumOfIter ) AltIte = 0;
-				}
-				// Bisection
-				XTemp = ( X1 + X0 ) / 2.0;
-			} else {
-				// Regula Falsi
+			switch ( HVACSystemRootFinding.HVACSystemRootSolver )
+			{
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsi: {
 				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				break;
 			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisection: {
+				XTemp = ( X1 + X0 ) / 2.0;
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsiThenBisection: {
+				if ( NIte > HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+				} else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisectionThenRegulaFalsi: {
+				if ( NIte <= HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+				}
+				else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eAlternation: {
+				if ( AltIte > HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+					if ( AltIte >= 2 * HVACSystemRootFinding.NumOfIter ) AltIte = 0;
+				} else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			default: {
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+
+			} }
+
 			YTemp = f( XTemp, Par );
 
 			++NIte;
@@ -512,19 +537,49 @@ namespace General {
 			DY = Y0 - Y1;
 			if ( std::abs( DY ) < SMALL ) DY = SMALL;
 			// new estimation
-			if ( ( HVACSystemRootFinding.TypeNum == Bisection ) ||
-				( HVACSystemRootFinding.TypeNum == Alternation && AltIte > HVACSystemRootFinding.NumOfIter ) ||
-				( HVACSystemRootFinding.TypeNum == RegulaFalsiThenBisection && NIte > HVACSystemRootFinding.NumOfIter ) ||
-				( HVACSystemRootFinding.TypeNum == BisectionThenRegulaFalsi && NIte <= HVACSystemRootFinding.NumOfIter ) ) {
-				if ( HVACSystemRootFinding.TypeNum == Alternation ) {
+			switch ( HVACSystemRootFinding.HVACSystemRootSolver )
+			{
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsi: {
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisection: {
+				XTemp = ( X1 + X0 ) / 2.0;
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsiThenBisection: {
+				if ( NIte > HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+				}
+				else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisectionThenRegulaFalsi: {
+				if ( NIte <= HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+				}
+				else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eAlternation: {
+				if ( AltIte > HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
 					if ( AltIte >= 2 * HVACSystemRootFinding.NumOfIter ) AltIte = 0;
 				}
-				// Bisection
-				XTemp = ( X1 + X0 ) / 2.0;
-			} else {
-				// Regula Falsi
-				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
 			}
+			default: {
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+
+			} }
+
 			YTemp = f( XTemp );
 
 			++NIte;
