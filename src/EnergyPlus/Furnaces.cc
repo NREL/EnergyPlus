@@ -4824,24 +4824,28 @@ namespace Furnaces {
 				}
 			}
 		}
-		if ( allocated( AirToZoneNodeInfo ) && FlowFracFlagReady ) {
-			SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
-			for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex ) {
-				ZoneInletNodeNum = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolInletNodes( ZoneInSysIndex );
-				SumOfMassFlowRateMax += Node( ZoneInletNodeNum ).MassFlowRateMax;
-				if ( AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZoneInSysIndex ) == Furnace( FurnaceNum ).ControlZoneNum ) {
-					CntrlZoneTerminalUnitMassFlowRateMax = Node( ZoneInletNodeNum ).MassFlowRateMax;
+
+		if ( MyFlowFracFlag( FurnaceNum ) ) {
+			if ( allocated( AirToZoneNodeInfo ) && FlowFracFlagReady ) {
+				SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
+				for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex ) {
+					ZoneInletNodeNum = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolInletNodes( ZoneInSysIndex );
+					SumOfMassFlowRateMax += Node( ZoneInletNodeNum ).MassFlowRateMax;
+					if ( AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZoneInSysIndex ) == Furnace( FurnaceNum ).ControlZoneNum ) {
+						CntrlZoneTerminalUnitMassFlowRateMax = Node( ZoneInletNodeNum ).MassFlowRateMax;
+					}
 				}
-			}
-			if ( SumOfMassFlowRateMax != 0.0 && MyFlowFracFlag( FurnaceNum ) ) {
-				if ( CntrlZoneTerminalUnitMassFlowRateMax >= SmallAirVolFlow ) {
-					Furnace( FurnaceNum ).ControlZoneMassFlowFrac = CntrlZoneTerminalUnitMassFlowRateMax / SumOfMassFlowRateMax;
-				} else {
-					ShowSevereError( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " = " + Furnace( FurnaceNum ).Name );
-					ShowContinueError( " The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1." );
+				if ( SumOfMassFlowRateMax != 0.0 ) {
+					if ( CntrlZoneTerminalUnitMassFlowRateMax >= SmallAirVolFlow ) {
+						Furnace( FurnaceNum ).ControlZoneMassFlowFrac = CntrlZoneTerminalUnitMassFlowRateMax / SumOfMassFlowRateMax;
+					}
+					else {
+						ShowSevereError( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " = " + Furnace( FurnaceNum ).Name );
+						ShowContinueError( " The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1." );
+					}
+					ReportSizingOutput( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ), Furnace( FurnaceNum ).Name, "Fraction of Supply Air Flow That Goes Through the Controlling Zone", Furnace( FurnaceNum ).ControlZoneMassFlowFrac );
+					MyFlowFracFlag( FurnaceNum ) = false;
 				}
-				ReportSizingOutput( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ), Furnace( FurnaceNum ).Name, "Fraction of Supply Air Flow That Goes Through the Controlling Zone", Furnace( FurnaceNum ).ControlZoneMassFlowFrac );
-				MyFlowFracFlag( FurnaceNum ) = false;
 			}
 		}
 
@@ -6302,27 +6306,30 @@ namespace Furnaces {
 							SolveRegulaFalsi( HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
 							//         OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
 							OnOffAirFlowRatio = OnOffAirFlowRatioSave;
-							if ( SolFlag == -1 ) {
-								CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, PartLoadRatio, 0.0, 0.0, TempHeatOutput, TempLatentOutput, OnOffAirFlowRatio, false );
-								if ( std::abs( SystemSensibleLoad - TempHeatOutput ) > SmallLoad ) {
-									if ( Furnace( FurnaceNum ).DXHeatingMaxIterIndex == 0 ) {
-										ShowWarningMessage( "Heating coil control failed to converge for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + ':' + Furnace( FurnaceNum ).Name );
-										ShowContinueError( "  Iteration limit exceeded in calculating DX heating coil sensible part-load ratio." );
-										ShowContinueErrorTimeStamp( "Sensible load to be met by DX heating coil = " + TrimSigDigits( SystemSensibleLoad, 2 ) + " (watts), sensible output of DX heating coil = " + TrimSigDigits( TempHeatOutput, 2 ) + " (watts), and the simulation continues." );
+							if ( SolFlag < 0 ) {
+								if ( SolFlag == -1 ) {
+									CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, PartLoadRatio, 0.0, 0.0, TempHeatOutput, TempLatentOutput, OnOffAirFlowRatio, false );
+									if ( std::abs( SystemSensibleLoad - TempHeatOutput ) > SmallLoad ) {
+										if ( Furnace( FurnaceNum ).DXHeatingMaxIterIndex == 0 ) {
+											ShowWarningMessage( "Heating coil control failed to converge for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + ':' + Furnace( FurnaceNum ).Name );
+											ShowContinueError( "  Iteration limit exceeded in calculating DX heating coil sensible part-load ratio." );
+											ShowContinueErrorTimeStamp( "Sensible load to be met by DX heating coil = " + TrimSigDigits( SystemSensibleLoad, 2 ) + " (watts), sensible output of DX heating coil = " + TrimSigDigits( TempHeatOutput, 2 ) + " (watts), and the simulation continues." );
+										}
+										ShowRecurringWarningErrorAtEnd( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\" - Iteration limit exceeded in calculating DX sensible heating part-load ratio error continues. Sensible load statistics:", Furnace( FurnaceNum ).DXHeatingMaxIterIndex, SystemSensibleLoad, SystemSensibleLoad );
 									}
-									ShowRecurringWarningErrorAtEnd( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\" - Iteration limit exceeded in calculating DX sensible heating part-load ratio error continues. Sensible load statistics:", Furnace( FurnaceNum ).DXHeatingMaxIterIndex, SystemSensibleLoad, SystemSensibleLoad );
+								} else if ( SolFlag == -2 ) {
+									if ( Furnace( FurnaceNum ).DXHeatingRegulaFalsiFailedIndex == 0 ) {
+										ShowWarningMessage( "Heating coil control failed for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + ':' + Furnace( FurnaceNum ).Name );
+										ShowContinueError( "  DX sensible heating part-load ratio determined to be outside the range of 0-1." );
+										ShowContinueErrorTimeStamp( "Sensible load to be met by DX heating coil = " + TrimSigDigits( SystemSensibleLoad, 2 ) + " (watts), and the simulation continues." );
+									}
+									ShowRecurringWarningErrorAtEnd( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\" -  DX sensible heating part-load ratio out of range error continues. Sensible load statistics:", Furnace( FurnaceNum ).DXHeatingRegulaFalsiFailedIndex, SystemSensibleLoad, SystemSensibleLoad );
 								}
-							} else if ( SolFlag == -2 ) {
-								if ( Furnace( FurnaceNum ).DXHeatingRegulaFalsiFailedIndex == 0 ) {
-									ShowWarningMessage( "Heating coil control failed for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + ':' + Furnace( FurnaceNum ).Name );
-									ShowContinueError( "  DX sensible heating part-load ratio determined to be outside the range of 0-1." );
-									ShowContinueErrorTimeStamp( "Sensible load to be met by DX heating coil = " + TrimSigDigits( SystemSensibleLoad, 2 ) + " (watts), and the simulation continues." );
-								}
-								ShowRecurringWarningErrorAtEnd( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\" -  DX sensible heating part-load ratio out of range error continues. Sensible load statistics:", Furnace( FurnaceNum ).DXHeatingRegulaFalsiFailedIndex, SystemSensibleLoad, SystemSensibleLoad );
 							}
 						}
 
 						Furnace( FurnaceNum ).HeatPartLoadRatio = PartLoadRatio;
+						Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
 
 					} else if ( SystemSensibleLoad > FullSensibleOutput ) {
 						//       SystemSensibleLoad is greater than full DX Heating coil output so heat pump runs entire
@@ -6633,26 +6640,28 @@ namespace Furnaces {
 							SolveRegulaFalsi( CoolErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
 							//             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
 							OnOffAirFlowRatio = OnOffAirFlowRatioSave;
-							if ( SolFlag == -1 ) {
-								CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, PartLoadRatio, 0.0, 0.0, 0.0, TempCoolOutput, TempLatentOutput, OnOffAirFlowRatio, HXUnitOn );
-								if ( !WarmupFlag ) {
-									if ( std::abs( CoolCoilLoad - TempCoolOutput ) > SmallLoad ) {
-										if ( Furnace( FurnaceNum ).SensibleMaxIterIndex == 0 ) {
-											ShowWarningMessage( "Cooling coil control failed to converge for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + ':' + Furnace( FurnaceNum ).Name );
-											ShowContinueError( "  Iteration limit exceeded in calculating DX cooling coil sensible part-load ratio." );
-											ShowContinueErrorTimeStamp( "Sensible load to be met by DX coil = " + TrimSigDigits( CoolCoilLoad, 2 ) + " (watts), sensible output of DX coil = " + TrimSigDigits( TempCoolOutput, 2 ) + " (watts), and the simulation continues." );
+							if ( SolFlag < 0 ) {
+								if ( SolFlag == -1 ) {
+									CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, PartLoadRatio, 0.0, 0.0, 0.0, TempCoolOutput, TempLatentOutput, OnOffAirFlowRatio, HXUnitOn );
+									if ( !WarmupFlag ) {
+										if ( std::abs( CoolCoilLoad - TempCoolOutput ) > SmallLoad ) {
+											if ( Furnace( FurnaceNum ).SensibleMaxIterIndex == 0 ) {
+												ShowWarningMessage( "Cooling coil control failed to converge for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + ':' + Furnace( FurnaceNum ).Name );
+												ShowContinueError( "  Iteration limit exceeded in calculating DX cooling coil sensible part-load ratio." );
+												ShowContinueErrorTimeStamp( "Sensible load to be met by DX coil = " + TrimSigDigits( CoolCoilLoad, 2 ) + " (watts), sensible output of DX coil = " + TrimSigDigits( TempCoolOutput, 2 ) + " (watts), and the simulation continues." );
+											}
+											ShowRecurringWarningErrorAtEnd( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\" - Iteration limit exceeded in calculating sensible cooling part-load ratio error continues. Sensible load statistics:", Furnace( FurnaceNum ).SensibleMaxIterIndex, CoolCoilLoad, CoolCoilLoad );
 										}
-										ShowRecurringWarningErrorAtEnd( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\" - Iteration limit exceeded in calculating sensible cooling part-load ratio error continues. Sensible load statistics:", Furnace( FurnaceNum ).SensibleMaxIterIndex, CoolCoilLoad, CoolCoilLoad );
 									}
-								}
-							} else if ( SolFlag == -2 ) {
-								if ( !WarmupFlag ) {
-									if ( Furnace( FurnaceNum ).SensibleRegulaFalsiFailedIndex == 0 ) {
-										ShowWarningMessage( "Cooling coil control failed for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + ':' + Furnace( FurnaceNum ).Name );
-										ShowContinueError( "  Cooling sensible part-load ratio determined to be outside the range of 0-1." );
-										ShowContinueErrorTimeStamp( "  Cooling sensible load = " + TrimSigDigits( CoolCoilLoad, 2 ) );
+								} else if ( SolFlag == -2 ) {
+									if ( !WarmupFlag ) {
+										if ( Furnace( FurnaceNum ).SensibleRegulaFalsiFailedIndex == 0 ) {
+											ShowWarningMessage( "Cooling coil control failed for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + ':' + Furnace( FurnaceNum ).Name );
+											ShowContinueError( "  Cooling sensible part-load ratio determined to be outside the range of 0-1." );
+											ShowContinueErrorTimeStamp( "  Cooling sensible load = " + TrimSigDigits( CoolCoilLoad, 2 ) );
+										}
+										ShowRecurringWarningErrorAtEnd( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load statistics:", Furnace( FurnaceNum ).SensibleRegulaFalsiFailedIndex, CoolCoilLoad, CoolCoilLoad );
 									}
-									ShowRecurringWarningErrorAtEnd( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load statistics:", Furnace( FurnaceNum ).SensibleRegulaFalsiFailedIndex, CoolCoilLoad, CoolCoilLoad );
 								}
 							}
 						}

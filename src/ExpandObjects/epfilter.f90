@@ -25291,8 +25291,6 @@ DO iZone = 1, numCompactPTHP
   CALL AddToObjStr('Heating Coil Object Type','Coil:Heating:DX:SingleSpeed')
   CALL AddToObjFld('Heating Coil Name', base + pthpzNameOff,' PTHP Heating Coil')
   CALL AddToObjStr('Heating Convergence Tolerance {dimensionless}','0.001')
-  CALL AddToObjFld('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}',   &
-     base + pthpzHPHeatMinODBOff,'')
   CALL AddToObjStr('Cooling Coil Object Type','Coil:Cooling:DX:SingleSpeed')
   CALL AddToObjFld('Cooling Coil Name', base + pthpzNameOff,' PTHP Cooling Coil')
   CALL AddToObjStr('Cooling Convergence Tolerance {dimensionless}','0.001')

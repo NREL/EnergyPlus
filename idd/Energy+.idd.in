@@ -33653,13 +33653,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \default 0.001
         \units dimensionless
         \note Defines Heating convergence tolerance as a fraction of Heating load to be met.
-   N8 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-        \type real
-        \minimum -20.0
-        \default -8.0
-        \units C
-        \note Needs to match the corresponding minimum outdoor temperature defined
-        \note in the DX Heating Coil object.
    A11, \field Cooling Coil Object Type
         \required-field
         \type choice
@@ -33675,7 +33668,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \object-list CoolingCoilsDXSingleSpeed
         \object-list CoolingCoilsDXVariableSpeed
         \note Needs to match in the DX Cooling Coil object.
-   N9 , \field Cooling Convergence Tolerance
+   N8 , \field Cooling Convergence Tolerance
         \type real
         \minimum> 0.0
         \default 0.001
@@ -33694,13 +33687,13 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \type object-list
         \object-list HeatingCoilName
         \note Needs to match in the supplemental heating coil object.
-   N10, \field Maximum Supply Air Temperature from Supplemental Heater
+   N9 , \field Maximum Supply Air Temperature from Supplemental Heater
         \required-field
         \type real
         \units C
         \autosizable
         \note Supply air temperature from the supplemental heater will not exceed this value.
-   N11, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+   N10, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
         \type real
         \maximum 21.0
         \default 21.0

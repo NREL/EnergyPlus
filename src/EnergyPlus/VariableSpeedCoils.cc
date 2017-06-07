@@ -4177,9 +4177,6 @@ namespace VariableSpeedCoils {
 			CpSource = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSourceSideInletTemp );
 		}
 
-		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) && ( CondInletTemp < VarSpeedCoil( DXCoilNum ).MinOATCompressor ) ) {
-			LoadSideMassFlowRate = 0.0;
-		}
 		//Check for flows, do not perform simulation if no flow in load side or source side.
 		if ( SourceSideMassFlowRate <= 0.0 || LoadSideMassFlowRate <= 0.0 ) {
 
@@ -4195,6 +4192,11 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( CompOp == 0 ) {
+			VarSpeedCoil( DXCoilNum ).SimFlag = false;
+			return;
+		}
+
+		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) && ( CondInletTemp < VarSpeedCoil( DXCoilNum ).MinOATCompressor ) ) {
 			VarSpeedCoil( DXCoilNum ).SimFlag = false;
 			return;
 		}
