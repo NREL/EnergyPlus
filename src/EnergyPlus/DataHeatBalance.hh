@@ -973,6 +973,7 @@ namespace DataHeatBalance {
 		Array1D_int LayerPoint; // Pointer array which refers back to
 		// the Material structure; LayerPoint(i)=j->Material(j)%Name,etc
 		bool IsUsed; // Marked true when the construction is used
+		bool IsUsedCTF; // Mark true when the construction is used for a surface with CTF calculations
 		Real64 InsideAbsorpVis; // Inside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 OutsideAbsorpVis; // Outside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 InsideAbsorpSolar; // Inside Layer solar absorptance of an opaque surface; not used for windows.
@@ -1136,6 +1137,7 @@ namespace DataHeatBalance {
 			TotGlassLayers( 0 ),
 			LayerPoint( MaxLayersInConstruct, 0 ),
 			IsUsed( false ),
+			IsUsedCTF( false ),
 			InsideAbsorpVis( 0.0 ),
 			OutsideAbsorpVis( 0.0 ),
 			InsideAbsorpSolar( 0.0 ),
@@ -1289,6 +1291,7 @@ namespace DataHeatBalance {
 		// Calculated after input
 		Real64 FloorArea; // Floor area used for this zone
 		Real64 CalcFloorArea; // Calculated floor area used for this zone
+		Real64 CeilingArea; // Ceiling area for the zone
 		bool HasFloor; // Has "Floor" surface
 		bool HasRoof; // Has "Roof" or "Ceiling" Surface
 		bool HasInterZoneWindow; // Interzone Window(s) present in this zone
@@ -1372,6 +1375,7 @@ namespace DataHeatBalance {
 			UserEnteredFloorArea( AutoCalculate ),
 			FloorArea( 0.0 ),
 			CalcFloorArea( 0.0 ),
+			CeilingArea( 0.0 ), 
 			HasFloor( false ),
 			HasRoof( false ),
 			HasInterZoneWindow( false ),

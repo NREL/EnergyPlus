@@ -16,6 +16,7 @@ set( test_src
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BoilerHotWater.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
@@ -58,6 +59,7 @@ set( test_src
   Furnaces.unit.cc
   General.unit.cc
   GroundHeatExchangers.unit.cc
+  HeatBalanceAirManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc

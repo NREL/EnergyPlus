@@ -53,7 +53,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.6;
+  Version,8.7;
 
   Building,
     FHX House,               !- Name
@@ -356,10 +356,10 @@
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    15,0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    15,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    15,0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    15,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Wall 2,         !- Name
@@ -372,9 +372,9 @@
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    15,10,0,  !- X,Y,Z ==> Vertex 1 {m}
     15,10,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    15,10,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,10,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
     0,10,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
@@ -388,10 +388,10 @@
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15,0,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    15,10,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    15,10,0,  !- X,Y,Z ==> Vertex 3 {m}
-    15,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+    15,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15,0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    15,10,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    15,10,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Wall 4,         !- Name
@@ -404,10 +404,11 @@
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    0,10,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,10,-3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0,10,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,10,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
 
   BuildingSurface:Detailed,
     Basement Floor,          !- Name
@@ -438,8 +439,8 @@
     4,                       !- Number of Vertices
     0,10,0,  !- X,Y,Z ==> Vertex 1 {m}
     0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    10,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-    10,10,0;  !- X,Y,Z ==> Vertex 4 {m}
+    15,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15,10,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:OtherSideConditionsModel,
     BasementWallOSCM,        !- Name
@@ -479,10 +480,10 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    15,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    15,0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 2,       !- Name
@@ -495,9 +496,9 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10,0,  !- X,Y,Z ==> Vertex 1 {m}
+    15,10,3.1,  !- X,Y,Z ==> Vertex 1 {m}
     15,10,0,  !- X,Y,Z ==> Vertex 2 {m}
-    15,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    0,10,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,10,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
@@ -511,10 +512,10 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    15,10,0,  !- X,Y,Z ==> Vertex 2 {m}
-    15,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    15,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    15,0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    15,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15,10,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15,10,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 4,       !- Name
@@ -527,10 +528,10 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    0,0,3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    0,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,10,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0,10,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    0,10,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Roof,         !- Name
@@ -545,8 +546,8 @@
     4,                       !- Number of Vertices
     0,10,3.1,  !- X,Y,Z ==> Vertex 1 {m}
     0,0,3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    10,0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    10,10,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    15,0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    15,10,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
 !***********************************************************
 !****** ABOVE-GROUND MATERIALS/CONSTRUCTIONS ***************

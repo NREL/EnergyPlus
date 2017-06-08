@@ -922,7 +922,7 @@ namespace HWBaseboardRadiator {
 					if ( HWBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 						CheckZoneSizing( CompType, CompName );
 						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 					}
 					TempSize = HWBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 
@@ -935,7 +935,7 @@ namespace HWBaseboardRadiator {
 					CheckZoneSizing( CompType, CompName );
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					DataFracOfAutosizedHeatingCapacity = HWBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 					TempSize = AutoSize;
 					DataScalableCapSizingON = true;
 				} else {
