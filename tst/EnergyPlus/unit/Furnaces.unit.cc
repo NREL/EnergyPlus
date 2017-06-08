@@ -1034,7 +1034,7 @@ namespace EnergyPlus {
 		"    HPACHeatEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name",
 		"    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
-		"    -18.0,                   !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+		"    -8.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
 		"    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
 		"    200.0,                   !- Crankcase Heater Capacity {W}",

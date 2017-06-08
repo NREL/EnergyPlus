@@ -1079,6 +1079,8 @@ namespace EnergyPlus {
 		SizeDXCoil( 1 );
 		EXPECT_EQ( 25000.0, DXCoil( 1 ).RatedTotCap( 1 ) );
 		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ) * 0.004266, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
+		// Minimum Outdoor Temperature for Compressor Operation defaults to -25.0 C
+		EXPECT_EQ( DXCoil( 1 ).MinOATCompressor, -25.0 );
 
 	}
 

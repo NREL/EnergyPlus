@@ -5100,6 +5100,13 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 	GetUnitarySystemInput( ); // get UnitarySystem input from object above
 	ASSERT_FALSE( DXCoil( 1 ).MSHPHeatRecActive ); // electricity
 	ASSERT_TRUE( DXCoil( 2 ).MSHPHeatRecActive ); // natural gas
+	// Minimum Outdoor Temperature for Compressor Operation blank field defaults to -25.0 C
+	EXPECT_EQ( DXCoil( 1 ).MinOATCompressor, -25.0 );
+	// Minimum Outdoor Temperature for Compressor read from input field as -8.0 C
+	EXPECT_EQ( DXCoil( 2 ).MinOATCompressor,  -8.0 );
+	// Unitary System mines data from coil objects
+	EXPECT_EQ( DXCoil( 1 ).MinOATCompressor, UnitarySystem( 1 ).MinOATCompressorCooling );
+	EXPECT_EQ( DXCoil( 2 ).MinOATCompressor, UnitarySystem( 1 ).MinOATCompressorHeating );
 
 }
 TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
@@ -5478,6 +5485,11 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 1.0 ); // Watts
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow * UnitarySystem( 1 ).PartLoadFrac  );
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
+
+	// water to air HP coils do not have a Minimum OAT for Compressor Operation input field
+	// Unitary System mines data from coil objects
+	EXPECT_EQ( UnitarySystem( 1 ).MinOATCompressorCooling, -1000.0 );
+	EXPECT_EQ( UnitarySystem( 1 ).MinOATCompressorHeating, -1000.0 );
 
 }
 

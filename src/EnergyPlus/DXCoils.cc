@@ -12540,12 +12540,12 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
+		if ( SameString( CoilType, "Coil:Cooling:DX:SingleSpeed" ) || SameString( CoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
 			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				MinOAT = DXCoil( WhichCoil ).MinOATCompressor;
 			}
-		} else if ( SameString( CoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
+		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) || SameString( CoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
 			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				MinOAT = DXCoil( WhichCoil ).MinOATCompressor;
