@@ -1,4 +1,51 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -7,7 +54,6 @@
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -31,12 +77,14 @@
 #include <DataSystemVariables.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingDevices.hh>
+#include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <EconomicTariff.hh>
 #include <EMSManager.hh>
 #include <General.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MatrixDataManager.hh>
@@ -46,6 +94,7 @@
 #include <ScheduleManager.hh>
 #include <SolarShading.hh>
 #include <SurfaceGeometry.hh>
+#include <SurfaceOctree.hh>
 #include <UtilityRoutines.hh>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
@@ -281,6 +330,18 @@ namespace HeatBalanceManager {
 		// Get the heat balance input at the beginning of the simulation only
 		if ( ManageHeatBalanceGetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+
+			// Surface octree setup
+			//  The surface octree holds live references to surfaces so it must be updated
+			//   if in the future surfaces are altered after this point
+			if ( TotSurfaces >= DaylightingManager::octreeCrossover ) { // Octree can be active
+				if ( GetNumObjectsFound( "Daylighting:Controls" ) > 0 ) { // Daylighting is active
+					surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
+				}
+			}
+
+			for ( auto & surface : DataSurfaces::Surface ) surface.set_computed_geometry(); // Set up extra surface geometry info for PierceSurface
+
 			ManageHeatBalanceGetInputFlag = false;
 		}
 
@@ -295,7 +356,8 @@ namespace HeatBalanceManager {
 		// the HVAC system (called from the Air Heat Balance) and the zone (simulated
 		// in the Surface Heat Balance Manager).  In the future, this may be improved.
 		ManageSurfaceHeatBalance();
-		ManageEMS( emsCallFromEndZoneTimestepBeforeZoneReporting ); // EMS calling point
+		bool anyRan;
+		ManageEMS( emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan ); // EMS calling point
 		RecKeepHeatBalance(); // Do any heat balance related record keeping
 
 		// This call has been moved to the FanSystemModule and does effect the output file
@@ -304,7 +366,7 @@ namespace HeatBalanceManager {
 
 		ReportHeatBalance(); // Manage heat balance reporting until the new reporting is in place
 
-		ManageEMS( emsCallFromEndZoneTimestepAfterZoneReporting ); // EMS calling point
+		ManageEMS( emsCallFromEndZoneTimestepAfterZoneReporting, anyRan ); // EMS calling point
 
 		UpdateEMSTrendVariables();
 
@@ -315,7 +377,7 @@ namespace HeatBalanceManager {
 				DayOfSim = 0; // Reset DayOfSim if Warmup converged
 				DayOfSimChr = "0";
 
-				ManageEMS( emsCallFromBeginNewEvironmentAfterWarmUp ); // calling point
+				ManageEMS( emsCallFromBeginNewEvironmentAfterWarmUp, anyRan ); // calling point
 			}
 
 		}
@@ -477,7 +539,7 @@ namespace HeatBalanceManager {
 				Construct( CNum ).IsUsed = true;
 			}
 		}
-		Unused = TotConstructs - count( Construct.IsUsed() );
+		Unused = TotConstructs - std::count_if( Construct.begin(), Construct.end(), []( DataHeatBalance::ConstructionData const & e ){ return e.IsUsed; } );
 		if ( Unused > 0 ) {
 			if ( ! DisplayExtraWarnings ) {
 				ShowWarningError( "CheckUsedConstructions: There are " + RoundSigDigits( Unused ) + " nominally unused constructions in input." );
@@ -817,11 +879,8 @@ namespace HeatBalanceManager {
 				DefaultInsideConvectionAlgo = ASHRAESimple;
 				AlphaName( 1 ) = "Simple";
 
-			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
+			} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 				DefaultInsideConvectionAlgo = ASHRAETARP;
-				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetInsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "TARP";
 
 			} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
@@ -858,32 +917,20 @@ namespace HeatBalanceManager {
 			GetObjectItem( "SurfaceConvectionAlgorithm:Outside", 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 
-			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
+			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAESimple;
-				if ( AlphaName( 1 ) == "SIMPLE" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to SimpleCombined, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "SimpleCombined";
 
-			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
+			} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAETARP;
-				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
-				if ( AlphaName( 1 ) == "BLAST" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "TARP";
 
 			} else if ( SELECT_CASE_var == "MOWITT" ) {
 				DefaultOutsideConvectionAlgo = MoWiTTHcOutside;
 				AlphaName( 1 ) = "MoWitt";
 
-			} else if ( ( SELECT_CASE_var == "DOE-2" ) || ( SELECT_CASE_var == "DOE2" ) ) {
+			} else if ( ( SELECT_CASE_var == "DOE-2" ) ) {
 				DefaultOutsideConvectionAlgo = DOE2HcOutside;
-				if ( AlphaName( 1 ) == "DOE2" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to DOE-2, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "DOE-2";
 
 			} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
@@ -1276,6 +1323,7 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::ScanForReports;
+		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3204,6 +3252,16 @@ namespace HeatBalanceManager {
 				ErrorsFound = true;
 			}
 
+			if ( Material( MaterNum ).InitMoisture > Material( MaterNum ).Porosity ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is greater than " + cNumericFieldNames( 13 ) + ". It must be less or equal." );
+				ShowContinueError( cNumericFieldNames( 13 ) + " = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " = " + TrimSigDigits( Material( MaterNum ).InitMoisture, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is reset to the maximum (saturation) value = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( "Simulation continues." );
+				Material( MaterNum ).InitMoisture = Material( MaterNum ).Porosity;
+			}
+
 		}
 
 		// Thermochromic glazing group
@@ -3648,19 +3706,22 @@ namespace HeatBalanceManager {
 		Construct.allocate( TotConstructs );
 		//Note: If TotWindow5Constructs > 0, additional constructions are created in
 		//subr. SearchWindow5DataFile corresponding to those found on the data file.
-		//Initialize CTF and History terms.
-		Construct.NumCTFTerms() = 0;
-		Construct.NumHistories() = 0;
+		for ( auto & e : Construct ) {
+			// Initialize CTF and History terms
+			e.NumCTFTerms = 0;
+			e.NumHistories = 0;
 
-		//Initialize some heat source/sink variables
-		Construct.SourceSinkPresent() = false; // "default" is no source or sink present
-		Construct.SolutionDimensions() = 1; // "default" is 1-D heat transfer
-		Construct.SourceAfterLayer() = 0; // this has no meaning if a source/sink is not present
-		Construct.TempAfterLayer() = 0; // this has no meaning if a source/sink is not present
-		Construct.ThicknessPerpend() = 0.0; // this has no meaning if a source/sink is not present
+			// Initialize some heat source/sink variables
+			e.SourceSinkPresent = false; // "default" is no source or sink present
+			e.SolutionDimensions = 1; // "default" is 1-D heat transfer
+			e.SourceAfterLayer = 0; // this has no meaning if a source/sink is not present
+			e.TempAfterLayer = 0; // this has no meaning if a source/sink is not present
+			e.ThicknessPerpend = 0.0; // this has no meaning if a source/sink is not present
 
-		Construct.W5FrameDivider() = 0;
-		Construct.FromWindow5DataFile() = false;
+			e.W5FrameDivider = 0;
+			e.FromWindow5DataFile = false;
+		}
+
 
 		ConstrNum = 0;
 
@@ -3761,6 +3822,7 @@ namespace HeatBalanceManager {
 		ConstrNum = 0;
 
 		CurrentModuleObject = "Construction:InternalSource";
+		if ( TotSourceConstructs > 0 ) AnyConstructInternalSourceInInput = true;
 		for ( Loop = 1; Loop <= TotSourceConstructs; ++Loop ) { // Loop through all constructs with sources in the input...
 
 			//Get the object names for each construction from the input processor
@@ -3792,7 +3854,7 @@ namespace HeatBalanceManager {
 				ShowContinueError( "Construction=" + Construct( TotRegConstructs + ConstrNum ).Name + " is affected." );
 				Construct( TotRegConstructs + ConstrNum ).SolutionDimensions = 1;
 			}
-			Construct( TotRegConstructs + ConstrNum ).ThicknessPerpend = DummyProps( 4 );
+			Construct( TotRegConstructs + ConstrNum ).ThicknessPerpend = DummyProps( 4 ) / 2.0;
 
 			//Set the total number of layers for the construction
 			Construct( TotRegConstructs + ConstrNum ).TotLayers = ConstructNumAlpha - 1;
@@ -4278,6 +4340,7 @@ namespace HeatBalanceManager {
 
 		// Using/Aliasing
 		using DataDaylighting::ZoneDaylight;
+		using HybridModel::FlagHybridModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4314,11 +4377,7 @@ namespace HeatBalanceManager {
 				if ( SELECT_CASE_var == "SIMPLE" ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAESimple;
 
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
-					if ( cAlphaArgs( 2 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\", defaulting to TARP." );
-					}
+				} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
 
 				} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
@@ -4346,22 +4405,10 @@ namespace HeatBalanceManager {
 		if ( NumAlphas > 2 && !lAlphaFieldBlanks( 3 ) ) {
 				{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 
-				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
-					if ( cAlphaArgs( 3 ) == "SIMPLE" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to SimpleCombined." );
-					}
+				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
 					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAESimple;
 
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
-					if ( cAlphaArgs( 3 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
-					if ( cAlphaArgs( 3 ) == "BLAST" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
+				} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAETARP;
 
 				} else if ( SELECT_CASE_var == "MOWITT" ) {
@@ -4404,6 +4451,11 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+
+		if ( FlagHybridModel ){
+			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+		}
+
 	}
 
 	// End of Get Input subroutines for the HB Module
@@ -4502,8 +4554,10 @@ namespace HeatBalanceManager {
 			MaxLoadZoneRpt = 0.0;
 			CountWarmupDayPoints = 0;
 
-			SurfaceWindow.ThetaFace() = 296.15;
-			SurfaceWindow.EffInsSurfTemp() = 23.0;
+			for ( auto & e : SurfaceWindow ) {
+				e.ThetaFace = 296.15;
+				e.EffInsSurfTemp = 23.0;
+			}
 
 		}
 
@@ -4591,6 +4645,7 @@ namespace HeatBalanceManager {
 		QHWBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QSteamBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QElecBaseboardToPerson.dimension( NumOfZones, 0.0 );
+		QCoolingPanelToPerson.dimension( NumOfZones, 0.0 );
 		XMAT.dimension( NumOfZones, 23.0 );
 		XM2T.dimension( NumOfZones, 23.0 );
 		XM3T.dimension( NumOfZones, 23.0 );
@@ -4692,38 +4747,19 @@ namespace HeatBalanceManager {
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   April 1997
 		//       MODIFIED       June 2011, Daeho Kang for individual zone maximums & convergence outputs
-		//       RE-ENGINEERED  na
+		//       				July 2016, Rick Strand for movable insulation bug fix
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is the main driver for record keeping within the
 		// heat balance.
 
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger record keeping events.
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::ReportDetailedWarmupConvergence;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//  CHARACTER(len=MaxNameLength) :: ZoneName
 		int ZoneNum;
+		int SurfNum;
 		static bool FirstWarmupWrite( true );
 
 		// Formats
@@ -4732,7 +4768,6 @@ namespace HeatBalanceManager {
 
 		// FLOW:
 
-		// Always do the following record keeping (every time step):
 		// Record Maxs & Mins for individual zone
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZTAV( ZoneNum ) > MaxTempZone( ZoneNum ) ) {
@@ -4779,13 +4814,11 @@ namespace HeatBalanceManager {
 
 		}
 
-		// There is no hourly record keeping in the heat balance.
-
-		// There is no daily record keeping in the heat balance.
-
-		// There is no environment level record keeping in the heat balance.
-
-		// There is no simulation level record keeping in the heat balance.
+		// Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
+		// exchange algorithm knows whether there has been a change in interior movable insulation or not.
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			DataSurfaces::Surface( SurfNum ).MovInsulIntPresentPrevTS = DataSurfaces::Surface( SurfNum ).MovInsulIntPresent;
+		}
 
 	}
 
@@ -5740,11 +5773,15 @@ Label20: ;
 				Material( loop ).WinShadeRightOpeningMult = 0.0;
 				Material( loop ).WinShadeAirFlowPermeability = 0.0;
 				Material( loop ).BlindDataPtr = 0;
-				Material( loop ).EMPDVALUE = 0.0;
+				Material( loop ).EMPDmu = 0.0;
 				Material( loop ).MoistACoeff = 0.0;
 				Material( loop ).MoistBCoeff = 0.0;
 				Material( loop ).MoistCCoeff = 0.0;
 				Material( loop ).MoistDCoeff = 0.0;
+				Material( loop ).EMPDSurfaceDepth = 0.0;
+				Material( loop ).EMPDDeepDepth = 0.0;
+				Material( loop ).EMPDmuCoating = 0.0;
+				Material( loop ).EMPDCoatingThickness = 0.0;
 			}
 
 			// Glass objects
@@ -7143,7 +7180,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-			VerifyName( cAlphaArgs( 1 ), Material, MaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Material, MaterNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
@@ -8084,31 +8121,6 @@ Label1000: ;
 		if ( ErrorsFound ) ShowFatalError( "Error in complex fenestration input." );
 
 	}
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HeatBalanceManager
 

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <algorithm>
 #include <istream>
@@ -360,7 +406,7 @@ namespace InputProcessor {
 		idd_stream.close();
 
 		ListOfObjects.allocate( NumObjectDefs );
-		ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
+		for ( int i = 1; i <= NumObjectDefs; ++i ) ListOfObjects( i ) = ObjectDef( i ).Name;
 		if ( SortedIDD ) {
 			iListOfObjects.allocate( NumObjectDefs );
 			SetupAndSort( ListOfObjects, iListOfObjects );
@@ -405,7 +451,7 @@ namespace InputProcessor {
 		idf_stream.close();
 
 		ListOfSections.allocate( NumSectionDefs );
-		ListOfSections = SectionDef( {1,NumSectionDefs} ).Name();
+		for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
 
 		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
 		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
@@ -2081,7 +2127,7 @@ namespace InputProcessor {
 			ShowWarningError( "More in list than allowed in passed array - (GetListofSectionsinInput)" );
 		}
 		NuminList = MaxAllowedOut;
-		SectionList( {1,MaxAllowedOut} ) = SectionsOnFile( {1,MaxAllowedOut} ).Name();
+		for ( int i = 1; i <= MaxAllowedOut; ++i ) SectionList( i ) = SectionsOnFile( i ).Name;
 
 	}
 
@@ -2352,7 +2398,7 @@ namespace InputProcessor {
 						AlphaFieldNames()( {1,ObjectDef( Found ).NumAlpha} ) = ObjectDef( Found ).AlphFieldChks( {1,ObjectDef( Found ).NumAlpha} );
 					}
 					if ( present( NumericFieldNames ) ) {
-						NumericFieldNames()( {1,ObjectDef( Found ).NumNumeric} ) = ObjectDef( Found ).NumRangeChks( {1,ObjectDef( Found ).NumNumeric} ).FieldName();
+						for ( int i = 1, e = ObjectDef( Found ).NumNumeric; i <= e; ++i ) NumericFieldNames()( i ) = ObjectDef( Found ).NumRangeChks( i ).FieldName;
 					}
 					Status = 1;
 					break;
@@ -3422,7 +3468,7 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
-		Array1D_string const & ListOfItems,
+		Array1_string const & ListOfItems,
 		int const NumItems
 	)
 	{
@@ -4306,7 +4352,7 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		ObjectNames( {1,NumObjectDefs} ) = ObjectDef( {1,NumObjectDefs} ).Name();
+		for ( int i = 1; i <= NumObjectDefs; ++i ) ObjectNames( i ) = ObjectDef( i ).Name;
 		Number = NumObjectDefs;
 
 	}
@@ -5269,7 +5315,7 @@ namespace InputProcessor {
 		int Loop;
 		int Loop1;
 
-		OutputVariablesForSimulation.allocate( 10000 );
+		OutputVariablesForSimulation.reserve( 1024 );
 		MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
@@ -5383,11 +5429,6 @@ namespace InputProcessor {
 
 			}
 			CurrentRecord = FindNextRecord( OutputTableSummaries, CurrentRecord );
-		}
-
-		if ( NumConsideredOutputVariables > 0 ) {
-			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
-			MaxConsideredOutputVariables = NumConsideredOutputVariables;
 		}
 
 	}
@@ -5885,39 +5926,14 @@ namespace InputProcessor {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
-		//       MODIFIED       na
+		//       MODIFIED       March 2017
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine adds a new record (if necessary) to the Output Variable
 		// reporting structure.  DataOutputs, OutputVariablesForSimulation
 
-		// METHODOLOGY EMPLOYED:
-		// OutputVariablesForSimulation is a linked list structure for later
-		// semi-easy perusal.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataOutputs;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CurNum;
-		int NextNum;
-		bool FoundOne;
 		std::string::size_type vnameLen; // if < length, there were units on the line/name
 
 		std::string::size_type const rbpos = index( VariableName, '[' );
@@ -5926,97 +5942,18 @@ namespace InputProcessor {
 		} else {
 			vnameLen = len_trim( VariableName.substr( 0, rbpos ) );
 		}
-
-		FoundOne = false;
 		std::string const VarName( VariableName.substr( 0, vnameLen ) );
-		for ( CurNum = 1; CurNum <= NumConsideredOutputVariables; ++CurNum ) {
-			if ( VarName == OutputVariablesForSimulation( CurNum ).VarName ) {
-				FoundOne = true;
-				break;
-			}
-		}
 
-		if ( ! FoundOne ) {
-			if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-				ReAllocateAndPreserveOutputVariablesForSimulation();
-			}
-			++NumConsideredOutputVariables;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
+		auto const found = DataOutputs::OutputVariablesForSimulation.find( VarName );
+		if ( found == DataOutputs::OutputVariablesForSimulation.end() ) {
+			std::unordered_map< std::string, DataOutputs::OutputReportingVariables > data;
+			data.reserve( 32 );
+			data.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
+			DataOutputs::OutputVariablesForSimulation.emplace( VarName, std::move( data ) );
 		} else {
-			if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
-				NextNum = CurNum;
-				if ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-					while ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-						CurNum = NextNum;
-						NextNum = OutputVariablesForSimulation( NextNum ).Next;
-					}
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = NextNum;
-					OutputVariablesForSimulation( NextNum ).Next = NumConsideredOutputVariables;
-				} else {
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = CurNum;
-					OutputVariablesForSimulation( CurNum ).Next = NumConsideredOutputVariables;
-				}
-			}
+			found->second.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
 		}
-
-	}
-
-	void
-	ReAllocateAndPreserveOutputVariablesForSimulation()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   April 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine does a simple reallocate for the OutputVariablesForSimulation structure, preserving
-		// the data that is already in the structure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataOutputs;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const OutputVarAllocInc( ObjectsIDFAllocInc );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// up allocation by OutputVarAllocInc
-		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
+		DataOutputs::NumConsideredOutputVariables++;
 	}
 
 	void
@@ -6205,29 +6142,6 @@ namespace InputProcessor {
 		return stripped( String );
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // InputProcessor
 

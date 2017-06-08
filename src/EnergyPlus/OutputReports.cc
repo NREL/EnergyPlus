@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
@@ -712,7 +758,7 @@ DXFOut(
 					}
 					gio::write( unit, Format_717 ) << TempZoneName;
 				} else {
-					if ( Surface( surf ).Shape == RectangularOverhang ) {
+					if ( Surface( surf ).Shape == SurfaceShape::RectangularOverhang ) {
 						ntri = Triangulate( Surface( surf ).Sides, Surface( surf ).Vertex, mytriangles, Surface( surf ).Azimuth, Surface( surf ).Tilt, Surface( surf ).Name, SurfaceClass_Overhang );
 					} else {
 						ntri = Triangulate( Surface( surf ).Sides, Surface( surf ).Vertex, mytriangles, Surface( surf ).Azimuth, Surface( surf ).Tilt, Surface( surf ).Name, SurfaceClass_Fin );
@@ -791,7 +837,7 @@ DXFOut(
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
 			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
@@ -1216,7 +1262,7 @@ DXFOutLines( std::string const & ColorScheme )
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
 			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
@@ -1615,7 +1661,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
 			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
@@ -1691,60 +1737,51 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	int fd;
 	std::string AlgoName;
 
-	// Formats
-	static gio::Fmt Format_700( "('! <Zone/Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
-	static gio::Fmt Format_701( "('! <HeatTransfer/Shading/Frame/Divider_Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
-	static gio::Fmt Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
-	static gio::Fmt Format_7012( "(',#Sides')" );
-	static gio::Fmt Format_702( "('! <Units>,,,,,')" );
-	static gio::Fmt Format_7021( "(',{W/m2-K}/{},{W/m2-K}/{},{},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,')" );
-	static gio::Fmt Format_7022( "(',')" );
-	static gio::Fmt Format_703( "(A,',',A,',',I5)" );
-	static gio::Fmt Format_704( "(A,'_Surface,',A,',',A,',',A,',',A)" );
-	static gio::Fmt Format_7041( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','),A)" );
-	static gio::Fmt Format_7042( "(',',A)" );
-	static gio::Fmt Format_7044( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','))" );
-	static gio::Fmt Format_7045( "(',,,,,',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-	static gio::Fmt Format_705( "(',',A)" );
-	static gio::Fmt Format_706( "(4(',',A),',',A)" );
-	static gio::Fmt Format_7061( "(',,,,,,,,,,',A)" );
-	static gio::Fmt Format_707( "(',{Vertex 1},,,{Vertex 2},,,{Vertex 3},,,{Vertex 4},,,{etc}')" );
-	static gio::Fmt Format_708( "(4(',X {m},Y {m},Z {m}'))" );
-	static gio::Fmt Format_709( "(3(',',A))" );
-	static gio::Fmt Format_710( "(', Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates')" );
-	static gio::Fmt Format_711( "(1X)" );
-
 	if ( TotSurfaces > 0 && ! allocated( Surface ) ) {
 		// no error needed, probably in end processing, just return
 		return;
 	}
 
 	unit = OutputFileInits;
+	if ( !DataGlobals::eio_stream ) return;
+	std::ostream * eiostream = DataGlobals::eio_stream;
 
 	//!!!    Write Header lines for report
 	if ( RptType == 10 ) { // Details only
-		gio::write( unit, Format_700 );
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
-		gio::write( unit, Format_7011 );
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
-		gio::write( unit, Format_7021 );
+		*eiostream << "! <Zone Surfaces>,Zone Name,# Surfaces" + DataStringGlobals::NL; // Format_700
+		*eiostream << "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces" + DataStringGlobals::NL; // Format_700b
+		*eiostream << "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701
+		*eiostream << ",Construction,Nominal U (w/o film coefs) {W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides" + DataStringGlobals::NL; // Format_7011
+		*eiostream << "! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701b
+		*eiostream << ",Transmittance Schedule,Min Schedule Value,Max Schedule Value,Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides" + DataStringGlobals::NL; // Format_7011b
+		*eiostream << "! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701c
+		*eiostream << ",Construction,Nominal U (w/o film coefs) {W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m}" + DataStringGlobals::NL; // Format_7011c
 	} else if ( RptType == 11 ) { // Details with Vertices
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700, flags ); }
-		gio::write( unit, Format_710 );
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7011, flags ); }
-		gio::write( unit, Format_707 );
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7021, flags ); }
-		gio::write( unit, Format_708 );
+		*eiostream << "! <Zone Surfaces>,Zone Name,# Surfaces"; // Format_700
+		*eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates" + DataStringGlobals::NL; // Format_710
+		*eiostream << "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces"; // Format_700b
+		*eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates" + DataStringGlobals::NL; // Format_710
+		*eiostream << "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701
+		*eiostream << ",Construction,Nominal U (w/o film coefs) {W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides"; // Format_7011
+		*eiostream << ",Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y {m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}" + DataStringGlobals::NL; //Format_707
+		*eiostream << "! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701b
+		*eiostream << ",Transmittance Schedule,Min Schedule Value,Max Schedule Value,Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides"; // Format_7011b
+		*eiostream << ",Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y {m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}" + DataStringGlobals::NL; //Format_707
+		*eiostream << "! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701c
+		// Vertices are not applicable for window frame and divider, so skip 707
+		*eiostream << ",Construction,Nominal U (w/o film coefs) {W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m}" + DataStringGlobals::NL; // Format_7011c
 	} else { // Vertices only
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700, flags ); }
-		gio::write( unit, Format_710 );
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7012, flags ); }
-		gio::write( unit, Format_707 );
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
-		gio::write( unit, Format_708 );
+		*eiostream << "! <Zone Surfaces>,Zone Name,# Surfaces"; // Format_700
+		*eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates" + DataStringGlobals::NL; // Format_710
+		*eiostream << "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces"; // Format_700b
+		*eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates" + DataStringGlobals::NL; // Format_710
+		*eiostream << "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701
+		*eiostream << ",#Sides"; // Format_7012
+		*eiostream << ",Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y {m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}" + DataStringGlobals::NL; //Format_707
+		*eiostream << "! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701b
+		*eiostream << ",#Sides"; // Format_7012
+		*eiostream << ",Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y {m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}" + DataStringGlobals::NL; //Format_707
+		// Vertices are not applicable for window frame and divider, so skip 701c here
 	}
 
 	// Do just "detached" shading first
@@ -1752,11 +1789,11 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 		if ( Surface( surf ).Zone != 0 ) break;
 	}
 	if ( ( surf - 1 ) > 0 ) {
-		gio::write( unit, Format_703 ) << "Shading_Surfaces" << "Number of Shading Surfaces" << surf - 1;
+		*eiostream << "Shading Surfaces," << "Number of Shading Surfaces," << surf - 1 << DataStringGlobals::NL;
 		for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 			if ( Surface( surf ).Zone != 0 ) break;
 			AlgoName = "None";
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "Shading" << Surface( surf ).Name << cSurfaceClass( Surface( surf ).Class ) << Surface( surf ).BaseSurfName << AlgoName; }
+			*eiostream << "Shading Surface," << Surface( surf ).Name << "," << cSurfaceClass( Surface( surf ).Class ) << "," << Surface( surf ).BaseSurfName << "," << AlgoName << ",";
 			if ( RptType == 10 ) {
 				if ( Surface( surf ).SchedShadowSurfIndex > 0 ) {
 					ScheduleName = GetScheduleName( Surface( surf ).SchedShadowSurfIndex );
@@ -1767,10 +1804,10 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					cSchedMin = "0.0";
 					cSchedMax = "0.0";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << ' ' << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
-				gio::write( unit, Format_7061 ) << TrimSigDigits( Surface( surf ).Sides );
+				*eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << RoundSigDigits( Surface( surf ).Area, 2 ) << "," << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << "," << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << "," << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << "," << RoundSigDigits( Surface( surf ).Tilt, 2 ) << "," << RoundSigDigits( Surface( surf ).Width, 2 ) << "," << RoundSigDigits( Surface( surf ).Height, 2 ) << ",";
+				*eiostream << ",,,,,,,,,," << TrimSigDigits( Surface( surf ).Sides ) << DataStringGlobals::NL;
 			} else if ( RptType == 1 ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7042, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
+				*eiostream << TrimSigDigits( Surface( surf ).Sides ) << ",";
 			} else {
 				if ( Surface( surf ).SchedShadowSurfIndex > 0 ) {
 					ScheduleName = GetScheduleName( Surface( surf ).SchedShadowSurfIndex );
@@ -1781,24 +1818,24 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					cSchedMin = "0.0";
 					cSchedMax = "0.0";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << ' ' << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7061, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
+				*eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << RoundSigDigits( Surface( surf ).Area, 2 ) << "," << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << "," << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << "," << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << "," << RoundSigDigits( Surface( surf ).Tilt, 2 ) << "," << RoundSigDigits( Surface( surf ).Width, 2 ) << "," << RoundSigDigits( Surface( surf ).Height, 2 ) << ",";
+				*eiostream << ",,,,,,,,,," << TrimSigDigits( Surface( surf ).Sides ) << ",";
 			}
 			if ( RptType == 10 ) continue;
 			for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 				if ( vert != Surface( surf ).Sides ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_709, flags ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ); }
+					*eiostream << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ) << ",";
 				} else {
-					gio::write( unit, Format_709 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 );
+					*eiostream << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ) << DataStringGlobals::NL;
 				}
 			}
 			//  This shouldn't happen with shading surface -- always have vertices
-			if ( Surface( surf ).Sides == 0 ) gio::write( unit, Format_711 );
+			if ( Surface( surf ).Sides == 0 ) *eiostream << DataStringGlobals::NL;
 		}
 	}
 
 	for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-		gio::write( unit, Format_703 ) << "Zone_Surfaces" << Zone( ZoneNum ).Name << ( Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1 );
+		*eiostream << "Zone Surfaces," << Zone( ZoneNum ).Name << "," << ( Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1 ) << DataStringGlobals::NL;
 		for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 			if ( Surface( surf ).Zone != ZoneNum ) continue;
 			SolarDiffusing = "";
@@ -1830,13 +1867,14 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 				IntConvCoeffCalc = ConvCoeffCalcs( Zone( ZoneNum ).InsideConvectionAlgo );
 				ExtConvCoeffCalc = ConvCoeffCalcs( Zone( ZoneNum ).OutsideConvectionAlgo );
 
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "HeatTransfer" << Surface( surf ).Name << cSurfaceClass( Surface( surf ).Class ) << BaseSurfName << AlgoName; }
+				*eiostream << "HeatTransfer Surface," << Surface( surf ).Name << "," << cSurfaceClass( Surface( surf ).Class ) << "," << BaseSurfName << "," << AlgoName << ",";
 
 				// NOTE - THIS CODE IS REPEATED IN SurfaceGeometry.cc IN SetupZoneGeometry
 				// Calculate Nominal U-value with convection/film coefficients for reporting by adding on
 				// prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
 				if ( Surface( surf ).Construction > 0 && Surface( surf ).Construction <= TotConstructs ) {
 					cNominalUwithConvCoeffs = "";
+					ConstructionName = Construct( Surface( surf ).Construction ).Name;
 					{ auto const SELECT_CASE_var( Surface( surf ).Class );
 					if ( SELECT_CASE_var == SurfaceClass_Wall ) {
 						// Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
@@ -1891,7 +1929,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					ConstructionName = "**invalid**";
 				}
 
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7041, flags ) << ConstructionName << cNominalU << cNominalUwithConvCoeffs << SolarDiffusing << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ) << RoundSigDigits( Surface( surf ).Reveal, 2 ); }
+				*eiostream << ConstructionName << "," << cNominalU << "," << cNominalUwithConvCoeffs << "," << SolarDiffusing << "," << RoundSigDigits( Surface( surf ).Area, 2 ) << "," << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << "," << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << "," << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << "," << RoundSigDigits( Surface( surf ).Tilt, 2 ) << "," << RoundSigDigits( Surface( surf ).Width, 2 ) << "," << RoundSigDigits( Surface( surf ).Height, 2 ) << "," << RoundSigDigits( Surface( surf ).Reveal, 2 ) << ",";
 				if ( Surface( surf ).IntConvCoeff > 0 ) {
 					{ auto const SELECT_CASE_var( UserIntConvectionCoeffs( Surface( surf ).IntConvCoeff ).OverrideType );
 					if ( SELECT_CASE_var == ConvCoefValue ) {
@@ -1921,52 +1959,42 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					ExtConvCoeffCalc = ConvCoeffCalcs( std::abs( Surface( surf ).ExtConvCoeff ) );
 				}
 				if ( Surface( surf ).ExtBoundCond == ExternalEnvironment ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "ExternalEnvironment"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << ExtConvCoeffCalc; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					*eiostream << "ExternalEnvironment" << "," << ExtConvCoeffCalc << "," << IntConvCoeffCalc << ",";
 				} else if ( Surface( surf ).ExtBoundCond == Ground ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "Ground"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-Ground"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					*eiostream << "Ground" << "," << "N/A-Ground" << "," << IntConvCoeffCalc << ",";
 				} else if ( Surface( surf ).ExtBoundCond == GroundFCfactorMethod ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "FCGround"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-FCGround"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					*eiostream << "FCGround" << "," << "N/A-FCGround" << "," << IntConvCoeffCalc << ",";
+				} else if ( Surface( surf ).ExtBoundCond == KivaFoundation ) {
+					*eiostream << "Foundation" << "," << "N/A-Foundation" << "," << IntConvCoeffCalc << ",";
 				} else if ( Surface( surf ).ExtBoundCond == OtherSideCoefNoCalcExt || Surface( surf ).ExtBoundCond == OtherSideCoefCalcExt ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << OSC( Surface( surf ).OSCPtr ).Name; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-OSC"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					*eiostream << OSC( Surface( surf ).OSCPtr).Name << "," << "N/A-OSC" << "," << IntConvCoeffCalc << ",";
 				} else if ( Surface( surf ).ExtBoundCond == OtherSideCondModeledExt ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << OSCM( Surface( surf ).OSCMPtr ).Name; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-OSCM"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					*eiostream << OSCM( Surface( surf ).OSCMPtr).Name << "," << "N/A-OSCM" << "," << IntConvCoeffCalc << ",";
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << Surface( surf ).ExtBoundCondName; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "Other/Same Surface Int Conv"; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+					*eiostream << Surface( surf ).ExtBoundCondName << "," << "Other/Same Surface Int Conv" << "," << IntConvCoeffCalc << ",";
 				}
 				if ( Surface( surf ).ExtSolar ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "SunExposed"; }
+					*eiostream << "SunExposed" << ",";
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "NoSun"; }
+					*eiostream << "NoSun" << ",";
 				}
 				if ( Surface( surf ).ExtWind ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "WindExposed"; }
+					*eiostream << "WindExposed" << ",";
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "NoWind"; }
+					*eiostream << "NoWind" << ",";
 				}
 				if ( RptType == 10 ) {
-					gio::write( unit, Format_706 ) << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << TrimSigDigits( Surface( surf ).Sides );
+					*eiostream << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << "," << TrimSigDigits( Surface( surf ).Sides ) << DataStringGlobals::NL;
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_706, flags ) << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << TrimSigDigits( Surface( surf ).Sides ); }
+					*eiostream << RoundSigDigits( Surface( surf ).ViewFactorGround, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorSky, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorGroundIR, 2 ) << "," << RoundSigDigits( Surface( surf ).ViewFactorSkyIR, 2 ) << "," << TrimSigDigits( Surface( surf ).Sides ) << ",";
 					for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 						if ( vert != Surface( surf ).Sides ) {
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_709, flags ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ); }
+						*eiostream << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ) << ",";
 						} else {
-							gio::write( unit, Format_709 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 );
+							*eiostream << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ) << DataStringGlobals::NL;
 						}
 					}
-					if ( Surface( surf ).Sides == 0 ) gio::write( unit, Format_711 );
+					if ( Surface( surf ).Sides == 0 )  *eiostream << DataStringGlobals::NL;
 				}
 				// if window, report frame/divider as appropriate
 				if ( Surface( surf ).FrameDivider > 0 ) {
@@ -1990,16 +2018,16 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 						} else if ( SELECT_CASE_var == HeatTransferModel_TDD ) {
 							AlgoName = "Tubular Daylighting Device";
 						}}
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "Frame/Divider" << FrameDivider( fd ).Name << "Frame" << Surface( surf ).Name << AlgoName; }
-						gio::write( unit, Format_7045 ) << RoundSigDigits( SurfaceWindow( surf ).FrameArea, 2 ) << RoundSigDigits( SurfaceWindow( surf ).FrameArea / Surface( surf ).Multiplier, 2 ) << "*" << "N/A" << "N/A" << RoundSigDigits( FrameDivider( fd ).FrameWidth, 2 ) << "N/A";
+						*eiostream << "Frame/Divider Surface," << FrameDivider( fd ).Name << "," << "Frame," << Surface( surf ).Name << "," << AlgoName << ",";
+						*eiostream << ",N/A,N/A,," << RoundSigDigits( SurfaceWindow( surf ).FrameArea, 2 ) << "," << RoundSigDigits( SurfaceWindow( surf ).FrameArea / Surface( surf ).Multiplier, 2 ) << ",*" << ",N/A" << ",N/A," << RoundSigDigits( FrameDivider( fd ).FrameWidth, 2 ) << ",N/A" << DataStringGlobals::NL;
 					}
 					if ( FrameDivider( fd ).DividerWidth > 0.0 ) {
 						if ( FrameDivider( fd ).DividerType == DividedLite ) {
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "Frame/Divider" << FrameDivider( fd ).Name << "Divider:DividedLite" << Surface( surf ).Name; }
+							*eiostream << "Frame/Divider Surface," << FrameDivider( fd ).Name << "," << "Divider:DividedLite," << Surface( surf ).Name << ",,";
 						} else {
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "Frame/Divider" << FrameDivider( fd ).Name << "Divider:Suspended" << Surface( surf ).Name; }
+							*eiostream << "Frame/Divider Surface," << FrameDivider( fd ).Name << "," << "Divider:Suspended," << Surface( surf ).Name << ",,";
 						}
-						gio::write( unit, Format_7045 ) << RoundSigDigits( SurfaceWindow( surf ).DividerArea, 2 ) << RoundSigDigits( SurfaceWindow( surf ).DividerArea / Surface( surf ).Multiplier, 2 ) << "*" << "N/A" << "N/A" << RoundSigDigits( FrameDivider( fd ).DividerWidth, 2 ) << "N/A";
+						*eiostream << ",N/A,N/A,," << RoundSigDigits( SurfaceWindow( surf ).DividerArea, 2 ) << "," << RoundSigDigits( SurfaceWindow( surf ).DividerArea / Surface( surf ).Multiplier, 2 ) << ",*" << ",N/A" << ",N/A," << RoundSigDigits( FrameDivider( fd ).DividerWidth, 2 ) << ",N/A" << DataStringGlobals::NL;
 					}
 				}
 			} else { // RptType=1  Vertices only
@@ -2026,16 +2054,16 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 				} else if ( SELECT_CASE_var == HeatTransferModel_TDD ) {
 					AlgoName = "Tubular Daylighting Device";
 				}}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "HeatTransfer" << Surface( surf ).Name << cSurfaceClass( Surface( surf ).Class ) << BaseSurfName << AlgoName; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7042, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
+				*eiostream << "HeatTransfer Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << BaseSurfName << "," << AlgoName << ",";
+				*eiostream << TrimSigDigits( Surface( surf ).Sides ) << ",";
 				for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 					if ( vert != Surface( surf ).Sides ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_709, flags ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ); }
+						*eiostream << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ) << ",";
 					} else {
-						gio::write( unit, Format_709 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 );
+						*eiostream << RoundSigDigits( Surface( surf ).Vertex( vert ).x, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).y, 2 ) << "," << RoundSigDigits( Surface( surf ).Vertex( vert ).z, 2 ) << DataStringGlobals::NL;
 					}
 				}
-				if ( Surface( surf ).Sides == 0 ) gio::write( unit, Format_711 );
+				if ( Surface( surf ).Sides == 0 )  *eiostream << DataStringGlobals::NL;
 			}
 		} // surfaces
 	} // zones
@@ -2442,28 +2470,6 @@ VRMLOut(
 	gio::close( unit );
 
 }
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

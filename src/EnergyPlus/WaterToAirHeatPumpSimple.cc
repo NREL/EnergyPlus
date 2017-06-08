@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
@@ -113,6 +159,7 @@ namespace WaterToAirHeatPumpSimple {
 	Real64 QSource( 0.0 ); // Source side heat transfer rate [W]
 	Real64 Winput( 0.0 ); // Power Consumption [W]
 	Real64 PLRCorrLoadSideMdot( 0.0 ); // Load Side Mdot corrected for Part Load Ratio of the unit
+	bool MyOneTimeFlag( true ); // one time allocation flag
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -134,6 +181,11 @@ namespace WaterToAirHeatPumpSimple {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state() {
+		MyOneTimeFlag = true;
+		SimpleWatertoAirHP.deallocate();
+	}
 
 	void
 	SimWatertoAirHPSimple(
@@ -196,7 +248,6 @@ namespace WaterToAirHeatPumpSimple {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HPNum; // The WatertoAirHP that you are currently loading input into
 		Real64 OnOffAirFlowRatio; // ratio of comp on to comp off air flow rate
-		Real64 WaterPartLoad; // The part load ratio of water
 
 		// FLOW:
 
@@ -229,25 +280,15 @@ namespace WaterToAirHeatPumpSimple {
 			OnOffAirFlowRatio = 1.0;
 		}
 
-		// Calculate the Correct Water to Air HP Model with the current HPNum
-		if ( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterCycling ) {
-			WaterPartLoad = RuntimeFrac;
-			//IF (WaterPartLoad < 0.1d0)THEN
-			// WaterPartLoad = 0.1d0
-			//ENDIF
-		} else {
-			WaterPartLoad = 1.0;
-		}
-
 		if ( SimpleWatertoAirHP( HPNum ).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit ) {
 			// Cooling mode
-			InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, WaterPartLoad, FirstHVACIteration );
-			CalcHPCoolingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio, WaterPartLoad );
+			InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+			CalcHPCoolingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
 			UpdateSimpleWatertoAirHP( HPNum );
 		} else if ( SimpleWatertoAirHP( HPNum ).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit ) {
 			// Heating mode
-			InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, constant_zero, CyclingScheme, OnOffAirFlowRatio, WaterPartLoad, FirstHVACIteration );
-			CalcHPHeatingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio, WaterPartLoad );
+			InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, constant_zero, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+			CalcHPHeatingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
 			UpdateSimpleWatertoAirHP( HPNum );
 		} else {
 			ShowFatalError( "SimWatertoAirHPSimple: WatertoAir heatpump not in either HEATING or COOLING mode" );
@@ -561,7 +602,6 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 const LatentLoad, // Control zone latent load[W]
 		int const EP_UNUSED( CyclingScheme ), // fan operating mode
 		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
-		Real64 const WaterPartLoad,
 		bool const FirstHVACIteration // Iteration flag
 	)
 	{
@@ -609,7 +649,6 @@ namespace WaterToAirHeatPumpSimple {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirInletNode; // Node Number of the air inlet
 		int WaterInletNode; // Node Number of the Water inlet
-		static bool MyOneTimeFlag( true ); // one time allocation flag
 		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
 		static Array1D_bool MyPlantScanFlag;
 		Real64 rho; // local fluid density
@@ -734,18 +773,6 @@ namespace WaterToAirHeatPumpSimple {
 
 			InitComponentNodes( 0.0, SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate, SimpleWatertoAirHP( HPNum ).WaterInletNodeNum, SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum, SimpleWatertoAirHP( HPNum ).LoopNum, SimpleWatertoAirHP( HPNum ).LoopSide, SimpleWatertoAirHP( HPNum ).BranchNum, SimpleWatertoAirHP( HPNum ).CompNum );
 
-			Node( WaterInletNode ).Temp = 5.0;
-			Node( WaterInletNode ).Enthalpy = Cp * Node( WaterInletNode ).Temp;
-			Node( WaterInletNode ).Quality = 0.0;
-			Node( WaterInletNode ).Press = 0.0;
-			Node( WaterInletNode ).HumRat = 0.0;
-
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Temp = 5.0;
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Enthalpy = Cp * Node( WaterInletNode ).Temp;
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Quality = 0.0;
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Press = 0.0;
-			Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).HumRat = 0.0;
-
 			SimpleWatertoAirHP( HPNum ).SimFlag = true;
 
 			MyEnvrnFlag( HPNum ) = false;
@@ -767,20 +794,15 @@ namespace WaterToAirHeatPumpSimple {
 
 		if ( ( SensLoad != 0.0 || LatentLoad != 0.0 ) && ( Node( AirInletNode ).MassFlowRate > 0.0 ) ) {
 
-			// changed the water mass flow rate to be equal to the design times run time fraction in order to account for
-			// cycling of equipment
-			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * WaterPartLoad;
-
-			//    SimpleWatertoAirHP(HPNum)%WaterMassFlowRate =    SimpleWatertoAirHP(HPNum)%DesignWaterMassFlowRate
-
 			// Model requires the values to be calculated at full design flow rate for air and then scaled to part load ratio.
 			// So always start the calculations by setting the air flow rate to design flow rate.
 
-			//    SimpleWatertoAirHP(HPNum)%AirMassFlowRate   = Node(AirInletNode)%MassFlowRate
-			SimpleWatertoAirHP( HPNum ).AirMassFlowRate = SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
+			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+
+			SimpleWatertoAirHP( HPNum ).AirMassFlowRate = SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, RoutineName );
 			//If air flow is less than 25% rated flow. Then set air flow to the 25% of rated conditions
-			if ( SimpleWatertoAirHP( HPNum ).AirMassFlowRate < 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat ) ) {
-				SimpleWatertoAirHP( HPNum ).AirMassFlowRate = 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
+			if ( SimpleWatertoAirHP( HPNum ).AirMassFlowRate < 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, RoutineName ) ) {
+				SimpleWatertoAirHP( HPNum ).AirMassFlowRate = 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, RoutineName );
 			}
 			SimpleWatertoAirHP( HPNum ).WaterFlowMode = true;
 		} else { //heat pump is off
@@ -828,6 +850,8 @@ namespace WaterToAirHeatPumpSimple {
 		SimpleWatertoAirHP( HPNum ).InletAirEnthalpy = Node( AirInletNode ).Enthalpy;
 		SimpleWatertoAirHP( HPNum ).InletWaterTemp = Node( WaterInletNode ).Temp;
 		SimpleWatertoAirHP( HPNum ).InletWaterEnthalpy = Node( WaterInletNode ).Enthalpy;
+		SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SimpleWatertoAirHP( HPNum ).InletWaterTemp;
+		SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SimpleWatertoAirHP( HPNum ).InletWaterEnthalpy;
 
 		SimpleWatertoAirHP( HPNum ).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
 		SimpleWatertoAirHP( HPNum ).HPTimeConstant = HPTimeConstant;
@@ -845,12 +869,6 @@ namespace WaterToAirHeatPumpSimple {
 		SimpleWatertoAirHP( HPNum ).EnergyLatent = 0.0;
 		SimpleWatertoAirHP( HPNum ).EnergySource = 0.0;
 		SimpleWatertoAirHP( HPNum ).COP = 0.0;
-
-		SimpleWatertoAirHP( HPNum ).OutletAirDBTemp = 0.0;
-		SimpleWatertoAirHP( HPNum ).OutletWaterTemp = 0.0;
-		SimpleWatertoAirHP( HPNum ).OutletAirHumRat = 0.0;
-		SimpleWatertoAirHP( HPNum ).OutletAirEnthalpy = 0.0;
-		SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = 0.0;
 
 	}
 
@@ -1578,8 +1596,7 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 const EP_UNUSED( LatentDemand ), // Cooling Latent Demand [W]
 		int const CompOp, // compressor operation flag
 		Real64 const PartLoadRatio, // compressor part load ratio
-		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
-		Real64 const WaterPartLoad // water part load ratio
+		Real64 const EP_UNUSED( OnOffAirFlowRatio ) // ratio of compressor on flow to average flow over time step
 	)
 	{
 
@@ -1627,6 +1644,7 @@ namespace WaterToAirHeatPumpSimple {
 		using Psychrometrics::PsyWFnTdbH;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
+		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1679,6 +1697,7 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 ratioVS; // Ratio of the water flow rate to the rated conditions
 		Real64 CpWater; // Specific heat of water [J/kg_C]
 		Real64 CpAir; // Specific heat of air [J/kg_C]
+		Real64 QSource_fullload; // full load source side capacity [W]
 		Real64 ReportingConstant;
 
 		bool LatDegradModelSimFlag; // Latent degradation model simulation flag
@@ -1793,10 +1812,10 @@ namespace WaterToAirHeatPumpSimple {
 			ratioTDB = ( ( LoadSideInletDBTemp + CelsiustoKelvin ) / Tref );
 			ratioTWB = ( ( LoadSideInletWBTemp + CelsiustoKelvin ) / Tref );
 			ratioTS = ( ( SourceSideInletTemp + CelsiustoKelvin ) / Tref );
-			ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat ) ) );
+			ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, RoutineName ) ) );
 
-			if ( WaterPartLoad > 0.0 && SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate > 0.0 ) {
-				ratioVS = ( SourceSideMassFlowRate ) / ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * WaterPartLoad );
+			if ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate > 0.0 ) {
+				ratioVS = ( SourceSideMassFlowRate ) / ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate );
 			} else {
 				ratioVS = 0.0;
 			}
@@ -1804,7 +1823,7 @@ namespace WaterToAirHeatPumpSimple {
 			QLoadTotal = TotalCapRated * ( TotalCapCoeff1 + ( ratioTWB * TotalCapCoeff2 ) + ( ratioTS * TotalCapCoeff3 ) + ( ratioVL * TotalCapCoeff4 ) + ( ratioVS * TotalCapCoeff5 ) );
 			QSensible = SensCapRated * ( SensCapCoeff1 + ( ratioTDB * SensCapCoeff2 ) + ( ratioTWB * SensCapCoeff3 ) + ( ratioTS * SensCapCoeff4 ) + ( ratioVL * SensCapCoeff5 ) + ( ratioVS * SensCapCoeff6 ) );
 			Winput = CoolPowerRated * ( CoolPowerCoeff1 + ( ratioTWB * CoolPowerCoeff2 ) + ( ratioTS * CoolPowerCoeff3 ) + ( ratioVL * CoolPowerCoeff4 ) + ( ratioVS * CoolPowerCoeff5 ) );
-			QSource = QLoadTotal + Winput;
+			QSource_fullload = QLoadTotal + Winput;
 
 			//Check if the Sensible Load is greater than the Total Cooling Load
 			if ( QSensible > QLoadTotal ) {
@@ -1854,7 +1873,7 @@ namespace WaterToAirHeatPumpSimple {
 		QLoadTotal *= PartLoadRatio;
 		QSensible *= PartLoadRatio;
 		Winput *= RuntimeFrac;
-		QSource *= PartLoadRatio;
+		QSource = QSource_fullload * PartLoadRatio;
 
 		//  Add power to global variable so power can be summed by parent object
 		DXElecCoolingPower = Winput;
@@ -1880,9 +1899,28 @@ namespace WaterToAirHeatPumpSimple {
 		SimpleWatertoAirHP( HPNum ).PartLoadRatio = PartLoadRatio;
 		SimpleWatertoAirHP( HPNum ).AirMassFlowRate = PLRCorrLoadSideMdot;
 
-		SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SourceSideMassFlowRate;
-		SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpWater );
-		SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SourceSideMassFlowRate;
+		if ( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterCycling ) {
+			// plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
+			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * PartLoadRatio;
+			SetComponentFlowRate( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, SimpleWatertoAirHP( HPNum ).WaterInletNodeNum, SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum, SimpleWatertoAirHP( HPNum ).LoopNum, SimpleWatertoAirHP( HPNum ).LoopSide, SimpleWatertoAirHP( HPNum ).BranchNum, SimpleWatertoAirHP( HPNum ).CompNum );
+			if( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate > 0.0 ) {
+				SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp + QSource / ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate * CpWater );
+				SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SimpleWatertoAirHP( HPNum ).WaterMassFlowRate;
+			}
+		} else {
+			if( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterConstant ) {
+				if ( SimpleWatertoAirHP( HPNum ).WaterFlowMode ) {
+					SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+					SetComponentFlowRate( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, SimpleWatertoAirHP( HPNum ).WaterInletNodeNum, SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum, SimpleWatertoAirHP( HPNum ).LoopNum, SimpleWatertoAirHP( HPNum ).LoopSide, SimpleWatertoAirHP( HPNum ).BranchNum, SimpleWatertoAirHP( HPNum ).CompNum );
+				} else {
+					SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SourceSideMassFlowRate;
+				}
+			} else {
+				SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SourceSideMassFlowRate;
+			}
+			SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpWater );
+			SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SourceSideMassFlowRate;
+		}
 
 	}
 
@@ -1894,8 +1932,7 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 const EP_UNUSED( SensDemand ), // Cooling Sensible Demand [W] !unused1208
 		int const CompOp, // compressor operation flag
 		Real64 const PartLoadRatio, // compressor part load ratio
-		Real64 const EP_UNUSED( OnOffAirFlowRatio ), // ratio of compressor on flow to average flow over time step
-		Real64 const WaterPartLoad // water part load ratio
+		Real64 const EP_UNUSED( OnOffAirFlowRatio ) // ratio of compressor on flow to average flow over time step
 	)
 	{
 
@@ -1933,6 +1970,7 @@ namespace WaterToAirHeatPumpSimple {
 		using Psychrometrics::PsyWFnTdbH;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
+		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1972,6 +2010,7 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 ratioVS; // Ratio of the source side flow rate to the rated conditions
 		Real64 CpWater; // Specific heat of water [J/kg_C]
 		Real64 CpAir; // Specific heat of air [J/kg_C]
+		Real64 QSource_fullload; // full load source side capacity [W]
 		Real64 ReportingConstant;
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
@@ -2019,8 +2058,8 @@ namespace WaterToAirHeatPumpSimple {
 		ratioTDB = ( ( LoadSideInletDBTemp + CelsiustoKelvin ) / Tref );
 		ratioTS = ( ( SourceSideInletTemp + CelsiustoKelvin ) / Tref );
 		ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, RoutineName ) ) );
-		if ( WaterPartLoad > 0.0 && SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate > 0.0 ) {
-			ratioVS = ( SourceSideMassFlowRate ) / ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * WaterPartLoad );
+		if ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate > 0.0 ) {
+			ratioVS = ( SourceSideMassFlowRate ) / ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate );
 		} else {
 			ratioVS = 0.0;
 		}
@@ -2028,7 +2067,7 @@ namespace WaterToAirHeatPumpSimple {
 		QLoadTotal = HeatCapRated * ( HeatCapCoeff1 + ( ratioTDB * HeatCapCoeff2 ) + ( ratioTS * HeatCapCoeff3 ) + ( ratioVL * HeatCapCoeff4 ) + ( ratioVS * HeatCapCoeff5 ) );
 		QSensible = QLoadTotal;
 		Winput = HeatPowerRated * ( HeatPowerCoeff1 + ( ratioTDB * HeatPowerCoeff2 ) + ( ratioTS * HeatPowerCoeff3 ) + ( ratioVL * HeatPowerCoeff4 ) + ( ratioVS * HeatPowerCoeff5 ) );
-		QSource = QLoadTotal - Winput;
+		QSource_fullload = QLoadTotal - Winput;
 
 		// calculate coil outlet state variables
 		LoadSideOutletEnth = LoadSideInletEnth + QLoadTotal / LoadSideMassFlowRate;
@@ -2054,7 +2093,7 @@ namespace WaterToAirHeatPumpSimple {
 		QLoadTotal *= PartLoadRatio;
 		QSensible *= PartLoadRatio;
 		Winput *= RuntimeFrac;
-		QSource *= PartLoadRatio;
+		QSource = QSource_fullload * PartLoadRatio;
 
 		//  Add power to global variable so power can be summed by parent object
 		DXElecHeatingPower = Winput;
@@ -2079,9 +2118,28 @@ namespace WaterToAirHeatPumpSimple {
 		SimpleWatertoAirHP( HPNum ).PartLoadRatio = PartLoadRatio;
 		SimpleWatertoAirHP( HPNum ).AirMassFlowRate = PLRCorrLoadSideMdot;
 
-		SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SourceSideMassFlowRate;
-		SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp - QSource / ( SourceSideMassFlowRate * CpWater );
-		SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth - QSource / SourceSideMassFlowRate;
+		if ( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterCycling ) {
+			// plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
+			SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * PartLoadRatio;
+			SetComponentFlowRate( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, SimpleWatertoAirHP( HPNum ).WaterInletNodeNum, SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum, SimpleWatertoAirHP( HPNum ).LoopNum, SimpleWatertoAirHP( HPNum ).LoopSide, SimpleWatertoAirHP( HPNum ).BranchNum, SimpleWatertoAirHP( HPNum ).CompNum );
+			if ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate > 0.0 ) {
+				SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp - QSource / ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate * CpWater );
+				SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth - QSource / SimpleWatertoAirHP( HPNum ).WaterMassFlowRate;
+			}
+		} else {
+			if( ( SimpleWatertoAirHP( HPNum ).WaterCyclingMode ) == WaterConstant ) {
+				if( SimpleWatertoAirHP( HPNum ).WaterFlowMode ) {
+					SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+					SetComponentFlowRate( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, SimpleWatertoAirHP( HPNum ).WaterInletNodeNum, SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum, SimpleWatertoAirHP( HPNum ).LoopNum, SimpleWatertoAirHP( HPNum ).LoopSide, SimpleWatertoAirHP( HPNum ).BranchNum, SimpleWatertoAirHP( HPNum ).CompNum );
+				} else {
+					SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SourceSideMassFlowRate;
+				}
+			} else {
+				SimpleWatertoAirHP( HPNum ).WaterMassFlowRate = SourceSideMassFlowRate;
+			}
+			SimpleWatertoAirHP( HPNum ).OutletWaterTemp = SourceSideInletTemp - QSource / ( SourceSideMassFlowRate * CpWater );
+			SimpleWatertoAirHP( HPNum ).OutletWaterEnthalpy = SourceSideInletEnth - QSource / SourceSideMassFlowRate;
+		}
 
 	}
 

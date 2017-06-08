@@ -1,9 +1,54 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -474,6 +519,13 @@ namespace AirflowNetworkSolver {
 		static gio::Fmt Format_907( "(,/,' CPU seconds for ',A,F12.3)" );
 
 		// FLOW:
+
+		// Initialize pressure for pressure control and for Initialization Type = LinearInitializationMethod
+		if ( ( AirflowNetworkSimu.InitFlag == 0 ) || ( PressureSetFlag > 0 && AirflowNetworkFanActivated ) ) {
+			for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
+				if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) PZ( n ) = 0.0;
+			}
+		}
 		// Compute zone air properties.
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
 			RHOZ( n ) = PsyRhoAirFnPbTdbW( StdBaroPress + PZ( n ), TZ( n ), WZ( n ) );
@@ -485,11 +537,6 @@ namespace AirflowNetworkSolver {
 			SQRTDZ( n ) = std::sqrt( RHOZ( n ) );
 			VISCZ( n ) = 1.71432e-5 + 4.828e-8 * TZ( n );
 			if ( LIST >= 2 ) gio::write( Unit21, Format_903 ) << "D,V:" << n << RHOZ( n ) << VISCZ( n );
-		}
-		if ( AirflowNetworkSimu.InitFlag == 0 ) {
-			for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
-				if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) PZ( n ) = 0.0;
-			}
 		}
 		// Compute stack pressures.
 		for ( i = 1; i <= NetworkNumOfLinks; ++i ) {
@@ -917,6 +964,10 @@ namespace AirflowNetworkSolver {
 				AFEHEX( j, LFLAG, DP, i, n, M, F, DF, NF );
 			} else if ( SELECT_CASE_var == CompTypeNum_HOP ) { // Horizontal opening
 				AFEHOP( j, LFLAG, DP, i, n, M, F, DF, NF );
+			} else if ( SELECT_CASE_var == CompTypeNum_OAF ) { // OA supply fan
+				AFEOAF( j, LFLAG, DP, i, n, M, F, DF, NF );
+			} else if ( SELECT_CASE_var == CompTypeNum_REL ) { // Relief fan
+				AFEREL( j, LFLAG, DP, i, n, M, F, DF, NF );
 			} else {
 				continue;
 			}}
@@ -2749,7 +2800,7 @@ Label90: ;
 				DF( 1 ) = 0.5 * FT / PDROP;
 			}
 		}
-		// If damper, setup the airflows from nodal values calculated from teminal
+		// If damper, setup the airflows from nodal values calculated from terminal
 		if ( AirflowNetworkLinkageData( i ).VAVTermDamper ) {
 			F( 1 ) = Node( DisSysCompTermUnitData( CompNum ).DamperInletNode ).MassFlowRate;
 			if ( VAVTerminalRatio > 0.0 ) {
@@ -2834,7 +2885,11 @@ Label90: ;
 		if ( Node( InletNode ).MassFlowRate > VerySmallMassFlow ) {
 			// Treat the component as an exhaust fan
 			NF = 1;
-			F( 1 ) = Node( InletNode ).MassFlowRate;
+			if ( PressureSetFlag == PressureCtrlExhaust ) {
+				F( 1 ) = ExhaustFanMassFlowRate;
+			} else {
+				F( 1 ) = Node( InletNode ).MassFlowRate;
+			}
 			DF( 1 ) = 0.0;
 			return;
 		} else {
@@ -3228,6 +3283,283 @@ Label90: ;
 			F( 2 ) = BuoFlow;
 		}
 		DF( 2 ) = 0.0;
+
+	}
+
+	void
+	AFEOAF(
+		int const j, // Component number
+		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+		int const EP_UNUSED( i ), // Linkage number
+		int const n, // Node 1 number
+		int const M, // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
+		int & NF // Number of flows, either 1 or 2
+	)
+	{
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
+
+
+		// Using/Aliasing
+		using DataLoopNode::Node;
+		using DataHVACGlobals::VerySmallMassFlow;
+		using DataAirLoop::LoopSystemOnMassFlowrate;
+		using DataAirLoop::LoopSystemOffMassFlowrate;
+		using DataAirLoop::LoopFanOperationMode;
+		using DataAirLoop::LoopOnOffFanPartLoadRatio;
+		using DataHVACGlobals::FanType_SimpleOnOff;
+
+		// Argument array dimensioning
+		F.dim( 2 );
+		DF.dim( 2 );
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const CycFanCycComp( 1 ); // fan cycles with compressor operation
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 expn;
+		Real64 Ctl;
+		Real64 coef;
+		Real64 Corr;
+		Real64 VisAve;
+		Real64 Tave;
+		Real64 RhoCor;
+		int CompNum;
+		int InletNode;
+		Real64 RhozNorm;
+		Real64 VisczNorm;
+		Real64 CDM;
+		Real64 FL;
+		Real64 FT;
+
+		// FLOW:
+		CompNum = AirflowNetworkCompData( j ).TypeNum;
+
+		InletNode = DisSysCompOutdoorAirData( CompNum ).InletNode;
+		if ( Node( InletNode ).MassFlowRate > VerySmallMassFlow ) {
+			// Treat the component as an exhaust fan
+			NF = 1;
+			F( 1 ) = Node( InletNode ).MassFlowRate;
+			DF( 1 ) = 0.0;
+			if ( LoopFanOperationMode == CycFanCycComp && LoopOnOffFanPartLoadRatio > 0.0 ) {
+				F( 1 ) = F( 1 ) / LoopOnOffFanPartLoadRatio;
+			}
+			return;
+		} else {
+			// Treat the component as a surface crack
+			// Crack standard condition from given inputs
+			Corr = 1.0;
+			RhozNorm = PsyRhoAirFnPbTdbW( DisSysCompOutdoorAirData( CompNum ).StandardP, DisSysCompOutdoorAirData( CompNum ).StandardT, DisSysCompOutdoorAirData( CompNum ).StandardW );
+			VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompOutdoorAirData( CompNum ).StandardT;
+
+			expn = DisSysCompOutdoorAirData( CompNum ).FlowExpo;
+			VisAve = ( VISCZ( n ) + VISCZ( M ) ) / 2.0;
+			Tave = ( TZ( n ) + TZ( M ) ) / 2.0;
+			if ( PDROP >= 0.0 ) {
+				coef = DisSysCompOutdoorAirData( CompNum ).FlowCoef / SQRTDZ( n ) * Corr;
+			} else {
+				coef = DisSysCompOutdoorAirData( CompNum ).FlowCoef / SQRTDZ( M ) * Corr;
+			}
+
+			NF = 1;
+			if ( LFLAG == 1 ) {
+				// Initialization by linear relation.
+				if ( PDROP >= 0.0 ) {
+					RhoCor = ( TZ( n ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( n ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					DF( 1 ) = coef * RHOZ( n ) / VISCZ( n ) * Ctl;
+				} else {
+					RhoCor = ( TZ( M ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( M ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					DF( 1 ) = coef * RHOZ( M ) / VISCZ( M ) * Ctl;
+				}
+				F( 1 ) = -DF( 1 ) * PDROP;
+			} else {
+				// Standard calculation.
+				if ( PDROP >= 0.0 ) {
+					// Flow in positive direction.
+					// Laminar flow.
+					RhoCor = ( TZ( n ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( n ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					CDM = coef * RHOZ( n ) / VISCZ( n ) * Ctl;
+					FL = CDM * PDROP;
+					// Turbulent flow.
+					if ( expn == 0.5 ) {
+						FT = coef * SQRTDZ( n ) * std::sqrt( PDROP ) * Ctl;
+					} else {
+						FT = coef * SQRTDZ( n ) * std::pow( PDROP, expn ) * Ctl;
+					}
+				} else {
+					// Flow in negative direction.
+					// Laminar flow.
+					RhoCor = ( TZ( M ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( M ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					CDM = coef * RHOZ( M ) / VISCZ( M ) * Ctl;
+					FL = CDM * PDROP;
+					// Turbulent flow.
+					if ( expn == 0.5 ) {
+						FT = -coef * SQRTDZ( M ) * std::sqrt( -PDROP ) * Ctl;
+					} else {
+						FT = -coef * SQRTDZ( M ) * std::pow( -PDROP, expn ) * Ctl;
+					}
+				}
+				// Select laminar or turbulent flow.
+				if ( std::abs( FL ) <= std::abs( FT ) ) {
+					F( 1 ) = FL;
+					DF( 1 ) = CDM;
+				} else {
+					F( 1 ) = FT;
+					DF( 1 ) = FT * expn / PDROP;
+				}
+			}
+		}
+
+	}
+
+	void
+	AFEREL(
+		int const j, // Component number
+		int const LFLAG, // Initialization flag.If = 1, use laminar relationship
+		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+		int const EP_UNUSED( i ), // Linkage number
+		int const n, // Node 1 number
+		int const M, // Node 2 number
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
+		int & NF // Number of flows, either 1 or 2
+	)
+	{
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
+
+		// Using/Aliasing
+		using DataLoopNode::Node;
+		using DataHVACGlobals::VerySmallMassFlow;
+
+		// Argument array dimensioning
+		F.dim( 2 );
+		DF.dim( 2 );
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 expn;
+		Real64 Ctl;
+		Real64 coef;
+		Real64 Corr;
+		Real64 VisAve;
+		Real64 Tave;
+		Real64 RhoCor;
+		int CompNum;
+		int OutletNode;
+		Real64 RhozNorm;
+		Real64 VisczNorm;
+		Real64 CDM;
+		Real64 FL;
+		Real64 FT;
+
+		// FLOW:
+		CompNum = AirflowNetworkCompData( j ).TypeNum;
+
+		OutletNode = DisSysCompReliefAirData( CompNum ).OutletNode;
+		if ( Node( OutletNode ).MassFlowRate > VerySmallMassFlow && PressureSetFlag == PressureCtrlRelief ) {
+			// Treat the component as an exhaust fan
+			NF = 1;
+			F( 1 ) = ReliefMassFlowRate;
+			DF( 1 ) = 0.0;
+			return;
+		} else {
+			// Treat the component as a surface crack
+			// Crack standard condition from given inputs
+			Corr = 1.0;
+			RhozNorm = PsyRhoAirFnPbTdbW( DisSysCompReliefAirData( CompNum ).StandardP, DisSysCompReliefAirData( CompNum ).StandardT, DisSysCompReliefAirData( CompNum ).StandardW );
+			VisczNorm = 1.71432e-5 + 4.828e-8 * DisSysCompReliefAirData( CompNum ).StandardT;
+
+			expn = DisSysCompReliefAirData( CompNum ).FlowExpo;
+			VisAve = ( VISCZ( n ) + VISCZ( M ) ) / 2.0;
+			Tave = ( TZ( n ) + TZ( M ) ) / 2.0;
+			if ( PDROP >= 0.0 ) {
+				coef = DisSysCompReliefAirData( CompNum ).FlowCoef / SQRTDZ( n ) * Corr;
+			} else {
+				coef = DisSysCompReliefAirData( CompNum ).FlowCoef / SQRTDZ( M ) * Corr;
+			}
+
+			NF = 1;
+			if ( LFLAG == 1 ) {
+				// Initialization by linear relation.
+				if ( PDROP >= 0.0 ) {
+					RhoCor = ( TZ( n ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( n ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					DF( 1 ) = coef * RHOZ( n ) / VISCZ( n ) * Ctl;
+				} else {
+					RhoCor = ( TZ( M ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( M ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					DF( 1 ) = coef * RHOZ( M ) / VISCZ( M ) * Ctl;
+				}
+				F( 1 ) = -DF( 1 ) * PDROP;
+			} else {
+				// Standard calculation.
+				if ( PDROP >= 0.0 ) {
+					// Flow in positive direction.
+					// Laminar flow.
+					RhoCor = ( TZ( n ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( n ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					CDM = coef * RHOZ( n ) / VISCZ( n ) * Ctl;
+					FL = CDM * PDROP;
+					// Turbulent flow.
+					if ( expn == 0.5 ) {
+						FT = coef * SQRTDZ( n ) * std::sqrt( PDROP ) * Ctl;
+					} else {
+						FT = coef * SQRTDZ( n ) * std::pow( PDROP, expn ) * Ctl;
+					}
+				} else {
+					// Flow in negative direction.
+					// Laminar flow.
+					RhoCor = ( TZ( M ) + KelvinConv ) / ( Tave + KelvinConv );
+					Ctl = std::pow( RhozNorm / RHOZ( M ) / RhoCor, expn - 1.0 ) * std::pow( VisczNorm / VisAve, 2.0 * expn - 1.0 );
+					CDM = coef * RHOZ( M ) / VISCZ( M ) * Ctl;
+					FL = CDM * PDROP;
+					// Turbulent flow.
+					if ( expn == 0.5 ) {
+						FT = -coef * SQRTDZ( M ) * std::sqrt( -PDROP ) * Ctl;
+					} else {
+						FT = -coef * SQRTDZ( M ) * std::pow( -PDROP, expn ) * Ctl;
+					}
+				}
+				// Select laminar or turbulent flow.
+				if ( std::abs( FL ) <= std::abs( FT ) ) {
+					F( 1 ) = FL;
+					DF( 1 ) = CDM;
+				} else {
+					F( 1 ) = FT;
+					DF( 1 ) = FT * expn / PDROP;
+				}
+			}
+		}
 
 	}
 
@@ -5076,28 +5408,6 @@ Label90: ;
 	}
 
 	//*****************************************************************************************
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // AirflowNetworkSolver
 

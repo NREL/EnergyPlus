@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <vector>
 
@@ -58,7 +104,6 @@ namespace EnergyPlus {
 		using DataPlant::PlantLoop;
 		using DataPlant::TotNumLoops;
 		using DataPlant::SupplySide;
-		using DataGlobals::InitConvTemp;
 		using namespace FluidProperties;
 		using DataSizing::PlantSizData;
 
@@ -70,10 +115,10 @@ namespace EnergyPlus {
 			if ( PlantLoopName == PlantLoop( i ).Name ) { //found it
 
 				density = GetDensityGlycol( PlantLoop( i ).FluidName,
-								InitConvTemp, PlantLoop( i ).FluidIndex,
+								DataGlobals::CWInitConvTemp, PlantLoop( i ).FluidIndex,
 								"createNewCoincidentPlantAnalysisObject" );
 				cp = GetSpecificHeatGlycol( PlantLoop( i ).FluidName,
-								InitConvTemp, PlantLoop( i ).FluidIndex,
+								DataGlobals::CWInitConvTemp, PlantLoop( i ).FluidIndex,
 								"createNewCoincidentPlantAnalysisObject" );
 
 				plantCoincAnalyObjs.emplace_back( PlantLoopName, i, PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn, density,
@@ -95,20 +140,20 @@ namespace EnergyPlus {
 		for ( auto & P : plantCoincAnalyObjs ) {
 			//call setup log routine for each coincident plant analysis object
 			P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(
-				Node(P.supplySideInletNodeNum).MassFlowRate,
+				Node( P.supplySideInletNodeNum ).MassFlowRate,
 				P.numTimeStepsInAvg );
 			P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(
-				Node(P.supplySideInletNodeNum).Temp,
+				Node( P.supplySideInletNodeNum ).Temp,
 				P.numTimeStepsInAvg );
-			if ( PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop
-					|| PlantSizData(P.plantSizingIndex).LoopType == SteamLoop ) {
+			if ( PlantSizData(P.plantSizingIndex ).LoopType == HeatingLoop
+					|| PlantSizData(P.plantSizingIndex ).LoopType == SteamLoop ) {
 				P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(
-					PlantReport(P.plantLoopIndex ).HeatingDemand,
+					PlantReport( P.plantLoopIndex ).HeatingDemand,
 					P.numTimeStepsInAvg );
-			} else if ( PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop
-						|| PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop ) {
+			} else if ( PlantSizData( P.plantSizingIndex ).LoopType == CoolingLoop
+						|| PlantSizData( P.plantSizingIndex ).LoopType == CondenserLoop ) {
 				P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(
-					PlantReport(P.plantLoopIndex ).CoolingDemand,
+					PlantReport( P.plantLoopIndex ).CoolingDemand,
 					P.numTimeStepsInAvg );
 			}
 
@@ -207,7 +252,7 @@ namespace EnergyPlus {
 
 		bool Available; // an environment is available to process
 		int HVACSizingIterCount;
-		static gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
+		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
 		static gio::Fmt fmtLD( "*" );
 
 		hvacSizingSimulationManager->DetermineSizingAnalysesNeeded();
@@ -230,9 +275,9 @@ namespace EnergyPlus {
 			Available = true;
 			for ( int i = 1; i <= NumOfEnvrn; ++i ) { // loop over environments
 
-				GetNextEnvironment(Available, ErrorsFound);
-				if (ErrorsFound) break;
-				if (!Available) continue;
+				GetNextEnvironment( Available, ErrorsFound );
+				if ( ErrorsFound ) break;
+				if ( !Available ) continue;
 
 				hvacSizingSimulationManager->sizingLogger.SetupSizingLogsNewEnvironment();
 
@@ -241,7 +286,7 @@ namespace EnergyPlus {
 				if ( KindOfSim == ksDesignDay ) continue;
 				if ( KindOfSim == ksRunPeriodDesign ) continue;
 
-				if ( Environment(Envrn).HVACSizingIterationNum != HVACSizingIterCount ) continue;
+				if ( Environment( Envrn ).HVACSizingIterationNum != HVACSizingIterCount ) continue;
 
 				if ( ReportDuringHVACSizingSimulation ) {
 					if ( sqlite ) {
@@ -252,7 +297,7 @@ namespace EnergyPlus {
 				}
 				ExitDuringSimulations = true;
 
-				DisplayString("Initializing New Environment Parameters, HVAC Sizing Simulation");
+				DisplayString( "Initializing New Environment Parameters, HVAC Sizing Simulation" );
 
 				BeginEnvrnFlag = true;
 				EndEnvrnFlag = false;
@@ -262,19 +307,20 @@ namespace EnergyPlus {
 				DayOfSimChr = "0";
 				NumOfWarmupDays = 0;
 
-				ManageEMS(emsCallFromBeginNewEvironment); // calling point
+				bool anyEMSRan;
+				ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
 
-				while ( (DayOfSim < NumOfDayInEnvrn) || (WarmupFlag) ) { // Begin day loop ...
+				while ( ( DayOfSim < NumOfDayInEnvrn) || ( WarmupFlag ) ) { // Begin day loop ...
 
 					if ( ReportDuringHVACSizingSimulation ) {
 						if ( sqlite ) sqlite->sqliteBegin(); // setup for one transaction per day
 					}
 					++DayOfSim;
 					gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
-					strip(DayOfSimChr);
-					if ( !WarmupFlag ) {
+					strip( DayOfSimChr );
+					if ( ! WarmupFlag ) {
 						++CurrentOverallSimDay;
-						DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
+						DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
 					} else {
 						DayOfSimChr = "0";
 					}
@@ -283,13 +329,13 @@ namespace EnergyPlus {
 
 					if ( WarmupFlag ) {
 						++NumOfWarmupDays;
-						cWarmupDay = TrimSigDigits(NumOfWarmupDays);
-						DisplayString("Warming up {" + cWarmupDay + '}');
+						cWarmupDay = TrimSigDigits( NumOfWarmupDays );
+						DisplayString( "Warming up {" + cWarmupDay + '}' );
 					} else if (DayOfSim == 1) {
-						DisplayString("Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName);
+						DisplayString( "Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName );
 						gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
 					} else if (DisplayPerfSimulationFlag) {
-						DisplayString("Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
+						DisplayString( "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName );
 						DisplayPerfSimulationFlag = false;
 					}
 
@@ -298,7 +344,7 @@ namespace EnergyPlus {
 						BeginHourFlag = true;
 						EndHourFlag = false;
 
-						for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+						for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 							if ( AnySlabsInModel || AnyBasementsInModel ) {
 								SimulateGroundDomains( false );
 							}

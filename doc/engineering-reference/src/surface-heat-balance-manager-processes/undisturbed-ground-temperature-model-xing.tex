@@ -1,0 +1,25 @@
+\section{Undisturbed Ground Temperature Model: Xing}\label{undisturbed-ground-temperature-model-xing}
+
+\subsubsection{Approach}\label{approach-005}
+
+This model uses the correlation developed by Xing, 2014 to predict undisturbed ground temperature. The correlation parameters for 4000+ international locations can be found in Xing, 2014. The parameters were first determined by creating and validating a finite difference numerical model which used local weather data for boundary conditions. From the numerical model, the correlation parameters were determined to provide for this simplified design model.
+
+\begin{equation}
+T(z,t) = \bar{T}_{s} - \sum_{n = 1}^{2} \Delta\bar{T}_{s,n} \cdot e^{-z \cdot \sqrt{\frac{n\pi}{\alpha\tau}}} \cdot cos\left[ \frac{2 \pi n}{\tau} \left(t - \theta_{n} \right) - z \sqrt{\frac{n \pi}{\alpha \tau}} \right]
+\end{equation}
+
+\(T(z,t)\) is the undisturbed ground temperature as a function of time and depth
+
+\(\bar{T}_{s}\) is the average annual soil surface temperature, in deg C
+
+\(\Delta\bar{T}_{s,n}\) is the n-th amplitude of the soil temperature change throughout the year, in deg C
+
+\(\theta_{n}\) is the n-th phase shift, or day of minimum surface temperature
+
+\(\alpha\) is the themal diffusivity of the ground
+
+\(\tau\) is time constant, 365.
+
+\subsubsection{References}\label{references-050}
+
+Xing, L. 2014. Estimations of Undisturbed Ground Temperatures using Numerical and Analytical Modeling. Ph.D.~Diss. Oklahoma State University, Stillwater, OK.

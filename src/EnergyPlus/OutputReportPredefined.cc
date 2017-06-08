@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
@@ -151,6 +197,7 @@ namespace OutputReportPredefined {
 	int pdchOpUfactFilm;
 	int pdchOpUfactNoFilm;
 	int pdchOpGrArea;
+	int pdchOpNetArea;
 	int pdchOpAzimuth;
 	int pdchOpTilt;
 	int pdchOpDir;
@@ -236,8 +283,9 @@ namespace OutputReportPredefined {
 	int pdchExLtConsump;
 	int pdstDaylight;
 	int pdchDyLtZone;
+	int pdchDyLtCtrlName;
 	int pdchDyLtKind;
-	int pdchDyLtCtrl;
+	int pdchDyLtCtrlType;
 	int pdchDyLtFrac;
 	int pdchDyLtWInst;
 	int pdchDyLtWCtrl;
@@ -304,6 +352,10 @@ namespace OutputReportPredefined {
 	int pdchDCVventMechName;
 	int pdchDCVperPerson;
 	int pdchDCVperArea;
+	int pdchDCVperZone;
+	int pdchDCVperACH;
+	int pdchDCVMethod;
+	int pdchDCVOASchName;
 
 	//added for new DCV
 	int pdchDCVZoneADEffCooling;
@@ -775,6 +827,7 @@ namespace OutputReportPredefined {
 		pdchOpUfactFilm = 0;
 		pdchOpUfactNoFilm = 0;
 		pdchOpGrArea = 0;
+		pdchOpNetArea = 0;
 		pdchOpAzimuth = 0;
 		pdchOpTilt = 0;
 		pdchOpDir = 0;
@@ -850,8 +903,9 @@ namespace OutputReportPredefined {
 		pdchExLtConsump = 0;
 		pdstDaylight = 0;
 		pdchDyLtZone = 0;
+		pdchDyLtCtrlName = 0;
 		pdchDyLtKind = 0;
-		pdchDyLtCtrl = 0;
+		pdchDyLtCtrlType = 0;
 		pdchDyLtFrac = 0;
 		pdchDyLtWInst = 0;
 		pdchDyLtWCtrl = 0;
@@ -909,6 +963,10 @@ namespace OutputReportPredefined {
 		pdchDCVventMechName = 0;
 		pdchDCVperPerson = 0;
 		pdchDCVperArea = 0;
+		pdchDCVperZone = 0;
+		pdchDCVperACH = 0;
+		pdchDCVMethod = 0;
+		pdchDCVOASchName = 0;
 		pdchDCVZoneADEffCooling = 0;
 		pdchDCVZoneADEffHeating = 0;
 		pdchDCVZoneADEffSchName = 0;
@@ -1281,6 +1339,7 @@ namespace OutputReportPredefined {
 		pdchOpUfactFilm = newPreDefColumn( pdstOpaque, "U-Factor with Film [W/m2-K]" );
 		pdchOpUfactNoFilm = newPreDefColumn( pdstOpaque, "U-Factor no Film [W/m2-K]" );
 		pdchOpGrArea = newPreDefColumn( pdstOpaque, "Gross Area [m2]" );
+		pdchOpNetArea = newPreDefColumn( pdstOpaque, "Net Area [m2]" );
 		pdchOpAzimuth = newPreDefColumn( pdstOpaque, "Azimuth [deg]" );
 		pdchOpTilt = newPreDefColumn( pdstOpaque, "Tilt [deg]" );
 		pdchOpDir = newPreDefColumn( pdstOpaque, "Cardinal Direction" );
@@ -1371,8 +1430,9 @@ namespace OutputReportPredefined {
 		pdstDaylight = newPreDefSubTable( pdrLighting, "Daylighting" );
 
 		pdchDyLtZone = newPreDefColumn( pdstDaylight, "Zone" );
-		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Type" ); //detailed or DElight
-		pdchDyLtCtrl = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
+		pdchDyLtCtrlName = newPreDefColumn (pdstDaylight, "Control Name");
+		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Method" ); //detailed or DElight
+		pdchDyLtCtrlType = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
 		pdchDyLtFrac = newPreDefColumn( pdstDaylight, "Fraction Controlled" );
 		pdchDyLtWInst = newPreDefColumn( pdstDaylight, "Lighting Installed in Zone [W]" );
 		pdchDyLtWCtrl = newPreDefColumn( pdstDaylight, "Lighting Controlled [W]" );
@@ -1415,7 +1475,7 @@ namespace OutputReportPredefined {
 
 		// o  CoilDX_HeatingEmpirical         Coil:Heating:DX:SingleSpeed            DXCoil                   HeatPumpAuto
 		// o  CoilDX_MultiSpeedHeating        Coil:Heating:DX:MultiSpeed             DXCoil                   MultispeedHeatPump
-		// o  Coil_HeatingGas                 Coil:Heating:Gas                       HVACHeatingCoils         5ZoneAutoDXVAV
+		// o  Coil_HeatingGasOrOtherFuel                 Coil:Heating:Fuel                       HVACHeatingCoils         5ZoneAutoDXVAV
 		// o  Coil_HeatingElectric            Coil:Heating:Electric                  HVACHeatingCoils         PackagedTerminalAirConditioner
 		// o  Coil_HeatingDesuperheater       Coil:Heating:Desuperheater             HVACHeatingCoils         SuperMarket_DesuperHeatingCoil
 		// o  Coil_HeatingWater               Coil:Heating:Water                     HVACWaterCoilComponent   5ZoneAirCooled
@@ -1578,11 +1638,15 @@ namespace OutputReportPredefined {
 		pdchDCVventMechName = newPreDefColumn( pdstDemCntlVent, "Controller:MechanicalVentilation Name" );
 		pdchDCVperPerson = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Person [m3/s-person]" );
 		pdchDCVperArea = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Area [m3/s-m2]" );
+		pdchDCVperZone = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Zone [m3/s]" );
+		pdchDCVperACH = newPreDefColumn( pdstDemCntlVent, "Outdoor Air ACH [ach]" );
+		pdchDCVMethod = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Method" );
+		pdchDCVOASchName = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Schedule Name" );
 
 		// added for new DCV
 		pdchDCVZoneADEffCooling = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness in Cooling Mode" );
 		pdchDCVZoneADEffHeating = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness in Heating Mode" );
-		pdchDCVZoneADEffSchName = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness Schedule" );
+		pdchDCVZoneADEffSchName = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness Schedule Name" );
 
 		pdstSimpleComfort = newPreDefSubTable( pdrSystem, "Time Not Comfortable Based on Simple ASHRAE 55-2004" );
 		pdchSCwinterClothes = newPreDefColumn( pdstSimpleComfort, "Winter Clothes [hr]" );
@@ -2181,6 +2245,22 @@ namespace OutputReportPredefined {
 		tableEntry( numTableEntry ).indexColumn = columnIndex;
 	}
 
+	std::string
+	RetrievePreDefTableEntry(
+		int const columnIndex,
+		std::string const & objName
+		)
+	{
+		for ( int iTableEntry = 1; iTableEntry <= numTableEntry; ++iTableEntry ) {
+			if ( tableEntry( iTableEntry ).indexColumn == columnIndex && tableEntry( iTableEntry ).objectName == objName ){
+				return trimmed( left_justified(tableEntry( iTableEntry ).charEntry) );
+				break;
+			}
+		}
+		return "NOT FOUND";
+	}
+
+
 	void
 	incrementTableEntry()
 	{
@@ -2552,29 +2632,6 @@ namespace OutputReportPredefined {
 		newPreDefColumn = numColumnTag;
 		return newPreDefColumn;
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutputReportPredefined
 

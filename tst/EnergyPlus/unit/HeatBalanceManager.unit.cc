@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // EnergyPlus::HeatBalanceManager Unit Tests
 
 // Google Test Headers
@@ -17,6 +63,7 @@
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataHVACGlobals.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -35,6 +82,78 @@ using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names )
+	{
+		std::string const idf_objects = delimited_string( {
+			"Version,8.6;",
+			"  WindowMaterial:Gap,",
+			"    Gap_1_Layer,             !- Name",
+			"    0.0127,                  !- Thickness {m}",
+			"    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)",
+			"    101325.0000;             !- Pressure {Pa}",
+			"  WindowGap:DeflectionState,",
+			"    DeflectionState_813_Measured_Gap_1,  !- Name",
+			"    0.0120;                  !- Deflected Thickness {m}",
+			"  WindowMaterial:Gap,",
+			"    Gap_6_Layer,             !- Name",
+			"    0.0060,                  !- Thickness {m}",
+			"    Gap_6_W_0_0060,          !- Gas (or Gas Mixture)",
+			"    101300.0000,             !- Pressure {Pa}",
+			"    DeflectionState_813_Measured_Gap_1;  !- Deflection State",
+		    "  WindowMaterial:Gap,",
+			"    Gap_1_Layer,             !- Name",
+			"    0.0100,                  !- Thickness {m}",
+			"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
+			"    101325.0000;             !- Pressure {Pa}",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+
+		GetMaterialData( ErrorsFound );
+
+		EXPECT_TRUE( ErrorsFound );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2 )
+	{
+		std::string const idf_objects = delimited_string(
+			{
+				"Version,8.6;",
+				"  WindowGap:DeflectionState,",
+				"    DeflectionState_813_Measured_Gap_1,  !- Name",
+				"    0.0120;                  !- Deflected Thickness {m}",
+				"  WindowMaterial:Gap,",
+				"    Gap_6_Layer,             !- Name",
+				"    0.0060,                  !- Thickness {m}",
+				"    Gap_6_W_0_0060,          !- Gas (or Gas Mixture)",
+				"    101300.0000,             !- Pressure {Pa}",
+				"    DeflectionState_813_Measured_Gap_1;  !- Deflection State",
+				"  WindowMaterial:Gap,",
+				"    Gap_1_Layer,             !- Name",
+				"    0.0127,                  !- Thickness {m}",
+				"    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)",
+				"    101325.0000;             !- Pressure {Pa}",
+				"  WindowMaterial:Gap,",
+				"    Gap_1_Layer,             !- Name",
+				"    0.0100,                  !- Thickness {m}",
+				"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
+				"    101325.0000;             !- Pressure {Pa}",
+			}
+		);
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+
+		GetMaterialData( ErrorsFound );
+
+		EXPECT_TRUE( ErrorsFound );
+
+	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ProcessZoneData )
 	{
@@ -259,7 +378,7 @@ namespace EnergyPlus {
 		bool ErrorsFound( false ); // If errors detected in input
 
 		// call to process input
-		ProcessScheduleInput( );
+		ProcessScheduleInput();
 		ErrorsFound = false;
 		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
 		EXPECT_FALSE( ErrorsFound );
@@ -274,11 +393,11 @@ namespace EnergyPlus {
 		ErrorsFound = false;
 		GetZoneData( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
-		AllocateHeatBalArrays( );
+		AllocateHeatBalArrays();
 		ErrorsFound = false;
 		GetSimpleAirModelInputs( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
-		SetZoneMassConservationFlag( );
+		SetZoneMassConservationFlag();
 		// setup zone equipment configuration
 		ZoneEquipConfig.allocate( NumOfZones );
 
@@ -333,7 +452,7 @@ namespace EnergyPlus {
 		Mixing( 1 ).MixingMassFlowRate = 0.1;
 
 		// call zone air mass balance
-		CalcZoneMassBalance( );
+		CalcZoneMassBalance();
 		EXPECT_EQ( Node( 4 ).MassFlowRate, 0.0 ); // Zone 1 return node (max(0.0, 1-2)
 		EXPECT_EQ( Infiltration( 1 ).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
 		EXPECT_EQ( Mixing( 1 ).MixingMassFlowRate, 0.1 ); // Zone 1 to Zone 2 mixing flow rate (unchanged)
@@ -381,6 +500,119 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ZoneAirMassFlow.BalanceMixing );
 		EXPECT_EQ( ZoneAirMassFlow.InfiltrationTreatment, NoInfiltrationFlow );
 		EXPECT_EQ( ZoneAirMassFlow.InfiltrationZoneType, 0 );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVariableTest )
+	{
+		// Test get output variables for ZoneAirMassFlowConservation object #5637
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.5;",
+			"Building,",
+			"My Building, !- Name",
+			"30., !- North Axis{ deg }",
+			"City, !- Terrain",
+			"0.04, !- Loads Convergence Tolerance Value",
+			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+			"FullExterior, !- Solar Distribution",
+			"25, !- Maximum Number of Warmup Days",
+			"6;                       !- Minimum Number of Warmup Days",
+			"ZoneAirMassFlowConservation,",
+			"Yes, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+			"AdjustInfiltrationFlow, !- Infiltration Balancing Method",
+			"AllZones;                !- Infiltration Balancing Zones",
+
+			"  Zone,",
+			"    WEST ZONE,               !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    autocalculate,           !- Ceiling Height {m}",
+			"    autocalculate;           !- Volume {m3}",
+
+			"  Zone,",
+			"    EAST ZONE,               !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    autocalculate,           !- Ceiling Height {m}",
+			"    autocalculate;           !- Volume {m3}",
+			" Output:Variable,",
+			"   *, !- Key Value",
+			"   Zone Air Mass Balance Exhaust Mass Flow Rate, !- Variable Name",
+			"   hourly;                  !- Reporting Frequency",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+
+		// call to process input
+		ErrorsFound = false;
+		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+		EXPECT_FALSE( ErrorsFound );
+		NumOfZones = 2;
+		ZoneReOrder.allocate( NumOfZones );
+		ErrorsFound = false;
+		GetZoneData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+		ErrorsFound = false;
+		GetSimpleAirModelInputs( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+
+		EXPECT_EQ( "WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 1 ).VarName );
+		EXPECT_EQ( "EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
+		EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
+		EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation )
+	{
+		std::string const idf_objects = delimited_string( {
+		"  Version,8.6;",
+  
+		"  Material:RoofVegetation,",
+		"    ThickSoil,               !- Name",
+		"    0.5,                     !- Height of Plants {m}",
+		"    5,                       !- Leaf Area Index {dimensionless}",
+		"    0.2,                     !- Leaf Reflectivity {dimensionless}",
+		"    0.95,                    !- Leaf Emissivity",
+		"    180,                     !- Minimum Stomatal Resistance {s/m}",
+		"    EcoRoofSoil,             !- Soil Layer Name",
+		"    MediumSmooth,            !- Roughness",
+		"    0.36,                    !- Thickness {m}",
+		"    0.4,                     !- Conductivity of Dry Soil {W/m-K}",
+		"    641,                     !- Density of Dry Soil {kg/m3}",
+		"    1100,                    !- Specific Heat of Dry Soil {J/kg-K}",
+		"    0.95,                    !- Thermal Absorptance",
+		"    0.8,                     !- Solar Absorptance",
+		"    0.7,                     !- Visible Absorptance",
+		"    0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer",
+		"    0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer",
+		"    0.45,                    !- Initial Volumetric Moisture Content of the Soil Layer",
+		"    Advanced;                !- Moisture Diffusion Calculation Method",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+		GetMaterialData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+
+		// check the "Material:RoofVegetation" names
+		EXPECT_EQ( Material( 1 ).Name, "THICKSOIL" );
+		// check maximum (saturated) moisture content 
+		EXPECT_EQ( 0.4, Material( 1 ).Porosity );
+		// check initial moisture Content was reset
+		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input
 
 	}
 }

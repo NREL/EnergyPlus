@@ -1,8 +1,51 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <HVACDXHeatPumpSystem.hh>
@@ -16,6 +59,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -68,6 +112,8 @@ namespace HVACDXHeatPumpSystem {
 	int const On( 1 ); // normal compressor operation
 	int const Off( 0 ); // signal DXCoil that compressor shouldn't run
 
+	bool GetInputFlag( true ); // Flag to get input only once
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -91,6 +137,15 @@ namespace HVACDXHeatPumpSystem {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumDXHeatPumpSystems = 0;
+		EconomizerFlag = false;
+		CheckEquipName.deallocate();
+		DXHeatPumpSystem.deallocate();
+	}
 
 	void
 	SimDXHeatPumpSystem(
@@ -147,7 +202,6 @@ namespace HVACDXHeatPumpSystem {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of CoilSystem:Heating:DX object
 		int DXSystemNum; // Index to CoilSystem:Heating:DX object
-		static bool GetInputFlag( true ); // Flag to get input only once
 		Real64 AirMassFlow; // DX System air mass flow rate
 		int InletNodeNum; // DX System inlet node number
 		int OutletNodeNum; // DX System outlet node number
@@ -368,6 +422,7 @@ namespace HVACDXHeatPumpSystem {
 				DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpCoilOutletNodeNum = GetCoilOutletNode( DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType, DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilName, ErrorsFound );
 			}
 
+			//Coil air-side outlet node is the control node
 			DXHeatPumpSystem( DXHeatSysNum ).DXSystemControlNodeNum = DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpCoilOutletNodeNum;
 
 			TestCompSet( CurrentModuleObject, DXHeatPumpSystem( DXHeatSysNum ).Name, NodeID( DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpCoilInletNodeNum ), NodeID( DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpCoilOutletNodeNum ), "Air Nodes" );
@@ -528,12 +583,11 @@ namespace HVACDXHeatPumpSystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Brent Griffith (derived from ControlDXSystem by Richard Liesen)
 		//       DATE WRITTEN   Jan 2012
-		//       MODIFIED       Richard Raustad, FSEC Nov 2003
-		//                      Feb 2005 M. J. Witte, GARD Analytics, Inc.
-		//                        Add dehumidification controls and support for multimode DX coil
-		//                      Jan 2008 R. Raustad, FSEC. Added coolreheat to all coil types
-		//                      Feb 2013, Bo Shen, Oak Ridge National Lab
-		//                      Add Coil:Heating:DX:VariableSpeed
+		//       MODIFIED       Nov. 2003, R. Raustad, FSEC 
+		//                      Feb. 2005, M. J. Witte, GARD. Add dehumidification controls and support for multimode DX coil
+		//                      Jan. 2008, R. Raustad, FSEC. Added coolreheat to all coil types
+		//                      Feb. 2013, B. Shen, ORNL. Add Coil:Heating:DX:VariableSpeed
+		//                      Nov. 2016, R. Zhang, LBNL. Applied the coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -547,14 +601,18 @@ namespace HVACDXHeatPumpSystem {
 
 		// Using/Aliasing
 		using namespace ScheduleManager;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
+		using DXCoils::SimDXCoil;
+		using DXCoils::DXCoilOutletTemp;
+		using FaultsManager::FaultsCoilSATSensor;
+		using General::SolveRegulaFalsi;
+		using General::RoundSigDigits;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
-		using General::SolveRegulaFalsi;
-		using General::RoundSigDigits;
-		using DXCoils::SimDXCoil;
-		using DXCoils::DXCoilOutletTemp;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 
@@ -630,6 +688,15 @@ namespace HVACDXHeatPumpSystem {
 		I = 1;
 		SpeedRatio = 0.0;
 
+		//If there is a fault of coil SAT Sensor (zrp_Nov2016)
+		if( DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATIndex;
+			DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the DesOutTemp
+			DesOutTemp -= DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATOffset;
+		}
+		
 		// If DXHeatingSystem is scheduled on and there is flow
 		if ( ( GetCurrentScheduleValue( DXHeatPumpSystem( DXSystemNum ).SchedPtr ) > 0.0 ) && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
@@ -653,7 +720,7 @@ namespace HVACDXHeatPumpSystem {
 
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
-					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXHeatPumpSystem( DXSystemNum ).DesiredOutletTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
 					//         IF NoOutput is higher than (more heating than required) or very near the ReqOutput, do not run the compressor
 					if ( ( NoOutput - ReqOutput ) > Acc ) {
@@ -740,7 +807,7 @@ namespace HVACDXHeatPumpSystem {
 
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
-					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXHeatPumpSystem( DXSystemNum ).DesiredOutletTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 					//         IF NoOutput is higher than (more heating than required) or very near the ReqOutput, do not run the compressor
 					if ( ( NoOutput - ReqOutput ) > Acc ) {
 						PartLoadFrac = 0.0;
@@ -864,11 +931,11 @@ namespace HVACDXHeatPumpSystem {
 				}}
 			} // End of cooling load type (sensible or latent) if block
 		} // End of If DXheatingSystem is scheduled on and there is flow
+
 		//Set the final results
 		DXHeatPumpSystem( DXSystemNum ).PartLoadFrac = PartLoadFrac;
 		DXHeatPumpSystem( DXSystemNum ).SpeedRatio = SpeedRatio;
 		DXHeatPumpSystem( DXSystemNum ).SpeedNum = SpeedNum;
-
 	}
 
 	Real64

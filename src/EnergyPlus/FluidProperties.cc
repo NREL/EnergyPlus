@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cstddef>
@@ -5,7 +51,6 @@
 #include <limits>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -116,6 +161,28 @@ namespace FluidProperties {
 
 	// Data Initializer Forward Declarations
 	// See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
+
+	void
+	clear_state()
+	{
+		GetInput = true;
+		NumOfRefrigerants = 0;
+		NumOfGlycols = 0;
+		DebugReportGlycols = false;
+		DebugReportRefrigerants = false;
+		GlycolErrorLimitTest = 1;
+		RefrigerantErrorLimitTest = 1;
+		RefrigUsed.deallocate();
+		GlycolUsed.deallocate();
+		FluidIndex_Water = 0;
+		FluidIndex_EthyleneGlycol = 0;
+		FluidIndex_PropoleneGlycol = 0;
+		RefrigData.deallocate();
+		RefrigErrorTracking.deallocate();
+		GlyRawData.deallocate();
+		GlycolData.deallocate();
+		GlycolErrorTracking.deallocate();
+	}
 
 	void
 	DefaultEthGlyCpData_initializer(
@@ -342,17 +409,6 @@ namespace FluidProperties {
 				NumOfTemps( 0 )
 			{}
 
-			// Member Constructor
-			FluidTempData(
-				std::string const & Name, // Name of the temperature list
-				int const NumOfTemps, // Number of temperatures in a particular arry
-				Array1< Real64 > const & Temps // Temperature values (degrees C)
-			) :
-				Name( Name ),
-				NumOfTemps( NumOfTemps ),
-				Temps( Temps )
-			{}
-
 		};
 
 		struct PressureSequence
@@ -367,15 +423,6 @@ namespace FluidProperties {
 				InPtr( 0 )
 			{}
 
-			// Member Constructor
-			PressureSequence(
-				Real64 const Pressure,
-				int const InPtr
-			) :
-				Pressure( Pressure ),
-				InPtr( InPtr )
-			{}
-
 		};
 
 		struct FluidData
@@ -387,15 +434,6 @@ namespace FluidProperties {
 			// Default Constructor
 			FluidData() :
 				IsGlycol( false )
-			{}
-
-			// Member Constructor
-			FluidData(
-				std::string const & Name,
-				bool const IsGlycol
-			) :
-				Name( Name ),
-				IsGlycol( IsGlycol )
 			{}
 
 		};
@@ -1869,7 +1907,7 @@ namespace FluidProperties {
 
 		NumOfGlycols = NumOfGlyConcs; // Reset number of glycols to actual number
 		GlycolErrorTracking.allocate( NumOfGlycols );
-		GlycolErrorTracking.Name() = GlycolData.Name();
+		for ( std::size_t i = 0; i < GlycolErrorTracking.size(); ++i ) GlycolErrorTracking[ i ].Name = GlycolData[ i ].Name;
 
 		if ( ! ErrorsFound ) InitializeGlycolTempLimits( ErrorsFound ); // Initialize the Temp limits for the glycols
 
@@ -1929,6 +1967,7 @@ namespace FluidProperties {
 		Array1D< Real64 > const & DefaultWaterViscData
 	)
 	{
+		DefaultEthGlyViscData( _, 1 ) = 0.0; // Initialize before division below
 		DefaultEthGlyViscData( _, 2 ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 2.08, 1.79, 1.56, 1.37, 1.21, 1.08, 0.97, 0.88, 0.80, 0.73, 0.67, 0.62, 0.57, 0.53, 0.50, 0.47, 0.44, 0.41, 0.39, 0.37, 0.35, 0.33, 0.32, 0.30, 0.29, 0.28 }; // Conc=0.1
 		DefaultEthGlyViscData( _, 3 ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 3.65, 3.02, 2.54, 2.18, 1.89, 1.65, 1.46, 1.30, 1.17, 1.06, 0.96, 0.88, 0.81, 0.74, 0.69, 0.64, 0.59, 0.55, 0.52, 0.49, 0.46, 0.43, 0.40, 0.38, 0.36, 0.34, 0.33 }; // Conc=0.2
 		DefaultEthGlyViscData( _, 4 ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 6.19, 5.03, 4.15, 3.48, 2.95, 2.53, 2.20, 1.92, 1.69, 1.50, 1.34, 1.21, 1.09, 0.99, 0.90, 0.83, 0.76, 0.70, 0.65, 0.60, 0.56, 0.52, 0.49, 0.46, 0.43, 0.41, 0.38, 0.36 }; // Conc=0.3
@@ -2014,6 +2053,7 @@ namespace FluidProperties {
 		Array1D< Real64 > const & DefaultWaterViscData
 	)
 	{
+		DefaultPropGlyViscData( _, 1 ) = 0.0; // Initialize before division below
 		DefaultPropGlyViscData( _, 2 ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 2.68, 2.23, 1.89, 1.63, 1.42, 1.25, 1.11, 0.99, 0.89, 0.81, 0.73, 0.67, 0.62, 0.57, 0.53, 0.49, 0.46, 0.43, 0.40, 0.38, 0.35, 0.33, 0.32, 0.30, 0.28, 0.27 }; // Conc=0.1
 		DefaultPropGlyViscData( _, 3 ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 4.98, 4.05, 3.34, 2.79, 2.36, 2.02, 1.74, 1.52, 1.34, 1.18, 1.06, 0.95, 0.86, 0.78, 0.71, 0.66, 0.60, 0.56, 0.52, 0.49, 0.45, 0.43, 0.40, 0.38, 0.36, 0.34, 0.32 }; // Conc=0.2
 		DefaultPropGlyViscData( _, 4 ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 11.87, 9.08, 7.08, 5.61, 4.52, 3.69, 3.06, 2.57, 2.18, 1.88, 1.63, 1.43, 1.26, 1.13, 1.01, 0.91, 0.83, 0.76, 0.70, 0.65, 0.61, 0.57, 0.53, 0.50, 0.47, 0.45, 0.43, 0.41 }; // Conc=0.3
@@ -4435,6 +4475,193 @@ namespace FluidProperties {
 	//*****************************************************************************
 
 	Real64
+	GetSupHeatTempRefrig(
+		std::string const & Refrigerant, // carries in substance name
+		Real64 const Pressure, // actual pressure given as input
+		Real64 const Enthalpy, // actual enthalpy given as input
+		Real64 TempLow, // lower bound of temperature in the iteration
+		Real64 TempUp, // upper bound of temperature in the iteration
+		int & RefrigIndex, // Index to Refrigerant Properties
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Jan 2016
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Performs iterations to calculate the refrigerant temperature corresponding to the given 
+		// enthalpy and pressure.  Works only in superheated region.
+
+		// METHODOLOGY EMPLOYED:
+		// Perform iterations to identify the temperature by calling GetSupHeatEnthalpyRefrig.
+
+		// USE STATEMENTS:
+		using General::SolveRegulaFalsi;
+
+		// Return value
+		Real64 ReturnValue;
+
+		// FUNCTION PARAMETERS:
+		// the enthalpy calculated from the pressure found
+		static std::string const RoutineName( "GetSupHeatTempRefrig: " );
+		static std::string const RoutineNameNoSpace( "GetSupHeatTempRefrig:" );
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int RefrigNum; // index for refrigerant under consideration
+		Real64 EnthalpyHigh; // Enthalpy value at interpolated pressure and high temperature
+		Real64 EnthalpyLow; // Enthalpy value at interpolated pressure and low temperature
+		Real64 RefTHigh; // High Temperature Value for Ps (max in tables)
+		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area
+		Real64 Temp; // Temperature of the superheated refrigerant at the given enthalpy and pressure
+		
+		if ( GetInput ) {
+			GetFluidPropertiesData();
+			GetInput = false;
+		}
+
+		RefrigNum = 0;
+		if ( NumOfRefrigerants == 0 ) {
+			ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom );
+		}
+
+		// Find which refrigerant (index) is being requested and then determine
+		// where the temperature is within the temperature array
+		if ( RefrigIndex > 0 ) {
+			RefrigNum = RefrigIndex;
+		} else {
+			// Find which refrigerant (index) is being requested
+			RefrigNum = FindRefrigerant( Refrigerant );
+			if ( RefrigNum == 0 ) {
+				ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom );
+			}
+			RefrigIndex = RefrigNum;
+		}
+		auto const & refrig( RefrigData( RefrigNum ) );
+
+		// check temperature data range and attempt to cap if necessary
+		RefTHigh = refrig.PsHighTempValue;
+		RefTSat = GetSatTemperatureRefrig( Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+		
+		if ( TempLow < RefTSat ) {
+			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
+			ShowContinueError( " Called From:" + CalledFrom );
+			ShowContinueErrorTimeStamp( "" );
+			TempLow = RefTSat;
+		}
+		if ( TempUp > RefTHigh ) {
+			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
+			ShowContinueError( " Called From:" + CalledFrom );
+			ShowContinueErrorTimeStamp( "" );
+			TempUp = RefTHigh;
+		}
+		if ( TempLow >= TempUp ) {
+			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
+			ShowContinueError( " Called From:" + CalledFrom );
+			ShowContinueErrorTimeStamp( "" );
+			TempLow = RefTSat;
+			TempUp = RefTHigh;
+		}
+		
+		// check enthalpy data range and attempt to cap if necessary
+		EnthalpyLow = GetSupHeatEnthalpyRefrig( Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+		EnthalpyHigh = GetSupHeatEnthalpyRefrig( Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+		if ( Enthalpy <= EnthalpyLow ) {
+			ReturnValue = TempLow;
+			return ReturnValue;
+		}
+		if ( Enthalpy >= EnthalpyHigh ) {
+			ReturnValue = TempUp;
+			return ReturnValue;
+		}
+		
+		//Perform iterations to obtain the temperature level
+		{
+			Array1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
+			Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
+			int const MaxIte( 500 ); // maximum number of iterations
+			int SolFla; // Flag of RegulaFalsi solver
+			
+			Par( 1 ) = RefrigNum;
+			Par( 2 ) = Enthalpy;
+			Par( 3 ) = Pressure;
+			
+			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
+			ReturnValue = Temp;
+		}
+
+		return ReturnValue;
+
+	}
+	
+	Real64
+	GetSupHeatTempRefrigResidual(
+		Real64 const Temp, // temperature of the refrigerant
+		Array1< Real64 > const & Par 
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Rongpeng Zhang, LBNL
+		//       DATE WRITTEN   July 2016
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		//  Calculates residual function (( Enthalpy_Actual - Enthalpy_Req ) / Enthalpy_Req )
+		//  This method is designed to support , which calculates the refrigerant temperature corresponding to the given 
+		//  enthalpy and pressure in superheated region.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		Real64 TempResidual;
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Par( 1 ) = RefrigNum;
+		// Par( 2 ) = Enthalpy;
+		// Par( 3 ) = Pressure;
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		//  na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		//  na
+
+		// DERIVED TYPE DEFINITIONS
+		//  na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineNameNoSpace( "GetSupHeatTempRefrigResidual" );
+		std::string Refrigerant; // carries in substance name
+		int RefrigNum; // index for refrigerant under consideration
+		Real64 Pressure; // pressure of the refrigerant 
+		Real64 Enthalpy_Req; // enthalpy of the refrigerant to meet
+		Real64 Enthalpy_Act; // enthalpy of the refrigerant calculated
+		
+		RefrigNum = int( Par( 1 ) );
+		Enthalpy_Req = Par( 2 );
+		Pressure = Par( 3 );
+		Refrigerant = RefrigErrorTracking( RefrigNum ).Name;
+		if ( std::abs( Enthalpy_Req ) < 100.0 ) Enthalpy_Req = sign( 100.0, Enthalpy_Req );
+		
+		Enthalpy_Act = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace);
+		
+		TempResidual = ( Enthalpy_Act - Enthalpy_Req ) / Enthalpy_Req;
+
+		return TempResidual;
+	}
+	
+	//*****************************************************************************
+
+	Real64
 	GetSupHeatDensityRefrig(
 		std::string const & Refrigerant, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
@@ -6130,29 +6357,6 @@ namespace FluidProperties {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // FluidProperties
 

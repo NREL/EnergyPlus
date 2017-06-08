@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef AirflowNetworkBalanceManager_hh_INCLUDED
 #define AirflowNetworkBalanceManager_hh_INCLUDED
 
@@ -24,6 +70,7 @@ namespace AirflowNetworkBalanceManager {
 	extern int const VentCtrNum_ZoneLevel; // ZoneLevel control for a heat transfer subsurface
 	extern int const VentCtrNum_AdjTemp; // Temperature venting control based on adjacent zone conditions
 	extern int const VentCtrNum_AdjEnth; // Enthalpy venting control based on adjacent zone conditions
+	extern int const NumOfVentCtrTypes; // Number of zone level venting control types
 
 	// DERIVED TYPE DEFINITIONS:
 	// Report variables
@@ -49,14 +96,12 @@ namespace AirflowNetworkBalanceManager {
 	extern int AirflowNetworkNumOfSurCracks;
 	extern int AirflowNetworkNumOfSurELA;
 	extern int AirflowNetworkNumOfExtNode;
-	extern int AirflowNetworkNumOfCPArray;
-	extern int AirflowNetworkNumOfCPValue;
 	extern int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-	extern int AirflowNetworkNumofWindDir;
 	extern int DisSysNumOfNodes;
 	extern int DisSysNumOfLeaks;
 	extern int DisSysNumOfELRs;
 	extern int DisSysNumOfDucts;
+	extern int DysSysNumOfDuctViewFactors;
 	extern int DisSysNumOfDampers;
 	extern int DisSysNumOfCVFs;
 	extern int DisSysNumOfDetFans;
@@ -120,47 +165,15 @@ namespace AirflowNetworkBalanceManager {
 			MixMass( 0.0 )
 		{}
 
-		// Member Constructor
-		AirflowNetworkReportVars(
-			Real64 const MeanAirTemp, // Mean Air Temperature {C}
-			Real64 const OperativeTemp, // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
-			Real64 const InfilHeatGain, // Heat Gain {W} due to infiltration
-			Real64 const InfilHeatLoss, // Heat Loss {W} due to infiltration
-			Real64 const InfilVolume, // Volume of Air {m3} due to infiltration
-			Real64 const InfilMass, // Mass of Air {kg} due to infiltration
-			Real64 const InfilAirChangeRate, // Infiltration air change rate {ach}
-			Real64 const VentilHeatLoss, // Heat Gain {W} due to ventilation
-			Real64 const VentilHeatGain, // Heat Loss {W} due to ventilation
-			Real64 const VentilVolume, // Volume of Air {m3} due to ventilation
-			Real64 const VentilMass, // Mass of Air {kg} due to ventilation
-			Real64 const VentilFanElec, // Fan Electricity {W} due to ventilation
-			Real64 const VentilAirTemp, // Air Temp {C} of ventilation
-			Real64 const MixVolume, // Mixing volume of Air {m3}
-			Real64 const MixMass // Mixing mass of air {kg}
-		) :
-			MeanAirTemp( MeanAirTemp ),
-			OperativeTemp( OperativeTemp ),
-			InfilHeatGain( InfilHeatGain ),
-			InfilHeatLoss( InfilHeatLoss ),
-			InfilVolume( InfilVolume ),
-			InfilMass( InfilMass ),
-			InfilAirChangeRate( InfilAirChangeRate ),
-			VentilHeatLoss( VentilHeatLoss ),
-			VentilHeatGain( VentilHeatGain ),
-			VentilVolume( VentilVolume ),
-			VentilMass( VentilMass ),
-			VentilFanElec( VentilFanElec ),
-			VentilAirTemp( VentilAirTemp ),
-			MixVolume( MixVolume ),
-			MixMass( MixMass )
-		{}
-
 	};
 
 	// Object Data
 	extern Array1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	ManageAirflowNetworkBalance(
@@ -185,11 +198,64 @@ namespace AirflowNetworkBalanceManager {
 	CalcWindPressureCoeffs();
 
 	Real64
-	CalcWindPressure(
-		int const CPVNum, // CP Value number
-		Real64 const Vref, // Velocity at reference height
-		Real64 const Height // Node height for outdoor temperature calculation
+	airThermConductivity(
+		Real64 T // Temperature in Celsius
 	);
+
+	Real64
+	airDynamicVisc(
+		Real64 T  // Temperature in Celsius
+	);
+
+	Real64
+	airKinematicVisc(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	airThermalDiffusivity(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	airPrandtl(
+		Real64 T, // Temperature in Celsius
+		Real64 W, // Humidity ratio
+		Real64 P // Barometric pressure
+	);
+
+	Real64
+	CalcDuctInsideConvResist(
+		Real64 const Tair, // Average air temperature
+		Real64 const mdot, // Mass flow rate
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const hIn // User defined convection coefficient
+	);
+
+	Real64
+	CalcDuctOutsideConvResist(
+		Real64 const Ts, // Surface temperature
+		Real64 const Tamb, // Free air temperature
+		Real64 const Wamb, // Free air humidity ratio
+		Real64 const Pamb, // Free air barometric pressure
+		Real64 const Dh, // Hydraulic diameter
+		Real64 const ZoneNum, // Zone number
+		Real64 const hOut // User defined convection coefficient
+	);
+
+	Real64
+    CalcWindPressure(
+        int const curve, // Curve index, change this to pointer after curve refactor
+        Real64 const Vref, // Velocity at reference height
+        Real64 const height, // Node height for outdoor temperature calculation
+        Real64 const azimuth, // Azimuthal angle of surface
+        bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
+        bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
+    );
 
 	void
 	CalcAirflowNetworkHeatBalance();
@@ -228,10 +294,16 @@ namespace AirflowNetworkBalanceManager {
 	HybridVentilationControl();
 
 	void
-	CalcSingleSidedCps();
+	CalcSingleSidedCps(std::vector< std::vector< Real64 > > &valsByFacade, int numWindDirs = 36);
 
 	Real64
 	GetZoneInfilAirChangeRate( int const ZoneNum ); // hybrid ventilation system controlled zone number
+
+	Real64
+	AFNPressureResidual(
+		Real64 const ExFanMassFlowRate,
+		Array1< Real64 > const & Par ); // Residual function using Regula Falsi
+
 
 	// derived class or struct
 	struct OccupantVentilationControlProp {
@@ -288,29 +360,6 @@ namespace AirflowNetworkBalanceManager {
 	};
 
 	extern Array1D< OccupantVentilationControlProp > OccupantVentilationControl;
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // AirflowNetworkBalanceManager
 

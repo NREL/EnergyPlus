@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
@@ -571,7 +617,6 @@ namespace WaterToAirHeatPump {
 				SetupOutputVariable( "Heating Coil Source Side Mass Flow Rate [kg/s]", WatertoAirHP( HPNum ).OutletWaterMassFlowRate, "System", "Average", WatertoAirHP( HPNum ).Name );
 				SetupOutputVariable( "Heating Coil Source Side Inlet Temperature [C]", WatertoAirHP( HPNum ).InletWaterTemp, "System", "Average", WatertoAirHP( HPNum ).Name );
 				SetupOutputVariable( "Heating Coil Source Side Outlet Temperature [C]", WatertoAirHP( HPNum ).OutletWaterTemp, "System", "Average", WatertoAirHP( HPNum ).Name );
-
 			}
 
 		}
@@ -878,17 +923,19 @@ namespace WaterToAirHeatPump {
 		Real64 const CpWater( 4210.0 ); // Specific heat of water J/kg_C
 		Real64 const DegreeofSuperheat( 80.0 ); // Initial guess of degree of superheat
 		Real64 const gamma( 1.114 ); // Expansion Coefficient
-		Real64 const RelaxParam( 0.5 ); // Relaxation Parameter
 		Real64 const ERR( 0.01 ); // Error Value
 		Real64 const PB( 1.013e5 ); // Barometric Pressure (Pa)
 
-		int const STOP1( 100000 ); // Iteration stopper1
-		int const STOP2( 100000 ); // Iteration stopper2
-		int const STOP3( 100000 ); // Iteration stopper3
+		int const STOP1( 1000 ); // Iteration stopper1
+		int const STOP2( 1000 ); // Iteration stopper2
+		int const STOP3( 1000 ); // Iteration stopper3
 
 		static std::string const RoutineNameSourceSideInletTemp( "CalcWatertoAirHPCooling:SourceSideInletTemp" );
 		static std::string const RoutineNameSourceSideTemp( "CalcWatertoAirHPCooling:SourceSideTemp" );
 		static std::string const RoutineNameLoadSideTemp( "CalcWatertoAirHPCooling:LoadSideTemp" );
+		static std::string const RoutineNameLoadSideSurfaceTemp( "CalcWatertoAirHPCooling:LoadSideSurfaceTemp" );
+		static std::string const RoutineNameLoadSideEvapTemp( "CalcWatertoAirHPCooling:LoadSideEvapTemp" );
+		static std::string const RoutineNameLoadSideOutletEnthalpy( "CalcWatertoAirHPCooling:LoadSideOutletEnthalpy" );
 		static std::string const RoutineNameCompressInletTemp( "CalcWatertoAirHPCooling:CompressInletTemp" );
 		static std::string const RoutineNameSuctionPr( "CalcWatertoAirHPCooling:SuctionPr" );
 		static std::string const RoutineNameCompSuctionTemp( "CalcWatertoAirHPCooling:CompSuctionTemp");
@@ -991,7 +1038,7 @@ namespace WaterToAirHeatPump {
 		Real64 Twet_Rated; // Twet at rated conditions (coil air flow rate and air temperatures), sec
 		Real64 Gamma_Rated; // Gamma at rated conditions (coil air flow rate and air temperatures)
 		bool LatDegradModelSimFlag; // Latent degradation model simulation flag
-		bool FinalSimFlag; // Final Simulation Flag
+		bool StillSimulatingFlag; // Final Simulation Flag
 		bool Converged; // overall convergence Flag
 
 		Real64 QLatRated; // Qlatent at rated conditions of indoor(TDB,TWB)=(26.7C,19.4C)
@@ -1007,6 +1054,9 @@ namespace WaterToAirHeatPump {
 		Real64 LoadSideInletDBTemp_Unit; // calc conditions for unit
 		Real64 LoadSideInletHumRat_Unit; // calc conditions for unit
 		Real64 LoadSideAirInletEnth_Unit; // calc conditions for unit
+		Real64 LoadResidual; // loop convergence criteria
+		Real64 SourceResidual; // loop convergence criteria
+		Real64 RelaxParam( 0.5 ); // Relaxation Parameter
 
 		if ( firstTime ) {
 			//Set indoor air conditions to the rated condition
@@ -1054,7 +1104,7 @@ namespace WaterToAirHeatPump {
 		Twet_Rated = WatertoAirHP( HPNum ).Twet_Rated;
 		Gamma_Rated = WatertoAirHP( HPNum ).Gamma_Rated;
 
-		FinalSimFlag = false;
+		StillSimulatingFlag = true;
 
 		// If heat pump is not operating, return
 		if ( SensDemand == 0.0 || LoadSideMassFlowRate <= 0.0 || SourceSideMassFlowRate <= 0.0 ) {
@@ -1119,11 +1169,13 @@ namespace WaterToAirHeatPump {
 			//Outerloop: Calculate source side heat transfer
 			NumIteration2 = 0;
 			Converged = false;
-			FinalSimFlag = false;
-			while ( true ) {
-				if ( Converged ) FinalSimFlag = true;
+			StillSimulatingFlag = true;
+			SourceResidual = 1.0;
+			while ( StillSimulatingFlag ) {
+				if ( Converged ) StillSimulatingFlag = false;
 
 				++NumIteration2;
+				if ( NumIteration2 == 1 ) RelaxParam = 0.5;
 
 				if ( NumIteration2 > STOP2 ) {
 					WatertoAirHP( HPNum ).SimFlag = false;
@@ -1132,7 +1184,8 @@ namespace WaterToAirHeatPump {
 
 				//Innerloop: Calculate load side heat transfer
 				NumIteration3 = 0;
-				while ( true ) {
+				LoadResidual = 1.0;
+				while ( LoadResidual > ERR ) {
 
 					++NumIteration3;
 
@@ -1184,7 +1237,7 @@ namespace WaterToAirHeatPump {
 					//        END IF
 					//      END DO LOOP1
 
-					EffectiveSurfaceTemp = PsyTsatFnHPb( EffectiveSatEnth, PB );
+					EffectiveSurfaceTemp = PsyTsatFnHPb( EffectiveSatEnth, PB, RoutineNameLoadSideSurfaceTemp );
 
 					QSensible = LoadSideMassFlowRate * CpAir * ( LoadSideInletDBTemp - EffectiveSurfaceTemp ) * LoadSideEffec;
 					EvapSatEnth = LoadSideAirInletEnth - initialQLoadTotal / ( EffectWET * LoadSideMassFlowRate );
@@ -1213,7 +1266,7 @@ namespace WaterToAirHeatPump {
 					//        END IF
 					//      END DO LOOP2
 
-					EvapTemp = PsyTsatFnHPb( EvapSatEnth, PB );
+					EvapTemp = PsyTsatFnHPb( EvapSatEnth, PB, RoutineNameLoadSideEvapTemp );
 
 					// Load Side Saturated Temperature (Evaporating Temp in this case)
 					LoadSideTemp = EvapTemp;
@@ -1317,18 +1370,15 @@ namespace WaterToAirHeatPump {
 					} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
 						MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * ( DischargePr / SuctionPr );
 					}}
+					MassRef = max( 0.0, MassRef );
 
 					// Find the Load Side Heat Transfer
 					QLoadTotal = MassRef * ( LoadSideOutletEnth - SourceSideOutletEnth );
-
-					if ( std::abs( QLoadTotal - initialQLoadTotal ) / initialQLoadTotal < ERR ) {
-						goto LOOPLoadEnth_exit;
-					} else {
-						initialQLoadTotal += RelaxParam * ( QLoadTotal - initialQLoadTotal );
-					}
+					LoadResidual = std::abs( QLoadTotal - initialQLoadTotal ) / initialQLoadTotal;
+					initialQLoadTotal += RelaxParam * ( QLoadTotal - initialQLoadTotal );
+					if ( NumIteration3 > 8 ) RelaxParam = 0.3;
 
 				}
-				LOOPLoadEnth_exit: ;
 
 				// Determine the Power Consumption
 				{ auto const SELECT_CASE_var( CompressorType );
@@ -1342,16 +1392,12 @@ namespace WaterToAirHeatPump {
 
 				// Determine the Sourceside Heat Rate
 				QSource = Power + QLoadTotal;
+				SourceResidual = std::abs( QSource - initialQSource ) / initialQSource;
+				if ( SourceResidual < ERR ) Converged = true;
+				initialQSource += RelaxParam * ( QSource - initialQSource );
+				if ( NumIteration2 > 8 ) RelaxParam = 0.2;
 
-				if ( std::abs( QSource - initialQSource ) / initialQSource < ERR ) {
-					Converged = true;
-				} else {
-					initialQSource += RelaxParam * ( QSource - initialQSource );
-				}
-
-				if ( FinalSimFlag ) goto LOOPSourceEnth_exit;
 			}
-			LOOPSourceEnth_exit: ;
 
 			if ( SuctionPr < LowPressCutoff ) {
 				ShowWarningError( "Heat pump:cooling shut down on low pressure" );
@@ -1391,7 +1437,7 @@ namespace WaterToAirHeatPump {
 		//calculate coil outlet state variables
 		LoadSideAirOutletEnth = LoadSideAirInletEnth - QLoadTotal / LoadSideMassFlowRate;
 		LoadSideOutletDBTemp = LoadSideInletDBTemp - QSensible * LoadSideMassFlowRate_CpAir_inv;
-		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth );
+		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth, RoutineNameLoadSideOutletEnthalpy );
 		SourceSideOutletTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpWater );
 
 		// Actual outlet conditions are "average" for time step
@@ -1423,10 +1469,6 @@ namespace WaterToAirHeatPump {
 		WatertoAirHP( HPNum ).PartLoadRatio = PartLoadRatio;
 
 		//  Air-side outlet conditions are already calculated above
-		//  WatertoAirHP(HPNum)%OutletAirDBTemp=LoadSideOutletDBTemp
-		//  WatertoAirHP(HPNum)%OutletAirHumRat=LoadsideOutletHumRat
-		//  WatertoAirHP(HPNum)%OutletAirEnthalpy = LoadSideAirOutletEnth
-
 		WatertoAirHP( HPNum ).OutletAirMassFlowRate = LoadSideMassFlowRate;
 		WatertoAirHP( HPNum ).OutletWaterTemp = SourceSideOutletTemp;
 		WatertoAirHP( HPNum ).OutletWaterMassFlowRate = SourceSideMassFlowRate;
@@ -1541,15 +1583,16 @@ namespace WaterToAirHeatPump {
 		Real64 const CpWater( 4210.0 ); // Specific heat of water J/kg_C
 		Real64 const DegreeofSuperheat( 80.0 ); // Initial guess of degree of superheat
 		Real64 const gamma( 1.114 ); // Expnasion Coefficient
-		Real64 const RelaxParam( 0.5 ); // Relaxation Parameter
+		Real64 RelaxParam( 0.5 ); // Relaxation Parameter
 		Real64 const ERR( 0.01 ); // Error Value
-		int const STOP1( 10000 ); // Iteration stopper1
-		int const STOP2( 100000 ); // Iteration stopper2
-		int const STOP3( 100000 ); // Iteration stopper3
+		int const STOP1( 1000 ); // Iteration stopper1
+		int const STOP2( 1000 ); // Iteration stopper2
+		int const STOP3( 1000 ); // Iteration stopper3
 
 		static std::string const RoutineNameSourceSideInletTemp( "CalcWatertoAirHPHeating:SourceSideInletTemp" );
 		static std::string const RoutineNameSourceSideTemp( "CalcWatertoAirHPHeating:SourceSideTemp" );
 		static std::string const RoutineNameLoadSideTemp( "CalcWatertoAirHPHeating:LoadSideTemp" );
+		static std::string const RoutineNameLoadSideOutletEnthalpy( "CalcWatertoAirHPHeating:LoadSideOutletEnthalpy" );
 		static std::string const RoutineNameCompressInletTemp( "CalcWatertoAirHPHeating:CompressInletTemp" );
 		static std::string const RoutineNameSuctionPr( "CalcWatertoAirHPHeating:SuctionPr" );
 		static std::string const RoutineNameCompSuctionTemp( "CalcWatertoAirHPHeating:CompSuctionTemp");
@@ -1630,10 +1673,12 @@ namespace WaterToAirHeatPump {
 		Real64 CompSuctionEnth; // Enthalpy of the Refrigerant Entering the Compressor [J/kg]
 		Real64 CompSuctionDensity; // Density of the Refrigerant Entering the Compressorkg/m3
 		Real64 CompSuctionSatTemp; // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
-		bool FinalSimFlag; // Final Simulation Flag
+		bool StillSimulatingFlag; // Final Simulation Flag
 		bool Converged; // Overall convergence Flag
 		Array1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
 		int SolFlag; // Solution flag returned from RegulaFalsi function
+		Real64 LoadResidual; // loop convergence criteria
+		Real64 SourceResidual; // loop convergence criteria
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
 
@@ -1701,11 +1746,13 @@ namespace WaterToAirHeatPump {
 		//Outerloop: calculate load side heat transfer
 		NumIteration3 = 0;
 		Converged = false;
-		FinalSimFlag = false;
-		while ( true ) {
-			if ( Converged ) FinalSimFlag = true;
+		StillSimulatingFlag = true;
+		LoadResidual = 1.0;
+		while ( StillSimulatingFlag ) {
+			if ( Converged ) StillSimulatingFlag = false;
 
 			++NumIteration3;
+			if ( NumIteration3 == 1 ) RelaxParam = 0.5;
 
 			if ( NumIteration3 > STOP3 ) {
 				WatertoAirHP( HPNum ).SimFlag = false;
@@ -1714,7 +1761,8 @@ namespace WaterToAirHeatPump {
 
 			//Innerloop: calculate load side heat transfer
 			NumIteration2 = 0;
-			while ( true ) {
+			SourceResidual = 1.0;
+			while ( SourceResidual > ERR ) {
 
 				++NumIteration2;
 
@@ -1849,17 +1897,15 @@ namespace WaterToAirHeatPump {
 				} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
 					MassRef = RefVolFlowRate * CompSuctionDensity - LeakRateCoeff * ( DischargePr / SuctionPr );
 				}}
+				MassRef = max( 0.0, MassRef );
 
 				// Find the Source Side Heat Transfer
 				QSource = MassRef * ( SourceSideOutletEnth - LoadSideOutletEnth );
+				SourceResidual = std::abs( QSource - initialQSource ) / initialQSource;
+				initialQSource += RelaxParam * ( QSource - initialQSource );
+				if ( NumIteration2 > 8 ) RelaxParam = 0.3;
 
-				if ( std::abs( QSource - initialQSource ) / initialQSource < ERR ) {
-					goto LOOPSourceEnth_exit;
-				} else {
-					initialQSource += RelaxParam * ( QSource - initialQSource );
-				}
 			}
-			LOOPSourceEnth_exit: ;
 
 			// Determine the Power Consumption
 			{ auto const SELECT_CASE_var( CompressorType );
@@ -1873,16 +1919,12 @@ namespace WaterToAirHeatPump {
 
 			// Determine the Load Side Heat Rate
 			QLoadTotal = Power + QSource;
+			LoadResidual = std::abs( QLoadTotal - initialQLoad ) / initialQLoad;
+			if ( LoadResidual < ERR ) Converged = true;
+			initialQLoad += RelaxParam * ( QLoadTotal - initialQLoad );
+			if ( NumIteration3 > 8 ) RelaxParam = 0.2;
 
-			if ( std::abs( QLoadTotal - initialQLoad ) / initialQLoad < ERR ) {
-				Converged = true;
-			} else {
-				initialQLoad += RelaxParam * ( QLoadTotal - initialQLoad );
-			}
-
-			if ( FinalSimFlag ) goto LOOPLoadEnth_exit;
 		}
-		LOOPLoadEnth_exit: ;
 
 		if ( SuctionPr < LowPressCutoff && ! FirstHVACIteration ) {
 			ShowWarningError( "Heat pump:heating shut down on low pressure" );
@@ -1899,7 +1941,7 @@ namespace WaterToAirHeatPump {
 		//calculate coil outlet state variables
 		LoadSideAirOutletEnth = LoadSideAirInletEnth + QLoadTotal / LoadSideMassFlowRate;
 		LoadSideOutletDBTemp = LoadSideInletDBTemp + QLoadTotal / ( LoadSideMassFlowRate * CpAir );
-		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth );
+		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth, RoutineNameLoadSideOutletEnthalpy );
 		SourceSideOutletTemp = SourceSideInletTemp - QSource / ( SourceSideMassFlowRate * CpWater );
 
 		// Calculate actual outlet conditions for the run time fraction

@@ -1,5 +1,50 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -53,14 +98,9 @@ namespace Humidifiers {
 
 	// REFERENCES: ASHRAE HVAC 2 Toolkit, page 4-112
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
@@ -71,11 +111,8 @@ namespace Humidifiers {
 	using DataEnvironment::OutHumRat;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SetPointErrorFlag;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	int const Humidifier_Steam_Electric( 1 );
 	int const Humidifier_Steam_Gas( 2 );
@@ -84,8 +121,6 @@ namespace Humidifiers {
 
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
-
-	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumHumidifiers( 0 ); // number of humidifiers of all types
@@ -100,12 +135,8 @@ namespace Humidifiers {
 	int const FixedInletWaterTemperature( 1 );
 	int const VariableInletWaterTemperature( 2 );
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
 	// Object Data
 	Array1D< HumidifierData > Humidifier;
-
-	// Functions
 
 	// Clears the global data in Humidifiers.
 	// Needed for unit tests, should not be normally called.
@@ -456,8 +487,8 @@ namespace Humidifiers {
 				SetupOutputVariable( "Humidifier Electric Power [W]", Humidifier( HumNum ).ElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Electric Energy [J]", Humidifier( HumNum ).ElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
 			} else if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Gas ) {
-				SetupOutputVariable( "Humidifier Gas USe Thermal Efficiency []", Humidifier( HumNum ).ThermalEff, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Gas USe Rate [W]", Humidifier( HumNum ).GasUseRate, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Gas Use Thermal Efficiency []", Humidifier( HumNum ).ThermalEff, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Gas Use Rate [W]", Humidifier( HumNum ).GasUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Gas Use Energy [J]", Humidifier( HumNum ).GasUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "GAS", "HUMIDIFIER", _, "System" );
 				SetupOutputVariable( "Humidifier Auxiliary Electric Power [W]", Humidifier( HumNum ).AuxElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Auxiliary Electric Energy [J]", Humidifier( HumNum ).AuxElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
@@ -586,7 +617,7 @@ namespace Humidifiers {
 		// This subroutine is for for sizing electric steam humidifier nominal electric power.
 
 		// METHODOLOGY EMPLOYED:
-		// Uses user sepecified nominal capacity in m3/s and water enthalpy change required to
+		// Uses user specified nominal capacity in m3/s and water enthalpy change required to
 		// vaporize water from a reference temperature of 20.0C. to steam at 100.0C.
 		//  m_dot = Nominal Capacity [m3/s] * Density of water at 5.05 [kg/m3]
 		//  Nominal Capacity =  m_dot [kg/s] * delta_enthalpy [J/kg]
@@ -623,8 +654,8 @@ namespace Humidifiers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CalledFrom( "Humidifier:SizeHumidifier" );
-		Real64 const Tref( 20.0 ); // Reference temp of water for rated capacity calac [C]
-		Real64 const TSteam( 100.0 ); // saturated steam temperatur generated by Humidifier [C]
+		Real64 const Tref( 20.0 ); // Reference temp of water for rated capacity calcs [C]
+		Real64 const TSteam( 100.0 ); // saturated steam temperature generated by Humidifier [C]
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -634,7 +665,7 @@ namespace Humidifiers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string ModuleObjectType; // for ease in getting objects
-		int RefrigerantIndex; // refiferant index
+		int RefrigerantIndex; // refrigerant index
 		int WaterIndex; // fluid type index
 		Real64 NominalPower; // Nominal power input to humidifier, W
 		Real64 WaterSpecHeatAvg; // specific heat of water, J/kgK
@@ -737,7 +768,7 @@ namespace Humidifiers {
 			}
 
 			if ( !HardSizeNoDesRun ) {
-				NomCapVolDes = MassFlowDes * ( OutletHumRatDes - InletHumRatDes ) / RhoH2O( InitConvTemp );
+				NomCapVolDes = MassFlowDes * ( OutletHumRatDes - InletHumRatDes ) / RhoH2O( DataGlobals::InitConvTemp );
 				if ( NomCapVolDes < 0.0 ) NomCapVolDes = 0.0;	// No humidity demand
 
 				if ( IsAutoSize ) {
@@ -760,7 +791,7 @@ namespace Humidifiers {
 				}
 			}
 
-			NomCap = RhoH2O( InitConvTemp ) * NomCapVol;
+			NomCap = RhoH2O( DataGlobals::InitConvTemp ) * NomCapVol;
 			RefrigerantIndex = FindRefrigerant( fluidNameSteam );
 			WaterIndex = FindGlycol( fluidNameWater );
 			SteamSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom );
@@ -944,7 +975,7 @@ namespace Humidifiers {
 		HumRatSatOut = 0.0;
 		HumRatSatApp = 0.0;
 		WaterInEnthalpy = 2676125.0; // At 100 C
-		WaterDens = RhoH2O( InitConvTemp );
+		WaterDens = RhoH2O( DataGlobals::InitConvTemp );
 		WaterAddNeededMax = min( WaterAddNeeded, NomCap );
 		if ( WaterAddNeededMax > 0.0 ) {
 			//   ma*W1 + mw = ma*W2
@@ -1042,7 +1073,7 @@ namespace Humidifiers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcGasSteamHumidifier" );
-		Real64 const TSteam( 100.0 ); // saturated steam temperatur generated by Humidifier [C]
+		Real64 const TSteam( 100.0 ); // saturated steam temperature generated by Humidifier [C]
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1073,7 +1104,7 @@ namespace Humidifiers {
 		HumRatSatOut = 0.0;
 		HumRatSatApp = 0.0;
 		WaterInEnthalpy = 2676125.0; // At 100 C
-		WaterDens = RhoH2O( InitConvTemp );
+		WaterDens = RhoH2O( DataGlobals::InitConvTemp );
 		WaterAddNeededMax = min( WaterAddNeeded, NomCap );
 		if ( WaterAddNeededMax > 0.0 ) {
 			//   ma*W1 + mw = ma*W2
@@ -1122,9 +1153,9 @@ namespace Humidifiers {
 			if ( InletWaterTempOption == FixedInletWaterTemperature ) {
 				GasUseRateAtRatedEff = ( WaterAdd / NomCap ) * NomPower;
 			} else if ( InletWaterTempOption == VariableInletWaterTemperature ) {
-				if ( SuppliedByWaterSystem ) { // use water use storage tank supply temperaure
+				if ( SuppliedByWaterSystem ) { // use water use storage tank supply temperature
 					 CurMakeupWaterTemp = WaterStorage( WaterTankID ).TwaterSupply( TankSupplyID );
-				} else { // use water main temperaure
+				} else { // use water main temperature
 					 CurMakeupWaterTemp = WaterMainsTemp;
 				}
 				Tref = CurMakeupWaterTemp;
@@ -1322,29 +1353,6 @@ namespace Humidifiers {
 		GasUseEnergy = GasUseRate * TimeStepSys * SecInHour;
 		AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * SecInHour;
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Humidifiers
 

@@ -1,8 +1,53 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -19,6 +64,7 @@
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 #include <WaterCoils.hh>
 
 namespace EnergyPlus {
@@ -371,6 +417,22 @@ namespace HVACHXAssistedCoolingCoil {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ErrorsFound = true;
 				}
+			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = CurrentModuleObject;
+				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
+				CoolingCoilErrFlag = false;
+				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed( AlphArray( 4 ), AlphArray( 5 ), CoolingCoilErrFlag );
+
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ErrorsFound = true;
+				}
+				HXAssistedCoil( HXAssistedCoilNum ).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ErrorsFound = true;
+				}
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				ShowContinueError( "Invalid " + cAlphaFields( 4 ) + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "\"" );
@@ -432,6 +494,36 @@ namespace HVACHXAssistedCoolingCoil {
 					ErrorsFound = true;
 				}
 
+			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+				//         Check node names in heat exchanger and coil objects for consistency
+				CoolingCoilErrFlag = false;
+				CoolingCoilInletNodeNum = VariableSpeedCoils::GetCoilInletNodeVariableSpeed( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+				}
+				if ( SupplyAirOutletNode != CoolingCoilInletNodeNum ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ShowContinueError( "Node names are inconsistent in heat exchanger and cooling coil object." );
+					ShowContinueError( "The supply air outlet node name in heat exchanger = " + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName + "\"" );
+					ShowContinueError( "must match the cooling coil inlet node name in = " + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName + "\"" );
+					ShowContinueError( "Heat exchanger supply air outlet node name=\"" + NodeID( SupplyAirOutletNode ) + "\"" );
+					ShowContinueError( "Cooling coil air inlet node name=\"" + NodeID( CoolingCoilInletNodeNum ) + "\"" );
+					ErrorsFound = true;
+				}
+				CoolingCoilErrFlag = false;
+				CoolingCoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+				}
+				if ( SecondaryAirInletNode != CoolingCoilOutletNodeNum ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ShowContinueError( "Node names are inconsistent in heat exchanger and cooling coil object." );
+					ShowContinueError( "The secondary air inlet node name in heat exchanger =" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName + "\"" );
+					ShowContinueError( "must match the cooling coil air outlet node name in = " + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName + "\"." );
+					ShowContinueError( "Heat exchanger secondary air inlet node name =\"" + NodeID( SecondaryAirInletNode ) + "\"." );
+					ShowContinueError( "Cooling coil air outlet node name =\"" + NodeID( CoolingCoilOutletNodeNum ) + "\"." );
+					ErrorsFound = true;
+				}
 			}
 
 			TestCompSet( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeID( SupplyAirInletNode ), NodeID( SecondaryAirOutletNode ), "Air Nodes" );
@@ -626,6 +718,9 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 			DXCoilFullLoadOutAirTemp( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 			DXCoilFullLoadOutAirHumRat( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
+		} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+			// 
+		
 		}
 
 	}
@@ -699,7 +794,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
 		Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).MassFlowRate = AirMassFlow;
 
-		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
+		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
 			CompanionCoilIndexNum = HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex;
 		} else {
 			CompanionCoilIndexNum = 0;
@@ -719,10 +814,18 @@ namespace HVACHXAssistedCoolingCoil {
 		// Force at least 2 iterations to pass outlet node information
 		while ( ( std::abs( Error ) > 0.0005 && Iter <= MaxIter ) || Iter < 2 ) {
 
-			SimHeatRecovery( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerIndex, FanOpMode, PartLoadRatio, HXUnitOn, CompanionCoilIndexNum, _, EconomizerFlag );
+			SimHeatRecovery( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerIndex, FanOpMode, PartLoadRatio, HXUnitOn, CompanionCoilIndexNum, _, EconomizerFlag, _, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num );
 
 			if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 				SimDXCoil( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CompOp, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex, FanOpMode, PartLoadRatio, OnOffAirFlow );
+			} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+				Real64 QZnReq( -1.0 ); // Zone load (W), input to variable-speed DX coil
+				Real64 QLatReq( 0.0 ); // Zone latent load, input to variable-speed DX coil
+				Real64 MaxONOFFCyclesperHour( 4.0 ); // Maximum cycling rate of heat pump [cycles/hr]
+				Real64 HPTimeConstant( 0.0 ); // Heat pump time constant [s]
+				Real64 FanDelayTime( 0.0 ); // Fan delay time, time delay for the HP's fan to
+				Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
+				VariableSpeedCoils::SimVariableSpeedCoils( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex, CompOp, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadRatio, HXAssistedCoil( HXAssistedCoilNum ).DXCoilNumOfSpeeds, QZnReq, QLatReq, OnOffAirFlowRatio ); // call vs coil model at top speed.
 			} else {
 				SimulateWaterCoilComponents( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex );
 			}
@@ -966,7 +1069,12 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 			if ( WhichCoil != 0 ) {
 				// coil does not have capacity in input so mine information from DX cooling coil
-				CoilCapacity = GetDXCoilCapacity( HXAssistedCoil( WhichCoil ).CoolingCoilType, HXAssistedCoil( WhichCoil ).CoolingCoilName, errFlag );
+
+				if ( HXAssistedCoil( WhichCoil ).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) {
+					CoilCapacity = GetDXCoilCapacity( HXAssistedCoil( WhichCoil ).CoolingCoilType, HXAssistedCoil( WhichCoil ).CoolingCoilName, errFlag );
+				} else if ( HXAssistedCoil( WhichCoil ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+					CoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed( HXAssistedCoil( WhichCoil ).CoolingCoilType, HXAssistedCoil( WhichCoil ).CoolingCoilName, errFlag );
+				}
 				if ( errFlag ) {
 					ShowRecurringWarningErrorAtEnd( "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount );
 				}
@@ -1976,31 +2084,6 @@ namespace HVACHXAssistedCoolingCoil {
 
 	//        End of Utility subroutines for the HXAssistedCoil Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACHXAssistedCoolingCoil
 

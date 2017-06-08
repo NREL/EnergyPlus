@@ -1,0 +1,34 @@
+\section{HVAC Sizing Simulation Manager}\label{hvac-sizing-simulation-manager}
+
+After the Sizing Manager has completed its initial pass, all the data needed to complete a running model should be available and the program is ready to run the main simulation(s). However, as of Version 8.3 there is now an option of applying some advanced sizing calculations using what are called HVAC Sizing Simulations.
+
+With this new sizing method we distinguish between different kinds of simulations and introduce some new terminology. The Primary Simulations are the main simulations that are the final version of the model to be run. Prior to Version 8.3, these are just the usual simulations with the final results. When the program is running the zone heat balance model over the sizing periods for zone sizing (for step 3 in the Sizing Manager description above), we call those Ideal Loads Sizing Simulations. When the program is running the zone heat balance model over the sizing periods for component loads calculations we call those Ideal Component Loads Simulations. HVAC Sizing Simulations are a kind of simulation, where the program creates copies of sizing periods and runs them as complete EnergyPlus simulations with the most current equipment sizes and full HVAC systems. The advanced sizing algorithms monitor what occurred during those sizing periods and determines if new size results are needed and signals systems and components to repeat their sizing calculations. The process can repeat in an iterative manner and a Sizing Pass refers to a set of the HVAC Sizing Simulations for each of the sizing periods (e.g.~two design days).
+
+If the user has selected a sizing option that requires HVAC Sizing Simulations the main ManageSimulation will call ManageHVACSizingSimulation before going on to the main simulations.
+
+\begin{itemize}
+\item
+  Instantiate a new HVACSizingSimulationManager object.
+\item
+  Call DetermineSizingAnalysesNeeded(). This checks what user input and decides what, if anything, needs to be done for advanced sizing algorithms. This involves, for example, checking the input in Sizing:Plant object to see if coincident sizing option has been selected.
+\item
+  Call SetupSizingAnalyses(). This method creates the data logging apparatus needed to monitor operation during HVAC Sizing Simulations. Individual sizing algorithms include selecting specific variables, such as system node states or load output variables, that will be recorded.
+\item
+  Loop over some number of Sizing Passes. The set of sizing periods, run as HVAC Sizing Simulations, can iterate up to a maximum limit on the number of passes
+  \begin{itemize}
+  \item
+    Loop over all the sizing periods by each day. This runs the HVAC Sizing Simulations which have basically the same set of calls as are used for marching through time and calling of EnergyPlus modeling for the Primary Simulations (in ManageSimulation).
+  \item
+    Call PostProcessLogs(). This method applies running averages (if desired) and averages system timestep data to fill zone timestep data in the records.
+  \item
+    Call ProcessCoincidentPlantSizeAdjustments(). This method retrieves data from the logs and calls for the coincident plant sizing algorithm to execute. Set flag if the sizing analyses request another Sizing Pass. (See the section below on Coincident Plant Sizing.)
+  \item
+    Call RedoKickOffAndResize(). The methods calls SetupSimulation() and sets flag to signal that system and component level sizing methods need to be called again. These are fake timesteps used to initialize and are not part of a Simulation.
+  \item
+    Break out of Sizing Pass loop if size results did not change or the limit on Sizing Passes has been reached.
+  \end{itemize}
+\item
+  Empty HVACSizingSimulationManager object to free memory
+\end{itemize}
+
+Currently the only application for HVAC Sizing Simulations is to improve the sizing of plant loops using the Coincident sizing option. However this approach may be expanded in the future to extend advanced sizing methods to air-side equipment.

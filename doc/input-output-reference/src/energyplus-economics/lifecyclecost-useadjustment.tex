@@ -1,0 +1,77 @@
+\section{LifeCycleCost:UseAdjustment}\label{lifecyclecostuseadjustment}
+
+Used by advanced users to adjust the energy or water use costs for future years. This should not be used for compensating for inflation but should only be used to increase the costs of energy or water based on assumed changes to the actual use of water or energy, such as due to changes in the future function of the building or the impact of future adjacent buildings on energy use. This object is not commonly used and should be used with caution. The adjustments begin at the start of the service period.
+
+\subsection{Inputs}\label{inputs-060}
+
+\paragraph{Field: Name}\label{field-name-058}
+
+The identifier used for the object.
+
+\paragraph{Field: Resource}\label{field-resource}
+
+Enter the resource such as:
+
+\begin{itemize}
+\item
+  Electricity
+\item
+  NaturalGas
+\item
+  Steam
+\item
+  Gasoline
+\item
+  Diesel
+\item
+  Coal
+\item
+  FuelOil \#1
+\item
+  FuelOil \#2
+\item
+  Propane
+\item
+  Water
+\end{itemize}
+
+\paragraph{Field: Year 1 multiplier}\label{field-year-1-multiplier}
+
+The multiplier to be applied to the end use cost for the first year in the service period. The total utility costs for the selected end use is multiplied by this value. For no change enter 1.0.
+
+\paragraph{Field: Year N multiplier}\label{field-year-n-multiplier}
+
+The multiplier to be applied to the end use cost for each following year. The total utility costs for the selected end use is multiplied by this value. For no change enter 1.0.~ This object is extensible and often includes 25 to 50 years of values.
+
+An example of this object in an IDF:
+
+\begin{lstlisting}
+LifeCycleCost:UseAdjustment,
+  ElecAdjustment,       !- Name
+  Electricity,          !- Resource
+  1.0000,               !- Year 1 Multiplier
+  1.0022,               !- Year 2 Multiplier
+  1.0023,               !- Year 3 Multiplier
+  1.0024,               !- Year 4 Multiplier
+  1.0025,               !- Year 5 Multiplier
+  1.0026,               !- Year 6 Multiplier
+  1.0027;               !- Year 7 Multiplier
+\end{lstlisting}
+
+\subsubsection{CurrencyType}\label{currencytype}
+
+By default, the predefined reports related to economics use the \$ symbol. If a different symbol should be shown in the predefined reports to represent the local currency this object can be used. If the object is not used, the \$ sign is used in the reports. Only one CurrencyType object is allowed in the input file.
+
+\paragraph{Field: Monetary Unit}\label{field-monetary-unit}
+
+The commonly used three letter currency code for the units of money for the country or region. Based on ISO 4217 currency codes. Common currency codes are USD for the U.S. Dollar represented with `\$' and EUR for Euros represented with `€'. The three letter currency codes can be seen at the following web sites (as of 2008):
+
+\url{http://www.iso.org/iso/support/faqs/faqs_widely_used_standards/widely_used_standards_other/currency_codes/currency_codes_list-1.htm}
+
+\url{http://www.xe.com/symbols.php}
+
+When a three letter currency code is specified, the HTML file will use either an ASCII character if available or one or more UNICODE characters. Since not all browsers and all fonts used by browsers completely support UNICODE, not all currency symbols may be rendered correctly. If a box or a box with four small letters appears, this indicates that the browser and its fonts do not support a specific UNICODE character.
+
+For text reports, an ASCII representation of the currency code will be used. Since ASCII is much more limited than UNICODE, many times the three letter currency code will be shown in the reports.
+
+Since forms of currency change, please contact EnergyPlus support if a new currency code and symbol are needed.

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -29,7 +75,6 @@
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
-#include <ManageElectricPower.hh>
 #include <MicroCHPElectricGenerator.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -46,6 +91,8 @@
 #include <NodeInputManager.hh>
 #include <CurveManager.hh>
 #include <DataHVACGlobals.hh>
+#include <ElectricPowerServiceManager.hh>
+#include <ExteriorEnergyUse.hh>
 
 namespace EnergyPlus {
 
@@ -93,6 +140,7 @@ namespace InternalHeatGains {
 	int const ITEInletRoomAirModel( 2 );
 
 	bool GetInternalHeatGainsInputFlag( true ); // Controls the GET routine calling (limited to first time)
+	bool ErrorsFound( false ); // if errors were found in the input
 
 	static std::string const BlankString;
 
@@ -110,6 +158,7 @@ namespace InternalHeatGains {
 	clear_state()
 	{
 		GetInternalHeatGainsInputFlag = true;
+		ErrorsFound = false;
 	}
 
 	void
@@ -216,15 +265,10 @@ namespace InternalHeatGains {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
 		static std::string const RoutineName( "GetInternalHeatGains: " );
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		int const noOtherFuelTypeZero = 0;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string AlphaName;
-		static bool ErrorsFound( false ); // If errors found in input
 		bool IsNotOK; // Flag to verify name
 		Array1D< Real64 > IHGNumbers;
 		int IOStat;
@@ -265,10 +309,10 @@ namespace InternalHeatGains {
 		int Item1;
 
 		// Formats
-		static gio::Fmt Format_720( "(' Zone Internal Gains, ',A,',',A,',',A,',')" );
-		static gio::Fmt Format_721( "('! <Zone Internal Gains/Equipment Information - Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant {m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard Heat')" );
-		static gio::Fmt Format_722( "(' ',A,' Internal Gains, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt Format_723( "('! <',A,' Internal Gains - Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)" );
+		static gio::Fmt Format_720( "(' Zone Internal Gains Nominal, ',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <Zone Internal Gains Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant {m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard Heat')" );
+		static gio::Fmt Format_722( "(' ',A,' Internal Gains Nominal, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_723( "('! <',A,' Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)" );
 		static gio::Fmt Format_724( "(' ',A,', ',A)" );
 
 		// FLOW:
@@ -407,7 +451,7 @@ namespace InternalHeatGains {
 						People( Loop ).Name = AlphaName( 1 );
 						People( Loop ).ZonePtr = PeopleObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, PeopleObjects( Item ).Name, People.Name(), Loop - 1, People( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, PeopleObjects( Item ).Name, People, Loop - 1, People( Loop ).Name, errFlag );
 						People( Loop ).ZonePtr = ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -638,12 +682,12 @@ namespace InternalHeatGains {
 							} else if ( mrtType == "SURFACEWEIGHTED" ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
 								People( Loop ).SurfacePtr = FindItemInList( AlphaName( 8 ), Surface );
-								if ( People( Loop ).SurfacePtr == 0 ) {
+								if ( People( Loop ).SurfacePtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									if ( Item1 == 1 ) {
 										ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) + " invalid Surface Name=" + AlphaName( 8 ) );
 										ErrorsFound = true;
 									}
-								} else if ( Surface( People( Loop ).SurfacePtr ).Zone != People( Loop ).ZonePtr ) {
+								} else if ( Surface( People( Loop ).SurfacePtr ).Zone != People( Loop ).ZonePtr && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Surface referenced in " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 8 ) + " in different zone." );
 									ShowContinueError( "Surface is in Zone=" + Zone( Surface( People( Loop ).SurfacePtr ).Zone ).Name + " and " + CurrentModuleObject + " is in Zone=" + AlphaName( 2 ) );
 									ErrorsFound = true;
@@ -654,10 +698,10 @@ namespace InternalHeatGains {
 								People( Loop ).AngleFactorListName = AlphaName( 8 );
 
 							} else if ( mrtType == "" ) { // Blank input field--just ignore this
-								if ( MustInpSch && Item1 == 1 ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
+								if ( MustInpSch && Item1 == 1 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
 
 							} else { // An invalid keyword was entered--warn but ignore
-								if ( MustInpSch && Item1 == 1 ) {
+								if ( MustInpSch && Item1 == 1 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) );
 									ShowContinueError( "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\"." );
 								}
@@ -696,7 +740,7 @@ namespace InternalHeatGains {
 										}
 									}
 								}
-							} else if ( MustInpSch ) {
+							} else if ( MustInpSch && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 								if ( Item1 == 1 ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 9 ) + " is required for this item." );
 									ErrorsFound = true;
@@ -708,7 +752,7 @@ namespace InternalHeatGains {
 								if ( clothingType == "CLOTHINGINSULATIONSCHEDULE" ) {
 									People( Loop ).ClothingType = 1;
 									People( Loop ).ClothingPtr = GetScheduleIndex( AlphaName( 12 ) );
-									if ( People( Loop ).ClothingPtr == 0 ) {
+									if ( People( Loop ).ClothingPtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 										if ( Item1 == 1 ) {
 											ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 12 ) + " entered=" + AlphaName( 12 ) );
 											ErrorsFound = true;
@@ -796,7 +840,7 @@ namespace InternalHeatGains {
 										}
 									}
 								}
-							} else if ( MustInpSch ) {
+							} else if ( MustInpSch && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 								if ( Item1 == 1 ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 13 ) + " is required for this item." );
 									ErrorsFound = true;
@@ -955,7 +999,7 @@ namespace InternalHeatGains {
 						Lights( Loop ).Name = AlphaName( 1 );
 						Lights( Loop ).ZonePtr = LightsObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, LightsObjects( Item ).Name, Lights.Name(), Loop - 1, Lights( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, LightsObjects( Item ).Name, Lights, Loop - 1, Lights( Loop ).Name, errFlag );
 						Lights( Loop ).ZonePtr = ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1222,7 +1266,7 @@ namespace InternalHeatGains {
 						ZoneElectric( Loop ).Name = AlphaName( 1 );
 						ZoneElectric( Loop ).ZonePtr = ZoneElectricObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneElectricObjects( Item ).Name, ZoneElectric.Name(), Loop - 1, ZoneElectric( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneElectricObjects( Item ).Name, ZoneElectric, Loop - 1, ZoneElectric( Loop ).Name, errFlag );
 						ZoneElectric( Loop ).ZonePtr = ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1432,7 +1476,7 @@ namespace InternalHeatGains {
 						ZoneGas( Loop ).Name = AlphaName( 1 );
 						ZoneGas( Loop ).ZonePtr = ZoneGasObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneGasObjects( Item ).Name, ZoneGas.Name(), Loop - 1, ZoneGas( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneGasObjects( Item ).Name, ZoneGas, Loop - 1, ZoneGas( Loop ).Name, errFlag );
 						ZoneGas( Loop ).ZonePtr = ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1663,7 +1707,7 @@ namespace InternalHeatGains {
 						ZoneHWEq( Loop ).Name = AlphaName( 1 );
 						ZoneHWEq( Loop ).ZonePtr = HotWaterEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, HotWaterEqObjects( Item ).Name, ZoneHWEq.Name(), Loop - 1, ZoneHWEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, HotWaterEqObjects( Item ).Name, ZoneHWEq, Loop - 1, ZoneHWEq( Loop ).Name, errFlag );
 						ZoneHWEq( Loop ).ZonePtr = ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1873,7 +1917,7 @@ namespace InternalHeatGains {
 						ZoneSteamEq( Loop ).Name = AlphaName( 1 );
 						ZoneSteamEq( Loop ).ZonePtr = SteamEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, SteamEqObjects( Item ).Name, ZoneSteamEq.Name(), Loop - 1, ZoneSteamEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, SteamEqObjects( Item ).Name, ZoneSteamEq, Loop - 1, ZoneSteamEq( Loop ).Name, errFlag );
 						ZoneSteamEq( Loop ).ZonePtr = ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -2039,9 +2083,9 @@ namespace InternalHeatGains {
 			}
 			OtherEqObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = FindItemInList( AlphaName( 2 ), Zone );
+			Item1 = FindItemInList( AlphaName( 3 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 3 ), ZoneList );
 			if ( Item1 > 0 ) {
 				OtherEqObjects( Item ).StartPtr = TotOthEquip + 1;
 				++TotOthEquip;
@@ -2055,7 +2099,7 @@ namespace InternalHeatGains {
 				OtherEqObjects( Item ).ZoneListActive = true;
 				OtherEqObjects( Item ).ZoneOrZoneListPtr = ZLItem;
 			} else {
-				ShowSevereError( CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphaName( 2 ) + "\" not found." );
+				ShowSevereError( CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + AlphaName( 3 ) + "\" not found." );
 				ErrorsFound = true;
 				errFlag = true;
 			}
@@ -2083,19 +2127,31 @@ namespace InternalHeatGains {
 						ZoneOtherEq( Loop ).Name = AlphaName( 1 );
 						ZoneOtherEq( Loop ).ZonePtr = OtherEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, OtherEqObjects( Item ).Name, ZoneOtherEq.Name(), Loop - 1, ZoneOtherEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, OtherEqObjects( Item ).Name, ZoneOtherEq, Loop - 1, ZoneOtherEq( Loop ).Name, errFlag );
 						ZoneOtherEq( Loop ).ZonePtr = ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
 
-					ZoneOtherEq( Loop ).SchedPtr = GetScheduleIndex( AlphaName( 3 ) );
+					std::string FuelTypeString( "" );
+					if ( AlphaName( 2 ) == "NONE" ) {
+						ZoneOtherEq( Loop ).OtherEquipFuelType = noOtherFuelTypeZero;
+						FuelTypeString = AlphaName( 2 );
+					} else {
+						ExteriorEnergyUse::ValidateFuelType( ZoneOtherEq( Loop ).OtherEquipFuelType, AlphaName( 2 ), FuelTypeString, CurrentModuleObject, cAlphaFieldNames( 2 ), AlphaName( 2 ) );
+						if ( ZoneOtherEq( Loop ).OtherEquipFuelType == noOtherFuelTypeZero || ZoneOtherEq( Loop ).OtherEquipFuelType == ExteriorEnergyUse::WaterUse ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + AlphaName( 1 ) );
+							ErrorsFound = true;
+						}
+					}
+
+					ZoneOtherEq( Loop ).SchedPtr = GetScheduleIndex( AlphaName( 4 ) );
 					SchMin = 0.0;
 					SchMax = 0.0;
 					if ( ZoneOtherEq( Loop ).SchedPtr == 0 ) {
-						if ( lAlphaFieldBlanks( 3 ) ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 3 ) + " is required." );
+						if ( lAlphaFieldBlanks( 4 ) ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 4 ) + " is required." );
 						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + " entered=" + AlphaName( 3 ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + " entered=" + AlphaName( 4 ) );
 						}
 						ErrorsFound = true;
 					} else { // check min/max on schedule
@@ -2103,43 +2159,54 @@ namespace InternalHeatGains {
 						SchMax = GetScheduleMaxValue( ZoneOtherEq( Loop ).SchedPtr );
 					}
 
-					// Hot Water equipment design level calculation method.
-					{ auto const equipmentLevel( AlphaName( 4 ) );
+					// equipment design level calculation method.
+					unsigned int DesignLevelFieldNumber;
+					{ auto const equipmentLevel( AlphaName( 5 ) );
 					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
-						ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 1 );
-						if ( lNumericFieldBlanks( 1 ) ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
+						DesignLevelFieldNumber = 1;
+						ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( DesignLevelFieldNumber );
+						if ( lNumericFieldBlanks( DesignLevelFieldNumber ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but that field is blank.  0 Other Equipment will result." );
 						}
 
 					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
+						DesignLevelFieldNumber = 2;
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
-							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea;
+							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( DesignLevelFieldNumber ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea <= 0.0 ) {
-								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but Zone Floor Area = 0.  0 Hot Water Equipment will result." );
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but Zone Floor Area = 0.  0 Other Equipment will result." );
 							}
 						}
-						if ( lNumericFieldBlanks( 2 ) ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
+						if ( lNumericFieldBlanks( DesignLevelFieldNumber ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but that field is blank.  0 Other Equipment will result." );
 						}
 
 					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
+						DesignLevelFieldNumber = 3;
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
 							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants <= 0.0 ) {
-								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but Total Occupants = 0.  0 Hot Water Equipment will result." );
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but Total Occupants = 0.  0 Other Equipment will result." );
 							}
 						}
-						if ( lNumericFieldBlanks( 3 ) ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 3 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
+						if ( lNumericFieldBlanks( DesignLevelFieldNumber ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( DesignLevelFieldNumber ) + ", but that field is blank.  0 Other Equipment will result." );
 						}
 
 					} else {
 						if ( Item1 == 1 ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + ", value  =" + AlphaName( 4 ) );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 5 ) + ", value  =" + AlphaName( 5 ) );
 							ShowContinueError( "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\"." );
 							ErrorsFound = true;
 						}
 					}}
+
+					// Throw an error if the design level is negative and we have a fuel type
+					if ( ZoneOtherEq( Loop ).DesignLevel < 0.0 && ZoneOtherEq( Loop ).OtherEquipFuelType != noOtherFuelTypeZero ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cNumericFieldNames( DesignLevelFieldNumber ) + " is not allowed to be negative" );
+						ShowContinueError( "... when a fuel type of " + FuelTypeString + " is specified." );
+						ErrorsFound = true;
+					}
 
 					// Calculate nominal min/max equipment level
 					ZoneOtherEq( Loop ).NomMinDesignLevel = ZoneOtherEq( Loop ).DesignLevel * SchMin;
@@ -2148,6 +2215,19 @@ namespace InternalHeatGains {
 					ZoneOtherEq( Loop ).FractionLatent = IHGNumbers( 4 );
 					ZoneOtherEq( Loop ).FractionRadiant = IHGNumbers( 5 );
 					ZoneOtherEq( Loop ).FractionLost = IHGNumbers( 6 );
+
+					if ( ( NumNumber == 7 ) || ( ! lNumericFieldBlanks( 7 ) ) ) {
+						ZoneOtherEq( Loop ).CO2RateFactor = IHGNumbers( 7 );
+					}
+					if ( ZoneOtherEq( Loop ).CO2RateFactor < 0.0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cNumericFieldNames( 7 ) + " < 0.0, value =" + RoundSigDigits( IHGNumbers( 7 ), 2 ) );
+						ErrorsFound = true;
+					}
+					if ( ZoneOtherEq( Loop ).CO2RateFactor > 4.0e-7 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cNumericFieldNames( 7 ) + " > 4.0E-7, value =" + RoundSigDigits( IHGNumbers( 7 ), 2 ) );
+						ErrorsFound = true;
+					}
+
 					// FractionConvected is a calculated field
 					ZoneOtherEq( Loop ).FractionConvected = 1.0 - ( ZoneOtherEq( Loop ).FractionLatent + ZoneOtherEq( Loop ).FractionRadiant + ZoneOtherEq( Loop ).FractionLost );
 					if ( std::abs( ZoneOtherEq( Loop ).FractionConvected ) <= 0.001 ) ZoneOtherEq( Loop ).FractionConvected = 0.0;
@@ -2156,8 +2236,8 @@ namespace InternalHeatGains {
 						ErrorsFound = true;
 					}
 
-					if ( NumAlpha > 4 ) {
-						ZoneOtherEq( Loop ).EndUseSubcategory = AlphaName( 5 );
+					if ( NumAlpha > 5 ) {
+						ZoneOtherEq( Loop ).EndUseSubcategory = AlphaName( 6 );
 					} else {
 						ZoneOtherEq( Loop ).EndUseSubcategory = "General";
 					}
@@ -2165,6 +2245,11 @@ namespace InternalHeatGains {
 					if ( ZoneOtherEq( Loop ).ZonePtr <= 0 ) continue; // Error, will be caught and terminated later
 
 					// Object report variables
+					if ( ZoneOtherEq( Loop ).OtherEquipFuelType > noOtherFuelTypeZero ) {
+						SetupOutputVariable( "Other Equipment " + FuelTypeString + " Rate [W]", ZoneOtherEq( Loop ).Power, "Zone", "Average", ZoneOtherEq( Loop ).Name );
+						SetupOutputVariable( "Other Equipment " + FuelTypeString + " Energy [J]", ZoneOtherEq( Loop ).Consumption, "Zone", "Sum", ZoneOtherEq( Loop ).Name, _, FuelTypeString, "InteriorEquipment", ZoneOtherEq( Loop ).EndUseSubcategory, "Building", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name, Zone( ZoneOtherEq( Loop ).ZonePtr ).Multiplier, Zone( ZoneOtherEq( Loop ).ZonePtr ).ListMultiplier );
+					}
+
 					SetupOutputVariable( "Other Equipment Radiant Heating Energy [J]", ZoneOtherEq( Loop ).RadGainEnergy, "Zone", "Sum", ZoneOtherEq( Loop ).Name );
 					SetupOutputVariable( "Other Equipment Radiant Heating Rate [W]", ZoneOtherEq( Loop ).RadGainRate, "Zone", "Average", ZoneOtherEq( Loop ).Name );
 					SetupOutputVariable( "Other Equipment Convective Heating Energy [J]", ZoneOtherEq( Loop ).ConGainEnergy, "Zone", "Sum", ZoneOtherEq( Loop ).Name );
@@ -2179,6 +2264,12 @@ namespace InternalHeatGains {
 					// Zone total report variables
 					if ( RepVarSet( ZoneOtherEq( Loop ).ZonePtr ) ) {
 						RepVarSet( ZoneOtherEq( Loop ).ZonePtr ) = false;
+
+						if ( ZoneOtherEq( Loop ).OtherEquipFuelType > noOtherFuelTypeZero ) {
+							SetupOutputVariable( "Zone Other Equipment " + FuelTypeString + " Rate [W]", ZnRpt( ZoneOtherEq( Loop ).ZonePtr ).OtherPower, "Zone", "Average", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Other Equipment " + FuelTypeString + " Energy [J]", ZnRpt( ZoneOtherEq( Loop ).ZonePtr ).OtherConsump, "Zone", "Sum", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name );
+						}
+
 						SetupOutputVariable( "Zone Other Equipment Radiant Heating Energy [J]", ZnRpt( ZoneOtherEq( Loop ).ZonePtr ).OtherRadGain, "Zone", "Sum", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name );
 						SetupOutputVariable( "Zone Other Equipment Radiant Heating Rate [W]", ZnRpt( ZoneOtherEq( Loop ).ZonePtr ).OtherRadGainRate, "Zone", "Average", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name );
 						SetupOutputVariable( "Zone Other Equipment Convective Heating Energy [J]", ZnRpt( ZoneOtherEq( Loop ).ZonePtr ).OtherConGain, "Zone", "Sum", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name );
@@ -2198,7 +2289,7 @@ namespace InternalHeatGains {
 					if ( ! ErrorsFound ) SetupZoneInternalGain( ZoneOtherEq( Loop ).ZonePtr, "OtherEquipment", ZoneOtherEq( Loop ).Name, IntGainTypeOf_OtherEquipment, ZoneOtherEq( Loop ).ConGainRate, _, ZoneOtherEq( Loop ).RadGainRate, ZoneOtherEq( Loop ).LatGainRate );
 
 				} // Item1
-			} // Item - number of hot water statements
+			} // Item - number of other equipment statements
 		}
 
 		RepVarSet = true;
@@ -3215,13 +3306,9 @@ namespace InternalHeatGains {
 		using DataRoomAirModel::TCMF;
 		using DataRoomAirModel::IsZoneUI;
 		using WaterThermalTanks::CalcWaterThermalTankZoneGains;
-		using PipeHeatTransfer::CalcZonePipesHeatGain;
 		using WaterUse::CalcWaterUseZoneGains;
 		using FuelCellElectricGenerator::FigureFuelCellZoneGains;
 		using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
-		using ManageElectricPower::FigureInverterZoneGains;
-		using ManageElectricPower::FigureElectricalStorageZoneGains;
-		using ManageElectricPower::FigureTransformerZoneGains;
 		using DaylightingDevices::FigureTDDZoneGains;
 		using RefrigeratedCase::FigureRefrigerationZoneGains;
 		using OutputReportTabular::radiantPulseUsed;
@@ -3268,49 +3355,53 @@ namespace InternalHeatGains {
 		//  IF (.NOT. ALLOCATED(QSA)) ALLOCATE(QSA(NumOfZones))
 
 		//  Zero out time step variables
-		ZoneIntGain.NOFOCC() = 0.0;
-		ZoneIntGain.QOCTOT() = 0.0;
-		ZoneIntGain.QOCSEN() = 0.0;
-		ZoneIntGain.QOCLAT() = 0.0;
-		ZoneIntGain.QOCRAD() = 0.0;
-		ZoneIntGain.QOCCON() = 0.0;
-		ZoneIntGain.QLTSW() = 0.0;
-		ZoneIntGain.QLTCRA() = 0.0;
-		ZoneIntGain.QLTRAD() = 0.0;
-		ZoneIntGain.QLTCON() = 0.0;
-		ZoneIntGain.QLTTOT() = 0.0;
+		for ( auto & e : ZoneIntGain ) {
+			e.NOFOCC = 0.0;
+			e.QOCTOT = 0.0;
+			e.QOCSEN = 0.0;
+			e.QOCLAT = 0.0;
+			e.QOCRAD = 0.0;
+			e.QOCCON = 0.0;
+			e.QLTSW = 0.0;
+			e.QLTCRA = 0.0;
+			e.QLTRAD = 0.0;
+			e.QLTCON = 0.0;
+			e.QLTTOT = 0.0;
 
-		ZoneIntGain.QEELAT() = 0.0;
-		ZoneIntGain.QEERAD() = 0.0;
-		ZoneIntGain.QEECON() = 0.0;
-		ZoneIntGain.QEELost() = 0.0;
-		ZoneIntGain.QGELAT() = 0.0;
-		ZoneIntGain.QGERAD() = 0.0;
-		ZoneIntGain.QGECON() = 0.0;
-		ZoneIntGain.QGELost() = 0.0;
-		ZoneIntGain.QBBRAD() = 0.0;
-		ZoneIntGain.QBBCON() = 0.0;
-		ZoneIntGain.QOELAT() = 0.0;
-		ZoneIntGain.QOERAD() = 0.0;
-		ZoneIntGain.QOECON() = 0.0;
-		ZoneIntGain.QOELost() = 0.0;
-		ZoneIntGain.QHWLAT() = 0.0;
-		ZoneIntGain.QHWRAD() = 0.0;
-		ZoneIntGain.QHWCON() = 0.0;
-		ZoneIntGain.QHWLost() = 0.0;
-		ZoneIntGain.QSELAT() = 0.0;
-		ZoneIntGain.QSERAD() = 0.0;
-		ZoneIntGain.QSECON() = 0.0;
-		ZoneIntGain.QSELost() = 0.0;
+			e.QEELAT = 0.0;
+			e.QEERAD = 0.0;
+			e.QEECON = 0.0;
+			e.QEELost = 0.0;
+			e.QGELAT = 0.0;
+			e.QGERAD = 0.0;
+			e.QGECON = 0.0;
+			e.QGELost = 0.0;
+			e.QBBRAD = 0.0;
+			e.QBBCON = 0.0;
+			e.QOELAT = 0.0;
+			e.QOERAD = 0.0;
+			e.QOECON = 0.0;
+			e.QOELost = 0.0;
+			e.QHWLAT = 0.0;
+			e.QHWRAD = 0.0;
+			e.QHWCON = 0.0;
+			e.QHWLost = 0.0;
+			e.QSELAT = 0.0;
+			e.QSERAD = 0.0;
+			e.QSECON = 0.0;
+			e.QSELost = 0.0;
+		}
 
 		ZoneIntEEuse = zeroZoneCatEUse; // Set all member arrays to zeros
 
-		ZnRpt.LtsPower() = 0.0;
-		ZnRpt.ElecPower() = 0.0;
-		ZnRpt.GasPower() = 0.0;
-		ZnRpt.HWPower() = 0.0;
-		ZnRpt.SteamPower() = 0.0;
-		ZnRpt.BaseHeatPower() = 0.0;
+		for ( auto & e : ZnRpt ) {
+			e.LtsPower = 0.0;
+			e.ElecPower = 0.0;
+			e.GasPower = 0.0;
+			e.HWPower = 0.0;
+			e.SteamPower = 0.0;
+			e.BaseHeatPower = 0.0;
+		}
 
 		//  QSA = 0.0
 
@@ -3353,7 +3444,7 @@ namespace InternalHeatGains {
 
 				//For predefined tabular reports related to outside air ventilation
 				ZonePreDefRep( NZ ).isOccupied = true; //set flag to occupied to be used in tabular reporting for ventilation
-				ZonePreDefRep( NZ ).NumOccAccum += NumberOccupants *  Zone( NZ ).Multiplier * Zone( NZ ).ListMultiplier * TimeStepZone;
+				ZonePreDefRep( NZ ).NumOccAccum += NumberOccupants * TimeStepZone;
 				ZonePreDefRep( NZ ).NumOccAccumTime += TimeStepZone;
 			} else {
 				ZonePreDefRep( NZ ).isOccupied = false; //set flag to occupied to be used in tabular reporting for ventilation
@@ -3379,7 +3470,7 @@ namespace InternalHeatGains {
 			NZ = Lights( Loop ).ZonePtr;
 			Q = Lights( Loop ).DesignLevel * GetCurrentScheduleValue( Lights( Loop ).SchedPtr );
 
-			if ( ZoneDaylight( NZ ).DaylightType == DetailedDaylighting || ZoneDaylight( NZ ).DaylightType == DElightDaylighting ) {
+			if ( ZoneDaylight( NZ ).DaylightMethod == SplitFluxDaylighting || ZoneDaylight( NZ ).DaylightMethod == DElightDaylighting ) {
 
 				if ( Lights( Loop ).FractionReplaceable > 0.0 ) { // FractionReplaceable can only be 0 or 1 for these models
 					Q *= ZoneDaylight( NZ ).ZonePowerReductionFactor;
@@ -3572,13 +3663,11 @@ namespace InternalHeatGains {
 		if ( NumZoneITEqStatements > 0 ) CalcZoneITEq();
 
 		CalcWaterThermalTankZoneGains();
-		CalcZonePipesHeatGain();
+		PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
 		CalcWaterUseZoneGains();
 		FigureFuelCellZoneGains();
 		FigureMicroCHPZoneGains();
-		FigureInverterZoneGains();
-		FigureElectricalStorageZoneGains();
-		FigureTransformerZoneGains();
+		initializeElectricPowerServiceZoneGains();
 		FigureTDDZoneGains();
 		FigureRefrigerationZoneGains();
 
@@ -4041,7 +4130,7 @@ namespace InternalHeatGains {
 			Lights( Loop ).TotGainEnergy = Lights( Loop ).TotGainRate * TimeStepZoneSec;
 			if ( ! WarmupFlag ) {
 				if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) { //for weather simulations only
-					//for tabular report, accumlate the total electricity used for each Light object
+					//for tabular report, accumulate the total electricity used for each Light object
 					Lights( Loop ).SumConsumption += Lights( Loop ).Consumption;
 					//for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)
 					if ( Lights( Loop ).Power > 0.01 * Lights( Loop ).DesignLevel ) {
@@ -4191,6 +4280,7 @@ namespace InternalHeatGains {
 			ZnRpt( ZoneLoop ).OtherRadGainRate = ZoneIntGain( ZoneLoop ).QOERAD;
 			ZnRpt( ZoneLoop ).OtherLatGainRate = ZoneIntGain( ZoneLoop ).QOELAT;
 			ZnRpt( ZoneLoop ).OtherLostRate = ZoneIntGain( ZoneLoop ).QOELost;
+			ZnRpt( ZoneLoop ).OtherConsump = ZnRpt( ZoneLoop ).OtherConGain + ZnRpt( ZoneLoop ).OtherRadGain + ZnRpt( ZoneLoop ).OtherLatGain + ZnRpt( ZoneLoop ).OtherLost;
 			ZnRpt( ZoneLoop ).OtherTotGain = ZnRpt( ZoneLoop ).OtherConGain + ZnRpt( ZoneLoop ).OtherRadGain + ZnRpt( ZoneLoop ).OtherLatGain;
 			ZnRpt( ZoneLoop ).OtherTotGainRate = ZnRpt( ZoneLoop ).OtherConGainRate + ZnRpt( ZoneLoop ).OtherRadGainRate + ZnRpt( ZoneLoop ).OtherLatGainRate;
 
@@ -4342,7 +4432,7 @@ namespace InternalHeatGains {
 			LightsRepMin = min( LightsRepMin, Lights( Loop ).FractionReplaceable );
 			LightsRepMax = max( LightsRepMax, Lights( Loop ).FractionReplaceable );
 			++NumLights;
-			if ( ( ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightType == DetailedDaylighting || ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightType == DElightDaylighting ) && ( Lights( Loop ).FractionReplaceable > 0.0 && Lights( Loop ).FractionReplaceable < 1.0 ) ) {
+			if ( ( ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightMethod == SplitFluxDaylighting || ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightMethod == DElightDaylighting ) && ( Lights( Loop ).FractionReplaceable > 0.0 && Lights( Loop ).FractionReplaceable < 1.0 ) ) {
 				ShowWarningError( "CheckLightsReplaceableMinMaxForZone: Fraction Replaceable must be 0.0 or 1.0 if used with daylighting." );
 				ShowContinueError( "..Lights=\"" + Lights( Loop ).Name + "\", Fraction Replaceable will be reset to 1.0 to allow dimming controls" );
 				ShowContinueError( "..in Zone=" + Zone( WhichZone ).Name );
@@ -4350,7 +4440,7 @@ namespace InternalHeatGains {
 			}
 		}
 
-		if ( ZoneDaylight( WhichZone ).DaylightType == DetailedDaylighting ) {
+		if ( ZoneDaylight( WhichZone ).DaylightMethod == SplitFluxDaylighting ) {
 			if ( LightsRepMax == 0.0 ) {
 				ShowWarningError( "CheckLightsReplaceable: Zone \"" + Zone( WhichZone ).Name + "\" has Daylighting:Controls." );
 				ShowContinueError( "but all of the LIGHTS object in that zone have zero Fraction Replaceable." );
@@ -4361,7 +4451,7 @@ namespace InternalHeatGains {
 				ShowContinueError( "but there are no LIGHTS objects in that zone." );
 				ShowContinueError( "The daylighting controls will have no effect." );
 			}
-		} else if ( ZoneDaylight( WhichZone ).DaylightType == DElightDaylighting ) {
+		} else if ( ZoneDaylight( WhichZone ).DaylightMethod == DElightDaylighting ) {
 			if ( LightsRepMax == 0.0 ) {
 				ShowWarningError( "CheckLightsReplaceable: Zone \"" + Zone( WhichZone ).Name + "\" has Daylighting:Controls." );
 				ShowContinueError( "but all of the LIGHTS object in that zone have zero Fraction Replaceable." );
@@ -5256,7 +5346,7 @@ namespace InternalHeatGains {
 		static Array1D_int IntGainTypesRefrig( 7, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
 		static Array1D_int IntGainTypesWaterUse( 3, { IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified } );
 		static Array1D_int IntGainTypesHvacLoss( 13, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined } );
-		static Array1D_int IntGainTypesPowerGen( 8, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple } );
+		static Array1D_int IntGainTypesPowerGen( 9, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_ElectricLoadCenterConverter } );
 
 		if ( CompLoadReportIsReq && ! isPulseZoneSizing ) {
 			TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
@@ -5575,29 +5665,6 @@ namespace InternalHeatGains {
 		SumReturnAirGainRate = tmpSumReturnAirGainRate;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // InternalHeatGains
 

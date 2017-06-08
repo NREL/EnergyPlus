@@ -1,4 +1,51 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 
 // ObjexxFCL Headers
@@ -21,18 +68,22 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PipeHeatTransfer.hh>
 #include <Pipes.hh>
+#include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
+#include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -109,6 +160,20 @@ namespace PlantManager {
 	// Functions
 
 	void
+	clear_state()
+	{
+		InitLoopEquip = true;
+		GetCompSizFac = true;
+		PlantSupplyLoopCase = 0;
+		PlantDemandLoopCase = 0;
+		SupplySideInletNode.deallocate();
+		SupplySideOutletNode.deallocate();
+		DemandSideInletNode.deallocate();
+		LoopPipe.deallocate();
+		TempLoop = TempLoopData();
+	}
+
+	void
 	ManagePlantLoops(
 		bool const FirstHVACIteration,
 		bool & SimAirLoops, // True when the air loops need to be (re)simulated
@@ -158,7 +223,7 @@ namespace PlantManager {
 		int HalfLoopNum;
 		int CurntMinPlantSubIterations;
 
-		if ( any_eq( PlantLoop.CommonPipeType(), CommonPipe_Single ) || any_eq( PlantLoop.CommonPipeType(), CommonPipe_TwoWay ) ) {
+		if ( std::any_of( PlantLoop.begin(), PlantLoop.end(), []( DataPlant::PlantLoopData const & e ){ return ( e.CommonPipeType == DataPlant::CommonPipe_Single ) || ( e.CommonPipeType == DataPlant::CommonPipe_TwoWay ); } ) ) {
 			CurntMinPlantSubIterations = max( 7, MinPlantSubIterations );
 		} else {
 			CurntMinPlantSubIterations = MinPlantSubIterations;
@@ -415,7 +480,12 @@ namespace PlantManager {
 			if ( this_loop.Volume == AutoCalculate ) {
 				this_loop.VolumeWasAutoSized = true;
 			}
-
+			// circulation time used to autocalculate loop volume
+			if ( lNumericFieldBlanks( 6 ) ) {
+				this_loop.CirculationTime = 2.0 ; // default
+			} else {
+				this_loop.CirculationTime = Num( 6 );
+			}
 
 			// Load the Loop Inlet and Outlet Nodes and Connection Info (Alpha(7-10) are related to the supply side)
 			this_supply_side.NodeNameIn = Alpha( 6 );
@@ -673,8 +743,6 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		using Pipes::InitializePipes;
-		using PipeHeatTransfer::InitializeHeatTransferPipes;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -800,7 +868,7 @@ namespace PlantManager {
 					OutletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 					OutletNodeNumbers.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 
-					GetBranchData( TempLoop.Name, BranchNames( BranchNum ), TempLoop.Branch( BranchNum ).MaxVolFlowRate, TempLoop.Branch( BranchNum ).PressureCurveType, TempLoop.Branch( BranchNum ).PressureCurveIndex, TempLoop.Branch( BranchNum ).TotalComponents, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); // Why is this Vdot and not mdot?
+					GetBranchData( TempLoop.Name, BranchNames( BranchNum ), TempLoop.Branch( BranchNum ).PressureCurveType, TempLoop.Branch( BranchNum ).PressureCurveIndex, TempLoop.Branch( BranchNum ).TotalComponents, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 					TempLoop.Branch( BranchNum ).Comp.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 
@@ -816,22 +884,27 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Pipe;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_Pipe, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Adiabatic:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeSteam;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_PipeSteam, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Outdoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeExterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeExterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Indoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeInterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeInterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Underground" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeUnderground;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeUnderground, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "PipingSystem:Underground:PipeCircuit" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
@@ -939,22 +1012,27 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
 							this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+							this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Vertical" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgVertical, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData::factory( TypeOf_GrndHtExchgSurface, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Pond" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = PondGroundHeatExchanger::PondGroundHeatExchangerData::factory( TypeOf_GrndHtExchgPond, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Slinky" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgSlinky, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Chiller:Electric:EIR" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1171,6 +1249,10 @@ namespace PlantManager {
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else if ( SameString( this_comp_type, "ZoneHVAC:Baseboard:RadiantConvective:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Steam;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "ZoneHVAC:CoolingPanel:RadiantConvective:Water" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoolingPanel_Simple;
 							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else if ( SameString( this_comp_type, "ZoneHVAC:LowTemperatureRadiant:VariableFlow" ) ) {
@@ -1515,7 +1597,7 @@ namespace PlantManager {
 									//                            TempLoop%Branch(BranchNum)%Comp(CompNum)%CompNum, &
 									//                            0.0d0)
 								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
-									InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
+									//InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
 								}
 							}
 						}
@@ -1914,15 +1996,17 @@ namespace PlantManager {
 
 		PlantReport.allocate( TotNumLoops );
 
-		PlantReport.CoolingDemand() = 0.0;
-		PlantReport.HeatingDemand() = 0.0;
-		PlantReport.DemandNotDispatched() = 0.0;
-		PlantReport.UnmetDemand() = 0.0;
-		PlantReport.InletNodeTemperature() = 0.0;
-		PlantReport.OutletNodeTemperature() = 0.0;
-		PlantReport.InletNodeFlowrate() = 0.0;
-		PlantReport.BypassFrac() = 0.0;
-		PlantReport.OutletNodeFlowrate() = 0.0;
+		for ( auto & e : PlantReport ) {
+			e.CoolingDemand = 0.0;
+			e.HeatingDemand = 0.0;
+			e.DemandNotDispatched = 0.0;
+			e.UnmetDemand = 0.0;
+			e.InletNodeTemperature = 0.0;
+			e.OutletNodeTemperature = 0.0;
+			e.InletNodeFlowrate = 0.0;
+			e.BypassFrac = 0.0;
+			e.OutletNodeFlowrate = 0.0;
+		}
 
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 			if ( LoopNum <= NumPlantLoops ) {
@@ -1960,6 +2044,12 @@ namespace PlantManager {
 			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
 				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
@@ -2344,8 +2434,6 @@ namespace PlantManager {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::OutWetBulbTemp;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::StdBaroPress;
 		using HVACInterfaceManager::PlantCommonPipe;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -2437,7 +2525,7 @@ namespace PlantManager {
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).LastTempInterfaceTankOutlet = LoopSetPointTemp;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).LoopSideInlet_TankTemp = LoopSetPointTemp;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalPumpHeat = 0.0;
-					if ( allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps.PumpHeatToFluid() = 0.0;
+					if ( allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) for ( auto & e : PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) e.PumpHeatToFluid = 0.0;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowRequest = 0.0;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TimeElapsed = 0.0;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock = 0;
@@ -2527,15 +2615,17 @@ namespace PlantManager {
 					} //BRANCH LOOP
 				} //LOOPSIDE
 			} //PLANT LOOP
-			PlantReport.CoolingDemand() = 0.0;
-			PlantReport.HeatingDemand() = 0.0;
-			PlantReport.DemandNotDispatched() = 0.0;
-			PlantReport.UnmetDemand() = 0.0;
-			PlantReport.LastLoopSideSimulated() = 0;
-			PlantReport.InletNodeFlowrate() = 0.0;
-			PlantReport.InletNodeTemperature() = 0.0;
-			PlantReport.OutletNodeFlowrate() = 0.0;
-			PlantReport.OutletNodeTemperature() = 0.0;
+			for ( auto & e : PlantReport ) {
+				e.CoolingDemand = 0.0;
+				e.HeatingDemand = 0.0;
+				e.DemandNotDispatched = 0.0;
+				e.UnmetDemand = 0.0;
+				e.LastLoopSideSimulated = 0;
+				e.InletNodeFlowrate = 0.0;
+				e.InletNodeTemperature = 0.0;
+				e.OutletNodeFlowrate = 0.0;
+				e.OutletNodeTemperature = 0.0;
+			}
 
 			MyEnvrnFlag = false;
 			//*****************************************************************
@@ -2678,8 +2768,10 @@ namespace PlantManager {
 
 		// array assignment
 		if ( NumOfNodes > 0 ) {
-			Node.TempLastTimestep() = Node.Temp();
-			Node.EnthalpyLastTimestep() = Node.Enthalpy();
+			for ( auto & e : Node ) { //MA
+				e.TempLastTimestep = e.Temp;
+				e.EnthalpyLastTimestep = e.Enthalpy;
+			}
 		}
 
 	}
@@ -2984,9 +3076,8 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 
-		PlantSizNum = 0;
 		if ( PlantLoop( LoopNum ).PlantSizNum == 0 ) {
 			if ( NumPltSizInput > 0 ) {
 				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
@@ -3030,7 +3121,7 @@ namespace PlantManager {
 		using ReportSizingManager::ReportSizingOutput;
 
 		// Locals
-		bool InitLoopEquip;
+		bool InitLoopEquip( true );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3044,37 +3135,23 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 		int BranchNum; // DO loop counter for cycling through branches on a demand side loop
 		int CompNum; // DO loop counter for cycling through components on a demand side loop
 		int SupNodeNum; // component inlet water node number
 		int WaterCompNum; // DO loop counter for cycling through all the components that demand water
-		bool ErrorsFound; // If errors detected in input
-		bool SimNestedLoop;
-		bool ReSize;
-		bool AllSizFac;
-		Real64 LoopSizFac;
+		bool ErrorsFound( false ); // If errors detected in input
+		// bool SimNestedLoop( false );
+		bool ReSize( false );
+		bool AllSizFac( true );
+		Real64 LoopSizFac( 0.0 );
 		Real64 AvLoopSizFac;
-		Real64 PlantSizFac;
-		Real64 MaxSizFac;
+		Real64 PlantSizFac( 1.0 );
+		Real64 MaxSizFac( 0.0 );
 		Real64 BranchSizFac;
-		Real64 NumBrSizFac;
+		Real64 NumBrSizFac( 0.0 );
 		Real64 FluidDensity( 0.0 ); // local value from glycol routine
-		bool Finalize;
-
-		Finalize = OkayToFinish;
-		PlantSizNum = 0;
-		ErrorsFound = false;
-		LoopSizFac = 0.0;
-		// InitLoopEquip = .FALSE.
-		InitLoopEquip = true;
-		SimNestedLoop = false;
-
-		AllSizFac = true;
-		MaxSizFac = 0.0;
-		PlantSizFac = 1.0;
-		NumBrSizFac = 0.0;
-		ReSize = false;
+		bool Finalize( OkayToFinish );
 
 		if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) {
 			ReSize = true;
@@ -3207,8 +3284,9 @@ namespace PlantManager {
 
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
-			// Although there is no longer a stability requirement (mass can be zero), autosizing is formulated the same way.
-			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+			// There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
+			// Note this calculation also appears in PlantManager::ResizePlantLoopLevelSizes and SizingAnalysisObjects::ResolveDesignFlowRate
+			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * PlantLoop( LoopNum ).CirculationTime * 60.0;
 			if (PlantFinalSizesOkayToReport) {
 				if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 					// condenser loop vs plant loop breakout needed.
@@ -3284,7 +3362,7 @@ namespace PlantManager {
 		using DataPlant::PlantLoop;
 
 		// Locals
-		bool InitLoopEquip;
+		// bool InitLoopEquip( true );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3298,23 +3376,17 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 		int BranchNum; // DO loop counter for cycling through branches on a demand side loop
 		int CompNum; // DO loop counter for cycling through components on a demand side loop
 		int SupNodeNum; // component inlet water node number
 		int WaterCompNum; // DO loop counter for cycling through all the components that demand water
-		bool ErrorsFound; // If errors detected in input
-		bool SimNestedLoop;
+		bool ErrorsFound( false ); // If errors detected in input
+		// bool SimNestedLoop( false );
 		bool ReSize;
 
 		Real64 FluidDensity( 0.0 ); // local value from glycol routine
 
-		PlantSizNum = 0;
-		ErrorsFound = false;
-
-		// InitLoopEquip = .FALSE.
-		InitLoopEquip = true;
-		SimNestedLoop = false;
 		Real64 PlantSizeFac;
 
 
@@ -3377,8 +3449,9 @@ namespace PlantManager {
 
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
-			// Although there is no longer a stability requirement (mass can be zero), autosizing is formulated the same way.
-			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * TimeStepZoneSec / 0.8;
+			// There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
+			// Note this calculation also appears in PlantManager::SizePlantLoop and SizingAnalysisObjects::ResolveDesignFlowRate
+			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * PlantLoop( LoopNum ).CirculationTime * 60.0;
 			if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 				// condenser loop vs plant loop breakout needed.
 				ReportSizingOutput( "PlantLoop", PlantLoop( LoopNum ).Name, "Plant Loop Volume [m3]", PlantLoop( LoopNum ).Volume );
@@ -4198,6 +4271,10 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
+						} else if ( SELECT_CASE_var == TypeOf_CoolingPanel_Simple ) {
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -4322,7 +4399,7 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
-						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgVertical ) { // = 91
+						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgSlinky ) { //            = 91
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
 							this_component.HowLoadServed = HowMet_PassiveCap;
@@ -4361,7 +4438,7 @@ namespace PlantManager {
 								//  assume multiple active components in series means branch is SeriesActive
 								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).ControlType = ControlType_SeriesActive;
 								// assume all components on branch are to be SeriesActive as well
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp.FlowCtrl() = ControlType_SeriesActive;
+								for ( auto & e : PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp ) e.FlowCtrl = ControlType_SeriesActive;
 							} else {
 								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).ControlType = ControlType_Active;
 							}
@@ -4468,28 +4545,20 @@ namespace PlantManager {
 
 	}
 
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	void
+	CheckOngoingPlantWarnings()
+	{
+		int LoopNum;
+		for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+			//Warning if the excess storage time is more than half of the total time
+			if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime > PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
+				ShowWarningError("Plant Loop: " + PlantLoop(LoopNum).Name + " Demand Side is storing excess heat the majority of the time.");
+			}
+			if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime > PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
+				ShowWarningError("Plant Loop: " + PlantLoop(LoopNum).Name + " Supply Side is storing excess heat the majority of the time.");
+			}
+		}
+	}
 
 } // PlantManager
 

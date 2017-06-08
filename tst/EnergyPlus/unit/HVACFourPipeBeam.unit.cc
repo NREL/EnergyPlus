@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // EnergyPlus::HVACFourPipeBeam Unit Tests
 
 // Google Test Headers
@@ -12,6 +58,7 @@
 #include <NodeInputManager.hh>
 #include <DataDefineEquip.hh>
 #include <SimulationManager.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
@@ -27,7 +74,7 @@ namespace EnergyPlus {
 
 
 	TEST_F( EnergyPlusFixture, Beam_FactoryAllAutosize ) {
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
 		"AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,",
 		"    Perimeter_top_ZN_4 4pipe Beam, !- Name",
@@ -113,7 +160,7 @@ namespace EnergyPlus {
 		"    1.0,      1.0,",
 		"    1.2857,   1.0778; ",
 		} );
-	
+
 		ASSERT_FALSE( process_idf( idf_objects ) );
 		DataGlobals::NumOfZones = 1;
 
@@ -148,9 +195,9 @@ namespace EnergyPlus {
 	}
 
 
-	TEST_F( EnergyPlusFixture, Beam_sizeandSimulateOneZone ) 
+	TEST_F( EnergyPlusFixture, Beam_sizeandSimulateOneZone )
 	{
-			std::string const idf_objects = delimited_string( { 
+			std::string const idf_objects = delimited_string( {
 		"    SimulationControl,",
 		"    YES,                     !- Do Zone Sizing Calculation",
 		"    YES,                     !- Do System Sizing Calculation",
@@ -243,7 +290,7 @@ namespace EnergyPlus {
 		"    Through: 12/31,          !- Field 9",
 		"    For: AllDays,            !- Field 10",
 		"    Until: 24:00,1.0;        !- Field 11",
-		
+
 		"    Schedule:Compact,",
 		"    BLDG_OCC_SCH,            !- Name",
 		"    Fraction,                !- Schedule Type Limits Name",
@@ -271,7 +318,7 @@ namespace EnergyPlus {
 		"    Until: 24:00,0.0,        !- Field 39",
 		"    For: AllOtherDays,       !- Field 41",
 		"    Until: 24:00,0.0;        !- Field 42",
-		
+
 		"    Schedule:Compact,",
 		"    BLDG_LIGHT_SCH,          !- Name",
 		"    Fraction,                !- Schedule Type Limits Name",
@@ -919,28 +966,23 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CV_1 Air Loop Main Branch,  !- Name",
-		"    AUTOSIZE,                !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"    CV_1_OA,                !- Component 1 Name",
 		"    CV_1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name",
 		"    CV_1_OA-CV_1_CoolCNode,!- Component 1 Outlet Node Name",
-		"    Passive,                 !- Component 1 Branch Control Type",
 		"    Coil:Cooling:Water,      !- Component 2 Object Type",
 		"    CV_1_CoolC,             !- Component 2 Name",
 		"    CV_1_OA-CV_1_CoolCNode,!- Component 2 Inlet Node Name",
 		"    CV_1_CoolC-CV_1_HeatCNode,  !- Component 2 Outlet Node Name",
-		"    Passive,                 !- Component 2 Branch Control Type",
 		"    Coil:Heating:Water,      !- Component 3 Object Type",
 		"    CV_1_HeatC,             !- Component 3 Name",
 		"    CV_1_CoolC-CV_1_HeatCNode,  !- Component 3 Inlet Node Name",
 		"    CV_1_HeatC-CV_1_FanNode,  !- Component 3 Outlet Node Name",
-		"    Passive,                 !- Component 3 Branch Control Type",
 		"    Fan:VariableVolume,      !- Component 4 Object Type",
 		"    CV_1_Fan,               !- Component 4 Name",
 		"    CV_1_HeatC-CV_1_FanNode,  !- Component 4 Inlet Node Name",
-		"    CV_1 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name",
-		"    Active;                  !- Component 4 Branch Control Type",
+		"    CV_1 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name",
 
 		"  AirLoopHVAC:ControllerList,",
 		"    CV_1_Controllers,       !- Name",
@@ -1067,13 +1109,11 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CoolSys1 Demand Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    CoolSys1 Demand Inlet Pipe,  !- Component 1 Name",
 		"    CoolSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name",
-		"    CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    CoolSys1 Demand Inlet Pipe,  !- Name",
@@ -1092,33 +1132,27 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CoolSys1 Demand Load Branch 1,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    CV_1_CoolC,             !- Component 1 Name",
 		"    CV_1_CoolCDemand Inlet Node,  !- Component 1 Inlet Node Name",
-		"    CV_1_CoolCDemand Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    CV_1_CoolCDemand Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    CoolSys1 Demand Load Branch 2,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type",
 		"    Zone One 4pipe Beam,  !- Component 1 Name",
 		"    Zone One 4pipe Beam CW Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Zone One 4pipe Beam CW Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    Zone One 4pipe Beam CW Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    CoolSys1 Demand Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    CoolSys1 Demand Outlet Pipe,  !- Component 1 Name",
 		"    CoolSys1 Demand Mixer-CoolSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name",
-		"    CoolSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    CoolSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name",
 
 
 
@@ -1141,7 +1175,12 @@ namespace EnergyPlus {
 		"    CoolSys1 Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    CoolSys1 Demand Branches,  !- Demand Side Branch List Name",
 		"    CoolSys1 Demand Connectors,!- Demand Side Connector List Name",
-		"    OPTIMAL;                 !- Load Distribution Scheme",
+		"    OPTIMAL,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled,",
 		"    SOURCE Loop Setpoint Manager,  !- Name",
@@ -1202,13 +1241,11 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    SOURCE Pump,             !- Component 1 Name",
 		"    SOURCE Supply Inlet Node,!- Component 1 Inlet Node Name",
-		"    SOURCE Supply Pump-Cooling Node,  !- Component 1 Outlet Node Name",
-		"    ;                        !- Component 1 Branch Control Type",
+		"    SOURCE Supply Pump-Cooling Node;  !- Component 1 Outlet Node Name",
 
 		"  Pump:VariableSpeed,",
 		"    SOURCE Pump,             !- Name",
@@ -1228,13 +1265,11 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Cooling Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    SOURCE Purchased Cooling,!- Component 1 Name",
 		"    SOURCE Supply Cooling Inlet Node,  !- Component 1 Inlet Node Name",
-		"    SOURCE Supply Cooling Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ;                        !- Component 1 Branch Control Type",
+		"    SOURCE Supply Cooling Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  DistrictCooling,",
 		"    SOURCE Purchased Cooling,!- Name",
@@ -1244,13 +1279,11 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    SOURCE Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    SOURCE Supply Outlet Pipe,  !- Component 1 Name",
 		"    SOURCE Supply Cooling-Pipe Node,  !- Component 1 Inlet Node Name",
-		"    SOURCE Supply Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ;                        !- Component 1 Branch Control Type",
+		"    SOURCE Supply Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    SOURCE Supply Outlet Pipe,  !- Name",
@@ -1259,14 +1292,12 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    CoolSys1 Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    CoolSys1 Demand Bypass Pipe,  !- Component 1 Name",
 		"    CoolSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    CoolSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Bypass;                  !- Component 1 Branch Control Type",
-		
+		"    CoolSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name",
+
 		"  Sizing:Plant,",
 		"    HeatSys1 Loop,                !- Plant or Condenser Loop Name",
 		"    Heating,                 !- Loop Type",
@@ -1295,7 +1326,12 @@ namespace EnergyPlus {
 		"    HeatSys1 Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    HeatSys1 Demand Branches,  !- Demand Side Branch List Name",
 		"    HeatSys1 Demand Connectors,!- Demand Side Connector List Name",
-		"    OPTIMAL;                 !- Load Distribution Scheme",
+		"    OPTIMAL,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled,",
 		"    HeatSys1 Loop Setpoint Manager,  !- Name",
@@ -1356,13 +1392,11 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    HeatSys1 Pump,             !- Component 1 Name",
 		"    HeatSys1 Supply Inlet Node,!- Component 1 Inlet Node Name",
-		"    HeatSys1 Supply Pump-Heating Node,  !- Component 1 Outlet Node Name",
-		"    ;                        !- Component 1 Branch Control Type",
+		"    HeatSys1 Supply Pump-Heating Node;  !- Component 1 Outlet Node Name",
 
 		"  Pump:VariableSpeed,",
 		"    HeatSys1 Pump,             !- Name",
@@ -1382,13 +1416,11 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Heating Branch,   !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    HeatSys1 Purchased Heating,!- Component 1 Name",
 		"    HeatSys1 Supply Heating Inlet Node,  !- Component 1 Inlet Node Name",
-		"    HeatSys1 Supply Heating Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ;                        !- Component 1 Branch Control Type",
+		"    HeatSys1 Supply Heating Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  DistrictHeating,",
 		"    HeatSys1 Purchased Heating,!- Name",
@@ -1398,13 +1430,11 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    HeatSys1 Supply Outlet Pipe,  !- Component 1 Name",
 		"    HeatSys1 Supply Heating-Pipe Node,  !- Component 1 Inlet Node Name",
-		"    HeatSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ;                        !- Component 1 Branch Control Type",
+		"    HeatSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    HeatSys1 Supply Outlet Pipe,  !- Name",
@@ -1425,23 +1455,19 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    HeatSys1 Demand Bypass Pipe,  !- Component 1 Name",
 		"    HeatSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    HeatSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Bypass;                  !- Component 1 Branch Control Type",
+		"    HeatSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    HeatSys1 Demand Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    HeatSys1 Demand Inlet Pipe,!- Component 1 Name",
 		"    HeatSys1 Demand Inlet Node,!- Component 1 Inlet Node Name",
-		"    HeatSys1 Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name",
-		"    ;                        !- Component 1 Branch Control Type",
+		"    HeatSys1 Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    HeatSys1 Demand Inlet Pipe,!- Name",
@@ -1451,13 +1477,11 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Demand Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    HeatSys1 Demand Outlet Pipe,  !- Component 1 Name",
 		"    HeatSys1 Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name",
-		"    HeatSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HeatSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    HeatSys1 Demand Outlet Pipe,  !- Name",
@@ -1488,23 +1512,19 @@ namespace EnergyPlus {
 
 		"  Branch,",
 		"    HeatSys1 Demand Load Branch 1,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    CV_1_HeatC,             !- Component 1 Name",
 		"    CV_1_HeatCDemand Inlet Node,  !- Component 1 Inlet Node Name",
-		"    CV_1_heatCDemand Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    CV_1_heatCDemand Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    HeatSys1 Demand Load Branch 2,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,      !- Component 1 Object Type",
 		"    Zone One 4pipe Beam,  !- Component 1 Name",
 		"    Zone One 4pipe Beam HW Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Zone One 4pipe Beam HW Outlet Node,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    Zone One 4pipe Beam HW Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,",
 		"    Zone One 4pipe Beam, !- Name",
@@ -1594,7 +1614,7 @@ namespace EnergyPlus {
 		"    1.0,      1.0,",
 		"    1.2857,   1.0778; ",
 				} );
-	
+
 		ASSERT_FALSE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 
@@ -1609,7 +1629,7 @@ namespace EnergyPlus {
 		OutputProcessor::SetupTimePointers( "Zone", DataGlobals::TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		OutputProcessor::SetupTimePointers( "HVAC", DataHVACGlobals::TimeStepSys );
 		PlantManager::CheckIfAnyPlant();
-
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput(); // just gets input and returns.
 		DataGlobals::DoingSizing = true;
 		SizingManager::ManageSizing();
@@ -1645,7 +1665,7 @@ namespace EnergyPlus {
 
 		EXPECT_NEAR( DataLoopNode::Node( 1 ).MassFlowRate, 0.3521952339035046, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 19.191523455437512, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.046199561631265804, 0.00001 ); 
+		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.046199561631265804, 0.00001 );
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
@@ -1660,7 +1680,7 @@ namespace EnergyPlus {
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 ); 
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 35.064466069323743, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.19320550334974979, 0.00001 );
 
@@ -1683,7 +1703,7 @@ namespace EnergyPlus {
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
 		EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 18.027306264618733, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001); 
+		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001);
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
@@ -1700,14 +1720,14 @@ namespace EnergyPlus {
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0);
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0); 
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0);
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
 
 		EXPECT_NEAR( NonAirSysOutput, 4685.4000901131676, 0.0001 );
 
-	
+
 	}
-	
+
 
 }

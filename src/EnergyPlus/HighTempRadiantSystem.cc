@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -116,7 +162,23 @@ namespace HighTempRadiantSystem {
 	Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
+	void
+ 	clear_state()
+ 	{
+		NumOfHighTempRadSys = 0;
+		QHTRadSource.deallocate();
+		QHTRadSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQHTRadSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		HighTempRadSys.deallocate();
+		HighTempRadSysNumericFields.deallocate();
+	}
 
+	
 	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
@@ -161,11 +223,14 @@ namespace HighTempRadiantSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
+		bool ErrorsFoundInGet; // Set to true when there are severe errors during the Get routine
 		int RadSysNum; // Radiant system number/index in local derived types
 
 		// FLOW:
 		if ( GetInputFlag ) {
-			GetHighTempRadiantSystem();
+			ErrorsFoundInGet = false;
+			GetHighTempRadiantSystem( ErrorsFoundInGet );
+			if ( ErrorsFoundInGet ) ShowFatalError( "GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination." );
 			GetInputFlag = false;
 		}
 
@@ -205,7 +270,9 @@ namespace HighTempRadiantSystem {
 	}
 
 	void
-	GetHighTempRadiantSystem()
+	GetHighTempRadiantSystem(
+			bool & ErrorsFound // TRUE if errors are found on processing the input
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -267,12 +334,13 @@ namespace HighTempRadiantSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant, latent, and lost (must be <= 1)
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
+		Real64 FracOfRadPotentiallyLost; // Difference between unity and AllFracsSummed for error reporting
 		int IOStatus; // Used in GetObjectItem
 		int Item; // Item to be "gotten"
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int SurfNum; // Surface number DO loop counter
+		Real64 TotalFracToSurfs; // Sum of fractions of radiation to surfaces
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
@@ -566,9 +634,16 @@ namespace HighTempRadiantSystem {
 				ErrorsFound = true;
 			}
 			if ( AllFracsSummed < ( MaxFraction - 0.01 ) ) { // User didn't distribute all of the radiation warn that some will be lost
-				ShowWarningError( "Fraction of radiation distributed to surfaces sums up to less than 1 for " + cAlphaArgs( 1 ) );
-				ShowContinueError( "As a result, some of the radiant energy delivered by the high temp radiant heater will be lost." );
-				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				TotalFracToSurfs = AllFracsSummed - HighTempRadSys( Item ).FracDistribPerson;
+				FracOfRadPotentiallyLost = 1.0 - AllFracsSummed;
+				ShowSevereError( "Fraction of radiation distributed to surfaces and people sums up to less than 1 for " + cAlphaArgs( 1 ) );
+				ShowContinueError( "This would result in some of the radiant energy delivered by the high temp radiant heater being lost." );
+				ShowContinueError( "The sum of all radiation fractions to surfaces = " + TrimSigDigits( TotalFracToSurfs, 5) );
+				ShowContinueError( "The radiant fraction to people = " + TrimSigDigits( HighTempRadSys( Item ).FracDistribPerson, 5) );
+				ShowContinueError( "So, all radiant fractions including surfaces and people = " + TrimSigDigits( AllFracsSummed, 5) );
+				ShowContinueError( "This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = " +  TrimSigDigits( FracOfRadPotentiallyLost, 5) );
+				ShowContinueError( "Please check and correct this so that all radiant energy is accounted for in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ErrorsFound = true;
 			}
 
 		} // ...end of DO loop through all of the high temperature radiant heaters
@@ -586,10 +661,6 @@ namespace HighTempRadiantSystem {
 				SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", HighTempRadSys( Item ).ElecEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
 			}
 
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
 		}
 
 	}
@@ -770,7 +841,7 @@ namespace HighTempRadiantSystem {
 				if ( CapSizingMethod == HeatingDesignCapacity ) {
 					if ( HighTempRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
 						CheckZoneSizing( CompType, CompName );
-						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
 					} else {
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
 					}
@@ -785,7 +856,7 @@ namespace HighTempRadiantSystem {
 					CheckZoneSizing( CompType, CompName );
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					DataFracOfAutosizedHeatingCapacity = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
 					TempSize = AutoSize;
 					DataScalableCapSizingON = true;
 				} else {
@@ -793,6 +864,7 @@ namespace HighTempRadiantSystem {
 				}
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
+				DataScalableCapSizingON = false;
 			}
 
 		}
@@ -1467,29 +1539,6 @@ namespace HighTempRadiantSystem {
 		return SumHATsurf;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HighTempRadiantSystem
 

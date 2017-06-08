@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -255,7 +255,85 @@ is_alpha( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! isalpha( c ) ) return false;
+			if ( std::isalpha( c ) == 0 ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Consonants?
+inline
+bool
+is_consonant( std::string const & s )
+{
+	static std::string const vowels( "aeiou" );
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( std::isalpha( c ) == 0 ) return false;
+			if ( vowels.find( std::tolower( c ) ) != std::string::npos ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Vowels?
+inline
+bool
+is_vowel( std::string const & s )
+{
+	static std::string const vowels( "aeiou" );
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( vowels.find( std::tolower( c ) ) == std::string::npos ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Lowercase Alphabetic?
+inline
+bool
+is_lower( std::string const & s )
+{
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( std::islower( c ) == 0 ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Uppercase Alphabetic?
+inline
+bool
+is_upper( std::string const & s )
+{
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( std::isupper( c ) == 0 ) return false;
+		}
+		return true;
+	}
+}
+
+// string is Alphanumeric?
+inline
+bool
+is_alpha_numeric( std::string const & s )
+{
+	if ( s.empty() ) {
+		return false;
+	} else {
+		for ( char const c : s ) {
+			if ( std::isalnum( c ) == 0 ) return false;
 		}
 		return true;
 	}
@@ -270,10 +348,32 @@ is_digit( std::string const & s )
 		return false;
 	} else {
 		for ( char const c : s ) {
-			if ( ! isdigit( c ) ) return false;
+			if ( std::isdigit( c ) == 0 ) return false;
 		}
 		return true;
 	}
+}
+
+// string has a Lowercase Character?
+inline
+bool
+has_lower( std::string const & s )
+{
+	for ( char const c : s ) {
+		if ( std::islower( c ) != 0 ) return true;
+	}
+	return false;
+}
+
+// string has an Uppercase Character?
+inline
+bool
+has_upper( std::string const & s )
+{
+	for ( char const c : s ) {
+		if ( std::isupper( c ) != 0 ) return true;
+	}
+	return false;
 }
 
 // string has a string?

@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.4;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 !========================
@@ -281,14 +281,6 @@
     0.72,                    !- Conductivity {W/m-K}
     1856,                    !- Density {kg/m3}
     840;                     !- Specific Heat {J/kg-K}
-
-  Material,
-    F08 Metal surface,       !- Name
-    Smooth,                  !- Roughness
-    0.0008,                  !- Thickness {m}
-    45.28,                   !- Conductivity {W/m-K}
-    7824,                    !- Density {kg/m3}
-    500;                     !- Specific Heat {J/kg-K}
 
   Material,
     F09 Opaque spandrel glass,  !- Name
@@ -2294,7 +2286,6 @@
 
   Construction,
     Light Exterior Wall,     !- Name
-    F08 Metal surface,       !- Outside Layer
     I02 50mm insulation board,  !- Layer 2
     F04 Wall air space resistance,  !- Layer 3
     G01a 19mm gypsum board;  !- Layer 4

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
@@ -18,6 +64,7 @@
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -63,22 +110,16 @@ namespace UnitHeater {
 	// Rick Strand's unit heater module which was based upon Fred Buhl's fan coil
 	// module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::cFanTypes;
 	using DataHVACGlobals::CycFanCycCoil;
@@ -91,21 +132,27 @@ namespace UnitHeater {
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using namespace FluidProperties;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	std::string const cMO_UnitHeater( "ZoneHVAC:UnitHeater" );
 
 	// Character parameters for outside air control types:
 	std::string const ElectricCoil( "ElectricCoil" );
 	std::string const GasCoil( "GasCoil" );
-	std::string const WaterCoil( "WaterCoil" );
+	std::string const WaterHeatingCoil( "WaterHeatingCoil" );
 	std::string const SteamCoil( "SteamCoil" );
 
 	static std::string const fluidNameSteam( "STEAM" );
 
-	// DERIVED TYPE DEFINITIONS
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitUnitHeaterOneTimeFlag( true );
+		bool GetUnitHeaterInputFlag( true );
+	}
 
-	// MODULE VARIABLE DECLARATIONS:
 	bool HCoilOn; // TRUE if the heating coil (gas or electric especially) should be running
 	int NumOfUnitHeats; // Number of unit heaters in the input file
 	Real64 QZnReq; // heating or cooling needed by zone [watts]
@@ -119,6 +166,20 @@ namespace UnitHeater {
 	Array1D< UnitHeatNumericFieldData > UnitHeatNumericFields;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		HCoilOn = false;
+		NumOfUnitHeats = 0;
+		QZnReq = 0.0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		UnitHeat.deallocate();
+		UnitHeatNumericFields.deallocate();
+		InitUnitHeaterOneTimeFlag = true;
+		GetUnitHeaterInputFlag = true;
+	}
 
 	void
 	SimUnitHeater(
@@ -166,12 +227,11 @@ namespace UnitHeater {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitHeatNum; // index of unit heater being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 
 		// FLOW:
-		if ( GetInputFlag ) {
+		if ( GetUnitHeaterInputFlag ) {
 			GetUnitHeaterInput();
-			GetInputFlag = false;
+			GetUnitHeaterInputFlag = false;
 		}
 
 		// Find the correct Unit Heater Equipment
@@ -362,27 +422,50 @@ namespace UnitHeater {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				GetFanType( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).FanType_Num, errFlag, CurrentModuleObject, UnitHeat( UnitHeatNum ).Name );
+				if ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
+					GetFanType( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).FanType_Num, errFlag, CurrentModuleObject, UnitHeat( UnitHeatNum ).Name );
 
-				{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).FanType_Num );
-				if ( ( SELECT_CASE_var == FanType_SimpleConstVolume ) || ( SELECT_CASE_var == FanType_SimpleVAV ) || ( SELECT_CASE_var == FanType_SimpleOnOff ) ) {
-					// Get fan outlet node
-					UnitHeat( UnitHeatNum ).FanOutletNode = GetFanOutletNode( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag );
-					if ( errFlag ) {
-						ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." );
+					{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).FanType_Num );
+					if ( ( SELECT_CASE_var == FanType_SimpleConstVolume ) || ( SELECT_CASE_var == FanType_SimpleVAV ) || ( SELECT_CASE_var == FanType_SimpleOnOff ) ) {
+						// Get fan outlet node
+						UnitHeat( UnitHeatNum ).FanOutletNode = GetFanOutletNode( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag );
+						if ( errFlag ) {
+							ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." );
+							ErrorsFound = true;
+						}
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"" );
+						ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume" );
 						ErrorsFound = true;
-					}
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"" );
-					ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume" );
-					ErrorsFound = true;
-				}}
-				GetFanIndex( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).Fan_Index, errFlag, CurrentModuleObject );
-				if ( errFlag ) {
-					ErrorsFound = true;
-				} else {
-					GetFanVolFlow( UnitHeat( UnitHeatNum ).Fan_Index, FanVolFlow );
+					}}
+					GetFanIndex( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).Fan_Index, errFlag, CurrentModuleObject );
+					if ( errFlag ) {
+						ErrorsFound = true;
+					} else {
+						GetFanVolFlow( UnitHeat( UnitHeatNum ).Fan_Index, FanVolFlow );
 
+						if ( FanVolFlow != AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitHeat( UnitHeatNum ).MaxAirVolFlow ) {
+							ShowSevereError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
+							ShowContinueError( "...air flow rate (" + TrimSigDigits( FanVolFlow, 7 ) + ") in fan object " + UnitHeat( UnitHeatNum ).FanName + " is less than the unit heater maximum supply air flow rate (" + TrimSigDigits( UnitHeat( UnitHeatNum ).MaxAirVolFlow, 7 ) + ")." );
+							ShowContinueError( "...the fan flow rate must be greater than or equal to the unit heater maximum supply air flow rate." );
+							ErrorsFound = true;
+						} else if ( FanVolFlow == AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow != AutoSize ) {
+							ShowWarningError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
+							ShowContinueError( "...the fan flow rate is autosized while the unit heater flow rate is not." );
+							ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+						} else if ( FanVolFlow != AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow == AutoSize ) {
+							ShowWarningError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
+							ShowContinueError( "...the unit heater flow rate is autosized while the fan flow rate is not." );
+							ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+						}
+						UnitHeat( UnitHeatNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag );
+					}
+				} else if ( InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
+					UnitHeat( UnitHeatNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitHeat( UnitHeatNum ).FanName ) ); // call constructor
+					UnitHeat( UnitHeatNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitHeat( UnitHeatNum ).FanName ); //zero-based
+					UnitHeat( UnitHeatNum ).FanOutletNode = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->outletNodeNum;
+					FanVolFlow =  HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->designAirVolFlowRate;
 					if ( FanVolFlow != AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitHeat( UnitHeatNum ).MaxAirVolFlow ) {
 						ShowSevereError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
 						ShowContinueError( "...air flow rate (" + TrimSigDigits( FanVolFlow, 7 ) + ") in fan object " + UnitHeat( UnitHeatNum ).FanName + " is less than the unit heater maximum supply air flow rate (" + TrimSigDigits( UnitHeat( UnitHeatNum ).MaxAirVolFlow, 7 ) + ")." );
@@ -397,21 +480,22 @@ namespace UnitHeater {
 						ShowContinueError( "...the unit heater flow rate is autosized while the fan flow rate is not." );
 						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
 					}
-					UnitHeat( UnitHeatNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag );
+
+					UnitHeat( UnitHeatNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->availSchedIndex;
 				}
 			}
 
 			// Heating coil information:
 			{ auto const SELECT_CASE_var( Alphas( 7 ) );
 			if ( SELECT_CASE_var == "COIL:HEATING:WATER" ) {
-				UnitHeat( UnitHeatNum ).HCoilType = WaterCoil;
+				UnitHeat( UnitHeatNum ).HCoilType = WaterHeatingCoil;
 				UnitHeat( UnitHeatNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
 			} else if ( SELECT_CASE_var == "COIL:HEATING:STEAM" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = SteamCoil;
 				UnitHeat( UnitHeatNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 			} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = ElectricCoil;
-			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+			} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = GasCoil;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
@@ -429,10 +513,10 @@ namespace UnitHeater {
 				} else {
 					// The heating coil control node is necessary for hot water and steam coils, but not necessary for an
 					// electric or gas coil.
-					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil || UnitHeat( UnitHeatNum ).HCoilType == SteamCoil ) {
+					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil || UnitHeat( UnitHeatNum ).HCoilType == SteamCoil ) {
 						// mine the hot water or steam node from the coil object
 						errFlag = false;
-						if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+						if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 							UnitHeat( UnitHeatNum ).HotControlNode = GetCoilWaterInletNode( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, errFlag );
 						} else { // its a steam coil
 							UnitHeat( UnitHeatNum ).HCoil_Index = GetSteamCoilIndex( "COIL:HEATING:STEAM", UnitHeat( UnitHeatNum ).HCoilName, errFlag );
@@ -453,7 +537,7 @@ namespace UnitHeater {
 				ShowSevereError( CurrentModuleObject + " \"" + UnitHeat( UnitHeatNum ).Name + "\" " + cAlphaFields( 9 ) + " not found: " + Alphas( 9 ) );
 				ErrorsFound = true;
 			} else if ( lAlphaBlanks( 9 ) ) {
-				if ( UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff ) {
+				if ( UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff || UnitHeat( UnitHeatNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					UnitHeat( UnitHeatNum ).OpMode = CycFanCycCoil;
 				} else {
 					UnitHeat( UnitHeatNum ).OpMode = ContFanCycCoil;
@@ -595,9 +679,6 @@ namespace UnitHeater {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::StdRhoAir;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -618,20 +699,10 @@ namespace UnitHeater {
 		using namespace DataZoneEnergyDemands;
 		using WaterCoils::SimulateWaterCoilComponents;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitUnitHeater" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag;
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -649,7 +720,7 @@ namespace UnitHeater {
 		// FLOW:
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitUnitHeaterOneTimeFlag ) {
 
 			MyEnvrnFlag.allocate( NumOfUnitHeats );
 			MySizeFlag.allocate( NumOfUnitHeats );
@@ -659,7 +730,7 @@ namespace UnitHeater {
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
 			MyZoneEqFlag = true;
-			MyOneTimeFlag = false;
+			InitUnitHeaterOneTimeFlag = false;
 
 		}
 
@@ -719,8 +790,8 @@ namespace UnitHeater {
 			Node( InNode ).MassFlowRateMax = UnitHeat( UnitHeatNum ).MaxAirMassFlow;
 			Node( InNode ).MassFlowRateMin = 0.0;
 
-			if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
-				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+			if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
+				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 				UnitHeat( UnitHeatNum ).MaxHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MaxVolHotWaterFlow;
 				UnitHeat( UnitHeatNum ).MinHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MinVolHotWaterFlow;
@@ -816,15 +887,14 @@ namespace UnitHeater {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace InputProcessor;
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
+		using WaterCoils::GetWaterCoilIndex;
+		using WaterCoils::WaterCoil;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using DataPlant::PlantLoop;
@@ -837,17 +907,8 @@ namespace UnitHeater {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeUnitHeater" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -882,6 +943,9 @@ namespace UnitHeater {
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+		bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
+		Real64 WaterCoilSizDeltaT; // water coil deltaT for design water flow rate autosizing
+		int CoilNum; // index of water coil object
 
 		PltSizHeatNum = 0;
 		ErrorsFound = false;
@@ -968,7 +1032,7 @@ namespace UnitHeater {
 			IsAutoSize = true;
 		}
 
-		if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+		if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 
 			if ( CurZoneEqNum > 0 ) {
 				if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
@@ -982,7 +1046,24 @@ namespace UnitHeater {
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						if ( PltSizHeatNum > 0 ) {
+						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
+							DoWaterCoilSizing = true;
+						} else {
+							if ( PltSizHeatNum > 0 ) {
+								WaterCoilSizDeltaT = PlantSizData( PltSizHeatNum ).DeltaT;
+								DoWaterCoilSizing = true;
+							} else {
+								DoWaterCoilSizing = false;
+								// If there is no heating Plant Sizing object and autosizing was requested, issue fatal error message
+								ShowSevereError( "Autosizing of water coil requires a heating loop Sizing:Plant object" );
+								ShowContinueError( "Occurs in ZoneHVAC:UnitHeater Object=" + UnitHeat( UnitHeatNum ).Name );
+								ErrorsFound = true;
+							}
+						}
+
+						if ( DoWaterCoilSizing ) {
 							SizingMethod = HeatingCapacitySizing;
 							if ( UnitHeat( UnitHeatNum ).HVACSizingIndex > 0 ) {
 								zoneHVACIndex = UnitHeat( UnitHeatNum ).HVACSizingIndex;
@@ -1010,6 +1091,7 @@ namespace UnitHeater {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								SizingString = "";
 								PrintFlag = false;
@@ -1021,17 +1103,12 @@ namespace UnitHeater {
 							}
 
 							if ( DesCoilLoad >= SmallLoad ) {
-								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
-								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+								MaxVolHotWaterFlowDes = DesCoilLoad / ( WaterCoilSizDeltaT * Cp * rho );
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
 							}
-
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in ZoneHVAC:UnitHeater Object=" + UnitHeat( UnitHeatNum ).Name );
-							ErrorsFound = true;
 						}
 					}
 					if ( IsAutoSize ) {
@@ -1107,6 +1184,7 @@ namespace UnitHeater {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 							}
@@ -1246,7 +1324,6 @@ namespace UnitHeater {
 		bool UnitOn;
 
 		// initialize local variables
-		FanElecPower = 0.0;
 		QUnitOut = 0.0;
 		NoOutput = 0.0;
 		FullOutput = 0.0;
@@ -1269,7 +1346,7 @@ namespace UnitHeater {
 				//         OR child fan in not available OR child fan not being cycled ON by sys avail manager
 				//         OR child fan being forced OFF by sys avail manager
 				HCoilOn = false;
-				if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+				if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 					mdot = 0.0; // try to turn off
 
 					SetComponentFlowRate( mdot, UnitHeat( UnitHeatNum ).HotControlNode, UnitHeat( UnitHeatNum ).HotCoilOutNodeNum, UnitHeat( UnitHeatNum ).HWLoopNum, UnitHeat( UnitHeatNum ).HWLoopSide, UnitHeat( UnitHeatNum ).HWBranchNum, UnitHeat( UnitHeatNum ).HWCompNum );
@@ -1288,7 +1365,7 @@ namespace UnitHeater {
 					// Case 2: NO LOAD OR COOLING/ON-OFF FAN CONTROL-->turn everything off
 					//         because there is no load on the unit heater
 					HCoilOn = false;
-					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 						mdot = 0.0; // try to turn off
 
 						SetComponentFlowRate( mdot, UnitHeat( UnitHeatNum ).HotControlNode, UnitHeat( UnitHeatNum ).HotCoilOutNodeNum, UnitHeat( UnitHeatNum ).HWLoopNum, UnitHeat( UnitHeatNum ).HWLoopSide, UnitHeat( UnitHeatNum ).HWBranchNum, UnitHeat( UnitHeatNum ).HWCompNum );
@@ -1307,7 +1384,7 @@ namespace UnitHeater {
 					// so there is really nothing else left to do except call the components.
 
 					HCoilOn = false;
-					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
+					if ( UnitHeat( UnitHeatNum ).HCoilType == WaterHeatingCoil ) {
 						mdot = 0.0; // try to turn off
 
 						if ( UnitHeat( UnitHeatNum ).HWLoopNum > 0 ) {
@@ -1329,7 +1406,7 @@ namespace UnitHeater {
 
 				{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).HCoilType );
 
-				if ( SELECT_CASE_var == WaterCoil ) {
+				if ( SELECT_CASE_var == WaterHeatingCoil ) {
 
 					//On the first HVAC iteration the system values are given to the controller, but after that
 					// the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1407,7 +1484,11 @@ namespace UnitHeater {
 
 		// Report variables...
 		UnitHeat( UnitHeatNum ).HeatPower = max( 0.0, QUnitOut );
-		UnitHeat( UnitHeatNum ).ElecPower = FanElecPower;
+		if ( UnitHeat( UnitHeatNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			UnitHeat( UnitHeatNum ).ElecPower = Fans::GetFanPower( UnitHeat( UnitHeatNum ).Fan_Index );
+		} else {
+			UnitHeat( UnitHeatNum ).ElecPower = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->fanPower();
+		}
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;
@@ -1443,7 +1524,6 @@ namespace UnitHeater {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
@@ -1492,11 +1572,15 @@ namespace UnitHeater {
 			FanOpMode = ContFanCycCoil;
 		}
 		if ( FanOpMode != CycFanCycCoil ) {
-			SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( UnitHeat( UnitHeatNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+				Fans::SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
+			}
 
 			{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).HCoilType );
 
-			if ( SELECT_CASE_var == WaterCoil ) {
+			if ( SELECT_CASE_var == WaterHeatingCoil ) {
 
 				SimulateWaterCoilComponents( UnitHeat( UnitHeatNum ).HCoilName, FirstHVACIteration, UnitHeat( UnitHeatNum ).HCoil_Index );
 			} else if ( SELECT_CASE_var == SteamCoil ) {
@@ -1537,12 +1621,14 @@ namespace UnitHeater {
 			Node( InletNode ).MassFlowRateMaxAvail = AirMassFlow;
 
 			if ( QCoilReq < 0.0 ) QCoilReq = 0.0; // a heating coil can only heat, not cool
-
-			SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-
+			if ( UnitHeat( UnitHeatNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+				Fans::SimulateFanComponents( UnitHeat( UnitHeatNum ).FanName, FirstHVACIteration, UnitHeat( UnitHeatNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
+			}
 			{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).HCoilType );
 
-			if ( SELECT_CASE_var == WaterCoil ) {
+			if ( SELECT_CASE_var == WaterHeatingCoil ) {
 
 				if ( ! HCoilOn ) {
 					mdot = 0.0;
@@ -1707,29 +1793,6 @@ namespace UnitHeater {
 		return Residuum;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // UnitHeater
 

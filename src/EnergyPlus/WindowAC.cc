@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
@@ -8,6 +54,7 @@
 // EnergyPlus Headers
 #include <WindowAC.hh>
 #include <BranchNodeConnections.hh>
+#include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -20,6 +67,7 @@
 #include <DXCoils.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -31,6 +79,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -73,13 +122,11 @@ namespace WindowAC {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataEnvironment::OutBaroPress;
-	using DataEnvironment::OutDryBulbTemp;
 	using DataEnvironment::OutRelHum;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::DXElecCoolingPower;
 	using DataHVACGlobals::OnOffFanPartLoadFraction;
 	using DataHVACGlobals::SmallAirVolFlow;
@@ -111,6 +158,11 @@ namespace WindowAC {
 
 	// MODULE VARIABLE DECLARATIONS:
 
+	namespace {
+		bool MyOneTimeFlag( true );
+		bool ZoneEquipmentListChecked( false );
+	}
+
 	int NumWindAC( 0 );
 	int NumWindACCyc( 0 );
 	Array1D_bool MySizeFlag;
@@ -125,6 +177,21 @@ namespace WindowAC {
 	Array1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumWindAC = 0;
+		NumWindACCyc = 0;
+		GetWindowACInputFlag = true;
+		CoolingLoad = false;
+		MyOneTimeFlag = true;
+		ZoneEquipmentListChecked = false;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		WindAC.deallocate();
+		WindACNumericFields.deallocate();
+	}
 
 	void
 	SimWindowAC(
@@ -408,31 +475,48 @@ namespace WindowAC {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				GetFanType( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC( WindACNum ).Name );
-				{ auto const SELECT_CASE_var( WindAC( WindACNum ).FanType_Num );
-				if ( ( SELECT_CASE_var == FanType_SimpleOnOff ) || ( SELECT_CASE_var == FanType_SimpleConstVolume ) ) {
-					GetFanIndex( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanIndex, FanErrFlag, CurrentModuleObject );
-					if ( FanErrFlag ) {
-						ShowContinueError( " specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
-						ErrorsFound = true;
-					} else {
-						GetFanVolFlow( WindAC( WindACNum ).FanIndex, FanVolFlow );
-						if ( FanVolFlow != AutoSize ) {
-							if ( FanVolFlow < WindAC( WindACNum ).MaxAirVolFlow ) {
-								ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
-								ShowContinueError( " The fan flow rate must be >= to the " + cNumericFields( 1 ) + " in the " + CurrentModuleObject + " object." );
-								ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
-								ErrorsFound = true;
-							}
+				if ( SameString(  WindAC( WindACNum ).FanType, "Fan:SystemModel" ) ) {
+					WindAC( WindACNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( WindAC( WindACNum ).FanName ) ); // call constructor
+					WindAC( WindACNum ).FanIndex = HVACFan::getFanObjectVectorIndex( WindAC( WindACNum ).FanName );
+					FanVolFlow =  HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->designAirVolFlowRate;
+					if ( FanVolFlow != AutoSize ) {
+						if ( FanVolFlow < WindAC( WindACNum ).MaxAirVolFlow ) {
+							ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
+							ShowContinueError( " The fan flow rate must be >= to the " + cNumericFields( 1 ) + " in the " + CurrentModuleObject + " object." );
+							ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
+							ErrorsFound = true;
 						}
 					}
+					WindAC( WindACNum ).FanAvailSchedPtr = HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->availSchedIndex;
 				} else {
-					ShowSevereError( CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"." );
-					ShowContinueError( "Fan Type must be Fan:OnOff, or Fan:ConstantVolume." );
-					ErrorsFound = true;
-				}}
-				// Get the fan's availability schedule
-				WindAC( WindACNum ).FanAvailSchedPtr = GetFanAvailSchPtr( WindAC( WindACNum ).FanType, WindAC( WindACNum ).FanName, FanErrFlag );
+
+					GetFanType( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC( WindACNum ).Name );
+					{ auto const SELECT_CASE_var( WindAC( WindACNum ).FanType_Num );
+					if ( ( SELECT_CASE_var == FanType_SimpleOnOff ) || ( SELECT_CASE_var == FanType_SimpleConstVolume ) ) {
+						GetFanIndex( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanIndex, FanErrFlag, CurrentModuleObject );
+						if ( FanErrFlag ) {
+							ShowContinueError( " specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
+							ErrorsFound = true;
+						} else {
+							GetFanVolFlow( WindAC( WindACNum ).FanIndex, FanVolFlow );
+							if ( FanVolFlow != AutoSize ) {
+								if ( FanVolFlow < WindAC( WindACNum ).MaxAirVolFlow ) {
+									ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
+									ShowContinueError( " The fan flow rate must be >= to the " + cNumericFields( 1 ) + " in the " + CurrentModuleObject + " object." );
+									ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
+									ErrorsFound = true;
+								}
+							}
+						}
+					} else {
+						ShowSevereError( CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"." );
+						ShowContinueError( "Fan Type must be Fan:OnOff, or Fan:ConstantVolume." );
+						ErrorsFound = true;
+					}}
+					// Get the fan's availability schedule
+					WindAC( WindACNum ).FanAvailSchedPtr = GetFanAvailSchPtr( WindAC( WindACNum ).FanType, WindAC( WindACNum ).FanName, FanErrFlag );
+				}
 				if ( FanErrFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
 					ErrorsFound = true;
@@ -441,7 +525,7 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).DXCoilName = Alphas( 10 );
 
-			if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+			if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 				WindAC( WindACNum ).DXCoilType = Alphas( 9 );
 				CoilNodeErrFlag = false;
 				if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
@@ -450,6 +534,10 @@ namespace WindowAC {
 				} else if ( SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingHXAssisted;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXHXAsstdCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
+				} else if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" )  ) {
+					WindAC( WindACNum ).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+					WindAC( WindACNum ).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
+					WindAC( WindACNum ).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds( WindAC( WindACNum ).DXCoilName, ErrorsFound );
 				}
 				if ( CoilNodeErrFlag ) {
 					ShowContinueError( " that was specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
@@ -675,8 +763,10 @@ namespace WindowAC {
 		int OutsideAirNode; // outside air node number in window AC loop
 		int AirRelNode; // relief air node number in window AC loop
 		Real64 RhoAir; // air density at InNode
-		static bool MyOneTimeFlag( true );
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true );
+		// static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		////////////////////////////////////////////////////////////////////////////////////
 		int Loop; // loop counter
 		static Array1D_bool MyEnvrnFlag; // one time initialization flag
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -879,6 +969,7 @@ namespace WindowAC {
 		DataScalableSizingON = false;
 		ZoneHeatingOnlyFan = false;
 		ZoneCoolingOnlyFan = true;
+		DataScalableCapSizingON = false;
 		CompType = "ZoneHVAC:WindowAirConditioner";
 		CompName = WindAC( WindACNum ).Name;
 		DataZoneNumber = WindAC( WindACNum ).ZonePtr;
@@ -987,6 +1078,8 @@ namespace WindowAC {
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = WindAC( WindACNum ).MaxAirVolFlow;
 		}
 
+		DataScalableCapSizingON = false;
+		
 	}
 
 	void
@@ -1050,8 +1143,8 @@ namespace WindowAC {
 		Real64 SpecHumOut; // Specific humidity ratio of outlet air (kg moisture / kg moist air)
 		Real64 SpecHumIn; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
-		// zero the fan and DX coil electricity consumption
-		FanElecPower = 0.0;
+		// zero the DX coil electricity consumption
+
 		DXElecCoolingPower = 0.0;
 		// initialize local variables
 		UnitOn = true;
@@ -1127,7 +1220,13 @@ namespace WindowAC {
 		WindAC( WindACNum ).TotCoolEnergyRate = std::abs( min( 0.0, QTotUnitOut ) );
 		WindAC( WindACNum ).SensCoolEnergyRate = min( WindAC( WindACNum ).SensCoolEnergyRate, WindAC( WindACNum ).TotCoolEnergyRate );
 		WindAC( WindACNum ).LatCoolEnergyRate = WindAC( WindACNum ).TotCoolEnergyRate - WindAC( WindACNum ).SensCoolEnergyRate;
-		WindAC( WindACNum ).ElecPower = FanElecPower + DXElecCoolingPower;
+		Real64 locFanElecPower = 0.0;
+		if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = Fans::GetFanPower( WindAC( WindACNum ).FanIndex );
+		} else {
+			locFanElecPower = HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->fanPower();
+		}
+		WindAC( WindACNum ).ElecPower = locFanElecPower + DXElecCoolingPower;
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;
@@ -1210,7 +1309,6 @@ namespace WindowAC {
 
 		// Using/Aliasing
 		using MixedAir::SimOAMixer;
-		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using InputProcessor::SameString;
@@ -1255,17 +1353,35 @@ namespace WindowAC {
 
 		// if blow through, simulate fan then coil. For draw through, simulate coil then fan.
 		if ( WindAC( WindACNum ).FanPlace == BlowThru ) {
-			SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+				Fans::SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[  WindAC( WindACNum ).FanIndex ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+			}
 		}
 
 		if ( WindAC( WindACNum ).DXCoilType_Num == CoilDX_CoolingHXAssisted ) {
 			SimHXAssistedCoolingCoil( WindAC( WindACNum ).DXCoilName, FirstHVACIteration, On, PartLoadFrac, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, HXUnitOn );
+		} else if ( WindAC( WindACNum ).DXCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+			Real64 QZnReq( -1.0 ); // Zone load (W), input to variable-speed DX coil
+			Real64 QLatReq( 0.0 ); // Zone latent load, input to variable-speed DX coil
+			Real64 MaxONOFFCyclesperHour( 4.0 ); // Maximum cycling rate of heat pump [cycles/hr]
+			Real64 HPTimeConstant( 0.0 ); // Heat pump time constant [s]
+			Real64 FanDelayTime( 0.0 ); // Fan delay time, time delay for the HP's fan to
+			Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
+
+			VariableSpeedCoils::SimVariableSpeedCoils( WindAC( WindACNum ).DXCoilName, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadFrac, WindAC( WindACNum ).DXCoilNumOfSpeeds, 1.0, QZnReq, QLatReq, OnOffAirFlowRatio );
+		
 		} else {
 			SimDXCoil( WindAC( WindACNum ).DXCoilName, On, FirstHVACIteration, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, PartLoadFrac );
 		}
 
 		if ( WindAC( WindACNum ).FanPlace == DrawThru ) {
-			SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+				Fans::SimulateFanComponents( WindAC( WindACNum ).FanName, FirstHVACIteration, WindAC( WindACNum ).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[  WindAC( WindACNum ).FanIndex ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+			}
 		}
 
 		MinHumRat = min( Node( InletNode ).HumRat, Node( OutletNode ).HumRat );
@@ -1662,29 +1778,6 @@ namespace WindowAC {
 		return GetWindowACMixedAirNode;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WindowAC
 

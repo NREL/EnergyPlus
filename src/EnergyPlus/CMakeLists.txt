@@ -10,6 +10,8 @@ if(NOT PROFILE_USE)
 endif()
 
 SET( SRC
+  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
   Timer.h
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
@@ -30,6 +32,8 @@ SET( SRC
   BranchNodeConnections.hh
   CTElectricGenerator.cc
   CTElectricGenerator.hh
+  ChilledCeilingPanelSimple.cc
+  ChilledCeilingPanelSimple.hh
   ChillerAbsorption.cc
   ChillerAbsorption.hh
   ChillerElectricEIR.cc
@@ -127,8 +131,6 @@ SET( SRC
   DataPhotovoltaics.hh
   DataPlant.cc
   DataPlant.hh
-  DataPlantPipingSystems.cc
-  DataPlantPipingSystems.hh
   DataPrecisionGlobals.cc
   DataPrecisionGlobals.hh
   DataReportingFlags.cc
@@ -198,6 +200,8 @@ SET( SRC
   EconomicTariff.hh
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
+  ElectricPowerServiceManager.hh
+  ElectricPowerServiceManager.cc
   EnergyPlus.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
@@ -250,6 +254,8 @@ SET( SRC
   HVACDXSystem.hh
   HVACDuct.cc
   HVACDuct.hh
+  HVACFan.cc
+  HVACFan.hh
   HVACFourPipeBeam.cc
   HVACFourPipeBeam.hh
   HVACHXAssistedCoolingCoil.cc
@@ -276,6 +282,8 @@ SET( SRC
   HWBaseboardRadiator.hh
   HeatBalFiniteDiffManager.cc
   HeatBalFiniteDiffManager.hh
+  HeatBalanceKivaManager.cc
+  HeatBalanceKivaManager.hh
   HeatBalanceAirManager.cc
   HeatBalanceAirManager.hh
   HeatBalanceHAMTManager.cc
@@ -304,12 +312,10 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  HybridModel.cc
+  HybridModel.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
-)
- 
-SET( SRC_2
-  Timer.h
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
   GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
@@ -326,12 +332,12 @@ SET( SRC_2
   IceThermalStorage.hh
   InputProcessor.cc
   InputProcessor.hh
+  IntegratedHeatPump.cc
+  IntegratedHeatPump.hh
   InternalHeatGains.cc
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  ManageElectricPower.cc
-  ManageElectricPower.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
   MicroCHPElectricGenerator.cc
@@ -376,7 +382,6 @@ SET( SRC_2
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
   Photovoltaics.hh
-  PierceSurface.cc
   PierceSurface.hh
   PipeHeatTransfer.cc
   PipeHeatTransfer.hh
@@ -386,6 +391,7 @@ SET( SRC_2
   PlantCentralGSHP.hh
   PlantChillers.cc
   PlantChillers.hh
+  PlantComponent.hh
   PlantComponentTemperatureSources.cc
   PlantComponentTemperatureSources.hh
   PlantCondLoopOperation.cc
@@ -409,6 +415,7 @@ SET( SRC_2
   PlantUtilities.hh
   PlantValves.cc
   PlantValves.hh
+  Platform.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
@@ -443,6 +450,7 @@ SET( SRC_2
   ScheduleManager.hh
   SetPointManager.cc
   SetPointManager.hh
+  Shape.hh
   SimAirServingZones.cc
   SimAirServingZones.hh
   SimulationManager.cc
@@ -473,6 +481,8 @@ SET( SRC_2
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
   SurfaceGroundHeatExchanger.hh
+  SurfaceOctree.cc
+  SurfaceOctree.hh
   SwimmingPool.cc
   SwimmingPool.hh
   SystemAvailabilityManager.cc
@@ -505,6 +515,7 @@ SET( SRC_2
   ThermalEN673Calc.hh
   ThermalISO15099Calc.cc
   ThermalISO15099Calc.hh
+  Timer.h
   TranspiredCollector.cc
   TranspiredCollector.hh
   UFADManager.cc
@@ -569,7 +580,11 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight jsoncpp )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva)
+if(BUILD_GROUND_PLOT)
+  set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
+  target_link_libraries( energypluslib groundplot )
+endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
 endif()
@@ -577,17 +592,9 @@ if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
 
-add_library( energypluslib2 STATIC ${SRC_2} )
-target_link_libraries( energypluslib2 )
-if(UNIX AND NOT APPLE)
-  target_link_libraries( energypluslib2 dl )
-endif()
-
-
 # second we will create the shared library that is actually packaged with EnergyPlus
 add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
-target_link_libraries( energyplusapi energypluslib energypluslib2 )
-
+target_link_libraries( energyplusapi energypluslib )
 
 set_target_properties(
   energyplusapi
@@ -597,18 +604,15 @@ set_target_properties(
 install( TARGETS energyplusapi
   RUNTIME DESTINATION ./
   LIBRARY DESTINATION ./
+  ARCHIVE DESTINATION ./
 )
 
 if (MINGW)
-  target_link_libraries( energypluslib2 energypluslib )
-  target_link_libraries( energypluslib energypluslib2 )
   add_executable( energyplus main.cc  )
   target_link_libraries( energyplus energyplusapi )
 elseif (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
-  target_link_libraries( energypluslib2 energypluslib )
-  target_link_libraries( energypluslib energypluslib2 )
   add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-  target_link_libraries( energyplus energypluslib energypluslib2 )
+  target_link_libraries( energyplus energypluslib )
 else()
   add_executable( energyplus main.cc  )
   target_link_libraries( energyplus energyplusapi )
@@ -637,4 +641,3 @@ if(UNIX AND NOT APPLE)
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
   COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
 endif()
-

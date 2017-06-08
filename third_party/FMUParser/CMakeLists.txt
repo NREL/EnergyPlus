@@ -1,8 +1,9 @@
 
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat/lib")
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/")
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 
-SET(SRC 
+SET(SRC
   parser.h
   parser.c
   fmumini.c
@@ -29,9 +30,10 @@ ADD_EXECUTABLE( parser ${SRC} )
 
 TARGET_LINK_LIBRARIES( parser epexpat miniziplib )
 
-INSTALL( TARGETS parser 
-  RUNTIME DESTINATION PreProcess/FMUParser 
-  LIBRARY DESTINATION ./ 
+INSTALL( TARGETS parser
+  RUNTIME DESTINATION PreProcess/FMUParser
+  LIBRARY DESTINATION ./
+  ARCHIVE DESTINATION ./
 )
 
 if( UNIX )
@@ -41,4 +43,3 @@ set_target_properties(
   INSTALL_NAME_DIR "@executable_path"
 )
 endif()
-

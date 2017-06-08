@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // FMI-Related Headers
 extern "C" {
 #include <FMI/main.h>
@@ -51,6 +97,7 @@ extern "C" {
 #include <DualDuct.hh>
 #include <EconomicLifeCycleCost.hh>
 #include <EconomicTariff.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <EMSManager.hh>
 #include <ExteriorEnergyUse.hh>
 #include <ExternalInterface.hh>
@@ -65,7 +112,6 @@ extern "C" {
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <InputProcessor.hh>
-#include <ManageElectricPower.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -94,17 +140,6 @@ extern "C" {
 #include <Vectors.hh>
 
 namespace EnergyPlus {
-
-// HBIRE_USE_OMP defined, then openMP instructions are used.  Compiler may have to have switch for openmp
-// HBIRE_NO_OMP defined, then old code is used without any openmp instructions
-// HBIRE - loop in HeatBalanceIntRadExchange.cc
-
-#ifdef HBIRE_USE_OMP
-#undef HBIRE_NO_OMP
-#else
-#define HBIRE_NO_OMP
-#endif
-
 namespace SimulationManager {
 
 	// MODULE INFORMATION:
@@ -238,7 +273,6 @@ namespace SimulationManager {
 		using BranchInputManager::ManageBranchInput;
 		using BranchInputManager::TestBranchIntegrity;
 		using BranchInputManager::InvalidBranchDefinitions;
-		using ManageElectricPower::VerifyCustomMetersElecPowerMgr;
 		using MixedAir::CheckControllerLists;
 		using EMSManager::CheckIfAnyEMS;
 		using EMSManager::ManageEMS;
@@ -305,7 +339,6 @@ namespace SimulationManager {
 		AskForConnectionsReport = false; // set to false until sizing is finished
 
 		OpenOutputFiles();
-		CheckThreading();
 		GetProjectData();
 		CheckForMisMatchedEnvironmentSpecifications();
 		CheckForRequestedReporting();
@@ -320,13 +353,12 @@ namespace SimulationManager {
 		CheckIfAnySlabs();
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
+		createFacilityElectricPowerServiceObject();
 
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
 		ManageSizing();
-
-		CheckAndReadFaults();
 
 		BeginFullSimFlag = true;
 		SimsDone = false;
@@ -349,6 +381,9 @@ namespace SimulationManager {
 
 		ResetEnvironmentCounter();
 		SetupSimulation( ErrorsFound );
+
+		CheckAndReadFaults();
+
 		InitCurveReporting();
 
 		AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
@@ -368,7 +403,7 @@ namespace SimulationManager {
 			SetupPollutionMeterReporting();
 			UpdateMeterReporting();
 			CheckPollutionMeterReporting();
-			VerifyCustomMetersElecPowerMgr();
+			facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
 			SetupPollutionCalculations();
 			InitDemandManagers();
 
@@ -395,8 +430,8 @@ namespace SimulationManager {
 			}
 
 			CreateEnergyReportStructure();
-
-			ManageEMS( emsCallFromSetupSimulation ); // point to finish setup processing EMS, sensor ready now
+			bool anyEMSRan;
+			ManageEMS( emsCallFromSetupSimulation, anyEMSRan ); // point to finish setup processing EMS, sensor ready now
 
 			ProduceRDDMDD();
 
@@ -464,7 +499,8 @@ namespace SimulationManager {
 				isFinalYear = true;
 			}
 
-			ManageEMS( emsCallFromBeginNewEvironment ); // calling point
+			bool anyEMSRan;
+			ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
@@ -625,6 +661,8 @@ namespace SimulationManager {
 			}
 		}
 
+		PlantManager::CheckOngoingPlantWarnings();
+
 		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
@@ -633,6 +671,8 @@ namespace SimulationManager {
 		SimCostEstimate();
 
 		ComputeTariff(); //     Compute the utility bills
+
+		EMSManager::checkForUnusedActuatorsAtEnd();
 
 		ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
@@ -1341,6 +1381,7 @@ namespace SimulationManager {
 		if ( write_stat != 0 ) {
 			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEioFileName+" for output (write)." );
 		}
+		eio_stream = gio::out_stream( OutputFileInits );
 		gio::write( OutputFileInits, fmtA ) << "Program Version," + VerString;
 
 		// Open the Meters Output File
@@ -1545,6 +1586,7 @@ namespace SimulationManager {
 		// Close the Initialization Output File
 		gio::write( OutputFileInits, EndOfDataFormat );
 		gio::close( OutputFileInits );
+		eio_stream = nullptr;
 
 		// Close the Meters Output File
 		gio::write( OutputFileMeters, EndOfDataFormat );
@@ -1741,7 +1783,6 @@ namespace SimulationManager {
 		int NumNonParents;
 		int NumNonConnected;
 		std::string ChrOut;
-		Array1D_bool NonConnectedNodes;
 		bool ParentComponentFound;
 
 		// Formats
@@ -2595,177 +2636,6 @@ namespace SimulationManager {
 
 	}
 
-	void
-	CheckThreading()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   April 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Check number of threads available versus number of surfaces, etc.
-
-		// METHODOLOGY EMPLOYED:
-		// Check Max Threads (OMP_NUM_THREADS) = MaxNumberOfThreads, iEnvSetThreads
-		// Check EP Max Threads (EP_OMP_NUM_THREADS) = iepEnvSetThreads
-		// Check if IDF input (ProgramControl) = iIDFSetThreads
-		// Check # active sims (cntActv) = inumActiveSims [report only?]
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataSystemVariables;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using namespace DataIPShortCuts;
-		using General::RoundSigDigits;
-#if defined(_OPENMP) && defined(HBIRE_USE_OMP)
-		using omp_lib::omp_get_max_threads;
-		using omp_lib::omp_get_num_threads;
-		using omp_lib::omp_set_num_threads;
-#endif
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string cEnvValue;
-		int ios;
-		int TotHTSurfs; // Number of BuildingSurface:Detailed items to obtain
-		int TotDetailedWalls; // Number of Wall:Detailed items to obtain
-		int TotDetailedRoofs; // Number of RoofCeiling:Detailed items to obtain
-		int TotDetailedFloors; // Number of Floor:Detailed items to obtain
-		int TotHTSubs; // Number of FenestrationSurface:Detailed items to obtain
-		int TotIntMass; // Number of InternalMass items to obtain
-		// Simple Surfaces (Rectangular)
-		int TotRectExtWalls; // Number of Exterior Walls to obtain
-		int TotRectIntWalls; // Number of Adiabatic Walls to obtain
-		int TotRectIZWalls; // Number of Interzone Walls to obtain
-		int TotRectUGWalls; // Number of Underground to obtain
-		int TotRectRoofs; // Number of Roofs to obtain
-		int TotRectCeilings; // Number of Adiabatic Ceilings to obtain
-		int TotRectIZCeilings; // Number of Interzone Ceilings to obtain
-		int TotRectGCFloors; // Number of Floors with Ground Contact to obtain
-		int TotRectIntFloors; // Number of Adiabatic Walls to obtain
-		int TotRectIZFloors; // Number of Interzone Floors to obtain
-		int TotRectWindows;
-		int TotRectDoors;
-		int TotRectGlazedDoors;
-		int TotRectIZWindows;
-		int TotRectIZDoors;
-		int TotRectIZGlazedDoors;
-		int iIDFsetThreadsInput;
-		int NumAlphas;
-		int NumNumbers;
-
-		// Figure out how many surfaces there are.
-		TotHTSurfs = GetNumObjectsFound( "BuildingSurface:Detailed" );
-		TotDetailedWalls = GetNumObjectsFound( "Wall:Detailed" );
-		TotDetailedRoofs = GetNumObjectsFound( "RoofCeiling:Detailed" );
-		TotDetailedFloors = GetNumObjectsFound( "Floor:Detailed" );
-		TotHTSubs = GetNumObjectsFound( "FenestrationSurface:Detailed" );
-		TotIntMass = GetNumObjectsFound( "InternalMass" );
-		TotRectWindows = GetNumObjectsFound( "Window" );
-		TotRectDoors = GetNumObjectsFound( "Door" );
-		TotRectGlazedDoors = GetNumObjectsFound( "GlazedDoor" );
-		TotRectIZWindows = GetNumObjectsFound( "Window:Interzone" );
-		TotRectIZDoors = GetNumObjectsFound( "Door:Interzone" );
-		TotRectIZGlazedDoors = GetNumObjectsFound( "GlazedDoor:Interzone" );
-		TotRectExtWalls = GetNumObjectsFound( "Wall:Exterior" );
-		TotRectIntWalls = GetNumObjectsFound( "Wall:Adiabatic" );
-		TotRectIZWalls = GetNumObjectsFound( "Wall:Interzone" );
-		TotRectUGWalls = GetNumObjectsFound( "Wall:Underground" );
-		TotRectRoofs = GetNumObjectsFound( "Roof" );
-		TotRectCeilings = GetNumObjectsFound( "Ceiling:Adiabatic" );
-		TotRectIZCeilings = GetNumObjectsFound( "Ceiling:Interzone" );
-		TotRectGCFloors = GetNumObjectsFound( "Floor:GroundContact" );
-		TotRectIntFloors = GetNumObjectsFound( "Floor:Adiabatic" );
-		TotRectIZFloors = GetNumObjectsFound( "Floor:Interzone" );
-
-		iNominalTotSurfaces = TotHTSurfs + TotDetailedWalls + TotDetailedRoofs + TotDetailedFloors + TotHTSubs + TotIntMass + TotRectWindows + TotRectDoors + TotRectGlazedDoors + TotRectIZWindows + TotRectIZDoors + TotRectIZGlazedDoors + TotRectExtWalls + TotRectIntWalls + TotRectIZWalls + TotRectUGWalls + TotRectRoofs + TotRectCeilings + TotRectIZCeilings + TotRectGCFloors + TotRectIntFloors + TotRectIZFloors;
-
-#ifdef HBIRE_USE_OMP
-		MaxNumberOfThreads = MAXTHREADS();
-		Threading = true;
-
-		get_environment_variable( cNumThreads, cEnvValue );
-		if ( ! cEnvValue.empty() ) {
-			lEnvSetThreadsInput = true;
-			{ IOFlags flags; gio::read( cEnvValue, fmtLD, flags ) >> iEnvSetThreads; ios = flags.ios(); }
-			if ( ios != 0 ) iEnvSetThreads = MaxNumberOfThreads;
-			if ( iEnvSetThreads == 0 ) iEnvSetThreads = MaxNumberOfThreads;
-		}
-
-		get_environment_variable( cepNumThreads, cEnvValue );
-		if ( ! cEnvValue.empty() ) {
-			lepSetThreadsInput = true;
-			{ IOFlags flags; gio::read( cEnvValue, fmtLD, flags ) >> iepEnvSetThreads; ios = flags.ios(); }
-			if ( ios != 0 ) iepEnvSetThreads = MaxNumberOfThreads;
-			if ( iepEnvSetThreads == 0 ) iepEnvSetThreads = MaxNumberOfThreads;
-		}
-
-		cCurrentModuleObject = "ProgramControl";
-		if ( GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, ios, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			iIDFSetThreads = int( rNumericArgs( 1 ) );
-			lIDFsetThreadsInput = true;
-			if ( iIDFSetThreads <= 0 ) {
-				iIDFSetThreads = MaxNumberOfThreads;
-				if ( lEnvSetThreadsInput ) iIDFSetThreads = iEnvSetThreads;
-				if ( lepSetThreadsInput ) iIDFSetThreads = iepEnvSetThreads;
-			}
-			if ( iIDFSetThreads > MaxNumberOfThreads ) {
-				ShowWarningError( "CheckThreading: Your chosen number of threads=[" + RoundSigDigits( iIDFSetThreads ) + "] is greater than the maximum number of threads=[" + RoundSigDigits( MaxNumberOfThreads ) + "]." );
-				ShowContinueError( "...execution time for this run may be degraded." );
-			}
-		}
-
-		if ( iNominalTotSurfaces <= 30 ) {
-			NumberIntRadThreads = 1;
-			if ( lEnvSetThreadsInput ) NumberIntRadThreads = iEnvSetThreads;
-			if ( lepSetThreadsInput ) NumberIntRadThreads = iepEnvSetThreads;
-			if ( lIDFSetThreadsInput ) NumberIntRadThreads = iIDFSetThreads;
-		} else {
-			NumberIntRadThreads = MaxNumberOfThreads;
-			if ( lEnvSetThreadsInput ) NumberIntRadThreads = iEnvSetThreads;
-			if ( lepSetThreadsInput ) NumberIntRadThreads = iepEnvSetThreads;
-			if ( lIDFSetThreadsInput ) NumberIntRadThreads = iIDFSetThreads;
-		}
-#else
-		Threading = false;
-		cCurrentModuleObject = "ProgramControl";
-		if ( GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, ios, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			iIDFsetThreadsInput = int( rNumericArgs( 1 ) );
-			if ( iIDFSetThreads > 1 ) {
-				ShowWarningError( "CheckThreading: " + cCurrentModuleObject + " is not available in this version." );
-				ShowContinueError( "...user requested [" + RoundSigDigits( iIDFsetThreadsInput ) + "] threads." );
-			}
-		}
-		MaxNumberOfThreads = 1;
-#endif
-		// just reporting
-		get_environment_variable( cNumActiveSims, cEnvValue );
-		if ( ! cEnvValue.empty() ) {
-			lnumActiveSims = true;
-			{ IOFlags flags; gio::read( cEnvValue, fmtLD, flags ) >> inumActiveSims; ios = flags.ios(); }
-		}
-
-	}
-
 } // SimulationManager
 
 // EXTERNAL SUBROUTINES:
@@ -2892,25 +2762,6 @@ Resimulate(
 	}
 
 }
-
-//     NOTICE
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -8,6 +54,7 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -907,6 +954,7 @@ CalcPassiveExteriorBaffleGap(
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using DataSurfaces::Surface;
+	using DataSurfaces::SurfaceData;
 	using DataHeatBalSurface::TH;
 	using DataHeatBalance::Material;
 	using DataHeatBalance::Construct;
@@ -980,11 +1028,13 @@ CalcPassiveExteriorBaffleGap(
 	Real64 ICSULossbottom; // ICS solar collector bottom loss Conductance
 	static bool MyICSEnvrnFlag( true ); // Local environment flag for ICS
 
+	Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, SurfPtrARR ) );
+
 //	LocalOutDryBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutDryBulbTemp ) / sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	LocalOutDryBulbTemp = sum_product_sub( Surface.Area(), Surface.OutDryBulbTemp(), SurfPtrARR ) / sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	LocalOutDryBulbTemp = sum_product_sub( Surface, &SurfaceData::Area, &SurfaceData::OutDryBulbTemp, SurfPtrARR ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 //	LocalWetBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutWetBulbTemp ) / sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	LocalWetBulbTemp = sum_product_sub( Surface.Area(), Surface.OutWetBulbTemp(), SurfPtrARR ) / sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	LocalWetBulbTemp = sum_product_sub( Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 	LocalOutHumRat = PsyWFnTdbTwbPb( LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName );
 
@@ -996,7 +1046,7 @@ CalcPassiveExteriorBaffleGap(
 		Tamb = LocalWetBulbTemp;
 	}
 //	A = sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	A = sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	A = surfaceArea;
 	TmpTsBaf = TsBaffle;
 
 	//loop through underlying surfaces and collect needed data
@@ -1051,7 +1101,7 @@ CalcPassiveExteriorBaffleGap(
 	if ( A == 0.0 ) { // should have been caught earlier
 
 	}
-	auto Area( array_sub( Surface.Area(), SurfPtrARR ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+	auto Area( array_sub( Surface, &SurfaceData::Area, SurfPtrARR ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
 	// now figure area-weighted averages from underlying surfaces.
 //	Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Vwind = sum( LocalWindArr * Area ) / A;
@@ -1075,9 +1125,9 @@ CalcPassiveExteriorBaffleGap(
 	if ( IsRain ) HExt = 1000.0;
 
 //	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-	Tso = sum_product_sub( TH( 1, 1, _ ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
+	Tso = sum_product_sub( TH( 1, 1, _ ), Surface, &SurfaceData::Area, SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-	Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
+	Isc = sum_product_sub( QRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 
 	TmeanK = 0.5 * ( TmpTsBaf + Tso ) + KelvinConv;
 
@@ -2042,28 +2092,6 @@ TestReturnAirPathIntegrity(
 	}
 
 }
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

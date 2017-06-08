@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -1241,8 +1241,8 @@ pack( Array5S< T > const & a, Array5< bool > const & mask )
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						if ( mask[ l ] ) r[ k++ ] = a( i1, i2, i3, i4, i5, ++l );
+					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
+						if ( mask[ l ] ) r[ k++ ] = a( i1, i2, i3, i4, i5 );
 					}
 				}
 			}
@@ -2719,8 +2719,8 @@ minloc( Array2S< T > const & a, int const dim )
 		{
 		Array1D< int > loc( a.isize2(), a.size2() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1 ) );
-			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+			T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, i2 ) );
+			for ( int i1 = 2, e1 = a.u1(); i1 <= e1; ++i1 ) {
 				if ( a( i1, i2 ) < r ) {
 					r = a( i1, i2 );
 					loc( i2 ) = i1;
@@ -2733,8 +2733,8 @@ minloc( Array2S< T > const & a, int const dim )
 		{
 		Array1D< int > loc( a.isize1(), a.size1() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-			T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1 ) );
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+			T r( a.empty() ? std::numeric_limits< T >::max() : a( i1, 1 ) );
+			for ( int i2 = 2, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) < r ) {
 					r = a( i1, i2 );
 					loc( i1 ) = i2;
@@ -3087,8 +3087,8 @@ maxloc( Array2S< T > const & a, int const dim )
 		{
 		Array1D< int > loc( a.isize2(), a.size2() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1 ) );
-			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+			T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, i2 ) );
+			for ( int i1 = 2, e1 = a.u1(); i1 <= e1; ++i1 ) {
 				if ( a( i1, i2 ) > r ) {
 					r = a( i1, i2 );
 					loc( i2 ) = i1;
@@ -3101,8 +3101,8 @@ maxloc( Array2S< T > const & a, int const dim )
 		{
 		Array1D< int > loc( a.isize1(), a.size1() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-			T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1 ) );
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+			T r( a.empty() ? std::numeric_limits< T >::lowest() : a( i1, 1 ) );
+			for ( int i2 = 2, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) > r ) {
 					r = a( i1, i2 );
 					loc( i1 ) = i2;

@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <string>
 
@@ -85,8 +131,10 @@ namespace NodeInputManager {
 
 	// Object Data
 	Array1D< NodeListDef > NodeLists; // Node Lists
-	namespace { 
+	namespace {
 		bool CalcMoreNodeInfoMyOneTimeFlag( true ); // one time flag
+		Array1D_int GetOnlySingleNodeNodeNums;
+		bool GetOnlySingleNodeFirstTime( true );
 	}
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -109,8 +157,10 @@ namespace NodeInputManager {
 		NumCheckNodes = 0;
 		MaxCheckNodes = 0;
 		NodeVarsSetup = false;
-		NodeWetBulbRepReq.deallocate();
 		NodeLists.deallocate();
+		GetOnlySingleNodeNodeNums.deallocate();
+		GetOnlySingleNodeFirstTime = true;
+		NodeWetBulbRepReq.deallocate();
 	}
 
 	void
@@ -219,7 +269,7 @@ namespace NodeInputManager {
 			NodeNumbers( 1 ) = 0;
 		}
 
-		// Most calls to this routined use a fixed fluid stream number for all nodes, this is the default
+		// Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
 		FluidStreamNum = NodeFluidStream;
 		for ( Loop = 1; Loop <= NumNodes; ++Loop ) {
 			if ( NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes ) {
@@ -524,9 +574,9 @@ namespace NodeInputManager {
 		rNumbers.allocate( NumNumbers );
 		NumOfNodeLists = GetNumObjectsFound( CurrentModuleObject );
 		NodeLists.allocate( NumOfNodeLists );
-		if ( NumOfNodeLists > 0 ) {
-			NodeLists( {1,NumOfNodeLists} ).Name() = "";
-			NodeLists( {1,NumOfNodeLists} ).NumOfNodesInList() = 0;
+		for ( int i = 1; i <= NumOfNodeLists; ++i ) {
+			NodeLists( i ).Name.clear();
+			NodeLists( i ).NumOfNodesInList = 0;
 		}
 
 		NCount = 0;
@@ -768,23 +818,23 @@ namespace NodeInputManager {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NumNodes;
-		static Array1D_int NodeNums;
+
 		int FluidType;
 		std::string ConnectionType;
-		static bool firstTime( true );
+
 		int NumParams;
 		int NumAlphas;
 		int NumNums;
 
-		if ( firstTime ) {
+		if ( GetOnlySingleNodeFirstTime ) {
 			GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
-			NodeNums.dimension( NumParams, 0 );
-			firstTime = false;
+			GetOnlySingleNodeNodeNums.dimension( NumParams, 0 );
+			GetOnlySingleNodeFirstTime = false;
 		}
 
 		FluidType = NodeFluidType;
 
-		GetNodeNums( NodeName, NumNodes, NodeNums, errFlag, FluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
+		GetNodeNums( NodeName, NumNodes, GetOnlySingleNodeNodeNums, errFlag, FluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
 
 		if ( NumNodes > 1 ) {
 			ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
@@ -793,7 +843,7 @@ namespace NodeInputManager {
 			ShowContinueError( "...a Nodelist may not be valid in this context." );
 			errFlag = true;
 		} else if ( NumNodes == 0 ) {
-			NodeNums( 1 ) = 0;
+			GetOnlySingleNodeNodeNums( 1 ) = 0;
 		}
 		if ( NumNodes > 0 ) {
 			if ( NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes ) {
@@ -805,7 +855,7 @@ namespace NodeInputManager {
 			//                                  ConnectionType,NodeFluidStream,ObjectIsParent,errFlag)
 		}
 
-		GetSingleNodeResult = NodeNums( 1 );
+		GetSingleNodeResult = GetOnlySingleNodeNodeNums( 1 );
 
 		return GetSingleNodeResult;
 
@@ -1046,9 +1096,6 @@ namespace NodeInputManager {
 		// Input is the existing node data plus environment variables. Output is
 		// stored in MoreNodeInfo.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::OutBaroPress;
@@ -1061,7 +1108,6 @@ namespace NodeInputManager {
 		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyTdpFnWPb;
 		using Psychrometrics::PsyCpAirFnWTdb;
-		using DataGlobals::InitConvTemp;
 		using OutputProcessor::ReqReportVariables;
 		using OutputProcessor::ReqRepVars;
 		using OutputProcessor::NumOfReqVariables;
@@ -1074,18 +1120,9 @@ namespace NodeInputManager {
 		using FluidProperties::NumOfGlycols;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMoreNodeInfo" );
 		static std::string const NodeReportingCalc( "NodeReportingCalc:" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iNode; // node loop index
@@ -1109,15 +1146,13 @@ namespace NodeInputManager {
 		Real64 SteamDensity;
 		Real64 EnthSteamInDry;
 		Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
-		//  REAL(r64)     :: rRhoVapor
-		//  INTEGER,save :: Count=0
 		Real64 rho;
 		Real64 Cp;
 		Real64 rhoStd;
 
 		if ( CalcMoreNodeInfoMyOneTimeFlag ) {
 			RhoAirStdInit = StdRhoAir;
-			RhoWaterStdInit = RhoH2O( InitConvTemp );
+			RhoWaterStdInit = RhoH2O( DataGlobals::InitConvTemp );
 			NodeWetBulbRepReq.allocate( NumOfNodes );
 			NodeWetBulbSchedPtr.allocate( NumOfNodes );
 			NodeRelHumidityRepReq.allocate( NumOfNodes );
@@ -1157,7 +1192,7 @@ namespace NodeInputManager {
 						}
 					}
 				}
-				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) { 
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) {
 					NodeWetBulbRepReq( iNode ) = true;
 					NodeWetBulbSchedPtr( iNode ) = 0;
 				}
@@ -1249,7 +1284,7 @@ namespace NodeInputManager {
 					Cp = CPCW( Node( iNode ).Temp );
 				} else {
 					Cp = GetSpecificHeatGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
-					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
+					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], DataGlobals::InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 					rho = GetDensityGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 				}
 
@@ -1401,29 +1436,6 @@ namespace NodeInputManager {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // NodeInputManager
 

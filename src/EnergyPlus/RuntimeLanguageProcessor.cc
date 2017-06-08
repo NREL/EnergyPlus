@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -15,6 +61,7 @@
 
 // EnergyPlus Headers
 #include <RuntimeLanguageProcessor.hh>
+#include <EMSManager.hh>
 #include <CurveManager.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
@@ -224,7 +271,7 @@ namespace RuntimeLanguageProcessor {
 			True = SetErlValueNumber( 1.0 );
 
 			// Create constant built-in variables
-			NullVariableNum = NewEMSVariable( "NULL", 0 );
+			NullVariableNum = NewEMSVariable( "NULL", 0, SetErlValueNumber( 0.0) );
 			ErlVariable( NullVariableNum ).Value.Type = ValueNull;
 			FalseVariableNum = NewEMSVariable( "FALSE", 0, False );
 			TrueVariableNum = NewEMSVariable( "TRUE", 0, True );
@@ -384,7 +431,9 @@ namespace RuntimeLanguageProcessor {
 			}
 			if ( CycleThisVariable ) continue;
 
-			ErlVariable( ErlVariableNum ).Value = SetErlValueNumber( 0.0, ErlVariable( ErlVariableNum ).Value );
+			if ( ErlVariable( ErlVariableNum ).Value.initialized ) {
+				ErlVariable( ErlVariableNum ).Value = SetErlValueNumber( 0.0, ErlVariable( ErlVariableNum ).Value );
+			}
 
 		}
 		//reinitialize state of actuators
@@ -862,9 +911,9 @@ namespace RuntimeLanguageProcessor {
 		int InstructionNum;
 		int InstructionNum2;
 		int ExpressionNum;
-		Real64 ReturnValueActual; // for testing
 		static int VariableNum;
 		int WhileLoopExitCounter; // to avoid infinite loop in While loop
+		bool seriousErrorFound( false ); // once it gets set true (inside EvaluateExpresssion) it will trigger a fatal (in WriteTrace)
 
 		WhileLoopExitCounter = 0;
 		ReturnValue.Type = ValueNumber;
@@ -879,14 +928,14 @@ namespace RuntimeLanguageProcessor {
 				// There probably shouldn't be any of these
 
 			} else if ( SELECT_CASE_var == KeywordReturn ) {
-				if ( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 > 0 ) ReturnValue = EvaluateExpression( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 );
+				if ( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 > 0 ) ReturnValue = EvaluateExpression( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1, seriousErrorFound );
 
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 				break; // RETURN always terminates an instruction stack
 
 			} else if ( SELECT_CASE_var == KeywordSet ) {
 
-				ReturnValue = EvaluateExpression( ErlStack( StackNum ).Instruction( InstructionNum ).Argument2 );
+				ReturnValue = EvaluateExpression( ErlStack( StackNum ).Instruction( InstructionNum ).Argument2, seriousErrorFound );
 				VariableNum = ErlStack( StackNum ).Instruction( InstructionNum ).Argument1;
 				if ( ( ! ErlVariable( VariableNum ).ReadOnly ) && ( ! ErlVariable( VariableNum ).Value.TrendVariable ) ) {
 					ErlVariable( VariableNum ).Value = ReturnValue;
@@ -895,12 +944,12 @@ namespace RuntimeLanguageProcessor {
 					ErlVariable( VariableNum ).Value.Error = ReturnValue.Error;
 				}
 
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 
 			} else if ( SELECT_CASE_var == KeywordRun ) {
 				ReturnValue.Type = ValueString;
 				ReturnValue.String = "";
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 				ReturnValue = EvaluateStack( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 );
 
 			} else if ( ( SELECT_CASE_var == KeywordIf ) || ( SELECT_CASE_var == KeywordElse ) ) { // same???
@@ -908,8 +957,8 @@ namespace RuntimeLanguageProcessor {
 				InstructionNum2 = ErlStack( StackNum ).Instruction( InstructionNum ).Argument2;
 
 				if ( ExpressionNum > 0 ) { // could be 0 if this was an ELSE
-					ReturnValue = EvaluateExpression( ExpressionNum );
-					WriteTrace( StackNum, InstructionNum, ReturnValue );
+					ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
+					WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 					if ( ReturnValue.Number == 0.0 ) { //  This is the FALSE case
 						// Eventually should handle strings and arrays too
 						InstructionNum = InstructionNum2;
@@ -919,7 +968,7 @@ namespace RuntimeLanguageProcessor {
 					// KeywordELSE  -- kind of a kludge
 					ReturnValue.Type = ValueNumber;
 					ReturnValue.Number = 1.0;
-					WriteTrace( StackNum, InstructionNum, ReturnValue );
+					WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 				}
 
 			} else if ( SELECT_CASE_var == KeywordGoto ) {
@@ -935,14 +984,14 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == KeywordEndIf ) {
 				ReturnValue.Type = ValueString;
 				ReturnValue.String = "";
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 
 			} else if ( SELECT_CASE_var == KeywordWhile ) {
 				// evaluate expresssion at while, skip to past endwhile if not true
 				ExpressionNum = ErlStack( StackNum ).Instruction( InstructionNum ).Argument1;
 				InstructionNum2 = ErlStack( StackNum ).Instruction( InstructionNum ).Argument2;
-				ReturnValue = EvaluateExpression( ExpressionNum );
-				WriteTrace( StackNum, InstructionNum, ReturnValue );
+				ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 				if ( ReturnValue.Number == 0.0 ) { //  This is the FALSE case
 					// Eventually should handle strings and arrays too
 					InstructionNum = InstructionNum2;
@@ -953,10 +1002,10 @@ namespace RuntimeLanguageProcessor {
 				// reevaluate expression at While and goto there if true, otherwise continue
 				ExpressionNum = ErlStack( StackNum ).Instruction( InstructionNum ).Argument1;
 				InstructionNum2 = ErlStack( StackNum ).Instruction( InstructionNum ).Argument2;
-				ReturnValue = EvaluateExpression( ExpressionNum );
+				ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
 				if ( ( ReturnValue.Number != 0.0 ) && ( WhileLoopExitCounter <= MaxWhileLoopIterations ) ) { //  This is the True case
 					// Eventually should handle strings and arrays too
-					WriteTrace( StackNum, InstructionNum, ReturnValue ); // duplicative?
+					WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound ); // duplicative?
 					InstructionNum = InstructionNum2;
 					++WhileLoopExitCounter;
 
@@ -966,11 +1015,11 @@ namespace RuntimeLanguageProcessor {
 						WhileLoopExitCounter = 0;
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-						WriteTrace( StackNum, InstructionNum, ReturnValue );
+						WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 					} else {
 						ReturnValue.Type = ValueNumber;
 						ReturnValue.Number = 0.0;
-						WriteTrace( StackNum, InstructionNum, ReturnValue );
+						WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 						WhileLoopExitCounter = 0;
 					}
 				}
@@ -982,8 +1031,6 @@ namespace RuntimeLanguageProcessor {
 			++InstructionNum;
 		} // InstructionNum
 
-		ReturnValueActual = ( 4.91 + 632.0 ) / ( 32.0 * ( 4.0 - 10.2 ) ); // must have extra periods
-
 		return ReturnValue;
 
 	}
@@ -992,7 +1039,8 @@ namespace RuntimeLanguageProcessor {
 	WriteTrace(
 		int const StackNum,
 		int const InstructionNum,
-		ErlValueType const & ReturnValue
+		ErlValueType const & ReturnValue,
+		bool const seriousErrorFound
 	)
 	{
 
@@ -1000,6 +1048,7 @@ namespace RuntimeLanguageProcessor {
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   June 2006
 		//       MODIFIED       Brent Griffith, May 2009
+		//                      Brent Griffith, May 2016, added bool and fatal error messages for runtime problems with math and unitialized vars
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1029,9 +1078,9 @@ namespace RuntimeLanguageProcessor {
 		std::string DuringWarmup;
 
 		// FLOW:
-		if ( ( ! OutputFullEMSTrace ) && ( ! OutputEMSErrors ) ) return;
+		if ( ( ! OutputFullEMSTrace ) && ( ! OutputEMSErrors ) && ( ! seriousErrorFound ) ) return;
 
-		if ( ( OutputEMSErrors ) && ( ! OutputFullEMSTrace ) ) {
+		if ( ( OutputEMSErrors ) && ( ! OutputFullEMSTrace ) && ( ! seriousErrorFound ) ) {
 			//see if error needs to be reported.
 			if ( ReturnValue.Type != ValueError ) return;
 
@@ -1066,7 +1115,20 @@ namespace RuntimeLanguageProcessor {
 		}
 		TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
-		gio::write( OutputEMSFileUnitNum, fmtA ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
+		if ( OutputFullEMSTrace || ( OutputEMSErrors && ( ReturnValue.Type == ValueError ) ) ) {
+			gio::write( OutputEMSFileUnitNum, fmtA ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
+		}
+
+		if ( seriousErrorFound ) { // throw EnergyPlus severe then fatal
+			ShowSevereError( "Problem found in EMS EnergyPlus Runtime Language." );
+			ShowContinueError( "Erl program name: " + NameString );
+			ShowContinueError( "Erl program line number: " + LineNumString );
+			ShowContinueError( "Erl program line text: " + LineString );
+			ShowContinueError( "Error message: " + cValueString );
+			ShowContinueErrorTimeStamp( "" );
+			ShowFatalError( "Previous EMS error caused program termination.");
+		}
+
 
 	}
 
@@ -1488,31 +1550,31 @@ namespace RuntimeLanguageProcessor {
 						Token( NumTokens ).Operator = FuncTdbFnHW;
 						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
-					} else if ( SameString( String.substr( Pos, 12 ), "@RhovFnTdbRh" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
-						Token( NumTokens ).Operator = FuncRhovFnTdbRh;
-						Token( NumTokens ).String = String.substr( Pos, 12 );
-						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 18 ), "@RhovFnTdbRhLBnd0C" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbRhLBnd0C;
 						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
+					} else if ( SameString( String.substr( Pos, 12 ), "@RhovFnTdbRh" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						Token( NumTokens ).Operator = FuncRhovFnTdbRh;
+						Token( NumTokens ).String = String.substr( Pos, 12 );
+						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 13 ), "@RhovFnTdbWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( SameString( String.substr( Pos, 12 ), "@RhFnTdbRhov" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
-						Token( NumTokens ).Operator = FuncRhFnTdbRhov;
-						Token( NumTokens ).String = String.substr( Pos, 12 );
-						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 18 ), "@RhFnTdbRhovLBnd0C" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbRhovLBnd0C;
 						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
+					} else if ( SameString( String.substr( Pos, 12 ), "@RhFnTdbRhov" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						Token( NumTokens ).Operator = FuncRhFnTdbRhov;
+						Token( NumTokens ).String = String.substr( Pos, 12 );
+						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 11 ), "@RhFnTdbWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbWPb;
@@ -2032,7 +2094,10 @@ namespace RuntimeLanguageProcessor {
 	}
 
 	ErlValueType
-	EvaluateExpression( int const ExpressionNum )
+	EvaluateExpression( 
+		int const ExpressionNum,
+		bool & seriousErrorFound
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -2083,6 +2148,7 @@ namespace RuntimeLanguageProcessor {
 		static std::string const EMSBuiltInFunction( "EMS Built-In Function" );
 
 		// FLOW:
+
 		ReturnValue.Type = ValueNumber;
 		ReturnValue.Number = 0.0;
 
@@ -2093,24 +2159,49 @@ namespace RuntimeLanguageProcessor {
 			for ( OperandNum = 1; OperandNum <= ErlExpression( ExpressionNum ).NumOperands; ++OperandNum ) {
 				Operand( OperandNum ) = ErlExpression( ExpressionNum ).Operand( OperandNum );
 				if ( Operand( OperandNum ).Type == ValueExpression ) {
-					Operand( OperandNum ) = EvaluateExpression( Operand( OperandNum ).Expression ); //recursive call
+					Operand( OperandNum ) = EvaluateExpression( Operand( OperandNum ).Expression, seriousErrorFound ); //recursive call
+					// check if recursive call found an error in nested expression, want to preserve error message from that
+					if ( seriousErrorFound ) {
+						ReturnValue.Type = ValueError;
+						ReturnValue.Error = Operand( OperandNum ).Error;
+					}
+
 				} else if ( Operand( OperandNum ).Type == ValueVariable ) {
-					Operand( OperandNum ) = ErlVariable( Operand( OperandNum ).Variable ).Value;
+					if ( ErlVariable( Operand( OperandNum ).Variable ).Value.initialized ) { // check that value has been initialized
+						Operand( OperandNum ) = ErlVariable( Operand( OperandNum ).Variable ).Value;
+					} else { // value has never been set
+						ReturnValue.Type = ValueError;
+						ReturnValue.Error = "EvaluateExpression: Variable = '" + ErlVariable( Operand( OperandNum ).Variable ).Name + "' used in expression has not been initialized!" ;
+						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+
+							//check if this is an arg in CurveValue,
+							if ( ErlExpression( ExpressionNum ).Operator != FuncCurveValue ) { // padding the argument list for CurveValue is too common to fatal on.  only reported to EDD
+								seriousErrorFound = true;
+							}
+						}
+					}
+					
 				}
 			}
+
+			if ( ReturnValue.Type != ValueError) {
 
 			// Perform the operation
 			{ auto const SELECT_CASE_var( ErlExpression( ExpressionNum ).Operator );
 
 			if ( SELECT_CASE_var == OperatorLiteral ) {
 				ReturnValue = Operand( 1 );
+				ReturnValue.initialized = true;
 			} else if ( SELECT_CASE_var == OperatorNegative ) { // unary minus sign.  parsing does not work yet
 				ReturnValue = SetErlValueNumber( -1.0 * Operand( 1 ).Number );
 			} else if ( SELECT_CASE_var == OperatorDivide ) {
 				if ( ( Operand( 1 ).Type == ValueNumber ) && ( Operand( 2 ).Type == ValueNumber ) ) {
 					if ( Operand( 2 ).Number == 0.0 ) {
 						ReturnValue.Type = ValueError;
-						ReturnValue.Error = "Divide by zero!";
+						ReturnValue.Error = "EvaluateExpression: Divide By Zero in EMS Program!";
+						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+							seriousErrorFound = true;
+						}
 					} else {
 						ReturnValue = SetErlValueNumber( Operand( 1 ).Number / Operand( 2 ).Number );
 					}
@@ -2190,10 +2281,13 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == OperatorRaiseToPower ) {
 				if ( ( Operand( 1 ).Type == ValueNumber ) && ( Operand( 2 ).Type == ValueNumber ) ) {
 					TestValue = std::pow( Operand( 1 ).Number, Operand( 2 ).Number );
-					if ( std::isnan( TestValue ) ) { // Use IEEE_IS_NAN when GFortran supports it
+					if ( std::isnan( TestValue ) ) { 
 						// throw Error
 						ReturnValue.Type = ValueError;
-						ReturnValue.Error = "Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
+						ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
+						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+							seriousErrorFound = true;
+						}
 					} else {
 						ReturnValue = SetErlValueNumber( TestValue );
 					}
@@ -2232,12 +2326,19 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == FuncRadToDeg ) {
 				ReturnValue = SetErlValueNumber( Operand( 1 ).Number / DegToRadians );
 			} else if ( SELECT_CASE_var == FuncExp ) {
-				if ( Operand( 1 ).Number < 700.0 ) {
+				if ( ( Operand( 1 ).Number < 700.0 ) && ( Operand( 1 ).Number > -20.0 ) ) {
 					ReturnValue = SetErlValueNumber( std::exp( Operand( 1 ).Number ) );
 				} else {
 					// throw Error
+					if ( Operand( 1 ).Number >= 700.0 ) {
+						ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
+					} else if (  Operand( 1 ).Number <= -20.0 ) {
+						ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too small a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
+					}
 					ReturnValue.Type = ValueError;
-					ReturnValue.Error = "Attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
+					if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+						seriousErrorFound = true;
+					}
 				}
 			} else if ( SELECT_CASE_var == FuncLn ) {
 				if ( Operand( 1 ).Number > 0.0 ) {
@@ -2245,7 +2346,10 @@ namespace RuntimeLanguageProcessor {
 				} else {
 					// throw error,
 					ReturnValue.Type = ValueError;
-					ReturnValue.Error = "Natural Log of zero or less!";
+					ReturnValue.Error = "EvaluateExpression: Natural Log of zero or less! ln of value = " + TrimSigDigits( Operand( 1 ).Number, 4 ) ;
+					if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+						seriousErrorFound = true;
+					}
 				}
 			} else if ( SELECT_CASE_var == FuncMax ) {
 				ReturnValue = SetErlValueNumber( max( Operand( 1 ).Number, Operand( 2 ).Number ) );
@@ -2521,6 +2625,7 @@ namespace RuntimeLanguageProcessor {
 				// throw Error!
 				ShowFatalError( "caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression" );
 			}}
+			}
 			Operand.deallocate();
 		}
 
@@ -2647,6 +2752,22 @@ namespace RuntimeLanguageProcessor {
 			GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
+			GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			MaxNumNumbers = max(MaxNumNumbers, NumNums);
+			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
+			GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			MaxNumNumbers = max(MaxNumNumbers, NumNums);
+			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
+			GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			MaxNumNumbers = max(MaxNumNumbers, NumNums);
+			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
+			GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			MaxNumNumbers = max(MaxNumNumbers, NumNums);
+			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			//  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
 			//  CALL GetObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
 			//  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
@@ -2673,21 +2794,56 @@ namespace RuntimeLanguageProcessor {
 
 			cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
 
-			if ( NumUserGlobalVariables + NumExternalInterfaceGlobalVariables > 0 ) {
-				for ( GlobalNum = 1; GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables; ++GlobalNum ) {
+			if (NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+				+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
+				+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables > 0) {
+				for (GlobalNum = 1; GlobalNum <= NumUserGlobalVariables 
+					+ NumExternalInterfaceGlobalVariables 
+					+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+					+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables; ++GlobalNum) {
 					// If we process the ExternalInterface actuators, all we need to do is to change the
 					// name of the module object, and add an offset for the variable number
 					// This is done in the following IF/THEN section.
 					if ( GlobalNum <= NumUserGlobalVariables ) {
-						GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					} else {
+						GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, 
+							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					}
+					else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
 						cCurrentModuleObject = "ExternalInterface:Variable";
-						GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+						GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas, 
+							rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					}
+					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables){
+						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
+						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables, 
+							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+
+					}
+					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+						+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables){
+						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
+						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables 
+							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables, 
+							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 					}
 
 					// loop over each alpha and register variable named as global Erl variable
 					for ( ErlVarLoop = 1; ErlVarLoop <= NumAlphas; ++ErlVarLoop ) {
-						ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( ErlVarLoop ), cAlphaFieldNames( ErlVarLoop ), errFlag, ErrorsFound );
+						if ((cCurrentModuleObject.compare("ExternalInterface:FunctionalMockupUnitImport:To:Variable") == 0)){
+							if (ErlVarLoop == 1){
+								// Only validate first field of object ExternalInterface:FunctionalMockupUnitImport:To:Variable.
+								// This object is allowed to contain fields that do not need to be valid EMS fields (e.g. path to the FMU).
+								ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+							}
+						}
+						else{
+							ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+						}
 						if ( lAlphaFieldBlanks( ErlVarLoop ) ) {
 							ShowWarningError( RoutineName + cCurrentModuleObject );
 							ShowContinueError( "Blank " + cAlphaFieldNames( 1 ) );
@@ -2903,6 +3059,7 @@ namespace RuntimeLanguageProcessor {
 						// register the trend pointer in ErlVariable.
 						ErlVariable( VariableNum ).Value.TrendVariable = true;
 						ErlVariable( VariableNum ).Value.TrendVarPointer = TrendNum;
+						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this, 
 					}
 
 					NumTrendSteps = std::floor( rNumericArgs( 1 ) );
@@ -3509,6 +3666,7 @@ namespace RuntimeLanguageProcessor {
 			newValue.Number = Number;
 		}
 
+		newValue.initialized = true;
 		return newValue;
 
 	}
@@ -4142,29 +4300,6 @@ namespace RuntimeLanguageProcessor {
 		return isExternalInterfaceVar;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // RuntimeLanguageProcessor
 

@@ -1,5 +1,55 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef FanCoilUnits_hh_INCLUDED
 #define FanCoilUnits_hh_INCLUDED
+
+// C++ Headers
+#include <memory>
+#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -8,6 +58,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -40,6 +91,7 @@ namespace FanCoilUnits {
 	extern int const CCM_VarFanVarFlow;
 	extern int const CCM_VarFanConsFlow;
 	extern int const CCM_MultiSpeedFan;
+	extern int const CCM_ASHRAE;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -81,7 +133,9 @@ namespace FanCoilUnits {
 		int CapCtrlMeth_Num;
 		Real64 PLR; // Part Load Ratio, fraction of time step fancoil is on
 		int MaxIterIndexH; // Maximum iterations exceeded for heating
+		int BadMassFlowLimIndexH; // Bad mass flow limit error index for heating
 		int MaxIterIndexC; // Maximum iterations exceeded for cooling
+		int BadMassFlowLimIndexC; // Bad mass flow limit error index for cooling
 		Real64 FanAirVolFlow; // m3/s
 		Real64 MaxAirVolFlow; // m3/s
 		Real64 MaxAirMassFlow; // kg/s
@@ -157,7 +211,16 @@ namespace FanCoilUnits {
 		Real64 SpeedRatio; // speed ratio when the fan is cycling between stages
 		int FanOpModeSchedPtr; // pointer to supply air fan operating mode schedule
 		int FanOpMode; // 1=cycling fan cycling coil; 2=constant fan cycling coil
-
+		Real64 MinSATempCooling; // ASHRAE90.1 maximum supply air temperature in Cooling mode
+		Real64 MaxSATempHeating; // ASHRAE90.1 maximum supply air temperature in Heating mode
+		bool ASHRAETempControl; // ASHRAE90.1 control to temperature set point when true
+		Real64 QUnitOutNoHC; // unit output with coils off [W]
+		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
+		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
+		int LimitErrCountH; // count of SolveRegulaFalsi limit errors
+		int LimitErrCountC; // count of SolveRegulaFalsi limit errors
+		int ConvgErrCountH; // count of SolveRegulaFalsi iteration limit errors
+		int ConvgErrCountC; // count of SolveRegulaFalsi iteration limit errors
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
 		Real64 HeatEnergy; // unit heating output in J
@@ -169,6 +232,9 @@ namespace FanCoilUnits {
 		Real64 ElecEnergy; // unit electiric energy consumption in joules
 		Real64 DesCoolingLoad; // used for reporting in watts
 		Real64 DesHeatingLoad; // used for reporting in watts
+		Real64 DesZoneCoolingLoad; // used for reporting in watts
+		Real64 DesZoneHeatingLoad; // used for reporting in watts
+		int DSOAPtr; // design specification outdoor air object index
 
 		// Default Constructor
 		FanCoilData() :
@@ -180,7 +246,9 @@ namespace FanCoilUnits {
 			CapCtrlMeth_Num( 0 ),
 			PLR( 0.0 ),
 			MaxIterIndexH( 0 ),
+			BadMassFlowLimIndexH( 0 ),
 			MaxIterIndexC( 0 ),
+			BadMassFlowLimIndexC( 0 ),
 			FanAirVolFlow( 0.0 ),
 			MaxAirVolFlow( 0.0 ),
 			MaxAirMassFlow( 0.0 ),
@@ -239,6 +307,16 @@ namespace FanCoilUnits {
 			SpeedRatio( 0.0 ),
 			FanOpModeSchedPtr( 0 ),
 			FanOpMode( 1 ),
+			MinSATempCooling( 0.0 ),
+			MaxSATempHeating( 0.0 ),
+			ASHRAETempControl( false ),
+			QUnitOutNoHC( 0.0 ),
+			QUnitOutMaxH( 0.0 ),
+			QUnitOutMaxC( 0.0 ),
+			LimitErrCountH( 0 ),
+			LimitErrCountC( 0 ),
+			ConvgErrCountH( 0 ),
+			ConvgErrCountC( 0 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
@@ -248,7 +326,10 @@ namespace FanCoilUnits {
 			ElecPower( 0.0 ),
 			ElecEnergy( 0.0 ),
 			DesCoolingLoad( 0.0 ),
-			DesHeatingLoad( 0.0 )
+			DesHeatingLoad( 0.0 ),
+			DesZoneCoolingLoad( 0.0 ),
+			DesZoneHeatingLoad( 0.0 ),
+			DSOAPtr( 0 )
 		{}
 
 	};
@@ -262,12 +343,6 @@ namespace FanCoilUnits {
 		FanCoilNumericFieldData()
 		{}
 
-		// Member Constructor
-		FanCoilNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data
@@ -275,6 +350,9 @@ namespace FanCoilUnits {
 	extern Array1D< FanCoilNumericFieldData > FanCoilNumericFields;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimFanCoilUnit(
@@ -318,6 +396,32 @@ namespace FanCoilUnits {
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
 		Real64 & LatOutputProvided // Latent power supplied (kg/s), negative = dehumidification
+	);
+
+	void
+	TightenWaterFlowLimits(
+		int const FanCoilNum, // Unit index in fan coil array
+		bool const CoolingLoad, // true if zone requires cooling
+		bool const HeatingLoad, // true if zone requires heating
+		int const WaterControlNode, // water control node, either cold or hot water
+		int const ControlledZoneNum, // controlling zone index
+		bool const FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
+		Real64 const QZnReq, // zone load [W]
+		Real64 & MinWaterFlow, // minimum water flow rate
+		Real64 & MaxWaterFlow // maximum water flow rate
+	);
+
+	void
+	TightenAirAndWaterFlowLimits(
+		int const FanCoilNum, // Unit index in fan coil array
+		bool const CoolingLoad, // true if zone requires cooling
+		bool const HeatingLoad, // true if zone requires heating
+		int const WaterControlNode, // water control node, either cold or hot water
+		int const ControlledZoneNum, // controlling zone index
+		bool const FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
+		Real64 const QZnReq, // zone load [W]
+		Real64 & PLRMin, // minimum part-load ratio
+		Real64 & PLRMax // maximum part-load ratio
 	);
 
 	void
@@ -378,30 +482,63 @@ namespace FanCoilUnits {
 		Array1< Real64 > const & Par // Function parameters
 	);
 
-	//     NOTICE
+	Real64
+	CalcFanCoilPLRResidual(
+		Real64 const PLR, // part-load ratio of air and water mass flow rate
+		Array1< Real64 > const & Par // Function parameters
+	);
 
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
+	Real64
+	CalcFanCoilHWLoadResidual(
+		Real64 const HWFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
 
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
+	Real64
+		CalcFanCoilCWLoadResidual(
+		Real64 const CWFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+		);	Real64
+	CalcFanCoilWaterFlowTempResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
+	Real64
+	CalcFanCoilWaterFlowResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
+	Real64
+	CalcFanCoilAirAndWaterFlowResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
 
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
+	Real64
+	CalcFanCoilAirAndWaterInStepResidual(
+		Real64 const PLR, // air and water mass flow rate ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
 
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	Real64
+	CalcFanCoilBothFlowResidual(
+		Real64 const PLR, // air and water mass flow rate ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
 
-} // FanCoilUnits
+	Real64
+	CalcFanCoilElecHeatResidual(
+		Real64 const PLR, // electric heating coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilElecHeatTempResidual(
+		Real64 const PLR, // electric heating coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
+	);} // FanCoilUnits
 
 } // EnergyPlus
 

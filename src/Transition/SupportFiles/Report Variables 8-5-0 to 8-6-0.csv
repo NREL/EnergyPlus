@@ -1,0 +1,9 @@
+8.5.0,8.6.0,Transition notes
+6,6,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+EMPD Surface Inside Face Humidity Ratio,<DELETE>,
+EMPD Surface Inside Face Relative Humidity,<DELETE>,
+Zone Mixing Current Density Air Volume Flow Rate,Zone Mixing Current Density Volume Flow Rate,
+Zone Mixing Standard Density Air Volume Flow Rate,Zone Mixing Standard Density Volume Flow Rate,
+Zone Mixing Current Density Volumetric Flow Rate,Zone Mixing Current Density Volume Flow Rate,
+Zone Mixing Standard Density Volumetric Flow Rate,Zone Mixing Standard Density Volume Flow Rate,
+old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete

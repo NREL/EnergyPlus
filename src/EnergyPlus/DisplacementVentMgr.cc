@@ -1,11 +1,56 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <DisplacementVentMgr.hh>
@@ -290,8 +335,8 @@ namespace DisplacementVentMgr {
 				SurfNum = APos_Wall( Ctd );
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 				ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 				ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
@@ -340,8 +385,8 @@ namespace DisplacementVentMgr {
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
 				if ( Surface( SurfNum ).Tilt > 10.0 && Surface( SurfNum ).Tilt < 170.0 ) { // Window Wall
-					Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-					Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+					Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+					Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 					ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 					ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
@@ -403,12 +448,46 @@ namespace DisplacementVentMgr {
 				SurfNum = APos_Door( Ctd );
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
-				ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
+				if ( Surface( SurfNum ).Tilt > 10.0 && Surface( SurfNum ).Tilt < 170.0 ) { // Door Wall
+					Z1 = minval( Surface( SurfNum ).Vertex( { 1, Surface( SurfNum ).Sides } ), &Vector::z );
+					Z2 = maxval( Surface( SurfNum ).Vertex( { 1, Surface( SurfNum ).Sides } ), &Vector::z );
+					ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
+					ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
-				if ( ZInfSurf > LayH ) {
+					if ( ZInfSurf > LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HDoor( Ctd ) = DVHcIn( SurfNum );
+						HAT_MX += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
+						HA_MX += Surface( SurfNum ).Area * HDoor( Ctd );
+					}
+
+					if ( ZSupSurf < LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HDoor( Ctd ) = DVHcIn( SurfNum );
+						HAT_OC += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
+						HA_OC += Surface( SurfNum ).Area * HDoor( Ctd );
+					}
+
+					if ( ZInfSurf <= LayH && ZSupSurf >= LayH ) {
+						TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HLU = DVHcIn( SurfNum );
+						TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
+						CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
+						HLD = DVHcIn( SurfNum );
+						TmedDV = ( ( ZSupSurf - LayH ) * ZTMX( ZoneNum ) + ( LayH - ZInfSurf ) * ZTOC( ZoneNum ) ) / ( ZSupSurf - ZInfSurf );
+						HDoor( Ctd ) = ( ( LayH - ZInfSurf ) * HLD + ( ZSupSurf - LayH ) * HLU ) / ( ZSupSurf - ZInfSurf );
+						HAT_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLU;
+						HA_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * HLU;
+						HAT_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLD;
+						HA_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * HLD;
+						TempEffBulkAir( SurfNum ) = TmedDV;
+					}
+				}
+
+				if ( Surface( SurfNum ).Tilt <= 10.0 ) { // Door Ceiling
 					TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
 					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
 					HDoor( Ctd ) = DVHcIn( SurfNum );
@@ -416,28 +495,12 @@ namespace DisplacementVentMgr {
 					HA_MX += Surface( SurfNum ).Area * HDoor( Ctd );
 				}
 
-				if ( ZSupSurf < LayH ) {
+				if ( Surface( SurfNum ).Tilt >= 170.0 ) { // Door Floor
 					TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
 					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
 					HDoor( Ctd ) = DVHcIn( SurfNum );
 					HAT_OC += Surface( SurfNum ).Area * TempSurfIn( SurfNum ) * HDoor( Ctd );
 					HA_OC += Surface( SurfNum ).Area * HDoor( Ctd );
-				}
-
-				if ( ZInfSurf <= LayH && ZSupSurf >= LayH ) {
-					TempEffBulkAir( SurfNum ) = ZTMX( ZoneNum );
-					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
-					HLU = DVHcIn( SurfNum );
-					TempEffBulkAir( SurfNum ) = ZTOC( ZoneNum );
-					CalcDetailedHcInForDVModel( SurfNum, TempSurfIn, DVHcIn );
-					HLD = DVHcIn( SurfNum );
-					TmedDV = ( ( ZSupSurf - LayH ) * ZTMX( ZoneNum ) + ( LayH - ZInfSurf ) * ZTOC( ZoneNum ) ) / ( ZSupSurf - ZInfSurf );
-					HDoor( Ctd ) = ( ( LayH - ZInfSurf ) * HLD + ( ZSupSurf - LayH ) * HLU ) / ( ZSupSurf - ZInfSurf );
-					HAT_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLU;
-					HA_MX += Surface( SurfNum ).Area * ( ZSupSurf - LayH ) / ( ZSupSurf - ZInfSurf ) * HLU;
-					HAT_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * TempSurfIn( SurfNum ) * HLD;
-					HA_OC += Surface( SurfNum ).Area * ( LayH - ZInfSurf ) / ( ZSupSurf - ZInfSurf ) * HLD;
-					TempEffBulkAir( SurfNum ) = TmedDV;
 				}
 
 				DVHcIn( SurfNum ) = HDoor( Ctd );
@@ -512,6 +575,22 @@ namespace DisplacementVentMgr {
 	}
 
 	//**************************************************************************************************
+
+	Real64
+	calculateThirdOrderFloorTemperature(
+		Real64 temperatureHistoryTerm,
+		Real64 HAT_floor,
+		Real64 HA_floor,
+		Real64 MCpT_Total,
+		Real64 MCp_Total,
+		Real64 occupiedTemp,
+		Real64 nonAirSystemResponse,
+		Real64 zoneMultiplier,
+		Real64 airCap
+	) {
+		static const Real64 elevenOverSix = 11.0 / 6.0;
+		return ( temperatureHistoryTerm + HAT_floor + MCpT_Total + 0.6 * occupiedTemp * MCp_Total + nonAirSystemResponse / zoneMultiplier ) / ( elevenOverSix * airCap + HA_floor + 1.6 * MCp_Total );
+	}
 
 	void
 	CalcUCSDDV( int const ZoneNum ) // Which Zonenum
@@ -772,11 +851,9 @@ namespace DisplacementVentMgr {
 				//HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) / CeilingHeight, 1.0 ); //Tuned This does not vary in loop
 				//EPTeam-replaces above (cause diffs)      HeightFrac = MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				AIRRATFloor( ZoneNum ) = Zone( ZoneNum ).Volume * min( HeightTransition( ZoneNum ), HeightFloorSubzoneTop ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATFloor( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATFloor( ZoneNum ) ) / ( TimeStepSys * SecInHour );
-
-				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour );
-
-				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+				AIRRATFloor( ZoneNum ) = Zone( ZoneNum ).Volume * min( HeightTransition( ZoneNum ), HeightFloorSubzoneTop ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATFloor( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATFloor( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
+				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
+				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 
 				if ( UseZoneTimeStepHistory ) {
 					ZTM3Floor( ZoneNum ) = XM3TFloor( ZoneNum );
@@ -812,7 +889,7 @@ namespace DisplacementVentMgr {
 				TempIndCoef = HAT_FLOOR + MCpT_Total + NonAirSystemResponse( ZoneNum ) / ZoneMult;
 				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
 				if ( SELECT_CASE_var == Use3rdOrder ) {
-					ZTFloor( ZoneNum ) = ( TempHistTerm + HAT_FLOOR + MCpT_Total + NonAirSystemResponse( ZoneNum ) / ZoneMult ) / ( ( 11.0 / 6.0 ) * AirCap + HA_FLOOR + MCp_Total );
+					ZTFloor( ZoneNum ) = calculateThirdOrderFloorTemperature( TempHistTerm, HAT_FLOOR, HA_FLOOR, MCpT_Total, MCp_Total, ZTOC( ZoneNum ), NonAirSystemResponse( ZoneNum ), ZoneMult, AirCap );
 				} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTFloor( ZoneNum ) = Zone1Floor( ZoneNum ) + TempIndCoef / AirCap;
@@ -828,7 +905,7 @@ namespace DisplacementVentMgr {
 				TempIndCoef = ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + ZTFloor( ZoneNum ) * MCp_Total;
 				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
 				if ( SELECT_CASE_var == Use3rdOrder ) {
-					ZTOC( ZoneNum ) = ( TempHistTerm + ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + ZTFloor( ZoneNum ) * MCp_Total ) / ( ( 11.0 / 6.0 ) * AirCap + HA_OC + MCp_Total );
+					ZTOC( ZoneNum ) = ( TempHistTerm + ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + 1.6 * ZTFloor( ZoneNum ) * MCp_Total ) / ( ( 11.0 / 6.0 ) * AirCap + HA_OC + 1.6 * MCp_Total );
 				} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTOC( ZoneNum ) = Zone1OC( ZoneNum ) + TempIndCoef / AirCap;
@@ -1024,29 +1101,6 @@ namespace DisplacementVentMgr {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DisplacementVentMgr
 

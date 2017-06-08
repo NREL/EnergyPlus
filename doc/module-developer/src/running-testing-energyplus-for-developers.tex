@@ -1,0 +1,32 @@
+\chapter{Running/Testing EnergyPlus -- for Developers}\label{runningtesting-energyplus-for-developers}
+
+Any item mentioned in this section is available at no charge to collaborative or other developers -- the documentation, however, may be rudimentary and use of the procedures require some knowledge of command line (Windows) or Linux scripts.
+
+EnergyPlus is rigorously tested during each release cycle and prior to each release.~ Details on some of the test suites that have been used can be seen at:
+
+\url{http://www.eere.energy.gov/buildings/energyplus/testing.html}
+
+Equally important is the testing done by each developer during feature development or changes.~ For example, on the core development team, developers are charged with executing the entire test suite (≥230 files) for their checkins.~ In addition, one of the core development team does run the entire test suite with each checkin and compares those results to previous results.~ Unexpected changes, and certainly crashes, should NOT occur.
+
+Since most modules being developed are aimed at the HVAC or plant features, there is a standard 5-zone template geometry that can be used.~ This should form the basis of any new additions.~ The old 3-zone model should not be used.~ Of course, you may develop your own model.
+
+Developers are also charged with making sure their input file runs an entire weather year, has minimal errors (including max simulation errors) and results compare \emph{exactly} when design days (preferably winter-summer vs summer-winter) are reversed in consecutive runs (also known as ReverseDD).~ To assist in ReverseDD testing, each input file \emph{should} have a ``Run Control'' object as well as (at least) two design days (winter-summer / summer-winter as the first two).
+
+Input files should report Zone Air temperatures (Zone Mean Air Temperature or Zone/Sys Air Temperature) as well as meters such as electricity and gas (if applicable).~ Of course, reporting features being implemented should be done as well.~ These variables will help identify files that have proper ``ReverseDD'' requirements (failures usually indicate some initialization problems).~ Developers should try to minimize output file size -- if you are running a full annual simulation (as required by your feature), you should \emph{NOT} report variables at the timestep level.
+
+To compare results, we have a python script (Mathdiff) that is run on the .csv files.~ It will report (by default) differences \textless{} = .001 or \textless{} = .5\% as ``within range'' and outside those limits as ``differences''.~ If they are exactly the same (from the .csv precision limits), they will be reported as such.
+
+Developers in the core development team use several methods for running the entire test suite.
+
+\begin{itemize}
+\item
+  One method uses a list of input file names along with an indication of the proper weather file.~ A program reads this file and produces several batch files which help with not only running the file but comparing them to previous results, building the ``composite error'' (the .err files from each file run), and other utility features.~ (The same file can be used in Linux testing)
+\item
+  Another method uses a batch file with options that will allow running old vs.~new exes as well as somewhat automating the reverse dd testing.
+\item
+  Still another method uses a simple batch procedure to ``run'' all files in a folder.
+\item
+  Finally, EP-Launch and ``groups'' can be used.
+\end{itemize}
+
+To facilitate testing, Environment Variables ``values'' have been implemented in EnergyPlus and/or script files.~ To use, one uses the ``Set'' command and the value as indicated.~ Environment variable value testing is inherent in F2003 compliant compilers; for others we have written a set of routines that can either be modified or used directly.

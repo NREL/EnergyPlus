@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -66,12 +66,15 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
-	// Using
-	using Super::in_range;
 	using Super::isize;
 	using Super::overlap;
 	using Super::size;
+
+protected: // Types
+
+	using Super::in_range;
 	using Super::slice_k;
+
 	using Super::contiguous_;
 	using Super::data_;
 	using Super::data_beg_;
@@ -1353,8 +1356,6 @@ public: // MArray Generators
 	{
 		return MArray1< Array1S, M >( *this, pmem );
 	}
-
-#include <ObjexxFCL/Array1S.Project.MArray.hh> // Inject project-specific MArray generators
 
 public: // Comparison: Predicate
 

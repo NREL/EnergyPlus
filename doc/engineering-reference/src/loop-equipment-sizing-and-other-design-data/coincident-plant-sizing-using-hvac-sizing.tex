@@ -1,0 +1,38 @@
+\section{Coincident Plant Sizing using HVAC Sizing Simulation}\label{coincident-plant-sizing-using-hvac-sizing-simulation}
+
+Coincident plant sizing is an advanced sizing method that uses HVAC Sizing Simulations to determine coincident flows. This section describes the algorithm used for sizing plant loop flow rate based on the coincidence of flow requests that actually occur when operating the system. The purpose is to provide a more accurate value for the plant loop design flow rate. This value is held in PlantSizData( PltSizIndex ).DesVolFlowRate. For plant, this flow rate is the main independent variable used by component models in their sizing routines (along with the design temperature difference in Sizing:Plant). The code is contained in a PlantCoinicidentAnalysis object, one for each plant loop that is to be sized using the coincident method using HVAC Sizing Simulation.
+
+The analysis will proceed as follows:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Find the maximum mass flow rate over all Sizing Periods, along with the coinciding return temperature and load. Record which sizing period and timestep. This system node used for logging here is the plant loop supply side inlet node.
+\item
+  Find the maximum load, and the coinciding mass flow and return temperature. Record which sizing period and timestep. For a heating or steam plant loop, the load that is logged is associated with the output variable called Plant Supply Side Heating Demand Rate. For a cooling or condenser plant loop, the load log is as for the output variable called Plant Supply Side Cooling Demand Rate.
+\item
+  Calculate a maximum design flow rate from the maximum load, from step 2, and the temperature difference entered in the Plant:Sizing object and the specific heat (at 5 degC) of the plant fluid.
+\item
+  Compare the flow rate from step 1 to the flow rate from step 3 and take the higher.
+\item
+  Apply a sizing factor to the flow rate from Step 4, if desired. The user can select among different options for which sizing factor use.
+\item
+  Compare the flow rate from step 5 to the current value for plant loop flow rate and calculate a normalized change using
+\end{enumerate}
+
+\begin{equation}
+  \text{Normalized\_Change} = \frac{\left|\text{NewFlowRate}-\text{PreviousFlowRate}\right|}{\text{PreviousFlowRate}}
+\end{equation}
+
+\begin{itemize}
+  \item
+    Compare magnitude of Normalized\_Change to a threshold, currently set at 0.005, to determine if it was significant or not.
+  \item
+    If change is significant, then alter the size result for that plant loop. Set flags that sizes have changed and sizing calculations need to be called again. Trigger special setup timesteps with flags set so that all plant system and component level sizes will be recomputed. Not this will call and resize all of plant so that if one loop has coincident sizing and it places a load on a loop that has noncoincident sizing, the noncoincident loop might still change size because the loop it depends on changed. Call for another Sizing Pass.
+  \item
+    If change is not significant, then leave the sizes alone and do not trigger resizing. Do not call for another Sizing Pass.
+\end{itemize}
+
+See OutputDetailsAndExamples documentation for a description of a fairly comprehensive report sent the EIO file called ``Plant Coincident Sizing Algorithm'' which provides the user details for each execution of the algorithm. There is also a predefined summary table
+
+The algorithm described above can have powerful impacts on the sizes of plant loops. It is not uncommon for a hot water plant to size out at around half of what would be determined from the noncoincident sum of the sizes of all the components connected to the loop. The maximum load aspect of the algorithm is able to increase plant flow rates above the size of the pumps, whereas the flow rate aspect of the algorithm is only able to reduce the flow rates. It can happen that load spikes cause sizes to increase after the first Sizing Pass, and then the coincident flow rate bring the sizes back down some during subsequent Sizing Passes. It is worthwhile to explore multiple Sizing Passes, or iterations, because sometimes the algorithm will switch between coincident flow and coincident demand from one Sizing Pass and gradually find a size that just meets conditions. Be aware that all the controls and and EMS are also
