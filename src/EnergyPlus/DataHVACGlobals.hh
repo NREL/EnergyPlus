@@ -64,11 +64,11 @@ namespace DataHVACGlobals {
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
 	enum class HVACSystemRootSolverAlgorithm : int {
-		eRegulaFalsi = 0,
-		eBisection,
-		eRegulaFalsiThenBisection,
-		eBisectionThenRegulaFalsi,
-		eAlternation
+		RegulaFalsi = 0,
+		Bisection,
+		RegulaFalsiThenBisection,
+		BisectionThenRegulaFalsi,
+		Alternation
 	};
 
 	// MODULE PARAMETER DEFINITIONS:
@@ -510,7 +510,7 @@ namespace DataHVACGlobals {
 										 // Default Constructor
 		HVACSystemRootFindingAlgorithm( ) :
 			NumOfIter( 5 ),
-			HVACSystemRootSolver( HVACSystemRootSolverAlgorithm::eRegulaFalsi )
+			HVACSystemRootSolver( HVACSystemRootSolverAlgorithm::RegulaFalsi )
 		{}
 
 	};

@@ -208,15 +208,15 @@ namespace General {
 			// new estimation
 			switch ( HVACSystemRootFinding.HVACSystemRootSolver )
 			{
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsi: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
 				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
 				break;
 			}
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisection: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
 				XTemp = ( X1 + X0 ) / 2.0;
 				break;
 			}
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsiThenBisection: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
 				if ( NIte > HVACSystemRootFinding.NumOfIter ) {
 					XTemp = ( X1 + X0 ) / 2.0;
 				} else {
@@ -224,7 +224,7 @@ namespace General {
 				}
 				break;
 			}
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisectionThenRegulaFalsi: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
 				if ( NIte <= HVACSystemRootFinding.NumOfIter ) {
 					XTemp = ( X1 + X0 ) / 2.0;
 				}
@@ -233,7 +233,7 @@ namespace General {
 				}
 				break;
 			}
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eAlternation: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
 				if ( AltIte > HVACSystemRootFinding.NumOfIter ) {
 					XTemp = ( X1 + X0 ) / 2.0;
 					if ( AltIte >= 2 * HVACSystemRootFinding.NumOfIter ) AltIte = 0;
@@ -539,15 +539,15 @@ namespace General {
 			// new estimation
 			switch ( HVACSystemRootFinding.HVACSystemRootSolver )
 			{
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsi: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
 				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
 				break;
 			}
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisection: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
 				XTemp = ( X1 + X0 ) / 2.0;
 				break;
 			}
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsiThenBisection: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
 				if ( NIte > HVACSystemRootFinding.NumOfIter ) {
 					XTemp = ( X1 + X0 ) / 2.0;
 				}
@@ -556,7 +556,7 @@ namespace General {
 				}
 				break;
 			}
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisectionThenRegulaFalsi: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
 				if ( NIte <= HVACSystemRootFinding.NumOfIter ) {
 					XTemp = ( X1 + X0 ) / 2.0;
 				}
@@ -565,7 +565,7 @@ namespace General {
 				}
 				break;
 			}
-			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::eAlternation: {
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
 				if ( AltIte > HVACSystemRootFinding.NumOfIter ) {
 					XTemp = ( X1 + X0 ) / 2.0;
 					if ( AltIte >= 2 * HVACSystemRootFinding.NumOfIter ) AltIte = 0;
