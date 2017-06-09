@@ -225,6 +225,48 @@ TEST_F( EnergyPlusFixture, EconomicTariff_GetInput_Test)
 
 }
 
+TEST_F( EnergyPlusFixture, EconomicTariff_WaterInput_Test)
+{
+	std::string const idf_objects = delimited_string( {
+		"  UtilityCost:Tariff,                                                       ",
+		"    ExampleWaterTariff,      !- Name                                        ",
+		"    Water:Facility,          !- Output Meter Name                           ",
+		"    ,                        !- Conversion Factor Choice                    ",
+		"    ,                        !- Energy Conversion Factor                    ",
+		"    ,                        !- Demand Conversion Factor                    ",
+		"    ,                        !- Time of Use Period Schedule Name            ",
+		"    ,                        !- Season Schedule Name                        ",
+		"    ,                        !- Month Schedule Name                         ",
+		"    ,                        !- Demand Window Length                        ",
+		"    10;                      !- Monthly Charge or Variable Name             ",
+		"                                                                            ",
+		"  UtilityCost:Charge:Simple,                                                ",
+		"    FlatWaterChargePerm3,    !- Name                                        ",
+		"    ExampleWaterTariff,      !- Tariff Name                                 ",
+		"    totalEnergy,             !- Source Variable                             ",
+		"    Annual,                  !- Season                                      ",
+		"    EnergyCharges,           !- Category Variable Name                      ",
+		"    3.3076;                  !- Cost per Unit Value or Variable Name        ",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	UpdateUtilityBills();
+
+	// tariff
+	EXPECT_EQ( 1, numTariff );
+	EXPECT_EQ( "ExampleWaterTariff", tariff( 1 ).tariffName );
+
+	// Check that it correctly defaults the conversion factor
+	EXPECT_EQ( 1, tariff( 1 ).kindMeterWater);
+	EXPECT_EQ( conversionUSERDEF, tariff( 1 ).convChoice );
+	EXPECT_EQ( 1, tariff( 1 ).energyConv );
+	EXPECT_EQ( 1, tariff( 1 ).demandConv );
+	EXPECT_EQ( 10, tariff( 1 ).monthChgVal );
+
+}
+
+
 TEST_F( EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test )
 {
 	NumEnergyMeters = 4;

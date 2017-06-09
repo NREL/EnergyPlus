@@ -243,6 +243,8 @@ namespace EconomicTariff {
 	int const kindMeterElecSurplusSold( 4 );
 	int const kindMeterElecNet( 5 );
 
+	int const kindMeterWater( 1 );
+
 	int const varUnitTypeEnergy( 1 );
 	int const varUnitTypeDemand( 2 );
 	int const varUnitTypeDimensionless( 3 );
@@ -482,11 +484,21 @@ namespace EconomicTariff {
 				tariff( iInObj ).energyConv = 9.4781712e-9;
 				tariff( iInObj ).demandConv = 0.00003412;
 			} else {
-				tariff( iInObj ).convChoice = conversionKWH;
-				tariff( iInObj ).energyConv = 0.0000002778;
-				tariff( iInObj ).demandConv = 0.001;
-				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
-				ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to KWH." );
+				// If it's a water meter, default to m^3, otherwise will default to kWh
+				if ( tariff( iInObj ).kindMeterWater == kindMeterWater ) {
+					tariff( iInObj ).convChoice= conversionUSERDEF;
+					tariff( iInObj ).eneryConv = 1.0;
+					tariff( iInObj ).demandConv = 1.0;
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to m^3 (Water resource detected)." );
+
+				} else {
+					tariff( iInObj ).convChoice = conversionKWH;
+					tariff( iInObj ).energyConv = 0.0000002778;
+					tariff( iInObj ).demandConv = 0.001;
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to KWH." );
+				}
 			}
 			//schedules
 			// period schedule
@@ -4596,6 +4608,13 @@ namespace EconomicTariff {
 					tariff( iTariff ).kindElectricMtr = kindMeterElecNet;
 				} else {
 					tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
+					// Handle the case where its a water meter
+					if  ( SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER"
+						  || SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
+						  || SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
+						  || SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
+						tariff( iTariff ).kindMeterWater = kindMeterWater;
+					}
 				}}
 			} else {
 				tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
