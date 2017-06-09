@@ -1021,18 +1021,4 @@ namespace EnergyPlus {
 		EXPECT_EQ(stringType5, stringTypes[5]);
 	}
 
-	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteComponentDesignAndUserSizingRecord ) {
-		// verifies design and user specified sizing values are reported to SQLite output
-		sqlite_test->sqliteBegin();
-		sqlite_test->addSQLiteComponentSizingRecord( "Boiler:HotWater", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity [W]", 105977.98934 );
-		sqlite_test->addSQLiteComponentSizingRecord( "Boiler:HotWater", "RESIDENTIAL BOILER ELECTRIC", "User-Specified Nominal Capacity [W]", 26352.97405 );
-		auto result = queryResult( "SELECT * FROM ComponentSizes;", "ComponentSizes" );
-		sqlite_test->sqliteCommit();
-
-		ASSERT_EQ( 2ul, result.size() );
-		std::vector<std::string> testResult0{ "1", "Boiler:HotWater", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity", "105977.98934", "W" };
-		std::vector<std::string> testResult1{ "2", "Boiler:HotWater", "RESIDENTIAL BOILER ELECTRIC", "User-Specified Nominal Capacity", "26352.97405", "W" };
-		EXPECT_EQ( testResult0, result[0] );
-		EXPECT_EQ( testResult1, result[1] );
-	}
 }
