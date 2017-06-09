@@ -4594,7 +4594,11 @@ namespace EconomicTariff {
 		numMins = 0;
 		MinTariffIndex.dimension( numTariff, 0 );
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-			//determine if this is meter related to electricity
+			// TODO: is this needed?
+			// Assume it's not a water meter (already handled in the constructor, since set to 0)
+			tariff( iTariff ).kindWaterMtr = kindMeterNotWater;
+
+			//determine if this is meter related to electricity, or water
 			if ( tariff( iTariff ).reportMeterIndx != 0 ) {
 				{ auto const SELECT_CASE_var( MakeUPPERCase( EnergyMeters( tariff( iTariff ).reportMeterIndx ).ResourceType ) );
 
