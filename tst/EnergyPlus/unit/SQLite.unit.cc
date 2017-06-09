@@ -1020,5 +1020,4 @@ namespace EnergyPlus {
 		EXPECT_EQ(stringType4, stringTypes[4]);
 		EXPECT_EQ(stringType5, stringTypes[5]);
 	}
-
 }
