@@ -220,6 +220,9 @@ namespace EconomicTariff {
 	extern int const kindMeterElecSurplusSold;
 	extern int const kindMeterElecNet;
 
+	extern int const kindMeterNotWater;
+	extern int const kindMeterWater;
+
 	extern int const varUnitTypeEnergy;
 	extern int const varUnitTypeDemand;
 	extern int const varUnitTypeDimensionless;
@@ -314,6 +317,7 @@ namespace EconomicTariff {
 		std::string reportMeter; // name of the report meter
 		int reportMeterIndx; // index of the report meter
 		int kindElectricMtr; // kind of electric meter - see enumerated list above, 0 is not electric
+		int kindWaterMtr; // kinf of water meter - 0 (default) is not water, 1 is water
 		int resourceNum; // based on list of DataGlobalConstants
 		int convChoice; // enumerated choice index of the conversion factor
 		Real64 energyConv; // energy conversion factor
@@ -419,6 +423,7 @@ namespace EconomicTariff {
 		TariffType() :
 			reportMeterIndx( 0 ),
 			kindElectricMtr( 0 ),
+			kindWaterMtr( 0 ),
 			resourceNum( 0 ),
 			convChoice( 0 ),
 			energyConv( 0.0 ),

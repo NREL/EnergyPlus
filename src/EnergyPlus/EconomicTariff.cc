@@ -243,6 +243,7 @@ namespace EconomicTariff {
 	int const kindMeterElecSurplusSold( 4 );
 	int const kindMeterElecNet( 5 );
 
+	int const kindMeterNotWater( 0 );
 	int const kindMeterWater( 1 );
 
 	int const varUnitTypeEnergy( 1 );
@@ -485,9 +486,9 @@ namespace EconomicTariff {
 				tariff( iInObj ).demandConv = 0.00003412;
 			} else {
 				// If it's a water meter, default to m^3, otherwise will default to kWh
-				if ( tariff( iInObj ).kindMeterWater == kindMeterWater ) {
+				if ( tariff( iInObj ).kindWaterMtr == kindMeterWater ) {
 					tariff( iInObj ).convChoice= conversionUSERDEF;
-					tariff( iInObj ).eneryConv = 1.0;
+					tariff( iInObj ).energyConv = 1.0;
 					tariff( iInObj ).demandConv = 1.0;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to m^3 (Water resource detected)." );
@@ -4596,6 +4597,7 @@ namespace EconomicTariff {
 			//determine if this is meter related to electricity
 			if ( tariff( iTariff ).reportMeterIndx != 0 ) {
 				{ auto const SELECT_CASE_var( MakeUPPERCase( EnergyMeters( tariff( iTariff ).reportMeterIndx ).ResourceType ) );
+
 				if ( SELECT_CASE_var == "ELECTRICITY" ) {
 					tariff( iTariff ).kindElectricMtr = kindMeterElecSimple;
 				} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
@@ -4613,7 +4615,7 @@ namespace EconomicTariff {
 						  || SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
 						  || SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
 						  || SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
-						tariff( iTariff ).kindMeterWater = kindMeterWater;
+						tariff( iTariff ).kindWaterMtr = kindMeterWater;
 					}
 				}}
 			} else {
