@@ -49,6 +49,7 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
@@ -8589,6 +8590,16 @@ namespace SurfaceGeometry {
 		initmsg = true;
 		ShowZoneSurfaces = ( GetNumSectionsFound( "SHOWZONESURFACES_DEBUG" ) > 0 );
 
+		enum class zoneVolumeCalculationMethod {
+			enclosed,
+			floorAreaTimesHeight1,
+			floorAreaTimesHeight2,
+			ceilingAreaTimesHeight,
+			opWallAreaTimesDistance,
+			userProvided,
+			error
+		};
+
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 			if ( ! Zone( ZoneNum ).HasFloor ) {
@@ -8634,21 +8645,60 @@ namespace SurfaceGeometry {
 
 			bool areWallsSameHeight = areWallHeightSame( ZoneStruct );
 
-			if ( isEnclosedVolume( ZoneStruct ) ) {
+			std::vector<EdgeOfSurf> listOfedgeNotUsedTwice;
+			bool isZoneEnclosed = isEnclosedVolume( ZoneStruct, listOfedgeNotUsedTwice );
+			zoneVolumeCalculationMethod volCalcMethod;
+
+			if ( isZoneEnclosed ) {
 				CalcVolume = CalcPolyhedronVolume( ZoneStruct );
+				volCalcMethod = zoneVolumeCalculationMethod::enclosed;
 			} else if (  Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 && areFloorAndCeilingSame( ZoneStruct ) ) {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
+				volCalcMethod = zoneVolumeCalculationMethod::floorAreaTimesHeight1;
 			} else if ( isFloorHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;  
+				volCalcMethod = zoneVolumeCalculationMethod::floorAreaTimesHeight2;
 			} else if ( isCeilingHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).CeilingArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0) {
 			    CalcVolume = Zone( ZoneNum ).CeilingArea * Zone( ZoneNum ).CeilingHeight;
+				volCalcMethod = zoneVolumeCalculationMethod::ceilingAreaTimesHeight;
 			} else if ( areOppositeWallsSame( ZoneStruct, oppositeWallArea, distanceBetweenOppositeWalls ) ) {
 				CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
+				volCalcMethod = zoneVolumeCalculationMethod::opWallAreaTimesDistance;
 			} else if ( Zone( ZoneNum ).Volume == AutoCalculate ) { // no user entered zone volume
 				ShowSevereError("For zone: " + Zone( ZoneNum ).Name + " it is not possible to calculate the volume from the surrounding surfaces so either provide the volume value or define all the surfaces to fully enclose the zone.");
 				CalcVolume = 0.;
+				volCalcMethod = zoneVolumeCalculationMethod::error;
 			} else {
 				CalcVolume = 0.;
+				volCalcMethod = zoneVolumeCalculationMethod::userProvided;
+			}
+			if ( !isZoneEnclosed &&  DisplayExtraWarnings ) {  // report missing
+				ShowWarningError( "The Zone=\"" + Zone( ZoneNum ).Name + "\" is not fully enclosed. To be fully enclosed, each edge of a surface must also be an edge on one other surface." );
+				switch ( volCalcMethod ) {
+				case zoneVolumeCalculationMethod::floorAreaTimesHeight1:
+					ShowContinueError( "  The zone volume was calculated using the floor area times ceiling height method where the floor and ceiling are the same except for the z-coordinates." );
+					break;
+				case zoneVolumeCalculationMethod::floorAreaTimesHeight2:
+					ShowContinueError( "  The zone volume was calculated using the floor area times ceiling height method where the floor is horizontal, the walls are vertical, and the wall heights are all the same." );
+					break;
+				case zoneVolumeCalculationMethod::ceilingAreaTimesHeight:
+					ShowContinueError( "  The zone volume was calculated using the ceiling area times ceiling height method where the ceiling is horizontal, the walls are vertical, and the wall heights are all the same." );
+					break;
+				case zoneVolumeCalculationMethod::opWallAreaTimesDistance:
+					ShowContinueError( "  The zone volume was calculated using the opposite wall area times the distance between them method " );
+					break;
+				case zoneVolumeCalculationMethod::userProvided:
+					ShowContinueError( "  The zone volume was provided as an input to the ZONE object " );
+					break;
+				case zoneVolumeCalculationMethod::error:
+					ShowContinueError( "  The zone volume was not calculated and an error exists. " );
+					break;
+				}
+				for ( auto edge : listOfedgeNotUsedTwice ) {
+					ShowContinueError( "  The surface    \"" + Surface(edge.surfNum).Name + "\" has an edge that is not an edge on another surface: " );
+					ShowContinueError( "    Vertex start { " + RoundSigDigits( edge.start.x, 4 ) + ", " + RoundSigDigits( edge.start.y, 4 ) + ", " + RoundSigDigits( edge.start.z, 4 ) + "}"  );
+					ShowContinueError( "    Vertex end   { " + RoundSigDigits( edge.end.x, 4 ) + ", " + RoundSigDigits( edge.end.y, 4 ) + ", " + RoundSigDigits( edge.end.z, 4 ) + "}" );
+				}
 			}
 			if ( Zone( ZoneNum ).Volume > 0.0 ) { // User entered zone volume, produce message if not near calculated
 				if ( CalcVolume > 0.0 ) {
@@ -8742,7 +8792,8 @@ namespace SurfaceGeometry {
 	// test if the volume described by the polyhedron if full enclosed (would not leak)
 	bool
 	isEnclosedVolume(
-		DataVectorTypes::Polyhedron const & zonePoly
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<EdgeOfSurf> & edgeNot2
 	)
 	{
 		// J. Glazer - March 2017
@@ -8750,24 +8801,22 @@ namespace SurfaceGeometry {
 		std::vector<Vector>  uniqueVertices;
 		makeListOfUniqueVertices( zonePoly, uniqueVertices);
 
-		int numEdgesNotUsedTwice = numberOfEdgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
+		edgeNot2 = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
 
 		// if all edges had two counts then it is fully enclosed
-		if ( numEdgesNotUsedTwice == 0 ) {
+		if ( edgeNot2.size() == 0 ) {
 			return true;
-		} else if ( numEdgesNotUsedTwice % 3 != 0) { // less than three means that it is not a colinear point issue
-			return false;
 		} else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not on the "other side" of the edge
 				 // Go through all the points looking for the number that are colinear and see if that is consistent with the number of edges found that didn't have a count of two
 			DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints( zonePoly, uniqueVertices ); // this is done after initial test since it is computationally intensive.
-			numEdgesNotUsedTwice = numberOfEdgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices );
-			return ( numEdgesNotUsedTwice == 0 );
+			edgeNot2 = edgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices );
+			return ( edgeNot2.size() == 0 );
 		}
 	}
 
 	// returns the number of times the edges of the polyhedron of the zone are not used twice by the sides
-	int
-	numberOfEdgesNotTwoForEnclosedVolumeTest(
+	std::vector<EdgeOfSurf>
+	edgesNotTwoForEnclosedVolumeTest(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		std::vector<Vector> const & uniqueVertices
 	)
@@ -8781,14 +8830,17 @@ namespace SurfaceGeometry {
 			int start;
 			int end;
 			int count;
+			int firstSurfNum;
 			EdgeByPts( ):
 				start( 0 ),
 				end( 0 ),
-				count( 0 )
+				count( 0 ),
+				firstSurfNum( 0 )
 			{}
 		};
 		std::vector<EdgeByPts> uniqueEdges;
 		uniqueEdges.reserve( zonePoly.NumSurfaceFaces * 6 );
+
 
 		// construct list of unique edges
 		Vector curVertex;
@@ -8818,6 +8870,7 @@ namespace SurfaceGeometry {
 					curEdge.start = prevVertexIndex;
 					curEdge.end = curVertexIndex;
 					curEdge.count = 1;
+					curEdge.firstSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
 					uniqueEdges.emplace_back( curEdge );
 				} else {
 					++uniqueEdges[ found ].count;
@@ -8826,13 +8879,17 @@ namespace SurfaceGeometry {
 		}
 		// All edges for an enclosed polyhedron should be shared by two (and only two) sides. 
 		// So if the count is not two for all edges, the polyhedron is not enclosed
-		int edgeNotTwoFoundCount = 0;
+		std::vector<EdgeOfSurf> edgesNotTwoCount;
 		for ( auto anEdge : uniqueEdges ) {
 			if ( anEdge.count != 2 ) {
-				++edgeNotTwoFoundCount;
+				EdgeOfSurf curEdgeOne;
+				curEdgeOne.surfNum = anEdge.firstSurfNum;
+				curEdgeOne.start = uniqueVertices[ anEdge.start ];
+				curEdgeOne.end = uniqueVertices[ anEdge.end ];
+				edgesNotTwoCount.push_back( curEdgeOne );
 			}
 		}
-		return edgeNotTwoFoundCount;
+		return edgesNotTwoCount;
 	}
 
 	// create a list of unique vertices given the polyhedron describing the zone
