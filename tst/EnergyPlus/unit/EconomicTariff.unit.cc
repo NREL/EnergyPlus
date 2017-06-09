@@ -251,14 +251,20 @@ TEST_F( EnergyPlusFixture, EconomicTariff_WaterInput_Test)
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
+	// Create a water meter
+	NumEnergyMeters = 1;
+	EnergyMeters.allocate( NumEnergyMeters );
+	EnergyMeters( 1 ).Name = "WATER:FACILITY";
+	EnergyMeters( 1 ).ResourceType = "WATER";
+
 	UpdateUtilityBills();
 
 	// tariff
 	EXPECT_EQ( 1, numTariff );
-	EXPECT_EQ( "ExampleWaterTariff", tariff( 1 ).tariffName );
+	EXPECT_EQ( "EXAMPLEWATERTARIFF", tariff( 1 ).tariffName );
 
 	// Check that it correctly defaults the conversion factor
-	EXPECT_EQ( 1, tariff( 1 ).kindMeterWater);
+	EXPECT_EQ( kindMeterWater, tariff( 1 ).kindWaterMtr );
 	EXPECT_EQ( conversionUSERDEF, tariff( 1 ).convChoice );
 	EXPECT_EQ( 1, tariff( 1 ).energyConv );
 	EXPECT_EQ( 1, tariff( 1 ).demandConv );

@@ -485,6 +485,52 @@ namespace EconomicTariff {
 				tariff( iInObj ).energyConv = 9.4781712e-9;
 				tariff( iInObj ).demandConv = 0.00003412;
 			} else {
+
+
+				// TODO: is this needed?
+				// Assume it's not a water meter (already handled in the constructor, since set to 0)
+				tariff( iInObj ).kindWaterMtr = kindMeterNotWater;
+
+				//determine if this is meter related to electricity, or water
+				if ( tariff( iInObj ).reportMeterIndx != 0 ) {
+					{ auto const SELECT_CASE_var( MakeUPPERCase( EnergyMeters( tariff( iInObj ).reportMeterIndx ).ResourceType ) );
+
+					// TODO: wouldn't it be better to check whether it's electric here rather than in SelectTariff?
+					// For now, only check water
+					if  ( SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER"
+						  || SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
+						  || SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
+						  || SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
+						tariff( iInObj ).kindWaterMtr = kindMeterWater;
+					} }
+				}
+
+
+					/**if ( SELECT_CASE_var == "ELECTRICITY" ) {
+						tariff( iTariff ).kindElectricMtr = kindMeterElecSimple;
+					} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
+						tariff( iTariff ).kindElectricMtr = kindMeterElecProduced;
+					} else if ( SELECT_CASE_var == "ELECTRICITYPURCHASED" ) {
+						tariff( iTariff ).kindElectricMtr = kindMeterElecPurchased;
+					} else if ( SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD" ) {
+						tariff( iTariff ).kindElectricMtr = kindMeterElecSurplusSold;
+					} else if ( SELECT_CASE_var == "ELECTRICITYNET" ) {
+						tariff( iTariff ).kindElectricMtr = kindMeterElecNet;
+					} else {
+						tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
+						// Handle the case where its a water meter
+						if  ( SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER"
+							  || SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
+							  || SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
+							  || SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
+							tariff( iTariff ).kindWaterMtr = kindMeterWater;
+						}
+					}}
+				} else {
+					tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
+				}**/
+
+
 				// If it's a water meter, default to m^3, otherwise will default to kWh
 				if ( tariff( iInObj ).kindWaterMtr == kindMeterWater ) {
 					tariff( iInObj ).convChoice= conversionUSERDEF;
