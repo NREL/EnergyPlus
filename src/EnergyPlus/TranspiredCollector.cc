@@ -1195,7 +1195,7 @@ namespace TranspiredCollector {
 		UTSC( UTSCNum ).PlenumVelocity = 0.0;
 		UTSC( UTSCNum ).SupOutTemp = TmpTaPlen;
 		UTSC( UTSCNum ).SupOutHumRat = OutHumRatAmb;
-		UTSC( UTSCNum ).SupOutEnth = PsyHFnTdbW( Tamb, OutHumRatAmb );
+		UTSC( UTSCNum ).SupOutEnth = PsyHFnTdbW( TmpTaPlen, OutHumRatAmb );
 		UTSC( UTSCNum ).SupOutMassFlow = 0.0;
 		UTSC( UTSCNum ).SensHeatingRate = 0.0;
 		UTSC( UTSCNum ).SensHeatingEnergy = 0.0;
