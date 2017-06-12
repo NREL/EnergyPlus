@@ -48,7 +48,6 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
-#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
