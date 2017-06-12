@@ -8804,14 +8804,14 @@ namespace SurfaceGeometry {
 		std::vector<EdgeOfSurf> edgeNot2orig = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
 
 		// if all edges had two counts then it is fully enclosed
-		if ( edgeNot2orig.size() == 0 ) {
+		if ( edgeNot2orig.size() == size_t( 0 ) ) {
 			edgeNot2 = edgeNot2orig;
 			return true;
 		} else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not on the "other side" of the edge
 				 // Go through all the points looking for the number that are colinear and see if that is consistent with the number of edges found that didn't have a count of two
 			DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints( zonePoly, uniqueVertices ); // this is done after initial test since it is computationally intensive.
 			std::vector<EdgeOfSurf> edgeNot2again = edgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices );
-			if ( edgeNot2again.size() == 0 ) {
+			if ( edgeNot2again.size() == size_t( 0 ) ) {
 				return true;
 			} else {
 				edgeNot2 = edgesInBoth( edgeNot2orig, edgeNot2again); // only return a list of those edges that appear in both the original edge and the revised edges
