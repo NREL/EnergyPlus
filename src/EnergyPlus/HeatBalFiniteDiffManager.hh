@@ -139,7 +139,8 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< int > PhaseChangeState;
 		Array1D< int > PhaseChangeStateOld;
 		Array1D< int > PhaseChangeStateOldOld;
-		Array1D< int > PhaseChangeTemperatureReverse;
+		Array1D< Real64 > PhaseChangeTemperatureReverse;
+		Array1D< Real64 > SpecificHeat;
 
 		// Default Constructor
 		SurfaceDataFD() :

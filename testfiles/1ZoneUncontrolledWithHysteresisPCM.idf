@@ -391,11 +391,41 @@ MaterialProperty:PhaseChangeHysteresis,
 
   Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,hourly;
 
-  Output:Variable,*,CondFD Phase Change State 1,hourly; !- Zone Average [C]
-  Output:Variable,*,CondFD Phase Change State 2,hourly; !- Zone Average [C]
-  Output:Variable,*,CondFD Phase Change State 3,hourly; !- Zone Average [C]
-  Output:Variable,*,CondFD Phase Change State 4,hourly; !- Zone Average [C]
-  Output:Variable,*,CondFD Phase Change State 5,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change State 1,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change State 2,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change State 3,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change State 4,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change State 5,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change State 6,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change State 7,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change State 8,hourly; !- Zone Average [C]
+
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 1,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 2,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 3,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 4,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 5,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 6,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 7,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 8,hourly; !- Zone Average [C]
+
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 1,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 2,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 3,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 4,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 5,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 6,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 7,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 8,hourly; !- Zone Average [C]
+
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 1,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 2,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 3,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 4,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 5,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 6,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 7,hourly; !- Zone Average [C]
+  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 8,hourly; !- Zone Average [C]
 
   Output:VariableDictionary,IDF;
 

@@ -27,15 +27,6 @@ namespace EnergyPlus {
 
 namespace HysteresisPhaseChange {
 
-    struct PhaseChangeStates {
-        // keeping these as ints to allow output variable reporting; could refine later into enum class
-        static const int LIQUID = -2;
-		static const int MELTING = -1;
-		static const int TRANSITION = 0;
-		static const int FREEZING = 1;
-		static const int CRYSTALLIZED = 2;
-    };
-
 	bool getHysteresisModels( true );
 	int numHysteresisModels = 0;
 	std::vector< HysteresisPhaseChange > hysteresisPhaseChangeModels;
@@ -76,7 +67,9 @@ namespace HysteresisPhaseChange {
 		Real64 TempHighPCF = this->peakTempFreezing + this->deltaTempFreezingHigh;
 		Real64 DeltaH = this->totalLatentHeat;
 		Real64 Cp, Tc;
-	        Real64 phaseChangeDeltaT = prevTempTD - updatedTempTDT;
+		Real64 phaseChangeDeltaT = prevTempTD - updatedTempTDT;
+
+		//std::cout << prevTempTD << "," << updatedTempTDT << "," << prevPhaseChangeState << "," << phaseChangeState << "\n";
 
 		// this is pulled directly from a chunk of the Fortran PCM code changes
 		if ( phaseChangeDeltaT <= 0 ) {
@@ -121,6 +114,7 @@ namespace HysteresisPhaseChange {
 				Tau2 = this->deltaTempFreezingHigh;
 			}
 		}
+
 		if ( prevPhaseChangeState == PhaseChangeStates::TRANSITION && phaseChangeState == PhaseChangeStates::CRYSTALLIZED ) {
 			this->phaseChangeTransition = PhaseChangeStates::FREEZING;
 		} else if ( prevPhaseChangeState == PhaseChangeStates::TRANSITION && phaseChangeState == PhaseChangeStates::FREEZING ) {
