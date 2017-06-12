@@ -69,8 +69,6 @@ namespace HysteresisPhaseChange {
 		Real64 Cp, Tc;
 		Real64 phaseChangeDeltaT = prevTempTD - updatedTempTDT;
 
-		//std::cout << prevTempTD << "," << updatedTempTDT << "," << prevPhaseChangeState << "," << phaseChangeState << "\n";
-
 		// this is pulled directly from a chunk of the Fortran PCM code changes
 		if ( phaseChangeDeltaT <= 0 ) {
 			if ( updatedTempTDT < TempLowPCM ) {

@@ -788,30 +788,6 @@ namespace DataHeatBalance {
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
 		PhaseChangeModel * phaseChange = nullptr;
-		Real64 tk1; // Temperature coefficient for thermal conductivity
-		Array2D< Real64 > TempEnth; //  (25, 2) = -100 Temperature enthalpy Function Pairs,TempEnth(1,1)= first Temp
-		                             //  TempEnth(1,2) = First Enthalpy, TempEnth(2,1) = second  Temp, etc.
-		Array2D<Real64> TempCond; //  (25, 2) = -100 Temperature thermal conductivity Function Pairs,TempCond(1,1)= first Temp
-		                             //  Tempcond(1,2) = First conductivity, TempEnth(2,1) = second  Temp, etc.
-		//-------------------------------------------------------------------------------------------------------------------
-		Array2D<Real64> TempEnthMelting; //  (25, 2) = -100 Temperature enthalpy Function Pairs for melting curve of PCM,
-		                             //  TempEnthMelting(1,1)= first Temp, TempEnthMelting(1,2) = First Enthalpy,
-									 //  TempEnthMelting(2,1) = second  Temp, etc.
-		Array2D<Real64> TempEnthFreezing; //  (25, 2) = -100 Temperature enthalpy Function Pairs for freezing curve of PCM,
-		                             //  TempEnthFreezing(1,1)= first Temp, TempEnthFreezing(1,2) = First Enthalpy,
-									 //  TempEnthFreezing(2,1) = second  Temp, etc.
-		Array2D<Real64> TempEnthCrystallizationPoint; // (1,2) = -100.; //  Temperature enthalpy Function Pairs for crystallization point of PCM,
-		                             //  TempEnthCrystallizationPoint(1,1)= first Temp, TempEnthCrystallizationPoint(1,2) = First Enthalpy,
-									 //  TempEnthCrystallizationPoint(2,1) = second  Temp, etc.
-
-		Array3D<Real64> TempEnthModified; // (50,6,2) = -100.; //  Temperature enthalpy Function Pairs,TempEnth(1,1)= first Temp
-		                             //  TempEnth(1,2) = First Enthalpy, TempEnth(2,1) = second  Temp, etc.
-		Array3D<Real64> TempEnthMeltingModified; // (50,6,2) = -100.; //  Temperature enthalpy Function Pairs for melting curve of PCM,
-		                             //  TempEnthMelting(1,1)= first Temp, TempEnthMelting(1,2) = First Enthalpy,
-									 //  TempEnthMelting(2,1) = second  Temp, etc.
-		Array3D<Real64> TempEnthFreezingModified; // (50,6,2) = -100.; //  Temperature enthalpy Function Pairs for freezing curve of PCM,
-		                             //  TempEnthFreezing(1,1)= first Temp, TempEnthFreezing(1,2) = First Enthalpy,
-									 //  TempEnthFreezing(2,1) = second Temp, etc.
 
 		// Default Constructor
 		MaterialProperties() :
