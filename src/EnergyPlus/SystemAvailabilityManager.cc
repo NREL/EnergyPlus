@@ -2168,12 +2168,6 @@ namespace SystemAvailabilityManager {
 		static Array1D_bool ZoneCompNCControlType;
 		int CyclingRunTimeControlType; 
 
-		CyclingRunTimeControlType = NCycSysAvailMgrData( SysAvailNum ).CycRunTimeCntrlType;
-		if ( CyclingRunTimeControlType == FixedRunTime ) {
-			TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
-		} else {
-			TempTol = 0.0;
-		}
 		if ( present( ZoneEquipType ) ) {
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;
 			StopTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime;
@@ -2190,6 +2184,22 @@ namespace SystemAvailabilityManager {
 			AvailStatus = NoAction;
 			NCycSysAvailMgrData( SysAvailNum ).AvailStatus = AvailStatus; // CR 8358
 			return;
+		}
+
+		CyclingRunTimeControlType = NCycSysAvailMgrData( SysAvailNum ).CycRunTimeCntrlType;
+
+		if ( CyclingRunTimeControlType == FixedRunTime ) {
+			TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
+		} else {
+			if ( CyclingRunTimeControlType == ThermostatWithMinimumRunTime ) {
+				if ( SimTimeSteps < StopTime ) {
+					TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
+				} else {
+					TempTol = 0.0;  // after minimum cycle run time satisfied, TempTol is set to 0.0
+				}
+			} else { // CyclingRunTimeControlType == Thermostat
+				TempTol = 0.0;
+			}
 		}
 
 		if ( present( ZoneEquipType ) ) {
