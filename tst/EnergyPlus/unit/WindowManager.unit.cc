@@ -336,9 +336,6 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 {
 	// GitHub issue 6037
 	bool ErrorsFound( false );
-TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
-{
-	DataIPShortCuts::lAlphaFieldBlanks = true;
 
 	std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
@@ -437,8 +434,6 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 		"  autocalculate,           !- Ceiling Height {m}",
 		"  autocalculate;           !- Volume {m3}"
 	} );
-	std::string const idf_objects = delimited_string( {
-
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
@@ -592,6 +587,12 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 	EXPECT_NEAR( 25.0, DataHeatBalance::TempEffBulkAir( 2 ), 0.0001 );
 
 }
+
+TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
+{
+	DataIPShortCuts::lAlphaFieldBlanks = true;
+
+	std::string const idf_objects = delimited_string( {
 
 		"  Version,8.7;",
 
