@@ -8695,7 +8695,7 @@ namespace SurfaceGeometry {
 					break;
 				}
 				for ( auto edge : listOfedgeNotUsedTwice ) {
-					ShowContinueError( "  The surface    \"" + Surface(edge.surfNum).Name + "\" has an edge that is not an edge on another surface: " );
+					ShowContinueError( "  The surface    \"" + Surface(edge.surfNum).Name + "\" has an edge that is either not an edge on another surface or is an edge on three or more surfaces: " );
 					ShowContinueError( "    Vertex start { " + RoundSigDigits( edge.start.x, 4 ) + ", " + RoundSigDigits( edge.start.y, 4 ) + ", " + RoundSigDigits( edge.start.z, 4 ) + "}"  );
 					ShowContinueError( "    Vertex end   { " + RoundSigDigits( edge.end.x, 4 ) + ", " + RoundSigDigits( edge.end.y, 4 ) + ", " + RoundSigDigits( edge.end.z, 4 ) + "}" );
 				}
@@ -8801,18 +8801,68 @@ namespace SurfaceGeometry {
 		std::vector<Vector>  uniqueVertices;
 		makeListOfUniqueVertices( zonePoly, uniqueVertices);
 
-		edgeNot2 = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
+		std::vector<EdgeOfSurf> edgeNot2orig = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
 
 		// if all edges had two counts then it is fully enclosed
-		if ( edgeNot2.size() == 0 ) {
+		if ( edgeNot2orig.size() == 0 ) {
+			edgeNot2 = edgeNot2orig;
 			return true;
 		} else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not on the "other side" of the edge
 				 // Go through all the points looking for the number that are colinear and see if that is consistent with the number of edges found that didn't have a count of two
 			DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints( zonePoly, uniqueVertices ); // this is done after initial test since it is computationally intensive.
-			edgeNot2 = edgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices );
-			return ( edgeNot2.size() == 0 );
+			std::vector<EdgeOfSurf> edgeNot2again = edgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices );
+			if ( edgeNot2again.size() == 0 ) {
+				return true;
+			} else {
+				edgeNot2 = edgesInBoth( edgeNot2orig, edgeNot2again); // only return a list of those edges that appear in both the original edge and the revised edges
+                                                                     // this eliminates added edges that will confuse users and edges that were caught by the updateZonePoly routine
+				return false;
+			}
 		}
 	}
+
+	// returns a vector of edges that are in both vectors
+	std::vector<EdgeOfSurf>
+	edgesInBoth(
+		std::vector<EdgeOfSurf> edges1,
+		std::vector<EdgeOfSurf> edges2
+	) 
+	{
+		// J. Glazer - June 2017
+		// this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20. 
+
+		std::vector<EdgeOfSurf> inBoth;
+		for ( auto e1 : edges1 ) {
+			for ( auto e2 : edges2 ) {
+				if ( edgesEqualOnSameSurface( e1, e2 ) ) {
+					inBoth.push_back(e1);
+					exit;
+				}
+			}
+		}
+		return inBoth;
+	}
+
+	// returns true if the edges match - including the surface number
+	bool
+	edgesEqualOnSameSurface(
+		EdgeOfSurf a,
+		EdgeOfSurf b
+	)
+	{
+		if ( a.surfNum == b.surfNum ) {
+			if ( a.start == b.start && a.end == b.end ) { // vertex comparison
+				return true;
+			} else if ( a.start == b.end && a.end == b.start ) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
 
 	// returns the number of times the edges of the polyhedron of the zone are not used twice by the sides
 	std::vector<EdgeOfSurf>
