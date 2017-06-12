@@ -94,8 +94,7 @@ void Domain::setDomain(Foundation &foundation)
             cell[i][j][k].specificHeat = foundation.blocks[b].material.specificHeat;
             cell[i][j][k].conductivity = foundation.blocks[b].material.conductivity;
 
-            cell[i][j][k].block = foundation.blocks[b];
-
+            cell[i][j][k].blockPtr = &foundation.blocks[b];
 
             if (foundation.blocks[b].blockType == Block::INTERIOR_AIR)
             {
@@ -119,7 +118,7 @@ void Domain::setDomain(Foundation &foundation)
             {
               cell[i][j][k].cellType = Cell::BOUNDARY;
 
-              cell[i][j][k].surface = foundation.surfaces[s];
+              cell[i][j][k].surfacePtr = &foundation.surfaces[s];
 
               // Point/Line cells not on the boundary should be
               // zero-thickness cells
@@ -165,8 +164,8 @@ void Domain::setDomain(Foundation &foundation)
           if (foundation.numberOfDimensions == 2 &&
               foundation.coordinateSystem == Foundation::CS_CYLINDRICAL)
           {
-            if (cell[i][j][k].surface.orientation == Surface::X_POS ||
-              cell[i][j][k].surface.orientation == Surface::X_NEG)
+            if (cell[i][j][k].surfacePtr->orientation == Surface::X_POS ||
+              cell[i][j][k].surfacePtr->orientation == Surface::X_NEG)
             {
               cell[i][j][k].area = 2.0*PI*meshX.centers[i]*meshZ.deltas[k];
             }
@@ -180,8 +179,8 @@ void Domain::setDomain(Foundation &foundation)
           else if (foundation.numberOfDimensions == 2 &&
                    foundation.coordinateSystem == Foundation::CS_CARTESIAN)
           {
-            if (cell[i][j][k].surface.orientation == Surface::X_POS ||
-              cell[i][j][k].surface.orientation == Surface::X_NEG)
+            if (cell[i][j][k].surfacePtr->orientation == Surface::X_POS ||
+              cell[i][j][k].surfacePtr->orientation == Surface::X_NEG)
             {
               cell[i][j][k].area = 2.0*meshZ.deltas[k]*foundation.linearAreaMultiplier;
             }
@@ -193,13 +192,13 @@ void Domain::setDomain(Foundation &foundation)
           }
           else if (foundation.numberOfDimensions == 3)
           {
-            if (cell[i][j][k].surface.orientation == Surface::X_POS ||
-              cell[i][j][k].surface.orientation == Surface::X_NEG)
+            if (cell[i][j][k].surfacePtr->orientation == Surface::X_POS ||
+              cell[i][j][k].surfacePtr->orientation == Surface::X_NEG)
             {
               cell[i][j][k].area = meshY.deltas[j]*meshZ.deltas[k];
             }
-            else if (cell[i][j][k].surface.orientation == Surface::Y_POS ||
-                 cell[i][j][k].surface.orientation == Surface::Y_NEG)
+            else if (cell[i][j][k].surfacePtr->orientation == Surface::Y_POS ||
+                 cell[i][j][k].surfacePtr->orientation == Surface::Y_NEG)
             {
               cell[i][j][k].area = meshX.deltas[i]*meshZ.deltas[k];
             }

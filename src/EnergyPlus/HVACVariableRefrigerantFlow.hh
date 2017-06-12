@@ -934,6 +934,7 @@ namespace HVACVariableRefrigerantFlow {
 		int ATMixerPriNode; // primary inlet air node number for the air terminal mixer
 		int ATMixerSecNode; // secondary air inlet node number for the air terminal mixer
 		int ATMixerOutNode; // outlet air node number for the air terminal mixer
+		bool firstPass; // used to reset global sizing data
 		// Default Constructor
 		VRFTerminalUnitEquipment() :
 			VRFTUType_Num( 0 ),
@@ -1012,7 +1013,8 @@ namespace HVACVariableRefrigerantFlow {
 			ATMixerType( 0 ),
 			ATMixerPriNode( 0 ),
 			ATMixerSecNode( 0 ),
-			ATMixerOutNode( 0 )
+			ATMixerOutNode( 0 ),
+			firstPass( true )
 		{}
 
 		public:
