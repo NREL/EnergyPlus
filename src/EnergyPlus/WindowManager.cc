@@ -2504,7 +2504,7 @@ namespace WindowManager {
 				if ( SumSysMCp > 0.0 ) {
 					RefAirTemp = SumSysMCpT / SumSysMCp;
 				} else {
-					RefAirTemp = NodeTemp;
+					RefAirTemp = MAT( ZoneNum );
 				}
 				TempEffBulkAir( SurfNum ) = RefAirTemp;
 
@@ -2718,7 +2718,7 @@ namespace WindowManager {
 						// a weighted average of the inlet temperatures.
 						RefAirTemp = SumSysMCpT / SumSysMCp;
 					} else {
-						RefAirTemp = NodeTemp;
+						RefAirTemp = MAT( ZoneNumAdj );
 					}
 					TempEffBulkAir( SurfNumAdj ) = RefAirTemp;
 				} else {
