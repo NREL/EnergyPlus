@@ -503,7 +503,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	SizeWaterCoil( CoilNum );
 
 	// check coil UA-value sizing
-	EXPECT_NEAR( 577.68, WaterCoil( CoilNum ).UACoil, 0.01 ); // smaller UA than result above at 1435.00
+	EXPECT_NEAR( 556.76, WaterCoil( CoilNum ).UACoil, 0.01 ); // smaller UA than result above at 1435.00
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
