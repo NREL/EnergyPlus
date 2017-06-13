@@ -9006,25 +9006,37 @@ namespace SurfaceGeometry {
 		for ( int iFace = 1; iFace <= updZonePoly.NumSurfaceFaces; ++iFace ) {
 			bool faceUpdated = false;
 			DataVectorTypes::Face updFace = updZonePoly.SurfaceFace( iFace );
-			for ( int curVertexIndex = updZonePoly.SurfaceFace( iFace ).NSides; curVertexIndex >= 1; --curVertexIndex ) { // go through array from end
-				Vector curVertex = updZonePoly.SurfaceFace( iFace ).FacePoints( curVertexIndex );
-				Vector nextVertex;
-				int nextVertexIndex;
-				if ( curVertexIndex == updZonePoly.SurfaceFace( iFace ).NSides ) {
-					nextVertexIndex = 1;
-				} else {
-					nextVertexIndex = curVertexIndex + 1;
-				}
-				nextVertex = updZonePoly.SurfaceFace( iFace ).FacePoints( nextVertexIndex );
-				// now go through all the vertices and see if they are colinear with start and end vertices
-				for ( auto testVertex : uniqVertices ) {
-					if ( !isAlmostEqual3dPt( curVertex, testVertex ) && !isAlmostEqual3dPt( nextVertex, testVertex ) ) {
-						if ( isPointOnLineBetweenPoints( curVertex, nextVertex, testVertex ) ) {
-							insertVertexOnFace( updFace, nextVertexIndex, testVertex );
-							faceUpdated = true;
+			for ( int iterationLimiter = 0; iterationLimiter < 20; ++iterationLimiter) { // could probably be while loop but want to make sure it does not get stuck
+				bool insertedVertext = false;
+				for ( int curVertexIndex = updFace.NSides; curVertexIndex >= 1; --curVertexIndex ) { // go through array from end
+					Vector curVertex = updFace.FacePoints( curVertexIndex );
+					Vector nextVertex;
+					int nextVertexIndex;
+					if ( curVertexIndex == updFace.NSides ) {
+						nextVertexIndex = 1;
+					} else {
+						nextVertexIndex = curVertexIndex + 1;
+					}
+					nextVertex = updFace.FacePoints( nextVertexIndex );
+					// now go through all the vertices and see if they are colinear with start and end vertices
+					bool found = false;
+					Vector foundIntermediateVertex;
+					for ( auto testVertex : uniqVertices ) {
+						if ( !isAlmostEqual3dPt( curVertex, testVertex ) && !isAlmostEqual3dPt( nextVertex, testVertex ) ) {
+							if ( isPointOnLineBetweenPoints( curVertex, nextVertex, testVertex ) ) {
+								foundIntermediateVertex = testVertex;
+								found = true;
+							}
 						}
 					}
+					if ( found ) {
+						insertVertexOnFace( updFace, nextVertexIndex, foundIntermediateVertex );
+						faceUpdated = true;
+						insertedVertext = true;
+						break;
+					}
 				}
+				if ( !insertedVertext ) break;
 			}
 			if ( faceUpdated ) {
 				updZonePoly.SurfaceFace( iFace ) = updFace;
