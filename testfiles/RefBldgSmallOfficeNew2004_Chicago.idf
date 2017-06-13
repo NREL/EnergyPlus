@@ -2470,7 +2470,7 @@ Fan:SystemModel,
   Sizing:Zone,
     Perimeter_ZN_1,          !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.0000,                 !- Zone Cooling Design Supply Air Temperature {C}
+    13.9000,                 !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     40.0000,                 !- Zone Heating Design Supply Air Temperature {C}
@@ -2532,7 +2532,7 @@ Fan:SystemModel,
   Sizing:Zone,
     Perimeter_ZN_3,          !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.0000,                 !- Zone Cooling Design Supply Air Temperature {C}
+    13.9000,                 !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     40.0000,                 !- Zone Heating Design Supply Air Temperature {C}
