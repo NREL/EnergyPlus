@@ -8600,6 +8600,7 @@ namespace SurfaceGeometry {
 			error
 		};
 
+		int countNotFullyEnclosedZones = 0;
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 			if ( ! Zone( ZoneNum ).HasFloor ) {
@@ -8672,35 +8673,38 @@ namespace SurfaceGeometry {
 				CalcVolume = 0.;
 				volCalcMethod = zoneVolumeCalculationMethod::userProvided;
 			}
-			if ( !isZoneEnclosed &&  DisplayExtraWarnings ) {  // report missing
-				ShowWarningError( "The Zone=\"" + Zone( ZoneNum ).Name + "\" is not fully enclosed. To be fully enclosed, each edge of a surface must also be an edge on one other surface." );
-				switch ( volCalcMethod ) {
-				case zoneVolumeCalculationMethod::floorAreaTimesHeight1:
-					ShowContinueError( "  The zone volume was calculated using the floor area times ceiling height method where the floor and ceiling are the same except for the z-coordinates." );
-					break;
-				case zoneVolumeCalculationMethod::floorAreaTimesHeight2:
-					ShowContinueError( "  The zone volume was calculated using the floor area times ceiling height method where the floor is horizontal, the walls are vertical, and the wall heights are all the same." );
-					break;
-				case zoneVolumeCalculationMethod::ceilingAreaTimesHeight:
-					ShowContinueError( "  The zone volume was calculated using the ceiling area times ceiling height method where the ceiling is horizontal, the walls are vertical, and the wall heights are all the same." );
-					break;
-				case zoneVolumeCalculationMethod::opWallAreaTimesDistance:
-					ShowContinueError( "  The zone volume was calculated using the opposite wall area times the distance between them method " );
-					break;
-				case zoneVolumeCalculationMethod::userProvided:
-					ShowContinueError( "  The zone volume was provided as an input to the ZONE object " );
-					break;
-				case zoneVolumeCalculationMethod::error:
-					ShowContinueError( "  The zone volume was not calculated and an error exists. " );
-					break;
-				case zoneVolumeCalculationMethod::enclosed: // should not be called but completes enumeration
-					ShowContinueError( "  The zone volume was calculated using multiple pyramids and was fully enclosed. " );
-					break;
-				}
-				for ( auto edge : listOfedgeNotUsedTwice ) {
-					ShowContinueError( "  The surface    \"" + Surface(edge.surfNum).Name + "\" has an edge that is either not an edge on another surface or is an edge on three or more surfaces: " );
-					ShowContinueError( "    Vertex start { " + RoundSigDigits( edge.start.x, 4 ) + ", " + RoundSigDigits( edge.start.y, 4 ) + ", " + RoundSigDigits( edge.start.z, 4 ) + "}"  );
-					ShowContinueError( "    Vertex end   { " + RoundSigDigits( edge.end.x, 4 ) + ", " + RoundSigDigits( edge.end.y, 4 ) + ", " + RoundSigDigits( edge.end.z, 4 ) + "}" );
+			if ( !isZoneEnclosed ){
+				++countNotFullyEnclosedZones;
+				if ( DisplayExtraWarnings ) {  // report missing
+					ShowWarningError( "CalculateZoneVolume: The Zone=\"" + Zone( ZoneNum ).Name + "\" is not fully enclosed. To be fully enclosed, each edge of a surface must also be an edge on one other surface." );
+					switch ( volCalcMethod ) {
+					case zoneVolumeCalculationMethod::floorAreaTimesHeight1:
+						ShowContinueError( "  The zone volume was calculated using the floor area times ceiling height method where the floor and ceiling are the same except for the z-coordinates." );
+						break;
+					case zoneVolumeCalculationMethod::floorAreaTimesHeight2:
+						ShowContinueError( "  The zone volume was calculated using the floor area times ceiling height method where the floor is horizontal, the walls are vertical, and the wall heights are all the same." );
+						break;
+					case zoneVolumeCalculationMethod::ceilingAreaTimesHeight:
+						ShowContinueError( "  The zone volume was calculated using the ceiling area times ceiling height method where the ceiling is horizontal, the walls are vertical, and the wall heights are all the same." );
+						break;
+					case zoneVolumeCalculationMethod::opWallAreaTimesDistance:
+						ShowContinueError( "  The zone volume was calculated using the opposite wall area times the distance between them method " );
+						break;
+					case zoneVolumeCalculationMethod::userProvided:
+						ShowContinueError( "  The zone volume was provided as an input to the ZONE object " );
+						break;
+					case zoneVolumeCalculationMethod::error:
+						ShowContinueError( "  The zone volume was not calculated and an error exists. " );
+						break;
+					case zoneVolumeCalculationMethod::enclosed: // should not be called but completes enumeration
+						ShowContinueError( "  The zone volume was calculated using multiple pyramids and was fully enclosed. " );
+						break;
+					}
+					for ( auto edge : listOfedgeNotUsedTwice ) {
+						ShowContinueError( "  The surface    \"" + Surface(edge.surfNum).Name + "\" has an edge that is either not an edge on another surface or is an edge on three or more surfaces: " );
+						ShowContinueError( "    Vertex start { " + RoundSigDigits( edge.start.x, 4 ) + ", " + RoundSigDigits( edge.start.y, 4 ) + ", " + RoundSigDigits( edge.start.z, 4 ) + "}"  );
+						ShowContinueError( "    Vertex end   { " + RoundSigDigits( edge.end.x, 4 ) + ", " + RoundSigDigits( edge.end.y, 4 ) + ", " + RoundSigDigits( edge.end.z, 4 ) + "}" );
+					}
 				}
 			}
 			if ( Zone( ZoneNum ).Volume > 0.0 ) { // User entered zone volume, produce message if not near calculated
@@ -8779,6 +8783,13 @@ namespace SurfaceGeometry {
 			ZoneStruct.SurfaceFace.deallocate();
 			surfacenotused.deallocate();
 
+		} // zone loop
+		if ( !DisplayExtraWarnings ) {
+			if ( countNotFullyEnclosedZones == 1 ) {
+				ShowWarningError( "CalculateZoneVolume: 1 zone is not fully enclosed. Use Output:Diagnostics:DisplayExtrawarnings for more details." );
+			} else if ( countNotFullyEnclosedZones > 1 ) {
+				ShowWarningError( "CalculateZoneVolume: " + RoundSigDigits( countNotFullyEnclosedZones ) + " zones are not fully enclosed. Use Output:Diagnostics:DisplayExtrawarnings for more details." );
+			}
 		}
 
 		ErrorFlag = false;

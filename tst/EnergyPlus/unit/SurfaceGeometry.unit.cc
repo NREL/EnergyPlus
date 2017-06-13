@@ -692,8 +692,6 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 	HeatTransferAlgosUsed( 1 ) = OverallHeatTransferSolutionAlgo;
 	SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
 
-	compare_err_stream( "" ); // just for debugging
-
 	EXPECT_FALSE( FoundError );
 
 	// test coordinate on existing surface
