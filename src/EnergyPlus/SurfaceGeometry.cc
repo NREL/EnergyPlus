@@ -8693,6 +8693,9 @@ namespace SurfaceGeometry {
 				case zoneVolumeCalculationMethod::error:
 					ShowContinueError( "  The zone volume was not calculated and an error exists. " );
 					break;
+				case zoneVolumeCalculationMethod::enclosed: // should not be called but completes enumeration
+					ShowContinueError( "  The zone volume was calculated using multiple pyramids and was fully enclosed. " );
+					break;
 				}
 				for ( auto edge : listOfedgeNotUsedTwice ) {
 					ShowContinueError( "  The surface    \"" + Surface(edge.surfNum).Name + "\" has an edge that is either not an edge on another surface or is an edge on three or more surfaces: " );
@@ -8836,7 +8839,7 @@ namespace SurfaceGeometry {
 			for ( auto e2 : edges2 ) {
 				if ( edgesEqualOnSameSurface( e1, e2 ) ) {
 					inBoth.push_back(e1);
-					exit;
+					break;
 				}
 			}
 		}
