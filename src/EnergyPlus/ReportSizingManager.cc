@@ -979,8 +979,7 @@ namespace ReportSizingManager {
 						}
 
 						// check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-						DesMassFlow = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
-						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DesMassFlow, AutosizeDes, CallingRoutine );
+						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DataFlowUsedForSizing, AutosizeDes, CallingRoutine );
 
 					} else {
 						AutosizeDes = 1.0;
@@ -1704,8 +1703,7 @@ namespace ReportSizingManager {
 						}
 
 						// check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-						DesMassFlow = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
-						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DesMassFlow, AutosizeDes, CallingRoutine );
+						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DataFlowUsedForSizing, AutosizeDes, CallingRoutine );
 
 					} else {
 						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName );
