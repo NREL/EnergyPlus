@@ -703,7 +703,6 @@ namespace SystemAvailabilityManager {
 				}
 				NCycSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				NCycSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_NightCycle;
-
 				NCycSysAvailMgrData( SysAvailNum ).TempTolRange = rNumericArgs( 1 );
 				CyclingTimeSteps = nint( ( rNumericArgs( 2 ) / SecInHour ) * double( NumOfTimeStepInHour ) );
 				CyclingTimeSteps = max( 1, CyclingTimeSteps );
@@ -2191,19 +2190,11 @@ namespace SystemAvailabilityManager {
 		if ( CyclingRunTimeControlType == FixedRunTime ) {
 			TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
 		} else {
-			if ( CyclingRunTimeControlType == ThermostatWithMinimumRunTime ) {
-				if ( SimTimeSteps < StopTime ) {
-					TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
-				} else {
-					TempTol = 0.0;  // after minimum cycle run time satisfied, TempTol is set to 0.0
-				}
-			} else { // CyclingRunTimeControlType == Thermostat
-				TempTol = 0.0;
-			}
+			TempTol = 0.05;
 		}
 
 		if ( present( ZoneEquipType ) ) {
-			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime ) { // if cycled on
+			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime && ( CyclingRunTimeControlType == FixedRunTime || CyclingRunTimeControlType == ThermostatWithMinimumRunTime ) ) { // if cycled on
 				AvailStatus = CycleOn;
 			} else if ( SimTimeSteps == StopTime && CyclingRunTimeControlType == FixedRunTime ) { // if end of cycle run time, shut down if fan off
 				AvailStatus = NoAction;
@@ -2280,10 +2271,10 @@ namespace SystemAvailabilityManager {
 
 			}
 		} else {
-			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime ) { // if cycled on
+			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime && ( CyclingRunTimeControlType == FixedRunTime || CyclingRunTimeControlType == ThermostatWithMinimumRunTime ) ) { // if cycled on
 				AvailStatus = NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus;
 				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == ZoneFansOnly ) AvailStatus = CycleOnZoneFansOnly;
-			} else if ( SimTimeSteps == StopTime ) { // if end of cycle run time, shut down if fan off
+			} else if ( SimTimeSteps == StopTime && CyclingRunTimeControlType == FixedRunTime ) { // if end of cycle run time, shut down if fan off
 				AvailStatus = NoAction;
 			} else {
 
