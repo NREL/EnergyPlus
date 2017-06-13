@@ -71,6 +71,7 @@ set( test_src
   HighTempRadiantSystem.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
+  HVACDXSystem.unit.cc
   HVACFan.unit.cc
   HVACFourPipeBeam.unit.cc
   HVACManager.unit.cc

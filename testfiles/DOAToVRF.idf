@@ -2485,7 +2485,7 @@
   Sizing:Zone,
     SPACE1-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    12.0,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}
