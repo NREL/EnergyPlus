@@ -185,7 +185,9 @@ namespace ReportSizingManager {
 
 		// add to SQL output
 		if ( sqlite ) sqlite->addSQLiteComponentSizingRecord( CompType, CompName, VarDesc, VarValue );
-
+		if ( present( UsrDesc ) && present( UsrValue ) ) {
+			if ( sqlite ) sqlite->addSQLiteComponentSizingRecord( CompType, CompName, UsrDesc, UsrValue );
+		}
 	}
 
 	void
@@ -977,8 +979,7 @@ namespace ReportSizingManager {
 						}
 
 						// check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-						DesMassFlow = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
-						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DesMassFlow, AutosizeDes, CallingRoutine );
+						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DataFlowUsedForSizing, AutosizeDes, CallingRoutine );
 
 					} else {
 						AutosizeDes = 1.0;
@@ -1229,7 +1230,7 @@ namespace ReportSizingManager {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 					}
 				} else if (SizingType == WaterHeatingCoilUASizing) {
-					if ( DataCapacityUsedForSizing > 0.0 ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataWaterFlowUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
 						Par( 1 ) = DataCapacityUsedForSizing;
 						Par( 2 ) = double( DataCoilNum );
 						Par( 3 ) = double( DataFanOpMode ); //fan operating mode
@@ -1288,12 +1289,12 @@ namespace ReportSizingManager {
 						}
 					} else {
 						AutosizeDes = 1.0;
-						if ( DataWaterFlowUsedForSizing > 0.0 ) {
-							DataErrorsFound = true;
-							ShowSevereError( "The design coil load is zero for Coil:Heating:Water " + CompName );
+						if ( DataWaterFlowUsedForSizing > 0.0 && DataCapacityUsedForSizing == 0.0 ) {
+							ShowWarningError( "The design coil load used for UA sizing is zero for Coil:Heating:Water " + CompName );
 							ShowContinueError( "An autosize value for UA cannot be calculated" );
 							ShowContinueError( "Input a value for UA, change the heating design day, or raise" );
 							ShowContinueError( "  the zone heating design supply air temperature" );
+							ShowContinueError( "Water coil UA is set to 1 and the simulation continues." );
 						}
 					}
 				} else if (SizingType == MaxHeaterOutletTempSizing) {
@@ -1694,8 +1695,7 @@ namespace ReportSizingManager {
 						}
 
 						// check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-						DesMassFlow = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
-						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DesMassFlow, AutosizeDes, CallingRoutine );
+						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DataFlowUsedForSizing, AutosizeDes, CallingRoutine );
 
 					} else {
 						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName );
@@ -2032,7 +2032,7 @@ namespace ReportSizingManager {
 					}
 					AutosizeDes *= StdRhoAir;
 				} else if (SizingType == WaterHeatingCoilUASizing) {
-					if ( DataCapacityUsedForSizing >= SmallLoad ) {
+					if( DataCapacityUsedForSizing >= SmallLoad && DataWaterFlowUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
 						Par( 1 ) = DataCapacityUsedForSizing;
 						Par( 2 ) = double( DataCoilNum );
 						Par( 3 ) = double( DataFanOpMode ); //fan operating mode
@@ -2077,12 +2077,12 @@ namespace ReportSizingManager {
 						}
 					} else {
 						AutosizeDes = 1.0;
-						if ( DataWaterFlowUsedForSizing > 0.0 ) {
-							DataErrorsFound = true;
-							ShowSevereError( "The design coil load is zero for Coil:Heating:Water " + CompName );
+						if ( DataWaterFlowUsedForSizing > 0.0 && DataCapacityUsedForSizing < SmallLoad ) {
+							ShowWarningError( "The design coil load used for UA sizing is too small for Coil:Heating:Water " + CompName );
 							ShowContinueError( "An autosize value for UA cannot be calculated" );
 							ShowContinueError( "Input a value for UA, change the heating design day, or raise" );
 							ShowContinueError( "  the system heating design supply air temperature" );
+							ShowContinueError( "Water coil UA is set to 1 and the simulation continues." );
 						}
 					}
 				} else if (SizingType == MaxHeaterOutletTempSizing) {
