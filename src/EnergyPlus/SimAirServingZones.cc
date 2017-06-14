@@ -1109,15 +1109,15 @@ namespace SimAirServingZones {
 								}
 							}
 						}
-						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
-						for (OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum) {
-							for (OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum) {
-								CompType = OutsideAirSys( AirSysNum ).ComponentType( OACompNum );
-								if (SameString( CompType, "Coil:Heating:Water" )) {
-									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
-								}
-							}
-						}
+//						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
+//						for (OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum) {
+//							for (OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum) {
+//								CompType = OutsideAirSys( AirSysNum ).ComponentType( OACompNum );
+//								if (SameString( CompType, "Coil:Heating:Water" )) {
+//									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
+//								}
+//							}
+//						}
 					}
 				}
 			}
@@ -2892,6 +2892,9 @@ namespace SimAirServingZones {
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using HVACMultiSpeedHeatPump::SimMSHeatPump;
 		using UserDefinedComponents::SimCoilUserDefined;
+		using WaterCoils::WaterCoil;
+		using WaterCoils::CalcWaterCoilWaterFlowRate;
+		using HVACControllers::ControllerProps;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2945,6 +2948,10 @@ namespace SimAirServingZones {
 			if ( QActual > 0.0 ) CoolingActive = true; // determine if coil is ON
 
 		} else if ( SELECT_CASE_var == WaterCoil_SimpleHeat ) { // 'Coil:Heating:Water'
+			if ( CompIndex > 0 ) {
+				CalcWaterCoilWaterFlowRate( CompName, FirstHVACIteration, CompIndex );
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
+			}
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex, QActual );
 			if ( QActual > 0.0 ) HeatingActive = true; // determine if coil is ON
 
@@ -2953,10 +2960,18 @@ namespace SimAirServingZones {
 			if ( QActual > 0.0 ) HeatingActive = true; // determine if coil is ON
 
 		} else if ( SELECT_CASE_var == WaterCoil_DetailedCool ) { // 'Coil:Cooling:Water:DetailedGeometry'
+			if ( CompIndex > 0 ) {
+				CalcWaterCoilWaterFlowRate( CompName, FirstHVACIteration, CompIndex );
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
+			}
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex, QActual );
 			if ( QActual > 0.0 ) CoolingActive = true; // determine if coil is ON
 
 		} else if ( SELECT_CASE_var == WaterCoil_Cooling ) { // 'Coil:Cooling:Water'
+			if ( CompIndex > 0 ) {
+				CalcWaterCoilWaterFlowRate( CompName, FirstHVACIteration, CompIndex );
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
+			}
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex, QActual );
 			if ( QActual > 0.0 ) CoolingActive = true; // determine if coil is ON
 

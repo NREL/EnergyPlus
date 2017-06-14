@@ -263,6 +263,10 @@ namespace WaterCoils {
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
 		Real64 DesignWaterDeltaTemp; // water deltaT for coil sizing [K]
 		bool UseDesignWaterDeltaTemp; // is true, the DesignWaterDeltaTemp is used for sizing coil design water flow rate
+		int ControllerIndex; // index to water coil controller
+		std::string ControllerName; // name of water coil controller
+		int WaterCoilMaxIterIndex; // warning index for messages
+		int WaterCoilIterFailedIndex; // warning index for messages
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -375,8 +379,12 @@ namespace WaterCoils {
 			DesiccantRegenerationCoil( false ),
 			DesiccantDehumNum( 0 ),
 			DesignWaterDeltaTemp( 0.0 ),
-			UseDesignWaterDeltaTemp( false )
-		{}
+			UseDesignWaterDeltaTemp( false ),
+			ControllerIndex( 0 ),
+			ControllerName( " " ),
+			WaterCoilMaxIterIndex( 0 ),
+			WaterCoilIterFailedIndex( 0 )
+			{}
 
 	};
 
@@ -774,8 +782,21 @@ namespace WaterCoils {
 		Real64 const PartLoadRatio, // part-load ratio of heating coil
 		Real64 const UAMax, // maximum UA-Value
 		Real64 & DesCoilInletWaterTempUsed // estimated coil design inlet water temperature
-		);
-	
+	);
+
+	void
+	CalcWaterCoilWaterFlowRate(
+		std::string const & CoilName, // name of water coil
+		bool const FirstHVACIteration, // first HVAC iteration flag
+		int & CoilNum // index to heating coil
+	);
+
+	Real64
+	SimpleHotWaterCoilResidual(
+		Real64 const PartLoadRatio, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par(1) = DX coil number
+	);
+
 	// End of Coil Utility subroutines
 	// *****************************************************************************
 

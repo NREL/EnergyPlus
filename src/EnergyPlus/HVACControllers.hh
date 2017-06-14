@@ -232,6 +232,7 @@ namespace HVACControllers {
 		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		bool BypassControllerCalc; // true if water coil is simulated using RegulaFalsi instead
 
 		// Default Constructor
 		ControllerPropsType() :
@@ -275,7 +276,8 @@ namespace HVACControllers {
 			BadActionErrIndex( 0 ),
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
-			FaultyCoilSATOffset( 0.0 )
+			FaultyCoilSATOffset( 0.0 ),
+			BypassControllerCalc( false )
 		{}
 
 	};
@@ -554,6 +556,20 @@ namespace HVACControllers {
 		std::string const & ControllerName, // name of coil controller
 		int & WaterInletNodeNum, // input actuator node number
 		bool & NodeNotFound // true if matching actuator node not found
+	);
+
+	void
+	GetControllerIndex(
+		int const WaterInletNodeNum, // input actuator node number
+		int & ControllerIndex, // true if matching actuator node not found
+		bool & ErrorsFound // true if controller not found
+	);
+
+	void
+	GetControllerName(
+		int const ControllerIndex, // index to water coil controller
+		std::string & ControllerName, // name of controller
+		bool & ErrorsFound // true if controller not found
 	);
 
 } // HVACControllers

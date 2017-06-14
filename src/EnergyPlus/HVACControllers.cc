@@ -375,6 +375,14 @@ namespace HVACControllers {
 				CheckEquipName( ControlNum ) = false;
 			}
 		}
+
+		if ( ControllerProps( ControllerIndex ).BypassControllerCalc ) {
+			IsUpToDateFlag = true;
+			IsConvergedFlag = true;
+			if ( present( AllowWarmRestartFlag ) ) AllowWarmRestartFlag = false;
+			return;
+		}
+
 		// Find the correct ControllerNumber with the AirLoop & CompNum from AirLoop Derived Type
 		//ControlNum = AirLoopEquip(AirLoopNum)%ComponentOfTypeNum(CompNum)
 
@@ -3605,6 +3613,77 @@ Label100: ;
 		if ( ControlNum > 0 && ControlNum <= NumControllers ) {
 			WaterInletNodeNum = ControllerProps( ControlNum ).ActuatedNode;
 			NodeNotFound = false;
+		}
+
+	}
+
+	void
+	GetControllerIndex(
+		int const WaterInletNodeNum, // input actuator node number
+		int & ControllerIndex, // true if matching actuator node not found
+		bool & ErrorsFound // true if controller not found
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   June 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine checks that the water inlet node number is matched by
+		// the actuator node number of some water coil controller
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ControlNum;
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		ControllerIndex = 0;
+		for ( ControlNum = 1; ControlNum <= NumControllers; ++ControlNum ) {
+			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
+				ControllerIndex = ControlNum;
+				break;
+			}
+		}
+
+		if ( ControllerIndex == 0 )	ErrorsFound = true;
+
+	}
+
+	void
+	GetControllerName(
+		int const ControllerIndex, // index to water coil controller
+		std::string & ControllerName, // name of controller
+		bool & ErrorsFound // true if controller not found
+	) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   June 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine checks returns the name of a water coil controller
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ControlNum;
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		if ( ControllerIndex > 0 ) {
+			ControllerName = ControllerProps( ControllerIndex ).ControllerName;
+		} else {
+			ControllerName = " ";
+			ErrorsFound = true;
 		}
 
 	}

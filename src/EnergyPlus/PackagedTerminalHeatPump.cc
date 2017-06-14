@@ -6588,20 +6588,20 @@ namespace PackagedTerminalHeatPump {
 						SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
 						if ( SolFlag == -1 ) {
 							if ( PTUnit( PTUnitNum ).HotWaterCoilMaxIterIndex == 0 ) {
-								ShowWarningMessage( "RoutineName//Hot water coil control failed for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name + "\"" ); //Autodesk:Bug? Meant RoutineName + "Hot water...
+								ShowWarningMessage( RoutineName + "Hot water coil control failed for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
 								ShowContinueErrorTimeStamp( "" );
 								ShowContinueError( "  Iteration limit [" + RoundSigDigits( SolveMaxIter ) + "] exceeded in calculating hot water mass flow rate" );
 							}
-							ShowRecurringWarningErrorAtEnd( "RoutineName//Hot water coil control failed (iteration limit [" + RoundSigDigits( SolveMaxIter ) + "]) for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).HotWaterCoilMaxIterIndex ); //Autodesk:Bug? Meant RoutineName + "Hot water...
+							ShowRecurringWarningErrorAtEnd( RoutineName + "Hot water coil control failed (iteration limit [" + RoundSigDigits( SolveMaxIter ) + "]) for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).HotWaterCoilMaxIterIndex ); //Autodesk:Bug? Meant RoutineName + "Hot water...
 						} else if ( SolFlag == -2 ) {
 							if ( PTUnit( PTUnitNum ).HotWaterCoilMaxIterIndex2 == 0 ) {
-								ShowWarningMessage( "RoutineName//Hot water coil control failed (maximum flow limits) for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name + "\"" ); //Autodesk:Bug? Meant RoutineName + "Hot water...
+								ShowWarningMessage( RoutineName + "Hot water coil control failed (maximum flow limits) for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
 								ShowContinueErrorTimeStamp( "" );
 								ShowContinueError( "...Bad hot water maximum flow rate limits" );
 								ShowContinueError( "...Given minimum water flow rate=" + RoundSigDigits( MinWaterFlow, 3 ) + " kg/s" );
 								ShowContinueError( "...Given maximum water flow rate=" + RoundSigDigits( MaxHotWaterFlow, 3 ) + " kg/s" );
 							}
-							ShowRecurringWarningErrorAtEnd( "RoutineName//Hot water coil control failed (flow limits) for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name + "\"", PTUnit( PTUnitNum ).HotWaterCoilMaxIterIndex2, MaxHotWaterFlow, MinWaterFlow, _, "[kg/s]", "[kg/s]" ); //Autodesk:Bug? Meant RoutineName + "Hot water...
+							ShowRecurringWarningErrorAtEnd( RoutineName + "Hot water coil control failed (flow limits) for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name + "\"", PTUnit( PTUnitNum ).HotWaterCoilMaxIterIndex2, MaxHotWaterFlow, MinWaterFlow, _, "[kg/s]", "[kg/s]" ); //Autodesk:Bug? Meant RoutineName + "Hot water...
 						}
 						QActual = SupHeaterLoad;
 						// simulate the hot water supplemental heating coil
