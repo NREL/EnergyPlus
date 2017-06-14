@@ -2144,6 +2144,7 @@ namespace WaterCoils {
 					TempSize = WaterCoil( CoilNum ).UACoil;
 				}
 
+					DataFlowUsedForSizing = WaterCoil( CoilNum ).InletAirMassFlowRate;
 				DesCoilWaterInTempSaved = WaterCoil( DataCoilNum ).InletWaterTemp;
 				if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
 					// at low coil design water inlet temp, sizing has convergence issue hence slightly higher water inlet temperature
@@ -2151,6 +2152,7 @@ namespace WaterCoils {
 					EstimateCoilInletWaterTemp( DataCoilNum, DataFanOpMode, 1.0, DataCapacityUsedForSizing, DesCoilInletWaterTempUsed );
 					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilInletWaterTempUsed;
 				}
+					// must set DataCapacityUsedForSizing, DataWaterFlowUsedForSizing and DataFlowUsedForSizing to size UA. Any value of 0 will result in UA = 1.
 				RequestSizing( CompType, CompName, WaterHeatingCoilUASizing, SizingString, TempSize, bPRINT, RoutineName );
 				if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
 					ShowWarningError( "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"" );
@@ -2160,6 +2162,12 @@ namespace WaterCoils {
 					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
 				}
 				WaterCoil( CoilNum ).UACoil = TempSize;
+					// if coil UA did not size due to one of these variables being 0, must set UACoilVariable to avoid crash later on
+					if ( DataCapacityUsedForSizing == 0.0 || DataWaterFlowUsedForSizing == 0.0 || DataFlowUsedForSizing == 0.0 ) {
+						if ( WaterCoil( CoilNum ).UACoilVariable == AutoSize ) {
+							WaterCoil( CoilNum ).UACoilVariable = TempSize;
+						}
+					}
 				WaterCoil( CoilNum ).UACoilVariable = TempSize;
 				WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
 				WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
