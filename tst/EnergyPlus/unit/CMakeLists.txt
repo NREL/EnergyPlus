@@ -16,9 +16,12 @@ set( test_src
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BoilerHotWater.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerConstantCOP.unit.cc
+  ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
@@ -56,6 +59,7 @@ set( test_src
   Furnaces.unit.cc
   General.unit.cc
   GroundHeatExchangers.unit.cc
+  HeatBalanceAirManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
@@ -67,15 +71,19 @@ set( test_src
   HighTempRadiantSystem.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
+  HVACDXSystem.unit.cc
+  HVACFan.unit.cc
   HVACFourPipeBeam.unit.cc
   HVACManager.unit.cc
   HVACInterfaceManager.unit.cc
+  HVACHXAssistedCoolingCoil.unit.cc
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
+  HybridModel.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
@@ -87,17 +95,22 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
+  OASystemHWPreheatCoil.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
+  OutputReports.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantChillers.unit.cc
   PlantUtilities.unit.cc
+  PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   ReportSizingManager.unit.cc
@@ -124,6 +137,7 @@ set( test_src
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
+  TranspiredCollector.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
@@ -135,6 +149,7 @@ set( test_src
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
+  WindowAC.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc

@@ -31,6 +31,9 @@ builds
 Build
 Builds
 
+# by default CLion uses cmake-build-debug as the build folder, so add that as well
+cmake-build-debug
+
 # App-specific project files, for example, for Geany IDE:
 *.geany
 .project
@@ -43,4 +46,3 @@ Builds
 
 # py2app puts things inside dist/ and build/, build/ is already ignored, just add dist/
 dist
-

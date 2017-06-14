@@ -1,3 +1,49 @@
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 // EnergyPlus::WindowManager unit tests
 
 // C++ Headers
@@ -24,6 +70,8 @@
 #include <HeatBalanceSurfaceManager.hh>
 #include <Psychrometrics.hh>
 #include <SolarShading.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -161,7 +209,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 	// This test will emulate NFRC 100 U-factor test
 	int winNum;
 
-	for (size_t i = 1; i <= DataSurfaces::Surface.size_; ++i) {
+	for (size_t i = 1; i <= DataSurfaces::Surface.size(); ++i) {
 		if (DataSurfaces::Surface( i ).Class == DataSurfaces::SurfaceClass_Window) {
 			winNum = i;
 		}
@@ -169,7 +217,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 	int cNum;
 
-	for (size_t i = 1; i <= DataHeatBalance::Construct.size_; ++i) {
+	for (size_t i = 1; i <= DataHeatBalance::Construct.size(); ++i) {
 		if (DataHeatBalance::Construct( i ).TypeIsWindow) {
 			cNum = i;
 		}
@@ -257,7 +305,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
 {
-	
+
 	Real64 const cs = 0.86603;  // Cosine of incidence angle
 	Real64 const tf0 = 0.8980; // Transmittance at zero incidence angle
 	Real64 const rf0 = 0.0810; // Front reflectance at zero incidence angle
@@ -279,5 +327,260 @@ TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
 
 }
 
+TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
+{
+	// GitHub issue 6037
+	bool ErrorsFound( false );
 
+	std::string const idf_objects = delimited_string( {
+		"Version,8.4;",
+		"Material,",
+		"  Concrete Block,          !- Name",
+		"  MediumRough,             !- Roughness",
+		"  0.1014984,               !- Thickness {m}",
+		"  0.3805070,               !- Conductivity {W/m-K}",
+		"  608.7016,                !- Density {kg/m3}",
+		"  836.8000;                !- Specific Heat {J/kg-K}",
+		"Construction,",
+		"  WallConstruction,        !- Name",
+		"  Concrete Block;          !- Outside Layer",
+		"WindowMaterial:SimpleGlazingSystem,",
+		"  WindowMaterial,          !- Name",
+		"  5.778,                   !- U-Factor {W/m2-K}",
+		"  0.819,                   !- Solar Heat Gain Coefficient",
+		"  0.881;                   !- Visible Transmittance",
+		"Construction,",
+		"  WindowConstruction,      !- Name",
+		"  WindowMaterial;          !- Outside Layer",
+		"WindowProperty:FrameAndDivider,",
+		"  WindowFrame,             !- Name",
+		"  0.05,                    !- Frame Width {m}",
+		"  0.00,                    !- Frame Outside Projection {m}",
+		"  0.00,                    !- Frame Inside Projection {m}",
+		"  5.0,                     !- Frame Conductance {W/m2-K}",
+		"  1.2,                     !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
+		"  0.8,                     !- Frame Solar Absorptance",
+		"  0.8,                     !- Frame Visible Absorptance",
+		"  0.9,                     !- Frame Thermal Hemispherical Emissivity",
+		"  DividedLite,             !- Divider Type",
+		"  0.02,                    !- Divider Width {m}",
+		"  2,                       !- Number of Horizontal Dividers",
+		"  2,                       !- Number of Vertical Dividers",
+		"  0.00,                    !- Divider Outside Projection {m}",
+		"  0.00,                    !- Divider Inside Projection {m}",
+		"  5.0,                     !- Divider Conductance {W/m2-K}",
+		"  1.2,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
+		"  0.8,                     !- Divider Solar Absorptance",
+		"  0.8,                     !- Divider Visible Absorptance",
+		"  0.9;                     !- Divider Thermal Hemispherical Emissivity",
+		"FenestrationSurface:Detailed,",
+		"  FenestrationSurface,     !- Name",
+		"  Window,                  !- Surface Type",
+		"  WindowConstruction,      !- Construction Name",
+		"  Wall,                    !- Building Surface Name",
+		"  ,                        !- Outside Boundary Condition Object",
+		"  0.5000000,               !- View Factor to Ground",
+		"  ,                        !- Shading Control Name",
+		"  WindowFrame,             !- Frame and Divider Name",
+		"  1.0,                     !- Multiplier",
+		"  4,                       !- Number of Vertices",
+		"  0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}",
+		"  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
+		"  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
+		"  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
+		"BuildingSurface:Detailed,"
+		"  Wall,                    !- Name",
+		"  Wall,                    !- Surface Type",
+		"  WallConstruction,        !- Construction Name",
+		"  Zone,                    !- Zone Name",
+		"  Outdoors,                !- Outside Boundary Condition",
+		"  ,                        !- Outside Boundary Condition Object",
+		"  SunExposed,              !- Sun Exposure",
+		"  WindExposed,             !- Wind Exposure",
+		"  0.5000000,               !- View Factor to Ground",
+		"  4,                       !- Number of Vertices",
+		"  0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}",
+		"  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
+		"BuildingSurface:Detailed,"
+		"  Floor,                   !- Name",
+		"  Floor,                   !- Surface Type",
+		"  WallConstruction,        !- Construction Name",
+		"  Zone,                    !- Zone Name",
+		"  Outdoors,                !- Outside Boundary Condition",
+		"  ,                        !- Outside Boundary Condition Object",
+		"  NoSun,                   !- Sun Exposure",
+		"  NoWind,                  !- Wind Exposure",
+		"  1.0,                     !- View Factor to Ground",
+		"  4,                       !- Number of Vertices",
+		"  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+		"  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+		"Zone,"
+		"  Zone,                    !- Name",
+		"  0,                       !- Direction of Relative North {deg}",
+		"  6.000000,                !- X Origin {m}",
+		"  6.000000,                !- Y Origin {m}",
+		"  0,                       !- Z Origin {m}",
+		"  1,                       !- Type",
+		"  1,                       !- Multiplier",
+		"  autocalculate,           !- Ceiling Height {m}",
+		"  autocalculate;           !- Volume {m3}"
+	} );
+
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataHeatBalance::ZoneIntGain.allocate( 1 );
+
+	createFacilityElectricPowerServiceObject( );
+	HeatBalanceManager::SetPreConstructionInputParameters( );
+	HeatBalanceManager::GetProjectControlData( ErrorsFound );
+	HeatBalanceManager::GetFrameAndDividerData( ErrorsFound );
+	HeatBalanceManager::GetMaterialData( ErrorsFound );
+	HeatBalanceManager::GetConstructData( ErrorsFound );
+	HeatBalanceManager::GetBuildingData( ErrorsFound );
+
+	Psychrometrics::InitializePsychRoutines( );
+
+	DataGlobals::TimeStep = 1;
+	DataGlobals::TimeStepZone = 1;
+	DataGlobals::HourOfDay = 1;
+	DataGlobals::NumOfTimeStepInHour = 1;
+	DataGlobals::BeginSimFlag = true;
+	DataGlobals::BeginEnvrnFlag = true;
+	DataEnvironment::OutBaroPress = 100000;
+
+	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "Zone";
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+	std::vector< int > controlledZoneEquipConfigNums;
+	controlledZoneEquipConfigNums.push_back( 1 );
+
+	DataZoneEquipment::ZoneEquipConfig( 1 ).NumInletNodes = 2;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
+	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 2 ) = 2;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+
+	DataLoopNode::Node.allocate( 4 );
+	DataHeatBalance::TempEffBulkAir.allocate( 3 );
+	DataHeatBalSurface::TempSurfInTmp.allocate( 3 );
+
+	DataSurfaces::Surface( 1 ).HeatTransSurf = true;
+	DataSurfaces::Surface( 2 ).HeatTransSurf = true;
+	DataSurfaces::Surface( 3 ).HeatTransSurf = true;
+	DataSurfaces::Surface( 1 ).Area = 10.0;
+	DataSurfaces::Surface( 2 ).Area = 10.0;
+	DataSurfaces::Surface( 3 ).Area = 10.0;
+	DataSurfaces::Surface( 1 ).TAirRef = DataSurfaces::ZoneMeanAirTemp;
+	DataSurfaces::Surface( 2 ).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
+	DataSurfaces::Surface( 3 ).TAirRef = DataSurfaces::AdjacentAirTemp;
+	DataHeatBalSurface::TempSurfInTmp( 1 ) = 15.0;
+	DataHeatBalSurface::TempSurfInTmp( 2 ) = 20.0;
+	DataHeatBalSurface::TempSurfInTmp( 3 ) = 25.0;
+	DataHeatBalance::TempEffBulkAir( 1 ) = 10.0;
+	DataHeatBalance::TempEffBulkAir( 2 ) = 10.0;
+	DataHeatBalance::TempEffBulkAir( 3 ) = 10.0;
+
+	DataLoopNode::Node( 1 ).Temp = 20.0;
+	DataLoopNode::Node( 2 ).Temp = 20.0;
+	DataLoopNode::Node( 3 ).Temp = 20.0;
+	DataLoopNode::Node( 4 ).Temp = 20.0;
+	DataLoopNode::Node( 1 ).MassFlowRate = 0.1;
+	DataLoopNode::Node( 2 ).MassFlowRate = 0.1;
+	DataLoopNode::Node( 3 ).MassFlowRate = 0.1;
+	DataLoopNode::Node( 4 ).MassFlowRate = 0.1;
+
+	DataHeatBalance::HConvIn.allocate( 3 );
+	DataHeatBalance::HConvIn( 1 ) = 0.5;
+	DataHeatBalance::HConvIn( 2 ) = 0.5;
+	DataHeatBalance::HConvIn( 3 ) = 0.5;
+	DataHeatBalance::Zone( 1 ).IsControlled = true;
+	DataHeatBalFanSys::ZoneAirHumRat.allocate( 1 );
+	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.011;
+	DataHeatBalFanSys::ZoneAirHumRatAvg.allocate( 1 );
+	DataHeatBalFanSys::ZoneAirHumRatAvg( 1 ) = DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.011;
+
+	DataHeatBalFanSys::MAT.allocate( 1 );
+	DataHeatBalFanSys::MAT( 1 ) = 25.0;
+	DataHeatBalFanSys::QHTRadSysSurf.allocate( 3 );
+	DataHeatBalFanSys::QHWBaseboardSurf.allocate( 3 );
+	DataHeatBalFanSys::QSteamBaseboardSurf.allocate( 3 );
+	DataHeatBalFanSys::QElecBaseboardSurf.allocate( 3 );
+	DataHeatBalance::QRadSWwinAbs.allocate( 1, 3 );
+	DataHeatBalance::QRadThermInAbs.allocate( 3 );
+	DataHeatBalance::QRadSWOutIncident.allocate( 3 );
+	DataSurfaces::WinTransSolar.allocate( 3 );
+	DataHeatBalance::ZoneWinHeatGain.allocate( 1 );
+	DataHeatBalance::ZoneWinHeatGainRep.allocate( 1 );
+	DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate( 1 );
+	DataSurfaces::WinHeatGain.allocate( 3 );
+	DataSurfaces::WinHeatTransfer.allocate( 3 );
+	DataSurfaces::WinGainConvGlazToZoneRep.allocate( 3 );
+	DataSurfaces::WinGainIRGlazToZoneRep.allocate( 3 );
+	DataSurfaces::WinGapConvHtFlowRep.allocate( 3 );
+	DataSurfaces::WinGapConvHtFlowRepEnergy.allocate( 3 );
+	DataHeatBalance::QS.allocate( 1 );
+	DataSurfaces::WinLossSWZoneToOutWinRep.allocate( 3 );
+	DataSurfaces::WinSysSolTransmittance.allocate( 3 );
+	DataSurfaces::WinSysSolAbsorptance.allocate( 3 );
+	DataSurfaces::WinSysSolReflectance.allocate( 3 );
+	DataSurfaces::InsideGlassCondensationFlag.allocate( 3 );
+	DataSurfaces::WinGainFrameDividerToZoneRep.allocate( 3 );
+	DataSurfaces::InsideFrameCondensationFlag.allocate( 3 );
+ 	DataSurfaces::InsideDividerCondensationFlag.allocate( 3 );
+
+	DataHeatBalSurface::QdotConvOutRep.allocate( 3 );
+	DataHeatBalSurface::QdotConvOutRepPerArea.allocate( 3 );
+	DataHeatBalSurface::QConvOutReport.allocate( 3 );
+	DataHeatBalSurface::QdotRadOutRep.allocate( 3 );
+	DataHeatBalSurface::QdotRadOutRepPerArea.allocate( 3 );
+	DataHeatBalSurface::QRadOutReport.allocate( 3 );
+
+	
+	DataHeatBalance::QRadSWOutIncident = 0.0;
+	DataHeatBalance::QRadSWwinAbs = 0.0;
+	DataHeatBalance::QRadThermInAbs = 0.0;
+
+	DataHeatBalFanSys::QHTRadSysSurf = 0.0;
+	DataHeatBalFanSys::QHWBaseboardSurf = 0.0;
+	DataHeatBalFanSys::QSteamBaseboardSurf = 0.0;
+	DataHeatBalFanSys::QElecBaseboardSurf = 0.0;
+	DataSurfaces::WinTransSolar = 0.0;
+	DataHeatBalance::QS = 0.0;
+
+	Real64 inSurfTemp;
+	Real64 outSurfTemp;
+
+	// Claculate temperature based on supply flow rate
+	WindowManager::CalcWindowHeatBalance( 2, DataHeatBalance::HConvIn( 2 ), inSurfTemp, outSurfTemp );
+	EXPECT_NEAR( 20.0, DataHeatBalance::TempEffBulkAir( 2 ), 0.0001 );
+	// Claculate temperature based on zone temperature with supply flow rate = 0
+	DataLoopNode::Node( 1 ).MassFlowRate = 0.0;
+	DataLoopNode::Node( 2 ).MassFlowRate = 0.0;
+	WindowManager::CalcWindowHeatBalance( 2, DataHeatBalance::HConvIn( 2 ), inSurfTemp, outSurfTemp );
+	EXPECT_NEAR( 25.0, DataHeatBalance::TempEffBulkAir( 2 ), 0.0001 );
+
+	// Adjacent surface
+	DataLoopNode::Node( 1 ).MassFlowRate = 0.1;
+	DataLoopNode::Node( 2 ).MassFlowRate = 0.1;
+	DataSurfaces::Surface( 1 ).ExtBoundCond = 2;
+	WindowManager::CalcWindowHeatBalance( 2, DataHeatBalance::HConvIn( 2 ), inSurfTemp, outSurfTemp );
+	EXPECT_NEAR( 20.0, DataHeatBalance::TempEffBulkAir( 2 ), 0.0001 );
+
+	DataLoopNode::Node( 1 ).MassFlowRate = 0.0;
+	DataLoopNode::Node( 2 ).MassFlowRate = 0.0;
+	DataSurfaces::Surface( 1 ).ExtBoundCond = 2;
+	DataSurfaces::Surface( 2 ).ExtBoundCond = 1;
+	DataSurfaces::Surface( 1 ).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
+	WindowManager::CalcWindowHeatBalance( 2, DataHeatBalance::HConvIn( 2 ), inSurfTemp, outSurfTemp );
+	EXPECT_NEAR( 25.0, DataHeatBalance::TempEffBulkAir( 2 ), 0.0001 );
+
+}
 

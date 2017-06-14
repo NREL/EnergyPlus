@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -81,6 +69,7 @@
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
+#include <DataGlobals.hh>
 #include <DataGlobalConstants.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -98,6 +87,7 @@
 #include <EconomicLifeCycleCost.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <LowTempRadiantSystem.hh>
 #include <ElectricPowerServiceManager.hh>
@@ -177,6 +167,7 @@ namespace OutputReportTabular {
 	using namespace DataGlobalConstants;
 	using namespace OutputReportPredefined;
 	using namespace DataHeatBalance;
+	using namespace HybridModel;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -288,6 +279,7 @@ namespace OutputReportTabular {
 	bool displayLifeCycleCostReport( false );
 	bool displayTariffReport( false );
 	bool displayEconomicResultSummary( false );
+	bool displayEioSummary( false );
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -524,6 +516,7 @@ namespace OutputReportTabular {
 		displayLifeCycleCostReport = false;
 		displayTariffReport = false;
 		displayEconomicResultSummary = false;
+		displayEioSummary = false;
 		meterNumTotalsBEPS = Array1D_int( numResourceTypes, 0 );
 		meterNumTotalsSource = Array1D_int ( numSourceTypes, 0 );
 		fuelfactorsused = Array1D_bool ( numSourceTypes, false );
@@ -702,11 +695,15 @@ namespace OutputReportTabular {
 		if ( UpdateTabularReportsGetInput ) {
 			GetInputTabularMonthly();
 			OutputReportTabularAnnual::GetInputTabularAnnual();
+			OutputReportTabularAnnual::checkAggregationOrderForAnnual();
 			GetInputTabularTimeBins();
 			GetInputTabularStyle();
 			GetInputOutputTableSummaryReports();
 			// noel -- noticed this was called once and very slow -- sped up a little by caching keys
 			InitializeTabularMonthly();
+			if ( isInvalidAggregationOrder( ) ) {
+				ShowFatalError( "OutputReportTabular: Invalid aggregations detected, no simulation performed." );
+			}
 			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
 			AddTOCZoneLoadComponentTable();
@@ -1056,7 +1053,6 @@ namespace OutputReportTabular {
 		bool environmentKeyFound;
 		static bool VarWarning( true );
 		static int ErrCount1( 0 );
-		static int ErrCount2( 0 );
 		//INTEGER       :: maxKeyCount
 
 		// if not a running a weather simulation do not create reports
@@ -1223,7 +1219,7 @@ namespace OutputReportTabular {
 
 				if ( KeyCount == 0 ) {
 					++ErrCount1;
-					if ( ErrCount1 == 1 && ! DisplayExtraWarnings && ! VarWarning && KindOfSim == ksRunPeriodWeather ) {
+					if ( ErrCount1 == 1 && ! DisplayExtraWarnings && KindOfSim == ksRunPeriodWeather ) {
 						ShowWarningError( "Processing Monthly Tabular Reports: Variable names not valid for this simulation" );
 						ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables." );
 					}
@@ -1376,11 +1372,6 @@ namespace OutputReportTabular {
 							MonthlyColumns( mColumn ).timeStamp = 0;
 						}}
 					} else { //if no key corresponds to this instance of the report
-						++ErrCount2;
-						if ( ErrCount2 == 1 && ! DisplayExtraWarnings && ! VarWarning && KindOfSim == ksRunPeriodWeather ) {
-							ShowWarningError( "Processing Monthly Tabular Reports: Variable names not valid for this simulation" );
-							ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables." );
-						}
 						//fixing CR5878 removed the showing of the warning once about a specific variable.
 						if ( DisplayExtraWarnings && KindOfSim == ksRunPeriodWeather ) {
 							ShowWarningError( "Processing Monthly Tabular Reports: " + MonthlyInput( TabNum ).name );
@@ -1412,6 +1403,54 @@ namespace OutputReportTabular {
 		//DEALLOCATE(NamesOfKeys)
 		//DEALLOCATE(IndexesForKeyVar)
 		//#endif
+	}
+
+	bool
+	isInvalidAggregationOrder( )
+	{
+		bool foundError = false;
+		if ( !DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
+			return foundError;
+		}
+		for ( int iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
+			bool foundMinOrMax = false;
+			bool foundHourAgg = false;
+			bool missingMaxOrMinError = false;
+			bool missingHourAggError = false;
+			for ( int jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
+				int curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
+				// test if the aggregation types are in the correct order
+				for ( int kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
+					int curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
+					if (MonthlyColumns( curCol ).varNum == 0) break; // if no variable was ever found than stop checking
+					int curAggType = MonthlyColumns( curCol ).aggType;
+					if ( ( curAggType == aggTypeMaximum ) || ( curAggType == aggTypeMinimum ) ) {
+						foundMinOrMax = true;
+					} else if ( ( curAggType == aggTypeHoursNonZero ) || ( curAggType == aggTypeHoursZero ) ||
+						( curAggType == aggTypeHoursPositive ) || ( curAggType == aggTypeHoursNonPositive ) ||
+								( curAggType == aggTypeHoursNegative ) || ( curAggType == aggTypeHoursNonNegative ) ) {
+						foundHourAgg = true;
+					} else if ( curAggType == aggTypeValueWhenMaxMin ) {
+						if ( !foundMinOrMax ) {
+							missingMaxOrMinError = true;
+						}
+					} else if ( ( curAggType == aggTypeSumOrAverageHoursShown ) || ( curAggType == aggTypeMaximumDuringHoursShown ) || ( curAggType == aggTypeMinimumDuringHoursShown ) ) {
+						if ( !foundHourAgg ) {
+							missingHourAggError = true;
+						}
+					}
+				}
+			}
+			if ( missingMaxOrMinError ) {
+				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
+				foundError = true;
+			}
+			if ( missingHourAggError ) {
+				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
+				foundError = true;
+			}
+		}	
+		return foundError;
 	}
 
 	void
@@ -1946,6 +1985,14 @@ namespace OutputReportTabular {
 				} else if ( SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
 					WriteTabularFiles = true;
 					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "EIO" ) ) {
+					WriteTabularFiles = true;
+					displayEioSummary = true;
+					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "InitializationSummary" ) ) {
+					WriteTabularFiles = true;
+					displayEioSummary = true;
+					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "AllSummary" ) ) {
 					WriteTabularFiles = true;
 					displayTabularBEPS = true;
@@ -1959,6 +2006,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
+					displayEioSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -1976,6 +2024,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
+					displayEioSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -2001,6 +2050,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
+					displayEioSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -2021,6 +2071,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
+					displayEioSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -3559,6 +3610,7 @@ namespace OutputReportTabular {
 		static std::string const Component_Sizing_Summary( "Component Sizing Summary" );
 		static std::string const Surface_Shadowing_Summary( "Surface Shadowing Summary" );
 		static std::string const Adaptive_Comfort_Summary( "Adaptive Comfort Summary" );
+		static std::string const Initialization_Summary( "Initialization Summary" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3614,6 +3666,9 @@ namespace OutputReportTabular {
 				}
 				if ( displayAdaptiveComfort ){
 					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Adaptive_Comfort_Summary, Entire_Facility ) << "\">Adaptive Comfort Summary</a>\n";
+				}
+				if ( displayEioSummary ) {
+					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Initialization_Summary, Entire_Facility ) << "\">Initialization Summary</a>\n";
 				}
 				for ( kReport = 1; kReport <= numReportName; ++kReport ) {
 					if ( reportName( kReport ).show ) {
@@ -5184,6 +5239,7 @@ namespace OutputReportTabular {
 			WriteSurfaceShadowing();
 			WriteCompCostTable();
 			WriteAdaptiveComfortTable();
+			WriteEioTables();
 			WriteZoneLoadComponentTable();
 			if ( DoWeathSim ) {
 				WriteMonthlyTables();
@@ -9325,8 +9381,8 @@ namespace OutputReportTabular {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   June 2006
-		//       MODIFIED       January 2010, Kyle Benne
-		//                      Added SQLite output
+		//       MODIFIED       Jan. 2010, Kyle Benne. Added SQLite output
+		//                      Aug. 2015, Sang Hoon Lee. Added a new table for hybrid modeling multiplier output.
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -9378,12 +9434,14 @@ namespace OutputReportTabular {
 		using DataSurfaces::Ground;
 		using DataSurfaces::OtherSideCondModeledExt;
 		using DataSurfaces::GroundFCfactorMethod;
+		using DataSurfaces::KivaFoundation;
 		using ScheduleManager::ScheduleAverageHoursPerWeek;
 		using ScheduleManager::GetScheduleName;
 		using ExteriorEnergyUse::ExteriorLights;
 		using ExteriorEnergyUse::NumExteriorLights;
 		using General::SafeDivide;
 		using General::RoundSigDigits;
+		using namespace DataGlobals; 
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9422,6 +9480,7 @@ namespace OutputReportTabular {
 		int iZone;
 		int iPeople;
 		int iPlugProc;
+		int NumOfCol;
 		Real64 mult;
 		Real64 curAzimuth;
 		Real64 curArea;
@@ -9651,7 +9710,7 @@ namespace OutputReportTabular {
 				//only exterior surfaces including underground
 				if ( ! Surface( iSurf ).HeatTransSurf ) continue;
 				isAboveGround = ( Surface( iSurf ).ExtBoundCond == ExternalEnvironment ) || ( Surface( iSurf ).ExtBoundCond == OtherSideCondModeledExt );
-				if ( isAboveGround || ( Surface( iSurf ).ExtBoundCond == Ground ) || ( Surface( iSurf ).ExtBoundCond == GroundFCfactorMethod ) ) {
+				if ( isAboveGround || ( Surface( iSurf ).ExtBoundCond == Ground ) || ( Surface( iSurf ).ExtBoundCond == GroundFCfactorMethod ) || ( Surface( iSurf ).ExtBoundCond == KivaFoundation ) ) {
 					curAzimuth = Surface( iSurf ).Azimuth;
 					curArea = Surface( iSurf ).GrossArea;
 					if ( Surface( iSurf ).FrameDivider != 0 ) {
@@ -9886,6 +9945,39 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
 
+			//---- Hybrid Model: Internal Thermal Mass Sub-Table
+			if ( FlagHybridModel ){
+				rowHead.allocate( NumOfZones );
+				NumOfCol = 2;
+				columnHead.allocate( NumOfCol );
+				columnWidth.allocate( NumOfCol );
+				columnWidth = 14; //array assignment - same for all columns
+				tableBody.allocate( NumOfCol, NumOfZones );
+
+				columnHead( 1 ) = "Hybrid Modeling (Y/N)";
+				columnHead( 2 ) = "Temperature Capacitance Multiplier ";
+
+				rowHead = "";
+				tableBody = "";
+
+				for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+					rowHead( iZone ) = Zone( iZone ).Name;
+					if ( HybridModelZone( iZone ).InternalThermalMassCalc ) {
+						tableBody( 1, iZone ) = "Yes";
+					}
+					else {
+						tableBody( 1, iZone ) = "No";
+					}
+					tableBody( 2, iZone ) = RealToStr( Zone( iZone ).ZoneVolCapMultpSensHMAverage, 2 );
+				}
+				
+				WriteSubtitle( "Hybrid Model: Internal Thermal Mass" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Hybrid Model: Internal Thermal Mass" );
+				}
+			}
+
 			Real64 const totExtGrossWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossWallArea_Multiplied ) );
 			Real64 const totExtGrossGroundWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied ) );
 			if ( totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0 ) {
@@ -9907,10 +9999,11 @@ namespace OutputReportTabular {
 			WriteTextLine( "PERFORMANCE", true );
 
 			rowHead.allocate( NumOfZones + 4 );
-			columnHead.allocate( 12 );
-			columnWidth.allocate( 12 );
+			NumOfCol = 12;
+			columnHead.allocate( NumOfCol );
+			columnWidth.allocate( NumOfCol );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 12, NumOfZones + 4 );
+			tableBody.allocate( NumOfCol, NumOfZones + 4 );
 
 			columnHead( 1 ) = "Area " + m2_unitName;
 			columnHead( 2 ) = "Conditioned (Y/N)";
@@ -9926,7 +10019,6 @@ namespace OutputReportTabular {
 			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
 
 			rowHead = "";
-
 			rowHead( NumOfZones + grandTotal ) = "Total";
 			rowHead( NumOfZones + condTotal ) = "Conditioned Total";
 			rowHead( NumOfZones + uncondTotal ) = "Unconditioned Total";
@@ -10012,6 +10104,7 @@ namespace OutputReportTabular {
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
 					tableBody( 12, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
+
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
 					zstArea( grandTotal ) += mult * Zone( iZone ).FloorArea;
@@ -10783,6 +10876,154 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			}
 		}
+	}
+
+    // Parses the contents of the EIO (initializations) file and creates subtables for each type of record in the tabular output files
+	// Glazer - November 2016
+	void
+	WriteEioTables( ) {
+
+		if ( displayEioSummary ) {
+			Array1D_string columnHead;
+			Array1D_int columnWidth;
+			Array1D_string rowHead;
+			Array2D_string tableBody; //in the format: (row, column)
+			Array1D_int colUnitConv;
+
+			// setting up  report header
+			WriteReportHeaders( "Initialization Summary", "Entire Facility", isAverage );
+
+			// since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
+			gio::close( OutputFileInits );
+
+			std::ifstream eioFile;
+			eioFile.open( DataStringGlobals::outputEioFileName );
+			std::vector< std::string > headerLines; // holds the lines that describe each type of records - each starts with ! symbol
+			std::vector< std::string > bodyLines;    // holds the data records only
+			std::string line;
+			while ( std::getline( eioFile, line ) ) {
+				if ( line.at( 0 ) == '!' ) {
+					headerLines.push_back( line );
+				} else {
+					if ( line.at( 0 ) == ' ' ) {
+						bodyLines.push_back( line.erase( 0, 1 ) ); // remove leading space
+					} else {
+						bodyLines.push_back( line );
+					}
+				}
+			}
+			eioFile.close( );
+
+			// now go through each header and create a report for each one
+			for ( auto headerLine : headerLines ) {
+				std::vector< std::string > headerFields = splitCommaString( headerLine );
+				std::string tableNameWithSigns = headerFields.at( 0 );
+				std::string tableName = tableNameWithSigns.substr( 3, tableNameWithSigns.size( ) - 4 ); // get rid of the '! <' from the beginning and the '>' from the end
+				// first count the number of matching lines
+				int countOfMatchingLines = 0;
+				for ( auto bodyLine : bodyLines ) {
+					if ( bodyLine.size( ) > tableName.size( ) ) {
+						if ( bodyLine.substr( 0, tableName.size( ) + 1 ) == tableName + "," ) {  // this needs to match the test used to populate the body of table below
+							++countOfMatchingLines;
+						}
+					}
+				}
+				int numRows = countOfMatchingLines;
+				int numCols = headerFields.size( ) - 1;
+
+				if ( numRows >= 1 ) {
+					rowHead.allocate( numRows );
+					columnHead.allocate( numCols );
+					columnWidth.allocate( numCols );
+					columnWidth = 14; //array assignment - same for all columns
+					tableBody.allocate( numCols, numRows );
+					tableBody = ""; // make sure everything is blank
+					std::string footnote = "";
+					colUnitConv.allocate( numCols );
+					// transfer the header row into column headings
+					for ( int iCol = 1; iCol <= numCols; ++iCol ) {
+						columnHead( iCol ) = headerFields.at( iCol );
+						// set the unit conversions
+						colUnitConv( iCol ) = unitsFromHeading( columnHead( iCol ) );
+					}
+					// look for data lines
+					int rowNum = 0;
+					for ( auto bodyLine : bodyLines ) {
+						if ( bodyLine.size( ) > tableName.size( ) ) {
+							if ( bodyLine.substr( 0, tableName.size( ) + 1 ) == tableName + "," ) {  // this needs to match the test used in the original counting
+								++rowNum;
+								if ( rowNum > countOfMatchingLines ) break;  // should never happen since same test as original could
+								std::vector<std::string> dataFields = splitCommaString( bodyLine );
+								rowHead( rowNum ) = IntToStr( rowNum );
+								for ( int iCol = 1; iCol <= numCols && iCol < int( dataFields.size( ) ); ++iCol ) {
+									if ( unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH ) {
+										if ( isNumber( dataFields[ iCol ] ) && colUnitConv( iCol ) > 0 ) {  // if it is a number that has a conversion
+											int numDecimalDigits = digitsAferDecimal( dataFields[ iCol ] );
+											Real64 convertedVal = ConvertIP( colUnitConv( iCol ), StrToReal( dataFields[ iCol ] ) );
+											tableBody( iCol, rowNum ) = RealToStr( convertedVal, numDecimalDigits );
+										} else if ( iCol == numCols && columnHead( iCol ) == "Value" && iCol > 1 ) {  // if it is the last column and the header is Value then treat the previous column as source of units
+											int indexUnitConv = unitsFromHeading( tableBody( iCol - 1, rowNum ) ); //base units on previous column
+											int numDecimalDigits = digitsAferDecimal( dataFields[ iCol ] );
+											Real64 convertedVal = ConvertIP( indexUnitConv, StrToReal( dataFields[ iCol ] ) );
+											tableBody( iCol, rowNum ) = RealToStr( convertedVal, numDecimalDigits );
+										} else {
+											tableBody( iCol, rowNum ) = dataFields[ iCol ];
+										}
+									} else {
+										tableBody( iCol, rowNum ) = dataFields[ iCol ];
+									}
+								}
+							}
+						}
+					}
+
+					WriteSubtitle( tableName );
+					WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
+					if ( sqlite ) {
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName );
+					}
+				}
+
+			}
+
+			// reopen the EIO initilization file and position it at the end of the file so that additional writes continue to be added at the end.
+			int write_stat;
+			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); flags.POSITION( "APPEND" ); gio::open( OutputFileInits, DataStringGlobals::outputEioFileName, flags ); write_stat = flags.ios( ); }
+			// as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
+		}
+	}
+
+	// changes the heading that contains and SI to IP as well as providing the unit conversion index
+	// Glazer Nov 2016
+	int
+	unitsFromHeading( std::string & heading )
+	{
+		std::string curHeading = "";
+		int unitConv = 0;
+		if ( unitsStyle == unitsStyleInchPound ) {
+			LookupSItoIP( heading, unitConv, curHeading );
+		} else if ( unitsStyle == unitsStyleJtoKWH ) {
+			LookupJtokWH( heading, unitConv, curHeading );
+		} else {
+			curHeading = heading;
+		}
+		heading = curHeading;
+		return( unitConv );
+	}
+
+
+	// function that returns a vector of strings when given a string with comma delimitters
+	// Glazer Nov 2016
+	std::vector< std::string >
+	splitCommaString( std::string const & inputString )
+	{
+		std::vector< std::string > fields;
+		std::string field;
+		std::stringstream inputSS( inputString );
+		while ( std::getline( inputSS, field, ',' ) ) {
+			fields.push_back( stripped( field ) );
+		}
+		return fields;
 	}
 
 	void
@@ -14180,6 +14421,36 @@ Label900: ;
 		return StringOut;
 	}
 
+	bool
+	isNumber( std::string const & s )
+	{
+		char* p;
+		strtod( s.c_str(), &p );
+		for (; isspace( *p ); ++p); // handle trailing whitespace
+		return *p == 0;
+	}
+
+	// return the number of digits after the decimal point
+	// Glazer - November 2016
+	int
+	digitsAferDecimal( std::string s )
+	{
+		std::size_t decimalpos = s.find( '.' );
+		std::size_t numDigits;
+		if ( decimalpos == s.npos ) {
+			numDigits = 0;
+		} else {
+			std::size_t epos = s.find( 'E' );
+			if ( epos == s.npos ) epos = s.find( 'e' );
+			if ( epos == s.npos ) {
+				numDigits = s.length() - ( decimalpos + 1 );
+			} else {
+				numDigits = epos - ( decimalpos + 1 );
+			}
+		}
+		return int( numDigits );
+	}
+
 	void
 	AddTOCEntry(
 		std::string const & nameSection,
@@ -14761,7 +15032,8 @@ Label900: ;
 		int modeInString;
 		int const misBrac( 1 );
 		int const misParen( 2 );
-		int const misNoHint( 3 );
+		int const misBrce( 3 );
+		int const misNoHint( 4 );
 		std::string const stringInUpper( MakeUPPERCase( stringInWithSI ) );
 
 		stringOutWithIP = "";
@@ -14770,12 +15042,17 @@ Label900: ;
 		std::string::size_type posRBrac = index( stringInUpper, ']' ); // right bracket
 		std::string::size_type posLParen = index( stringInUpper, '(' ); // left parenthesis
 		std::string::size_type posRParen = index( stringInUpper, ')' ); // right parenthesis
+		std::string::size_type posLBrce = index( stringInUpper, '{' ); // left brace
+		std::string::size_type posRBrce = index( stringInUpper, '}' ); // right brace
 		bool noBrackets = true;
 		//extract the substring with the units
 		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 			modeInString = misBrac;
 			noBrackets = false;
+		} else if ((posLBrce != std::string::npos) && (posRBrce != std::string::npos) && (posRBrce - posLBrce >= 1)) {
+			unitSIOnly = stringInUpper.substr(posLBrce + 1, posRBrce - posLBrce - 1);
+			modeInString = misBrce;
 		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
 			modeInString = misParen;
@@ -14783,6 +15060,7 @@ Label900: ;
 			unitSIOnly = stringInUpper;
 			modeInString = misNoHint;
 		}
+		unitSIOnly = stripped( unitSIOnly );
 		int defaultConv = 0;
 		int foundConv = 0;
 		int firstOfSeveral = 0;
@@ -14828,6 +15106,8 @@ Label900: ;
 				stringOutWithIP = stringInWithSI.substr( 0, posLBrac + 1 ) + UnitConv( selectedConv ).ipName + stringInWithSI.substr( posRBrac );
 			} else if ( modeInString == misParen ) {
 				stringOutWithIP = stringInWithSI.substr( 0, posLParen + 1 ) + UnitConv( selectedConv ).ipName + stringInWithSI.substr( posRParen );
+			} else if ( modeInString == misBrce ) {
+				stringOutWithIP = stringInWithSI.substr(0, posLBrce + 1) + UnitConv(selectedConv).ipName + stringInWithSI.substr(posRBrce);
 			} else if ( modeInString == misNoHint ) {
 				stringOutWithIP = UnitConv( selectedConv ).ipName;
 			}

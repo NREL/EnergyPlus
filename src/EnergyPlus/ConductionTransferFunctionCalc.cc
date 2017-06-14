@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -348,7 +336,9 @@ namespace ConductionTransferFunctionCalc {
 
 			AdjacentResLayerNum = 0; // Zero this out for each construct
 
-			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
+			if ( !Construct( ConstrNum ).IsUsedCTF ) {
+				continue;
+			}
 
 			// Initialize construct parameters
 
@@ -396,6 +386,11 @@ namespace ConductionTransferFunctionCalc {
 							}
 						}
 					}
+				}
+				if ( Material( CurrentLayer ).Thickness > 3.0 ) {
+					ShowSevereError( "InitConductionTransferFunctions: Material too thick for CTF calculation" );
+					ShowContinueError("material name = " + Material( CurrentLayer ).Name);
+					ErrorsFound = true;
 				}
 
 				if ( rk( Layer ) <= PhysPropLimit ) { // Thermal conductivity too small,
@@ -588,6 +583,12 @@ namespace ConductionTransferFunctionCalc {
 							}
 
 						} // ... end of layers loop.
+
+						// If the reverse construction isn't used by any surfaces then the CTFs
+						// still need to be defined.
+						if ( RevConst && !Construct( Constr ).IsUsedCTF ) {
+							RevConst = false;
+						}
 
 						if ( RevConst ) { // Curent construction is a reverse of
 							// construction Constr.  Thus, CTFs do not need to be re-
@@ -2193,7 +2194,7 @@ namespace ConductionTransferFunctionCalc {
 
 			for ( ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum ) {
 
-				if ( Construct( ThisNum ).TypeIsWindow ) continue;
+				if ( !Construct( ThisNum ).IsUsedCTF ) continue;
 
 				gio::write( OutputFileInits, Format_700 ) << Construct( ThisNum ).Name << ThisNum << Construct( ThisNum ).TotLayers << Construct( ThisNum ).NumCTFTerms << Construct( ThisNum ).CTFTimeStep << Construct( ThisNum ).UValue << Construct( ThisNum ).OutsideAbsorpThermal << Construct( ThisNum ).InsideAbsorpThermal << Construct( ThisNum ).OutsideAbsorpSolar << Construct( ThisNum ).InsideAbsorpSolar << DisplayMaterialRoughness( Construct( ThisNum ).OutsideRoughness );
 
