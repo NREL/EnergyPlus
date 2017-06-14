@@ -3101,10 +3101,8 @@ namespace WindowManager {
 
 		if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn ) {
 			nglfacep = nglface + 2;
-			ShadeAbsFac1 = SurfaceWindow( SurfNum ).ShadeAbsFacFace( 1 );
-			ShadeAbsFac2 = SurfaceWindow( SurfNum ).ShadeAbsFacFace( 2 );
-			AbsRadShadeFace( 1 ) = ( SurfaceWindow( SurfNum ).ExtBeamAbsByShade + SurfaceWindow( SurfNum ).ExtDiffAbsByShade ) * ShadeAbsFac1 + ( SurfaceWindow( SurfNum ).IntBeamAbsByShade + SurfaceWindow( SurfNum ).IntSWAbsByShade ) * ShadeAbsFac2;
-			AbsRadShadeFace( 2 ) = ( SurfaceWindow( SurfNum ).ExtBeamAbsByShade + SurfaceWindow( SurfNum ).ExtDiffAbsByShade ) * ShadeAbsFac2 + ( SurfaceWindow( SurfNum ).IntBeamAbsByShade + SurfaceWindow( SurfNum ).IntSWAbsByShade ) * ShadeAbsFac1;
+			AbsRadShadeFace( 1 ) = SurfaceWindow( SurfNum ).AbsFrontSide();
+      AbsRadShadeFace( 2 ) = SurfaceWindow( SurfNum ).AbsBackSide();
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) AbsRadShadeFace( 2 ) += SurfaceWindow( SurfNum ).IntLWAbsByShade;
 			sconsh = scon( ngllayer + 1 );
 			TauShIR = tir( nglface + 1 );

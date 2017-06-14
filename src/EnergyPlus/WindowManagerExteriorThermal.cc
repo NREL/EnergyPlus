@@ -424,20 +424,24 @@ namespace EnergyPlus {
       auto aSolidLayer = make_shared< CIGUSolidLayer >( thickness, conductivity, frontSurface, backSurface );
       auto swRadiation = surface.getSWIncident( t_SurfNum );
       if( swRadiation > 0 ) {
-        double absCoeff = 0;
-        if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ||
-          material.Group == ComplexWindowShade ) {
-          auto aIndex = t_Index;
-          if( m_ExteriorShade ) {
-            --aIndex;
-          }
-          absCoeff = QRadSWwinAbs( aIndex, t_SurfNum ) / swRadiation;          
-        } else {
-          absCoeff = ( m_Window.AbsFrontSide() + m_Window.AbsBackSide() ) / swRadiation;
+        auto aIndex = t_Index;
+        if( m_ExteriorShade ) {
+          --aIndex;
         }
+        auto absCoeff = AWinSurf( aIndex, t_SurfNum );
         if( ( 2 * t_Index - 1 ) == m_TotLay ) {
           absCoeff += QRadThermInAbs( t_SurfNum ) / swRadiation;
         }
+        // if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ||
+        //   material.Group == ComplexWindowShade ) {
+        //   auto aIndex = t_Index;
+        //   if( m_ExteriorShade ) {
+        //     --aIndex;
+        //   }
+        //   absCoeff = QRadSWwinAbs( aIndex, t_SurfNum ) / swRadiation;
+        // } else {
+        //   absCoeff = AWinSurf( t_Index, t_SurfNum );
+        // }
         aSolidLayer->setSolarAbsorptance( absCoeff );
       }
       return aSolidLayer;

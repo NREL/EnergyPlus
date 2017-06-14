@@ -7190,18 +7190,18 @@ namespace SolarShading {
 
         int ConstrNum = Surface( SurfNum2 ).Construction;
         if( window.ShadedConstruction > 0 ) ConstrNum = window.ShadedConstruction;
-        std::shared_ptr< CMultiLayerScattered > aLayer =
-          CWindowConstructionsSimplified::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
+        auto aLayer = CWindowConstructionsSimplified::instance().
+          getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
         ///////////////////////////////////////////////
         // Solar absorbed in window layers
         ///////////////////////////////////////////////
         if( SunlitFracWithoutReveal( TimeStep, HourOfDay, SurfNum2 ) > 0.0 ) {
-          size_t numOfLayers = aLayer->getNumOfLayers();
+          auto numOfLayers = aLayer->getNumOfLayers();
           for( size_t Lay = 1; Lay <= numOfLayers; ++Lay ) {
-            double AbWin = aLayer->getAbsorptance( Side::Front, ScatteringSimple::Direct, Theta, Phi ) * 
+            auto AbWin = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi ) * 
               window.OutProjSLFracMult( HourOfDay ) * CosInc;
-            double AfromReveals = aLayer->getAbsorptance( Side::Front, ScatteringSimple::Diffuse, Theta, Phi ) *
+            auto AfromReveals = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi ) *
               window.OutsRevealDiffOntoGlazing +
               aLayer->getAbsorptance( Side::Back, ScatteringSimple::Diffuse, Theta, Phi ) *
               window.InsRevealDiffOntoGlazing;
