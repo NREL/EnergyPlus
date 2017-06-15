@@ -4868,13 +4868,9 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int PriInNode;
-		int MixedAirOutNode;
-
-		InletNode = SysATMixer( ATMixerNum ).SecInNode;
-		PriInNode = SysATMixer( ATMixerNum ).PriInNode;
-		MixedAirOutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+		int InletNode = SysATMixer( ATMixerNum ).SecInNode;
+		int PriInNode = SysATMixer( ATMixerNum ).PriInNode;
+		int MixedAirOutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 
 		if ( FirstHVACIteration ) {
 			//  SysATMixer(ATMixerNum)%ZoneAirMassFlowRate = SysATMixer(ATMixerNum)%MaxAirMassFlowRate
@@ -5003,14 +4999,9 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int MixedAirOutNode;
-		int PriInNode;
-		int SecInNode;
-
-		PriInNode = SysATMixer( SysNum ).PriInNode;
-		SecInNode = SysATMixer( SysNum ).SecInNode;
-		MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;
-		
+		int PriInNode = SysATMixer( SysNum ).PriInNode;
+		int SecInNode = SysATMixer( SysNum ).SecInNode;
+		int MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;	
 		// mixed air data
 		Node( MixedAirOutNode ).Temp = SysATMixer( SysNum ).MixedAirTemp;
 		Node( MixedAirOutNode ).HumRat = SysATMixer( SysNum ).MixedAirHumRat;
