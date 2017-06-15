@@ -570,7 +570,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
 
 	// check coil UA-value sizing
-	EXPECT_NEAR( 1435.00, WaterCoil( CoilNum ).UACoil, 0.01 );
+	EXPECT_NEAR( 1439.30, WaterCoil( CoilNum ).UACoil, 0.01 );
 
 	// test single zone VAV reheat coil sizing
 	CurZoneEqNum = 1;
