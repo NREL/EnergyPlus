@@ -1145,9 +1145,11 @@ namespace CondenserLoopTowers {
 					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Low-speed nominal capacity must be less than the high-speed nominal capacity." );
 					ErrorsFound = true;
 				}
-				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap >= SimpleTower( TowerNum ).TowerLowSpeedNomCap ) {
-					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection nominal capacity must be less than the low-speed nominal capacity." );
-					ErrorsFound = true;
+				if ( !SimpleTower( TowerNum ).TowerLowSpeedNomCapWasAutoSized ) {
+					if ( SimpleTower( TowerNum ).TowerFreeConvNomCap >= SimpleTower( TowerNum ).TowerLowSpeedNomCap ) {
+						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection nominal capacity must be less than the low-speed nominal capacity." );
+						ErrorsFound = true;
+					}
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap > 0.0 && SimpleTower( TowerNum ).FreeConvAirFlowRate == 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection air flow must be greater than zero when tower free convection capacity is specified." );
