@@ -264,9 +264,13 @@ namespace WaterCoils {
 		Real64 DesignWaterDeltaTemp; // water deltaT for coil sizing [K]
 		bool UseDesignWaterDeltaTemp; // is true, the DesignWaterDeltaTemp is used for sizing coil design water flow rate
 		int ControllerIndex; // index to water coil controller
-		std::string ControllerName; // name of water coil controller
+		int ControllerSensedNode; // water coil sensed node
+		int ControllerControlVar; // controller control variable (e.g., Temp, TempandHumRat)
 		int WaterCoilMaxIterIndex; // warning index for messages
 		int WaterCoilIterFailedIndex; // warning index for messages
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -381,9 +385,13 @@ namespace WaterCoils {
 			DesignWaterDeltaTemp( 0.0 ),
 			UseDesignWaterDeltaTemp( false ),
 			ControllerIndex( 0 ),
-			ControllerName( " " ),
+			ControllerSensedNode( 0 ),
+			ControllerControlVar( 0 ),
 			WaterCoilMaxIterIndex( 0 ),
-			WaterCoilIterFailedIndex( 0 )
+			WaterCoilIterFailedIndex( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 			{}
 
 	};
@@ -792,7 +800,7 @@ namespace WaterCoils {
 	);
 
 	Real64
-	SimpleHotWaterCoilResidual(
+	WaterCoilResidual(
 		Real64 const PartLoadRatio, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
 		Array1< Real64 > const & Par // par(1) = DX coil number
 	);

@@ -846,8 +846,13 @@ namespace FaultsManager {
 					if( CoilNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
-					} 
+					} else {
+						// Link the water coil with the fault model
+						WaterCoils::WaterCoil( CoilNum ).FaultyCoilSATFlag = true;
+						WaterCoils::WaterCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+					}
 					
+// *** PREPARE TO DELETE REFERENCE TO HVAC CONTROLLER BELOW ***
 					// Read in Water Coil Controller Name
 					FaultsCoilSATSensor( jFault_CoilSAT ).WaterCoilControllerName = cAlphaArgs( 6 );
 					if( lAlphaFieldBlanks( 6 ) ) {
@@ -875,6 +880,7 @@ namespace FaultsManager {
 							ErrorsFound = true;
 						}
 					}
+// *** PREPARE TO DELETE REFERENCE TO HVAC CONTROLLER ABOVE ***
 				} else if ( SameString( SELECT_CASE_VAR, "CoilSystem:Cooling:DX" ) ){
 					// Read in DXCoolingSystem input if not done yet
 					if ( HVACDXSystem::GetInputFlag ) {

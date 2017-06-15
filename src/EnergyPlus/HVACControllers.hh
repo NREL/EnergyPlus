@@ -560,15 +560,22 @@ namespace HVACControllers {
 
 	void
 	GetControllerIndex(
-		int const WaterInletNodeNum, // input actuator node number
-		int & ControllerIndex, // true if matching actuator node not found
+		int const WaterInletNodeNum, // water coil water inlet node number
+		int & ControllerIndex, // controller index
 		bool & ErrorsFound // true if controller not found
 	);
 
 	void
-	GetControllerName(
-		int const ControllerIndex, // index to water coil controller
-		std::string & ControllerName, // name of controller
+	GetControllerSensedNode(
+		int const WaterInletNodeNum, // water coil water inlet node number
+		int & ControllerSensedNode, // controller sensed node
+		bool & ErrorsFound // true if controller not found
+	);
+
+	void
+	GetControllerControlVar(
+		int const WaterInletNodeNum, // water coil water inlet node number
+		int & ControllerControlVar, // controller control variable
 		bool & ErrorsFound // true if controller not found
 	);
 

@@ -3619,8 +3619,8 @@ Label100: ;
 
 	void
 	GetControllerIndex(
-		int const WaterInletNodeNum, // input actuator node number
-		int & ControllerIndex, // true if matching actuator node not found
+		int const WaterInletNodeNum, // water coil water inlet node number
+		int & ControllerIndex, // controller index
 		bool & ErrorsFound // true if controller not found
 	)
 	{
@@ -3632,8 +3632,8 @@ Label100: ;
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// This subroutine checks that the water inlet node number is matched by
-		// the actuator node number of some water coil controller
+		// This subroutine checks that the water inlet node number is matched by the
+		// actuator node number of some water coil controller and returns the controller index
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlNum;
@@ -3656,11 +3656,12 @@ Label100: ;
 	}
 
 	void
-	GetControllerName(
-		int const ControllerIndex, // index to water coil controller
-		std::string & ControllerName, // name of controller
+	GetControllerSensedNode(
+		int const WaterInletNodeNum, // water coil water inlet node number
+		int & SensedNode, // controller sensed node
 		bool & ErrorsFound // true if controller not found
-	) {
+	)
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
@@ -3669,7 +3670,8 @@ Label100: ;
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// This subroutine checks returns the name of a water coil controller
+		// This subroutine checks that the water inlet node number is matched by the
+		// actuator node number of some water coil controller and returns the controller sensed node
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlNum;
@@ -3679,12 +3681,53 @@ Label100: ;
 			GetControllerInputFlag = false;
 		}
 
-		if ( ControllerIndex > 0 ) {
-			ControllerName = ControllerProps( ControllerIndex ).ControllerName;
-		} else {
-			ControllerName = " ";
-			ErrorsFound = true;
+		SensedNode = 0;
+		for ( ControlNum = 1; ControlNum <= NumControllers; ++ControlNum ) {
+			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
+				SensedNode = ControllerProps( ControlNum ).SensedNode;
+				break;
+			}
 		}
+
+		if ( SensedNode == 0 )	ErrorsFound = true;
+
+	}
+
+	void
+	GetControllerControlVar(
+		int const WaterInletNodeNum, // water coil water inlet node number
+		int & ControlVar, // controller control variable
+		bool & ErrorsFound // true if controller not found
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   June 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine checks that the water inlet node number is matched by the
+		// actuator node number of some water coil controller and returns the controller control variable
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ControlNum;
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		ControlVar = 0;
+		for ( ControlNum = 1; ControlNum <= NumControllers; ++ControlNum ) {
+			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
+				ControlVar = ControllerProps( ControlNum ).ControlVar;
+				break;
+			}
+		}
+
+		if ( ControlVar == 0 )	ErrorsFound = true;
 
 	}
 
