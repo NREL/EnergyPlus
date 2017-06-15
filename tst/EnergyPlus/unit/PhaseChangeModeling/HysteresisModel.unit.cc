@@ -50,22 +50,34 @@
 
 using namespace EnergyPlus;
 
-TEST(HysteresisPhaseChangeModel, StraightUpCurve)
+// A new one of these is created for each test
+class HysteresisTest : public testing::Test
 {
-	HysteresisPhaseChange::HysteresisPhaseChange thisHM;
-	thisHM.name = "PCM Name";
-	thisHM.totalLatentHeat = 25000;  // J/kg ?
-	thisHM.specificHeatLiquid = 25000;  // J/kgK
-	thisHM.deltaTempMeltingHigh = 1.0;  // deltaC
-	thisHM.peakTempMelting = 27;  // degC
-	thisHM.deltaTempMeltingLow = 1.0;  // deltaC
-	thisHM.specificHeatSolid = 20000;  // J/kgK
-	thisHM.deltaTempFreezingHigh = 1.0;  // deltaC
-	thisHM.peakTempFreezing = 23;  // degC
-	thisHM.deltaTempFreezingLow = 1.0;  // deltaC
-	thisHM.specHeatTransition = ( thisHM.specificHeatSolid + thisHM.specificHeatLiquid ) / 2.0;
-	thisHM.CpOld = thisHM.specificHeatSolid;
+public:
+	HysteresisPhaseChange::HysteresisPhaseChange ModelA;
+	virtual void SetUp()
+	{
+		this->ModelA.name = "PCM Name";
+		this->ModelA.totalLatentHeat = 25000;  // J/kg ?
+		this->ModelA.specificHeatLiquid = 25000;  // J/kgK
+		this->ModelA.deltaTempMeltingHigh = 1.0;  // deltaC
+		this->ModelA.peakTempMelting = 27;  // degC
+		this->ModelA.deltaTempMeltingLow = 1.0;  // deltaC
+		this->ModelA.specificHeatSolid = 20000;  // J/kgK
+		this->ModelA.deltaTempFreezingHigh = 1.0;  // deltaC
+		this->ModelA.peakTempFreezing = 23;  // degC
+		this->ModelA.deltaTempFreezingLow = 1.0;  // deltaC
+		this->ModelA.specHeatTransition = ( this->ModelA.specificHeatSolid + this->ModelA.specificHeatLiquid ) / 2.0;
+		this->ModelA.CpOld = this->ModelA.specificHeatSolid;
+	}
 
+	virtual void TearDown()
+	{
+	}
+};
+
+TEST_F(HysteresisTest, StraightUpCurve)
+{
 	Real64 phaseChangeTempReverse = 999;
 
 	Real64 prevTempTD = 20;
@@ -74,7 +86,7 @@ TEST(HysteresisPhaseChangeModel, StraightUpCurve)
 	int phaseChangeState = HysteresisPhaseChange::PhaseChangeStates::CRYSTALLIZED;
 
 	// calculate a new specific heat value, moving from 20 to 21
-	Real64 newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	Real64 newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 
 	// validate the return value
 	EXPECT_NEAR( 20000, newSpecificHeat, 1.0 );
@@ -88,85 +100,205 @@ TEST(HysteresisPhaseChangeModel, StraightUpCurve)
 
 	// and repeat with different expectations as we move through the curve
 	updatedTempTDT += 1;  // now 22
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 20001, newSpecificHeat, 1.0 );
 	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 23
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 20008, newSpecificHeat, 1.0 );
 	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 23
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 20061, newSpecificHeat, 1.0 );
 	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 24
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 20457, newSpecificHeat, 1.0 );
 	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 25
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 23383, newSpecificHeat, 1.0 );
 	EXPECT_EQ( -1, phaseChangeState );  // MELTING
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 26
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 30808, newSpecificHeat, 1.0 );
 	EXPECT_EQ( -1, phaseChangeState );  // MELTING
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 27
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 28383, newSpecificHeat, 1.0 );
 	EXPECT_EQ( -1, phaseChangeState );  // MELTING
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 28
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 25457, newSpecificHeat, 1.0 );
 	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 29
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 25061, newSpecificHeat, 1.0 );
 	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 30
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 25008, newSpecificHeat, 1.0 );
 	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 31
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 25001, newSpecificHeat, 1.0 );
 	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
 
 	prevPhaseChangeState = phaseChangeState;
 	prevTempTD = updatedTempTDT;
 	updatedTempTDT += 1;  // now 32
-	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 25000, newSpecificHeat, 1.0 );
 	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
 }
 
+
+TEST_F(HysteresisTest, StraightDownCurve)
+{
+	Real64 phaseChangeTempReverse = 999;
+
+	Real64 prevTempTD = 32;
+	Real64 updatedTempTDT = 31;
+	int prevPhaseChangeState = HysteresisPhaseChange::PhaseChangeStates::LIQUID;
+	int phaseChangeState = HysteresisPhaseChange::PhaseChangeStates::LIQUID;
+
+	// calculate a new specific heat value, moving from 32 to 31
+	Real64 newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+
+	// validate the return value
+	EXPECT_NEAR( 25000, newSpecificHeat, 1.0 );
+
+	// each call to the getCurrentSpecificHeat will return a new phase change state, so assert it and then store it
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+	prevPhaseChangeState = phaseChangeState;
+
+	// also store the previous temp for convenience and move updatedTemp to a new state
+	prevTempTD = updatedTempTDT;
+
+	// and repeat with different expectations as we move through the curve
+	updatedTempTDT -= 1;  // now 30
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25000, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 29
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25000, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 28
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25001, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 27
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25008, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 26
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25061, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 25
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25457, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 24
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 28383, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 1, phaseChangeState );  // FREEZING
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 23
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 35808, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 1, phaseChangeState );  // FREEZING
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 22
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 23383, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 1, phaseChangeState );  // FREEZING
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 21
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20457, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 20
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20061, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 19
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20008, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 18
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20001, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT -= 1;  // now 17
+	newSpecificHeat = this->ModelA.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20000, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+}
