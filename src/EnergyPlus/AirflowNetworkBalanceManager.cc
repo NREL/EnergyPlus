@@ -2302,7 +2302,7 @@ namespace AirflowNetworkBalanceManager {
 				if ( MultizoneZoneData( i ).SingleSidedCpType == "ADVANCED" ) {
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), "; }
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneZoneData( i ).ZoneName + ", "; }
-					for ( auto j = 1; j <= EPDeltaCP( i ).WindDir.size() - 1; ++j ) {
+					for ( unsigned j = 1; j <= EPDeltaCP( i ).WindDir.size() - 1; ++j ) {
 						StringOut = RoundSigDigits( EPDeltaCP( i ).WindDir( j ), 2 );
 						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 					}
@@ -5201,7 +5201,7 @@ namespace AirflowNetworkBalanceManager {
 			FacadeNum = 5;
 			valsByFacade[ FacadeNum - 1 ].push_back( valsByFacade[ FacadeNum - 1 ][ 0 ] ); // Enforce periodicity
 			curveIndex[ FacadeNum - 1 ] = makeTable( "!SSWPCTABLEFACADE" + std::to_string( FacadeNum ), dirs30, valsByFacade[ FacadeNum - 1 ] );
-			for ( auto facadeNum = 6; facadeNum <= valsByFacade.size(); ++facadeNum ) {
+			for ( unsigned facadeNum = 6; facadeNum <= valsByFacade.size(); ++facadeNum ) {
 				valsByFacade[ facadeNum - 1 ].push_back( valsByFacade[ facadeNum - 1 ][ 0 ] ); // Enforce periodicity
 				curveIndex[ facadeNum - 1 ] = makeTable( "!SSWPCTABLE" + std::to_string( facadeNum ), dirs10, valsByFacade[ facadeNum - 1 ]);
 			}
