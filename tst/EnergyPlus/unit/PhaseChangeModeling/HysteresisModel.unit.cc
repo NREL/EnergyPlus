@@ -50,7 +50,7 @@
 
 using namespace EnergyPlus;
 
-TEST(HysteresisPhaseChangeModel, Test1)
+TEST(HysteresisPhaseChangeModel, StraightUpCurve)
 {
 	HysteresisPhaseChange::HysteresisPhaseChange thisHM;
 	thisHM.name = "PCM Name";
@@ -59,20 +59,114 @@ TEST(HysteresisPhaseChangeModel, Test1)
 	thisHM.deltaTempMeltingHigh = 1.0;  // deltaC
 	thisHM.peakTempMelting = 27;  // degC
 	thisHM.deltaTempMeltingLow = 1.0;  // deltaC
-	thisHM.specificHeatSolid = 25000;  // J/kgK
+	thisHM.specificHeatSolid = 20000;  // J/kgK
 	thisHM.deltaTempFreezingHigh = 1.0;  // deltaC
 	thisHM.peakTempFreezing = 23;  // degC
 	thisHM.deltaTempFreezingLow = 1.0;  // deltaC
 	thisHM.specHeatTransition = ( thisHM.specificHeatSolid + thisHM.specificHeatLiquid ) / 2.0;
 	thisHM.CpOld = thisHM.specificHeatSolid;
 
-	Real64 prevTempTD = 20;
-	Real64 updatedTempTDT = 24;
-	Real64 phaseChangeTempReverse = 22;
-	int prevPhaseChangeState = HysteresisPhaseChange::PhaseChangeStates::LIQUID;
-	int phaseChangeState = HysteresisPhaseChange::PhaseChangeStates::LIQUID;
+	Real64 phaseChangeTempReverse = 999;
 
+	Real64 prevTempTD = 20;
+	Real64 updatedTempTDT = 21;
+	int prevPhaseChangeState = HysteresisPhaseChange::PhaseChangeStates::CRYSTALLIZED;
+	int phaseChangeState = HysteresisPhaseChange::PhaseChangeStates::CRYSTALLIZED;
+
+	// calculate a new specific heat value, moving from 20 to 21
 	Real64 newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+
+	// validate the return value
+	EXPECT_NEAR( 20000, newSpecificHeat, 1.0 );
+
+	// each call to the getCurrentSpecificHeat will return a new phase change state, so assert it and then store it
+	EXPECT_EQ( 2, phaseChangeState );
+	prevPhaseChangeState = phaseChangeState;
+
+	// also store the previous temp for convenience and move updatedTemp to a new state
+	prevTempTD = updatedTempTDT;
+
+	// and repeat with different expectations as we move through the curve
+	updatedTempTDT += 1;  // now 22
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20001, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 23
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20008, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 23
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20061, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 24
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 20457, newSpecificHeat, 1.0 );
+	EXPECT_EQ( 2, phaseChangeState );  // CRYSTALLIZED
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 25
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 23383, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -1, phaseChangeState );  // MELTING
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 26
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 30808, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -1, phaseChangeState );  // MELTING
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 27
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 28383, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -1, phaseChangeState );  // MELTING
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 28
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25457, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 29
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
 	EXPECT_NEAR( 25061, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 30
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25008, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 31
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25001, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
+
+	prevPhaseChangeState = phaseChangeState;
+	prevTempTD = updatedTempTDT;
+	updatedTempTDT += 1;  // now 32
+	newSpecificHeat = thisHM.getCurrentSpecificHeat(prevTempTD, updatedTempTDT, phaseChangeTempReverse, prevPhaseChangeState, phaseChangeState);
+	EXPECT_NEAR( 25000, newSpecificHeat, 1.0 );
+	EXPECT_EQ( -2, phaseChangeState );  // LIQUID
 }
 
