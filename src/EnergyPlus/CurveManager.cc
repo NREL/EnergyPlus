@@ -2563,6 +2563,9 @@ namespace CurveManager {
 				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
 				ErrorsFound = true;
 			}
+			if (SameString( Alphas( 4 ), "ANGLE" ) && SameString( Alphas( 5 ), "WAVELENGTH" )) {
+				PerfCurve( CurveNum ).OpticalProperty = true;
+			}
 
 			if ( ! lNumericFieldBlanks( 7 ) ) {
 				TableData( TableNum ).NormalPoint = Numbers( 7 );
@@ -6449,35 +6452,12 @@ Label999: ;
 	GetCurveInterpolationMethodNum( int const CurveIndex ) // index of curve in curve array
 	{
 
-		// FUNCTION INFORMATION:
-		//       AUTHOR         L. Gu
-		//       DATE WRITTEN   Feb. 2017
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
 		// PURPOSE OF THIS FUNCTION:
 		// get the interpolation type integer identifier for tables
-
-		// METHODOLOGY EMPLOYED:
-		// retrieve from data structure.
 
 		// Return value
 		int TableInterpolationMethodNum;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 		if ( CurveIndex > 0 ) {
 			TableInterpolationMethodNum = PerfCurve( CurveIndex ).InterpolationType;
 		} else {
@@ -6494,12 +6474,6 @@ Label999: ;
 		int & lineNum
 	)
 	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Lixing Gu, FSEC
-		//       DATE WRITTEN   Feb. 2017
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// get data from an external file used to retrieve optical properties
@@ -6519,7 +6493,7 @@ Label999: ;
 
 		CheckForActualFileName( FileName, FileExists, TempFullFileName );
 		if ( !FileExists ) {
-			ShowSevereError( "CurveManager: SearchTableDataFile: Could not open Table Data File, expecting it as file name = " + FileName );
+			ShowSevereError( "CurveManager::ReadTwoVarTableDataFromFile: Could not open Table Data File, expecting it as file name = " + FileName );
 			ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
 			ShowContinueError( "Try again with putting full path and file name in the field." );
 			ShowFatalError( "Program terminates due to these conditions." );
@@ -6550,17 +6524,8 @@ Label999: ;
 	)
 	{
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Lixing Gu, FSEC
-		//       DATE WRITTEN   Feb. 2017
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
 		// PURPOSE OF THIS FUNCTION:
 		// Set up indenpendent varilable values the same in 3 table data 
-
-		// METHODOLOGY EMPLOYED:
-		// Recommended by NREL to read data
 
 		// Using/Aliasing
 		int X1TableNum;
@@ -6635,25 +6600,8 @@ Label999: ;
 		}
 
 		// ascend sort
-		for ( i = 1; i <= int( XX1.size() ); i++ ) {
-			for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
-				if ( XX1( i ) < XX1( j ) ) {
-					XX = XX1( i );
-					XX1( i ) = XX1( j );
-					XX1( j ) = XX;
-				}
-			}
-		}
-
-		for ( i = 1; i <= int( XX2.size( ) ); i++ ) {
-			for ( j = 1; j <= int( XX2.size( ) ); j++ ) {
-				if ( XX2( i ) < XX2( j ) ) {
-					XX = XX2( i );
-					XX2( i ) = XX2( j );
-					XX2( j ) = XX;
-				}
-			}
-		}
+		std::sort( XX1.begin( ), XX1.end( ) );
+		std::sort( XX2.begin( ), XX2.end( ) );
 
 		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
 			if ( int( XX2.size( ) ) > TableLookup( Tables( TableNum ) ).NumX2Vars ) {
@@ -6841,15 +6789,7 @@ Label999: ;
 		if ( !Anglefound ) return;
 
 		// ascend sort
-		for ( i = 1; i <= int( XX1.size( ) ); i++ ) {
-			for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
-				if ( XX1( i ) < XX1( j ) ) {
-					XX = XX1( i );
-					XX1( i ) = XX1( j );
-					XX1( j ) = XX;
-				}
-			}
-		}
+		std::sort( XX1.begin( ), XX1.end( ) );
 
 		for ( TabNum = 1; TabNum <= int( Tables.size( ) ); TabNum++ ) {
 			if ( Tables( TabNum ) == 0 ) continue;

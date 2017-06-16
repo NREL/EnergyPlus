@@ -254,7 +254,7 @@ namespace WindowManager {
 	Array1D< Real64 > CosPhiIndepVar( MaxNumOfIncidentAngles, 0.0 ); // Cos of incidence angles at 10-deg increments for curve fits
 
 	Array1D< int > LayerNum( 5, 0 ); // Glass layer number
-	Array1D< int > AngleNum( 5, 0 ); // Glass layer number for spetral and angular data only
+	Array1D< int > AngleNum( 5, 0 ); // Glass layer number for spectral and angular data only
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
 	//   Optical Calculation Routines
@@ -587,10 +587,10 @@ namespace WindowManager {
 
 			// First layer must be glass, shade, screen or blind to be a glazing construction
 			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass && 
-           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade && 
-           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen && 
-           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind && 
-           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade && 
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen && 
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind && 
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
 
 			ShadeLayNum = 0;
 			ExtShade = false;
@@ -841,6 +841,11 @@ namespace WindowManager {
 				}
 			}
 			SetCommonIncidentAngles( ConstrNum, NGlass, TotalIPhi, AngleNum );
+			if ( TotalIPhi > MaxNumOfIncidentAngles ) {
+				ShowSevereError( "WindowManage::InitGlassOpticalCalculations = " + Construct( ConstrNum ).Name + ", Invalid maximum value of common incidet angles = " + TrimSigDigits( TotalIPhi ) + "." );
+				ShowContinueError( "The maximum number of incident angles for each construct is " + TrimSigDigits( MaxNumOfIncidentAngles ) + ". Please rearrange the dataset." );
+				ShowFatalError( "Errors found getting inputs. Previous error(s) cause program termination." );
+			}
 
 			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 				LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
@@ -859,8 +864,10 @@ namespace WindowManager {
 			// effect of inter-reflection among glass layers) at each incidence angle.
 
 			for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
+				// 10 degree increment for incident angle is only value for a construction without a layer = SpectralAndAngle
 				Phi = double( IPhi - 1 ) * 10.0;
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
+					// Override 10 degeee icrement for incident angle for a construction with a layer = SpectralAndAngle
 					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
 					if ( Material( LayPtr ).GlassSpectralAndAngle ) {
 						Phi = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X1Var( IPhi );
@@ -1045,6 +1052,7 @@ namespace WindowManager {
 			// Get bare glass layer properties, then glazing system properties at each incidence angle.
 			// The glazing system properties include the effect of inter-reflection among glass layers,
 			// but exclude the effect of a shade or blind if present in the construction.
+			// When a construction has a layer = SpectralAndAngle, the 10 degree increment will be overridden.
 			for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
 				Phi = double( IPhi - 1 ) * 10.0;
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {

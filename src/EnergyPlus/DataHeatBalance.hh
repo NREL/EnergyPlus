@@ -786,7 +786,7 @@ namespace DataHeatBalance {
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
-		bool GlassSpectralAndAngle; // if SpectralAndAngle is an entered chcoice
+		bool GlassSpectralAndAngle; // if SpectralAndAngle is an entered choice
 		int GlassSpecAngTransDataPtr; // Data set index of transmittance as a function of spectral and angle associated with a window glass material
 		int GlassSpecAngFRefleDataPtr; // Data set index of front reflectance as a function of spectral and angle associated with a window glass material 
 		int GlassSpecAngBRefleDataPtr; // Data set index of back reflectance as a function of spectral and angle associated with a window glass material 

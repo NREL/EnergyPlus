@@ -293,6 +293,7 @@ namespace CurveManager {
 		Array1D< TriQuadraticCurveDataStruct > Tri2ndOrder; // structure for triquadratic curve data
 		bool EMSOverrideOn; // if TRUE, then EMS is calling to override curve value
 		Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
+		bool OpticalProperty; // if TRUE, this table is used to stro optical property
 		// report variables
 		Real64 CurveOutput; // curve output or result
 		Real64 CurveInput1; // curve input #1 (e.g., x or X1 variable)
@@ -351,6 +352,7 @@ namespace CurveManager {
 			Var5MaxPresent( false ),
 			EMSOverrideOn( false ),
 			EMSOverrideCurveValue( 0.0 ),
+			OpticalProperty( false ),
 			CurveOutput( 0.0 ),
 			CurveInput1( 0.0 ),
 			CurveInput2( 0.0 ),

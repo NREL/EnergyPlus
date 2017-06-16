@@ -1332,6 +1332,7 @@ namespace HeatBalanceManager {
 		using General::RoundSigDigits;
 		using General::ScanForReports;
 		using General::TrimSigDigits;
+		using CurveManager::PerfCurve;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveObjectTypeNum;
 		using CurveManager::GetCurveMinMaxValues;
@@ -1384,8 +1385,10 @@ namespace HeatBalanceManager {
 		static bool DoReport( false );
 		Real64 DenomRGas; // Denominator for WindowGas calculations of NominalR
 		Real64 Openness; // insect screen oppenness fraction = (1-d/s)^2
-		Real64 minValue; // minimum value
-		Real64 maxValue; // maximum value
+		Real64 minAngValue; // minimum value of angle
+		Real64 maxAngValue; // maximum value of angle
+		Real64 minLamValue; // minimum value of wavelength
+		Real64 maxLamValue; // maximum value of wavelength
 
 		// Added TH 1/9/2009 to read the thermochromic glazings
 		static int iTC( 0 );
@@ -1728,13 +1731,7 @@ namespace HeatBalanceManager {
 			// No need for spectral data for BSDF either
 			if ( SameString( MaterialNames( 2 ), "BSDF" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
 			if ( SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) Material( MaterNum ).GlassSpectralAndAngle = true;
-			if ( Material( MaterNum ).GlassSpectralAndAngle ) {
-//				if ( !inExtWindowModel->isExternalLibraryModel( ) ) {
-//					ShowSevereError( CurrentModuleObject + " object, The entered choice for " + cAlphaFieldNames( 2 ) + " is SpectralAndAngle. \"" );
-//					ShowContinueError( "This choice only works with the ExternalWindowsModel choice in the WindowsCalculationEngine object." );
-//					ErrorsFound = true;
-//				}
-			}
+
 			if ( Material( MaterNum ).GlassSpectralDataPtr == 0 && SameString( MaterialNames( 2 ), "Spectral" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + Material( MaterNum ).Name + "\" has " + cAlphaFieldNames( 2 ) + " = Spectral but has no matching MaterialProperty:GlazingSpectralData set" );
@@ -1748,7 +1745,7 @@ namespace HeatBalanceManager {
 			if ( ! SameString( MaterialNames( 2 ), "SpectralAverage" ) && ! SameString( MaterialNames( 2 ), "Spectral" ) && ! SameString( MaterialNames( 2 ), "BSDF" ) && ! SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + Material( MaterNum ).Name + "\", invalid specification." );
-				ShowContinueError( cAlphaFieldNames( 2 ) + " must be SpectralAverage, Spectral, BSDF or SpectralAndAngel, value=" + MaterialNames( 2 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value=" + MaterialNames( 2 ) );
 			}
 
 			// TH 8/24/2011, allow glazing properties MaterialProps(2 to 10) to equal 0 or 1: 0.0 =< Prop <= 1.0
@@ -1910,16 +1907,31 @@ namespace HeatBalanceManager {
 								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
 								ShowContinueError( cAlphaFieldNames( 5 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 5 ) );
 							}
-							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minValue, maxValue );
-							if ( minValue > 1.0e-6 ) {
+							if ( !PerfCurve( Material( MaterNum ).GlassSpecAngTransDataPtr ).OpticalProperty) {
 								ErrorsFound = true;
-								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minValue, 2 ) + "." );
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Table input." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires X unit is Angle and Y unit is Wavelength, entered table name=" + MaterialNames( 5 ) );
+							}
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
 								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
 							}
-							if ( abs( maxValue - 90.0) > 1.0e-6 ) {
+							if ( abs( maxAngValue - 90.0) > 1.0e-6 ) {
 								ErrorsFound = true;
-								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxValue, 2 ) + "." );
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
 								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
 							}
 						}
 					}
@@ -1945,16 +1957,26 @@ namespace HeatBalanceManager {
 								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
 								ShowContinueError( cAlphaFieldNames( 6 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 6 ) );
 							}
-							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngFRefleDataPtr, minValue, maxValue );
-							if ( minValue > 1.0e-6 ) {
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
 								ErrorsFound = true;
-								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minValue, 2 ) + "." );
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
 								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
 							}
-							if ( abs( maxValue - 90.0 ) > 1.0e-6 ) {
+							if ( abs( maxAngValue - 90.0 ) > 1.0e-6 ) {
 								ErrorsFound = true;
-								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxValue, 2 ) + "." );
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
 								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
 							}
 						}
 					}
@@ -1980,21 +2002,31 @@ namespace HeatBalanceManager {
 								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
 								ShowContinueError( cAlphaFieldNames( 7 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 7 ) );
 							}
-							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngBRefleDataPtr, minValue, maxValue );
-							if ( minValue > 1.0e-6 ) {
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
 								ErrorsFound = true;
-								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minValue, 2 ) + "." );
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
 								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
 							}
-							if ( abs( maxValue - 90.0 ) > 1.0e-6 ) {
+							if ( abs( maxAngValue - 90.0 ) > 1.0e-6 ) {
 								ErrorsFound = true;
-								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxValue, 2 ) + "." );
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
 								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
 							}
 						}
 					}
 				}
-				SetSameIndeVariableValues(Material(MaterNum).GlassSpecAngTransDataPtr, Material(MaterNum).GlassSpecAngFRefleDataPtr, Material(MaterNum).GlassSpecAngBRefleDataPtr);
+				SetSameIndeVariableValues( Material( MaterNum ).GlassSpecAngTransDataPtr, Material( MaterNum ).GlassSpecAngFRefleDataPtr, Material( MaterNum ).GlassSpecAngBRefleDataPtr );
 			}
 		}
 
