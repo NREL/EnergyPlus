@@ -53,6 +53,7 @@
 #include <ObjexxFCL/gio.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
@@ -351,5 +352,39 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingZone ) {
 	FinalZoneSizing.deallocate();
 	ZoneEqSizing.deallocate();
 	ZoneSizingInput.deallocate();
+
+}
+
+TEST_F( SQLiteFixture, ReportSizingManager_SQLiteRecordReportSizingOutputTest ) {
+	// issue #6112
+	std::string CompName;
+	std::string CompType;
+	std::string VarDesc;
+	std::string UsrDesc;
+	Real64 VarValue;
+	Real64 UsrValue;
+
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	// input values
+	CompType = "BOILER:HOTWATER";
+	CompName = "RESIDENTIAL BOILER ELECTRIC";
+	VarDesc = "Design Size Nominal Capacity [W]";
+	VarValue = 105977.98934;
+	UsrDesc = "User-Specified Nominal Capacity [W]";
+	UsrValue = 26352.97405;
+	// boiler hot water autosizing and userspecified nominal capacity reporting to SQLite output
+	ReportSizingManager::ReportSizingOutput( CompType, CompName, VarDesc, VarValue, UsrDesc, UsrValue );
+	// get the sqlite output
+	sqlite_test = std::move( EnergyPlus::sqlite );
+	// query the sqLite
+	auto result = queryResult( "SELECT * FROM ComponentSizes;", "ComponentSizes" );
+	sqlite_test->sqliteCommit();
+	// check that there are two sizing result records
+	ASSERT_EQ( 2ul, result.size() );
+	std::vector<std::string> testResult0{ "1", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity", "105977.98934", "W" };
+	std::vector<std::string> testResult1{ "2", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "User-Specified Nominal Capacity", "26352.97405", "W" };
+	EXPECT_EQ( testResult0, result[0] );
+	EXPECT_EQ( testResult1, result[1] );
 
 }
