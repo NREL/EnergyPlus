@@ -8786,9 +8786,9 @@ namespace SurfaceGeometry {
 		} // zone loop
 		if ( !DisplayExtraWarnings ) {
 			if ( countNotFullyEnclosedZones == 1 ) {
-				ShowWarningError( "CalculateZoneVolume: 1 zone is not fully enclosed. Use Output:Diagnostics:DisplayExtrawarnings for more details." );
+				ShowWarningError( "CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings;" );
 			} else if ( countNotFullyEnclosedZones > 1 ) {
-				ShowWarningError( "CalculateZoneVolume: " + RoundSigDigits( countNotFullyEnclosedZones ) + " zones are not fully enclosed. Use Output:Diagnostics:DisplayExtrawarnings for more details." );
+				ShowWarningError( "CalculateZoneVolume: " + RoundSigDigits( countNotFullyEnclosedZones ) + " zones are not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings;" );
 			}
 		}
 
