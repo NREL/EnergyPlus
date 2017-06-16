@@ -775,7 +775,7 @@ namespace FourPipeBeam {
 		this->mDotDesignPrimAir = this->vDotDesignPrimAir * DataEnvironment::StdRhoAir;
 
 		if ( ( originalTermUnitSizeMaxVDot > 0.0 ) && ( originalTermUnitSizeMaxVDot != this->vDotDesignPrimAir ) && ( CurZoneEqNum > 0 ) ) {
-			if ( DataSizing::FinalSysSizing.size() > 0 ) {
+			if ( DataSizing::SysSizingRunDone ) {
 				// perturb system size to handle change in system size calculated without knowing about 4 pipe beam
 				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).DesMainVolFlow
 					+= ( this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot );
