@@ -579,6 +579,13 @@ namespace HVACControllers {
 		bool & ErrorsFound // true if controller not found
 	);
 
+	void
+	GetControllerTolerance(
+		int const WaterInletNodeNum, // water coil water inlet node number
+		Real64 & ControllerTolerance, // controller control variable
+		bool & ErrorsFound // true if controller not found
+	);
+
 } // HVACControllers
 
 } // EnergyPlus

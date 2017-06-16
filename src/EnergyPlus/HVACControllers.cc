@@ -365,10 +365,10 @@ namespace HVACControllers {
 			ControllerIndex = ControlNum;
 		} else {
 			ControlNum = ControllerIndex;
-			if ( ControlNum > NumControllers || ControlNum < 1 ) {
-				ShowFatalError( "ManageControllers: Invalid ControllerIndex passed=" + TrimSigDigits( ControlNum ) + ", Number of controllers=" + TrimSigDigits( NumControllers ) + ", Controller name=" + ControllerName );
-			}
 			if ( CheckEquipName( ControlNum ) ) {
+				if ( ControlNum > NumControllers || ControlNum < 1 ) {
+					ShowFatalError( "ManageControllers: Invalid ControllerIndex passed=" + TrimSigDigits( ControlNum ) + ", Number of controllers=" + TrimSigDigits( NumControllers ) + ", Controller name=" + ControllerName );
+				}
 				if ( ControllerName != ControllerProps( ControlNum ).ControllerName ) {
 					ShowFatalError( "ManageControllers: Invalid ControllerIndex passed=" + TrimSigDigits( ControlNum ) + ", Controller name=" + ControllerName + ", stored Controller Name for that index=" + ControllerProps( ControlNum ).ControllerName );
 				}
@@ -376,7 +376,7 @@ namespace HVACControllers {
 			}
 		}
 
-		if ( ControllerProps( ControllerIndex ).BypassControllerCalc ) {
+		if ( ControllerProps( ControlNum ).BypassControllerCalc ) {
 			IsUpToDateFlag = true;
 			IsConvergedFlag = true;
 			if ( present( AllowWarmRestartFlag ) ) AllowWarmRestartFlag = false;
@@ -3728,6 +3728,44 @@ Label100: ;
 		}
 
 		if ( ControlVar == 0 )	ErrorsFound = true;
+
+	}
+
+	void
+	GetControllerTolerance(
+		int const WaterInletNodeNum, // water coil water inlet node number
+		Real64 & ControllerTolerance, // controller control variable
+		bool & ErrorsFound // true if controller not found
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   June 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine checks that the water inlet node number is matched by the
+		// actuator node number of some water coil controller and returns the controller control variable
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ControlNum;
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		ControllerTolerance = 0.0;
+		for ( ControlNum = 1; ControlNum <= NumControllers; ++ControlNum ) {
+			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
+				ControllerTolerance = ControllerProps( ControlNum ).Offset;
+				break;
+			}
+		}
+
+		if ( ControllerTolerance == 0 )	ErrorsFound = true;
 
 	}
 

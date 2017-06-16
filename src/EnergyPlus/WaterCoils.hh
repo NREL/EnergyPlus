@@ -266,6 +266,7 @@ namespace WaterCoils {
 		int ControllerIndex; // index to water coil controller
 		int ControllerSensedNode; // water coil sensed node
 		int ControllerControlVar; // controller control variable (e.g., Temp, TempandHumRat)
+		Real64 ControllerTolerance; // controller solution tolerance for convergence
 		int WaterCoilMaxIterIndex; // warning index for messages
 		int WaterCoilIterFailedIndex; // warning index for messages
 		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
@@ -387,6 +388,7 @@ namespace WaterCoils {
 			ControllerIndex( 0 ),
 			ControllerSensedNode( 0 ),
 			ControllerControlVar( 0 ),
+			ControllerTolerance( 0.0 ),
 			WaterCoilMaxIterIndex( 0 ),
 			WaterCoilIterFailedIndex( 0 ),
 			FaultyCoilSATFlag( false ),
