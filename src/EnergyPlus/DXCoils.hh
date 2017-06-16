@@ -84,6 +84,7 @@ namespace DXCoils {
 	extern Real64 const RatedOutdoorAirTemp; // 35 C or 95F
 	extern Real64 const RatedInletAirTempHeat; // 21.11C or 70F
 	extern Real64 const RatedOutdoorAirTempHeat; // 8.33 C or 47F
+	extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
 	extern Real64 const RatedInletWetBulbTempHeat; // 15.55 or 60F
 
 	extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
@@ -898,10 +899,9 @@ namespace DXCoils {
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
-		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
+		Real64 const AirVolFlowRate, // the air volume flow rate at the given capacity [m3/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
-		bool const PrintFlag = true, // flag used to print warnings if desired
-		Real64 const BaroPress=StdBaroPress // Barometric pressure [Pa]
+		bool const PrintFlag = true // flag used to print warnings if desired
 	);
 
 	Real64
@@ -996,6 +996,14 @@ namespace DXCoils {
 	void
 	GetDXCoilIndex(
 		std::string const & DXCoilName,
+		int & DXCoilIndex,
+		bool & ErrorsFound,
+		Optional_string_const ThisObjectType = _,
+		Optional_bool_const SuppressWarning = _
+	);
+
+	std::string
+	GetDXCoilName(
 		int & DXCoilIndex,
 		bool & ErrorsFound,
 		Optional_string_const ThisObjectType = _,
