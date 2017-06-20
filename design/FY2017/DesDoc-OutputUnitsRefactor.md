@@ -4,6 +4,7 @@ Design Document - Output Units Refactoring
 **Jason Glazer, GARD Analytics, Inc.**
 
  - June 1, 2017
+ - June 20, 2017 - Answers to questions at end.
  
 
 ## New Feature Proposal ##
@@ -422,23 +423,39 @@ The goal is to make small changes that will not show any diffs throughout the re
 
 Should enum or enum class, a C+11 feature, be used?
 
+- The enum class should be used, better scoping.
+
 Where should the VariableUnit be inserted in the SetupOutputVariable calls?
+
+- The VariableUnit will be the second argument, right after the VariableName.
 
 Should each enum start with "unit", for example kg_m3 or unitkg_m3?
 
+- Since the enum class will include the class name such as "units" it is enough to have the unit names as kg_m3. When used normally they would be units::kg_m3.
+
 Is using "_" to separate the numerator and denominator reasonable or should we use "per"?
+
+- The "_" will be used to separate the numerator and the denominator in the units enum class. If after implmentation this decision is revisted, it can be easily changed to "per" using search and replace.
 
 Should units be expressed in unit types instead of units (Temperature, VolumetricFlow, MassFlow, Power, etc.)?
 
+- No, this would not be feasible for the wide variety of units used and might get more confusing. This could also be revisited in the future.
+
 Should units used in tabular reports be included in this change so there is a single set of units for all outputs? 
+
+- Yes.
 
 Should the individual enum values correspond to the UnitConv array used in the tabular reports?
 
+- Yes.
+
 Is the three step implementation process reasonable?
+
+- Yes, proceeding in small steps and avoiding diffs is a good idea.
 
 Should we provide an option to provide IP converted values directly from EnergyPlus to the  ESO and MTR (and thus the normal CSV files)?
 
-
+- We probably won't have enough time to take this on and we did it would need some discussion and an NFP. 
 
 
 
