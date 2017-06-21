@@ -9327,7 +9327,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) && ( abs( v1.z - v2.z ) < tol ) ) ;
 	}
 
