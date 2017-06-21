@@ -254,6 +254,10 @@ namespace CoolingPanelSimple {
 	void SizeCoolingPanel(
 		int const CoolingPanelNum
 	);
+
+	void SizeCoolingPanelUA(
+		int const CoolingPanelNum
+	);
 	
 	void
 	CalcCoolingPanel(

@@ -1015,29 +1015,58 @@ namespace CoolingPanelSimple {
 		
 		RegisterPlantCompDesignFlow( CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
 
+		SizeCoolingPanelUA( CoolingPanelNum );
+		
+	}
+
+	void
+	SizeCoolingPanelUA(
+					 int const CoolingPanelNum
+					 )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   June 2017
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sizes UA value for the simple chilled ceiling panel.
+
 		// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
+		Real64 Cp;
 		Real64 MDot;
 		Real64 MDotXCp;
 		Real64 Qrated;
 		Real64 Tinletr;
 		Real64 Tzoner;
+		Real64 RatCapToTheoMax; // Ratio of unit capacity to theoretical maximum output based on rated parameters
+		
 		Cp = 4120.0; // Just an approximation, don't need to get an exact number
 		MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
 		MDotXCp = Cp * MDot;
 		Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
 		Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
 		Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
+		RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) );
+		if (RatCapToTheoMax >= 1.0 ) {
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a cooling capacity that is greater than the maximum possible value." );
+			ShowContinueError( "The result of this is that a UA value is impossible to calculate." );
+			ShowContinueError( "Check the rated input for temperatures, flow, and capacity for this unit." );
+			ShowContinueError( "The ratio of the capacity to the rated theoretical maximum must be less than unity." );
+			ShowContinueError( "The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high or the rated flow being too low." );
+			ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
+			CoolingPanel( CoolingPanelNum ).UA = 1.0;
+		}
 		if ( Tinletr >= Tzoner ) {
-			ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
 			ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
-			ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+			ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
 			CoolingPanel( CoolingPanelNum ).UA = 1.0;
 		} else {
-			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
+			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - RatCapToTheoMax );
 			if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
-				ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
+				ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
 				ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
-				ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+				ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
 			}
 		}
 		
