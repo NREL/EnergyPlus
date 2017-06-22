@@ -396,11 +396,15 @@ namespace EarthTube {
 					SetupOutputVariable( "Earth Tube Standard Density Air Volume Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRateStd, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Air Flow Mass [kg]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMass, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Air Mass Flow Rate [kg/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMassFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Water Mass Flow Rate [kg/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeWaterMassFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Fan Electric Energy [J]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeFanElec, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name, _, "Electricity", _, _, "Building" );
 					SetupOutputVariable( "Earth Tube Fan Electric Power [W]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeFanElecPower, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Zone Inlet Air Temperature [C]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeAirTemp, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Ground Interface Temperature [C]", EarthTubeSys( Loop ).GroundTempz1z2t, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Outdoor Air Heat Transfer Rate [W]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeOATreatmentPower, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Zone Inlet Wet Bulb Temperature [C]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeWetBulbTemp, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Zone Inlet Humidity Ratio [kgWater/kgDryAir]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHumRat, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+				
 				}
 			}
 		}
@@ -481,10 +485,6 @@ namespace EarthTube {
 		Real64 AirMassFlowRate; // Actual Mass Flow Rate of Air inside Pipe
 		Real64 AirSpecHeat; // Specific Heat of Air
 		Real64 AirDensity; // Density of Air
-		Real64 InsideEnthalpy;
-		Real64 OutletAirEnthalpy;
-		Real64 InsideDewPointTemp;
-		Real64 InsideHumRat;
 		static Array1D< Real64 > EVF; // DESIGN EARTHTUBE FLOW RATE (M**3/SEC)
 
 		// Allocate the EVF array
@@ -494,6 +494,7 @@ namespace EarthTube {
 		MCPTE = 0.0;
 		MCPE = 0.0;
 		EAMFL = 0.0;
+		EAMFLxHumRat = 0.0;
 
 		for ( Loop = 1; Loop <= TotEarthTube; ++Loop ) {
 
@@ -566,44 +567,98 @@ namespace EarthTube {
 
 			}
 
-			InsideDewPointTemp = PsyTdpFnWPb( OutHumRat, OutBaroPress );
-
-			if ( EarthTubeSys( Loop ).InsideAirTemp >= InsideDewPointTemp ) {
-				InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, OutHumRat );
-				// Intake fans will add some heat to the air, raising the temperature for an intake fan...
-				if ( EarthTubeSys( Loop ).FanType == IntakeEarthTube ) {
-					if ( EAMFL( NZ ) == 0.0 ) {
-						OutletAirEnthalpy = InsideEnthalpy;
-					} else {
-						OutletAirEnthalpy = InsideEnthalpy + EarthTubeSys( Loop ).FanPower / EAMFL( NZ );
-					}
-					EarthTubeSys( Loop ).AirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutHumRat );
-				} else {
-					EarthTubeSys( Loop ).AirTemp = EarthTubeSys( Loop ).InsideAirTemp;
-				}
-				MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
-
-			} else {
-				InsideHumRat = PsyWFnTdpPb( EarthTubeSys( Loop ).InsideAirTemp, OutBaroPress );
-				InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, InsideHumRat );
-				// Intake fans will add some heat to the air, raising the temperature for an intake fan...
-				if ( EarthTubeSys( Loop ).FanType == IntakeEarthTube ) {
-					if ( EAMFL( NZ ) == 0.0 ) {
-						OutletAirEnthalpy = InsideEnthalpy;
-					} else {
-						OutletAirEnthalpy = InsideEnthalpy + EarthTubeSys( Loop ).FanPower / EAMFL( NZ );
-					}
-					EarthTubeSys( Loop ).AirTemp = PsyTdbFnHW( OutletAirEnthalpy, InsideHumRat );
-				} else {
-					EarthTubeSys( Loop ).AirTemp = EarthTubeSys( Loop ).InsideAirTemp;
-				}
-				MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
-			}
-
+			CalcEarthTubeHumRat( Loop, NZ );
+			
 		}
 
 	}
 
+	void
+	CalcEarthTubeHumRat(
+		int const Loop, // EarthTube number (index)
+		int const NZ // Zone number (index)
+	)
+	{
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Kwang Ho Lee
+		//       DATE WRITTEN   November 2005
+		//       MODIFIED       Rick Strand, June 2017 (made this a separate subroutine)
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine determines the leaving humidity ratio for the EarthTube
+		// and calculates parameters associated with humidity ratio.
+		
+		// METHODOLOGY EMPLOYED:
+		// na
+		
+		// REFERENCES:
+		// na
+		
+		// Using/Aliasing
+		// na
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+		
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		
+		// DERIVED TYPE DEFINITIONS
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 InsideEnthalpy;
+		Real64 OutletAirEnthalpy;
+		Real64 InsideDewPointTemp;
+		Real64 InsideHumRat;
+
+		InsideDewPointTemp = PsyTdpFnWPb( OutHumRat, OutBaroPress );
+		
+		if ( EarthTubeSys( Loop ).InsideAirTemp >= InsideDewPointTemp ) {
+			InsideHumRat = OutHumRat;
+			InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, OutHumRat );
+			// Intake fans will add some heat to the air, raising the temperature for an intake fan...
+			if ( EarthTubeSys( Loop ).FanType == IntakeEarthTube ) {
+				if ( EAMFL( NZ ) == 0.0 ) {
+					OutletAirEnthalpy = InsideEnthalpy;
+				} else {
+					OutletAirEnthalpy = InsideEnthalpy + EarthTubeSys( Loop ).FanPower / EAMFL( NZ );
+				}
+				EarthTubeSys( Loop ).AirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutHumRat );
+			} else {
+				EarthTubeSys( Loop ).AirTemp = EarthTubeSys( Loop ).InsideAirTemp;
+			}
+			MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
+			
+		} else {
+			InsideHumRat = PsyWFnTdpPb( EarthTubeSys( Loop ).InsideAirTemp, OutBaroPress );
+			InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, InsideHumRat );
+			// Intake fans will add some heat to the air, raising the temperature for an intake fan...
+			if ( EarthTubeSys( Loop ).FanType == IntakeEarthTube ) {
+				if ( EAMFL( NZ ) == 0.0 ) {
+					OutletAirEnthalpy = InsideEnthalpy;
+				} else {
+					OutletAirEnthalpy = InsideEnthalpy + EarthTubeSys( Loop ).FanPower / EAMFL( NZ );
+				}
+				EarthTubeSys( Loop ).AirTemp = PsyTdbFnHW( OutletAirEnthalpy, InsideHumRat );
+			} else {
+				EarthTubeSys( Loop ).AirTemp = EarthTubeSys( Loop ).InsideAirTemp;
+			}
+			MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
+		}
+		
+		EarthTubeSys( Loop ).HumRat = InsideHumRat;
+		EarthTubeSys( Loop ).WetBulbTemp = PsyTwbFnTdbWPb( EarthTubeSys( Loop ).InsideAirTemp, InsideHumRat, OutBaroPress );
+		EAMFLxHumRat( NZ ) = EAMFL( NZ ) * InsideHumRat;		
+		
+	}
+	
 	void
 	ReportEarthTube()
 	{
@@ -659,6 +714,7 @@ namespace EarthTube {
 			ZnRptET( ZoneLoop ).EarthTubeVolFlowRate = MCPE( ZoneLoop ) / CpAir / AirDensity;
 			ZnRptET( ZoneLoop ).EarthTubeVolFlowRateStd = MCPE( ZoneLoop ) / CpAir / StdRhoAir;
 			ZnRptET( ZoneLoop ).EarthTubeMassFlowRate = MCPE( ZoneLoop ) / CpAir;
+			ZnRptET( ZoneLoop ).EarthTubeWaterMassFlowRate = EAMFLxHumRat( ZoneLoop );
 
 			ZnRptET( ZoneLoop ).EarthTubeFanElec = 0.0;
 			ZnRptET( ZoneLoop ).EarthTubeAirTemp = 0.0;
@@ -686,6 +742,8 @@ namespace EarthTube {
 					}
 
 					ZnRptET( ZoneLoop ).EarthTubeAirTemp = EarthTubeSys( EarthTubeNum ).AirTemp;
+					ZnRptET( ZoneLoop ).EarthTubeWetBulbTemp = EarthTubeSys( EarthTubeNum ).WetBulbTemp;
+					ZnRptET( ZoneLoop ).EarthTubeHumRat = EarthTubeSys( EarthTubeNum ).HumRat;
 					ZnRptET( ZoneLoop ).EarthTubeOATreatmentPower = MCPE( ZoneLoop ) * ( EarthTubeSys( EarthTubeNum ).AirTemp - OutDryBulbTemp );
 					break; // DO loop
 				}
