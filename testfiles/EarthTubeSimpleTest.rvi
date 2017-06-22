@@ -3,6 +3,7 @@ eplusout.csv
 Site Outdoor Air Drybulb Temperature
 Zone Air Temperature
 Zone Mean Air Temperature
+Zone Air Humidity Ratio
 Zone Air System Sensible Cooling Energy
 Zone Air System Sensible Cooling Rate
 Earth Tube Zone Sensible Cooling Energy

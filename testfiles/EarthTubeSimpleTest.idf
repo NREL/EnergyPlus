@@ -2175,6 +2175,8 @@
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
+  Output:Variable,*,Zone Air Humidity Ratio,hourly;
+
   Output:Variable,*,Zone Air System Sensible Cooling Energy,hourly;
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
