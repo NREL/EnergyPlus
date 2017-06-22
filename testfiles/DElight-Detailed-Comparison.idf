@@ -246,12 +246,6 @@
     CLAY TILE 2 CELL - 10 IN;!- Layer 3
 
   Construction,
-    CEILINGSLAB,             !- Name
-    CLAY TILE 2 CELL - 10 IN,!- Outside Layer
-    C13 - 6 IN HW CONCRETE,  !- Layer 2
-    BOARD INSULATION;        !- Layer 3
-
-  Construction,
     ROOFSLAB,                !- Name
     BOARD INSULATION,        !- Outside Layer
     C5 - 4 IN HW CONCRETE;   !- Layer 2
@@ -261,14 +255,6 @@
     GLASS - CLEAR SHEET 1 / 8 IN,  !- Outside Layer
     AirGap - AIRSPACE RESISTANCE,  !- Layer 2
     GLASS - CLEAR SHEET 1 / 8 IN;  !- Layer 3
-
-  Construction,
-    WOODEN DOOR,             !- Name
-    WOOD - SOFT 4MM;         !- Outside Layer
-
-  Construction,
-    HUNG CEILING,            !- Name
-    AC03 Acoustic Tile 3/4 in;  !- Outside Layer
 
 !Schedules
 
@@ -693,9 +679,9 @@
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
     4.7244,4.41960,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    4.7444,4.41960,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    4.7244,4.41960,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
     0.1524,4.41960,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.1544,4.41960,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    0.1524,4.41960,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Vertices in World Coordinate System, beginning in exterior upper left
    ! Surface Face Azimuth:    180.00000
