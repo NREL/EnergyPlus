@@ -2191,9 +2191,15 @@
 
   Output:Variable,*,Earth Tube Air Mass Flow Rate,hourly;
 
+  Output:Variable,*,Earth Tube Water Mass Flow Rate,hourly;
+
   Output:Variable,*,Earth Tube Fan Electric Energy,hourly;
 
   Output:Variable,*,Earth Tube Zone Inlet Air Temperature,hourly;
+
+  Output:Variable,*,Earth Tube Zone Inlet Wet Bulb Temperature,hourly;
+
+  Output:Variable,*,Earth Tube Zone Inlet Humidity Ratio,hourly;
 
   Output:Meter,Electricity:Facility,hourly;
 
