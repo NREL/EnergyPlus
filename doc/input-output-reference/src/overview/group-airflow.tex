@@ -1876,6 +1876,8 @@ Current Earth Tube output variables:
 \item
   HVAC,Average,Earth Tube Air Mass Flow Rate {[}kg/s{]}
 \item
+  HVAC,Average,Earth Tube Water Mass Flow Rate {[}kg/s{]}
+\item
   HVAC,Sum,Earth Tube Fan Electric Energy {[}J{]}
 \item
   HVAC,Average,Earth Tube Fan Electric Power {[}W{]}
@@ -1885,6 +1887,10 @@ Current Earth Tube output variables:
   HVAC,Average,Earth Tube Ground Interface Temperature {[}C{]}
 \item
   HVAC,Average,Earth Tube Outdoor Air Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Earth Tube Inlet Wet Bulb Temperature {[}C{]}
+\item
+  HVAC,Average,Earth Tube Inlet Humidity Ratio {[}kgWater/kgDryAir{]}
 \end{itemize}
 
 \subsubsection{Earth Tube Zone Sensible Cooling Energy {[}J{]}}\label{earth-tube-zone-sensible-cooling-energy-j}
@@ -1919,6 +1925,10 @@ The mass flow of air through the earth tube.
 
 The mass flow rate of air through the earth tube.
 
+\subsubsection{Earth Tube Water Mass Flow Rate {[}kg/s{]}}\label{earth-tube-water-mass-flow-rate-kgs}
+
+The mass flow rate of water vapor at the exit of the earth tube.
+
 \subsubsection{Earth Tube Fan Electric Energy {[}J{]}}\label{earth-tube-fan-electric-energy-j}
 
 \subsubsection{Earth Tube Fan Electric Power {[}W{]}}\label{earth-tube-fan-electric-power-w}
@@ -1936,6 +1946,14 @@ This is the average temperature of the ground along the outer surface of the ear
 \subsubsection{Earth Tube Outdoor Air Heat Transfer Rate {[}W{]}}\label{earth-tube-outdoor-air-heat-transfer-rate-w}
 
 This is the rate of heat transfer from the earth tube to the outdoor air {[}W{]}.~ Positive values indicate the rate at which outdoor air is preheated; negative values indicate the rate of precooling.
+
+\subsubsection{Earth Tube Zone Inlet Wet Bulb Temperature {[}C{]}}\label{earth-tube-zone-inlet-wet-bulb-temperature-c}
+
+This is the wet bulb temperature of the air entering the zone after passing through the earth tube {[}C{]}.
+
+\subsubsection{Earth Tube Zone Inlet Humidity Ratio {[}kgWater/krDryAir{]}}\label{earth-tube-zone-inlet-humidity-ratio-kgWater/kgDryAir}
+
+This is the humidity ratio of the air entering the zone after passing through the earth tube {[}kgWater/kgDryAir{]}.
 
 \subsection{ZoneCoolTower:Shower}\label{zonecooltowershower}
 

@@ -43,6 +43,7 @@ set( test_src
   DOASEffectOnZoneSizing.unit.cc
   DualDuct.unit.cc
   DXCoils.unit.cc
+  EarthTube.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc
   ElectricBaseboardRadiator.unit.cc

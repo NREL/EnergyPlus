@@ -134,6 +134,15 @@ namespace EarthTube {
 	// Functions
 
 	void
+	clear_state()
+	{
+		TotEarthTube = 0;
+		EarthTubeSys.deallocate();
+		ZnRptET.deallocate();
+	}
+
+	
+	void
 	ManageEarthTube()
 	{
 

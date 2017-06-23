@@ -196,6 +196,8 @@ namespace EarthTube {
 	extern Array1D< EarthTubeZoneReportVars > ZnRptET;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageEarthTube();
