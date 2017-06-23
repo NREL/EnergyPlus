@@ -531,7 +531,6 @@ namespace HeatBalFiniteDiffManager {
 				SurfaceFD( SurfNum ).CpDelXRhoS1 = 0.0;
 				SurfaceFD( SurfNum ).CpDelXRhoS2 = 0.0;
 				SurfaceFD( SurfNum ).TDpriortimestep = 0.0;
-				SurfaceFD( SurfNum ).SpecificHeat = 0.0;
 				SurfaceFD( SurfNum ).PhaseChangeState = 0;
 				SurfaceFD( SurfNum ).PhaseChangeStateOld = 0;
 				SurfaceFD( SurfNum ).PhaseChangeStateOldOld = 0;
@@ -872,7 +871,6 @@ namespace HeatBalFiniteDiffManager {
 			SurfaceFD( Surf ).CpDelXRhoS1.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).CpDelXRhoS2.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).TDpriortimestep.allocate( TotNodes + 1 );
-			SurfaceFD( Surf ).SpecificHeat.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).PhaseChangeState.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).PhaseChangeStateOld.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).PhaseChangeStateOldOld.allocate( TotNodes + 1 );
@@ -899,7 +897,6 @@ namespace HeatBalFiniteDiffManager {
 			SurfaceFD( Surf ).CpDelXRhoS1 = 0.0;
 			SurfaceFD( Surf ).CpDelXRhoS2 = 0.0;
 			SurfaceFD( Surf ).TDpriortimestep = 0.0;
-			SurfaceFD( Surf ).SpecificHeat = 2000;
 			SurfaceFD( Surf ).PhaseChangeState = 0;
 			SurfaceFD( Surf ).PhaseChangeStateOld = 0;
 			SurfaceFD( Surf ).PhaseChangeStateOldOld = 0;
@@ -917,7 +914,6 @@ namespace HeatBalFiniteDiffManager {
 			for ( Lay = 1; Lay <= TotNodes + 1; ++Lay ) { // include inside face node
 				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				SetupOutputVariable( "CondFD Surface Heat Flux Node " + TrimSigDigits( Lay ) + " [W/m2]", SurfaceFD( SurfNum ).QDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Phase Change Specific Heat " + TrimSigDigits( Lay ) + " [J/kg-K]", SurfaceFD( SurfNum ).SpecificHeat( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				SetupOutputVariable( "CondFD Phase Change State " + TrimSigDigits( Lay ) + " []", SurfaceFD( SurfNum ).PhaseChangeState( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				SetupOutputVariable( "CondFD Phase Change Previous State " + TrimSigDigits( Lay ) + " []", SurfaceFD( SurfNum ).PhaseChangeStateOld( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				SetupOutputVariable( "CondFD Phase Change Node Temperature " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDT( Lay ), "Zone", "State", Surface( SurfNum ).Name );
@@ -1447,7 +1443,6 @@ namespace HeatBalFiniteDiffManager {
 					auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 					if ( mat.phaseChange ) {
 						Cp = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-						SurfaceFD( Surf ).SpecificHeat( i ) = Cp;
 					} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data to generate Cp
 						// Enthalpy function used to get average specific heat. Updated by GS so enthalpy function is followed.
 						EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
@@ -1595,7 +1590,6 @@ namespace HeatBalFiniteDiffManager {
 		auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 		if ( mat.phaseChange ) {
 			Cp = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-			SurfaceFD( Surf ).SpecificHeat( i ) = Cp;
 		} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 			EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 			EnthNew( i ) = terpld( matFD_TempEnth, TDT_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
@@ -1753,7 +1747,6 @@ namespace HeatBalFiniteDiffManager {
 					// Check for PCM second layer
 					if ( mat2.phaseChange ) {
 						Cp2 = mat2.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-						SurfaceFD( Surf ).SpecificHeat( i ) = Cp2;
 					} else if ( ( matFD_sum < 0.0 ) && ( matFD2_sum > 0.0 ) ) { // Phase change material Layer2, Use TempEnth Data
 						Real64 const Enth2Old( terpld( matFD2_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth2New( terpld( matFD2_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
@@ -1789,7 +1782,6 @@ namespace HeatBalFiniteDiffManager {
 					// Check for PCM layer before R layer
 					if ( mat.phaseChange ) {
 						Cp1 = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-						SurfaceFD( Surf ).SpecificHeat( i ) = Cp1;
 					} else if ( ( matFD_sum > 0.0 ) && ( matFD2_sum < 0.0 ) ) { // Phase change material Layer1, Use TempEnth Data
 						Real64 const Enth1Old( terpld( matFD_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth1New( terpld( matFD_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
@@ -1865,11 +1857,9 @@ namespace HeatBalFiniteDiffManager {
 
 					if ( mat.phaseChange ) {
 						Cp1 = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-						SurfaceFD( Surf ).SpecificHeat( i ) = Cp1;
 					}
 					if ( mat2.phaseChange ) {
 						Cp2 = mat2.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-						SurfaceFD( Surf ).SpecificHeat( i ) = Cp2;
 					}
 
 					Real64 const Delt_Delx1( Delt * Delx1 );
@@ -2023,7 +2013,6 @@ namespace HeatBalFiniteDiffManager {
 				auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 				if ( mat.phaseChange ) {
 					Cp = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-					SurfaceFD( Surf ).SpecificHeat( i ) = Cp;
 				} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 					EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 					EnthNew( i ) = terpld( matFD_TempEnth, TDT_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
