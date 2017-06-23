@@ -74,10 +74,12 @@ namespace HysteresisPhaseChange {
 		// because of the passive linking between materials and material property objects,
 		// we don't know ahead of time for sure whether we will have a material property
 		// so we can't return fatal here if it isn't found, just leave it null
-		return nullptr; // just for the compiler warning
+		return nullptr;
 	}
 
 	Real64 HysteresisPhaseChange::getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2 ) {
+		// Looks up the enthalpy on the characteristic curve defined by the parameters Tc, tau1, and tau2,
+		// and the position on that curve defined by T.
 		Real64 eta1 = ( this->totalLatentHeat / 2 ) * exp( -2 * abs( T - Tc ) / tau1 );
 		Real64 eta2 = ( this->totalLatentHeat / 2 ) * exp( -2 * abs( T - Tc ) / tau2 );
 		if ( T <= Tc ) {
@@ -88,7 +90,8 @@ namespace HysteresisPhaseChange {
 	}
 
 	Real64 HysteresisPhaseChange::getCurrentSpecificHeat( Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, int prevPhaseChangeState, int & phaseChangeState ) {
-
+		// Main public facing function; returns the current specific heat based on input properties, and current and previous conditions.
+		// In a future version, this could be compartmentalized to track all states and histories, but it would require some further modification to the HBFDManager
 		Real64 TempLowPCM = this->peakTempMelting - this->deltaTempMeltingLow;
 		Real64 TempHighPCM = this->peakTempMelting + this->deltaTempMeltingHigh;
 		Real64 Tc = -999; // assigned later
@@ -145,10 +148,11 @@ namespace HysteresisPhaseChange {
 			this->phaseChangeTransition = false;
 		}
 
+		// now calculate the enthalpy appropriately
 		if ( !this->phaseChangeTransition ) {
 			this->enthOld = this->getEnthalpy(prevTempTD, Tc, Tau1, Tau2 );
 			this->enthNew = this->getEnthalpy(updatedTempTDT, Tc, Tau1, Tau2 );
-		} else { //if ( this->phaseChangeTransition ) {
+		} else {
 			if ( prevPhaseChangeState == PhaseChangeStates::FREEZING && phaseChangeState == PhaseChangeStates::TRANSITION ) {
 				this->enthRev = this->getEnthalpy(phaseChangeTempReverse, this->peakTempFreezing, this->deltaTempFreezingLow, this->deltaTempFreezingHigh );
 				this->enthNew = ( this->specHeatTransition * updatedTempTDT ) + ( this->enthOld - ( this->specHeatTransition * prevTempTD) );
@@ -224,13 +228,15 @@ namespace HysteresisPhaseChange {
 				this->enthNew = ( this->specHeatTransition * updatedTempTDT ) + ( this->enthRev - ( this->specHeatTransition * phaseChangeTempReverse ) );
 			}
 		}
+
+		// then calculate the specific heat and return it
 		if ( !this->phaseChangeTransition ) {
 			if ( this->enthNew == this->enthOld ) {
 				Cp = this->CpOld;
 			} else {
 				Cp = this->specHeat( prevTempTD, updatedTempTDT, Tc, Tau1, Tau2, this->enthOld, this->enthNew );
 			}
-		} else { // if ( this->phaseChangeTransition == 1 ) {
+		} else {
 			Cp = this->specHeatTransition;
 		}
 		this->CpOld = Cp;
@@ -239,11 +245,11 @@ namespace HysteresisPhaseChange {
 
 	Real64 HysteresisPhaseChange::specHeat( Real64 temperaturePrev, Real64 temperatureCurrent, Real64 criticalTemperature, Real64 tau1, Real64 tau2, Real64 EnthalpyOld, Real64 EnthalpyNew ) {
 
-//		REAL(r64), INTENT(IN)   ::  Tc                  ! Critical (Melting/Freezing) Temperature of PCM
-//		REAL(r64), INTENT(IN)   ::  Tau1                ! Width of Melting Zone low
-//		REAL(r64), INTENT(IN)   ::  Tau2                ! Width of Melting Zone high
-//		REAL(r64), INTENT(IN)   ::  EnthalpyOld         ! Previos Timestep Nodal Enthalpy
-//		REAL(r64), INTENT(IN)   ::  EnthalpyNew         ! Current Timestep Nodal Enthalpy
+		//	Tc                  ! Critical (Melting/Freezing) Temperature of PCM
+		//	Tau1                ! Width of Melting Zone low
+		//	Tau2                ! Width of Melting Zone high
+		//	EnthalpyOld         ! Previos Timestep Nodal Enthalpy
+		//	EnthalpyNew         ! Current Timestep Nodal Enthalpy
 
         Real64 Cp1 = this->specificHeatSolid;
         Real64 Cp2 = this->specificHeatLiquid;
@@ -265,56 +271,64 @@ namespace HysteresisPhaseChange {
 	}
 
 	void readAllHysteresisModels() {
+
+		// convenience variables
 		DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
 		numHysteresisModels = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 
-		if ( numHysteresisModels > 0 ) {
-			for ( int hmNum = 1; hmNum <= numHysteresisModels; ++ hmNum ) {
-				bool errorsFound = false;
-				int ioStatus;
-				int numAlphas;
-				int numNumbers;
-				InputProcessor::GetObjectItem(
-					DataIPShortCuts::cCurrentModuleObject,
-					hmNum,
-					DataIPShortCuts::cAlphaArgs,
-					numAlphas,
-					DataIPShortCuts::rNumericArgs,
-					numNumbers,
-					ioStatus,
-					DataIPShortCuts::lNumericFieldBlanks,
-					DataIPShortCuts::lAlphaFieldBlanks,
-					DataIPShortCuts::cAlphaFieldNames,
-					DataIPShortCuts::cNumericFieldNames
-				);
-				bool isNotOK = false;
-				bool isBlank = false;
-				// InputProcessor::VerifyName( DataIPShortCuts::cAlphaArgs( 1 ),
-				if ( isNotOK ) {
-					errorsFound = true;
-					if ( isBlank ) {
-						DataIPShortCuts::cAlphaArgs( 1 ) = "xxxxx";
-					}
-				}
-				HysteresisPhaseChange thisHM;
-				thisHM.name = DataIPShortCuts::cAlphaArgs( 1 );
-				thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs( 2 );
-				thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs( 3 );
-				thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs( 4 );
-				thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs( 5 );
-				thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs( 6 );
-				thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs( 7 );
-				thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs( 8 );
-				thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs( 9 );
-				thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs( 10 );
-				thisHM.specHeatTransition = ( thisHM.specificHeatSolid + thisHM.specificHeatLiquid ) / 2.0;
-				thisHM.CpOld = thisHM.specificHeatSolid;
-				if ( errorsFound ) {
-					ShowFatalError( "Error processing " + DataIPShortCuts::cCurrentModuleObject + " named \"" +DataIPShortCuts::cAlphaArgs( 1 ) + "\"" );
-				}
-				hysteresisPhaseChangeModels.push_back( thisHM );
-				// SetupOutputVariable( "Phase Change State [ ]", thisHM.phaseChangeState, "Zone", "Average", thisHM.name );
+		// loop over all hysteresis input instances, if zero, this will simply not do anything
+		for ( int hmNum = 1; hmNum <= numHysteresisModels; ++ hmNum ) {
+
+			// just a few vars to pass in and out to GetObjectItem
+			int ioStatus;
+			int numAlphas;
+			int numNumbers;
+
+			// get the input data and store it in the Shortcuts structures
+			InputProcessor::GetObjectItem(
+				DataIPShortCuts::cCurrentModuleObject,
+				hmNum,
+				DataIPShortCuts::cAlphaArgs,
+				numAlphas,
+				DataIPShortCuts::rNumericArgs,
+				numNumbers,
+				ioStatus,
+				DataIPShortCuts::lNumericFieldBlanks,
+				DataIPShortCuts::lAlphaFieldBlanks,
+				DataIPShortCuts::cAlphaFieldNames,
+				DataIPShortCuts::cNumericFieldNames
+			);
+
+			// the input processor validates the numeric inputs based on the IDD definition
+			// still validate the name to make sure there aren't any duplicates or blanks
+			// blanks are easy: fatal if blank
+			if ( DataIPShortCuts::lAlphaFieldBlanks[0] ) {
+				ShowFatalError( "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank" );
 			}
+
+			// we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
+			for ( auto & existingHysteresisModel : hysteresisPhaseChangeModels ) {
+				if ( DataIPShortCuts::cAlphaArgs( 1 ) == existingHysteresisModel.name ) {
+					ShowFatalError( "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Duplicate name found: " + existingHysteresisModel.name );
+				}
+			}
+
+			// now build out a new hysteresis instance and add it to the vector
+			HysteresisPhaseChange thisHM;
+			thisHM.name = DataIPShortCuts::cAlphaArgs( 1 );
+			thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs( 2 );
+			thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs( 3 );
+			thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs( 4 );
+			thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs( 5 );
+			thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs( 6 );
+			thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs( 7 );
+			thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs( 8 );
+			thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs( 9 );
+			thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs( 10 );
+			thisHM.specHeatTransition = ( thisHM.specificHeatSolid + thisHM.specificHeatLiquid ) / 2.0;
+			thisHM.CpOld = thisHM.specificHeatSolid;
+			hysteresisPhaseChangeModels.push_back( thisHM );
+
 		}
 	}
 
