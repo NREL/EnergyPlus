@@ -94,7 +94,10 @@ namespace EnergyPlus {
 	EarthTubeSys( 3 ).ZonePtr = 1;
 	CheckEarthTubesInZones( ZoneName, InputName, ErrorsFound );
 	EXPECT_EQ( ErrorsFound, true );
-		
+	
+	EarthTubeSys.deallocate();
+	TotEarthTube = 0;
+	
 	}
 	
 }
