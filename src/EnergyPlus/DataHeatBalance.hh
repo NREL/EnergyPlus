@@ -63,7 +63,7 @@
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
 #include <DataWindowEquivalentLayer.hh>
-#include <PhaseChangeModeling/PhaseChangeModel.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -787,7 +787,7 @@ namespace DataHeatBalance {
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
-		PhaseChangeModel * phaseChange = nullptr;
+		HysteresisPhaseChange::HysteresisPhaseChange * phaseChange = nullptr;
 
 		// Default Constructor
 		MaterialProperties() :

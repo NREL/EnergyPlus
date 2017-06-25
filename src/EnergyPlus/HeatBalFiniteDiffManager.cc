@@ -1099,9 +1099,6 @@ namespace HeatBalFiniteDiffManager {
 
 			SurfaceFD(Surf).PhaseChangeStateOldOld = SurfaceFD(Surf).PhaseChangeStateOld;
 			SurfaceFD(Surf).PhaseChangeStateOld = SurfaceFD(Surf).PhaseChangeState;
-			//SurfaceFD(Surf).PhaseChangeTransitionOld= SurfaceFD(Surf).PhaseChangeTransition;
-
-			//TcOld = Tc;
 
 		} // Time Loop  //PT solving time steps
 
@@ -1443,6 +1440,8 @@ namespace HeatBalFiniteDiffManager {
 					auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 					if ( mat.phaseChange ) {
 						Cp = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
+						SurfaceFD( Surf ).EnthalpyF = mat.phaseChange->enthalpyF;
+						SurfaceFD( Surf ).EnthalpyM = mat.phaseChange->enthalpyM;
 					} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data to generate Cp
 						// Enthalpy function used to get average specific heat. Updated by GS so enthalpy function is followed.
 						EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy

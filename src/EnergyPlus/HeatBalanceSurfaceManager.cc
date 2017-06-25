@@ -5220,8 +5220,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	bool const PartialResimulate( present( ZoneToResimulate ) );
 	SurfaceEnthalpyRead = false;
-	//ZnAirRpt.SumEnthalpyM = 0.0;
-	//ZnAirRpt.SumEnthalpyH = 0.0;
+	if ( ZnAirRpt.allocated() ) {
+		for ( auto & zar : ZnAirRpt ) {
+			zar.SumEnthalpyM = 0.0;
+			zar.SumEnthalpyH = 0.0;
+		}
+	}
 
 	//Tuned Relevant surfaces (set below) for performance/scalability //Do Store this once for all relevant Zones at higher level
 	std::vector< int > SurfToResimulate;
@@ -5455,7 +5459,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							}
 							SurfaceEnthalpyRead( SurfNum ) = true;
 						}
-						if ( ZnAirRpt.allocated() ) {
+						if ( ZnAirRpt.allocated() && SurfaceFD.allocated() ) {
 							ZnAirRpt( ZoneNum ).SumEnthalpyM += SurfaceFD( SurfNum ).EnthalpyM;
 							ZnAirRpt( ZoneNum ).SumEnthalpyH += SurfaceFD( SurfNum ).EnthalpyF;
 						}

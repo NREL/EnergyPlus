@@ -51,7 +51,6 @@
 
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
-#include <PhaseChangeModeling/PhaseChangeModel.hh>
 #include <OutputProcessor.hh>
 
 namespace EnergyPlus {
@@ -69,7 +68,9 @@ namespace HysteresisPhaseChange {
 
 	extern int numHysteresisModels;
 
-	struct HysteresisPhaseChange : public PhaseChangeModel {
+	struct HysteresisPhaseChange{
+
+		std::string name;
 
 		// input parameters
 		Real64 totalLatentHeat;
@@ -99,12 +100,12 @@ namespace HysteresisPhaseChange {
 		{}
 
 		static
-		PhaseChangeModel *
+		HysteresisPhaseChange *
 		factory( const std::string objectName );
 
 		Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2 );
 
-		Real64 getCurrentSpecificHeat( Real64, Real64, Real64, int, int & ) override;
+		Real64 getCurrentSpecificHeat( Real64, Real64, Real64, int, int & );
 
 		Real64 specHeat( Real64, Real64, Real64, Real64, Real64, Real64, Real64);
 

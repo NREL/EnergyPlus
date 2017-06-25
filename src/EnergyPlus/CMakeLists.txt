@@ -378,7 +378,6 @@ SET( SRC
   PackagedTerminalHeatPump.hh
   PackagedThermalStorageCoil.cc
   PackagedThermalStorageCoil.hh
-  PhaseChangeModeling/PhaseChangeModel.hh
   PhaseChangeModeling/HysteresisModel.cc
   PhaseChangeModeling/HysteresisModel.hh
   PhotovoltaicThermalCollectors.cc

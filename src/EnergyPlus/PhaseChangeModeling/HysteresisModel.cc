@@ -61,7 +61,7 @@ namespace HysteresisPhaseChange {
 	int numHysteresisModels = 0;
 	std::vector< HysteresisPhaseChange > hysteresisPhaseChangeModels;
 
-	PhaseChangeModel * HysteresisPhaseChange::factory( const std::string objectName ) {
+	HysteresisPhaseChange * HysteresisPhaseChange::factory( const std::string objectName ) {
 		if ( getHysteresisModels ) {
 			readAllHysteresisModels();
 			getHysteresisModels = false;
