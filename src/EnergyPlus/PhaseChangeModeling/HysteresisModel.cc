@@ -251,21 +251,21 @@ namespace HysteresisPhaseChange {
 		//	EnthalpyOld         ! Previos Timestep Nodal Enthalpy
 		//	EnthalpyNew         ! Current Timestep Nodal Enthalpy
 
-        Real64 T = temperatureCurrent;
+		Real64 T = temperatureCurrent;
 
-        if ( T < criticalTemperature ) {
+		if ( T < criticalTemperature ) {
 			Real64 DEta1 = - ( this->totalLatentHeat * ( T - criticalTemperature ) * exp( -2 * abs( T - criticalTemperature ) / tau1 ) ) / ( tau1 * abs( T - criticalTemperature ) );
 			Real64 Cp1 = this->specificHeatSolid;
-            return (Cp1 + DEta1);
-        } else if ( T == criticalTemperature ) {
-            return (EnthalpyNew - EnthalpyOld) / (temperatureCurrent - temperaturePrev);
-        } else if ( T > criticalTemperature ) {
+			return (Cp1 + DEta1);
+		} else if ( T == criticalTemperature ) {
+			return (EnthalpyNew - EnthalpyOld) / (temperatureCurrent - temperaturePrev);
+		} else if ( T > criticalTemperature ) {
 			Real64 DEta2 = ( this->totalLatentHeat * ( T - criticalTemperature ) * exp( -2 * abs( T - criticalTemperature ) / tau2 ) ) / ( tau2 * abs( T - criticalTemperature ) );
 			Real64 Cp2 = this->specificHeatLiquid;
-            return Cp2 + DEta2;
-        } else {
-            return 0;
-        }
+			return Cp2 + DEta2;
+		} else {
+			return 0;
+		}
 
 	}
 
