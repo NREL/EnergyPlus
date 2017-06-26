@@ -50,8 +50,6 @@
 #include <vector>
 
 #include <EnergyPlus.hh>
-#include <DataGlobals.hh>
-#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -101,13 +99,13 @@ namespace HysteresisPhaseChange {
 
 		static
 		HysteresisPhaseChange *
-		factory( const std::string objectName );
+		factory( const std::string & objectName );
 
 		Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2 );
 
-		Real64 getCurrentSpecificHeat( Real64, Real64, Real64, int, int & );
+		Real64 getCurrentSpecificHeat( Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, int prevPhaseChangeState, int & phaseChangeState );
 
-		Real64 specHeat( Real64, Real64, Real64, Real64, Real64, Real64, Real64);
+		Real64 specHeat( Real64 temperaturePrev, Real64 temperatureCurrent, Real64 criticalTemperature, Real64 tau1, Real64 tau2, Real64 EnthalpyOld, Real64 EnthalpyNew);
 
 	};
 

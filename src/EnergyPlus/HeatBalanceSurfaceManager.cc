@@ -176,6 +176,7 @@ namespace HeatBalanceSurfaceManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
+	Array1D< Real64 > SurfaceEnthalpyRead;
 
 	namespace {
 		bool ManageSurfaceHeatBalancefirstTime( true );
@@ -218,6 +219,7 @@ namespace HeatBalanceSurfaceManager {
 		UpdateThermalHistoriesFirstTimeFlag = true;
 		CalculateZoneMRTfirstTime = true;
 		calcHeatBalanceInsideSurfFirstTime = true;
+		SurfaceEnthalpyRead.deallocate();
 	}
 
 	void
@@ -5191,7 +5193,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	int OtherSideZoneNum; // Zone Number index for other side of an interzone partition HAMT
 	static int WarmupSurfTemp;
 	static int TimeStepInDay( 0 ); // time step number
-	static Array1D< Real64 > SurfaceEnthalpyRead; // ! True if EnthalpyM and EnthalpyH are read
 
 	// FLOW:
 	if ( calcHeatBalanceInsideSurfFirstTime ) {
