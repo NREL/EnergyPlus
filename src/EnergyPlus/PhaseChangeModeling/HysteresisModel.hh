@@ -66,9 +66,18 @@ namespace HysteresisPhaseChange {
 
 	extern int numHysteresisModels;
 
-	struct HysteresisPhaseChange{
+	class HysteresisPhaseChange{
 
+		Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2 );
+
+		Real64 specHeat( Real64 temperaturePrev, Real64 temperatureCurrent, Real64 criticalTemperature, Real64 tau1, Real64 tau2, Real64 EnthalpyOld, Real64 EnthalpyNew);
+
+	public:
+
+		// members are pretty much all accessed outside of the class in one way or another (by the static factory, etc.)
 		std::string name;
+		Real64 enthalpyM;
+		Real64 enthalpyF;
 
 		// input parameters
 		Real64 totalLatentHeat;
@@ -87,25 +96,20 @@ namespace HysteresisPhaseChange {
 		Real64 enthNew;
 		Real64 enthRev;
 		Real64 CpOld;
-
-		// unknown
 		Real64 specHeatTransition;
-		Real64 enthalpyM;
-		Real64 enthalpyF;
 
-		virtual
-		~HysteresisPhaseChange()
-		{}
-
+		// the factory for this class
 		static
 		HysteresisPhaseChange *
 		factory( const std::string & objectName );
 
-		Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2 );
-
+		// the one main public function for this class
 		Real64 getCurrentSpecificHeat( Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, int prevPhaseChangeState, int & phaseChangeState );
 
-		Real64 specHeat( Real64 temperaturePrev, Real64 temperatureCurrent, Real64 criticalTemperature, Real64 tau1, Real64 tau2, Real64 EnthalpyOld, Real64 EnthalpyNew);
+		// and the destructor
+		virtual
+		~HysteresisPhaseChange()
+		{}
 
 	};
 
