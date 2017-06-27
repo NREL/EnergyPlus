@@ -53,73 +53,72 @@
 
 namespace EnergyPlus {
 
-namespace HysteresisPhaseChange {
+	namespace HysteresisPhaseChange {
 
-	struct PhaseChangeStates {
-		// keeping these as ints to allow output variable reporting; could refine later into enum class
-		static const int LIQUID = -2;
-		static const int MELTING = -1;
-		static const int TRANSITION = 0;
-		static const int FREEZING = 1;
-		static const int CRYSTALLIZED = 2;
-	};
+		struct PhaseChangeStates {
+			// keeping these as ints to allow output variable reporting; could refine later into enum class
+			static const int LIQUID = -2;
+			static const int MELTING = -1;
+			static const int TRANSITION = 0;
+			static const int FREEZING = 1;
+			static const int CRYSTALLIZED = 2;
+		};
 
-	extern int numHysteresisModels;
+		extern int numHysteresisModels;
 
-	class HysteresisPhaseChange{
+		class HysteresisPhaseChange {
 
-		Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2 );
+			Real64 getEnthalpy( Real64 T, Real64 Tc, Real64 tau1, Real64 tau2 );
 
-		Real64 specHeat( Real64 temperaturePrev, Real64 temperatureCurrent, Real64 criticalTemperature, Real64 tau1, Real64 tau2, Real64 EnthalpyOld, Real64 EnthalpyNew);
+			Real64 specHeat( Real64 temperaturePrev, Real64 temperatureCurrent, Real64 criticalTemperature, Real64 tau1,
+							 Real64 tau2, Real64 EnthalpyOld, Real64 EnthalpyNew );
 
-	public:
+		public:
 
-		// members are pretty much all accessed outside of the class in one way or another (by the static factory, etc.)
-		std::string name;
-		Real64 enthalpyM;
-		Real64 enthalpyF;
+			// members are pretty much all accessed outside of the class in one way or another (by the static factory, etc.)
+			std::string name;
+			Real64 enthalpyM;
+			Real64 enthalpyF;
 
-		// input parameters
-		Real64 totalLatentHeat;
-		Real64 specificHeatLiquid;
-		Real64 deltaTempMeltingHigh;
-		Real64 peakTempMelting;
-		Real64 deltaTempMeltingLow;
-		Real64 specificHeatSolid;
-		Real64 deltaTempFreezingHigh;
-		Real64 peakTempFreezing;
-		Real64 deltaTempFreezingLow;
+			// input parameters
+			Real64 totalLatentHeat;
+			Real64 specificHeatLiquid;
+			Real64 deltaTempMeltingHigh;
+			Real64 peakTempMelting;
+			Real64 deltaTempMeltingLow;
+			Real64 specificHeatSolid;
+			Real64 deltaTempFreezingHigh;
+			Real64 peakTempFreezing;
+			Real64 deltaTempFreezingLow;
 
-		// history and state terms
-		bool phaseChangeTransition;
-		Real64 enthOld;
-		Real64 enthNew;
-		Real64 enthRev;
-		Real64 CpOld;
-		Real64 specHeatTransition;
+			// history and state terms
+			bool phaseChangeTransition;
+			Real64 enthOld;
+			Real64 enthNew;
+			Real64 enthRev;
+			Real64 CpOld;
+			Real64 specHeatTransition;
 
-		// the factory for this class
-		static
-		HysteresisPhaseChange *
-		factory( const std::string & objectName );
+			// the factory for this class
+			static HysteresisPhaseChange *factory( const std::string &objectName );
 
-		// the one main public function for this class
-		Real64 getCurrentSpecificHeat( Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse, int prevPhaseChangeState, int & phaseChangeState );
+			// the one main public function for this class
+			Real64 getCurrentSpecificHeat( Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse,
+										   int prevPhaseChangeState, int &phaseChangeState );
 
-		// and the destructor
-		virtual
-		~HysteresisPhaseChange()
-		{}
+			// and the destructor
+			virtual
+			~HysteresisPhaseChange() {}
 
-	};
+		};
 
-	extern std::vector< HysteresisPhaseChange > hysteresisPhaseChangeModels;
+		extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
-	void readAllHysteresisModels();
+		void readAllHysteresisModels();
 
-	void clear_state();
+		void clear_state();
 
-} // namespace HysteresisPhaseChange 
+	} // namespace HysteresisPhaseChange
 
 } // namespace EnergyPlus
 
