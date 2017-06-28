@@ -460,6 +460,51 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	// check coil UA-value sizing
 	EXPECT_NEAR( 1439.30, WaterCoil( CoilNum ).UACoil, 0.01 );
 
+	// test single zone VAV reheat coil sizing
+	CurZoneEqNum = 1;
+	CurSysNum = 0;
+	TermUnitSizing.allocate( 1 );
+	TermUnitSizing( CurZoneEqNum ).AirVolFlow = WaterCoil( CoilNum ).DesAirVolFlowRate / 3.0; // DesAirVolFlowRate = 1.0
+	TermUnitSizing( CurZoneEqNum ).MaxHWVolFlow = WaterCoil( CoilNum ).MaxWaterVolFlowRate / 3.0;
+	TermUnitSizing( CurZoneEqNum ).MinFlowFrac = 0.5;
+	DataSizing::TermUnitSingDuct = true;
+
+	WaterCoil( CoilNum ).DesAirVolFlowRate = AutoSize;
+	WaterCoil( CoilNum ).UACoil = AutoSize;
+	WaterCoil( CoilNum ).MaxWaterVolFlowRate = AutoSize;
+	WaterCoil( CoilNum ).CoilPerfInpMeth = UAandFlow;
+	WaterCoil( CoilNum ).DesInletAirTemp = AutoSize;
+	WaterCoil( CoilNum ).DesOutletAirTemp = AutoSize;
+	WaterCoil( CoilNum ).DesInletWaterTemp = AutoSize;
+	WaterCoil( CoilNum ).DesInletAirHumRat = AutoSize;
+	WaterCoil( CoilNum ).DesOutletAirHumRat = AutoSize;
+
+	SysSizingRunDone = false;
+	ZoneSizingRunDone = true;
+	NumZoneSizingInput = 1;
+	ZoneSizingInput.allocate( 1 );
+	ZoneSizingInput( 1 ).ZoneNum = 1;
+	ZoneEqSizing.allocate( 1 );
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 20 );
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::HeatingAirflowSizing ) = DataHVACGlobals::HeatingAirflowSizing;
+	ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = 0.0;
+	ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = 1.0;
+	FinalZoneSizing.allocate( 1 );
+	FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.0;
+	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.0;
+	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 10.0;
+	FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.0;
+	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.006;
+	FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.008;
+
+
+	MySizeFlag( 1 ) = true;
+	// run water coil sizing 
+	SizeWaterCoil( CoilNum );
+
+	// check coil UA-value sizing
+	EXPECT_NEAR( 558.656, WaterCoil( CoilNum ).UACoil, 0.01 ); // smaller UA than result above at 1435.00
+
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
