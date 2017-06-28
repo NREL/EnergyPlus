@@ -237,7 +237,6 @@ namespace EarthTube {
 		int NumNumber;
 		int IOStat;
 		int Loop;
-		int Loop1;
 		Array1D_bool RepVarSet;
 
 		RepVarSet.dimension( NumOfZones, true );
@@ -416,10 +415,11 @@ namespace EarthTube {
 	
 	void
 	CheckEarthTubesInZones
-		( std::string const ZoneName, // name of zone for error reporting
-		  std::string const FieldName, // name of earth tube in input
-		  bool & ErrorsFound // Found a problem
-		)
+	(
+		std::string const ZoneName, // name of zone for error reporting
+		std::string const FieldName, // name of earth tube in input
+		bool & ErrorsFound // Found a problem
+	)
 	{
 
 		int Loop;
