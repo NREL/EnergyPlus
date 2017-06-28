@@ -943,7 +943,6 @@ namespace EnergyPlus {
 		Real64 InletAirHumRat;
 		const Real64 TotalCap( 1303.5987246916557 );
 		const Real64 AirVolFlowRate( 0.085422486640000003 );
-		Real64 AirMassFlowRate;
 		const Real64 SHR( 0.88 );
 		Real64 AirPressure;
 		Real64 CBF_expected;
@@ -951,22 +950,21 @@ namespace EnergyPlus {
 
 		AirPressure = StdPressureSeaLevel;
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(InletDBTemp, InletWBTemp, AirPressure );
-		AirMassFlowRate = AirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW( AirPressure, InletDBTemp, InletAirHumRat );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirVolFlowRate, SHR, true );
 		CBF_expected = 0.17268167698750708;
 		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
 
 		// push inlet condition towards saturation curve to test CBF calculation robustness
 		InletWBTemp = 19.7; // 19.72 DB / 19.7 WB
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
-		EXPECT_NEAR( CBF_calculated, 0.00021141, 0.0000001 );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirVolFlowRate, SHR, true );
+		EXPECT_NEAR( CBF_calculated, 0.00020826, 0.0000001 );
 
 		InletDBTemp = 13.1; // colder and much less likely inlet air temperature
 		InletWBTemp = 13.08; // 13.1 DB / 13.08 WB - hard to find ADP (needed mod to CalcCBF function)
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
-		EXPECT_NEAR( CBF_calculated, 0.0001531, 0.0000001 );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirVolFlowRate, SHR, true );
+		EXPECT_NEAR( CBF_calculated, 0.0001572, 0.0000001 );
 	}
 
 	TEST_F( EnergyPlusFixture, DXCoilEvapCondPumpSizingTest ) {
@@ -1477,17 +1475,16 @@ namespace EnergyPlus {
 		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 		std::string const CallingRoutine( "DXCoil_ValidateADPFunction" );
 
-		Real64 DesMassFlow = DXCoil( 1 ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
-		Real64 CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+		Real64 CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DXCoil( 1 ).RatedAirVolFlowRate( 1 ), DXCoil( 1 ).RatedSHR( 1 ), true );
 
-		EXPECT_NEAR( 0.747472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
-		EXPECT_NEAR( 0.1012203, CBF_calculated, 0.0000001 );
+		EXPECT_NEAR( 0.788472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
+		EXPECT_NEAR( 0.0003944, CBF_calculated, 0.0000001 );
 
 		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // simulate outlet condition right at the saturation curve
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
 
 		SizeDXCoil( 1 );
-		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DXCoil( 1 ).RatedAirVolFlowRate( 1 ), DXCoil( 1 ).RatedSHR( 1 ), true );
 
 		EXPECT_NEAR( 0.67608322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
 		EXPECT_NEAR( 0.0003243, CBF_calculated, 0.0000001 );
@@ -1496,7 +1493,7 @@ namespace EnergyPlus {
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
 
 		SizeDXCoil( 1 );
-		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DXCoil( 1 ).RatedAirVolFlowRate( 1 ), DXCoil( 1 ).RatedSHR( 1 ), true );
 
 		EXPECT_NEAR( 0.64408322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
 		EXPECT_NEAR( 0.0028271, CBF_calculated, 0.0000001 );
@@ -1770,6 +1767,72 @@ namespace EnergyPlus {
 		ASSERT_EQ( DXCoil( 1 ).DefrostEIRFT, 1 );
 		ASSERT_EQ( DXCoil( 1 ).MaxOATDefrost, 5.0 );
 		ASSERT_EQ( DXCoil( 1 ).DefrostTime, 0.058333 );
+
+	}
+
+	TEST_F( EnergyPlusFixture, CurveOutputLimitWarning ) {
+
+		// tests performance curves reports warning if rating point results is not near 1.0
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			"	Schedule:Compact,",
+			"	Always On,            !- Name",
+			"	Fraction,             !- Schedule Type Limits Name",
+			"	Through: 12/31,       !- Field 1",
+			"	For: AllDays,         !- Field 2",
+			"	Until: 24:00, 1.0;    !- Field 3",
+
+			"Curve:Biquadratic,",
+			"	Biquadratic,     !- Name",
+			"	1.1001,          !- Coefficient1 Constant",
+			"	0.0,             !- Coefficient2 x",
+			"	0.0,             !- Coefficient3 x**2",
+			"	0.0,             !- Coefficient4 y",
+			"	0.0,             !- Coefficient5 y**2",
+			"	0.0,             !- Coefficient6 x*y",
+			"	12.0,            !- Minimum Value of x",
+			"	23.9,            !- Maximum Value of x",
+			"	18.0,            !- Minimum Value of y",
+			"	46.1,            !- Maximum Value of y",
+			"	,                !- Minimum Curve Output",
+			"	,                !- Maximum Curve Output",
+			"	Temperature,     !- Input Unit Type for X",
+			"	Temperature,     !- Input Unit Type for Y",
+			"	Dimensionless;   !- Output Unit Type",
+
+			"Curve:Quadratic,",
+			"	Quadratic, !- Name",
+			"	0.8,              !- Coefficient1 Constant",
+			"	0.2,              !- Coefficient2 x",
+			"	0.0,              !- Coefficient3 x**2",
+			"	0.5,              !- Minimum Value of x",
+			"	1.5;              !- Maximum Value of x",
+
+			"  COIL:Cooling:DX:VariableRefrigerantFlow,",
+			"    TU1 VRF DX Cooling Coil, !- Name",
+			"    Always On,           !- Availability Schedule Name",
+			"    6600.0,                  !- Gross Rated Total Cooling Capacity {W}",
+			"    0.75,                    !- Gross Rated Sensible Heat Ratio",
+			"    0.500,                   !- Rated Air Flow Rate {m3/s}",
+			"    Biquadratic,             !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+			"    Quadratic,               !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+			"    TU1 Inlet Node,          !- Coil Air Inlet Node",
+			"    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+			"    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		ProcessScheduleInput();
+		GetCurveInput();
+		GetDXCoils();
+
+		EXPECT_TRUE( has_cerr_output() ); // capacity as a function of temperature inputs will give output above 1.0 +- 10% and trip warning message
+
+		Real64 CurveVal = CurveValue( DXCoil( 1 ).CCapFTemp( 1 ), RatedInletWetBulbTemp, RatedOutdoorAirTemp );
+		ASSERT_EQ( CurveVal, 1.1001 ); // anything over 1.1 will trip warning message for capacity as a function of temperature
 
 	}
 

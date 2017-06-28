@@ -272,3 +272,40 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 
 }
 
+TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.7;",
+		"Output:Table:Annual,",
+		"Test Report, !- Name",
+		", !- Filter",
+		", !- Schedule Name",
+		"Electricity:Facility, !- Variable or Meter 2 Name",
+		"SumOrAverageDuringHoursShown, !- Aggregation Type for Variable or Meter 2",
+		", !- field Digits After Decimal 2",
+		"Misc Facility Electric Energy, !- Variable or Meter 3 Name",
+		"SumOrAverage, !- Aggregation Type for Variable or Meter 3",
+		"0; !- field Digits After Decimal 3",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	Real64 facilUse;
+	SetupOutputVariable( "Misc Facility Electric Energy [J]", facilUse, "Zone", "Sum", "Lite1", _, "Electricity", "Facility", "General" ); //create an electric meter
+
+	OutputProcessor::NumEnergyMeters = 2;
+	OutputProcessor::EnergyMeters.allocate( OutputProcessor::NumEnergyMeters );
+	OutputProcessor::EnergyMeters( 1 ).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
+	OutputProcessor::EnergyMeters( 2 ).Name = "ELECTRICITY:LIGHTING";
+
+	DataGlobals::DoWeathSim = true;
+
+	OutputReportTabularAnnual::GetInputTabularAnnual( );
+
+	EXPECT_EQ( OutputReportTabularAnnual::annualTables.size( ), 1u );
+
+	std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin( );
+
+	EXPECT_TRUE( firstTable->invalidAggregationOrder( ) );
+
+}

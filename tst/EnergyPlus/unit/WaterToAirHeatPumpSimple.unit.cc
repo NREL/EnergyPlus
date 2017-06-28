@@ -52,7 +52,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>

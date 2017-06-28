@@ -65,7 +65,6 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
@@ -275,9 +274,6 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		std::string const idf_objects = delimited_string( {
 			" Version,8.4;",
@@ -484,19 +480,13 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 		GetReturnAirPathInput();
 		GetAirPathData();
 		ASSERT_EQ( SimAirServingZones::HeatXchngr, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 4 ).CompType_Num );
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 }
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
-	int write_stat;
 	Real64 Qhr_HeatingRateTot( 0.0 );
 	int InletNode( 0 ); // Heat Recovery primary air inlet node number
 	int OutletNode( 0 ); // Heat Recovery primary air outlet node number
-
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 
 	std::string const idf_objects = delimited_string( {
@@ -3818,10 +3808,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	OutletNode = ExchCond( 1 ).SupOutletNode;
 	Qhr_HeatingRateTot = ExchCond( 1 ).SupInMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 	ASSERT_NEAR( Qhr_HeatingRateTot, ExchCond( 1 ).TotHeatingRate, 0.01 );
-
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileSysSizing, flags ); }
 
 }
 

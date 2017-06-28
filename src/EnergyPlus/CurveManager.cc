@@ -5833,6 +5833,42 @@ Label999: ;
 		return CurveOrTableObjectTypeNum;
 	}
 
+	void
+	checkCurveIsNormalizedToOne( 
+		std::string const callingRoutineObj, // calling routine with object type
+		std::string const objectName,        // parent object where curve is used
+		int const curveIndex,                // index to curve object
+		std::string const cFieldName,        // object field name
+		std::string const cFieldValue,       // user input curve name
+		Real64 const Var1,                   // required 1st independent variable
+		Optional <Real64 const > Var2,       // 2nd independent variable
+		Optional< Real64 const > Var3,       // 3rd independent variable
+		Optional< Real64 const > Var4,       // 4th independent variable
+		Optional< Real64 const > Var5        // 5th independent variable
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad
+		//       DATE WRITTEN   May 2017
+
+		// PURPOSE OF THIS FUNCTION:
+		// checks that curve output is within 10% of 1 at curve rating point
+
+		// Locals
+		Real64 CurveVal;
+
+		if ( curveIndex > 0 ) {
+			CurveVal = CurveValue( curveIndex, Var1, Var2, Var3, Var4, Var5 );
+			if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
+				ShowWarningError( callingRoutineObj + "=\"" + objectName + "\" curve values" );
+				ShowContinueError( "... " + cFieldName + " = " + cFieldValue + " output is not equal to 1.0 (+ or - 10%) at rated conditions." );
+				ShowContinueError( "... Curve output at rated conditions = " + General::TrimSigDigits( CurveVal, 3 ) );
+			}
+		}
+
+	}
+
 	//=================================================================================================!
 
 } // CurveManager

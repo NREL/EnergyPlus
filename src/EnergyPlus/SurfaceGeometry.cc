@@ -5978,6 +5978,7 @@ namespace SurfaceGeometry {
 		}
 
 		// test for missing materials for algorithms selected
+<<<<<<< HEAD
 		NumEMPDMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
 		NumPCMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:PhaseChange" ); // needs detailed algo
 		NumVTCMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
@@ -5987,6 +5988,17 @@ namespace SurfaceGeometry {
 		NumHAMTMat4 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Redistribution" );
 		NumHAMTMat5 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Diffusion" );
 		NumHAMTMat6 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity" );
+=======
+		NumEMPDMat = GetNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
+		NumPCMat = GetNumObjectsFound( "MaterialProperty:PhaseChange" ) + GetNumObjectsFound( "MaterialProperty:PhaseChangeHysteresis" );
+		NumVTCMat = GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
+		NumHAMTMat1 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Settings" );
+		NumHAMTMat2 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm" );
+		NumHAMTMat3 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Suction" );
+		NumHAMTMat4 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Redistribution" );
+		NumHAMTMat5 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Diffusion" );
+		NumHAMTMat6 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity" );
+>>>>>>> NREL/develop
 		SumHAMTMat = NumHAMTMat1 + NumHAMTMat2 + NumHAMTMat3 + NumHAMTMat4 + NumHAMTMat5 + NumHAMTMat6;
 		msgneeded = false;
 
@@ -6057,12 +6069,15 @@ namespace SurfaceGeometry {
 			if ( Surface( Item ).Class == SurfaceClass_Detached_B || Surface( Item ).Class == SurfaceClass_Detached_F || Surface( Item ).Class == SurfaceClass_Shading || Surface( Item ).Class == SurfaceClass_Overhang || Surface( Item ).Class == SurfaceClass_Fin ) {
 				Surface( Item ).HeatTransferAlgorithm = HeatTransferModel_None;
 			}
-			if ( Surface( Item ).Class == SurfaceClass_TDD_Diffuser ) {
+			if ( Surface( Item ).Class == SurfaceClass_TDD_Diffuser || Surface( Item ).Class == SurfaceClass_TDD_Dome ) {
 				Surface( Item ).HeatTransferAlgorithm = HeatTransferModel_TDD;
 			}
 
-		}
+			if ( Surface( Item ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( Item ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
+				Construct( Surface( Item ).Construction ).IsUsedCTF = true;
+			}
 
+		}
 	}
 
 	void
@@ -7007,7 +7022,7 @@ namespace SurfaceGeometry {
 			StormWindow( StormWinNum ).DateOff = JulianDay( StormWindow( StormWinNum ).MonthOff, StormWindow( StormWinNum ).DayOfMonthOff, 1 );
 
 			if ( StormWindow( StormWinNum ).DateOn == StormWindow( StormWinNum ).DateOff ) {
-				ShowSevereError( cCurrentModuleObject + ": Date On = Date Off -- not allowed, occured in WindowProperty:StormWindow Input #" + TrimSigDigits( StormWinNum ) );
+				ShowSevereError( cCurrentModuleObject + ": Date On = Date Off -- not allowed, occurred in WindowProperty:StormWindow Input #" + TrimSigDigits( StormWinNum ) );
 				ErrorsFound = true;
 			}
 

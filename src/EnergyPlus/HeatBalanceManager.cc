@@ -100,6 +100,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -490,8 +491,8 @@ namespace HeatBalanceManager {
 		using namespace DataIPShortCuts;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const NumConstrObjects( 5 );
-		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular" } );
+		int const NumConstrObjects( 6 );
+		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular", "EnergyManagementSystem:ConstructionIndexVariable" } );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Unused;
@@ -510,14 +511,29 @@ namespace HeatBalanceManager {
 		for ( ONum = 1; ONum <= NumConstrObjects; ++ONum ) {
 			NumObjects = InputProcessor::GetNumObjectsFound( ConstrObjects( ONum ) );
 			for ( Loop = 1; Loop <= NumObjects; ++Loop ) {
+<<<<<<< HEAD
 				InputProcessor::GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
 				if ( ONum != 5 ) {
 					CNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
 				} else {
 					CNum = InputProcessor::FindItemInList( cAlphaArgs( 4 ), Construct );
+=======
+				GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
+				if ( ONum == 5 ) {
+					CNum = FindItemInList( cAlphaArgs( 4 ), Construct );
+				} else {
+					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+>>>>>>> NREL/develop
 				}
 				if ( CNum == 0 ) continue;
 				Construct( CNum ).IsUsed = true;
+				if ( ONum == 4 || ONum == 6 ) {
+					// GroundHeatExchanger:Surface or EnergyManagementSystem:ConstructionIndexVariable
+					// Include all EMS constructions since they can potentially be used by a CTF surface
+					if ( !Construct( CNum ).TypeIsWindow ) {
+						Construct( CNum ).IsUsedCTF = true;
+					}
+				}
 			}
 		}
 		Unused = TotConstructs - std::count_if( Construct.begin(), Construct.end(), []( DataHeatBalance::ConstructionData const & e ){ return e.IsUsed; } );
@@ -3241,6 +3257,11 @@ namespace HeatBalanceManager {
 				SetupEMSActuator( "Material", Material( MaterNum ).Name, "Surface Property Thermal Absorptance", "[ ]", Material( MaterNum ).AbsorpThermalEMSOverrideOn, Material( MaterNum ).AbsorpThermalEMSOverride );
 				SetupEMSActuator( "Material", Material( MaterNum ).Name, "Surface Property Visible Absorptance", "[ ]", Material( MaterNum ).AbsorpVisibleEMSOverrideOn, Material( MaterNum ).AbsorpVisibleEMSOverride );
 			}
+		}
+
+		// try assigning phase change material properties for each material, won't do anything for non pcm surfaces
+		for ( auto & m : Material ) {
+			m.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory( m.Name );
 		}
 
 	}
