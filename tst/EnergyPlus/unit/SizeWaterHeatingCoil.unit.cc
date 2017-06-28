@@ -556,7 +556,7 @@ namespace EnergyPlus {
 		SizeSys( 1 );
 		SizeWaterCoil( 1 );
 		EXPECT_NEAR( WaterCoil( 1 ).MaxWaterVolFlowRate, .0000850575, 0.000000001 );
-		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 147.71, 0.01 );
+		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 86.167, 0.01 );
 
 		Node.deallocate();
 		ZoneEquipConfig.deallocate();
@@ -792,7 +792,7 @@ namespace EnergyPlus {
 		SizeSys( 1 );
 		SizeWaterCoil( 1 );
 		EXPECT_NEAR( WaterCoil( 1 ).MaxWaterVolFlowRate, .0000850575, 0.000000001 );
-		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 147.71, 0.01 );
+		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 86.167, 0.01 );
 
 		Node.deallocate();
 		ZoneEquipConfig.deallocate();
