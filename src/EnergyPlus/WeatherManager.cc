@@ -7459,7 +7459,10 @@ Label9999: ;
 		// Write Final Ground Reflectance Information to the initialization output file
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, "(' ',A,$)" ) << "Site:GroundReflectance";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I ); gio::write( OutputFileInits );
+		for ( I = 1; I <= 12; ++I ) {
+			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I ); 
+		}
+		gio::write( OutputFileInits );
 
 	}
 
@@ -7541,10 +7544,16 @@ Label9999: ;
 
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundReflectance:Snow";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifier, 1.0 ), 0.0 ); gio::write( OutputFileInits );
+		for ( I = 1; I <= 12; ++I ) {
+			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifier, 1.0 ), 0.0 );
+		}
+		gio::write( OutputFileInits );
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow:Daylighting>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundReflectance:Snow:Daylighting";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifierForDayltg, 1.0 ), 0.0 ); gio::write( OutputFileInits );
+		for ( I = 1; I <= 12; ++I ) {
+			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifierForDayltg, 1.0 ), 0.0 );
+		}
+		gio::write( OutputFileInits );
 
 	}
 
