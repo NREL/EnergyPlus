@@ -5978,9 +5978,8 @@ namespace SurfaceGeometry {
 		}
 
 		// test for missing materials for algorithms selected
-<<<<<<< HEAD
 		NumEMPDMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
-		NumPCMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:PhaseChange" ); // needs detailed algo
+		NumPCMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:PhaseChange" ) + InputProcessor::GetNumObjectsFound( "MaterialProperty:PhaseChangeHysteresis" );
 		NumVTCMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
 		NumHAMTMat1 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Settings" );
 		NumHAMTMat2 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm" );
@@ -5988,17 +5987,6 @@ namespace SurfaceGeometry {
 		NumHAMTMat4 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Redistribution" );
 		NumHAMTMat5 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Diffusion" );
 		NumHAMTMat6 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity" );
-=======
-		NumEMPDMat = GetNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
-		NumPCMat = GetNumObjectsFound( "MaterialProperty:PhaseChange" ) + GetNumObjectsFound( "MaterialProperty:PhaseChangeHysteresis" );
-		NumVTCMat = GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
-		NumHAMTMat1 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Settings" );
-		NumHAMTMat2 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm" );
-		NumHAMTMat3 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Suction" );
-		NumHAMTMat4 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Redistribution" );
-		NumHAMTMat5 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Diffusion" );
-		NumHAMTMat6 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity" );
->>>>>>> NREL/develop
 		SumHAMTMat = NumHAMTMat1 + NumHAMTMat2 + NumHAMTMat3 + NumHAMTMat4 + NumHAMTMat5 + NumHAMTMat6;
 		msgneeded = false;
 

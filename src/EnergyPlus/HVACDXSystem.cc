@@ -549,9 +549,6 @@ namespace HVACDXSystem {
 			} else {
 				if ( InputProcessor::SameString( Alphas( 11 ), "Yes" ) ) {
 					DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = true;
-<<<<<<< HEAD
-				} else if ( InputProcessor::SameString( Alphas( 11 ), "" ) ) {
-=======
 					if ( DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
 						ShowWarningError( CurrentModuleObject + " = " + DXCoolingSystem( DXCoolSysNum ).Name );
 						ShowContinueError( "Invalid entry for " + cAlphaFields( 11 ) + " :" + Alphas( 11 ) );
@@ -559,8 +556,7 @@ namespace HVACDXSystem {
 						ShowContinueError( "Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues." );
 						DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = false;
 					}
-				} else if ( SameString( Alphas( 11 ), "" ) ) {
->>>>>>> NREL/develop
+				} else if ( InputProcessor::SameString( Alphas( 11 ), "" ) ) {
 					DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = false;
 				} else if ( InputProcessor::SameString( Alphas( 11 ), "No" ) ) {
 					DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = false;

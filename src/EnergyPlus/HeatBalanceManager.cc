@@ -511,19 +511,11 @@ namespace HeatBalanceManager {
 		for ( ONum = 1; ONum <= NumConstrObjects; ++ONum ) {
 			NumObjects = InputProcessor::GetNumObjectsFound( ConstrObjects( ONum ) );
 			for ( Loop = 1; Loop <= NumObjects; ++Loop ) {
-<<<<<<< HEAD
 				InputProcessor::GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
-				if ( ONum != 5 ) {
-					CNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
-				} else {
-					CNum = InputProcessor::FindItemInList( cAlphaArgs( 4 ), Construct );
-=======
-				GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
 				if ( ONum == 5 ) {
-					CNum = FindItemInList( cAlphaArgs( 4 ), Construct );
+					CNum = InputProcessor::FindItemInList( cAlphaArgs( 4 ), Construct );
 				} else {
-					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
->>>>>>> NREL/develop
+					CNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
 				}
 				if ( CNum == 0 ) continue;
 				Construct( CNum ).IsUsed = true;

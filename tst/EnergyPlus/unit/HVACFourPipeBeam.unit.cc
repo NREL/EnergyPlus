@@ -1660,13 +1660,12 @@ namespace EnergyPlus {
 		DataLoopNode::Node( 40 ).HumRat = 0.008; // zone node
 		DataLoopNode::Node( 40 ).Temp = 24.0; // zone node
 		DataLoopNode::Node( 44 ).HumRat = 0.008; // primary air inlet node
-<<<<<<< HEAD
-		DataLoopNode::Node( 44 ).Temp = 12.8; // primare air inlet node
-		DataLoopNode::Node( 26 ).Temp = 45.0; // hot water inlet node
-=======
+
 		DataLoopNode::Node( 44 ).Temp = 12.8; // primary air inlet node
-		DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
->>>>>>> NREL/develop
+		DataLoopNode::Node( 26 ).Temp = 45.0; // hot water inlet node
+		// DataLoopNode::Node( 44 ).Temp = 12.8; // primary air inlet node
+		// DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
+
 		Real64 NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate( FirstHVACIteration, NonAirSysOutput );
 
@@ -1709,17 +1708,14 @@ namespace EnergyPlus {
 		NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate( FirstHVACIteration, NonAirSysOutput );
 
-<<<<<<< HEAD
 		EXPECT_NEAR( DataLoopNode::Node( 17 ).Temp, 18.027306264618733, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 17 ).MassFlowRate, 0.25614844309380103, 0.00001);
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 27 ).Temp, 45.0 );
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 27 ).MassFlowRate, 0.0 );
-=======
-		EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 18.027306264618733, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
->>>>>>> NREL/develop
+		// EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 18.027306264618733, 0.00001 );
+		// EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001 );
+		// EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
+		// EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
 		EXPECT_NEAR( NonAirSysOutput, -4318.4346465170929, 0.0001 );
 
@@ -1733,17 +1729,14 @@ namespace EnergyPlus {
 		NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate( FirstHVACIteration, NonAirSysOutput );
 
-<<<<<<< HEAD
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 17 ).Temp, 14.0);
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 17 ).MassFlowRate, 0.0);
 		EXPECT_NEAR( DataLoopNode::Node( 27 ).Temp, 33.836239364981424, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 27 ).MassFlowRate, 0.10040605035467959, 0.00001 );
-=======
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
-		EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
->>>>>>> NREL/develop
+		// EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
+		// EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
+		// EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );
+		// EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
 
 		EXPECT_NEAR( NonAirSysOutput, 4685.4000901131676, 0.0001 );
 	}
@@ -1942,7 +1935,7 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190;                     !- Elevation {m}",
 
-			"! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C",
+			"! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6?C",
 
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO Ann Htg 99.6% Condns DB,  !- Name",
@@ -1972,7 +1965,7 @@ namespace EnergyPlus {
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance ( taud ) {dimensionless}",
 			"    0.00;                    !- Sky Clearness",
 
-			"! CHICAGO_IL_USA Annual Cooling ( WB=>MDB ) .4%, MDB=31.2°C WB=25.5°C",
+			"! CHICAGO_IL_USA Annual Cooling ( WB=>MDB ) .4%, MDB=31.2?C WB=25.5?C",
 
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",

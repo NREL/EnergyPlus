@@ -4780,9 +4780,6 @@ namespace HVACUnitarySystem {
 			} else {
 				if ( InputProcessor::SameString( Alphas( iDOASDXCoilAlphaNum ), "Yes" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = true;
-<<<<<<< HEAD
-				} else if ( InputProcessor::SameString( Alphas( iDOASDXCoilAlphaNum ), "" ) ) {
-=======
 					if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
 						ShowWarningError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Invalid entry for " + cAlphaFields( iDOASDXCoilAlphaNum ) + " :" + Alphas( iDOASDXCoilAlphaNum ) );
@@ -4790,8 +4787,7 @@ namespace HVACUnitarySystem {
 						ShowContinueError( "Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues." );
 						UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
 					}
-				} else if ( SameString( Alphas( iDOASDXCoilAlphaNum ), "" ) ) {
->>>>>>> NREL/develop
+				} else if ( InputProcessor::SameString( Alphas( iDOASDXCoilAlphaNum ), "" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
 				} else if ( InputProcessor::SameString( Alphas( iDOASDXCoilAlphaNum ), "No" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;

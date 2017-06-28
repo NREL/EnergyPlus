@@ -1493,7 +1493,7 @@ namespace OutputReportTabular {
 				ShowSevereError( "The Output:Table:Monthly report named=\"" + MonthlyInput( iInput ).name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
 				foundError = true;
 			}
-		}	
+		}
 		return foundError;
 	}
 
@@ -2010,19 +2010,15 @@ namespace OutputReportTabular {
 					displayZoneComponentLoadSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-<<<<<<< HEAD
-				} else if ( InputProcessor::SameString( AlphArray( iReport ), "LEEDSummary" ) ) {
-=======
-				} else if ( SameString( AlphArray( iReport ), "AirLoopComponentLoadSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AirLoopComponentLoadSummary" ) ) {
 					displayAirLoopComponentLoadSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "FacilityComponentLoadSummary" ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "FacilityComponentLoadSummary" ) ) {
 					displayFacilityComponentLoadSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "LEEDSummary" ) ) {
->>>>>>> NREL/develop
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "LEEDSummary" ) ) {
 					displayLEEDSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
@@ -2087,13 +2083,9 @@ namespace OutputReportTabular {
 					}
 					//the sizing period reports
 					displayZoneComponentLoadSummary = true;
-<<<<<<< HEAD
-				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllMonthly" ) ) {
-=======
 					displayAirLoopComponentLoadSummary = true;
 					displayFacilityComponentLoadSummary = true;
-				} else if ( SameString( AlphArray( iReport ), "AllMonthly" ) ) {
->>>>>>> NREL/develop
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllMonthly" ) ) {
 					WriteTabularFiles = true;
 					for ( jReport = 1; jReport <= numNamedMonthly; ++jReport ) {
 						namedMonthly( jReport ).show = true;
@@ -2392,17 +2384,13 @@ namespace OutputReportTabular {
 				if ( InputProcessor::SameString( AlphArray( iReport ), "ZoneComponentLoadSummary" ) ) {
 					isFound = true;
 				}
-<<<<<<< HEAD
+				if ( InputProcessor::SameString( AlphArray( iReport ), "AirLoopComponentLoadSummary" ) ) {
+					isFound = true;
+				}
+				if ( InputProcessor::SameString( AlphArray( iReport ), "FacilityComponentLoadSummary" ) ) {
+					isFound = true;
+				}
 				if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummaryAndSizingPeriod" ) ) {
-=======
-				if ( SameString( AlphArray( iReport ), "AirLoopComponentLoadSummary" ) ) {
-					isFound = true;
-				}
-				if ( SameString( AlphArray( iReport ), "FacilityComponentLoadSummary" ) ) {
-					isFound = true;
-				}
-				if ( SameString( AlphArray( iReport ), "AllSummaryAndSizingPeriod" ) ) {
->>>>>>> NREL/develop
 					isFound = true;
 				}
 				if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummaryMonthlyAndSizingPeriod" ) ) {
@@ -11665,25 +11653,25 @@ namespace OutputReportTabular {
 		surfDelaySeqCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
 		surfDelaySeqCool = 0.0;
 
-		Array1D< CompLoadTablesType > ZoneHeatCompLoadTables; // for zone level component load summary output tables 
-		Array1D< CompLoadTablesType > ZoneCoolCompLoadTables;  
+		Array1D< CompLoadTablesType > ZoneHeatCompLoadTables; // for zone level component load summary output tables
+		Array1D< CompLoadTablesType > ZoneCoolCompLoadTables;
 
-		Array1D< CompLoadTablesType > AirLoopHeatCompLoadTables; // for airloop level component load summary output tables 
-		Array1D< CompLoadTablesType > AirLoopCoolCompLoadTables;  
+		Array1D< CompLoadTablesType > AirLoopHeatCompLoadTables; // for airloop level component load summary output tables
+		Array1D< CompLoadTablesType > AirLoopCoolCompLoadTables;
 		Array1D< CompLoadTablesType > AirLoopZonesHeatCompLoadTables; // zone results used for airloop report - never directly output
-		Array1D< CompLoadTablesType > AirLoopZonesCoolCompLoadTables; 
+		Array1D< CompLoadTablesType > AirLoopZonesCoolCompLoadTables;
 
-		CompLoadTablesType FacilityHeatCompLoadTables; // for facility level component load summary output tables 
-		CompLoadTablesType FacilityCoolCompLoadTables;  
+		CompLoadTablesType FacilityHeatCompLoadTables; // for facility level component load summary output tables
+		CompLoadTablesType FacilityCoolCompLoadTables;
 		Array1D< CompLoadTablesType > FacilityZonesHeatCompLoadTables; // zone results used for facility report - never directly output
-		Array1D< CompLoadTablesType > FacilityZonesCoolCompLoadTables; 
+		Array1D< CompLoadTablesType > FacilityZonesCoolCompLoadTables;
 
 		CompLoadTablesType curCompLoadTable; // active component load table
 
 
 		// initialize arrays
 		if ( displayZoneComponentLoadSummary ) {
-			ZoneHeatCompLoadTables.allocate( NumOfZones );  
+			ZoneHeatCompLoadTables.allocate( NumOfZones );
 			for ( auto & e : ZoneHeatCompLoadTables ) {
 				e.cells.allocate( cPerArea, rGrdTot );
 				e.cells = 0.;
@@ -11705,7 +11693,7 @@ namespace OutputReportTabular {
 				e.cells = 0.;
 				e.cellUsed.allocate( cPerArea, rGrdTot );
 				e.cellUsed = false;
-				e.zoneIndices.allocate( NumOfZones ); // only need to allocate this for the AirLoop 
+				e.zoneIndices.allocate( NumOfZones ); // only need to allocate this for the AirLoop
 				e.zoneIndices = 0;
 			}
 			AirLoopCoolCompLoadTables.allocate( NumPrimaryAirSys );
@@ -11714,7 +11702,7 @@ namespace OutputReportTabular {
 				e.cells = 0.;
 				e.cellUsed.allocate( cPerArea, rGrdTot );
 				e.cellUsed = false;
-				e.zoneIndices.allocate( NumOfZones ); // only need to allocate this for the AirLoop 
+				e.zoneIndices.allocate( NumOfZones ); // only need to allocate this for the AirLoop
 				e.zoneIndices = 0;
 			}
 			AirLoopZonesHeatCompLoadTables.allocate( NumOfZones );
@@ -11759,8 +11747,8 @@ namespace OutputReportTabular {
 			}
 		}
 
-		// get the zone areas needed later 
-		Array1D< ZompComponentAreasType > ZoneComponentAreas; 
+		// get the zone areas needed later
+		Array1D< ZompComponentAreasType > ZoneComponentAreas;
 		ZoneComponentAreas.allocate( NumOfZones );
 		GetZoneComponentAreas(ZoneComponentAreas);
 
@@ -11865,7 +11853,7 @@ namespace OutputReportTabular {
 				} else {
 					coolDesSelected = AirLoopZonesCoolCompLoadTables( iZone ).desDayNum;
 					timeCoolMax = AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax;
-					
+
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( AirLoopZonesCoolCompLoadTables( iZone ).cells, AirLoopZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					CollectPeakZoneConditions( AirLoopZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
@@ -12148,11 +12136,11 @@ namespace OutputReportTabular {
 		return AvgData( maxTimeStep );
 	}
 
-	// set the load summary table cells based on the load sequences using moving averages to smooth out 
+	// set the load summary table cells based on the load sequences using moving averages to smooth out
 	void
 	ComputeTableBodyUsingMovingAvg(
-		Array2D < Real64 > & resultCells, 
-		Array2D_bool & resCellsUsd, 
+		Array2D < Real64 > & resultCells,
+		Array2D_bool & resCellsUsd,
 		int const & desDaySelected,
 		int const & timeOfMax,
 		int const & zoneIndex,
@@ -12348,7 +12336,7 @@ namespace OutputReportTabular {
 
 	// for the load summary report add values the peak conditions subtable
 	void
-	CollectPeakZoneConditions( 
+	CollectPeakZoneConditions(
 		CompLoadTablesType & compLoad,
 		int const & timeOfMax,
 		int const & zoneIndex,
@@ -12373,7 +12361,7 @@ namespace OutputReportTabular {
 			if ( isCooling ) {
 				//Time of Peak Load
 				compLoad.peakDateHrMin = CoolPeakDateHrMin( zoneIndex );
-				
+
 				//Outside  Dry Bulb Temperature
 				compLoad.outsideDryBulb = CalcFinalZoneSizing( zoneIndex ).CoolOutTempSeq( timeOfMax );
 
@@ -12503,7 +12491,7 @@ namespace OutputReportTabular {
 		CompLoadTablesType & compLoad,
 		int const & airLoopIndex,
 		bool const & isCooling
-	) 
+	)
 	{
 		using DataSizing::FinalSysSizing;
 		using DataSizing::CalcSysSizing;
@@ -12527,7 +12515,7 @@ namespace OutputReportTabular {
 
 	}
 
-	void 
+	void
 	ComputeEngineeringChecks(
 		CompLoadTablesType & compLoad
 	)
@@ -12561,7 +12549,7 @@ namespace OutputReportTabular {
 	)
 	{
 		using namespace DataSurfaces;
-		
+
 		for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
 			areas(iZone).floor = Zone(iZone).FloorArea;
 		}
@@ -12676,7 +12664,7 @@ namespace OutputReportTabular {
 
 	// Used for the AirLoop and Facility level load component tables to sum the results from invidual zones
 	void
-	CombineLoadCompResults( 
+	CombineLoadCompResults(
 		CompLoadTablesType & compLoadTotal,
 		CompLoadTablesType const & compLoadPartial,
 		Real64 const & multiplier
@@ -12691,17 +12679,17 @@ namespace OutputReportTabular {
 		}
 
 		// take the partial value for these
-		compLoadTotal.desDayNum = compLoadPartial.desDayNum; 
-		compLoadTotal.timeStepMax = compLoadPartial.timeStepMax; 
-		compLoadTotal.peakDateHrMin = compLoadPartial.peakDateHrMin; 
-		compLoadTotal.outsideDryBulb = compLoadPartial.outsideDryBulb; 
-		compLoadTotal.outsideWebBulb = compLoadPartial.outsideWebBulb; 
+		compLoadTotal.desDayNum = compLoadPartial.desDayNum;
+		compLoadTotal.timeStepMax = compLoadPartial.timeStepMax;
+		compLoadTotal.peakDateHrMin = compLoadPartial.peakDateHrMin;
+		compLoadTotal.outsideDryBulb = compLoadPartial.outsideDryBulb;
+		compLoadTotal.outsideWebBulb = compLoadPartial.outsideWebBulb;
 		compLoadTotal.outsideHumRatio = compLoadPartial.outsideHumRatio;
 		compLoadTotal.zoneDryBulb = compLoadPartial.zoneDryBulb;
 		compLoadTotal.zoneRelHum = compLoadPartial.zoneRelHum;
 		compLoadTotal.zoneHumRatio = compLoadPartial.zoneHumRatio;
 
-		// sum the peak related values  
+		// sum the peak related values
 		compLoadTotal.designPeakLoad += compLoadPartial.designPeakLoad * multiplier;
 		compLoadTotal.diffDesignPeak += compLoadPartial.diffDesignPeak * multiplier;
 		compLoadTotal.peakDesSensLoad += compLoadPartial.peakDesSensLoad * multiplier;
@@ -12763,7 +12751,7 @@ namespace OutputReportTabular {
 	void
 	ComputePeakDifference(
 		CompLoadTablesType & compLoad
-	) 
+	)
 	{
 		//Estimated Instant + Delayed Sensible Load
 		compLoad.estInstDelSensLoad = compLoad.cells( cSensInst, rGrdTot ) + compLoad.cells( cSensDelay, rGrdTot );
@@ -12785,7 +12773,7 @@ namespace OutputReportTabular {
 	)
 	{
 		if ( unitsStyle == unitsStyleInchPound ) {
-			Real64 powerConversion = getSpecificUnitMultiplier( "W", "Btu/h" ); 
+			Real64 powerConversion = getSpecificUnitMultiplier( "W", "Btu/h" );
 			Real64 areaConversion = getSpecificUnitMultiplier("m2", "ft2");
 			Real64 powerPerAreaConversion = getSpecificUnitMultiplier("W/m2", "Btu/h-ft2");
 			Real64 airFlowConversion = getSpecificUnitMultiplier( "m3/s", "ft3/min" );
@@ -12832,17 +12820,17 @@ namespace OutputReportTabular {
 				compLoadTotal.totCapPerArea = compLoadTotal.totCapPerArea * powerConversion / areaConversion;
 			}
 			compLoadTotal.chlPumpPerFlow *= powerPerFlowLiquidConversion;
-			compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion; 
+			compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion;
 
 		}
 	}
 
-	// make a list of the zones for the airloop component loads report 
+	// make a list of the zones for the airloop component loads report
 	void
 	CreateListOfZonesForAirLoop(
 		CompLoadTablesType  & compLoad,
 		Array1D_int const & zoneToAirLoop,
-		int const & curAirLoop 
+		int const & curAirLoop
 	)
 	{
 		int counter = 0;
@@ -13002,7 +12990,7 @@ namespace OutputReportTabular {
 					rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
 
 					rowHead( 8 ) = "Supply Air Temperature [C]";
-					rowHead( 9 ) = "Mixed Air Temperature [C]";  
+					rowHead( 9 ) = "Mixed Air Temperature [C]";
 					rowHead( 10 ) = "Main Fan Air Flow [m3/s]";
 					rowHead( 11 ) = "Outside Air Flow [m3/s]";
 					rowHead( 12 ) = "Peak Sensible Load with Sizing Factor [W]";

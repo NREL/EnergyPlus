@@ -11915,10 +11915,7 @@ Label50: ;
 		using DataAirSystems::PrimaryAirSystem;
 		using DataHVACGlobals::NumPrimaryAirSys;
 
-<<<<<<< HEAD
-=======
 		// SUBROUTINE PARAMETER DEFINITIONS:
->>>>>>> NREL/develop
 		int const DXSystem( 14 ); // must match SimAirServingZones.cc (not public)
 		int const UnitarySystem( 19 ); // must match SimAirServingZones.cc (not public)
 
@@ -12132,17 +12129,12 @@ Label50: ;
 		// This subroutine sets an index for a given DX Coil -- issues error message if that
 		// DX Coil is not a legal DX Coil.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		if ( GetCoilsInputFlag ) {
 			GetDXCoils();
 			GetCoilsInputFlag = false;
 		}
 
-		DXCoilIndex = FindItemInList( DXCoilName, DXCoil );
+		DXCoilIndex = InputProcessor::FindItemInList( DXCoilName, DXCoil );
 		if ( DXCoilIndex == 0 ) {
 			if ( present( SuppressWarning ) ) {
 				//     No warning printed if only searching for the existence of a DX Coil
@@ -12175,19 +12167,11 @@ Label50: ;
 		// This subroutine gets a name for a given DX Coil -- issues error message if that
 		// DX Coil is not a legal DX Coil.
 
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		if ( GetCoilsInputFlag ) {
 			GetDXCoils();
 			GetCoilsInputFlag = false;
 		}
 
-<<<<<<< HEAD
-		DXCoilIndex = InputProcessor::FindItemInList( DXCoilName, DXCoil );
-=======
->>>>>>> NREL/develop
 		if ( DXCoilIndex == 0 ) {
 			if ( present( SuppressWarning ) ) {
 				//     No warning printed if only searching for the existence of a DX Coil
@@ -12226,13 +12210,6 @@ Label50: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
->>>>>>> NREL/develop
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
 
@@ -12297,13 +12274,6 @@ Label50: ;
 		// incorrect coil index or type is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
->>>>>>> NREL/develop
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
 
@@ -12357,12 +12327,6 @@ Label50: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		int TypeNum; // returned integerized type of matched coil
 
@@ -12414,13 +12378,6 @@ Label50: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 		// as negative.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
->>>>>>> NREL/develop
 		// Return value
 		Real64 MinOAT; // returned min oa temperature of matched coil
 
@@ -12470,12 +12427,6 @@ Label50: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		int NodeNumber; // returned node number of matched coil
 
@@ -12518,12 +12469,6 @@ Label50: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		int NodeNumber; // returned node number of matched coil
 
@@ -12565,12 +12510,6 @@ Label50: ;
 		// This function looks up the given coil and returns the condenser inlet node.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		int CondNode; // returned condenser node number of matched coil
 
@@ -12613,12 +12552,6 @@ Label50: ;
 		// Bypassed air flow fraction can only be greater than 0 for multimode DX cooling coils and is typical for 1st stage
 		// If incorrect coil type or name is given, ErrorsFound is returned as true.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		Real64 BypassFraction; // returned bypass air fraction of matched coil
 
@@ -12749,12 +12682,6 @@ Label50: ;
 		// This function looks up the given coil and returns the number of speeds for multispeed coils.
 		// If incorrect coil type or name is given, ErrorsFound is returned as true.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		int NumberOfSpeeds; // returned the number of speed of matched coil
 
@@ -12798,12 +12725,6 @@ Label50: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and schedule index is returned
 		// as -1.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		int SchPtr; // returned availabiltiy schedule of matched coil
 
@@ -12860,12 +12781,6 @@ Label50: ;
 		// incorrect coil type or name is given, ErrorsFound is returned as true and schedule index is returned
 		// as -1.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		Real64 AirFlow; // returned coil air flow rate
 
@@ -12916,12 +12831,6 @@ Label50: ;
 		// incorrect coil index is given, ErrorsFound is returned as true and schedule index is returned
 		// as -1.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// Return value
 		int CapFTCurveIndex; // returned coil CapFT curve index
 
@@ -13118,12 +13027,6 @@ Label50: ;
 		// METHODOLOGY EMPLOYED:
 		// set value of logical flag FindCompanionUpStreamCoil to true
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
 
@@ -13157,12 +13060,6 @@ Label50: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// inform the child DX coil what the name of its parent is.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
 
@@ -13258,12 +13155,6 @@ Label50: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// inform the child DX coil if the DX cooling coil is for 100% DOAS application.
 
-<<<<<<< HEAD
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
->>>>>>> NREL/develop
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
 
