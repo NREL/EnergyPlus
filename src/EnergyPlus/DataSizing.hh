@@ -290,6 +290,8 @@ namespace DataSizing {
 	extern bool HRFlowSizingFlag; // True, if it is a heat recovery heat exchanger flow sizing
 	extern Real64 DataWaterCoilSizCoolDeltaT; // used for sizing cooling coil water design flow rate
 	extern Real64 DataWaterCoilSizHeatDeltaT; // used for sizing heating coil water design flow rate
+	extern bool DataNomCapInpMeth; // True if heating coil is sized by CoilPerfInpMeth == NomCap
+
 	// Types
 
 	struct ZoneSizingInputData
