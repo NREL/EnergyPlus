@@ -265,23 +265,23 @@ namespace EnergyPlus {
 		General::SolveRoot( ErrorToler, MaxIte, SolFla, Frac, Residual, 0.0, 1.0 );
 		EXPECT_EQ( -1, SolFla );
 
-		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::eRegulaFalsiThenBisection;
+		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
 		HVACSystemRootFinding.NumOfIter = 10;
 		General::SolveRoot( ErrorToler, MaxIte, SolFla, Frac, Residual, 0.0, 1.0 );
 		EXPECT_EQ( 28, SolFla );
 		EXPECT_NEAR( 0.041420287, Frac, ErrorToler );
 
-		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisection;
+		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
 		General::SolveRoot( ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0 );
 		EXPECT_EQ( 17, SolFla );
 		EXPECT_NEAR( 0.041420287, Frac, ErrorToler );
 
-		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::eBisectionThenRegulaFalsi;
+		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
 		General::SolveRoot( ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0 );
 		EXPECT_EQ( 12, SolFla );
 		EXPECT_NEAR( 0.041420287, Frac, ErrorToler );
 
-		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::eAlternation;
+		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation;
 		HVACSystemRootFinding.NumOfIter = 3;
 		General::SolveRoot( ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0 );
 		EXPECT_EQ( 15, SolFla );
