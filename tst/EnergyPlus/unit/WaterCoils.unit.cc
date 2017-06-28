@@ -458,7 +458,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
 
 	// check coil UA-value sizing
-	EXPECT_NEAR( 1435.00, WaterCoil( CoilNum ).UACoil, 0.01 );
+	EXPECT_NEAR( 1439.30, WaterCoil( CoilNum ).UACoil, 0.01 );
 
 	// test single zone VAV reheat coil sizing
 	CurZoneEqNum = 1;
@@ -615,7 +615,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
 
 	// check coil UA-value sizing
-	EXPECT_NEAR( 1435.00, WaterCoil( CoilNum ).UACoil, 0.01 );
+	EXPECT_NEAR( 1439.30, WaterCoil( CoilNum ).UACoil, 0.01 );
 
 	// test single zone VAV reheat coil sizing
 	CurZoneEqNum = 1;
@@ -777,7 +777,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp )
 	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
 
 	// check coil UA-value sizing for low design loop exit temp
-	EXPECT_NEAR( 2479.27, WaterCoil( CoilNum ).UACoil, 0.01 );
+	EXPECT_NEAR( 2491.37, WaterCoil( CoilNum ).UACoil, 0.01 );
 
 	Real64 DesCoilInletWaterTempUsed = 0.0;
 	Real64 DataFanOpMode = ContFanCycCoil;

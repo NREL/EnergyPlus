@@ -1260,7 +1260,12 @@ namespace ReportSizingManager {
 							ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DataFlowUsedForSizing, 6 ) + " kg/s" );
 							// TotWaterHeatingCoilRate is set in CALL to CalcSimpleHeatingCoil
 							ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( DataDesignCoilCapacity, 3 ) + " W" );
-							if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
+							if ( DataNomCapInpMeth ) {
+								ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
+								ShowContinueError( "  Coil outlet air temperature    = " + TrimSigDigits( DataDesOutletAirTemp, 3 ) + " C" );
+								ShowContinueError( "  Coil outlet air humidity ratio = " + TrimSigDigits( DataDesOutletAirHumRat, 3 ) + " kgWater/kgDryAir" );
+							}
+							else if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
 								ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
 							} else {
 								ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
@@ -1278,7 +1283,12 @@ namespace ReportSizingManager {
 							ShowContinueError( "  Coil inlet air humidity ratio  = " + TrimSigDigits( DataDesInletAirHumRat, 3 ) + " kgWater/kgDryAir" );
 							ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DataFlowUsedForSizing, 6 ) + " kg/s" );
 							ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( DataDesignCoilCapacity, 3 ) + " W" );
-							if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
+							if ( DataNomCapInpMeth ) {
+								ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
+								ShowContinueError( "  Coil outlet air temperature    = " + TrimSigDigits( DataDesOutletAirTemp, 3 ) + " C" );
+								ShowContinueError( "  Coil outlet air humidity ratio = " + TrimSigDigits( DataDesOutletAirHumRat, 3 ) + " kgWater/kgDryAir" );
+							}
+							else if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
 								ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
 							} else {
 								ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
@@ -2062,6 +2072,10 @@ namespace ReportSizingManager {
 							ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DataFlowUsedForSizing, 6 ) + " kg/s" );
 							ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( DataDesignCoilCapacity, 3 ) + " W" );
 							ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
+							if ( DataNomCapInpMeth ) {
+								ShowContinueError( "  Coil outlet air temperature    = " + TrimSigDigits( DataDesOutletAirTemp, 3 ) + " C" );
+								ShowContinueError( "  Coil outlet air humidity ratio = " + TrimSigDigits( DataDesOutletAirHumRat, 3 ) + " kgWater/kgDryAir" );
+							}
 							DataErrorsFound = true;
 						} else if ( SolFla == -2 ) {
 							ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"" );
@@ -2074,7 +2088,11 @@ namespace ReportSizingManager {
 							ShowContinueError( "  Coil inlet air mass flow rate  = " + TrimSigDigits( DataFlowUsedForSizing, 6 ) + " kg/s" );
 							ShowContinueError( "  Design Coil Capacity           = " + TrimSigDigits( DataDesignCoilCapacity, 3 ) + " W" );
 							ShowContinueError( "  Design Coil Load               = " + TrimSigDigits( DataCapacityUsedForSizing, 3 ) + " W" );
-							if ( DataDesignCoilCapacity < DataCapacityUsedForSizing ) {
+							if ( DataNomCapInpMeth ) {
+								ShowContinueError( "  Coil outlet air temperature    = " + TrimSigDigits( DataDesOutletAirTemp, 3 ) + " C" );
+								ShowContinueError( "  Coil outlet air humidity ratio = " + TrimSigDigits( DataDesOutletAirHumRat, 3 ) + " kgWater/kgDryAir" );
+							}
+							if ( DataDesignCoilCapacity < DataCapacityUsedForSizing && !DataNomCapInpMeth ) {
 								ShowContinueError( "  Inadequate water side capacity: in Plant Sizing for this hot water loop" );
 								ShowContinueError( "  increase design loop exit temperature and/or decrease design loop delta T" );
 								ShowContinueError( "  Plant Sizing object = " + PlantSizData( DataPltSizHeatNum ).PlantLoopName );
