@@ -671,7 +671,7 @@ namespace DataSurfaces {
 		bool MovInsulIntPresentPrevTS; // True when movable insulation was present during the previous time step
 		// Vertices
 		//Array1D< Vector > Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
-        Array1D< Vector > NewVertex;
+		Array1D< Vector > NewVertex;
 		Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
 		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
 		Vector lcsx;
