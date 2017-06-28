@@ -288,6 +288,7 @@ namespace DataSizing {
 	bool HRFlowSizingFlag( false ); // True, if it is a heat recovery heat exchanger flow sizing
 	Real64 DataWaterCoilSizCoolDeltaT( 0.0 ); // used for sizing cooling coil water design flow rate
 	Real64 DataWaterCoilSizHeatDeltaT( 0.0 ); // used for sizing heating coil water design flow rate
+	bool DataNomCapInpMeth( false ); // True if heating coil is sized by CoilPerfInpMeth == NomCa
 
 	// Object Data
 	Array1D< OARequirementsData > OARequirements;
@@ -425,6 +426,7 @@ namespace DataSizing {
 		DataDesicRegCoil = false;
 		DataWaterCoilSizCoolDeltaT = 0.0;
 		DataWaterCoilSizHeatDeltaT = 0.0;
+		DataNomCapInpMeth = false;
 	}
 
 } // DataSizing
