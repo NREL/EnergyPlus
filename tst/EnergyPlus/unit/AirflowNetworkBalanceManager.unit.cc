@@ -4374,13 +4374,13 @@ namespace EnergyPlus {
 		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 0.001, 101000, 1, 2, 0.1 ), 10, tol );
 
 		//// Calculate convection resistance from correlation
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 0.001, 101000, 0.1, 2, 0 ), 3.977, tol );
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 0.001, 101000, 1.0, 2, 0 ), 39.77, tol );
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 0.001, 101000, 1.5, 2, 0 ), 59.66, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 0.001, 101000, 0.1, 2, 0 ), 0.2297, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 0.001, 101000, 1.0, 2, 0 ), 0.4093, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 20, 10, 0.001, 101000, 1.5, 2, 0 ), 0.4531, tol );
 
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 0.001, 101000, 0.1, 2, 0 ), 4.099, tol );
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 0.001, 101000, 1.0, 2, 0 ), 40.99, tol );
-		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 0.001, 101000, 1.5, 2, 0 ), 61.49, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 0.001, 101000, 0.1, 2, 0 ), 0.2368, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 0.001, 101000, 1.0, 2, 0 ), 0.4218, tol );
+		EXPECT_NEAR( CalcDuctOutsideConvResist( 10, 20, 0.001, 101000, 1.5, 2, 0 ), 0.4670, tol );
 
 		// Calculate convection resistance given a convection coefficient
 		EXPECT_NEAR( CalcDuctInsideConvResist( 20, 0.1, 1, 5 ), 0.2, tol );

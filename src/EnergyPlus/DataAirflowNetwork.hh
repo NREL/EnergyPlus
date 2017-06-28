@@ -1389,17 +1389,15 @@ namespace DataAirflowNetwork {
 		Real64 DuctEmittance;
 		Array1D< LinkageSurfaceProp > LinkageSurfaceData;
 		int ObjectNum;
-		Real64 UThermalRad;
 		Real64 QRad;
-		Real64 TSurr;
+		Real64 QConv;
 
 		AirflowNetworkLinkageViewFactorProp() :
 			DuctExposureFraction( 0.0 ),
 			DuctEmittance( 0.0 ),
 			ObjectNum( 0 ),
-			UThermalRad( 0.0 ),
 			QRad( 0.0 ),
-			TSurr( 0.0 )
+			QConv( 0.0 )
 		{}
 	};
 

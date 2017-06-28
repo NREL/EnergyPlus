@@ -2671,7 +2671,7 @@ namespace WeatherManager {
 					BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 					gio::write( ErrOut, fmtLD ) << ReadStatus;
 					strip( ErrOut );
-					ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+					ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 				}
 				if ( CurDayOfWeek <= 7 ) {
 					CurDayOfWeek = mod( CurDayOfWeek, 7 ) + 1;
@@ -2709,7 +2709,7 @@ namespace WeatherManager {
 						if ( ReadStatus != 0 ) {
 							gio::read( WeatherDataLine, fmtLD ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-							ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+							ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 						}
 					}
 					for ( Item = 1; Item <= 23 * NumIntervalsPerHour; ++Item ) {
@@ -2717,7 +2717,7 @@ namespace WeatherManager {
 						if ( ReadStatus != 0 ) {
 							gio::read( WeatherDataLine, fmtLD ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-							ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+							ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 						}
 					}
 				}

@@ -4577,7 +4577,7 @@ namespace OutputReportTabular {
 					// check if current value is greater than existing peak demand value
 					if ( curDemandValue > gatherDemandTotal( iResource ) ) {
 						gatherDemandTotal( iResource ) = curDemandValue;
-						// save the time that the peak demand occured
+						// save the time that the peak demand occurred
 						//        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
 						minuteCalculated = DetermineMinuteForReporting( IndexTypeKey );
 						EncodeMonDayHrMin( timestepTimeStamp, Month, DayOfMonth, HourOfDay, minuteCalculated );
@@ -9441,7 +9441,7 @@ namespace OutputReportTabular {
 		using ExteriorEnergyUse::NumExteriorLights;
 		using General::SafeDivide;
 		using General::RoundSigDigits;
-		using namespace DataGlobals; 
+		using namespace DataGlobals;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9970,7 +9970,7 @@ namespace OutputReportTabular {
 					}
 					tableBody( 2, iZone ) = RealToStr( Zone( iZone ).ZoneVolCapMultpSensHMAverage, 2 );
 				}
-				
+
 				WriteSubtitle( "Hybrid Model: Internal Thermal Mass" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {
@@ -11307,7 +11307,7 @@ namespace OutputReportTabular {
 			if ( ZoneNum == 0 ) continue;
 			if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
 			CoolDesSelected = CalcFinalZoneSizing( ZoneNum ).CoolDDNum;
-			//loop over timesteps after pulse occured
+			//loop over timesteps after pulse occurred
 			if ( CoolDesSelected != 0 ) {
 				TimeOfPulse = radiantPulseTimestep( CoolDesSelected, ZoneNum );
 				// if the CoolDesSelected time is on a different day than
