@@ -584,11 +584,17 @@ def next_token(data):
             if data.file[data.index] == '>':
                 data.index += 1
                 return TOKEN_MIN_EXCLUSIVE
+            elif data.file[data.index] == ' ' and data.file[data.index + 1] == '>':
+                data.index += 2
+                return TOKEN_MIN_EXCLUSIVE
             else:
                 return TOKEN_MIN
         if match_string(data, MAXIMUM_STR):
             if data.file[data.index] == '<':
                 data.index += 1
+                return TOKEN_MAX_EXCLUSIVE
+            elif data.file[data.index] == ' ' and data.file[data.index + 1] == '<':
+                data.index += 2
                 return TOKEN_MAX_EXCLUSIVE
             else:
                 return TOKEN_MAX

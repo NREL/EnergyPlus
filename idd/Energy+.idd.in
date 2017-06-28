@@ -16422,7 +16422,6 @@ Foundation:Kiva:Settings,
        \default Autoselect
   N8,  \field Deep-Ground Depth
        \type real
-       \default 40
        \units m
        \minimum> 0.0
        \autocalculatable
@@ -24671,6 +24670,7 @@ AirflowNetwork:Distribution:Linkage,
       \note conduction loss is ignored.
 
 AirflowNetwork:Distribution:DuctViewFactors,
+       \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
        \memo This object is used to allow user-defined view factors to be used for duct-surface radiation
        \memo calculations.
   A1,  \field Linkage Name
