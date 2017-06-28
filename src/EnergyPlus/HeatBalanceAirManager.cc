@@ -515,6 +515,8 @@ namespace HeatBalanceAirManager {
 			SetupOutputVariable( "Zone Air Heat Balance System Convective Heat Gain Rate [W]", ZnAirRpt( Loop ).SumNonAirSystem, "System", "Average", Zone( Loop ).Name );
 			SetupOutputVariable( "Zone Air Heat Balance Air Energy Storage Rate [W]", ZnAirRpt( Loop ).CzdTdt, "System", "Average", Zone( Loop ).Name );
 			if ( DisplayAdvancedReportVariables ) {
+				SetupOutputVariable( "Zone Phase Change Material Melting Enthalpy [J/kg]", ZnAirRpt( Loop ).SumEnthalpyM, "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Phase Change Material Freezing Enthalpy [J/kg]", ZnAirRpt( Loop ).SumEnthalpyH, "Zone", "Average", Zone( Loop ).Name );
 				SetupOutputVariable( "Zone Air Heat Balance Deviation Rate [W]", ZnAirRpt( Loop ).imBalance, "System", "Average", Zone( Loop ).Name );
 			}
 		}
