@@ -493,19 +493,13 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	// check coil UA-value sizing
 	EXPECT_NEAR( 558.656, WaterCoil( CoilNum ).UACoil, 0.01 ); // smaller UA than result above at 1435.00
 
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-
 }
 
 TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	InitializePsychRoutines();
 	OutBaroPress = 101325.0;
 	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
-	int write_stat;
 
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	// set up sizing flags
 	SysSizingRunDone = true;
