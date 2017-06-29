@@ -126,12 +126,6 @@ TEST_F( EnergyPlusFixture, SizePurchasedAirTest_Test1 )
 	EXPECT_NEAR( 509.856, PurchAir( PurchAirNum ).MaxHeatSensCap, 0.1 );
 	EXPECT_DOUBLE_EQ( 2.0, PurchAir( PurchAirNum ).MaxCoolVolFlowRate );
 	EXPECT_NEAR( 160.0, PurchAir( PurchAirNum ).MaxCoolTotCap, 0.1 );
-<<<<<<< HEAD
-	
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-=======
->>>>>>> input_processor_updates
 
 	ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
 	ZoneEqSizing.deallocate();
