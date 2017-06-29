@@ -104,7 +104,9 @@ extension_renaming = {
     'BranchList': 'branches',
     'PipingSystem:Underground:PipeCircuit': 'pipe_segments',
     'NodeList': 'nodes',
-    'OutdoorAir:NodeList': 'nodes'
+    'OutdoorAir:NodeList': 'nodes',
+    'Fan:SystemModel': 'speed_fractions',
+    'AirflowNetwork:Distribution:DuctViewFactors': 'surfaces'
 }
 remaining_objects = [
     'Site:SpectrumData',
@@ -216,8 +218,6 @@ def change_extensions_name(schema):
         loc = schema['properties'][key]['patternProperties']['.*']['properties']
         del loc['extensions']
         schema['properties'][key]['legacy_idd']['extension'] = value
-        
+
     for key in remaining_objects:
-        schema['properties'][key]['legacy_idd']['extension'] = 'extensions'
-        schema['properties'][key]['legacy_idd']['extension'] = 'extensions'
         schema['properties'][key]['legacy_idd']['extension'] = 'extensions'

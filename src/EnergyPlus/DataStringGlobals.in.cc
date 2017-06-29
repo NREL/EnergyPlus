@@ -179,6 +179,9 @@ namespace DataStringGlobals {
 	std::string outputMtrCsvFileName("eplusmtr.csv");
 	std::string outputRvauditFileName("eplusout.rvaudit");
 
+	std::string idfFileNameOnly;
+	std::string idfDirPathName;
+	std::string outDirPathName;
 	std::string inputFileNameOnly;
 	std::string inputDirPathName;
 	std::string outputDirPathName;

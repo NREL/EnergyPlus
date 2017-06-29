@@ -199,6 +199,7 @@ namespace DataGlobals {
 	std::ostream * err_stream( nullptr ); // Internal stream used for err output (used for performance)
 	int StdOutputRecordCount( 0 ); // Count of Standard output records
 	int OutputFileInits( 0 ); // Unit number for the standard Initialization output file
+	std::ostream * eio_stream( nullptr ); // Internal stream used for eio output (used for unit tests)
 	int OutputFileDebug( 0 ); // Unit number for debug outputs
 	int OutputFileZoneSizing( 0 ); // Unit number of zone sizing calc output file
 	int OutputFileSysSizing( 0 ); // Unit number of system sizing calc output file
@@ -354,6 +355,7 @@ namespace DataGlobals {
 		eso_stream = nullptr;
 		mtr_stream = nullptr;
 		err_stream = nullptr;
+		eio_stream = nullptr;
 		delightin_stream = nullptr;
 	}
 

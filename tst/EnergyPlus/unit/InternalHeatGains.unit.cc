@@ -227,3 +227,76 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType ) {
 	EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
 }
+
+TEST_F( EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortModel ) {
+	// Adaptive comfort model fatal for irrelevant blank fields  #5948
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.5;",
+
+		"ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
+
+		"  Schedule:Compact,",
+		"    HOUSE OCCUPANCY,    !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 12/31,           !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,1.0;        !- Field 3",
+
+		"  Schedule:Compact,",
+		"    Activity Sch,    !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 12/31,           !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,1.0;        !- Field 3",
+
+		"Zone,LIVING ZONE;",
+
+		"People,",
+		"LIVING ZONE People, !- Name",
+		"LIVING ZONE, !- Zone or ZoneList Name",
+		"HOUSE OCCUPANCY, !- Number of People Schedule Name",
+		"people, !- Number of People Calculation Method",
+		"3.000000, !- Number of People",
+		", !- People per Zone Floor Area{ person / m2 }",
+		", !- Zone Floor Area per Person{ m2 / person }",
+		"0.3000000, !- Fraction Radiant",
+		", !- Sensible Heat Fraction",
+		"Activity Sch, !- Activity Level Schedule Name",
+		"3.82E-8, !- Carbon Dioxide Generation Rate{ m3 / s - W }",
+		", !- Enable ASHRAE 55 Comfort Warnings",
+		"zoneaveraged, !- Mean Radiant Temperature Calculation Type",
+		", !- Surface Name / Angle Factor List Name",
+		", !- Work Efficiency Schedule Name",
+		", !- Clothing Insulation Calculation Method",
+		", !- Clothing Insulation Calculation Method Schedule Name",
+		", !- Clothing Insulation Schedule Name",
+		", !- Air Velocity Schedule Name",
+		"AdaptiveASH55;                  !- Thermal Comfort Model 1 Type",
+
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	bool ErrorsFound1( false );
+
+	ScheduleManager::ProcessScheduleInput( ); // read schedules
+	HeatBalanceManager::GetZoneData( ErrorsFound1 );
+	ASSERT_FALSE( ErrorsFound1 );
+
+	ScheduleManager::ScheduleInputProcessed = true;
+	ScheduleManager::Schedule( 1 ).Used = true;;
+	ScheduleManager::Schedule( 1 ).CurrentValue = 1.0;
+	ScheduleManager::Schedule( 1 ).MinValue = 1.0;
+	ScheduleManager::Schedule( 1 ).MaxValue = 1.0;
+	ScheduleManager::Schedule( 1 ).MaxMinSet = true;
+	ScheduleManager::Schedule( 2 ).Used = true;;
+	ScheduleManager::Schedule( 2 ).CurrentValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MinValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MaxValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MaxMinSet = true;
+	InternalHeatGains::GetInternalHeatGainsInput( );
+
+	EXPECT_FALSE( InternalHeatGains::ErrorsFound );
+
+}

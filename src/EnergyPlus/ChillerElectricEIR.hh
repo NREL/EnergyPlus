@@ -97,7 +97,12 @@ namespace ChillerElectricEIR {
 
 	extern Array1D_bool CheckEquipName;
 
+
 	extern bool GetInputEIR; // When TRUE, calls subroutine to read input file.
+	extern bool ChillerIPLVOneTimeFlag;
+	extern Array1D_bool ChillerIPLVFlagArr; // TRUE in order to calculate IPLV
+	extern bool getInputAllocatedFlag; // True when arrays are allocated
+	extern bool InitMyOneTimeFlag; // Flag used to execute code only once
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
 	//PUBLIC     SimEIRChillerHeatRecovery
@@ -190,10 +195,14 @@ namespace ChillerElectricEIR {
 		bool PrintMessage; // logical to determine if message is valid
 		int MsgErrorCount; // number of occurrences of warning
 		int ErrCount1; // for recurring error messages
+		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
+		//Operational fault parameters
 		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
 		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
 		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
-		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
+		bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
+		int FaultyChillerFoulingIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
 
 		// Default Constructor
 		ElectricEIRChillerSpecs() :
@@ -269,10 +278,13 @@ namespace ChillerElectricEIR {
 			PrintMessage( false ),
 			MsgErrorCount( 0 ),
 			ErrCount1( 0 ),
+			PossibleSubcooling( false ),
 			FaultyChillerSWTFlag( false ),
 			FaultyChillerSWTIndex( 0 ),
 			FaultyChillerSWTOffset( 0.0 ),
-			PossibleSubcooling( false )
+			FaultyChillerFoulingFlag( false ),
+			FaultyChillerFoulingIndex( 0 ),
+			FaultyChillerFoulingFactor( 1.0 )
 		{}
 
 
@@ -355,6 +367,8 @@ namespace ChillerElectricEIR {
 	extern Array1D< ReportEIRVars > ElectricEIRChillerReport;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimElectricEIRChiller(

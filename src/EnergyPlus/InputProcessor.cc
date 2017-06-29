@@ -1435,11 +1435,13 @@ namespace EnergyPlus {
 			if ( is_NumericFieldNames ) NumericFieldNames()( i + 1 ) = field;
 		}
 
-		auto const & legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
-		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() ) {
+		auto const legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
+		auto const jdf_extensions_iter = obj.value().find( extension_key );
+		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() && jdf_extensions_iter != obj.value().end() ) {
 			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
 			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
-			auto const & jdf_extensions_array = obj.value()[ extension_key ];
+			// auto const & jdf_extensions_array = obj.value()[ extension_key ];
+			auto const & jdf_extensions_array = jdf_extensions_iter.value();
 			int numerics_index = static_cast <int> ( legacy_idd_numerics_fields.size() );
 
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
@@ -2382,7 +2384,7 @@ namespace EnergyPlus {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string extension_key;
-		OutputVariablesForSimulation.allocate( 10000 );
+		OutputVariablesForSimulation.reserve( 1024 );
 		MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
@@ -2540,10 +2542,6 @@ namespace EnergyPlus {
 			}
 		}
 
-		if ( NumConsideredOutputVariables > 0 ) {
-			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
-			MaxConsideredOutputVariables = NumConsideredOutputVariables;
-		}
 	}
 
 	void
@@ -2920,21 +2918,14 @@ namespace EnergyPlus {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
+		//       MODIFIED       March 2017
+		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine adds a new record (if necessary) to the Output Variable
 		// reporting structure.  DataOutputs, OutputVariablesForSimulation
 
-		// METHODOLOGY EMPLOYED:
-		// OutputVariablesForSimulation is a linked list structure for later
-		// semi-easy perusal.
-
-		// Using/Aliasing
-		using namespace DataOutputs;
-
-		int CurNum;
-		int NextNum;
-		bool FoundOne;
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string::size_type vnameLen; // if < length, there were units on the line/name
 
 		std::string::size_type const rbpos = index( VariableName, '[' );
@@ -2943,71 +2934,18 @@ namespace EnergyPlus {
 		} else {
 			vnameLen = len_trim( VariableName.substr( 0, rbpos ) );
 		}
-
-		FoundOne = false;
 		std::string const VarName( VariableName.substr( 0, vnameLen ) );
-		for ( CurNum = 1; CurNum <= NumConsideredOutputVariables; ++CurNum ) {
-			if ( VarName == OutputVariablesForSimulation( CurNum ).VarName ) {
-				FoundOne = true;
-				break;
-			}
-		}
 
-		if ( !FoundOne ) {
-			if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-				ReAllocateAndPreserveOutputVariablesForSimulation();
-			}
-			++NumConsideredOutputVariables;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
+		auto const found = DataOutputs::OutputVariablesForSimulation.find( VarName );
+		if ( found == DataOutputs::OutputVariablesForSimulation.end() ) {
+			std::unordered_map< std::string, DataOutputs::OutputReportingVariables > data;
+			data.reserve( 32 );
+			data.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
+			DataOutputs::OutputVariablesForSimulation.emplace( VarName, std::move( data ) );
 		} else {
-			if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
-				NextNum = CurNum;
-				if ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-					while ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-						CurNum = NextNum;
-						NextNum = OutputVariablesForSimulation( NextNum ).Next;
-					}
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = NextNum;
-					OutputVariablesForSimulation( NextNum ).Next = NumConsideredOutputVariables;
-				} else {
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = CurNum;
-					OutputVariablesForSimulation( CurNum ).Next = NumConsideredOutputVariables;
-				}
-			}
+			found->second.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
 		}
-	}
-
-	void
-	InputProcessor::ReAllocateAndPreserveOutputVariablesForSimulation() {
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   April 2011
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine does a simple reallocate for the OutputVariablesForSimulation structure, preserving
-		// the data that is already in the structure.
-
-		using namespace DataOutputs;
-
-		int const OutputVarAllocInc( 500 );
-
-		// up allocation by OutputVarAllocInc
-		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
+		DataOutputs::NumConsideredOutputVariables++;
 	}
 
 //void

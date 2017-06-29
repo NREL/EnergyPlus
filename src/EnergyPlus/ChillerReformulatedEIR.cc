@@ -973,7 +973,10 @@ namespace ChillerReformulatedEIR {
 		tmpNomCap = ElecReformEIRChiller( EIRChillNum ).RefCap;
 		tmpEvapVolFlowRate = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
 		tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
-		PltSizCondNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
+
+		if ( ElecReformEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
+			PltSizCondNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
+		}
 
 		// find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).PlantSizNum;
@@ -981,8 +984,6 @@ namespace ChillerReformulatedEIR {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * ElecReformEIRChiller( EIRChillNum ).SizFac;
-				if ( ! ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
-
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = 0.0;
 
@@ -1044,13 +1045,9 @@ namespace ChillerReformulatedEIR {
 					SizingCondOutletTemp = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut;
 				}
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-
 				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-
 				RefCapFT = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, SizingEvapOutletTemp, SizingCondOutletTemp );
 				tmpNomCap = ( Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate ) / RefCapFT;
-				if ( ! ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized ) tmpNomCap = ElecReformEIRChiller( EIRChillNum ).RefCap;
-
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized ) tmpNomCap = 0.0;
 
@@ -1101,10 +1098,8 @@ namespace ChillerReformulatedEIR {
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
-
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / ElecReformEIRChiller( EIRChillNum ).RefCOP ) * ElecReformEIRChiller( EIRChillNum ).CompPowerToCondenserFrac ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
-				if ( ! ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
 				//IF (PlantFirstSizesOkayToFinalize) ElecReformEIRChiller(EIRChillNum)%CondVolFlowRate = tmpCondVolFlowRate
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = 0.0;
@@ -1801,6 +1796,7 @@ namespace ChillerReformulatedEIR {
 		//       MODIFIED
 		//			Aug. 2014, Rongpeng Zhang, added an additional part-load performance curve type
 		//			Jun. 2016, Rongpeng Zhang, applied the chiller supply water temperature sensor fault model
+		//			Nov. 2016, Rongpeng Zhang, added fouling chiller fault
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Simulate a vapor compression chiller using the reformulated model developed by Mark Hydeman
@@ -1813,6 +1809,9 @@ namespace ChillerReformulatedEIR {
 		//    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::TimeStepSys;
 		using General::RoundSigDigits;
@@ -1830,6 +1829,7 @@ namespace ChillerReformulatedEIR {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
 		using FaultsManager::FaultsChillerSWTSensor;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
@@ -1973,6 +1973,21 @@ namespace ChillerReformulatedEIR {
 		TempLowLimitEout = ElecReformEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElecReformEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
 		PartLoadCurveType = ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType; //zrp_Aug2014
+		
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerRefCap;
+			Real64 ReferenceCOP_ff = ReferenceCOP;
+		
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the Chiller nominal capacity and COP at faulty cases
+			ChillerRefCap = NomCap_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
+			ReferenceCOP = ReferenceCOP_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
+			
+		}
 
 		// Set mass flow rates
 

@@ -63,6 +63,7 @@
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
 #include <DataWindowEquivalentLayer.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -286,6 +287,7 @@ namespace DataHeatBalance {
 	extern int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
 	extern int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
 	extern int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
+	extern int const IntGainTypeOf_FanSystemModel;
 
 	//Parameters for checking surface heat transfer models
 	extern Real64 const HighDiffusivityThreshold; // used to check if Material properties are out of line.
@@ -785,6 +787,7 @@ namespace DataHeatBalance {
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
+		HysteresisPhaseChange::HysteresisPhaseChange * phaseChange = nullptr;
 
 		// Default Constructor
 		MaterialProperties() :
@@ -972,6 +975,7 @@ namespace DataHeatBalance {
 		Array1D_int LayerPoint; // Pointer array which refers back to
 		// the Material structure; LayerPoint(i)=j->Material(j)%Name,etc
 		bool IsUsed; // Marked true when the construction is used
+		bool IsUsedCTF; // Mark true when the construction is used for a surface with CTF calculations
 		Real64 InsideAbsorpVis; // Inside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 OutsideAbsorpVis; // Outside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 InsideAbsorpSolar; // Inside Layer solar absorptance of an opaque surface; not used for windows.
@@ -1135,6 +1139,7 @@ namespace DataHeatBalance {
 			TotGlassLayers( 0 ),
 			LayerPoint( MaxLayersInConstruct, 0 ),
 			IsUsed( false ),
+			IsUsedCTF( false ),
 			InsideAbsorpVis( 0.0 ),
 			OutsideAbsorpVis( 0.0 ),
 			InsideAbsorpSolar( 0.0 ),
@@ -1342,6 +1347,19 @@ namespace DataHeatBalance {
 		//   less out of bounds temperature errors allowed
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
+		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
+		// Hybrid Modeling
+		Real64 ZoneMeasuredTemperature; // Measured zone air temperature input by user
+		Real64 ZoneVolCapMultpSens; // Zone temperature capacity multiplier, i.e. internal thermal mass multiplier
+		Real64 ZoneVolCapMultpMoist; // Zone humidity capacity multiplier
+		Real64 ZoneVolCapMultpCO2; // Zone carbon dioxide capacity multiplier
+		Real64 ZoneVolCapMultpGenContam; // Zone generic contaminant capacity multiplier
+		Real64 ZoneVolCapMultpSensHM; // Calculated temperature capacity multiplier by hybrid model
+		Real64 ZoneVolCapMultpSensHMSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMCountSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMAverage; // Temperature capacity multiplier average
+		Real64 MCPIHM; // Calcualted mass flow rate by hybrid model
+		Real64 InfilOAAirChangeRateHM; // Calcualted infilgration air change per hour by hybrid model
 
 		// Default Constructor
 		ZoneData() :
@@ -1406,7 +1424,20 @@ namespace DataHeatBalance {
 			TempOutOfBoundsReported( false ),
 			EnforcedReciprocity( false ),
 			ZoneMinCO2SchedIndex( 0 ),
-			ZoneContamControllerSchedIndex( 0 )
+			ZoneContamControllerSchedIndex( 0 ),
+			FlagCustomizedZoneCap( false ),
+			// Hybrid Modeling
+			ZoneMeasuredTemperature( 0.0 ),
+			ZoneVolCapMultpSens( 1.0 ),
+			ZoneVolCapMultpMoist( 1.0 ),
+			ZoneVolCapMultpCO2( 1.0 ),
+			ZoneVolCapMultpGenContam( 1.0 ),
+			ZoneVolCapMultpSensHM( 1.0 ),
+			ZoneVolCapMultpSensHMSum( 0.0 ),
+			ZoneVolCapMultpSensHMCountSum( 0.0 ),
+			ZoneVolCapMultpSensHMAverage( 1.0 ),
+			MCPIHM( 0.0 ),
+			InfilOAAirChangeRateHM( 0.0 )
 		{}
 
 		void
@@ -2805,7 +2836,8 @@ namespace DataHeatBalance {
 		Real64 OABalanceMdot; // Mass flow rate of Air {kg/s} due to OA air balance
 		Real64 OABalanceAirChangeRate; // OA air balance air change rate (ach)
 		Real64 OABalanceFanElec; // Fan Electricity {W} due to OA air balance
-
+		Real64 SumEnthalpyM = 0.0; // Zone sum of EnthalpyM
+		Real64 SumEnthalpyH = 0.0; // Zone sum of EnthalpyH
 		// Default Constructor
 		AirReportVars() :
 			MeanAirTemp( 0.0 ),
@@ -2873,7 +2905,9 @@ namespace DataHeatBalance {
 			OABalanceMass( 0.0 ),
 			OABalanceMdot( 0.0 ),
 			OABalanceAirChangeRate( 0.0 ),
-			OABalanceFanElec( 0.0 )
+			OABalanceFanElec( 0.0 ),
+			SumEnthalpyM( 0.0 ),
+			SumEnthalpyH( 0.0 )
 		{}
 
 	};
@@ -3346,6 +3380,7 @@ namespace DataHeatBalance {
 	extern Array1D< HeatReclaimRefrigeratedRackData > HeatReclaimRefrigeratedRack;
 	extern Array1D< HeatReclaimRefrigCondenserData > HeatReclaimRefrigCondenser;
 	extern Array1D< HeatReclaimDXCoilData > HeatReclaimDXCoil;
+	extern Array1D< HeatReclaimDXCoilData > HeatReclaimVS_DXCoil;
 	extern Array1D< AirReportVars > ZnAirRpt;
 	extern Array1D< TCGlazingsType > TCGlazings;
 	extern Array1D< ZoneEquipData > ZoneCO2Gen;

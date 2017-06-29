@@ -85,6 +85,7 @@
 #include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MatrixDataManager.hh>
@@ -99,6 +100,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -489,8 +491,8 @@ namespace HeatBalanceManager {
 		using namespace DataIPShortCuts;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const NumConstrObjects( 5 );
-		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular" } );
+		int const NumConstrObjects( 6 );
+		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular", "EnergyManagementSystem:ConstructionIndexVariable" } );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Unused;
@@ -510,13 +512,20 @@ namespace HeatBalanceManager {
 			NumObjects = InputProcessor::GetNumObjectsFound( ConstrObjects( ONum ) );
 			for ( Loop = 1; Loop <= NumObjects; ++Loop ) {
 				InputProcessor::GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
-				if ( ONum != 5 ) {
-					CNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
-				} else {
+				if ( ONum == 5 ) {
 					CNum = InputProcessor::FindItemInList( cAlphaArgs( 4 ), Construct );
+				} else {
+					CNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
 				}
 				if ( CNum == 0 ) continue;
 				Construct( CNum ).IsUsed = true;
+				if ( ONum == 4 || ONum == 6 ) {
+					// GroundHeatExchanger:Surface or EnergyManagementSystem:ConstructionIndexVariable
+					// Include all EMS constructions since they can potentially be used by a CTF surface
+					if ( !Construct( CNum ).TypeIsWindow ) {
+						Construct( CNum ).IsUsedCTF = true;
+					}
+				}
 			}
 		}
 		Unused = TotConstructs - std::count_if( Construct.begin(), Construct.end(), []( DataHeatBalance::ConstructionData const & e ){ return e.IsUsed; } );
@@ -1275,6 +1284,7 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::ScanForReports;
+		using General::TrimSigDigits;
 
 		// if this has a size, then input has already been gotten
 		if ( UniqueMaterialNames.size() ) {
@@ -3103,6 +3113,16 @@ namespace HeatBalanceManager {
 				ErrorsFound = true;
 			}
 
+			if ( Material( MaterNum ).InitMoisture > Material( MaterNum ).Porosity ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is greater than " + cNumericFieldNames( 13 ) + ". It must be less or equal." );
+				ShowContinueError( cNumericFieldNames( 13 ) + " = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " = " + TrimSigDigits( Material( MaterNum ).InitMoisture, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is reset to the maximum (saturation) value = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( "Simulation continues." );
+				Material( MaterNum ).InitMoisture = Material( MaterNum ).Porosity;
+			}
+
 		}
 
 		// Thermochromic glazing group
@@ -3229,6 +3249,11 @@ namespace HeatBalanceManager {
 				SetupEMSActuator( "Material", Material( MaterNum ).Name, "Surface Property Thermal Absorptance", "[ ]", Material( MaterNum ).AbsorpThermalEMSOverrideOn, Material( MaterNum ).AbsorpThermalEMSOverride );
 				SetupEMSActuator( "Material", Material( MaterNum ).Name, "Surface Property Visible Absorptance", "[ ]", Material( MaterNum ).AbsorpVisibleEMSOverrideOn, Material( MaterNum ).AbsorpVisibleEMSOverride );
 			}
+		}
+
+		// try assigning phase change material properties for each material, won't do anything for non pcm surfaces
+		for ( auto & m : Material ) {
+			m.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory( m.Name );
 		}
 
 	}
@@ -4100,6 +4125,7 @@ namespace HeatBalanceManager {
 
 		// Using/Aliasing
 		using DataDaylighting::ZoneDaylight;
+		using HybridModel::FlagHybridModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4210,6 +4236,11 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+
+		if ( FlagHybridModel ){
+			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+		}
+
 	}
 
 	// End of Get Input subroutines for the HB Module

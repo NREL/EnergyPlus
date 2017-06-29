@@ -100,7 +100,7 @@
 ! End SimMetaData
 ! Number of Zones: 130
 
-  Version,8.6;
+  Version,8.7;
 
   Timestep,6;
 
@@ -64769,6 +64769,10 @@
     ,                        !- Low Speed Nominal Capacity Sizing Factor
     ,                        !- Free Convection Nominal Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Design Inlet Air Dry-Bulb Temperature
+    ,                        !- Design Inlet Air Wet-Bulb Temperature
+    ,                        !- Design Approach Temperature
+    ,                        !- Design Range Temperature
     0.0,                     !- Basin Heater Capacity {W/K}
     2.0,                     !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name

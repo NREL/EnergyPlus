@@ -364,8 +364,6 @@ namespace SimulationManager {
 		DoingSizing = true;
 		ManageSizing();
 
-		CheckAndReadFaults();
-
 		BeginFullSimFlag = true;
 		SimsDone = false;
 		if ( DoDesDaySim || DoWeathSim || DoHVACSizingSimulation ) {
@@ -387,6 +385,9 @@ namespace SimulationManager {
 
 		ResetEnvironmentCounter();
 		SetupSimulation( ErrorsFound );
+
+		CheckAndReadFaults();
+
 		InitCurveReporting();
 
 		AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
@@ -1373,6 +1374,7 @@ namespace SimulationManager {
 		if ( write_stat != 0 ) {
 			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEioFileName+" for output (write)." );
 		}
+		eio_stream = gio::out_stream( OutputFileInits );
 		gio::write( OutputFileInits, fmtA ) << "Program Version," + VerString;
 
 		// Open the Meters Output File
@@ -1576,6 +1578,7 @@ namespace SimulationManager {
 		// Close the Initialization Output File
 		gio::write( OutputFileInits, EndOfDataFormat );
 		gio::close( OutputFileInits );
+		eio_stream = nullptr;
 
 		// Close the Meters Output File
 		gio::write( OutputFileMeters, EndOfDataFormat );
@@ -1702,7 +1705,7 @@ namespace SimulationManager {
 		}
 
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
-		if ( ErrorsFound ) ShowFatalError( "Previous Conditions cause program termination." );
+		if ( ErrorsFound ) ShowFatalError( "Previous conditions cause program termination." );
 
 	}
 

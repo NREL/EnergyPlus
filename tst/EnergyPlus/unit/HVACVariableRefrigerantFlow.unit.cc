@@ -56,7 +56,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -4255,7 +4254,12 @@ namespace EnergyPlus {
 			"Demand Outlet Node, !- Demand Side Outlet Node Name",
 			"Demand Branches, !- Demand Side Branch List Name",
 			"Demand Connectors, !- Demand Side Connector List Name",
-			"OPTIMAL;                 !- Load Distribution Scheme",
+			"Optimal, !- Load Distribution Scheme",
+			", !- Availability Manager List Name",
+			", !- Plant Loop Demand Calculation Scheme",
+			", !- Common Pipe Simulation",
+			", !- Pressure Simulation Type",
+			"2.0; !- Loop Circulation Time {minutes}",
 			" ",
 			"Sizing:Plant,",
 			"  Main Loop, !- Plant or Condenser Loop Name",

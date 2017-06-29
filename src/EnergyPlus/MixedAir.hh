@@ -85,6 +85,7 @@ namespace MixedAir {
 	extern int const OAMixer_Num;
 	extern int const Fan_Simple_CV;
 	extern int const Fan_Simple_VAV;
+	extern int const Fan_System_Object;
 	extern int const WaterCoil_SimpleCool;
 	extern int const WaterCoil_Cooling;
 	extern int const WaterCoil_SimpleHeat;
@@ -155,6 +156,7 @@ namespace MixedAir {
 
 	extern Array1D_bool MyOneTimeErrorFlag;
 	extern Array1D_bool MyOneTimeCheckUnitarySysFlag;
+	extern Array1D_bool initOASysFlag;
 	extern bool GetOASysInputFlag; // Flag set to make sure you get input once
 	extern bool GetOAMixerInputFlag; // Flag set to make sure you get input once
 	extern bool GetOAControllerInputFlag; // Flag set to make sure you get input once
@@ -342,7 +344,8 @@ namespace MixedAir {
 
 		void
 		CalcOAController(
-			int const AirLoopNum
+			int const AirLoopNum,
+			bool const FirstHVACIteration
 		);
 
 		void
@@ -350,7 +353,8 @@ namespace MixedAir {
 			int const AirLoopNum,
 			Real64 const OutAirMinFrac,
 			Real64 & OASignal,
-			bool & HighHumidityOperationFlag
+			bool & HighHumidityOperationFlag,
+			bool const FirstHVACIteration
 		);
 
 		void
@@ -528,6 +532,13 @@ namespace MixedAir {
 	);
 
 	void
+	SimOASysComponents(
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum
+		);
+
+	void
 	SimOAComponent(
 		std::string const & CompType, // the component type
 		std::string const & CompName, // the component Name
@@ -537,9 +548,9 @@ namespace MixedAir {
 		int const AirLoopNum, // air loop index for economizer lockout coordination
 		bool const Sim, // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
 		int const OASysNum, // index to outside air system
-		Optional_bool OAHeatingCoil = _, // TRUE indicates a heating coil has been found
-		Optional_bool OACoolingCoil = _, // TRUE indicates a cooling coil has been found
-		Optional_bool OAHX = _ // TRUE indicates a heat exchanger has been found
+		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
+		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
+		bool & OAHX // TRUE indicates a heat exchanger has been found
 	);
 
 	void
@@ -595,8 +606,9 @@ namespace MixedAir {
 
 	void
 	InitOutsideAirSys(
-		int const OASysNum, // unused1208
-		bool const FirstHVACIteration
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum
 	);
 
 	void
@@ -647,6 +659,12 @@ namespace MixedAir {
 
 	Real64
 	MixedAirControlTempResidual(
+		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
+		Array1< Real64 > const & Par // par(1) = mixed node number
+	);
+
+	Real64
+	MultiCompControlTempResidual(
 		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
 		Array1< Real64 > const & Par // par(1) = mixed node number
 	);

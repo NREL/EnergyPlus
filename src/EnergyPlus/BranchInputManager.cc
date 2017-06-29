@@ -252,7 +252,7 @@ namespace BranchInputManager {
 		using General::TrimSigDigits;
 
 		int Found; // Points to correct Branch List/Branch
-		bool ErrFound; // True when error has occured (cannot find Branch List)
+		bool ErrFound; // True when error has occurred (cannot find Branch List)
 
 		ErrFound = false;
 
@@ -605,7 +605,7 @@ namespace BranchInputManager {
 		} else {
 			if ( BranchNum > 0 && BranchNum <= NumBranches ) {
 				for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
-					if ( InputProcessor::SameString( "Fan:OnOff", Branch( BranchNum ).Component( CompNum ).CType ) || InputProcessor::SameString( "Fan:ConstantVolume", Branch( BranchNum ).Component( CompNum ).CType ) || InputProcessor::SameString( "Fan:VariableVolume", Branch( BranchNum ).Component( CompNum ).CType ) ) {
+					if ( InputProcessor::SameString( "Fan:OnOff", Branch( BranchNum ).Component( CompNum ).CType ) || InputProcessor::SameString( "Fan:ConstantVolume", Branch( BranchNum ).Component( CompNum ).CType ) || InputProcessor::SameString( "Fan:VariableVolume", Branch( BranchNum ).Component( CompNum ).CType ) || InputProcessor::SameString( "Fan:SystemModel", Branch( BranchNum ).Component( CompNum ).CType ) ) {
 						FanType = Branch( BranchNum ).Component( CompNum ).CType;
 						FanName = Branch( BranchNum ).Component( CompNum ).Name;
 						break;
@@ -1582,7 +1582,7 @@ namespace BranchInputManager {
 		int BCount; // Actual Branch List Count
 		int Loop; // Loop Counter
 		int Found; // Points to correct Branch List/Branch
-		bool ErrFound; // True when error has occured (cannot find Branch List)
+		bool ErrFound; // True when error has occurred (cannot find Branch List)
 		// Following are needed because routine calls GetBranchInput
 		// which would overwrite the module Alphas and NumAlphas
 		int NumAlphas; // Used to retrieve Branch list from IDF

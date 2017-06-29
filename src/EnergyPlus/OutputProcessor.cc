@@ -85,6 +85,7 @@
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
+#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -646,13 +647,13 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
+			if ( ReqRepVars( Loop ).Key.empty() ) continue;
 			if ( ! InputProcessor::SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! InputProcessor::SameString( ReqRepVars( Loop ).Key, KeyedValue ) ) continue;
+			if ( ! DataOutputs::FindItemInVariableList( KeyedValue, VariableName ) ) continue;
 
-			//   A match.  Make sure doesnt duplicate
+			//   A match.  Make sure doesn't duplicate
 
 			ReqRepVars( Loop ).Used = true;
 			Dup = false;
@@ -705,7 +706,6 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;
@@ -4881,7 +4881,7 @@ SetupOutputVariable(
 	int IndexType; // 1=TimeStepZone, 2=TimeStepSys
 	int VariableType; // 1=Average, 2=Sum, 3=Min/Max
 	int Loop;
-	int RepFreq;
+	int RepFreq( ReportHourly );
 	bool OnMeter; // True if this variable is on a meter
 	std::string VarName; // Variable name without units
 	//  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
@@ -5138,7 +5138,7 @@ SetupOutputVariable(
 	bool invalidUnits;
 	static std::string UnitsString; // Units for Variable (no brackets)
 	int Loop;
-	int RepFreq;
+	int RepFreq( ReportHourly );
 
 	if (!OutputInitialized)	InitializeOutput();
 
@@ -5188,8 +5188,6 @@ SetupOutputVariable(
 		DetermineFrequency( ReportFreq, RepFreq );
 		NumExtraVars = 1;
 		ReportList = 0;
-	} else {
-		RepFreq = ReportHourly;
 	}
 
 	ThisOneOnTheList = FindItemInVariableList( KeyedValue, VarName );

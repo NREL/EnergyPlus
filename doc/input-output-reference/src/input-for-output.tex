@@ -116,12 +116,12 @@ Output:Surfaces:List, ViewFactorInfo;
 
 This report (in \textbf{eplusout.eio}) provides details about the thermal radiation exchange view factors and interchange factors.~ Specific details on this report can be found in the Output Details and Examples document.
 
-\paragraph{DecayCurvesfromZoneComponentLoads}\label{decaycurvesfromzonecomponentloads}
+\paragraph{DecayCurvesFromComponentLoadsSummary}\label{decaycurvesfromcomponentloadssummary}
 
 An example input object for this report follows.
 
 \begin{lstlisting}
-Output:Surfaces:List, DecayCurvesfromZoneComponentLoads;
+Output:Surfaces:List, DecayCurvesFromComponentLoadsSummary;
 \end{lstlisting}
 
 This report (in \textbf{eplusout.eio}) provides an intermediate calculation used, called a decay curve,~ in the Zone Component Loads Summary report for the estimate of the sensible-delayed column values. A decay curve is created for each surface in a zone by introducing a radiant pulse. Each value in each row of the report corresponds to a zone time step from the time the pulse was introduced. See Zone Component Load Summary described in object Output:Table:SummaryReports for more detailed information.
@@ -356,19 +356,32 @@ Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;
 This alpha field can be used to make a specific reference for reporting. In addition to the generic variable names listed in the Variable Dictionary Report for the input file, variables will also have a key designator (such as Zone name or Surface name). You can reference the standard output file (\textbf{eplusout.eso}) to see just how these look.
 
 \begin{lstlisting}
-41,2,ZN001:WALL004,Surface Inside Temperature [C]
-42,2,ZN001:WALL004,Surface Outside Temperature [C]
-43,2,ZN001:WALL004,Surface Int Convection Coeff[W/m2-K]
-44,2,ZN001:WALL004,Surface Ext Convection Coeff[W/m2-K]
-46,2,ZONE ONE,Zone Mean Radiant Temperature [C]
-47,2,ZONE ONE,Zone Total Internal Latent Gain Energy [J]
-51,2,ZONE ONE,Zone Lights Electric Energy [J]
-58,2,ZONE ONE,Zone Air Temperature [C]
+41,2,ZN001:WALL003,Surface Inside Temperature [C]
+42,2,ZN001:WALL004,Surface Inside Temperature [C]
+43,2,ZN002:WALL003,Surface Inside Temperature [C]
+44,2,ZN002:WALL004,Surface Inside Temperature [C]
+45,2,ZN001:WALL004,Surface Outside Temperature [C]
+46,2,ZN001:WALL004,Surface Int Convection Coeff[W/m2-K]
+47,2,ZN001:WALL004,Surface Ext Convection Coeff[W/m2-K]
+48,2,ZONE ONE,Zone Mean Radiant Temperature [C]
+49,2,ZONE ONE,Zone Total Internal Latent Gain Energy [J]
+50,2,ZONE ONE,Zone Lights Electric Energy [J]
+51,2,ZONE ONE,Zone Air Temperature [C]
 \end{lstlisting}
 
-For example, in the previous block, the key for the surface variables is \textbf{ZN001:WALL004} whereas the key for the zone variables is \textbf{ZONE ONE} (note that the space is required and significant for this key).
+For example, in the previous block, one key for the surface variables is \textbf{ZN001:WALL004} whereas the key for the zone variables is \textbf{ZONE ONE} (note that the space is required and significant for this key).
 
-You can have all keys listed in the standard output file by putting a ``*'' in this field or you can have specific items listed by putting in a key value. If this field is left blank, it will use a * as the default (i.e., you will get all variables of Variable Name).
+You can have all keys listed in the standard output file by putting a ``*'' in this field, you can have specific items listed by putting in a key value, or you can use regular expressions to filter the key values. If this field is left blank, it will use a * as the default (i.e., you will get all variables of Variable Name).
+
+Using regular expressions allows for powerful filtering capabilities on the key value. For example, in the previous block, you can find the Surface Inside Temperature for all surfaces in only ZN001 with a single Output:Variable expression.
+
+\begin{lstlisting}
+Output:Variable,ZN001:.*,Surface Inside Temperature,timestep;
+\end{lstlisting}
+
+Consult the following URL for more information about the regular expressions RE2 supports: \url{https://github.com/google/re2/wiki/Syntax}
+
+Note that due to the functionality of the Input Processor, no regular expression can contain a ``,'' even if it is a valid regular expression. If a regular expression has a comma in it then the Input Processor will create a new, erroneous field. The most common occurrence of a comma in a regular expression is ranges, such as ``[a-zA-Z]\{3,5\}''.
 
 \paragraph{Field: Variable Name}\label{field-variable-name}
 
@@ -454,13 +467,13 @@ Current resource types are shown in the table below:
 % table 38
 \begin{longtable}[c]{@{}l@{}}
 \caption{Table of Metered Resource  Types \label{table:table-of-metered-resource-types}} \tabularnewline
-\toprule 
+\toprule
 Utility/Fuel Types \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Table of Metered Resource  Types} \tabularnewline
-\toprule 
+\toprule
 Utility/Fuel Types \tabularnewline
 \midrule
 \endhead
@@ -486,12 +499,12 @@ ElectricityNet \tabularnewline
 \end{longtable}
 
 \begin{longtable}[c]{@{}l@{}}
-\toprule 
+\toprule
 Other Resource Types \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Other Resource Types \tabularnewline
 \midrule
 \endhead
@@ -505,13 +518,13 @@ The end use types are shown in the following table (note that certain end use ty
 % table 39
 \begin{longtable}[c]{@{}l@{}}
 \caption{End Use Category Types \label{table:end-use-category-types}} \tabularnewline
-\toprule 
+\toprule
 Utility/Fuel End Use Types \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{End Use Category Types} \tabularnewline
-\toprule 
+\toprule
 Utility/Fuel End Use Types \tabularnewline
 \midrule
 \endhead
@@ -535,12 +548,12 @@ WaterSystems \tabularnewline
 \end{longtable}
 
 \begin{longtable}[c]{@{}l@{}}
-\toprule 
+\toprule
 Additional End Use Types Only Used for EnergyTransfer \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Additional End Use Types Only Used for EnergyTransfer \tabularnewline
 \midrule
 \endhead
@@ -560,13 +573,13 @@ Specific meter types are then used for grouping the fuel type meters:
 % table 40
 \begin{longtable}[c]{@{}l@{}}
 \caption{Overall Meter Types \label{table:overall-meter-types}} \tabularnewline
-\toprule 
+\toprule
 Meters \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Overall Meter Types} \tabularnewline
-\toprule 
+\toprule
 Meters \tabularnewline
 \midrule
 \endhead
@@ -633,12 +646,12 @@ Users will enter environmental impact factors for each Fuel Type or FuelFactor. 
 The energy is obtained internally from the following facility meters:
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Electricity:Facility & Diesel:Facility \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Electricity:Facility & Diesel:Facility \tabularnewline
 \midrule
 \endhead

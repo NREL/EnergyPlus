@@ -237,7 +237,8 @@ namespace EnergyPlus {
 				// if user input did not include an Electric Load center, create a simple default one here for reporting purposes
 			//   but only if there are any other electricity components set up (yet) for metering
 			int anyElectricityPresent = GetMeterIndex( "ELECTRICITY:FACILITY" );
-			if ( anyElectricityPresent > 0 ) {
+			int anyPlantLoadProfilePresent = InputProcessor::GetNumObjectsFound( "LoadProfile:Plant" );
+			if ( anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0 ) {
 				elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 0 ) );
 				numLoadCenters_ = 1;
 			}

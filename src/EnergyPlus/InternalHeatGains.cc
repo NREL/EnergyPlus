@@ -671,12 +671,12 @@ namespace InternalHeatGains {
 							} else if ( mrtType == "SURFACEWEIGHTED" ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
 								People( Loop ).SurfacePtr = InputProcessor::FindItemInList( AlphaName( 8 ), Surface );
-								if ( People( Loop ).SurfacePtr == 0 ) {
+								if ( People( Loop ).SurfacePtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									if ( Item1 == 1 ) {
 										ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) + " invalid Surface Name=" + AlphaName( 8 ) );
 										ErrorsFound = true;
 									}
-								} else if ( Surface( People( Loop ).SurfacePtr ).Zone != People( Loop ).ZonePtr ) {
+								} else if ( Surface( People( Loop ).SurfacePtr ).Zone != People( Loop ).ZonePtr && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Surface referenced in " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 8 ) + " in different zone." );
 									ShowContinueError( "Surface is in Zone=" + Zone( Surface( People( Loop ).SurfacePtr ).Zone ).Name + " and " + CurrentModuleObject + " is in Zone=" + AlphaName( 2 ) );
 									ErrorsFound = true;
@@ -687,10 +687,10 @@ namespace InternalHeatGains {
 								People( Loop ).AngleFactorListName = AlphaName( 8 );
 
 							} else if ( mrtType == "" ) { // Blank input field--just ignore this
-								if ( MustInpSch && Item1 == 1 ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
+								if ( MustInpSch && Item1 == 1 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
 
 							} else { // An invalid keyword was entered--warn but ignore
-								if ( MustInpSch && Item1 == 1 ) {
+								if ( MustInpSch && Item1 == 1 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) );
 									ShowContinueError( "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\"." );
 								}
@@ -729,7 +729,7 @@ namespace InternalHeatGains {
 										}
 									}
 								}
-							} else if ( MustInpSch ) {
+							} else if ( MustInpSch && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 								if ( Item1 == 1 ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 9 ) + " is required for this item." );
 									ErrorsFound = true;
@@ -741,7 +741,7 @@ namespace InternalHeatGains {
 								if ( clothingType == "CLOTHINGINSULATIONSCHEDULE" ) {
 									People( Loop ).ClothingType = 1;
 									People( Loop ).ClothingPtr = GetScheduleIndex( AlphaName( 12 ) );
-									if ( People( Loop ).ClothingPtr == 0 ) {
+									if ( People( Loop ).ClothingPtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 										if ( Item1 == 1 ) {
 											ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 12 ) + " entered=" + AlphaName( 12 ) );
 											ErrorsFound = true;
@@ -829,7 +829,7 @@ namespace InternalHeatGains {
 										}
 									}
 								}
-							} else if ( MustInpSch ) {
+							} else if ( MustInpSch && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 								if ( Item1 == 1 ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 13 ) + " is required for this item." );
 									ErrorsFound = true;
@@ -4077,7 +4077,7 @@ namespace InternalHeatGains {
 			Lights( Loop ).TotGainEnergy = Lights( Loop ).TotGainRate * TimeStepZoneSec;
 			if ( ! WarmupFlag ) {
 				if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) { //for weather simulations only
-					//for tabular report, accumlate the total electricity used for each Light object
+					//for tabular report, accumulate the total electricity used for each Light object
 					Lights( Loop ).SumConsumption += Lights( Loop ).Consumption;
 					//for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)
 					if ( Lights( Loop ).Power > 0.01 * Lights( Loop ).DesignLevel ) {
