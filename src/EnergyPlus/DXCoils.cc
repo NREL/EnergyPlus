@@ -5209,8 +5209,7 @@ namespace DXCoils {
 				MySizeFlag( DXCoilNum ) = false;
 			}
 
-			Real64 const RatedAirMassFlowRateSeaLevel = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdPressureSeaLevel, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
-			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), true, StdPressureSeaLevel );
+			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ), DXCoil( DXCoilNum ).RatedSHR( 1 ), true );
 			MyEnvrnFlag( DXCoilNum ) = false;
 		}
 
@@ -5294,7 +5293,7 @@ namespace DXCoils {
 
 				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 				// get high speed rated coil bypass factor
-				DXCoil( DXCoilNum ).RatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( Mode ), DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+				DXCoil( DXCoilNum ).RatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( Mode ), DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
 
 			}
 
@@ -5325,7 +5324,7 @@ namespace DXCoils {
 						}
 						DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 						// get rated coil bypass factor
-						DXCoil( DXCoilNum ).RatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).CoilPerformanceType( Mode ), DXCoil( DXCoilNum ).CoilPerformanceName( Mode ), RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( Mode ), DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+						DXCoil( DXCoilNum ).RatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).CoilPerformanceType( Mode ), DXCoil( DXCoilNum ).CoilPerformanceName( Mode ), RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( Mode ), DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
 					} // End capacity stages loop
 				} // End dehumidification modes loop
 
@@ -5370,7 +5369,7 @@ namespace DXCoils {
 
 				DXCoil( DXCoilNum ).RatedAirMassFlowRate2 = DXCoil( DXCoilNum ).RatedAirVolFlowRate2 * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 				// get low speed rated coil bypass factor
-				DXCoil( DXCoilNum ).RatedCBF2 = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap2, DXCoil( DXCoilNum ).RatedAirMassFlowRate2, DXCoil( DXCoilNum ).RatedSHR2 );
+				DXCoil( DXCoilNum ).RatedCBF2 = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap2, DXCoil( DXCoilNum ).RatedAirVolFlowRate2, DXCoil( DXCoilNum ).RatedSHR2 );
 
 				// call for standard ratings for two-speeed DX coil
 				if ( DXCoil( DXCoilNum ).CondenserType( 1 ) == AirCooled ) {
@@ -5401,7 +5400,7 @@ namespace DXCoils {
 					}
 					DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 					// get high speed rated coil bypass factor
-					DXCoil( DXCoilNum ).MSRatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).MSRatedTotCap( Mode ), DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode ), DXCoil( DXCoilNum ).MSRatedSHR( Mode ) );
+					DXCoil( DXCoilNum ).MSRatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).MSRatedTotCap( Mode ), DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), DXCoil( DXCoilNum ).MSRatedSHR( Mode ) );
 				}
 			}
 
@@ -9488,10 +9487,9 @@ Label50: ;
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
-		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
+		Real64 const AirVolFlowRate, // the air volume flow rate at the given capacity [m3/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
-		bool const PrintFlag, // flag used to print warnings if desired
-		Real64 const BaroPress // Barometric pressure [Pa], defaulted to StdBaroPress in header
+		bool const PrintFlag // flag used to print warnings if desired
 	)
 	{
 
@@ -9502,7 +9500,7 @@ Label50: ;
 		// PURPOSE OF THIS FUNCTION:
 		// Calculate the coil bypass factor for a coil given the total capacity at the entering conditions,
 		// air mass flow rate at the entering conditions, and the sensible heat ratio (SHR) at the
-		// entering conditions.
+		// entering conditions. Standard barometric pressure is used for this model parameter.
 
 		// METHODOLOGY EMPLOYED:
 		// calculate SlopeRated (deltahumrat/deltaT) using rated unit information provided by
@@ -9543,8 +9541,11 @@ Label50: ;
 		Real64 Slope( 0.0 ); // Calculated Slope used while hunting for Tadp
 		Real64 Tolerance; // Convergence tolerance for CBF calculations
 		Real64 HTinHumRatOut; // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
+		Real64 AirMassFlowRate; // the standard air mass flow rate at the given capacity [kg/s]
+		Real64 adjustedSHR; // SHR calculated using adjusted outlet air properties []
 		static bool CBFErrors( false ); // Set to true if errors in CBF calculation, fatal at end of routine
 
+		AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW( StdPressureSeaLevel, InletAirTemp, InletAirHumRat, RoutineName );
 		DeltaH = TotCap / AirMassFlowRate;
 		InletAirEnthalpy = PsyHFnTdbW( InletAirTemp, InletAirHumRat );
 		HTinHumRatOut = InletAirEnthalpy - ( 1.0 - SHR ) * DeltaH;
@@ -9554,7 +9555,7 @@ Label50: ;
 		OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//  Pressure will have to be pass into this subroutine to fix this one
-		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, BaroPress, RoutineName );
+		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdPressureSeaLevel, RoutineName );
 		if ( OutletAirRH >= 1.0 && PrintFlag ) {
 			ShowSevereError( "For object = " + UnitType + ", name = \"" + UnitName + "\"" );
 			ShowContinueError( "Calculated outlet air relative humidity greater than 1. The combination of" );
@@ -9569,19 +9570,23 @@ Label50: ;
 			ShowContinueError( "...Outlet Air Humidity Ratio = " + RoundSigDigits( OutletAirHumRat, 6 ) + " kgWater/kgDryAir" );
 			ShowContinueError( "...Total Cooling Capacity used in calculation = " + RoundSigDigits( TotCap, 2 ) + " W" );
 			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + RoundSigDigits( AirMassFlowRate, 6 ) + " kg/s" );
-			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) + " m3/s" );
+			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirVolFlowRate, 6 ) + " m3/s" );
 			if ( TotCap > 0.0 ) {
-				if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap ) > SmallDifferenceTest ) || ( ( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
-					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) + " m3/s/W" );
+				if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - AirVolFlowRate / TotCap ) > SmallDifferenceTest ) || ( ( AirVolFlowRate / TotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
+					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirVolFlowRate / TotCap, 7 ) + " m3/s/W" );
 				}
 			}
 			ShowContinueErrorTimeStamp( "" );
-			ShowContinueError( "SHR adjusted to achieve valid outlet air properties and the simulation continues." );
-			OutletAirTempSat = PsyTsatFnHPb(OutletAirEnthalpy, BaroPress, RoutineName);
+			OutletAirTempSat = PsyTsatFnHPb(OutletAirEnthalpy, StdPressureSeaLevel, RoutineName);
 			if (OutletAirTemp < OutletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
 				OutletAirTemp = OutletAirTempSat + 0.005;
 				OutletAirHumRat = PsyWFnTdbH( OutletAirTemp, OutletAirEnthalpy, RoutineName );
 				DeltaHumRat = InletAirHumRat - OutletAirHumRat;
+				HTinHumRatOut = PsyHFnTdbW( InletAirTemp, OutletAirHumRat );
+				adjustedSHR = ( HTinHumRatOut - OutletAirEnthalpy ) / DeltaH;
+				ShowContinueError( "CalcCBF: SHR adjusted to achieve valid outlet air properties and the simulation continues." );
+				ShowContinueError( "CalcCBF: initial SHR = " + RoundSigDigits( SHR, 5 ) );
+				ShowContinueError( "CalcCBF: adjusted SHR = " + RoundSigDigits( adjustedSHR, 5 ) );
 			}
 		}
 		DeltaT = InletAirTemp - OutletAirTemp;
@@ -9599,10 +9604,10 @@ Label50: ;
 			ShowContinueError( "...Outlet Air Humidity Ratio = " + RoundSigDigits( OutletAirHumRat, 6 ) + " kgWater/kgDryAir" );
 			ShowContinueError( "...Total Cooling Capacity used in calculation = " + RoundSigDigits( TotCap, 2 ) + " W" );
 			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + RoundSigDigits( AirMassFlowRate, 6 ) + " kg/s" );
-			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) + " m3/s" );
+			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirVolFlowRate, 6 ) + " m3/s" );
 			if ( TotCap > 0.0 ) {
-				if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap ) > SmallDifferenceTest ) || ( ( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
-					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) + " m3/s/W" );
+				if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - AirVolFlowRate / TotCap ) > SmallDifferenceTest ) || ( ( AirVolFlowRate / TotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
+					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirVolFlowRate / TotCap, 7 ) + " m3/s/W" );
 				}
 			}
 			ShowContinueErrorTimeStamp( "" );
@@ -9624,10 +9629,10 @@ Label50: ;
 			ShowContinueError( "...Outlet Air Humidity Ratio = " + RoundSigDigits( OutletAirHumRat, 6 ) + " kgWater/kgDryAir" );
 			ShowContinueError( "...Total Cooling Capacity used in calculation = " + RoundSigDigits( TotCap, 2 ) + " W" );
 			ShowContinueError( "...Air Mass Flow Rate used in calculation     = " + RoundSigDigits( AirMassFlowRate, 6 ) + " kg/s" );
-			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ), 6 ) + " m3/s" );
+			ShowContinueError( "...Air Volume Flow Rate used in calculation   = " + RoundSigDigits( AirVolFlowRate, 6 ) + " m3/s" );
 			if ( TotCap > 0.0 ) {
-				if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap ) > SmallDifferenceTest ) || ( ( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
-					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirMassFlowRate / PsyRhoAirFnPbTdbW( BaroPress, InletAirTemp, InletAirHumRat, RoutineName ) / TotCap, 7 ) + " m3/s/W" );
+				if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - AirVolFlowRate / TotCap ) > SmallDifferenceTest ) || ( ( AirVolFlowRate / TotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
+					ShowContinueError( "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " + RoundSigDigits( AirVolFlowRate / TotCap, 7 ) + " m3/s/W" );
 				}
 			}
 			ShowContinueErrorTimeStamp( "" );
@@ -9638,7 +9643,7 @@ Label50: ;
 			//   First guess for Tadp is outlet air dew point
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			//  Pressure will have to be pass into this subroutine to fix this one
-			ADPTemp = PsyTdpFnWPb( OutletAirHumRat, BaroPress );
+			ADPTemp = PsyTdpFnWPb( OutletAirHumRat, StdPressureSeaLevel );
 
 			Tolerance = 1.0; // initial conditions for iteration
 			ErrorLast = 100.0;
@@ -9653,7 +9658,7 @@ Label50: ;
 
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  Pressure will have to be pass into this subroutine to fix this one
-				ADPHumRat = min( OutletAirHumRat, PsyWFnTdpPb( ADPTemp, BaroPress ) );
+				ADPHumRat = min( OutletAirHumRat, PsyWFnTdpPb( ADPTemp, StdPressureSeaLevel ) );
 				Slope = ( InletAirHumRat - ADPHumRat ) / max( 0.001, ( InletAirTemp - ADPTemp ) );
 
 				//     check for convergence (slopes are equal to within error tolerance)
@@ -9714,7 +9719,7 @@ Label50: ;
 		Real64 const RatedInletAirTemp, // coil inlet air temperature [C]
 		Real64 const RatedInletAirHumRat, // coil inlet air humidity ratio [kg/kg]
 		Real64 const TotCap, // coil total capacity [W]
-		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
+		Real64 const AirVolFlowRate, // coil air volume flow rate [m3/s]
 		Real64 const InitialSHR, // coil sensible heat ratio []
 		std::string const & CallingRoutine // function name calling this routine
 	)
@@ -9753,11 +9758,13 @@ Label50: ;
 		Real64 CalcADPHumRat( 0.0 ); // actual ADP humidity ratio based on bypass factor [kg/kg]
 		Real64 CalcADPTempFnHR( 0.0 ); // actual ADP temperature as a function of humidity ratio based on bypass factor [C]
 		Real64 ADPerror( 0.0 ); // difference between ADP function of temperature and humidity ratio [deltaC]
+		Real64 AirMassFlow( 0.0 ); // air mass flow rate based on standard barometric pressure [kg/s]
 		bool bStillValidating( true ); // while loop flag
 		bool bNoReporting( false ); // don't report specific warnings in calcCBF while iterating on result
 		bool bReversePerturb( false ); // identifies when SHR is being lowered based on outlet air RH
 
 		SHR = InitialSHR;
+		AirMassFlow = AirVolFlowRate * PsyRhoAirFnPbTdbW( StdPressureSeaLevel, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
 		while ( bStillValidating ) {
 			CBF_calculated = max( 0.0, CalcCBF( UnitType, UnitName, RatedInletAirTemp, RatedInletAirHumRat, TotCap, AirMassFlow, SHR, bNoReporting ) );
 			DeltaH = TotCap / AirMassFlow;
@@ -9767,11 +9774,11 @@ Label50: ;
 			DeltaHumRat = RatedInletAirHumRat - OutletAirHumRat;
 			OutletAirEnthalpy = InletAirEnthalpy - DeltaH;
 			OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
-			OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdBaroPress, CallingRoutine );
+			OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdPressureSeaLevel, CallingRoutine );
 			if ( CBF_calculated < 1 ) {
 				CalcADPTemp = RatedInletAirTemp - ( ( RatedInletAirTemp - OutletAirTemp ) / ( 1 - CBF_calculated ) );
 				CalcADPHumRat = RatedInletAirHumRat - ( ( DeltaHumRat ) / ( 1 - CBF_calculated ) );
-				CalcADPTempFnHR = PsyTdpFnWPb( CalcADPHumRat, StdBaroPress, CallingRoutine );
+				CalcADPTempFnHR = PsyTdpFnWPb( CalcADPHumRat, StdPressureSeaLevel, CallingRoutine );
 				ADPerror = CalcADPTemp - CalcADPTempFnHR;
 			} else {
 				ADPerror = 0; // might be able to check for RH >= 1 and reduce SHR, need defect file for that since can't create one
@@ -11633,7 +11640,7 @@ Label50: ;
 		Real64 PartLoadAirMassFlowRate;
 		Real64 AirMassFlowRatio;
 		static Real64 AccuracyTolerance( 0.2 ); // tolerance in AHRI 340/360 Table 6 note 1
-		static int MaximumIterations( 500 );
+		static int MaximumIterations( 1000 );
 		int SolverFlag;
 		Array1D< Real64 > Par( 12 ); // Parameter array passed to solver
 		Real64 EIR_HighSpeed;

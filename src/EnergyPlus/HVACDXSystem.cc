@@ -597,6 +597,13 @@ namespace HVACDXSystem {
 			} else {
 				if ( SameString( Alphas( 11 ), "Yes" ) ) {
 					DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = true;
+					if ( DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+						ShowWarningError( CurrentModuleObject + " = " + DXCoolingSystem( DXCoolSysNum ).Name );
+						ShowContinueError( "Invalid entry for " + cAlphaFields( 11 ) + " :" + Alphas( 11 ) );
+						ShowContinueError( "Variable DX Cooling Coil is not supported as 100% DOAS DX coil." );
+						ShowContinueError( "Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues." );
+						DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = false;
+					}
 				} else if ( SameString( Alphas( 11 ), "" ) ) {
 					DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = false;
 				} else if ( SameString( Alphas( 11 ), "No" ) ) {

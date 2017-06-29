@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include <General.hh>
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>

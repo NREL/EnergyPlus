@@ -3560,7 +3560,7 @@ namespace General {
 					ViewFactorInfo = true;
 					ViewRptOption1 = cAlphaArgs( 2 );
 
-				} else if ( SELECT_CASE_var == "DECAYCURVESFROMZONECOMPONENTLOADS" ) { //Should the Radiant to Convective Decay Curves from the load component report appear in the EIO file
+				} else if ( SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY" ) { //Should the Radiant to Convective Decay Curves from the load component report appear in the EIO file
 					ShowDecayCurvesInEIO = true;
 
 				} else if ( SELECT_CASE_var == "" ) {

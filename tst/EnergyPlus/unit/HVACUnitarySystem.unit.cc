@@ -49,14 +49,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <General.hh>
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -73,8 +69,10 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -6489,4 +6487,196 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXHeatingCoilOnly ) {
 	ASSERT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 3 ), 0.0393, 0.0001 );
 	ASSERT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 4 ), 0.0524, 0.0001 );
 
+}
+
+TEST_F( EnergyPlusFixture, UnitarySystem_SizingWithFans ) {
+
+// Add three fans to this model - one Fan:ConstantVolume, and three Fan:SystemModel in order to make the SupFanIndex=2
+	std::string const idf_objects = delimited_string({
+
+		"  Fan:SystemModel,",
+		"    Test Fan 1 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFanAirInletNode,         !- Air Inlet Node Name",
+		"    TestFanOutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    50.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  ",
+		"  Fan:SystemModel,",
+		"    Test Fan 2 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFan2AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan2OutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    100.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  Fan:SystemModel,",
+		"    Test Fan 3 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFan3AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan3OutletNode,           !- Air Outlet Node Name",
+		"    1.005 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    200.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  Fan:ConstantVolume,",
+		"    Test Fan 4,            !- Name",
+		"    ,    !- Availability Schedule Name",
+		"    0.5,                     !- Fan Total Efficiency",
+		"    25.0,                   !- Pressure Rise {Pa}",
+		"    1.0,                  !- Maximum Flow Rate {m3/s}",
+		"    0.9,                     !- Motor Efficiency",
+		"    1.0,                     !- Motor In Airstream Fraction",
+		"    TestFan4AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan4OutletNode;           !- Air Outlet Node Name",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	std::string fanName = "TEST FAN 1";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+
+	fanName = "TEST FAN 2";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+
+	fanName = "TEST FAN 3";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+	DataSizing::CurZoneEqNum = 0;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+	DataEnvironment::StdRhoAir = 1.2;
+	HVACFan::fanObjs[ 2 ]->simulate( _,_,_,_ ); // triggers sizing call
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 2 ]->designAirVolFlowRate; // get function
+	Real64 locDesignHeatGain3 = HVACFan::fanObjs[ 2 ]->getFanDesignHeatGain( locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain3, 402.0, 0.1 );
+
+	Fans::GetFanInput();
+	Real64 locDesignHeatGain4 = Fans::FanDesHeatGain( 1, locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain4, 50.25, 0.1 );
+
+	DataConstantUsedForSizing = 1.0;
+	DataFractionUsedForSizing = 1.0;
+	DataTotCapCurveIndex = 0;
+	DataDesOutletAirTemp = 0.0;
+
+	CurSysNum = 1;
+	FinalSysSizing.allocate( 1 );
+	FinalSysSizing( CurSysNum ).CoolSupTemp = 12.0;
+	FinalSysSizing( CurSysNum ).CoolSupHumRat = 0.0085;
+	FinalSysSizing( CurSysNum ).MixTempAtCoolPeak = 28.0;
+	FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak = 0.0075;
+	FinalSysSizing( CurSysNum ).DesCoolVolFlow = 1.005;
+	FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
+
+	PrimaryAirSystem.allocate( 1 );
+	PrimaryAirSystem( CurSysNum ).NumOACoolCoils = 0;
+	PrimaryAirSystem( CurSysNum ).SupFanNum = 0;
+	PrimaryAirSystem( CurSysNum ).RetFanNum = 0;
+	PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+
+	SysSizingRunDone = true;
+	SysSizInput.allocate( 1 );
+	SysSizInput( 1 ).AirLoopNum = CurSysNum;
+	DataSizing::NumSysSizInput = 1;
+
+	StdBaroPress = 101325.0;
+	InitializePsychRoutines();
+
+	// Need this to prevent crash in RequestSizing
+	UnitarySysEqSizing.allocate( 1 );
+	OASysEqSizing.allocate( 1 );
+
+	int UnitarySysNum( 1 );
+	int AirLoopNum( 1 );
+	bool FirstHVACIteration( true );
+	HVACUnitarySystem::NumUnitarySystem = 2; // Need to be one more than calls to unitarysystem in order to prevent deallocation of fields arrays
+
+	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
+
+	UnitarySystem.allocate( HVACUnitarySystem::NumUnitarySystem );
+	UnitarySystem( UnitarySysNum ).UnitarySystemType = "AirLoopHVAC:UnitarySystem";
+	UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
+	UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
+
+	UnitarySystemNumericFields.allocate( 1 );
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames.allocate( 20 );
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 3 ) = "Cooling Supply Air Flow Rate";
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 7 ) = "Heating Supply Air Flow Rate";
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 11 ) = "No Load Supply Air Flow Rate";
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 17 ) = "Maximum Supply Air Temperature";
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 18 ) = "Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation";
+
+	// test cooling only sizing
+	UnitarySystem( UnitarySysNum ).FanExists = true;
+	UnitarySystem( UnitarySysNum ).CoolCoilExists = true;
+	UnitarySystem( UnitarySysNum ).HeatCoilExists = false;
+
+	UnitarySystem( UnitarySysNum ).Name = "UnitarySystem:CoolingOnly";
+	UnitarySystem( UnitarySysNum ).CoolingSAFMethod = DataSizing::FractionOfAutosizedCoolingAirflow;
+	UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = AutoSize;
+	UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
+	UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+	UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
+	UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
+
+	// With Test Fan 3 fan heat - this fails before the #6026 fix in HVACUnitarySystem (and in ReportSizingManager)
+	UnitarySystem( UnitarySysNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+	UnitarySystem( UnitarySysNum ).FanIndex = 2; // Fan:SystemModel is zero-based subscripts, so 2 is 3
+	Real64 expectedSize = 18976.394 + locDesignHeatGain3;
+
+	SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
+
+	EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow );
+	EXPECT_NEAR( expectedSize, UnitarySystem( UnitarySysNum ).DesignCoolingCapacity, 0.001 );
+
+    // reset for next test
+	UnitarySystem(UnitarySysNum).DesignCoolingCapacity = AutoSize;
+	UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow = 1.0;
+	UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow = AutoSize;
+	UnitarySystem(UnitarySysNum).MaxNoCoolHeatAirVolFlow = AutoSize;
+	UnitarySystem(UnitarySysNum).DesignFanVolFlowRate = AutoSize;
+
+	// With Test Fan 4 fan heat
+	UnitarySystem(UnitarySysNum).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+	UnitarySystem(UnitarySysNum).FanIndex = 1; // Fan:ConstantVolume is one-based subscripts, so 1 is 1
+	expectedSize = 18976.394 + locDesignHeatGain4;
+
+	SizeUnitarySystem(UnitarySysNum, FirstHVACIteration, AirLoopNum);
+
+	EXPECT_EQ(1.005, UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow);
+	EXPECT_NEAR(expectedSize, UnitarySystem(UnitarySysNum).DesignCoolingCapacity, 0.001);
+
+
+
+	// clean
+	DataSizing::NumSysSizInput = 0;
+	FinalSysSizing.deallocate();
+	PrimaryAirSystem.deallocate();
+	SysSizInput.deallocate();
+	UnitarySysEqSizing.deallocate();
+	OASysEqSizing.deallocate();
 }
