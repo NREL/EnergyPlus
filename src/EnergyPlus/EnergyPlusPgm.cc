@@ -256,11 +256,9 @@ EnergyPlusPgm( std::string const & filepath )
 	// routine modules
 	using namespace FileSystem;
 	using namespace OutputProcessor;
-	using namespace ResultsFramework;
 	using namespace SimulationManager;
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
-	using ResultsFramework::OutputSchema;
 	using Psychrometrics::ShowPsychrometricSummary;
 
 	// Disable C++ i/o synching with C methods for speed
@@ -305,9 +303,9 @@ EnergyPlusPgm( std::string const & filepath )
 
 	CreateCurrentDateTimeString( CurrentDateTime );
 
-	OutputSchema->SimulationInformation.setProgramVersion( VerString );
-	OutputSchema->SimulationInformation.setStartDateTimeStamp(CurrentDateTime.substr(5));
-	
+	ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion( VerString );
+	ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(CurrentDateTime.substr(5));
+
 	VerString += "," + CurrentDateTime;
 
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
@@ -444,10 +442,9 @@ EnergyPlusPgm( std::string const & filepath )
 
 	try {
 
-		//OutputSchema->setupOutputOptions();
 		InputProcessor::InitFiles();
 		InputProcessor::ProcessInput();
-		OutputSchema->setupOutputOptions();
+		ResultsFramework::OutputSchema->setupOutputOptions();
 		ManageSimulation();
 
 		ShowMessage( "Simulation Error Summary *************" );

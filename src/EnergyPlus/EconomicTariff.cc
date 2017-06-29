@@ -83,7 +83,6 @@ namespace EconomicTariff {
 	//    Compute utility bills for a building based on energy
 	//    use estimate.
 	using namespace DataPrecisionGlobals;
-	using namespace ResultsFramework;
 	using ScheduleManager::GetScheduleIndex;
 
 	//ECONOMCIS:TARIFF enumerated lists
@@ -1421,7 +1420,7 @@ namespace EconomicTariff {
 		monetaryUnit( 56 ).txt = "$";
 		monetaryUnit( 57 ).txt = "KZT";
 		monetaryUnit( 58 ).txt = "LAK";
-		monetaryUnit( 59 ).txt = "�";
+		monetaryUnit( 59 ).txt = "£";
 		monetaryUnit( 60 ).txt = "LKR";
 		monetaryUnit( 61 ).txt = "$";
 		monetaryUnit( 62 ).txt = "Lt";
@@ -4041,10 +4040,9 @@ namespace EconomicTariff {
 					                                       "Economics Results Summary Report", "Entire Facility",
 					                                       "Annual Cost");
 				}
-				if (OutputSchema->timeSeriesAndTabularEnabled())
-					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
-					                                                      "Economics Results Summary Report",
-					                                                      "Entire Facility", "Annual Cost");
+				if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
+					ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
+				}
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -4075,13 +4073,13 @@ namespace EconomicTariff {
 					}
 					tableBody( 3, iTariff ) = tariff( iTariff ).reportMeter;
 					{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
-						if ( SELECT_CASE_var == buyFromUtility ) {
-							tableBody( 4, iTariff ) = "Buy";
-						} else if ( SELECT_CASE_var == sellToUtility ) {
-							tableBody( 4, iTariff ) = "Sell";
-						} else if ( SELECT_CASE_var == netMetering ) {
-							tableBody( 4, iTariff ) = "Net";
-						}}
+					if ( SELECT_CASE_var == buyFromUtility ) {
+						tableBody( 4, iTariff ) = "Buy";
+					} else if ( SELECT_CASE_var == sellToUtility ) {
+						tableBody( 4, iTariff ) = "Sell";
+					} else if ( SELECT_CASE_var == netMetering ) {
+						tableBody( 4, iTariff ) = "Net";
+					}}
 					if ( tariff( iTariff ).groupName == "" ) {
 						tableBody( 5, iTariff ) = "(none)";
 					} else {
@@ -4095,10 +4093,9 @@ namespace EconomicTariff {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
 				}
-				if (OutputSchema->timeSeriesAndTabularEnabled())
-					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
-					                                                      "Economics Results Summary Report",
-					                                                      "Entire Facility", "Tariff Summary");
+				if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
+					ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+				}
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -4173,8 +4170,9 @@ namespace EconomicTariff {
 					if ( sqlite ) {
 						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
 					}
-					if (OutputSchema->timeSeriesAndTabularEnabled())
-						OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
+					if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
+						ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+					}
 					columnHead.deallocate();
 					rowHead.deallocate();
 					columnWidth.deallocate();
@@ -4546,8 +4544,9 @@ namespace EconomicTariff {
 		if ( sqlite ) {
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
 		}
-		if (OutputSchema->timeSeriesAndTabularEnabled())
-			OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
+		if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
+			ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
+		}
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();

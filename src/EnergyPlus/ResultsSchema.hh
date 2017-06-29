@@ -2,6 +2,7 @@
 #define ResultsSchema_hh_INCLUDED
 
 #include <unordered_map>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -15,41 +16,33 @@
 #include <DataGlobals.hh>
 #include <OutputProcessor.hh>
 
-#include <memory>
-using json = nlohmann::json;
 namespace EnergyPlus {
 
 	namespace ResultsFramework {
 
-		// getUUID copied from Shannon's code; to be replaced with the right UUID API calls
-		std::string getUUID();
-		int randomInRange(int min, int max);
+		using json = nlohmann::json;
 
 		// trim string
-		std::string trim(std::string str);
-		
+		std::string trim( std::string str );
+
 		// base result object
 		class BaseResultObject {
 		public:
-			BaseResultObject();
-			void setUUID(const std::string uuid_);
-			const std::string UUID();
-		protected:
-			std::string uuid;
+			BaseResultObject() {};
 		};
 
 		class SimInfo : public BaseResultObject {
 		public:
-			void setProgramVersion(const std::string programVersion);
+			void setProgramVersion( const std::string & programVersion);
 			std::string getProgramVersion();
-			void setSimulationEnvironment(const std::string simulationEnvironment);
-			void setInputModelURI(const std::string inputModelURI);
-			void setStartDateTimeStamp(const std::string startDateTimeStamp);
-			void setRunTime(const std::string elapsedTime);
-			void setNumErrorsWarmup(const std::string  numWarningsDuringWarmup, const std::string  numSevereDuringWarmup);
-			void setNumErrorsSizing(const std::string  numWarningsDuringSizing, const std::string  numSevereDuringSizing);
-			void setNumErrorsSummary(const std::string  numWarnings, const std::string  numSevere);
-			json getJSON();
+			void setSimulationEnvironment( const std::string & simulationEnvironment);
+			void setInputModelURI( const std::string & inputModelURI);
+			void setStartDateTimeStamp( const std::string & startDateTimeStamp);
+			void setRunTime( const std::string & elapsedTime);
+			void setNumErrorsWarmup( const std::string & numWarningsDuringWarmup, const std::string & numSevereDuringWarmup);
+			void setNumErrorsSizing( const std::string & numWarningsDuringSizing, const std::string & numSevereDuringSizing);
+			void setNumErrorsSummary( const std::string & numWarnings, const std::string & numSevere);
+			json getJSON() const;
 		protected:
 			std::string ProgramVersion;
 			std::string SimulationEnvironment;
@@ -61,52 +54,54 @@ namespace EnergyPlus {
 
 		class Variable : public BaseResultObject {
 		public:
-			Variable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string units);
+			Variable() = default;
+			Variable( const std::string & VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string & units );
 
-			std::string variableName();
-			void setVariableName(const std::string VarName);
+			std::string variableName() const;
+			void setVariableName( const std::string & VarName );
 
 			std::string sReportFrequency();
 			int iReportFrequency();
-			void setReportFrequency(const int ReportFrequency);
-					
-			int indexType();
-			void setIndexType(const int IndexType);
+			void setReportFrequency( const int ReportFrequency );
 
-			int reportID();
-			void setReportID(const int Id);
-			
-			std::string units();
-			void setUnits(std::string units);
+			int indexType() const;
+			void setIndexType( const int IndexType );
 
-			void pushValue(const double val);
-			std::vector<double>& values();
-			
-			json getJSON();
+			int reportID() const;
+			void setReportID( const int Id );
+
+			std::string units() const;
+			void setUnits( const std::string & units );
+
+			void pushValue( const double val );
+			double value( size_t index ) const;
+			size_t numValues() const;
+
+			json getJSON() const;
 
 		protected:
 			std::string varName;
 			std::string sReportFreq;
 			std::string Units;
-			int iReportFreq;
-			int idxType;
-			int rptID;
+			int iReportFreq = -1;
+			int idxType = -1;
+			int rptID = -1;
 			std::vector<double> Values;
 		};
 
 		class OutputVariable : public Variable {
 		public:
-			OutputVariable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string units);
+			OutputVariable( const std::string & VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string & units );
 		};
 
 		class MeterVariable : public Variable {
 		public:
-			MeterVariable(const std::string VarName, const int ReportFrequency, const int ReportID, const std::string units, const bool Acculumative=false);
+			MeterVariable( const std::string & VarName, const int ReportFrequency, const int ReportID, const std::string & units, const bool Acculumative = false );
 
 			bool accumulative();
-			void setAccumulative(bool state);
+			void setAccumulative( bool state );
 
-			json getJSON();
+			json getJSON() const;
 
 		protected:
 			bool acc;
@@ -114,50 +109,50 @@ namespace EnergyPlus {
 
 		class DataFrame : public BaseResultObject {
 		public:
-			typedef std::pair< int, Variable* > VarPtrPair; 
+			typedef std::pair< int, Variable > VarPtrPair;
 
-			DataFrame(std::string ReportFreq);
-			~DataFrame();
+			DataFrame( const std::string & ReportFreq );
+			virtual ~DataFrame();
 
-			void addVariable(Variable *var);
+			void addVariable( Variable const & var );
 
-			void setRDataFrameEnabled(bool state);
-			void setIDataFrameEnabled(bool state);
-			
-			bool rDataFrameEnabled();
-			bool iDataFrameEnabled();
+			void setRDataFrameEnabled( bool state );
+			void setIDataFrameEnabled( bool state );
 
-			void setRVariablesScanned(bool state);
-			void setIVariablesScanned(bool state);
+			bool rDataFrameEnabled() const;
+			bool iDataFrameEnabled() const;
 
-			bool rVariablesScanned();
-			bool iVariablesScanned();
+			void setRVariablesScanned( bool state );
+			void setIVariablesScanned( bool state );
 
-			void newRow(const int month, const int dayOfMonth, const int hourOfDay, const int curMin);
-			void newRow(const std::string ts);
-			void pushVariableValue(const int reportID, double value);
-			
-			Variable* lastVariable();
-			
+			bool rVariablesScanned() const;
+			bool iVariablesScanned() const;
+
+			void newRow( const int month, const int dayOfMonth, const int hourOfDay, const int curMin );
+			void newRow( const std::string & ts );
+			void pushVariableValue( const int reportID, double value );
+
+			Variable & lastVariable();
+
 			json getVariablesJSON();
-			json getJSON();
+			json getJSON() const;
 
 			void writeReport();
 
 		protected:
-			bool IDataFrameEnabled;
-			bool RDataFrameEnabled;
-			bool RVariablesScanned;
-			bool IVariablesScanned;
+			bool IDataFrameEnabled = false;
+			bool RDataFrameEnabled = false;
+			bool RVariablesScanned = false;
+			bool IVariablesScanned = false;
 			std::string ReportFrequency;
 			std::vector < std::string > TS;
-			std::unordered_map< int, Variable * > variableMap; // for O(1) lookup when adding to data structure
+			std::unordered_map< int, Variable > variableMap; // for O(1) lookup when adding to data structure
 			int lastVarID;
 		};
 
 
 
-		class Table :public BaseResultObject {
+		class Table : public BaseResultObject {
 		public:
 			std::string TableName;
 			std::string FootnoteText;
@@ -169,53 +164,63 @@ namespace EnergyPlus {
 				Array1D_string const & rowLabels,
 				Array1D_string const & columnLabels,
 				std::string const & tableName,
-				std::string footnoteText = "");
+				std::string const & footnoteText);
 
-			json getJSON();
+			json getJSON() const;
 		};
 
-		class Report:public BaseResultObject {
+		class Report: public BaseResultObject {
 		public:
 			std::string ReportName;
 			std::string ReportForString;
-			std::vector< Table* > Tables;
+			std::vector< Table > Tables;
 
-			json getJSON();
+			json getJSON() const;
 		};
 
 		class ReportsCollection : public BaseResultObject {
-		public:			
-			typedef std::pair< std::string, Report* > RptPtrPair;
+		public:
+			typedef std::pair< std::string, Report > RptPtrPair;
 
 			ReportsCollection();
 
-			void addReportTable(Array2D_string const & body,
+			void addReportTable(
+				Array2D_string const & body,
 				Array1D_string const & rowLabels,
 				Array1D_string const & columnLabels,
-				std::string const & reportName, std::string const & reportForString, 
-				std::string const & tableName,
-				std::string footnoteText = "");
+				std::string const & reportName,
+				std::string const & reportForString,
+				std::string const & tableName);
 
-			json getJSON();
+			void addReportTable(
+				Array2D_string const & body,
+				Array1D_string const & rowLabels,
+				Array1D_string const & columnLabels,
+				std::string const & reportName,
+				std::string const & reportForString,
+				std::string const & tableName,
+				std::string const & footnoteText);
+
+			json getJSON() const;
 
 		protected:
-			std::unordered_map< std::string, Report * > reportsMap;
-			Report *rpt;
+			std::unordered_map< std::string, Report > reportsMap;
+			Report rpt;
 		};
 
 		class ResultsSchema : public BaseResultObject {
 		public:
 			ResultsSchema();
-			~ResultsSchema();
-			
+			virtual ~ResultsSchema();
+
 			void setupOutputOptions();
 
 			bool timeSeriesEnabled();
 			bool timeSeriesAndTabularEnabled();
 
-			void initializeRTSDataFrame(const int ReportFrequency, const Array1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar);
-			void initializeITSDataFrame(const int ReportFrequency, const Array1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar);
-			void initializeMeters(const Array1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency);
+			void initializeRTSDataFrame( const int ReportFrequency, const Array1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar );
+			void initializeITSDataFrame( const int ReportFrequency, const Array1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar );
+			void initializeMeters( const Array1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency );
 
 			static DataFrame RIDetailedZoneTSData, RIDetailedHVACTSData, RITimestepTSData, RIHourlyTSData, RIDailyTSData, RIMonthlyTSData, RIRunPeriodTSData;
 			static DataFrame TSMeters, HRMeters, DYMeters, MNMeters, SMMeters;
@@ -229,13 +234,11 @@ namespace EnergyPlus {
 			std::vector<std::string> RDD;
 			ReportsCollection TabularReportsCollection;
 		protected:
-			char *convert(const std::string & s);
-
 			bool tsEnabled;
 			bool tsAndTabularEnabled;
 		};
 
-		extern std::unique_ptr<ResultsSchema> OutputSchema;
+		extern std::unique_ptr< ResultsSchema > OutputSchema;
 
 		void clear_state();
 	} // ResultsFramework

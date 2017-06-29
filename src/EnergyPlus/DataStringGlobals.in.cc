@@ -78,11 +78,11 @@ namespace DataStringGlobals {
 	// Thus, all variables in this module must be PUBLIC.
 
 	// MODULE PARAMETER DEFINITIONS:
-	std::string const UpperCase( "ABCDEFGHIJKLMNOPQRSTUVWXYZ�����������������������������" );
-	std::string const LowerCase( "abcdefghijklmnopqrstuvwxyz�����������������������������" );
-	std::string const AccentedUpperCase( "�����������������������������" );
-	std::string const AccentedLowerCase( "�����������������������������" );
-	std::string const AllCase( "����������������������������������������������������������ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" );
+	std::string const UpperCase( "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ" );
+	std::string const LowerCase( "abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý" );
+	std::string const AccentedUpperCase( "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ" );
+	std::string const AccentedLowerCase( "àáâãäåæçèéêëìíîïðñòóôõöøùúûüý" );
+	std::string const AllCase( "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" );
 #ifdef _WIN32
 	std::string const NL( "\r\n" ); // Platform newline
 #else

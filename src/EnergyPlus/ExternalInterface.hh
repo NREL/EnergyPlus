@@ -85,7 +85,7 @@ namespace ExternalInterface {
 
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const maxVar;             // Maximum number of variables to be exchanged
-	extern int const maxErrMsgLength;   // Maximum error message length from json schema validation
+	extern int const maxErrMsgLength;   // Maximum error message length from xml schema validation
 	extern int const indexSchedule;  // Index for schedule in inpVarTypes
 	extern int const indexVariable;  // Index for variable in inpVarTypes
 	extern int const indexActuator;  // Index for actuator in inpVarTypes

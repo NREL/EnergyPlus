@@ -170,7 +170,6 @@ namespace SimulationManager {
 	using namespace HeatBalanceManager;
 	using namespace WeatherManager;
 	using namespace ExternalInterface;
-	using namespace ResultsFramework;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -316,9 +315,6 @@ namespace SimulationManager {
 
 		// Formats
 		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
-
-		// Is JSON Enabled?
-		// EnergyPlus::ResultsSchema::OutputSchema.InitializeSchema();
 
 		//CreateSQLiteDatabase();
 		sqlite = EnergyPlus::CreateSQLiteDatabase();
@@ -611,12 +607,13 @@ namespace SimulationManager {
 		PlantManager::CheckOngoingPlantWarnings();
 
 		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
-		// Output detailed ZONE time series data
 
+		// Output detailed ZONE time series data
 		OpenOutputJsonFiles();
 
-		if (OutputSchema->timeSeriesEnabled())
-			OutputSchema->writeTimeSeriesReports();
+		if ( ResultsFramework::OutputSchema->timeSeriesEnabled() ) {
+			ResultsFramework::OutputSchema->writeTimeSeriesReports();
+		}
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );
@@ -1225,100 +1222,101 @@ namespace SimulationManager {
 	}
 
 	void
-	OpenOutputJsonFiles() {
-
+	OpenOutputJsonFiles()
+	{
 		int write_stat;
 
 		//// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
-		if (OutputSchema->timeSeriesAndTabularEnabled() )
+		if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() )
 		{
 			OutputFileJson = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileJson, DataStringGlobals::outputJsonFileName, flags); write_stat = flags.ios(); }
-			if (write_stat != 0) {
-				ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputJsonFileName+ " for output (write).");
+			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileJson, DataStringGlobals::outputJsonFileName, flags ); write_stat = flags.ios(); }
+			if ( write_stat != 0 ) {
+				ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputJsonFileName + " for output (write)." );
 			}
 			json_stream = gio::out_stream( OutputFileJson );
 		}
 		//// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
-		if (OutputSchema->timeSeriesEnabled()){
+		if ( ResultsFramework::OutputSchema->timeSeriesEnabled() ) {
 			// Output detailed Zone time series file
-			if (OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled())
+			if ( ResultsFramework::OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || ResultsFramework::OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled() )
 			{
 				OutputFileTSZoneJson = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileTSZoneJson, DataStringGlobals::outputTSZoneJsonFileName, flags); write_stat = flags.ios(); }
-				if (write_stat != 0) {
-					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputTSZoneJsonFileName+ " for output (write).");
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileTSZoneJson, DataStringGlobals::outputTSZoneJsonFileName, flags ); write_stat = flags.ios(); }
+				if ( write_stat != 0 ) {
+					ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputTSZoneJsonFileName + " for output (write)." );
 				}
 				json_TSstream_Zone = gio::out_stream( OutputFileTSZoneJson );
 			}
 
 			// Output detailed HVAC time series file
-			if (OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() || OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled())
+			if ( ResultsFramework::OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() || ResultsFramework::OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled() )
 			{
 				OutputFileTSHVACJson = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileTSHVACJson, DataStringGlobals::outputTSHvacJsonFileName, flags); write_stat = flags.ios(); }
-				if (write_stat != 0) {
-					ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputTSHvacJsonFileName+ " for output (write).");
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileTSHVACJson, DataStringGlobals::outputTSHvacJsonFileName, flags ); write_stat = flags.ios(); }
+				if ( write_stat != 0 ) {
+					ShowFatalError( "OpenOutputFiles: Could not open file " +  DataStringGlobals::outputTSHvacJsonFileName + " for output (write)." );
 				}
 				json_TSstream_HVAC = gio::out_stream( OutputFileTSHVACJson );
 			}
 
 			// Output timestep time series file
-			if (OutputSchema->RITimestepTSData.iDataFrameEnabled() || OutputSchema->RITimestepTSData.rDataFrameEnabled())
+			if ( ResultsFramework::OutputSchema->RITimestepTSData.iDataFrameEnabled() || ResultsFramework::OutputSchema->RITimestepTSData.rDataFrameEnabled() )
 			{
 				OutputFileTSJson = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileTSJson, DataStringGlobals::outputTSJsonFileName, flags); write_stat = flags.ios(); }
-				if (write_stat != 0) {
-					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputTSJsonFileName+ " for output (write).");
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileTSJson, DataStringGlobals::outputTSJsonFileName, flags ); write_stat = flags.ios(); }
+				if ( write_stat != 0 ) {
+					ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputTSJsonFileName + " for output (write)." );
 				}
 				json_TSstream = gio::out_stream( OutputFileTSJson );
 			}
 
 			// Output hourly time series file
-			if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled())
+			if ( ResultsFramework::OutputSchema->RIHourlyTSData.iDataFrameEnabled() || ResultsFramework::OutputSchema->RIHourlyTSData.rDataFrameEnabled() )
 			{
 				OutputFileHRJson = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileHRJson, DataStringGlobals::outputHRJsonFileName, flags); write_stat = flags.ios(); }
-				if (write_stat != 0) {
-					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputHRJsonFileName+ " for output (write).");
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileHRJson, DataStringGlobals::outputHRJsonFileName, flags ); write_stat = flags.ios(); }
+				if ( write_stat != 0 ) {
+					ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputHRJsonFileName + " for output (write)." );
 				}
 				json_HRstream = gio::out_stream( OutputFileHRJson );
 			}
 
 			// Output daily time series file
-			if (OutputSchema->RIDailyTSData.iDataFrameEnabled() || OutputSchema->RIDailyTSData.rDataFrameEnabled())
+			if ( ResultsFramework::OutputSchema->RIDailyTSData.iDataFrameEnabled() || ResultsFramework::OutputSchema->RIDailyTSData.rDataFrameEnabled() )
 			{
 				OutputFileDYJson = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileDYJson, DataStringGlobals::outputDYJsonFileName, flags); write_stat = flags.ios(); }
-				if (write_stat != 0) {
-					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputDYJsonFileName+ " for output (write).");
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileDYJson, DataStringGlobals::outputDYJsonFileName, flags ); write_stat = flags.ios(); }
+				if ( write_stat != 0 ) {
+					ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputDYJsonFileName + " for output (write)." );
 				}
 				json_DYstream = gio::out_stream( OutputFileDYJson );
 			}
 
 			// Output monthly time series file
-			if (OutputSchema->RIMonthlyTSData.iDataFrameEnabled() || OutputSchema->RIMonthlyTSData.rDataFrameEnabled())
+			if ( ResultsFramework::OutputSchema->RIMonthlyTSData.iDataFrameEnabled() || ResultsFramework::OutputSchema->RIMonthlyTSData.rDataFrameEnabled() )
 			{
 				OutputFileMNJson = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileMNJson, DataStringGlobals::outputMNJsonFileName, flags); write_stat = flags.ios(); }
-				if (write_stat != 0) {
-					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputMNJsonFileName+ " for output (write).");
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileMNJson, DataStringGlobals::outputMNJsonFileName, flags ); write_stat = flags.ios(); }
+				if ( write_stat != 0 ) {
+					ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputMNJsonFileName + " for output (write)." );
 				}
 				json_MNstream = gio::out_stream( OutputFileMNJson );
 			}
 
 			// Output run period time series file
-			if (OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || OutputSchema->RIRunPeriodTSData.rDataFrameEnabled())
+			if ( ResultsFramework::OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || ResultsFramework::OutputSchema->RIRunPeriodTSData.rDataFrameEnabled() )
 			{
 				OutputFileSMJson = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open( OutputFileSMJson, DataStringGlobals::outputSMJsonFileName, flags); write_stat = flags.ios(); }
-				if (write_stat != 0) {
-					ShowFatalError("OpenOutputFiles: Could not open file " +DataStringGlobals::outputSMJsonFileName+ " for output (write).");
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileSMJson, DataStringGlobals::outputSMJsonFileName, flags ); write_stat = flags.ios(); }
+				if ( write_stat != 0 ) {
+					ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputSMJsonFileName + " for output (write)." );
 				}
 				json_SMstream = gio::out_stream( OutputFileSMJson );
 			}
 		}
 	}
+
 	void
 	OpenOutputFiles()
 	{
@@ -1590,11 +1588,6 @@ namespace SimulationManager {
 		}
 		mtr_stream = nullptr;
 
-		//// Close the Schema Output File if JSON output is enabled
-//		if(OutputSchema->timeSeriesEnabled()) {
-//			gio::close(OutputFileJson);
-//			json_stream = nullptr;
-//		}
 	}
 
 	void

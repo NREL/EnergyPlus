@@ -247,7 +247,6 @@ namespace EnergyPlus {
 
 		show_message();
 
-		this->json_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->eio_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -255,7 +254,6 @@ namespace EnergyPlus {
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->json_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
-		DataGlobals::json_stream = this->json_stream.get();
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::eio_stream = this->eio_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();

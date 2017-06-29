@@ -122,8 +122,6 @@ AbortEnergyPlus()
 	using namespace DataSystemVariables;
 	using namespace DataTimings;
 	using namespace DataErrorTracking;
-	using namespace ResultsFramework;
-	using namespace std;
 	using General::RoundSigDigits;
 	using NodeInputManager::SetupNodeVarsForReporting;
 	using NodeInputManager::CheckMarkedNodes;
@@ -238,10 +236,10 @@ AbortEnergyPlus()
 	if ( Seconds < 0.0 ) Seconds = 0.0;
 	gio::write( Elapsed, ETimeFmt ) << Hours << Minutes << Seconds;
 
-	OutputSchema->SimulationInformation.setRunTime(Elapsed);
-	OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-	OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-	OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+	ResultsFramework::OutputSchema->SimulationInformation.setRunTime( Elapsed );
+	ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup( NumWarningsDuringWarmup, NumSevereDuringWarmup );
+	ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing( NumWarningsDuringSizing, NumSevereDuringSizing );
+	ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary( NumWarnings, NumSevere );
 
 	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup + " Severe Errors." );
 	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing + " Severe Errors." );
@@ -255,8 +253,9 @@ AbortEnergyPlus()
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
 	gio::close( tempfl );
-	if(OutputSchema->timeSeriesAndTabularEnabled())
-		OutputSchema->WriteReport();
+	if( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
+		ResultsFramework::OutputSchema->WriteReport();
+	}
 
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
@@ -410,7 +409,6 @@ EndEnergyPlus()
 	using namespace DataSystemVariables;
 	using namespace DataTimings;
 	using namespace DataErrorTracking;
-	using namespace ResultsFramework;
 	using General::RoundSigDigits;
 	using SolarShading::ReportSurfaceErrors;
 	using ExternalInterface::NumExternalInterfaces;
@@ -479,10 +477,10 @@ EndEnergyPlus()
 	if ( Seconds < 0.0 ) Seconds = 0.0;
 	gio::write( Elapsed, ETimeFmt ) << Hours << Minutes << Seconds;
 
-	OutputSchema->SimulationInformation.setRunTime(Elapsed);
-	OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-	OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-	OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+	ResultsFramework::OutputSchema->SimulationInformation.setRunTime( Elapsed );
+	ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup( NumWarningsDuringWarmup, NumSevereDuringWarmup );
+	ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing( NumWarningsDuringSizing, NumSevereDuringSizing );
+	ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary( NumWarnings, NumSevere );
 
 	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup + " Severe Errors." );
 	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing + " Severe Errors." );
@@ -496,8 +494,9 @@ EndEnergyPlus()
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
 
-	if (OutputSchema->timeSeriesAndTabularEnabled())
-		OutputSchema->WriteReport();
+	if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
+		ResultsFramework::OutputSchema->WriteReport();
+	}
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
 #endif

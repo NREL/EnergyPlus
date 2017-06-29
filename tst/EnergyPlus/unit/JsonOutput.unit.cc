@@ -68,7 +68,7 @@ using namespace EnergyPlus::NodeInputManager;
 namespace EnergyPlus {
 
 
-	TEST_F( EnergyPlusFixture , JsonOutput_ParseJsonObject1){
+	TEST_F( EnergyPlusFixture , JsonOutput_ParseJsonObject1 ) {
 		std::string const idf_objects = delimited_string({
 				                                                 "Output:JSON,",
 				                                                 "TimeSeriesAndTabular;",
@@ -81,7 +81,7 @@ namespace EnergyPlus {
 		EXPECT_TRUE( OutputSchema->timeSeriesAndTabularEnabled() );
 	}
 
-	TEST_F( EnergyPlusFixture , JsonOutput_ParseJsonObject2){
+	TEST_F( EnergyPlusFixture , JsonOutput_ParseJsonObject2 ) {
 		std::string const idf_objects = delimited_string({
 				                                                 "Output:JSON,",
 				                                                 "TimeSeries;",
@@ -92,14 +92,13 @@ namespace EnergyPlus {
 		OutputSchema->setupOutputOptions();
 
 		EXPECT_TRUE( OutputSchema->timeSeriesEnabled() );
-		//compare_json_stream( "" );
+		compare_json_stream( "" );
 	}
 
-	TEST_F( EnergyPlusFixture , JsonOutput_SimInfo){
+	TEST_F( EnergyPlusFixture , JsonOutput_SimInfo ) {
 
 		OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
 		OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
-		OutputSchema->SimulationInformation.setUUID("b307f053-6c0a-8ca8-4d76-81841cd48f20");
 		OutputSchema->SimulationInformation.setInputModelURI("");
 		OutputSchema->SimulationInformation.setRunTime("00hr 08min  6.67sec");
 		OutputSchema->SimulationInformation.setNumErrorsSummary("1","2");
@@ -125,8 +124,7 @@ namespace EnergyPlus {
 					"ProgramVersion": "EnergyPlus, Version 8.6.0-0f5a10914b",
 					"RunTime": "00hr 08min  6.67sec",
 					"SimulationEnvironment": "",
-					"StartDateTimeStamp": "2017.03.22 11:03",
-					"UUID": "b307f053-6c0a-8ca8-4d76-81841cd48f20"
+					"StartDateTimeStamp": "2017.03.22 11:03"
 		} )"_json;
 		EXPECT_EQ( result.dump(), expectedResult.dump() );
 	}
@@ -134,7 +132,6 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture , JsonOutput_SimInfo_String) {
 		OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
 		OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
-		OutputSchema->SimulationInformation.setUUID("b307f053-6c0a-8ca8-4d76-81841cd48f20");
 		OutputSchema->SimulationInformation.setInputModelURI("");
 		OutputSchema->SimulationInformation.setRunTime("00hr 08min  6.67sec");
 		OutputSchema->SimulationInformation.setNumErrorsSummary("1","2");
@@ -145,7 +142,7 @@ namespace EnergyPlus {
 		json result = OutputSchema->SimulationInformation.getJSON();
 
 		std::string expectedResult =
-				"{\n    \"ErrorSummary\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"1\"\n    },\n    \"ErrorSummarySizing\": {\n        \"NumSevere\": \"0\",\n        \"NumWarnings\": \"0\"\n    },\n    \"ErrorSummaryWarmup\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"0\"\n    },\n    \"InputModelURI\": \"\",\n    \"ProgramVersion\": \"EnergyPlus, Version 8.6.0-0f5a10914b\",\n    \"RunTime\": \"00hr 08min  6.67sec\",\n    \"SimulationEnvironment\": \"\",\n    \"StartDateTimeStamp\": \"2017.03.22 11:03\",\n    \"UUID\": \"b307f053-6c0a-8ca8-4d76-81841cd48f20\"\n}";
+				"{\n    \"ErrorSummary\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"1\"\n    },\n    \"ErrorSummarySizing\": {\n        \"NumSevere\": \"0\",\n        \"NumWarnings\": \"0\"\n    },\n    \"ErrorSummaryWarmup\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"0\"\n    },\n    \"InputModelURI\": \"\",\n    \"ProgramVersion\": \"EnergyPlus, Version 8.6.0-0f5a10914b\",\n    \"RunTime\": \"00hr 08min  6.67sec\",\n    \"SimulationEnvironment\": \"\",\n    \"StartDateTimeStamp\": \"2017.03.22 11:03\"\n}";
 		EXPECT_EQ( result.dump(4), expectedResult );
 	};
 
@@ -168,20 +165,18 @@ namespace EnergyPlus {
 		int indexType = 1;
 		int repordId = 1;
 
-		Variable *var = new Variable("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, repordId, "C");
-		var->setUUID("b78f1461-c383-2b7c-4e6c-8ad163036bc7");
+		Variable var("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, repordId, "C");
 
-		std::string expected_result = "{\n         \"Frequency\": \"Timestep\",\n         \"Name\": \"SALESFLOOR INLET NODE:System Node Temperature\",\n         \"UUID\": \"b78f1461-c383-2b7c-4e6c-8ad163036bc7\",\n         \"Units\": \"C\"\n}";
-		EXPECT_EQ(expected_result, var->getJSON().dump('\t'));
+		std::string expected_result = "{\n         \"Frequency\": \"Timestep\",\n         \"Name\": \"SALESFLOOR INLET NODE:System Node Temperature\",\n         \"Units\": \"C\"\n}";
+		EXPECT_EQ(expected_result, var.getJSON().dump('\t'));
 
 		json expectedObject = R"( {
 					"Frequency": "Timestep",
 					"Name": "SALESFLOOR INLET NODE:System Node Temperature",
-					"UUID": "b78f1461-c383-2b7c-4e6c-8ad163036bc7",
 					"Units": "C"
 		} )"_json;
 
-		EXPECT_EQ( expectedObject, var->getJSON() );
+		EXPECT_EQ( expectedObject, var.getJSON() );
 	};
 
 	TEST_F( EnergyPlusFixture , JsonOutput_DataFrameInfo1) {
@@ -190,11 +185,9 @@ namespace EnergyPlus {
 		int indexType = 1;
 		int reportId = 1;
 
-		Variable *var0 = new Variable("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, reportId, "C");
-		var0->setUUID("b78f1461-c383-2b7c-4e6c-8ad163036bc7");
+		Variable var0("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, reportId, "C");
 		reportId++;
-		Variable *var1 = new Variable("SALESFLOOR INLET NODE:System Node Humidity Ratio", 0, indexType, reportId, "kgWater/kgDryAir");
-		var1->setUUID("d83f492c-bc10-9d87-4456-846a10607b79");
+		Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", 0, indexType, reportId, "kgWater/kgDryAir");
 
 		OutputSchema->RITimestepTSData.addVariable(var0);
 		OutputSchema->RITimestepTSData.addVariable(var1);
@@ -206,13 +199,11 @@ namespace EnergyPlus {
 					 {
 						"Frequency": "Timestep",
 						"Name": "SALESFLOOR INLET NODE:System Node Humidity Ratio",
-						"UUID": "d83f492c-bc10-9d87-4456-846a10607b79",
 						"Units": "kgWater/kgDryAir"
 					},
 					{
 						"Frequency": "Timestep",
 						"Name": "SALESFLOOR INLET NODE:System Node Temperature",
-						"UUID": "b78f1461-c383-2b7c-4e6c-8ad163036bc7",
 						"Units": "C"
 					}]
 		} )"_json;
@@ -227,8 +218,7 @@ namespace EnergyPlus {
 		int indexType = 1;
 		int reportId = 1;
 
-		Variable *var0 = new Variable("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, reportId, "C");
-		var0->setUUID("b78f1461-c383-2b7c-4e6c-8ad163036bc7");
+		Variable var0("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, reportId, "C");
 		OutputSchema->RITimestepTSData.addVariable(var0);
 		OutputSchema->RITimestepTSData.newRow(2,25,14,40); //month,day,hour,minute
 		OutputSchema->RITimestepTSData.newRow(2,25,14,45); //month,day,hour,minute
@@ -237,13 +227,10 @@ namespace EnergyPlus {
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 2.0);
 
 		reportId++;
-		Variable *var1 = new Variable("SALESFLOOR INLET NODE:System Node Humidity Ratio", 0, indexType, reportId, "kgWater/kgDryAir");
-		var1->setUUID("d83f492c-bc10-9d87-4456-846a10607b79");
+		Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", 0, indexType, reportId, "kgWater/kgDryAir");
 		OutputSchema->RITimestepTSData.addVariable(var1);
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 3.0);
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 4.0);
-
-		OutputSchema->RITimestepTSData.setUUID("b78f1461-c383-2b7c-4e6c-8ad163036bc7");
 
 		OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
@@ -251,22 +238,19 @@ namespace EnergyPlus {
 				"Timestep": {
 					"Cols":[
 						{
-							"UUID" : "d83f492c-bc10-9d87-4456-846a10607b79",
 							"Units" : "kgWater/kgDryAir",
 							"Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
 						},
 						{
-							"UUID" : "b78f1461-c383-2b7c-4e6c-8ad163036bc7",
 							"Units" : "C",
 							"Variable":"SALESFLOOR INLET NODE:System Node Temperature"
 						}
 					],
 					"ReportFrequency" : "Timestep",
 					"Rows":[
-						{ "2/25 14:40:00" : [3,1] },
-						{ "2/25 14:45:00" : [4,2] }
-					],
-					"UUID":"b78f1461-c383-2b7c-4e6c-8ad163036bc7"
+						{ "2/25 14:40:00" : [3.0,1.0] },
+						{ "2/25 14:45:00" : [4.0,2.0] }
+					]
 				}
 		} )"_json;
 
@@ -274,8 +258,7 @@ namespace EnergyPlus {
 
 		// If add one more, it also should go to the top of json cols array
 		reportId++;
-		Variable *var2 = new Variable("SALESFLOOR OUTLET NODE:System Node Temperature", 0, indexType, reportId, "C");
-		var2->setUUID("fcbad2f4-7342-17a4-429e-8f9de01bb10f");
+		Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", 0, indexType, reportId, "C");
 		OutputSchema->RITimestepTSData.addVariable(var2);
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 5.0);
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 6.0);
@@ -285,27 +268,23 @@ namespace EnergyPlus {
 				"Timestep": {
 					"Cols":[
 						{
-			                "UUID": "fcbad2f4-7342-17a4-429e-8f9de01bb10f",
 			                "Units": "C",
 							"Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
 			            },
 						{
-							"UUID" : "d83f492c-bc10-9d87-4456-846a10607b79",
 							"Units" : "kgWater/kgDryAir",
 							"Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
 						},
 						{
-							"UUID" : "b78f1461-c383-2b7c-4e6c-8ad163036bc7",
 							"Units" : "C",
 							"Variable":"SALESFLOOR INLET NODE:System Node Temperature"
 						}
 					],
 					"ReportFrequency" : "Timestep",
 					"Rows":[
-						{ "2/25 14:40:00" : [5,3,1] },
-						{ "2/25 14:45:00" : [6,4,2] }
-					],
-					"UUID":"b78f1461-c383-2b7c-4e6c-8ad163036bc7"
+						{ "2/25 14:40:00" : [5.0,3.0,1.0] },
+						{ "2/25 14:45:00" : [6.0,4.0,2.0] }
+					]
 				}
 		} )"_json;
 
@@ -329,10 +308,9 @@ namespace EnergyPlus {
 		tableBody(1,1) =  "5.22";
 		tableBody(1,2) =  "0.275000";
 
-		Table *tbl = new Table(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
-		tbl->setUUID("e13b6158-7e17-b1e8-43d0-89f365b8d506");
+		Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
-		json result = tbl->getJSON();
+		json result = tbl.getJSON();
 		json expectedResult = R"( {
 				"Cols": [
                         "User-Specified Maximum Air Flow Rate [m3/s]"
@@ -346,8 +324,7 @@ namespace EnergyPlus {
                        "0.275000"
                     ]
                 },
-                "TableName": "AirTerminal:SingleDuct:Uncontrolled",
-                "UUID": "e13b6158-7e17-b1e8-43d0-89f365b8d506"
+                "TableName": "AirTerminal:SingleDuct:Uncontrolled"
 		} )"_json;
 
 		EXPECT_EQ(result.dump(), expectedResult.dump());
@@ -369,8 +346,7 @@ namespace EnergyPlus {
 		tableBody(1,1) =  "5.22";
 		tableBody(1,2) =  "0.275000";
 
-		Table *tbl = new Table(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
-		tbl->setUUID("e13b6158-7e17-b1e8-43d0-89f365b8d506");
+		Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
 		rowLabels.deallocate();
 		columnLabels.deallocate();
@@ -391,17 +367,15 @@ namespace EnergyPlus {
 		tableBody(2,1) =  "100000.00";
 		tableBody(3,1) =  "100000.00";
 
-		Table *tbl2 = new Table(tableBody, rowLabels, columnLabels, "Coil:Cooling:DX:SingleSpeed", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
-		tbl2->setUUID("758b1c73-dacd-3148-4edc-8dd7d4d51557");
+		Table tbl2(tableBody, rowLabels, columnLabels, "Coil:Cooling:DX:SingleSpeed", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
-		Report *report = new Report();
-		report->setUUID("dbdd85a9-d01f-3b04-47bf-848215a28ea5");
-		report->Tables.push_back(tbl);
-		report->Tables.push_back(tbl2);
-		report->ReportName = "Component Sizing Summary";
-		report->ReportForString = "Entire Facility";
+		Report report;
+		report.Tables.push_back(tbl);
+		report.Tables.push_back(tbl2);
+		report.ReportName = "Component Sizing Summary";
+		report.ReportForString = "Entire Facility";
 
-		json result = report->getJSON();
+		json result = report.getJSON();
 		json expectedResult = R"( {
 				"For": "Entire Facility",
             "ReportName": "Component Sizing Summary",
@@ -419,8 +393,7 @@ namespace EnergyPlus {
                             "0.275000"
                         ]
                     },
-                    "TableName": "AirTerminal:SingleDuct:Uncontrolled",
-                    "UUID": "e13b6158-7e17-b1e8-43d0-89f365b8d506"
+                    "TableName": "AirTerminal:SingleDuct:Uncontrolled"
                 },
                 {
                     "Cols": [
@@ -436,11 +409,9 @@ namespace EnergyPlus {
                             "100000.00"
                         ]
                     },
-                    "TableName": "Coil:Cooling:DX:SingleSpeed",
-                    "UUID": "758b1c73-dacd-3148-4edc-8dd7d4d51557"
+                    "TableName": "Coil:Cooling:DX:SingleSpeed"
                 }
-			],
-            "UUID": "dbdd85a9-d01f-3b04-47bf-848215a28ea5"
+			]
 		} )"_json;
 
 		EXPECT_EQ(result.dump(), expectedResult.dump());

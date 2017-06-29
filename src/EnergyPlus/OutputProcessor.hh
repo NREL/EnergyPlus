@@ -151,7 +151,6 @@ namespace OutputProcessor {
 	extern bool OutputInitialized;
 	extern int ProduceReportVDD;
 	extern int OutputFileMeterDetails; // Unit number for Meter Details file (output)
-	//extern int OutputFileJson;
 	extern int NumHoursInDay;
 	extern int NumHoursInMonth;
 	extern int NumHoursInSim;
