@@ -136,7 +136,7 @@ namespace EnergyPlus {
 		// ControllerProps always expects the control variable type to be "HumididtyRatio"
 		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
 		ASSERT_EQ( iCtrlVarType_HumRat, ControllerProps( 1 ).HumRatCntrlType );
-	
+
 	}
 
 	TEST_F( EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType ) {
@@ -278,13 +278,13 @@ namespace EnergyPlus {
 		"	Cooling Coil Contoller;   !- Controller 1 Name",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetSetPointManagerInputs();
-		// There are two setpoint managers and are schedule type 	
+		// There are two setpoint managers and are schedule type
 		ASSERT_EQ( 2, NumSchSetPtMgrs ); // 2 schedule set point managers
 		ASSERT_EQ( 2, NumAllSetPtMgrs );  // 2 all set point managers
-		// check specified control variable types 	
+		// check specified control variable types
 		ASSERT_EQ( iTemperature, AllSetPtMgr( 1 ).CtrlTypeMode ); // is "Temperature"
 		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 2 ).CtrlTypeMode ); // is "MaximumHumidityRatio"
 
@@ -292,7 +292,7 @@ namespace EnergyPlus {
 		// check ControllerProps control variable is set to "MaximumHumidityRatio"
 		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
 		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType ); // MaximumHumidityRatio
-			
+
 	}
 
 }

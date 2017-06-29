@@ -221,7 +221,7 @@ TEST_F( EnergyPlusFixture, EMPDRcoating ) {
 		 "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"
 	 });
 
-	ASSERT_FALSE( process_idf(idf_objects) );
+	ASSERT_TRUE( process_idf(idf_objects) );
 
 	bool errors_found( false );
 	HeatBalanceManager::GetMaterialData(errors_found);

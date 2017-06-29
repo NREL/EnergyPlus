@@ -831,7 +831,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 			"  Until: 24:00,24.0;                     !- Field 3",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) ); // Tstat should show if the idf is legel
+		ASSERT_TRUE( process_idf( idf_objects ) ); // Tstat should show if the idf is legel
 
 		int ZoneNum( 4 );
 		int CoolZoneASHNum( 1 );
@@ -868,7 +868,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( DayOfYear ) );
 		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( DayOfYear ) );
 		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear ) );
-		 
+
 		Array1D< Real64 > runningAverageASH_2( 365, 40.0 );
 		Array1D< Real64 > runningAverageCEN_2( 365, 40.0 );
 		CalculateAdaptiveComfortSetPointSchl( runningAverageASH_2, runningAverageCEN_2 );
@@ -882,7 +882,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear ) );
 
 		Array1D< Real64 > runningAverageASH( 365, 25.0 );
-		Array1D< Real64 > runningAverageCEN( 365, 25.0 );	
+		Array1D< Real64 > runningAverageCEN( 365, 25.0 );
 		CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN );
 		ASSERT_TRUE( AdapComfortDailySetPointSchedule.initialized );// Tstat should show there adaptive model is initialized
 		ASSERT_EQ( 25.55, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( DayOfYear ) );// Tstat should show ASH 55 CENTRAL LINE model set point

@@ -197,7 +197,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0.0,                     !- Coefficient3 x**2",
 	"    0.5,                     !- Minimum Value of x",
 	"    1.5;                     !- Maximum Value of x  ",
-   
+
 	"  Curve:Cubic,",
 	"    HPACFFF,                 !- Name",
 	"    1.0,                     !- Coefficient1 Constant",
@@ -206,7 +206,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0.0,                     !- Coefficient4 x**3",
 	"    0.5,                     !- Minimum Value of x",
 	"    1.5;                     !- Maximum Value of x",
-    
+
 	"  Curve:Biquadratic,",
 	"    HPCoolingEIRFTemp4,      !- Name",
 	"    0.0001514017,            !- Coefficient1 Constant",
@@ -261,7 +261,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"  NodeList,",
 	"    Zone1Exhausts,           !- Name",
 	"    Zone1WindACAirInletNode; !- Node 1 Name",
-		
+
 	"  OutdoorAir:NodeList,",
 	"    OutsideAirInletNodes;    !- Node or NodeList Name 1",
 
@@ -430,7 +430,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
@@ -445,7 +445,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	SimulationManager::GetProjectData();
 	OutputReportPredefined::SetPredefinedTables();
 	HeatBalanceManager::SetPreConstructionInputParameters(); //establish array bounds for constructions early
-	
+
 	DataGlobals::BeginSimFlag = true;
 	DataGlobals::BeginEnvrnFlag = true;
 	DataGlobals::ZoneSizingCalc = true;

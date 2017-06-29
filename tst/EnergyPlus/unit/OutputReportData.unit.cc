@@ -121,7 +121,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex )
 		" Output:Variable,", "BackRoom(.*),", "System Node Temperature,", "timestep;",
 		" Output:Variable,", "(.*)N(ode|ODE),", "System Node Humidity Ratio,", "timestep;",
 	});
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 10 );
 	EXPECT_TRUE( FindItemInVariableList( "Outside Air Inlet Node", "System Node Mass Flow Rate" ));
@@ -153,7 +153,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Plus )
 		" Output:Variable,", "Outside Air .+ Node,", "Unitary System Load Ratio,", "timestep;",
 		" Output:Variable,", ".+,", "System Node Temperature,", "timestep;",
 	});
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 6 );
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" ));
@@ -178,7 +178,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Star )
 		" Output:Variable,", ".*,", "System Node Temperature,", "timestep;",
 		" Output:Variable,", "*,", "Refrigeration Compressor Rack Electric Power,", "timestep;",
 	});
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 7 );
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
@@ -212,7 +212,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Pipe )
 		" Output:Variable,", "System (Inlet|Outlet) Node,", "Unitary System Compressor Part Load Ratio,", "timestep;",
 		" Output:Variable,", "(BackRoom|BACKROOM|SALESFLOOR|SalesFloor) (Outlet|OUTLET) (NODE|Node),", "System Node Humidity Ratio,", "timestep;",
 	});
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 4 );
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
@@ -239,7 +239,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 		" Output:Variable,", "[A-Za-z ]{5,},", "Refrigeration Compressor Rack Electric Power,", "timestep;",
 		" Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
 	});
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 6 );
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
@@ -267,7 +267,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_SpecChars )
 		" Output:Variable,", "\\w,", "System Node Mass Flow Rate,", "timestep;",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 1 );
 
@@ -283,7 +283,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Carrot )
 		" Output:Variable,", "^Inlet(.*)Node,", "System Node Mass Flow Rate,", "timestep;",
 		" Output:Variable,", "[^0-9]+,", "System Node Humidity Ratio,", "timestep;",
 	});
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 2 );
 	EXPECT_FALSE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
@@ -299,7 +299,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Dollar )
 		"Version,8.6;",
 		" Output:Variable,", "(.*)Node$,", "System Node Mass Flow Rate,", "timestep;",
 	});
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 1 );
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));

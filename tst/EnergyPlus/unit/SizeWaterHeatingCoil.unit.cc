@@ -223,7 +223,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		FinalZoneSizing.allocate( 1 );
 		TermUnitFinalZoneSizing.allocate( 1 );
@@ -460,7 +460,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		FinalZoneSizing.allocate( 1 );
 		TermUnitFinalZoneSizing.allocate( 1 );
@@ -696,7 +696,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		FinalZoneSizing.allocate( 1 );
 		TermUnitFinalZoneSizing.allocate( 1 );
@@ -933,7 +933,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		FinalZoneSizing.allocate( 1 );
 		TermUnitFinalZoneSizing.allocate( 1 );
@@ -1137,7 +1137,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		FinalSysSizing.allocate( 1 );
 		UnitarySysEqSizing.allocate( 1 );
@@ -1350,7 +1350,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		TermUnitSizing.allocate( 1 );
 		TotNumLoops = 1;

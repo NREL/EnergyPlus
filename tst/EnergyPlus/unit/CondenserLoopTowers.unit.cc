@@ -1301,7 +1301,7 @@ namespace EnergyPlus {
 
 
 		} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 
 		bool ErrorsFound = false;
@@ -1330,7 +1330,7 @@ namespace EnergyPlus {
 
 		// input not needed for sizing
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUAWasAutoSized );
-		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9595.0, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K  
+		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9595.0, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
 		// input not needed for sizing
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).DesignWaterFlowRateWasAutoSized );
@@ -1484,7 +1484,7 @@ namespace EnergyPlus {
 			"    ,                        !- Blowdown Makeup Water Usage Schedule Name",
 			"    ,                        !- Supply Water Storage Tank Name",
 			"    ;                        !- Outdoor Air Inlet Node Name",
-			
+
 			"  Pump:ConstantSpeed,",
 			"    TowerWaterSys Pump,      !- Name",
 			"    TowerWaterSys Supply Inlet Node,  !- Inlet Node Name",
@@ -1715,7 +1715,7 @@ namespace EnergyPlus {
 
 
 		} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 
 		bool ErrorsFound = false;
@@ -1744,7 +1744,7 @@ namespace EnergyPlus {
 
 		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUAWasAutoSized );
-		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9595.55, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K  
+		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9595.55, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
 		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).DesignWaterFlowRateWasAutoSized );
@@ -1766,10 +1766,10 @@ namespace EnergyPlus {
 		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).LowSpeedAirFlowRate, 1.4131, 0.0001 );
 		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).LowSpeedAirFlowRate, CondenserLoopTowers::SimpleTower( 1 ).HighSpeedAirFlowRate * CondenserLoopTowers::SimpleTower( 1 ).LowSpeedAirFlowRateSizingFactor );
 
-		// autosized input	
+		// autosized input
 		EXPECT_TRUE( CondenserLoopTowers::SimpleTower( 1 ).LowSpeedTowerUAWasAutoSized );
 		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).LowSpeedTowerUA, 346.0, 1.0 );
-		
+
 		// autosized input
 		EXPECT_TRUE( CondenserLoopTowers::SimpleTower( 1 ).LowSpeedFanPowerWasAutoSized );
 		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).LowSpeedFanPower, 168 );
@@ -2197,7 +2197,7 @@ namespace EnergyPlus {
 
 
 		});
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 
 		bool ErrorsFound =  false;
@@ -2226,7 +2226,7 @@ namespace EnergyPlus {
 
 		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUAWasAutoSized );
-		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9770.0, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K  
+		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUA, 9770.0, 1.0 ); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
 		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_TRUE( CondenserLoopTowers::SimpleTower( 1 ).DesignWaterFlowRateWasAutoSized );
@@ -2623,7 +2623,7 @@ namespace EnergyPlus {
 
 
 		} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 
 		bool ErrorsFound = false;
@@ -2654,7 +2654,7 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).TowerNominalCapacity, 100000.0 );
 
 		// autosized other input fields of cooling tower
-		CondenserLoopTowers::SizeTower( 1 );	
+		CondenserLoopTowers::SizeTower( 1 );
 		// size low speed nominal capacity
 		LowSpeedCoolTowerNomCap = CondenserLoopTowers::SimpleTower( 1 ).TowerNominalCapacity * CondenserLoopTowers::SimpleTower( 1 ).TowerLowSpeedNomCapSizingFactor;
 		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).TowerLowSpeedNomCap, LowSpeedCoolTowerNomCap );

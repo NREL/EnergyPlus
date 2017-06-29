@@ -1435,11 +1435,13 @@ namespace EnergyPlus {
 			if ( is_NumericFieldNames ) NumericFieldNames()( i + 1 ) = field;
 		}
 
-		auto const & legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
-		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() ) {
+		auto const legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
+		auto const jdf_extensions_iter = obj.value().find( extension_key );
+		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() && jdf_extensions_iter != obj.value().end() ) {
 			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
 			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
-			auto const & jdf_extensions_array = obj.value()[ extension_key ];
+			// auto const & jdf_extensions_array = obj.value()[ extension_key ];
+			auto const & jdf_extensions_array = jdf_extensions_iter.value();
 			int numerics_index = static_cast <int> ( legacy_idd_numerics_fields.size() );
 
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {

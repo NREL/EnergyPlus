@@ -616,7 +616,7 @@ namespace EnergyPlus {
 	{
 		std::string const idf_objects = delimited_string( {
 		"  Version,8.6;",
-  
+
 		"  Material:RoofVegetation,",
 		"    ThickSoil,               !- Name",
 		"    0.5,                     !- Height of Plants {m}",
@@ -639,7 +639,7 @@ namespace EnergyPlus {
 		"    Advanced;                !- Moisture Diffusion Calculation Method",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetMaterialData( ErrorsFound );
@@ -647,7 +647,7 @@ namespace EnergyPlus {
 
 		// check the "Material:RoofVegetation" names
 		EXPECT_EQ( Material( 1 ).Name, "THICKSOIL" );
-		// check maximum (saturated) moisture content 
+		// check maximum (saturated) moisture content
 		EXPECT_EQ( 0.4, Material( 1 ).Porosity );
 		// check initial moisture Content was reset
 		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input

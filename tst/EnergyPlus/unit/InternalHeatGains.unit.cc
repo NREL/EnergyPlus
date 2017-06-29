@@ -276,7 +276,7 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortM
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound1( false );
 

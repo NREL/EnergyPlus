@@ -2498,7 +2498,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Boiler Gas Rate,runperiod;"
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
@@ -2537,7 +2537,7 @@ namespace EnergyPlus {
 				"Output:Variable,Boiler[13],Boiler Gas Rate,runperiod;"
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
@@ -2574,7 +2574,7 @@ namespace EnergyPlus {
 				"Output:Variable,Boiler.*,Boiler Gas Rate,runperiod;"
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
@@ -2612,7 +2612,7 @@ namespace EnergyPlus {
 				"Output:Variable,Zn003:Wall.*,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;"
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
@@ -2653,7 +2653,7 @@ namespace EnergyPlus {
 				"Output:Variable,(?i)Zn003:Wall.*,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;"
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();

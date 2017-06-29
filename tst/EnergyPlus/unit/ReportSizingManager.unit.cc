@@ -331,7 +331,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans) {
 		"    TestFan4OutletNode;           !- Air Outlet Node Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string fanName = "TEST FAN 1";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor

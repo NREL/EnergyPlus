@@ -197,7 +197,7 @@ TEST(OutputReportTabularTest, unitsFromHeading)
 	SetupUnitConversions();
 	unitsStyle = unitsStyleInchPound;
 	unitString = "";
-	EXPECT_EQ(96, unitsFromHeading(unitString)); 
+	EXPECT_EQ(96, unitsFromHeading(unitString));
 	EXPECT_EQ("", unitString);
 	unitString = "Zone Floor Area {m2}";
 	EXPECT_EQ(46, unitsFromHeading(unitString));
@@ -5988,7 +5988,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 extLitUse;
 

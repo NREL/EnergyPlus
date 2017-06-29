@@ -5619,7 +5619,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -6445,7 +6445,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXHeatingCoilOnly ) {
 		"    Until: 24:00,15.6;       !- Field 23",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData();
 	createFacilityElectricPowerServiceObject();
@@ -6555,7 +6555,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_SizingWithFans ) {
 		"    TestFan4OutletNode;           !- Air Outlet Node Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string fanName = "TEST FAN 1";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor

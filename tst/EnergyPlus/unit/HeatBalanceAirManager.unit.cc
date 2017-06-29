@@ -77,7 +77,7 @@ namespace EnergyPlus {
 			"  Direct;                  !- Air Temperature Coupling Strategy",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfZones = 2;
 
@@ -92,10 +92,10 @@ namespace EnergyPlus {
 		EXPECT_TRUE( ErrorsFound );
 
 		std::string const error_string = delimited_string( {
-			"   ** Severe  ** In RoomAirModelType = SKINNY_MODEL: Room-Air Modeling Type = AIRFLOWNETWORK.",
+			"   ** Severe  ** In RoomAirModelType = PHAT_MODEL: room_air_modeling_type = AIRFLOWNETWORK.",
 			"   **   ~~~   ** This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.",
 			"   **   ~~~   ** AirflowNetwork:SimulationControl not found.",
-			"   ** Severe  ** In RoomAirModelType = PHAT_MODEL: Room-Air Modeling Type = AIRFLOWNETWORK.",
+			"   ** Severe  ** In RoomAirModelType = SKINNY_MODEL: room_air_modeling_type = AIRFLOWNETWORK.",
 			"   **   ~~~   ** This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.",
 			"   **   ~~~   ** AirflowNetwork:SimulationControl not found.",
 			"   ** Severe  ** Errors found in processing input for RoomAirModelType",

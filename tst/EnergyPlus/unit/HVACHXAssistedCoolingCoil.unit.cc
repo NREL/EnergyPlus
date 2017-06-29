@@ -219,7 +219,7 @@ TEST_F( EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1 ) {
 		"    HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
 		"    HPCoolingEIRFTemp4,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
 		"    HPACFFF;                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-   
+
 		"   Curve:Quadratic,",
 		"    HPACCOOLPLFFPLR,         !- Name",
 		"    1.0,                    !- Coefficient1 Constant",
@@ -227,7 +227,7 @@ TEST_F( EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1 ) {
 		"    0.0,                     !- Coefficient3 x**2",
 		"    0.5,                     !- Minimum Value of x",
 		"    1.5;                     !- Maximum Value of x  ",
-   
+
 		"  Curve:Cubic,",
 		"    HPACFFF,                 !- Name",
 		"    1.0,                     !- Coefficient1 Constant",
@@ -236,7 +236,7 @@ TEST_F( EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1 ) {
 		"    0.0,                     !- Coefficient4 x**3",
 		"    0.5,                     !- Minimum Value of x",
 		"    1.5;                     !- Maximum Value of x",
-    
+
 		"  Curve:Biquadratic,",
 		"    HPCoolingEIRFTemp4,      !- Name",
 		"    0.0001514017,            !- Coefficient1 Constant",
@@ -385,7 +385,7 @@ TEST_F( EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1 ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	HeatBalanceManager::GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors

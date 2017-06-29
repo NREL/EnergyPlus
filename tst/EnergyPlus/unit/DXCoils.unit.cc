@@ -254,7 +254,7 @@ namespace EnergyPlus {
 		int CompOp = 1;
 		int SingleMode = 0;
 		CalcMultiSpeedDXCoilCooling( CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode );
-		
+
 		Real64 TdbAtOutlet = PsyTdbFnHW( DXCoil( CoilIndex ).OutletAirEnthalpy, DXCoil( CoilIndex ).OutletAirHumRat );
 		Real64 tSatAtOutlet = PsyTsatFnHPb( DXCoil( CoilIndex ).OutletAirEnthalpy, OutBaroPress);
 		Real64 rhAtOutlet = PsyRhFnTdbWPb(DXCoil( CoilIndex ).OutletAirTemp, DXCoil( CoilIndex ).OutletAirHumRat, OutBaroPress);
@@ -1502,7 +1502,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput )
 	{
-		// Test the crankcase heat for Coil:Cooling:DX:MultiSpeed #5659 
+		// Test the crankcase heat for Coil:Cooling:DX:MultiSpeed #5659
 
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
@@ -1823,7 +1823,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ProcessScheduleInput();
 		GetCurveInput();

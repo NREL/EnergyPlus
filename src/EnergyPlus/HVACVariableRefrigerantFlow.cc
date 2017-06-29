@@ -1711,9 +1711,9 @@ namespace HVACVariableRefrigerantFlow {
 				// Verify Curve Object, only legal type is biquadratic
 				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCapFT ) );
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-					if ( SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
+					if ( InputProcessor::SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
 						checkCurveIsNormalizedToOne( RoutineName + cCurrentModuleObject, VRF( VRFNum ).Name, VRF( VRFNum ).HeatCapFT, cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
-					} else if ( SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
+					} else if ( InputProcessor::SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
 						checkCurveIsNormalizedToOne( RoutineName + cCurrentModuleObject, VRF( VRFNum ).Name, VRF( VRFNum ).HeatCapFT, cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 					} else {
 						// do nothing, warning is issued below

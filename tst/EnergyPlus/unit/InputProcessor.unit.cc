@@ -359,12 +359,12 @@ namespace EnergyPlus {
 											},
 											{
 												{"vertex_x_coordinate", 0.0},
-												{"vertex_y_coordinate", 10},
+												{"vertex_y_coordinate", 10.0},
 												{"vertex_z_coordinate", 0}
 											},
 											{
 												{"vertex_x_coordinate", ""},
-												{"vertex_y_coordinate", 10},
+												{"vertex_y_coordinate", 10.0},
 												{"vertex_z_coordinate", ""}
 											}
 										}
@@ -472,7 +472,7 @@ namespace EnergyPlus {
 									{"vertices",
 										{
 											{
-												{"vertex_x_coordinate", 10},
+												{"vertex_x_coordinate", 10.0},
 												{"vertex_y_coordinate", 0.0},
 												{"vertex_z_coordinate", 0}
 											},
@@ -483,12 +483,12 @@ namespace EnergyPlus {
 											},
 											{
 												{"vertex_x_coordinate", 0.0},
-												{"vertex_y_coordinate", 10},
+												{"vertex_y_coordinate", 10.0},
 												{"vertex_z_coordinate", 0}
 											},
 											{
-												{"vertex_x_coordinate", 10},
-												{"vertex_y_coordinate", 10},
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 10.0},
 												{"vertex_z_coordinate", 0}
 											}
 										}
@@ -584,7 +584,7 @@ namespace EnergyPlus {
 									{"vertices",
 										{
 											{
-												{"vertex_x_coordinate", 10},
+												{"vertex_x_coordinate", 10.0},
 												{"vertex_y_coordinate", 0.0},
 												{"vertex_z_coordinate", 0}
 											},
@@ -595,12 +595,12 @@ namespace EnergyPlus {
 											},
 											{
 												{"vertex_x_coordinate", 0.0},
-												{"vertex_y_coordinate", 10},
+												{"vertex_y_coordinate", 10.0},
 												{"vertex_z_coordinate", 0}
 											},
 											{
-												{"vertex_x_coordinate", 10},
-												{"vertex_y_coordinate", 10},
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 10.0},
 												{"vertex_z_coordinate", 0}
 											}
 										}
@@ -621,7 +621,7 @@ namespace EnergyPlus {
 									{"vertices",
 									{
 											{
-												{"vertex_x_coordinate", 10},
+												{"vertex_x_coordinate", 10.0},
 												{"vertex_y_coordinate", 0.0},
 												{"vertex_z_coordinate", 0}
 											},
@@ -632,12 +632,12 @@ namespace EnergyPlus {
 											},
 											{
 												{"vertex_x_coordinate", 0.0},
-												{"vertex_y_coordinate", 10},
+												{"vertex_y_coordinate", 10.0},
 												{"vertex_z_coordinate", 0}
 											},
 											{
-												{"vertex_x_coordinate", 10},
-												{"vertex_y_coordinate", 10},
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 10.0},
 												{"vertex_z_coordinate", 0}
 											}
 										}
@@ -925,7 +925,7 @@ namespace EnergyPlus {
 							{"vertices",
 							{
 								{
-									{"vertex_x_coordinate", 10},
+									{"vertex_x_coordinate", 10.0},
 									{"vertex_y_coordinate", 0.0},
 									{"vertex_z_coordinate", 0}
 								},
@@ -936,12 +936,12 @@ namespace EnergyPlus {
 								},
 								{
 									{"vertex_x_coordinate", 0.0},
-									{"vertex_y_coordinate", 10},
+									{"vertex_y_coordinate", 10.0},
 									{"vertex_z_coordinate", 0}
 								},
 								{
-									{"vertex_x_coordinate", 10},
-									{"vertex_y_coordinate", 10},
+									{"vertex_x_coordinate", 10.0},
+									{"vertex_y_coordinate", 10.0},
 									{"vertex_z_coordinate", 0}
 								}
 								}
@@ -1031,7 +1031,7 @@ namespace EnergyPlus {
 							{"vertices",
 								{
 									{
-										{"vertex_x_coordinate", 10},
+										{"vertex_x_coordinate", 10.0},
 										{"vertex_y_coordinate", 0.0},
 										{"vertex_z_coordinate", 0}
 									},
@@ -1042,12 +1042,12 @@ namespace EnergyPlus {
 									},
 									{
 										{"vertex_x_coordinate", 0.0},
-										{"vertex_y_coordinate", 10},
+										{"vertex_y_coordinate", 10.0},
 										{"vertex_z_coordinate", 0}
 									},
 									{
-										{"vertex_x_coordinate", 10},
-										{"vertex_y_coordinate", 10},
+										{"vertex_x_coordinate", 10.0},
+										{"vertex_y_coordinate", 10.0},
 										{"vertex_z_coordinate", 0}
 									}
 								}
@@ -1068,7 +1068,7 @@ namespace EnergyPlus {
 							{"vertices",
 								{
 									{
-										{"vertex_x_coordinate", 10},
+										{"vertex_x_coordinate", 10.0},
 										{"vertex_y_coordinate", 0.0},
 										{"vertex_z_coordinate", 0}
 									},
@@ -1079,12 +1079,12 @@ namespace EnergyPlus {
 									},
 									{
 										{"vertex_x_coordinate", 0.0},
-										{"vertex_y_coordinate", 10},
+										{"vertex_y_coordinate", 10.0},
 										{"vertex_z_coordinate", 0}
 									},
 									{
-										{"vertex_x_coordinate", 10},
-										{"vertex_y_coordinate", 10},
+										{"vertex_x_coordinate", 10.0},
+										{"vertex_y_coordinate", 10.0},
 										{"vertex_z_coordinate", 0}
 									}
 								}

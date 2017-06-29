@@ -424,7 +424,7 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	} );
 
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataHeatBalance::ZoneIntGain.allocate( 1 );
 
@@ -536,7 +536,7 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	DataHeatBalSurface::QdotRadOutRepPerArea.allocate( 3 );
 	DataHeatBalSurface::QRadOutReport.allocate( 3 );
 
-	
+
 	DataHeatBalance::QRadSWOutIncident = 0.0;
 	DataHeatBalance::QRadSWwinAbs = 0.0;
 	DataHeatBalance::QRadThermInAbs = 0.0;

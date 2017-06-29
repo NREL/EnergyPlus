@@ -3147,7 +3147,7 @@ namespace EnergyPlus {
 			"    1.2857,   1.0778; ",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 
 		bool ErrorsFound = false;

@@ -4341,7 +4341,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound = false;
         // Read objects
@@ -4529,7 +4529,7 @@ namespace EnergyPlus {
 			"  -0.56;                   !- N31" });
 
 		// Load and verify the table
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 		EXPECT_EQ(0, CurveManager::NumCurves);
 		CurveManager::GetCurveInput();
 		CurveManager::GetCurvesInputFlag = false;
@@ -4602,7 +4602,7 @@ namespace EnergyPlus {
 			"  0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}"});
 
 		// Load and verify the table
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 		EXPECT_EQ(0, CurveManager::NumCurves);
 		CurveManager::GetCurveInput();
 		CurveManager::GetCurvesInputFlag = false;
@@ -5305,7 +5305,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -5974,7 +5974,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -6594,7 +6594,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool errors = false;
 
@@ -7249,7 +7249,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -7880,7 +7880,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -8356,7 +8356,7 @@ namespace EnergyPlus {
 			1.5837385005116038, 1.5699546250680769, 1.4391966568855996, 1.1829453813575432, 0.81696925904461237,
 			0.37465991281286887, -0.041152159946210520, -0.28653692388308377, -0.56146269488642231 };
 
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -8409,7 +8409,7 @@ namespace EnergyPlus {
 		for (auto value : CurveManager::PerfCurveTableData(6).Y) {
 			EXPECT_NEAR(valsForRightWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
 		}
-		
+
 	}
 
 }

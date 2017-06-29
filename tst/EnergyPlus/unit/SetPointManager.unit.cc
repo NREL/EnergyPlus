@@ -1098,10 +1098,10 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 
 		} ) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound =  false;
-	
-		DataGlobals::NumOfTimeStepInHour = 1; 
+
+		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::MinutesPerTimeStep = 60;
 		ScheduleManager::ProcessScheduleInput();
 
@@ -1119,7 +1119,7 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 		DataGlobals::SysSizingCalc = true;
 		SimAirServingZones::GetAirPathData();
 		SimAirServingZones::InitAirLoops( true );
-		// check the number of zones served by single duct or dual duct system 
+		// check the number of zones served by single duct or dual duct system
 		EXPECT_EQ( 1, DataAirLoop::AirToZoneNodeInfo( 1 ).NumZonesCooled ); // cooled and heated zone (served by single-duct)
 		EXPECT_EQ( 0, DataAirLoop::AirToZoneNodeInfo( 1 ).NumZonesHeated ); // no heated only zone (served by dual-duct)
 
@@ -1146,7 +1146,7 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 		EXPECT_DOUBLE_EQ( 16.0, SetPointManager::WarmestSetPtMgr( 1 ).SetPt ); // no cooling load, sets to maximum limit value
 
 		Real64 CpAir( 0.0 );
-		Real64 ZoneSetPointTemp( 0.0 ); 
+		Real64 ZoneSetPointTemp( 0.0 );
 
 		CpAir = Psychrometrics::PsyCpAirFnWTdb( DataLoopNode::Node( 2 ).HumRat, DataLoopNode::Node( 2 ).Temp );
 		ZoneSetPointTemp = DataLoopNode::Node( 5 ).Temp + DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired / ( CpAir * DataLoopNode::Node( 2 ).MassFlowRateMax );

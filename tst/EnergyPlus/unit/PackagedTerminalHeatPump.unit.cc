@@ -738,7 +738,7 @@ namespace EnergyPlus {
 			"NodeList,",
 			"    SPACE1-1 Exhausts,       !- Name",
 			"    SPACE1-1 HP Inlet Node;  !- Node 1 Name",
-			
+
 			"NodeList,",
 			"    OutsideAirInletNodes,    !- Name",
 			"    PTACOAInNode;            !- Node 1 Name",
@@ -747,7 +747,7 @@ namespace EnergyPlus {
 			"    OutsideAirInletNodes;    !- Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -798,7 +798,7 @@ namespace EnergyPlus {
 
 		PTUnitNum = 1;
 		PTUnit( 1 ).OpMode = ContFanCycCoil;
-		
+
 		Schedule( PTUnit( 1 ).FanSchedPtr ).CurrentValue = 1.0; // unit is always on
 		Schedule( PTUnit( 1 ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( PTUnit( 1 ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
@@ -824,7 +824,7 @@ namespace EnergyPlus {
 		Node( PTUnit( PTUnitNum ).OutsideAirNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( PTUnit( PTUnitNum ).OutsideAirNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( PTUnit( 1 ).AirInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( PTUnit( 1 ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( 1 ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -854,7 +854,7 @@ namespace EnergyPlus {
 
 		// initialized to false
 		ASSERT_FALSE( PackagedTerminalHeatPump::HeatingLoad );
-		// Init PTAC zoneHVAC equipment 
+		// Init PTAC zoneHVAC equipment
 		InitPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq );
 		// init sets heating mode to true due to cold ventilation air
 		ASSERT_TRUE( PackagedTerminalHeatPump::HeatingLoad );
@@ -868,9 +868,9 @@ namespace EnergyPlus {
 		ASSERT_NEAR( HeatingCoils::HeatingCoil( 1 ).InletAirTemp, 16.74764, 0.00001 );
 		// heating coil tempers cold ventilation air to neutral (zone air temp)
 		ASSERT_NEAR( HeatingCoils::HeatingCoil( 1 ).OutletAirTemp, 21.1, 0.00001 );
-		// heating coil air flow rate, continuous fan operation 
+		// heating coil air flow rate, continuous fan operation
 		ASSERT_NEAR( HeatingCoils::HeatingCoil( 1 ).OutletAirMassFlowRate, 0.50, 0.00001 );
-		// heating coil load due to cold ventilation air 
+		// heating coil load due to cold ventilation air
 		ASSERT_NEAR( HeatingCoils::HeatingCoil( 1 ).HeatingCoilRate, 2217.0, 1.0 );
 
 	}
