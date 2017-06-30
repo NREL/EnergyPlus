@@ -7881,7 +7881,7 @@ namespace SolarShading {
 			SurfaceWindow( ISurf ).ExtIntShadePrevTS = SurfaceWindow( ISurf ).ShadingFlag;
 			SurfaceWindow( ISurf ).ShadingFlag = NoShade;
 			SurfaceWindow( ISurf ).FracTimeShadingDeviceOn = 0.0;
-			if ( SurfaceWindow( ISurf ).WindowModelType = WindowEQLModel ) {
+			if ( SurfaceWindow( ISurf ).WindowModelType == WindowEQLModel ) {
 				SurfaceWindow( ISurf ).SlatAngThisTSDeg = 0.0;
 			}
 			if ( Surface( ISurf ).Class != SurfaceClass_Window ) continue;

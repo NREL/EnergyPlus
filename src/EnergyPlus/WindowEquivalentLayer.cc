@@ -8195,9 +8195,9 @@ namespace WindowEquivalentLayer {
 		} else if ( L.CNTRL == lscVBNOBM ) {
 			// slatA set to just exclude beam
 			if ( OMEGA_DEG < 0.0 ) {
-				SLATA = VB_CriticalSlatAngle( L, 30.0 ); // assume 30 deg for diffuse
+				SLATA = VB_CriticalSlatAngle( 30.0 ); // assume 30 deg for diffuse
 			} else {
-				SLATA = VB_CriticalSlatAngle( L, OMEGA_DEG );
+				SLATA = VB_CriticalSlatAngle( OMEGA_DEG );
 			}
 		}
 
@@ -8210,7 +8210,6 @@ namespace WindowEquivalentLayer {
 
 	Real64
 	VB_CriticalSlatAngle(
-		CFSLAYER const & L, // VB layer
 		Real64 const OMEGA_DEG // incident profile angle (degrees)
 	)
 	{
@@ -8256,11 +8255,7 @@ namespace WindowEquivalentLayer {
 		//VB_CriticalSlatAngle = max( 0.0, RadiansToDeg * std::asin( RAT ) - OMEGA_DEG );
 
 		// the slat normal points along the profile angle to block the beam solar
-		if ( OMEGA_DEG >= 0.0 ) {
-			VB_CriticalSlatAngle = 90.0 - OMEGA_DEG; // 
-		}else {
-			VB_CriticalSlatAngle = OMEGA_DEG;
-		}		
+		VB_CriticalSlatAngle = 90.0 - OMEGA_DEG; // 
 
 		return VB_CriticalSlatAngle;
 	}
