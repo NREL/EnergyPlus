@@ -6239,8 +6239,8 @@ WindowMaterial:Blind:EquivalentLayer,
   N4 , \field Slat Angle
        \type real
        \units deg
-       \minimum 0
-       \maximum 180
+       \minimum -90
+       \maximum 90
        \default 45
   N5 , \field Front Side Slat Beam-Diffuse Solar Transmittance
        \note The front side beam-diffuse solar transmittance of the slat at normal

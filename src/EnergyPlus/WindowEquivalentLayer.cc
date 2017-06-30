@@ -64,6 +64,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <DaylightingManager.hh>
+#include <DataWindowEquivalentLayer.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -314,6 +315,7 @@ namespace WindowEquivalentLayer {
 			}
 
 			if ( Material( MaterNum ).Group == BlindEquivalentLayer ) {
+				CFS( EQLNum ).VBLayerPtr = sLayer;
 				if ( Material( MaterNum ).SlatOrientation == Horizontal ) {
 					CFS( EQLNum ).L( sLayer ).LTYPE = ltyVBHOR;
 				} else if ( Material( MaterNum ).SlatOrientation == Vertical ) {
@@ -328,6 +330,7 @@ namespace WindowEquivalentLayer {
 				CFS( EQLNum ).L( sLayer ).SWP_MAT.RHOSBDD = Material( MaterNum ).ReflBackDiffDiff;
 				CFS( EQLNum ).L( sLayer ).SWP_MAT.TAUS_DD = Material( MaterNum ).TausDiffDiff;
 				CFS( EQLNum ).L( sLayer ).PHI_DEG = Material( MaterNum ).SlatAngle;
+				CFS( EQLNum ).L( sLayer ).CNTRL = Material( MaterNum ).SlatAngleType;
 				CFS( EQLNum ).L( sLayer ).S = Material( MaterNum ).SlatSeparation;
 				CFS( EQLNum ).L( sLayer ).W = Material( MaterNum ).SlatWidth;
 				CFS( EQLNum ).L( sLayer ).C = Material( MaterNum ).SlatCrown;
@@ -8241,14 +8244,24 @@ namespace WindowEquivalentLayer {
 		// DERIVED TYPE DEFINITIONS
 		// na
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 RAT;
-		// Flow
+		//// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		//Real64 RAT;
+		//// Flow
 
 		// TODO handle vert blind cases etc
-		RAT = L.S * std::cos( OMEGA_DEG ) / L.W;
-		// limit upward slat angle to horiz = max visibility
-		VB_CriticalSlatAngle = max( 0.0, RadiansToDeg * std::asin( RAT ) - OMEGA_DEG );
+
+		// issue #5750, commented out because it does not block the solar beam
+		//RAT = L.S * std::cos( OMEGA_DEG ) / L.W;
+		//// limit upward slat angle to horiz = max visibility
+		//VB_CriticalSlatAngle = max( 0.0, RadiansToDeg * std::asin( RAT ) - OMEGA_DEG );
+
+		// the slat normal points along the profile angle to block the beam solar
+		if ( OMEGA_DEG >= 0.0 ) {
+			VB_CriticalSlatAngle = 90.0 - OMEGA_DEG; // 
+		}else {
+			VB_CriticalSlatAngle = OMEGA_DEG;
+		}		
+
 		return VB_CriticalSlatAngle;
 	}
 
@@ -9244,8 +9257,8 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 ProfAngHor; // Solar profile angle (radians) for horizontal blind
-		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
+		Real64 ProfAngVer; // Solar vertical profile angle (radians) for horizontal blind
+		Real64 ProfAngHor; // Solar horizontal profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
 		static Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
 		int Lay; // window layer index
@@ -9259,16 +9272,16 @@ namespace WindowEquivalentLayer {
 		ProfAngVer = 0.0;
 		ConstrNum = Surface( SurfNum ).Construction;
 		EQLNum = Construct( Surface( SurfNum ).Construction ).EQLConsPtr;
-
+		
 		if ( BeamDIffFlag != isDIFF ) {
 			if ( CosIncAng( TimeStep, HourOfDay, SurfNum ) <= 0.0 ) return;
 
 			for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 				if ( IsVBLayer( CFS( EQLNum ).L( Lay ) ) ) {
 					if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBHOR ) {
-						ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngHor );
+						ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngVer );
 					} else if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBVER ) {
-						ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngVer );
+						ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngHor );
 					}
 				}
 			}
@@ -9282,12 +9295,13 @@ namespace WindowEquivalentLayer {
 				for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 					if ( IsVBLayer( CFS( EQLNum ).L( Lay ) ) ) {
 						if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBHOR ) {
-							ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngHor );
+							ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngVer );
 						} else if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBVER ) {
-							ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngVer );
+							ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngHor );
 						}
 					}
 				}
+				IncAng = std::acos( CosIncAng( TimeStep, HourOfDay, SurfNum ) );
 				CalcEQLWindowOpticalProperty( CFS( EQLNum ), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor );
 				CFSAbs( _, {1,CFSMAXNL + 1} ) = Abs1( _, {1,CFSMAXNL + 1} );
 				CFSDiffAbsTrans( _, {1,CFSMAXNL + 1}, EQLNum ) = Abs1( _, {1,CFSMAXNL + 1} );
@@ -9305,6 +9319,9 @@ namespace WindowEquivalentLayer {
 			}
 		}
 
+		if ( CFS( EQLNum ).VBLayerPtr > 0 ) {
+			SurfaceWindow( SurfNum ).SlatAngThisTSDeg = CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).PHI_DEG;
+		}
 	}
 
 	void
