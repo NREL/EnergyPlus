@@ -4870,7 +4870,6 @@ SetupOutputVariable(
 	using namespace OutputProcessor;
 	using DataOutputs::FindItemInVariableList;
 	using General::TrimSigDigits;
-	using namespace ResultsFramework;
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int CV;
@@ -5120,7 +5119,6 @@ SetupOutputVariable(
 	using namespace OutputProcessor;
 	using General::TrimSigDigits;
 	using DataOutputs::FindItemInVariableList;
-	using namespace ResultsFramework;
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int CV;
@@ -5363,19 +5361,9 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	using DataGlobals::EndEnvrnFlag;
 	using DataGlobals::eso_stream;
 	using DataGlobals::HourOfDay;
-	// using DataGlobals::DayOfSim;
 	using DataGlobals::DayOfSimChr;
-	// using DataGlobals::OutputFileStandard;
-	// using DataGlobals::MinutesPerTimeStep;
-	// using DataGlobals::ZoneTSReporting;
-	// using DataGlobals::HVACTSReporting;
-	// using DataEnvironment::Month;
-	// using DataEnvironment::DayOfMonth;
-	// using DataEnvironment::Year;
-	// using DataEnvironment::DSTIndicator;
 	using DataEnvironment::EndMonthFlag;
 	using General::EncodeMonDayHrMin;
-	using namespace ResultsFramework;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:

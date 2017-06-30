@@ -5214,5 +5214,4 @@
     displayallwarnings;      !- Key 1
 
   Output:SQLite,
-    SimpleAndTabular;        !- Option Type
-
+    Simple;                  !- Option Type
