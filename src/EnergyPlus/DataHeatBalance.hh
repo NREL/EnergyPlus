@@ -63,6 +63,7 @@
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
 #include <DataWindowEquivalentLayer.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -786,6 +787,7 @@ namespace DataHeatBalance {
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
+		HysteresisPhaseChange::HysteresisPhaseChange * phaseChange = nullptr;
 
 		// Default Constructor
 		MaterialProperties() :
@@ -2834,7 +2836,8 @@ namespace DataHeatBalance {
 		Real64 OABalanceMdot; // Mass flow rate of Air {kg/s} due to OA air balance
 		Real64 OABalanceAirChangeRate; // OA air balance air change rate (ach)
 		Real64 OABalanceFanElec; // Fan Electricity {W} due to OA air balance
-
+		Real64 SumEnthalpyM = 0.0; // Zone sum of EnthalpyM
+		Real64 SumEnthalpyH = 0.0; // Zone sum of EnthalpyH
 		// Default Constructor
 		AirReportVars() :
 			MeanAirTemp( 0.0 ),
@@ -2902,7 +2905,9 @@ namespace DataHeatBalance {
 			OABalanceMass( 0.0 ),
 			OABalanceMdot( 0.0 ),
 			OABalanceAirChangeRate( 0.0 ),
-			OABalanceFanElec( 0.0 )
+			OABalanceFanElec( 0.0 ),
+			SumEnthalpyM( 0.0 ),
+			SumEnthalpyH( 0.0 )
 		{}
 
 	};
