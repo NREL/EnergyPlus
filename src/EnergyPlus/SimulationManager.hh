@@ -86,6 +86,9 @@ namespace SimulationManager {
 	CheckForRequestedReporting();
 
 	void
+	OpenStreamFile( const std::string & fileName, int & unitNumber, std::ostream * out_stream );
+
+	void
 	OpenOutputFiles();
 
 	void

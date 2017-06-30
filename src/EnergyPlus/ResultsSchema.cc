@@ -353,29 +353,99 @@ namespace EnergyPlus {
 			return root;
 		}
 
-		void DataFrame::writeReport() {
+		void DataFrame::writeReport( bool outputJSON, bool outputCBOR, bool outputMsgPack ) {
 
 			json root = getJSON();
-			if ( DataGlobals::json_TSstream_HVAC && ReportFrequency == "Detailed-HVAC" ) {
-				*( DataGlobals::json_TSstream_HVAC ) << std::setw( 4 ) << root << std::endl;
+			if ( ReportFrequency == "Detailed-HVAC" ) {
+				if ( outputJSON && DataGlobals::jsonOutputStreams.json_TSstream_HVAC ) {
+					*( DataGlobals::jsonOutputStreams.json_TSstream_HVAC ) << std::setw( 4 ) << root << std::endl;
+				}
+				if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_TSstream_HVAC ) {
+					std::vector<uint8_t> v_cbor = json::to_cbor( root );
+					std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_TSstream_HVAC ) );
+				}
+				if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_TSstream_HVAC ) {
+					std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_TSstream_HVAC ) );
+				}
 			}
-			else if( DataGlobals::json_TSstream_Zone && ReportFrequency == "Detailed-Zone" ) {
-				*( DataGlobals::json_TSstream_Zone ) << std::setw( 4 ) << root << std::endl;
+			else if ( ReportFrequency == "Detailed-Zone" ) {
+				if ( outputJSON && DataGlobals::jsonOutputStreams.json_TSstream_Zone ) {
+					*( DataGlobals::jsonOutputStreams.json_TSstream_Zone ) << std::setw( 4 ) << root << std::endl;
+				}
+				if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_TSstream_Zone ) {
+					std::vector<uint8_t> v_cbor = json::to_cbor( root );
+					std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_TSstream_Zone ) );
+				}
+				if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_TSstream_Zone ) {
+					std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_TSstream_Zone ) );
+				}
 			}
-			else if( DataGlobals::json_TSstream && ReportFrequency == "Timestep" ) {
-				*( DataGlobals::json_TSstream ) << std::setw( 4 ) << root << std::endl;
+			else if ( ReportFrequency == "Timestep" ) {
+				if ( outputJSON && DataGlobals::jsonOutputStreams.json_TSstream ) {
+					*( DataGlobals::jsonOutputStreams.json_TSstream ) << std::setw( 4 ) << root << std::endl;
+				}
+				if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_TSstream ) {
+					std::vector<uint8_t> v_cbor = json::to_cbor( root );
+					std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_TSstream ) );
+				}
+				if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_TSstream ) {
+					std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_TSstream ) );
+				}
 			}
-			else if( DataGlobals::json_DYstream && ReportFrequency == "Daily" ) {
-				*( DataGlobals::json_DYstream ) << std::setw( 4 ) << root << std::endl;
+			else if ( ReportFrequency == "Daily" ) {
+				if ( outputJSON && DataGlobals::jsonOutputStreams.json_DYstream ) {
+					*( DataGlobals::jsonOutputStreams.json_DYstream ) << std::setw( 4 ) << root << std::endl;
+				}
+				if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_DYstream ) {
+					std::vector<uint8_t> v_cbor = json::to_cbor( root );
+					std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_DYstream ) );
+				}
+				if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_DYstream ) {
+					std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_DYstream ) );
+				}
 			}
-			else if( DataGlobals::json_HRstream && ReportFrequency == "Hourly" ) {
-				*( DataGlobals::json_HRstream ) << std::setw( 4 ) << root << std::endl;
+			else if ( ReportFrequency == "Hourly" ) {
+				if ( outputJSON && DataGlobals::jsonOutputStreams.json_HRstream ) {
+					*( DataGlobals::jsonOutputStreams.json_HRstream ) << std::setw( 4 ) << root << std::endl;
+				}
+				if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_HRstream ) {
+					std::vector<uint8_t> v_cbor = json::to_cbor( root );
+					std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_HRstream ) );
+				}
+				if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_HRstream ) {
+					std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_HRstream ) );
+				}
 			}
-			else if( DataGlobals::json_MNstream && ReportFrequency == "Monthly" ) {
-				*( DataGlobals::json_MNstream ) << std::setw( 4 ) << root << std::endl;
+			else if ( ReportFrequency == "Monthly" ) {
+				if ( outputJSON && DataGlobals::jsonOutputStreams.json_MNstream ) {
+					*( DataGlobals::jsonOutputStreams.json_MNstream ) << std::setw( 4 ) << root << std::endl;
+				}
+				if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_MNstream ) {
+					std::vector<uint8_t> v_cbor = json::to_cbor( root );
+					std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_MNstream ) );
+				}
+				if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_MNstream ) {
+					std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_MNstream ) );
+				}
 			}
-			else if( DataGlobals::json_SMstream && ReportFrequency == "RunPeriod" ) {
-				*( DataGlobals::json_SMstream ) << std::setw( 4 ) << root << std::endl;
+			else if ( ReportFrequency == "RunPeriod" ) {
+				if ( outputJSON && DataGlobals::jsonOutputStreams.json_SMstream ) {
+					*( DataGlobals::jsonOutputStreams.json_SMstream ) << std::setw( 4 ) << root << std::endl;
+				}
+				if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_SMstream ) {
+					std::vector<uint8_t> v_cbor = json::to_cbor( root );
+					std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_SMstream ) );
+				}
+				if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_SMstream ) {
+					std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_SMstream ) );
+				}
 			}
 		}
 		// class Table
@@ -528,49 +598,65 @@ namespace EnergyPlus {
 			ResultsSchema::MNMeters( "Monthly" ),
 			ResultsSchema::SMMeters( "RunPeriod" );
 
-		ResultsSchema::ResultsSchema() {
-			tsEnabled = false;
-			tsAndTabularEnabled = false;
-		}
-
-		ResultsSchema::~ResultsSchema() {
-
-		}
-
 		void ResultsSchema::setupOutputOptions() {
 			int numberOfOutputSchemaObjects = InputProcessor::GetNumObjectsFound( "Output:JSON" );
 			if ( numberOfOutputSchemaObjects == 1 ) {
-				try {
-					Array1D_string alphas( 5 );
-					int numAlphas;
-					Array1D< Real64 > numbers( 2 );
-					int numNumbers;
-					int status;
-					InputProcessor::GetObjectItem( "Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status );
+				Array1D_string alphas( 5 );
+				int numAlphas;
+				Array1D< Real64 > numbers( 2 );
+				int numNumbers;
+				int status;
+				InputProcessor::GetObjectItem( "Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status );
 
-					if ( numAlphas > 0 ) {
-						std::string option = alphas( 1 );
-						if ( InputProcessor::SameString( option, "TimeSeries" ) ) {
-							tsEnabled = true;
-						}
-						else if ( InputProcessor::SameString( option, "TimeSeriesAndTabular" ) ) {
-							tsEnabled = true;
-							tsAndTabularEnabled = true;
+				if ( numAlphas > 0 ) {
+					std::string option = alphas( 1 );
+					if ( InputProcessor::SameString( option, "TimeSeries" ) ) {
+						tsEnabled = true;
+					}
+					else if ( InputProcessor::SameString( option, "TimeSeriesAndTabular" ) ) {
+						tsEnabled = true;
+						tsAndTabularEnabled = true;
+					}
+
+					if ( numAlphas == 2 ) {
+						if ( InputProcessor::SameString( alphas( 2 ), "Yes" ) ) {
+							outputJSON = true;
 						}
 					}
-				}
-				catch ( const std::runtime_error& error ) {
-					ShowFatalError( error.what() );
+
+					if ( numAlphas == 3 ) {
+						if ( InputProcessor::SameString( alphas( 3 ), "Yes" ) ) {
+							outputCBOR = true;
+						}
+					}
+
+					if ( numAlphas == 4 ) {
+						if ( InputProcessor::SameString( alphas( 4 ), "Yes" ) ) {
+							outputMsgPack = true;
+						}
+					}
 				}
 			}
 		}
 
-		bool ResultsSchema::timeSeriesEnabled() {
+		bool ResultsSchema::timeSeriesEnabled() const {
 			return tsEnabled;
 		}
 
-		bool ResultsSchema::timeSeriesAndTabularEnabled() {
+		bool ResultsSchema::timeSeriesAndTabularEnabled() const {
 			return tsAndTabularEnabled;
+		}
+
+		bool ResultsSchema::JSONEnabled() const {
+			return outputJSON;
+		}
+
+		bool ResultsSchema::CBOREnabled() const {
+			return outputCBOR;
+		}
+
+		bool ResultsSchema::MsgPackEnabled() const {
+			return outputMsgPack;
 		}
 
 		void ResultsSchema::initializeRTSDataFrame( const int ReportFrequency, const Array1D< RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType ) {
@@ -844,37 +930,37 @@ namespace EnergyPlus {
 		{
 			// Output detailed Zone time series data
 			if ( OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled() ) {
-				OutputSchema->RIDetailedZoneTSData.writeReport();
+				OutputSchema->RIDetailedZoneTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
 			}
 
 			// Output detailed HVAC time series data
 			if ( OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() || OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled() ) {
-				OutputSchema->RIDetailedHVACTSData.writeReport();
+				OutputSchema->RIDetailedHVACTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
 			}
 
 			// Output timestep time series data
 			if ( OutputSchema->RITimestepTSData.iDataFrameEnabled() || OutputSchema->RITimestepTSData.rDataFrameEnabled() ) {
-				OutputSchema->RITimestepTSData.writeReport();
+				OutputSchema->RITimestepTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
 			}
 
 			// Output hourly time series data
 			if ( OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled() ) {
-				OutputSchema->RIHourlyTSData.writeReport();
+				OutputSchema->RIHourlyTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
 			}
 
 			// Output daily time series data
 			if ( OutputSchema->RIDailyTSData.iDataFrameEnabled() || OutputSchema->RIDailyTSData.rDataFrameEnabled() ) {
-				OutputSchema->RIDailyTSData.writeReport();
+				OutputSchema->RIDailyTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
 			}
 
 			// Output monthly time series data
 			if ( OutputSchema->RIMonthlyTSData.iDataFrameEnabled() || OutputSchema->RIMonthlyTSData.rDataFrameEnabled() ) {
-				OutputSchema->RIMonthlyTSData.writeReport();
+				OutputSchema->RIMonthlyTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
 			}
 
 			// Output run period time series data
 			if ( OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || OutputSchema->RIRunPeriodTSData.rDataFrameEnabled() ) {
-				OutputSchema->RIRunPeriodTSData.writeReport();
+				OutputSchema->RIRunPeriodTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
 			}
 		}
 
@@ -989,9 +1075,16 @@ namespace EnergyPlus {
 			root[ "MeterData" ] = meterData;
 			root[ "TabularReports" ] = TabularReportsCollection.getJSON();
 
-			if ( DataGlobals::json_stream ) {
-				*( DataGlobals::json_stream ) << std::setw( 4 ) << root << std::endl;
-				DataGlobals::json_stream = nullptr;
+			if ( outputJSON && DataGlobals::jsonOutputStreams.json_stream ) {
+				*( DataGlobals::jsonOutputStreams.json_stream ) << std::setw( 4 ) << root << std::endl;
+			}
+			if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_stream ) {
+				std::vector<uint8_t> v_cbor = json::to_cbor( root );
+				std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_stream ) );
+			}
+			if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_stream ) {
+				std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+				std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_stream ) );
 			}
 		}
 

@@ -259,7 +259,7 @@ namespace EnergyPlus {
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
-		DataGlobals::json_stream = this->json_stream.get();
+		DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
@@ -283,7 +283,7 @@ namespace EnergyPlus {
 			flags.DISPOSE( "DELETE" );
 			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
 			gio::close( DataGlobals::OutputFileStandard, flags );
-			gio::close( DataGlobals::OutputFileJson, flags );
+			gio::close( DataGlobals::jsonOutputStreams.OutputFileJson, flags );
 			gio::close( DataGlobals::OutputStandardError, flags );
 			gio::close( DataGlobals::OutputFileInits, flags );
 			gio::close( DataGlobals::OutputFileDebug, flags );

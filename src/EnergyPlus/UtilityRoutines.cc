@@ -253,6 +253,14 @@ AbortEnergyPlus()
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
 	gio::close( tempfl );
+
+	// Output detailed ZONE time series data
+	SimulationManager::OpenOutputJsonFiles();
+
+	if ( ResultsFramework::OutputSchema->timeSeriesEnabled() ) {
+		ResultsFramework::OutputSchema->writeTimeSeriesReports();
+	}
+
 	if( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 		ResultsFramework::OutputSchema->WriteReport();
 	}
@@ -494,9 +502,17 @@ EndEnergyPlus()
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
 
-	if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
+	// Output detailed ZONE time series data
+	SimulationManager::OpenOutputJsonFiles();
+
+	if ( ResultsFramework::OutputSchema->timeSeriesEnabled() ) {
+		ResultsFramework::OutputSchema->writeTimeSeriesReports();
+	}
+
+	if( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 		ResultsFramework::OutputSchema->WriteReport();
 	}
+
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
 #endif

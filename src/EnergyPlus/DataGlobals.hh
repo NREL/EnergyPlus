@@ -140,6 +140,59 @@ namespace DataGlobals {
 
 	// MODULE VARIABLE DECLARATIONS:
 
+	struct JsonOutputStreams
+	{
+		std::ostream * json_stream = nullptr; // Internal stream used for json output
+		std::ostream * json_TSstream_Zone = nullptr;
+		std::ostream * json_TSstream_HVAC = nullptr;
+		std::ostream * json_TSstream = nullptr;
+		std::ostream * json_HRstream = nullptr;
+		std::ostream * json_MNstream = nullptr;
+		std::ostream * json_DYstream = nullptr;
+		std::ostream * json_SMstream = nullptr;
+		std::ostream * cbor_stream = nullptr; // Internal stream used for cbor output
+		std::ostream * cbor_TSstream_Zone = nullptr;
+		std::ostream * cbor_TSstream_HVAC = nullptr;
+		std::ostream * cbor_TSstream = nullptr;
+		std::ostream * cbor_HRstream = nullptr;
+		std::ostream * cbor_MNstream = nullptr;
+		std::ostream * cbor_DYstream = nullptr;
+		std::ostream * cbor_SMstream = nullptr;
+		std::ostream * msgpack_stream = nullptr; // Internal stream used for messagepack output
+		std::ostream * msgpack_TSstream_Zone = nullptr;
+		std::ostream * msgpack_TSstream_HVAC = nullptr;
+		std::ostream * msgpack_TSstream = nullptr;
+		std::ostream * msgpack_HRstream = nullptr;
+		std::ostream * msgpack_MNstream = nullptr;
+		std::ostream * msgpack_DYstream = nullptr;
+		std::ostream * msgpack_SMstream = nullptr;
+
+		int OutputFileJson = 0; // Unit number for Schema output
+		int OutputFileTSZoneJson = 0;
+		int OutputFileTSHVACJson = 0;
+		int OutputFileTSJson = 0;
+		int OutputFileHRJson = 0;
+		int OutputFileDYJson = 0;
+		int OutputFileMNJson = 0;
+		int OutputFileSMJson = 0;
+		int OutputFileCBOR = 0; // Unit number for Schema output
+		int OutputFileTSZoneCBOR = 0;
+		int OutputFileTSHVACCBOR = 0;
+		int OutputFileTSCBOR = 0;
+		int OutputFileHRCBOR = 0;
+		int OutputFileDYCBOR = 0;
+		int OutputFileMNCBOR = 0;
+		int OutputFileSMCBOR = 0;
+		int OutputFileMsgPack = 0; // Unit number for Schema output
+		int OutputFileTSZoneMsgPack = 0;
+		int OutputFileTSHVACMsgPack = 0;
+		int OutputFileTSMsgPack = 0;
+		int OutputFileHRMsgPack = 0;
+		int OutputFileDYMsgPack = 0;
+		int OutputFileMNMsgPack = 0;
+		int OutputFileSMMsgPack = 0;
+	};
+
 	extern bool BeginDayFlag; // True at the start of each day, False after first time step in day
 	extern bool BeginEnvrnFlag; // True at the start of each environment, False after first time step in environ
 	extern bool BeginHourFlag; // True at the start of each hour, False after first time step in hour
@@ -165,14 +218,7 @@ namespace DataGlobals {
 	extern bool WarmupFlag; // True during the warmup portion of a simulation
 	extern int OutputFileStandard; // Unit number for the standard output file (hourly data only)
 	extern std::ostream * eso_stream; // Internal stream used for eso output (used for performance)
-	extern std::ostream * json_stream; // Internal stream used for json output (used for performance)
-	extern std::ostream * json_TSstream_Zone;
-	extern std::ostream * json_TSstream_HVAC;
-	extern std::ostream * json_TSstream;
-	extern std::ostream * json_HRstream;
-	extern std::ostream * json_MNstream;
-	extern std::ostream * json_DYstream;
-	extern std::ostream * json_SMstream;
+	extern JsonOutputStreams jsonOutputStreams; // Internal streams used for json outputs
 	extern int OutputStandardError; // Unit number for the standard error output file
 	extern std::ostream * err_stream; // Internal stream used for err output (used for performance)
 	extern int StdOutputRecordCount; // Count of Standard output records
@@ -182,14 +228,6 @@ namespace DataGlobals {
 	extern int OutputFileZoneSizing; // Unit number of zone sizing calc output file
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
-	extern int OutputFileJson; // Unit number for Schema output
-	extern int OutputFileTSZoneJson;
-	extern int OutputFileTSHVACJson;
-	extern int OutputFileTSJson;
-	extern int OutputFileHRJson;
-	extern int OutputFileDYJson;
-	extern int OutputFileMNJson;
-	extern int OutputFileSMJson;
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details

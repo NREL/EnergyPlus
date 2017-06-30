@@ -68,8 +68,8 @@ namespace DataStringGlobals {
 	extern std::string outputEndFileName;
 	extern std::string outputErrFileName;
 	extern std::string outputEsoFileName;
-	extern std::string outputJsonFileName;
 
+	extern std::string outputJsonFileName;
 	extern std::string outputTSHvacJsonFileName;
 	extern std::string outputTSZoneJsonFileName;
 	extern std::string outputTSJsonFileName;
@@ -77,6 +77,22 @@ namespace DataStringGlobals {
 	extern std::string outputDYJsonFileName;
 	extern std::string outputHRJsonFileName;
 	extern std::string outputSMJsonFileName;
+	extern std::string outputCborFileName;
+	extern std::string outputTSHvacCborFileName;
+	extern std::string outputTSZoneCborFileName;
+	extern std::string outputTSCborFileName;
+	extern std::string outputMNCborFileName;
+	extern std::string outputDYCborFileName;
+	extern std::string outputHRCborFileName;
+	extern std::string outputSMCborFileName;
+	extern std::string outputMsgPackFileName;
+	extern std::string outputTSHvacMsgPackFileName;
+	extern std::string outputTSZoneMsgPackFileName;
+	extern std::string outputTSMsgPackFileName;
+	extern std::string outputMNMsgPackFileName;
+	extern std::string outputDYMsgPackFileName;
+	extern std::string outputHRMsgPackFileName;
+	extern std::string outputSMMsgPackFileName;
 
 	extern std::string outputMtdFileName;
 	extern std::string outputMddFileName;

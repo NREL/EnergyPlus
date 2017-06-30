@@ -137,7 +137,7 @@ namespace EnergyPlus {
 			json getVariablesJSON();
 			json getJSON() const;
 
-			void writeReport();
+			void writeReport( bool outputJSON, bool outputCBOR, bool outputMsgPack );
 
 		protected:
 			bool IDataFrameEnabled = false;
@@ -210,13 +210,16 @@ namespace EnergyPlus {
 
 		class ResultsSchema : public BaseResultObject {
 		public:
-			ResultsSchema();
-			virtual ~ResultsSchema();
+			ResultsSchema() = default;
+			virtual ~ResultsSchema() = default;
 
 			void setupOutputOptions();
 
-			bool timeSeriesEnabled();
-			bool timeSeriesAndTabularEnabled();
+			bool timeSeriesEnabled() const;
+			bool timeSeriesAndTabularEnabled() const;
+			bool JSONEnabled() const;
+			bool CBOREnabled() const;
+			bool MsgPackEnabled() const;
 
 			void initializeRTSDataFrame( const int ReportFrequency, const Array1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar );
 			void initializeITSDataFrame( const int ReportFrequency, const Array1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar );
@@ -234,8 +237,11 @@ namespace EnergyPlus {
 			std::vector<std::string> RDD;
 			ReportsCollection TabularReportsCollection;
 		protected:
-			bool tsEnabled;
-			bool tsAndTabularEnabled;
+			bool tsEnabled = false;
+			bool tsAndTabularEnabled = false;
+			bool outputJSON = false;
+			bool outputCBOR = false;
+			bool outputMsgPack = false;
 		};
 
 		extern std::unique_ptr< ResultsSchema > OutputSchema;

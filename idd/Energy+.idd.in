@@ -101121,12 +101121,28 @@ Meter:CustomDecrement,
 Output:JSON,
        \memo Output from EnergyPlus can be written to JSON format files.
        \unique-object
-  A1 ; \field Option Type
+  A1 , \field Option Type
+  	   \required-field
        \type choice
        \key TimeSeries
        \key TimeSeriesAndTabular
+  A2 , \field Output JSON
+       \type choice
+       \key Yes
+       \key No
+       \default Yes
+  A3 , \field Output CBOR
+       \type choice
+       \key Yes
+       \key No
+       \default No
+  A4 ; \field Output MessagePack
+       \type choice
+       \key Yes
+       \key No
+       \default No
 
-   
+
 Output:SQLite,
        \memo Output from EnergyPlus can be written to an SQLite format file.
        \unique-object

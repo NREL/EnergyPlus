@@ -187,14 +187,7 @@ namespace DataGlobals {
 	bool WarmupFlag( false ); // True during the warmup portion of a simulation
 	int OutputFileStandard( 0 ); // Unit number for the standard output file (hourly data only)
 	std::ostream * eso_stream( nullptr ); // Internal stream used for eso output (used for performance)
-	std::ostream * json_stream( nullptr ); // Internal stream used for json output (used for performance)
-	std::ostream * json_TSstream_Zone( nullptr );
-	std::ostream * json_TSstream_HVAC( nullptr );
-	std::ostream * json_TSstream (nullptr);
-	std::ostream * json_HRstream( nullptr );
-	std::ostream * json_MNstream( nullptr );
-	std::ostream * json_DYstream( nullptr );
-	std::ostream * json_SMstream( nullptr );
+	JsonOutputStreams jsonOutputStreams;
 	int OutputStandardError( 0 ); // Unit number for the standard error output file
 	std::ostream * err_stream( nullptr ); // Internal stream used for err output (used for performance)
 	int StdOutputRecordCount( 0 ); // Count of Standard output records
@@ -204,14 +197,6 @@ namespace DataGlobals {
 	int OutputFileZoneSizing( 0 ); // Unit number of zone sizing calc output file
 	int OutputFileSysSizing( 0 ); // Unit number of system sizing calc output file
 	int OutputFileMeters( 0 ); // Unit number for meters output
-	int OutputFileJson( 0 ); // Unit number for Schema output
-	int OutputFileTSZoneJson( 0 );
-	int OutputFileTSHVACJson( 0 );
-	int OutputFileTSJson( 0 );
-	int OutputFileHRJson( 0 );
-	int OutputFileDYJson( 0 );
-	int OutputFileMNJson( 0 );
-	int OutputFileSMJson( 0 );
 	std::ostream * mtr_stream( nullptr ); // Internal stream used for mtr output (used for performance)
 	int StdMeterRecordCount( 0 ); // Count of Meter output records
 	int OutputFileBNDetails( 0 ); // Unit number for Branch-Node Details
