@@ -1215,7 +1215,7 @@ namespace SimulationManager {
 	}
 
 	void
-	OpenStreamFile( const std::string & fileName, int & unitNumber, std::ostream * out_stream )
+	OpenStreamFile( const std::string & fileName, int & unitNumber, std::ostream *& out_stream )
 	{
 		int write_stat;
 		unitNumber = GetNewUnitNumber();

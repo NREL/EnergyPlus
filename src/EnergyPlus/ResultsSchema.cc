@@ -618,19 +618,19 @@ namespace EnergyPlus {
 						tsAndTabularEnabled = true;
 					}
 
-					if ( numAlphas == 2 ) {
+					if ( numAlphas >= 2 ) {
 						if ( InputProcessor::SameString( alphas( 2 ), "Yes" ) ) {
 							outputJSON = true;
 						}
 					}
 
-					if ( numAlphas == 3 ) {
+					if ( numAlphas >= 3 ) {
 						if ( InputProcessor::SameString( alphas( 3 ), "Yes" ) ) {
 							outputCBOR = true;
 						}
 					}
 
-					if ( numAlphas == 4 ) {
+					if ( numAlphas >= 4 ) {
 						if ( InputProcessor::SameString( alphas( 4 ), "Yes" ) ) {
 							outputMsgPack = true;
 						}
@@ -1079,11 +1079,11 @@ namespace EnergyPlus {
 				*( DataGlobals::jsonOutputStreams.json_stream ) << std::setw( 4 ) << root << std::endl;
 			}
 			if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_stream ) {
-				std::vector<uint8_t> v_cbor = json::to_cbor( root );
+				std::vector< uint8_t > v_cbor = json::to_cbor( root );
 				std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_stream ) );
 			}
 			if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_stream ) {
-				std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+				std::vector< uint8_t > v_msgpack = json::to_msgpack( root );
 				std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_stream ) );
 			}
 		}
