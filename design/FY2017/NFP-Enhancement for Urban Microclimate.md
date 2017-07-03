@@ -2,7 +2,6 @@ Enhancement for Simulation using Urban Microclimate Conditions
 ================
 **Tianzhen Hong, Xuan Luo, LBNL**
 **Original: June 27, 2017**
-**Revised: June 27, 2017**
 
 # Justification for New Feature 
 
@@ -62,9 +61,7 @@ n/a
 
 # E-mail comments
 
-**Michael J Witte <mjwitte@gard.com> Mon, Jun 5, 2017** 
-
-Lixing Gu <gu@fsec.ucf.edu> Thu, Jun 1, 2017 
+**Lixing Gu <gu@fsec.ucf.edu> Thu, Jun 1, 2017** 
 
 LocalOutdoorAir:Node
 Since you require to input outdoor conditions, T, W, Wind Speed and direction, is it possible to add solar radiation treated as diffuse component?
@@ -72,6 +69,7 @@ Since you require to input outdoor conditions, T, W, Wind Speed and direction, i
 > That can be added in future using the same approach, but we don’t see this as an immediate need to support urban energy modeling. A separate topic is to allow the calculated solar radiation (diffuse, direct or combined) to be an input for external surfaces, which is outside the scope of this proposal.
 
 **Michael J Witte <mjwitte@gard.com> Mon, Jun 5, 2017** 
+
 Rather than add the concept of outdoor air nodes with one-to-one correspondence with surfaces and zones, here it may be better to just add new EMS actuators.  Surface and zone outdoor conditions are already tracked separately, and they are reportable:
 	Zone,Average,Surface Outside Face Outdoor Air Drybulb Temperature [C]
 	Zone,Average,Surface Outside Face Outdoor Air Wetbulb Temperature [C]
