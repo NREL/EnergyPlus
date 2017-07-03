@@ -293,7 +293,7 @@ namespace CurveManager {
 		Array1D< TriQuadraticCurveDataStruct > Tri2ndOrder; // structure for triquadratic curve data
 		bool EMSOverrideOn; // if TRUE, then EMS is calling to override curve value
 		Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
-		bool OpticalProperty; // if TRUE, this table is used to stro optical property
+		bool OpticalProperty; // if TRUE, this table is used to store optical property
 		// report variables
 		Real64 CurveOutput; // curve output or result
 		Real64 CurveInput1; // curve input #1 (e.g., x or X1 variable)
@@ -607,10 +607,10 @@ namespace CurveManager {
 
 	void
 	SetCommonIncidentAngles(
-		int const ConstrNum,
-		int const NGlass,
-		int & TotalIPhi,
-		Array1A_int const Tables
+		int const ConstrNum,  // Construction number
+		int const NGlass,     // The number of glass layers in the construction with index = ConstrNum
+		int & TotalIPhi,      // The number of incident angles
+		Array1A_int const Tables // Store glass layer number for SpectralAndAngleGlassLayer only. Otherwise = 0 for other layers.
 	);
 
 	//=================================================================================================!

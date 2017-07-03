@@ -2597,6 +2597,29 @@ namespace CurveManager {
 				FileName = "";
 
 				MaxTableNums = ( NumNumbers - 7 ) / 3;
+				if ( MaxTableNums < 4 ) {
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( "When data is read from input, the minimum number of data entries must be equal or greater than 12. The current input number is " + RoundSigDigits( NumNumbers - 7 ) );
+					ErrorsFound = true;
+				} else {
+					for ( TableDataIndex = 1; TableDataIndex <= 4; ++TableDataIndex ) {
+						if ( lNumericFieldBlanks( ( TableDataIndex - 1 ) * 3 + 7 + 1 ) ) {
+							ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+							ShowContinueError( "When data is read from input, this field is required and cannot be blank: " + cNumericFieldNames( ( TableDataIndex - 1 ) * 3 + 7 + 1 ) );
+							ErrorsFound = true;
+						}
+						if ( lNumericFieldBlanks( ( TableDataIndex - 1 ) * 3 + 7 + 2 ) ) {
+							ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+							ShowContinueError( "When data is read from input, this field is required and cannot be blank: " + cNumericFieldNames( ( TableDataIndex - 1 ) * 3 + 7 + 2 ) );
+							ErrorsFound = true;
+						}
+						if ( lNumericFieldBlanks( ( TableDataIndex - 1 ) * 3 + 7 + 3 ) ) {
+							ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+							ShowContinueError( "When data is read from input, this field is required and cannot be blank: " + cNumericFieldNames( ( TableDataIndex - 1 ) * 3 + 7 + 3 ) );
+							ErrorsFound = true;
+						}
+					}
+				}
 				if ( mod( ( NumNumbers - 7 ), 3 ) != 0 ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 					ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
