@@ -169,6 +169,22 @@ namespace SimAirServingZones {
 	);
 
 	void
+	SolveWaterCoilController(
+		bool const FirstHVACIteration,
+		int const AirLoopPass,
+		int const AirLoopNum,
+		int & AirLoopIterMax,
+		int & AirLoopIterTot,
+		int & AirLoopNumCalls,
+		std::string const & CompName,
+		int & CompIndex,
+		Real64 & QActual,
+		std::string const & ControllerName,
+		int ControllerIndex,
+		bool const OASys
+	);
+
+	void
 	ReSolveAirLoopControllers(
 		bool const FirstHVACIteration,
 		int const AirLoopPass,
@@ -186,12 +202,35 @@ namespace SimAirServingZones {
 	);
 
 	void
+	SimAirLoopComponentsWithController(
+		int const AirLoopNum, // Index of the air loop being currently simulated
+		bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+		int & AirLoopPass,
+		int & AirLoopIterMax,
+		int & AirLoopIterTot,
+		int & AirLoopNumCalls
+	);
+
+	void
 	SimAirLoopComponent(
 		std::string const & CompName, // the component Name
 		int const CompType_Num, // numeric equivalent for component type
 		bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
 		int const AirLoopNum, // Primary air loop number
 		int & CompIndex // numeric pointer for CompType/CompName -- passed back from other routines
+	);
+
+	void
+	SimAirLoopComponentWithController(
+		std::string const & CompName, // the component Name
+		int const CompType_Num, // numeric equivalent for component type
+		bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+		int const AirLoopNum, // Primary air loop number
+		int & CompIndex, // numeric pointer for CompType/CompName -- passed back from other routines
+		int & AirLoopPass,
+		int & AirLoopIterMax,
+		int & AirLoopIterTot,
+		int & AirLoopNumCalls
 	);
 
 	void

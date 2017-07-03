@@ -96,6 +96,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SimAirServingZones.hh>
 #include <SteamCoils.hh>
 #include <TranspiredCollector.hh>
 #include <UserDefinedComponents.hh>
@@ -430,6 +431,66 @@ namespace MixedAir {
 	}
 
 	void
+	ManageOutsideAirSystemWithController(
+		std::string const & OASysName,
+		bool const FirstHVACIteration,
+		int const AirLoopNum,
+		int & OASysNum,
+		int & AirLoopPass,
+		int & AirLoopIterMax,
+		int & AirLoopIterTot,
+		int & AirLoopNumCalls
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   Oct 1998
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Manage the outside air system
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		if ( GetOASysInputFlag ) {
+			GetOutsideAirSysInputs();
+			GetOASysInputFlag = false;
+		}
+
+		if ( OASysNum == 0 ) {
+			OASysNum = FindItemInList( OASysName, OutsideAirSys );
+			if ( OASysNum == 0 ) {
+				ShowFatalError( "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName );
+			}
+		}
+
+		InitOutsideAirSys( OASysNum, FirstHVACIteration, AirLoopNum );
+
+		SimOutsideAirSysWithController( OASysNum, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+
+	}
+
+	void
 	SimOASysComponents(
 		int const OASysNum,
 		bool const FirstHVACIteration,
@@ -466,6 +527,54 @@ namespace MixedAir {
 				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
 				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
 				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
+			}
+		}
+	}
+
+	void
+	SimOASysComponentsWithController(
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum,
+		int & AirLoopPass,
+		int & AirLoopIterMax,
+		int & AirLoopIterTot,
+		int & AirLoopNumCalls
+	)
+	{
+		int CompNum;
+		static std::string CompType; //Tuned Made static
+		static std::string CompName; //Tuned Made static
+		static std::string CtrlName; //Tuned Made static
+		bool ReSim( false );
+		bool Sim( true );
+		bool OAHeatCoil( false );
+		bool OACoolCoil( false );
+		bool OAHX( false );
+
+		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
+			CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+			CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+			SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+			if ( OAHX ) ReSim = true;
+			AirLoopNumCalls = +1;
+		}
+		// if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again
+		// in reverse order to propagate the air flow and conditions out the relief air path to the relief air
+		// exit node
+		if ( ReSim ) {
+			for ( CompNum = OutsideAirSys( OASysNum ).NumComponents - 1; CompNum >= 1; --CompNum ) {
+				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+				SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+				AirLoopNumCalls = +1;
+			}
+			// now simulate again propogate current temps back through OA system
+			for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
+				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+				SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+				AirLoopNumCalls = +1;
 			}
 		}
 	}
@@ -527,6 +636,110 @@ namespace MixedAir {
 		CurOASysNum = OASysNum;
 		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
 		SimOASysComponents( OASysNum, FirstHVACIteration, AirLoopNum );
+
+		if ( MyOneTimeErrorFlag( OASysNum ) ) {
+			if ( OutsideAirSys( OASysNum ).NumControllers - OutsideAirSys( OASysNum ).NumSimpleControllers > 1 ) {
+				ShowWarningError( "AirLoopHVAC:OutdoorAirSystem " + OutsideAirSys( OASysNum ).Name + " has more than 1 outside air controller; only the 1st will be used" );
+			}
+			for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
+				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+				if ( SameString( CompType, "OutdoorAir:Mixer" ) ) {
+					OAMixerNum = FindItemInList( CompName, OAMixer );
+					OAControllerNum = FindItemInList( CtrlName, OAController );
+					if ( OAController( OAControllerNum ).MixNode != OAMixer( OAMixerNum ).MixNode ) {
+						ShowSevereError( "The mixed air node of Controller:OutdoorAir=\"" + OAController( OAControllerNum ).Name + "\"" );
+						ShowContinueError( "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" + OAMixer( OAMixerNum ).Name + "\"." );
+						ShowContinueError( "Controller:OutdoorAir mixed air node=\"" + NodeID( OAController( OAControllerNum ).MixNode ) + "\"." );
+						ShowContinueError( "OutdoorAir:Mixer mixed air node=\"" + NodeID( OAMixer( OAMixerNum ).MixNode ) + "\"." );
+						FatalErrorFlag = true;
+					}
+					if ( OAController( OAControllerNum ).RelNode != OAMixer( OAMixerNum ).RelNode ) {
+						ShowSevereError( "The relief air node of Controller:OutdoorAir=\"" + OAController( OAControllerNum ).Name + "\"" );
+						ShowContinueError( "should be the same node as the relief air node of OutdoorAir:Mixer=\"" + OAMixer( OAMixerNum ).Name + "\"." );
+						ShowContinueError( "Controller:OutdoorAir relief air node=\"" + NodeID( OAController( OAControllerNum ).RelNode ) + "\"." );
+						ShowContinueError( "OutdoorAir:Mixer relief air node=\"" + NodeID( OAMixer( OAMixerNum ).RelNode ) + "\"." );
+						FatalErrorFlag = true;
+					}
+					if ( OAController( OAControllerNum ).RetNode != OAMixer( OAMixerNum ).RetNode ) {
+						ShowSevereError( "The return air node of Controller:OutdoorAir=\"" + OAController( OAControllerNum ).Name + "\"" );
+						ShowContinueError( "should be the same node as the return air node of OutdoorAir:Mixer=\"" + OAMixer( OAMixerNum ).Name + "\"." );
+						ShowContinueError( "Controller:OutdoorAir return air node=\"" + NodeID( OAController( OAControllerNum ).RetNode ) + "\"." );
+						ShowContinueError( "OutdoorAir:Mixer return air node=\"" + NodeID( OAMixer( OAMixerNum ).RetNode ) + "\"." );
+						FatalErrorFlag = true;
+					}
+				}
+			}
+			MyOneTimeErrorFlag( OASysNum ) = false;
+			if ( FatalErrorFlag ) ShowFatalError( "Previous severe error(s) cause program termination" );
+		}
+
+		CurOASysNum = 0;
+		AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated = true;
+
+	}
+
+	void
+	SimOutsideAirSysWithController(
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum,
+		int & AirLoopPass,
+		int & AirLoopIterMax,
+		int & AirLoopIterTot,
+		int & AirLoopNumCalls
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   Oct 1998
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Simulate the controllers and components in the outside air system.
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CompNum;
+		//INTEGER :: CtrlNum
+		int OAMixerNum;
+		int OAControllerNum;
+		static std::string CompType; //Tuned Made static
+		static std::string CompName; //Tuned Made static
+		static std::string CtrlName; //Tuned Made static
+		bool FatalErrorFlag( false );
+
+		// SimOutsideAirSys can handle only 1 controller right now.  This must be
+		// an Outside Air Controller.  This is because of the lack of iteration
+		// and convergence control in the following code.
+		//  DO CtrlNum=1,OutsideAirSys(OASysNum)%NumControllers
+		//    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
+		//    CALL SimOAController(CtrlName,FirstHVACIteration)
+		//  END DO
+		CtrlName = OutsideAirSys( OASysNum ).ControllerName( 1 );
+		CurOASysNum = OASysNum;
+		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
+		SimOASysComponentsWithController( OASysNum, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
 
 		if ( MyOneTimeErrorFlag( OASysNum ) ) {
 			if ( OutsideAirSys( OASysNum ).NumControllers - OutsideAirSys( OASysNum ).NumSimpleControllers > 1 ) {
@@ -784,6 +997,244 @@ namespace MixedAir {
 			// Evaporative Cooler Types
 		} else if ( SELECT_CASE_var == EvapCooler ) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
 			// 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
+			if ( Sim ) {
+				SimEvapCooler( CompName, CompIndex );
+			}
+
+		} else {
+			ShowFatalError( "Invalid Outside Air Component=" + CompType );
+
+		}}
+
+	}
+
+	void
+	SimOAComponentWithController(
+		std::string const & CompType, // the component type
+		std::string const & CompName, // the component Name
+		int const CompTypeNum, // Component Type -- Integerized for this module
+		bool const FirstHVACIteration,
+		int & CompIndex,
+		int const AirLoopNum, // air loop index for economizer lockout coordination
+		bool const Sim, // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
+		int const OASysNum, // index to outside air system
+		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
+		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
+		bool & OAHX, // TRUE indicates a heat exchanger has been found
+		int & AirLoopPass,
+		int & AirLoopIterMax,
+		int & AirLoopIterTot,
+		int & AirLoopNumCalls
+	)
+	{
+
+		// SUBROUTINE INFORMATION
+		//             AUTHOR:  Russ Taylor, Dan Fisher, Fred Buhl
+		//       DATE WRITTEN:  Oct 1997
+		//           MODIFIED:  Dec 1997 Fred Buhl, D Shirey Feb/Sept 2003
+		//                      Nov 2004 M. J. Witte, GARD Analytics, Inc.
+		//                        Add DXSystem:AirLoop as valid OA system equipment
+		//                        Work supported by ASHRAE research project 1254-RP
+		//      RE-ENGINEERED:  This is new code, not reengineered
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calls the individual air loop component simulation routines
+
+		// METHODOLOGY EMPLOYED: None
+
+		// REFERENCES: None
+
+		// USE Statements
+		// Using/Aliasing
+		using DataAirLoop::AirLoopInputsFilled;
+		using WaterCoils::SimulateWaterCoilComponents;
+		using HeatingCoils::SimulateHeatingCoilComponents;
+		using HeatRecovery::SimHeatRecovery;
+		using DesiccantDehumidifiers::SimDesiccantDehumidifier;
+		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+		using HVACDXSystem::SimDXCoolingSystem;
+		using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
+		using SteamCoils::SimulateSteamCoilComponents;
+		using TranspiredCollector::SimTranspiredCollector;
+		using EvaporativeCoolers::SimEvapCooler;
+		using PhotovoltaicThermalCollectors::SimPVTcollectors;
+		using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
+		using UserDefinedComponents::SimCoilUserDefined;
+		using HVACUnitarySystem::SimUnitarySystem;
+		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
+		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
+		using Humidifiers::SimHumidifier;
+		using SimAirServingZones::SolveWaterCoilController;
+		using WaterCoils::WaterCoil;
+		// Locals
+		// SUBROUTINE ARGUMENTS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS: None
+
+		// INTERFACE BLOCK DEFINITIONS: None
+
+		// DERIVED TYPE DEFINITIONS: None
+
+		// SUBROUTINE LOCAL VARIABLE DEFINITIONS
+
+		OAHeatingCoil = false;
+		OACoolingCoil = false;
+		OAHX = false;
+		Real64 AirloopPLR;
+		int FanOpMode;
+		Real64 QActual = 0;
+
+		{ auto const SELECT_CASE_var( CompTypeNum );
+
+		if ( SELECT_CASE_var == OAMixer_Num ) { // 'OutdoorAir:Mixer'
+			if ( Sim ) {
+				SimOAMixer( CompName, FirstHVACIteration, CompIndex );
+			}
+
+			// Fan Types
+		} else if ( SELECT_CASE_var == Fan_Simple_CV ) { // 'Fan:ConstantVolume'
+			if ( Sim ) {
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			}
+		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
+			if ( Sim ) {
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			}
+
+		} else if ( SELECT_CASE_var == Fan_System_Object ) { // 'Fan:SystemModel'
+			if ( CompIndex == 0 ) {// 0 means has not been filled because of 1-based arrays in old fortran
+				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+			}
+			if ( Sim ) {
+				HVACFan::fanObjs[ CompIndex - 1 ]->simulate( _, _, _, _ ); // vector is 0 based, but CompIndex is 1 based so shift 
+			}
+			//cpw22Aug2010 Add Fan:ComponentModel (new num=18)
+		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
+			if ( Sim ) {
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			}
+
+			// Coil Types
+		} else if ( SELECT_CASE_var == WaterCoil_Cooling ) { // 'Coil:Cooling:Water'
+			if ( Sim ) {
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				SolveWaterCoilController( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls, CompName, CompIndex, QActual, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
+				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+			}
+			OACoolingCoil = true;
+		} else if ( SELECT_CASE_var == WaterCoil_SimpleHeat ) { // 'Coil:Heating:Water')
+			if ( Sim ) {
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				SolveWaterCoilController( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls, CompName, CompIndex, QActual, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
+				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+			}
+			OAHeatingCoil = true;
+		} else if ( SELECT_CASE_var == SteamCoil_AirHeat ) { // 'Coil:Heating:Steam'
+			if ( Sim ) {
+				SimulateSteamCoilComponents( CompName, FirstHVACIteration, CompIndex, 0.0 );
+			}
+			OAHeatingCoil = true;
+		} else if ( SELECT_CASE_var == WaterCoil_DetailedCool ) { // 'Coil:Cooling:Water:DetailedGeometry'
+			if ( Sim ) {
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				SolveWaterCoilController( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls, CompName, CompIndex, QActual, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
+				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+			}
+			OACoolingCoil = true;
+		} else if ( SELECT_CASE_var == Coil_ElectricHeat ) { // 'Coil:Heating:Electric'
+			if ( Sim ) {
+				//     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
+				SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex );
+			}
+			OAHeatingCoil = true;
+		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Fuel'
+			if ( Sim ) {
+				//     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
+				SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex );
+			}
+			OAHeatingCoil = true;
+		} else if ( SELECT_CASE_var == WaterCoil_CoolingHXAsst ) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
+			if ( Sim ) {
+				SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil );
+			}
+			OACoolingCoil = true;
+		} else if ( SELECT_CASE_var == DXSystem ) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
+			if ( Sim ) {
+				SimDXCoolingSystem( CompName, FirstHVACIteration, AirLoopNum, CompIndex );
+			}
+			OACoolingCoil = true;
+		} else if ( SELECT_CASE_var == UnitarySystem ) { // AirLoopHVAC:UnitarySystem
+			if ( Sim ) {
+				SimUnitarySystem( CompName, FirstHVACIteration, AirLoopNum, CompIndex );
+			}
+			if ( AirLoopInputsFilled ) GetUnitarySystemOAHeatCoolCoil( CompName, OACoolingCoil, OAHeatingCoil );
+			if ( MyOneTimeCheckUnitarySysFlag( OASysNum ) ) {
+				if ( AirLoopInputsFilled ) {
+					CheckUnitarySysCoilInOASysExists( CompName );
+					MyOneTimeCheckUnitarySysFlag( OASysNum ) = false;
+				}
+			}
+		} else if ( SELECT_CASE_var == DXHeatPumpSystem ) {
+			if ( Sim ) {
+				SimDXHeatPumpSystem( CompName, FirstHVACIteration, AirLoopNum, CompIndex );
+			}
+			OAHeatingCoil = true;
+		} else if ( SELECT_CASE_var == Coil_UserDefined ) {
+			if ( Sim ) {
+				SimCoilUserDefined( CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil );
+			}
+			// Heat recovery
+		} else if ( SELECT_CASE_var == HeatXchngr ) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
+													  // 'HeatExchanger:Desiccant:BalancedFlow'
+			if ( Sim ) {
+				if ( AirLoopControlInfo( AirLoopNum ).FanOpMode == DataHVACGlobals::CycFanCycCoil ) {
+					FanOpMode = DataHVACGlobals::CycFanCycCoil;
+				} else {
+					FanOpMode = DataHVACGlobals::ContFanCycCoil;
+				}
+				if ( FanOpMode == DataHVACGlobals::CycFanCycCoil ) {
+					// HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
+					// adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be perfectly input,
+					// a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
+					//					AirloopPLR = AirLoopFlow( AirLoopNum ).FanPLR;
+					AirloopPLR = OAController( OASysNum ).OAMassFlow / OAController( OASysNum ).MaxOAMassFlowRate;
+				} else {
+					AirloopPLR = 1.0;
+				}
+				SimHeatRecovery( CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass, AirLoopControlInfo( AirLoopNum ).HighHumCtrlActive );
+			}
+			OAHX = true;
+
+			// Desiccant Dehumidifier
+		} else if ( SELECT_CASE_var == Desiccant ) { // 'Dehumidifier:Desiccant:NoFans'
+													 // 'Dehumidifier:Desiccant:System'
+			if ( Sim ) {
+				SimDesiccantDehumidifier( CompName, FirstHVACIteration, CompIndex );
+			}
+			OAHX = true;
+
+			// Humidifiers
+		} else if ( SELECT_CASE_var == Humidifier ) { // 'Humidifier:Steam:Electric'
+													  // 'Humidifier:Steam:Gas'
+			if ( Sim ) {
+				SimHumidifier( CompName, FirstHVACIteration, CompIndex );
+			}
+
+			// Unglazed Transpired Solar Collector
+		} else if ( SELECT_CASE_var == Unglazed_SolarCollector ) { // 'SolarCollector:UnglazedTranspired'
+			if ( Sim ) {
+				SimTranspiredCollector( CompName, CompIndex );
+			}
+
+			// Air-based Photovoltaic-thermal flat plate collector
+		} else if ( SELECT_CASE_var == PVT_AirBased ) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
+			if ( Sim ) {
+				SimPVTcollectors( CompIndex, FirstHVACIteration, CalledFromOutsideAirSystem, CompName );
+			}
+
+			// Evaporative Cooler Types
+		} else if ( SELECT_CASE_var == EvapCooler ) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
+													  // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
 			if ( Sim ) {
 				SimEvapCooler( CompName, CompIndex );
 			}

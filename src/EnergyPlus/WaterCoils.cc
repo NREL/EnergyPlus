@@ -72,6 +72,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACControllers.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -866,6 +867,7 @@ namespace WaterCoils {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using namespace FaultsManager;
 		using DataAirSystems::PrimaryAirSystem;
+		using HVACControllers::GetControllerNameAndIndex;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallNo( 1.e-9 ); // SmallNo number in place of zero
@@ -875,6 +877,7 @@ namespace WaterCoils {
 		static gio::Fmt fmtA( "(A)" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int tempCoilNum; // loop variable
 		Real64 DesInletAirEnth; // Entering air enthalpy at rating (J/kg)
 		Real64 DesOutletAirEnth; // Leaving air enthalpy at rating(J/kg)
 		Real64 DesAirApparatusDewPtEnth; // Air enthalpy at apparatus dew point at rating(J/kg)
@@ -980,6 +983,11 @@ namespace WaterCoils {
 			MyCoilReportFlag = true;
 			InitWaterCoilOneTimeFlag = false;
 			PlantLoopScanFlag = true;
+
+			for ( tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum ) {
+				GetControllerNameAndIndex( WaterCoil( tempCoilNum ).WaterInletNodeNum, WaterCoil( tempCoilNum ).ControllerName, WaterCoil( tempCoilNum ).ControllerIndex, errFlag );
+			}
+
 		}
 
 		if ( PlantLoopScanFlag( CoilNum ) && allocated( PlantLoop ) ) {

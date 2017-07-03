@@ -2174,51 +2174,6 @@ namespace HVACControllers {
 	}
 
 	void
-	LimitController(
-		int & EP_UNUSED( ControlNum ), // unused1208
-		bool & EP_UNUSED( IsConvergedFlag ) // unused1208
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR
-		//       DATE WRITTEN   July 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-	}
-
-	// End Algorithm Section of the Module
-	// *****************************************************************************
-
-	// Beginning of Update subroutines for the Controller Module
-	// *****************************************************************************
-
-	void
 	UpdateController( int const ControlNum )
 	{
 
@@ -3550,6 +3505,47 @@ Label100: ;
 			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
 				NodeNotFound = false;
 			}
+		}
+
+	}
+
+	void
+	GetControllerNameAndIndex(
+		int const WaterInletNodeNum, // input actuator node number
+		std::string & ControllerName, // controller name used by water coil
+		int & ControllerIndex, // controller index used by water coil
+		bool & ErrorsFound // true if matching actuator node not found
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   June 2017
+
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine checks that the water inlet node number is matched by
+		// the actuator node number of some water coil and passed back controller name and index
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ControlNum;
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		ControllerName = " ";
+		ControllerIndex = 0;
+		for ( ControlNum = 1; ControlNum <= NumControllers; ++ControlNum ) {
+			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
+				ControllerIndex = ControlNum;
+				ControllerName = ControllerProps( ControlNum ).ControllerName;
+				break;
+			}
+		}
+
+		if ( ControllerIndex == 0 ) {
+			ErrorsFound = true;
 		}
 
 	}

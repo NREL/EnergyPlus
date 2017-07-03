@@ -423,12 +423,6 @@ namespace HVACControllers {
 		bool const IsConvergedFlag
 	);
 
-	void
-	LimitController(
-		int & ControlNum, // unused1208
-		bool & IsConvergedFlag // unused1208
-	);
-
 	// End Algorithm Section of the Module
 	// *****************************************************************************
 
@@ -547,6 +541,14 @@ namespace HVACControllers {
 	CheckCoilWaterInletNode(
 		int const WaterInletNodeNum, // input actuator node number
 		bool & NodeNotFound // true if matching actuator node not found
+	);
+
+	void
+	GetControllerNameAndIndex(
+		int const WaterInletNodeNum, // input actuator node number
+		std::string & ControllerName, // controller name used by water coil
+		int & ControllerIndex, // controller index used by water coil
+		bool & ErrorsFound // true if matching actuator node not found
 	);
 
 	void
