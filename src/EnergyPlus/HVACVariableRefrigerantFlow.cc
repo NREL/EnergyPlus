@@ -3620,15 +3620,21 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).ATMixerExists ) {
 				if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRFTU( VRFTUNum ).Name + "\"" + " input value to " + cNumericFieldNames( 5 ) + " = 0.0 " );
-					ShowContinueError( cNumericFieldNames( 5 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + VRFTU( VRFTUNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( VRFTU( VRFTUNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFieldNames( 5 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
 				}
 				if ( VRFTU( VRFTUNum ).HeatOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRFTU( VRFTUNum ).Name + "\"" + " input value to " + cNumericFieldNames( 6 ) + " = 0.0 " );
-					ShowContinueError( cNumericFieldNames( 6 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + VRFTU( VRFTUNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( VRFTU( VRFTUNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFieldNames( 6 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
 				}
 				if ( VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRFTU( VRFTUNum ).Name + "\"" + " input value to " + cNumericFieldNames( 7 ) + " = 0.0 " );
-					ShowContinueError( cNumericFieldNames( 7 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + VRFTU( VRFTUNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( VRFTU( VRFTUNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFieldNames( 7 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
 				}
 			}
 			// check that the VRF TU have local outside air and DOA

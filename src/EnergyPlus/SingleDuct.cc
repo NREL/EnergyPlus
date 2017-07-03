@@ -4868,9 +4868,9 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode = SysATMixer( ATMixerNum ).SecInNode;
-		int PriInNode = SysATMixer( ATMixerNum ).PriInNode;
-		int MixedAirOutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+		//int InletNode = SysATMixer( ATMixerNum ).SecInNode;
+		//int PriInNode = SysATMixer( ATMixerNum ).PriInNode;
+		//int MixedAirOutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 
 		if ( FirstHVACIteration ) {
 			//  SysATMixer(ATMixerNum)%ZoneAirMassFlowRate = SysATMixer(ATMixerNum)%MaxAirMassFlowRate

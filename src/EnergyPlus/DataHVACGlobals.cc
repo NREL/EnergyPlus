@@ -282,13 +282,13 @@ namespace DataHVACGlobals {
 	Array1D_string const cHXTypes( NumHXTypes, { "HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow" } );
 
 	// Parameters describing air terminal mixers
-	int const NumATMixerTypes( 2 );
+	int const NumATMixerConnectionTypes( 2 );
 
 	int const No_ATMixer( 0 );
 	int const ATMixer_InletSide( 1 );
 	int const ATMixer_SupplySide( 2 );
 
-	Array1D_string const cATMixerTypes( NumATMixerTypes, { "AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:SupplySideMixer" } );
+	Array1D_string const cATMixerConnectionTypes( NumATMixerConnectionTypes, { "InletSide", "SupplySide" } );
 	bool const ATMixerExists( true );
 
 	// Parameters describing variable refrigerant flow terminal unit types

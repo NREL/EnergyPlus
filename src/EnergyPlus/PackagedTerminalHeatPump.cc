@@ -1081,15 +1081,21 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
 				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 4 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 5 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 6 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 			}
 			// check that PTUnit inlet node is a zone exhaust node.
@@ -1699,15 +1705,21 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
 				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 4 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 5 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 6 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 			}
 			// check that air-conditioner doesn' have local outside air and DOA
@@ -2729,15 +2741,21 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
 				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 4 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 5 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 6 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + PTUnit( PTUnitNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( PTUnit( PTUnitNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}
 			}
 			//Set the heat pump heating coil capacity

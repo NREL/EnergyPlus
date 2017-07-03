@@ -140,7 +140,7 @@ namespace FanCoilUnits {
 	using DataHVACGlobals::ContFanCycCoil;
 	using DataHVACGlobals::ATMixer_InletSide;
 	using DataHVACGlobals::ATMixer_SupplySide;
-	using DataHVACGlobals::cATMixerTypes;
+	using DataHVACGlobals::cATMixerConnectionTypes;
 	using DataHVACGlobals::ATMixerExists;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
@@ -405,13 +405,6 @@ namespace FanCoilUnits {
 		int NodeNum; // index to loop counter
 		static bool ZoneExNodeNotFound( false ); // used in error checking
 		static bool ZoneInNodeNotFound( false ); // used in error checking
-		//static int ATMixerNum( 0 ); // index of air terminal mixer in the air terminal mixer data array
-		//static int ATMixerType( 0 ); // type of air terminal mixer (1=inlet side; 2=supply side)
-		//static int ATMixerPriNode( 0 ); // node number of the air terminal mixer primary air inlet
-		//static int ATMixerSecNode( 0 ); // node number of the air terminal mixer secondary air inlet
-		//static int ATMixerOutNode( 0 ); // node number of the air terminal mixer secondary air inlet
-		//std::string ATMixerName;
-
 		// FLOW
 
 		// find the number of each type of fan coil unit
@@ -748,7 +741,9 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).ATMixerExists ) {
 				if ( FanCoil( FanCoilNum ).OutAirVolFlow == 0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"" + " input value to " + cNumericFields( 4 ) + " = 0.0 " );
-					ShowContinueError( cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + FanCoil( FanCoilNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( FanCoil( FanCoilNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
 				}			
 				//check for inlet side air mixer
 				if ( FanCoil( FanCoilNum ).ATMixerType == ATMixer_InletSide ) {
