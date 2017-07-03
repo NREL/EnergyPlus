@@ -1078,6 +1078,20 @@ namespace PackagedTerminalHeatPump {
 				ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit has local as well as central outdoor air specified" );
 				ErrorsFound = true;
 			}
+			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 4 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
+				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 5 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
+				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 6 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
+			}
 			// check that PTUnit inlet node is a zone exhaust node.
 			if ( !PTUnit( PTUnitNum ).ATMixerExists || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				ZoneNodeNotFound = true;
@@ -1491,7 +1505,6 @@ namespace PackagedTerminalHeatPump {
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 				ErrorsFound = true;
 			}
-
 			//set minimum OA to something low because its not an input for PTACs
 			PTUnit( PTUnitNum ).MinOATCompressor = -100.0;
 
@@ -1682,6 +1695,20 @@ namespace PackagedTerminalHeatPump {
 			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode );
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				PTUnit( PTUnitNum ).ATMixerExists = true;
+			}
+			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 4 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
+				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 5 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
+				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 6 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
 			}
 			// check that air-conditioner doesn' have local outside air and DOA
 			if ( PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
@@ -2699,7 +2726,20 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).CoolOutAirVolFlow = 0.0;
 				}
 			}
-
+			if ( PTUnit( PTUnitNum ).ATMixerExists ) {
+				if ( PTUnit( PTUnitNum ).CoolOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 4 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
+				if ( PTUnit( PTUnitNum ).HeatOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 5 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 5 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
+				if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"" + " input value to " + cNumericFields( 6 ) + " = 0.0 " );
+					ShowContinueError( cNumericFields( 6 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}
+			}
 			//Set the heat pump heating coil capacity
 			//  Get from coil module.
 			if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingWaterToAirHP ) {

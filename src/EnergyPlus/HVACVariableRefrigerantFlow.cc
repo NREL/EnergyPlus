@@ -3617,6 +3617,20 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide || VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
 				VRFTU( VRFTUNum ).ATMixerExists = true;
 			}
+			if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+				if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRFTU( VRFTUNum ).Name + "\"" + " input value to " + cNumericFieldNames( 5 ) + " = 0.0 " );
+					ShowContinueError( cNumericFieldNames( 5 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
+				}
+				if ( VRFTU( VRFTUNum ).HeatOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRFTU( VRFTUNum ).Name + "\"" + " input value to " + cNumericFieldNames( 6 ) + " = 0.0 " );
+					ShowContinueError( cNumericFieldNames( 6 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
+				}
+				if ( VRFTU( VRFTUNum ).NoCoolHeatOutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + VRFTU( VRFTUNum ).Name + "\"" + " input value to " + cNumericFieldNames( 7 ) + " = 0.0 " );
+					ShowContinueError( cNumericFieldNames( 7 ) + " must be > 0 or set to autosize when " + cCurrentModuleObject + " is connected to DOAS. " );
+				}
+			}
 			// check that the VRF TU have local outside air and DOA
 			if ( VRFTU( VRFTUNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + VRFTU( VRFTUNum ).Name + "\". VRF terminal unit has local as well as central outdoor air specified" );
