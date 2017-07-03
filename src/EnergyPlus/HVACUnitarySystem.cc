@@ -1884,7 +1884,13 @@ namespace HVACUnitarySystem {
 		SupFanNum = 0;
 
 		if ( CurSysNum > 0 && CurOASysNum == 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
-			PrimaryAirSystem( CurSysNum ).SupFanNum = UnitarySystem( UnitarySysNum ).FanIndex;
+			if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				PrimaryAirSystem( CurSysNum ).supFanVecIndex = UnitarySystem( UnitarySysNum ).FanIndex ;
+				PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+			} else {
+				PrimaryAirSystem( CurSysNum ).SupFanNum = UnitarySystem( UnitarySysNum ).FanIndex;
+				PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+			}
 		}
 
 		// STEP 1: find the autosized cooling air flow rate and capacity
@@ -4793,6 +4799,13 @@ namespace HVACUnitarySystem {
 			} else {
 				if ( SameString( Alphas( iDOASDXCoilAlphaNum ), "Yes" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = true;
+					if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+						ShowWarningError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Invalid entry for " + cAlphaFields( iDOASDXCoilAlphaNum ) + " :" + Alphas( iDOASDXCoilAlphaNum ) );
+						ShowContinueError( "Variable DX Cooling Coil is not supported as 100% DOAS DX coil." );
+						ShowContinueError( "Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues." );
+						UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
+					}
 				} else if ( SameString( Alphas( iDOASDXCoilAlphaNum ), "" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
 				} else if ( SameString( Alphas( iDOASDXCoilAlphaNum ), "No" ) ) {

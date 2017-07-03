@@ -134,7 +134,7 @@ namespace ExternalInterface {
 	bool haveExternalInterfaceFMUImport( false ); // Flag for FMU-Import interface
 	bool haveExternalInterfaceFMUExport( false ); // Flag for FMU-Export interface
 	int simulationStatus( 1 ); // Status flag. Used to report during
-	// which phase an error occured.
+	// which phase an error occurred.
 	// (1=initialization, 2=time stepping)
 
 	Array1D_int keyVarIndexes; // Array index for specific key name
