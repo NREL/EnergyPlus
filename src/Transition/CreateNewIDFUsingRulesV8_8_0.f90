@@ -8,12 +8,12 @@ PUBLIC
 CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
-      VerString='Conversion 8.6 => 8.7'
-      VersionNum=8.7
-      sVersionNum='8.7'
-      IDDFileNameWithPath=TRIM(ProgramPath)//'V8-6-0-Energy+.idd'
-      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-7-0-Energy+.idd'
-      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-6-0 to 8-7-0.csv'
+      VerString='Conversion 8.7 => 8.8'
+      VersionNum=8.8
+      sVersionNum='8.8'
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V8-7-0-Energy+.idd'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-8-0-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-7-0 to 8-8-0.csv'
 END SUBROUTINE
 
 END MODULE
@@ -109,24 +109,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: continuous
   CHARACTER(len=MaxNameLength) :: OutScheduleName
   LOGICAL :: isDElightOutVar
-
-
-  REAL MaterialDensity
-  REAL EMPDCoeffA
-  REAL EMPDCoeffB
-  REAL EMPDCoeffC
-  REAL EMPDCoeffD
-  REAL EMPDCoeffDEMPD
-  REAL MuEMPD
-  INTEGER MatlSearchNum
-  REAL, EXTERNAL :: CalculateMuEMPD
-  LOGICAL FoundMaterial
-
-  CHARACTER(len=10) :: AFNString
-  REAL :: AFNDuctUVal = 0.0
-  REAL :: AFNDuctFracRcond = 0.815384615
-  REAL :: AFNDuctFracRout = 0.153846154
-  REAL :: AFNDuctFracRin = 0.030769231
 
   LOGICAL :: ErrFlag
 
@@ -364,91 +346,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
 
     ! changes for this version
-              CASE('COIL:COOLING:DX:MULTISPEED', 'COIL:HEATING:DX:MULTISPEED')
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+
+             CASE('OUTPUT:SURFACES:LIST')
+                 ObjectName='Output:Surfaces:List'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs=InArgs
-                 IF (SameString(InArgs(16), '')) THEN
-                   OutArgs(16) = 'NaturalGas'
-                 ELSEIF (SameString(InArgs(16), 'PropaneGas')) THEN
-                   OutArgs(16) = 'Propane'
+                 OutArgs=InArgs 
+                 IF (SameString(InArgs(1), 'DecayCurvesfromZoneComponentLoads')) THEN
+                   OutArgs(1) = 'DecayCurvesFromComponentLoadsSummary'
                  ENDIF
-
-             CASE('COOLINGTOWER:SINGLESPEED')
-                 ObjectName='CoolingTower:SingleSpeed'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:16)=InArgs(1:16)  ! No change
-                 OutArgs(17:20)=''           ! Added 4 New Input Fields, Set
-                 OutArgs(21:CurArgs+4)=InArgs(17:CurArgs)  !
-                 CurArgs = CurArgs + 4
-
-             CASE('COOLINGTOWER:TWOSPEED')
-                 ObjectName='CoolingTower:TwoSpeed'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:24)=InArgs(1:24)  ! No change
-                 OutArgs(25:28)=''           ! Added 4 New Input Fields, Set
-                 OutArgs(29:CurArgs+4)=InArgs(25:CurArgs)  !
-                 CurArgs = CurArgs + 4
-
-             CASE('COOLINGTOWER:VARIABLESPEED:MERKEL')
-                 ObjectName='CoolingTower:VariableSpeed:Merkel'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:24)=InArgs(1:24)  ! No change
-                 OutArgs(25:28)=''           ! Added 4 New Input Fields, Set
-                 OutArgs(29:CurArgs+4)=InArgs(25:CurArgs)  !
-                 CurArgs = CurArgs + 4
-
-             CASE('AIRFLOWNETWORK:SIMULATIONCONTROL')
-                 ObjectName='AirflowNetwork:SimulationControl'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:3)=InArgs(1:3)
-                 OutArgs(4:(CurArgs-1))=InArgs(5:(CurArgs))
-                 CurArgs = CurArgs-1
-
-             CASE('ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL')
-                 ObjectName='ZoneCapacitanceMultiplier:ResearchSpecial'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1)='Multiplier'     ! Add new Name field
-                 OutArgs(2)=''               ! Add new Zone Name Field
-                 OutArgs(3:CurArgs+2)=InArgs(1:CurArgs)
-                 CurArgs = CurArgs + 2
-
-             CASE('WATERHEATER:HEATPUMP:WRAPPEDCONDENSER')
-                 ObjectName='WaterHeater:HeatPump:WrappedCondenser'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs=InArgs
-                 IF (SameString(InArgs(35), 'MutuallyExlcusive')) THEN
-                   OutArgs(35) = 'MutuallyExclusive'
-                 END IF
-
-             CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT')
-                  ObjectName='AirflowNetwork:Distribution:Component:Duct'
-                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.false.
-                  OutArgs(1:6)=InArgs(1:6)
-                  READ(InArgs(7), '(f10.6)') AFNDuctUVal
-                  WRITE(OutArgs(7), '(f10.6)') AFNDuctUVal/AFNDuctFracRcond
-                  OutArgs(8)=InArgs(8)
-                  WRITE(OutArgs(9), '(f10.6)') AFNDuctUVal/AFNDuctFracRout
-                  WRITE(OutArgs(10), '(f10.6)') AFNDuctUVal/AFNDuctFracRin
-                  CurArgs = CurArgs + 2
-
-
-    !!!   Changes for report variables, meters, tables -- update names
-              CASE('OUTPUT:VARIABLE')
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                nodiff=.true.
-                IF (OutArgs(1) == Blank) THEN
-                  OutArgs(1)='*'
-                  nodiff=.false.
-                ENDIF
 
                 CALL ScanOutputVariablesForReplacement(  &
                    2,  &

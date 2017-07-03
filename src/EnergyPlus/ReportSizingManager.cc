@@ -1795,8 +1795,6 @@ namespace ReportSizingManager {
 							}
 							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
 							RetFanNum = PrimaryAirSystem( CurSysNum ).RetFanNum;
-							PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ); //? what is this doing, a function with no left hand side?
-							FanCoolLoad = FanDesHeatGain( SupFanNum, DesVolFlow ) + ( 1.0 - OutAirFrac ) * FanDesHeatGain( RetFanNum, DesVolFlow );
 							switch ( PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum ){
 								case DataAirSystems::structArrayLegacyFanModels: {
 									FanCoolLoad = FanDesHeatGain( PrimaryAirSystem( CurSysNum ).SupFanNum, DesVolFlow );

@@ -294,9 +294,9 @@ namespace DataSizing {
 	Array1D< OARequirementsData > OARequirements;
 	Array1D< ZoneAirDistributionData > ZoneAirDistribution;
 	Array1D< ZoneSizingInputData > ZoneSizingInput; // Input data for zone sizing
-	Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design
+	Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design)
 	Array1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
-	Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
+	Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data)
 	Array1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
 	Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
 	Array1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
@@ -312,6 +312,9 @@ namespace DataSizing {
 	Array1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
 	Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	// used only for Facility Load Component Summary
+	Array1D< FacilitySizingData > CalcFacilitySizing; // Data for zone sizing 
+	FacilitySizingData CalcFinalFacilitySizing; // Final data for zone sizing 
 
 	// Clears the global data in DataSizing.
 	// Needed for unit tests, should not be normally called.
@@ -424,6 +427,19 @@ namespace DataSizing {
 		ZoneHVACSizing.deallocate();
 		DataDesicDehumNum = 0;
 		DataDesicRegCoil = false;
+
+		CalcFacilitySizing.deallocate(); 
+		CalcFinalFacilitySizing.DOASHeatAddSeq.deallocate();
+		CalcFinalFacilitySizing.DOASLatAddSeq.deallocate();
+		CalcFinalFacilitySizing.CoolOutHumRatSeq.deallocate();
+		CalcFinalFacilitySizing.CoolOutTempSeq.deallocate();
+		CalcFinalFacilitySizing.CoolZoneTempSeq.deallocate();
+		CalcFinalFacilitySizing.CoolLoadSeq.deallocate();
+		CalcFinalFacilitySizing.HeatOutHumRatSeq.deallocate();
+		CalcFinalFacilitySizing.HeatOutTempSeq.deallocate();
+		CalcFinalFacilitySizing.HeatZoneTempSeq.deallocate();
+		CalcFinalFacilitySizing.HeatLoadSeq.deallocate();
+	
 		DataWaterCoilSizCoolDeltaT = 0.0;
 		DataWaterCoilSizHeatDeltaT = 0.0;
 		DataNomCapInpMeth = false;

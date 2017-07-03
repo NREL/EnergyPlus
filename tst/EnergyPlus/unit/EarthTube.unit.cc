@@ -44,51 +44,60 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Fans Unit Tests
+// EnergyPlus::EarthTube Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/EarthTube.hh>
+#include <DataHeatBalFanSys.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <DataEnvironment.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::EarthTube;
+using namespace EnergyPlus::DataHeatBalFanSys;
+using namespace ObjexxFCL;
 using namespace DataGlobals;
-using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataHVACGlobals;
-using namespace EnergyPlus::Fans;
+using namespace EnergyPlus::DataEnvironment;
 
-TEST_F( EnergyPlusFixture, Fans_FanSizing )
-{
-	CurZoneEqNum = 0;
-	CurSysNum = 0;
-	CurOASysNum = 0;
-	NumFans = 1;
-	Fan.allocate( NumFans );
-	FanNumericFields.allocate( NumFans );
-	FanNumericFields( NumFans ).FieldNames.allocate( 3 );
+namespace EnergyPlus {
+	
 
-	int FanNum = 1;
-	Fan( FanNum ).FanName = "Test Fan";
-	Fan( FanNum ).FanType = "Fan:OnOff";
-	Fan( FanNum ).FanType_Num = FanType_SimpleOnOff;
-	Fan( FanNum ).MaxAirFlowRate = AutoSize;
-	Fan( FanNum ).FanEff = 0.4; // Prevent divide by zero computing RatedPower
+	TEST_F( EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest )
+	{
 
-	FanNumericFields( FanNum ).FieldNames( 3 ) = "Maximum Flow Rate";
+	// AUTHOR: R. Strand, UIUC
+	// DATE WRITTEN: June 2017
+	
+	// Set subroutine arguments
+	std::string ZoneName = "ZONE 1";
+	std::string InputName = "ZoneEarthtube";
+	bool ErrorsFound = false;
+	
+	// Allocate and set earth tube parameters necessary to run the tests
+	TotEarthTube = 3;
+	EarthTubeSys.allocate( TotEarthTube );
+	EarthTubeSys( 1 ).ZonePtr = 1;
+	EarthTubeSys( 2 ).ZonePtr = 2;
+	EarthTubeSys( 3 ).ZonePtr = 3;
+	
+	// First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
+	CheckEarthTubesInZones( ZoneName, InputName, ErrorsFound );
+	EXPECT_EQ( ErrorsFound, false );
 
-	CurZoneEqNum = 0;
-	CurSysNum = 0;
-	CurOASysNum = 0;
-
-	// DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
-	DataNonZoneNonAirloopValue = 1.00635;
-	SizeFan( FanNum );
-	EXPECT_DOUBLE_EQ( 1.00635, Fan( FanNum ).MaxAirFlowRate );
-	DataNonZoneNonAirloopValue = 0.0;
+	// Second case--conflict with the last earth tube and first (ErrorsFound = true)
+	EarthTubeSys( 3 ).ZonePtr = 1;
+	CheckEarthTubesInZones( ZoneName, InputName, ErrorsFound );
+	EXPECT_EQ( ErrorsFound, true );
+	
+	EarthTubeSys.deallocate();
+	TotEarthTube = 0;
+	
+	}
+	
 }
