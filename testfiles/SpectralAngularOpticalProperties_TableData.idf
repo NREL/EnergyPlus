@@ -9,8 +9,8 @@
 !
 ! Highlights:              This file does the basic test of window properties as a function of wavelength and incident angle
 !                          based on Winklemann approach. Table data are used to input optical properties. Linear interpolation 
-!                          is performed to caluclate optical properties with a given incident angle.
-!                          The file was revised from AIRFLOWNETWORK_MULTIZONE_SMALLOFFICE.idf wihtout AirflowNetwork.
+!                          is performed to calculate optical properties with a given incident angle.
+!                          The file was revised from AIRFLOWNETWORK_MULTIZONE_SMALLOFFICE.idf without AirflowNetwork.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the design days only.
