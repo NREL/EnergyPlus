@@ -1317,7 +1317,8 @@ If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angl
 
 If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
-
+It should be pointed out that when Optical Data Type = SpectralAndAngle for a glass layer in a construction, the table input data are converted into polynomial curve fits with 6 coefficients, so that all outputs of optical properties for the same construction will be curve values for a given incident angle. Therefore, the values may be slightly different from input values.
+  
 IDF examples of Spectral average and using a Spectral data set:
 
 \begin{lstlisting}

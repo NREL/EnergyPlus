@@ -610,7 +610,7 @@ namespace CurveManager {
 		int const ConstrNum,  // Construction number
 		int const NGlass,     // The number of glass layers in the construction with index = ConstrNum
 		int & TotalIPhi,      // The number of incident angles
-		Array1A_int const Tables // Store glass layer number for SpectralAndAngleGlassLayer only. Otherwise = 0 for other layers.
+		Array1A_int const Tables // Store construction layer number for SpectralAndAngleGlassLayer glass only. Otherwise = 0 for other layers.
 	);
 
 	//=================================================================================================!

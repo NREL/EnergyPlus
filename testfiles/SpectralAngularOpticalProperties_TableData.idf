@@ -8,8 +8,9 @@
 !                          Outdoor air is modulated based on occupancy and floor area.
 !
 ! Highlights:              This file does the basic test of window properties as a function of wavelength and incident angle
-!                          based on Winklemann approach. Table adta are uased to input optical properties. Linear interpolation 
-!                          is porformed to caluclate optical properties with a given incident angle.
+!                          based on Winklemann approach. Table data are used to input optical properties. Linear interpolation 
+!                          is performed to caluclate optical properties with a given incident angle.
+!                          The file was revised from AIRFLOWNETWORK_MULTIZONE_SMALLOFFICE.idf wihtout AirflowNetwork.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the design days only.
@@ -29,10 +30,6 @@
 !           and 3/4" gypsum drywall. A unconditioned attic zone is over three conditioned zones with height 3 feet.
 !           The roof is a built up roof with 1/2 in stone over 3/8 in felt supported by 2 in heavy weight concrete.
 !           The window to wall ratio is approxomately 0.07.!
-!
-!           There is a duct system with about 10% supply leaks and 5% return leaks.
-!           Supply ducts are located in the attic zone and return ducts are exposed to outdoors.
-!           Both supply and return leaks occur in the attic zone.
 !
 !           There is daylighting through the window in West Zone. The window has double-pane electrochromic
 !           (switchable) glazing in which the outer pane darkens automatically to control daylight glare.

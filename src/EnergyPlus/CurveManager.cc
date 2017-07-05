@@ -6511,7 +6511,6 @@ Label999: ;
 
 		int TableNum;
 		bool FileExists;
-		std::ifstream infile( FileName );
 		std::string line;
 
 		CheckForActualFileName( FileName, FileExists, TempFullFileName );
@@ -6523,6 +6522,7 @@ Label999: ;
 		}
 
 		TableNum = PerfCurve( CurveNum ).TableIndex;
+		std::ifstream infile( TempFullFileName );
 		TableData( TableNum ).X1.allocate( 0 );
 		TableData( TableNum ).X2.allocate( 0 );
 		TableData( TableNum ).Y.allocate( 0 );
@@ -6535,6 +6535,10 @@ Label999: ;
 				TableData( TableNum ).X2.push_back( std::stod( strings[1] ) );
 				TableData( TableNum ).Y.push_back( std::stod( strings[2] ) );
 			}
+		}
+		if ( lineNum == 0 ) {
+			ShowSevereError( "CurveManager::ReadTwoVarTableDataFromFile: The data file is empty as file name = " + FileName );
+			ShowFatalError( "Program terminates due to these conditions." );
 		}
 
 	}
