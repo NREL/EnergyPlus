@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <HVACControllers.hh>
+#include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -289,8 +290,7 @@ namespace HVACControllers {
 		std::string const & ControllerName,
 		int & ControllerIndex,
 		bool const FirstHVACIteration,
-		int const EP_UNUSED( AirLoopNum ), // unused1208
-		int const AirLoopPass,
+		int const AirLoopNum,
 		int const Operation,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
@@ -323,6 +323,7 @@ namespace HVACControllers {
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::FlowLocked;
+		using DataAirLoop::AirLoopControlInfo;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -375,6 +376,7 @@ namespace HVACControllers {
 				CheckEquipName( ControlNum ) = false;
 			}
 		}
+
 		// Find the correct ControllerNumber with the AirLoop & CompNum from AirLoop Derived Type
 		//ControlNum = AirLoopEquip(AirLoopNum)%ComponentOfTypeNum(CompNum)
 
@@ -485,7 +487,7 @@ namespace HVACControllers {
 		// To enable generating an individual, detailed trace file for each controller on each air loop,
 		// define the environment variable TRACE_CONTROLLER=YES or TRACE_CONTROLLER=Y
 		if ( TraceHVACControllerEnvFlag ) {
-			TraceIndividualController( ControlNum, FirstHVACIteration, AirLoopPass, Operation, IsConvergedFlag );
+			TraceIndividualController( ControlNum, FirstHVACIteration, AirLoopControlInfo( AirLoopNum ).AirLoopPass, Operation, IsConvergedFlag );
 		}
 
 	}

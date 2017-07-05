@@ -530,7 +530,6 @@ namespace MixedAir {
 		bool const FirstHVACIteration,
 		int const AirLoopNum,
 		int & OASysNum,
-		int & AirLoopPass,
 		int & AirLoopIterMax,
 		int & AirLoopIterTot,
 		int & AirLoopNumCalls
@@ -548,7 +547,6 @@ namespace MixedAir {
 		int const OASysNum,
 		bool const FirstHVACIteration,
 		int const AirLoopNum,
-		int & AirLoopPass,
 		int & AirLoopIterMax,
 		int & AirLoopIterTot,
 		int & AirLoopNumCalls
@@ -566,7 +564,6 @@ namespace MixedAir {
 		int const OASysNum,
 		bool const FirstHVACIteration,
 		int const AirLoopNum,
-		int & AirLoopPass,
 		int & AirLoopIterMax,
 		int & AirLoopIterTot,
 		int & AirLoopNumCalls
@@ -600,7 +597,6 @@ namespace MixedAir {
 		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
 		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
 		bool & OAHX, // TRUE indicates a heat exchanger has been found
-		int & AirLoopPass,
 		int & AirLoopIterMax,
 		int & AirLoopIterTot,
 		int & AirLoopNumCalls

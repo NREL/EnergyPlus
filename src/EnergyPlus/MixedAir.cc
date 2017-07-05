@@ -81,6 +81,7 @@
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
+#include <HVACControllers.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -436,7 +437,6 @@ namespace MixedAir {
 		bool const FirstHVACIteration,
 		int const AirLoopNum,
 		int & OASysNum,
-		int & AirLoopPass,
 		int & AirLoopIterMax,
 		int & AirLoopIterTot,
 		int & AirLoopNumCalls
@@ -486,7 +486,7 @@ namespace MixedAir {
 
 		InitOutsideAirSys( OASysNum, FirstHVACIteration, AirLoopNum );
 
-		SimOutsideAirSysWithController( OASysNum, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+		SimOutsideAirSysWithController( OASysNum, FirstHVACIteration, AirLoopNum, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
 
 	}
 
@@ -536,7 +536,6 @@ namespace MixedAir {
 		int const OASysNum,
 		bool const FirstHVACIteration,
 		int const AirLoopNum,
-		int & AirLoopPass,
 		int & AirLoopIterMax,
 		int & AirLoopIterTot,
 		int & AirLoopNumCalls
@@ -555,7 +554,7 @@ namespace MixedAir {
 		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
 			CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
 			CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-			SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+			SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
 			if ( OAHX ) ReSim = true;
 			AirLoopNumCalls = +1;
 		}
@@ -566,14 +565,14 @@ namespace MixedAir {
 			for ( CompNum = OutsideAirSys( OASysNum ).NumComponents - 1; CompNum >= 1; --CompNum ) {
 				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
 				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-				SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+				SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
 				AirLoopNumCalls = +1;
 			}
 			// now simulate again propogate current temps back through OA system
 			for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
 				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
 				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-				SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+				SimOAComponentWithController( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
 				AirLoopNumCalls = +1;
 			}
 		}
@@ -684,7 +683,6 @@ namespace MixedAir {
 		int const OASysNum,
 		bool const FirstHVACIteration,
 		int const AirLoopNum,
-		int & AirLoopPass,
 		int & AirLoopIterMax,
 		int & AirLoopIterTot,
 		int & AirLoopNumCalls
@@ -739,7 +737,7 @@ namespace MixedAir {
 		CtrlName = OutsideAirSys( OASysNum ).ControllerName( 1 );
 		CurOASysNum = OASysNum;
 		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
-		SimOASysComponentsWithController( OASysNum, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
+		SimOASysComponentsWithController( OASysNum, FirstHVACIteration, AirLoopNum, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
 
 		if ( MyOneTimeErrorFlag( OASysNum ) ) {
 			if ( OutsideAirSys( OASysNum ).NumControllers - OutsideAirSys( OASysNum ).NumSimpleControllers > 1 ) {
@@ -835,6 +833,9 @@ namespace MixedAir {
 		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 		using Humidifiers::SimHumidifier;
+		using SimAirServingZones::SolveWaterCoilController;
+		using HVACControllers::ControllerProps;
+		using WaterCoils::WaterCoil;
 		// Locals
 		// SUBROUTINE ARGUMENTS:
 
@@ -886,11 +887,13 @@ namespace MixedAir {
 		} else if ( SELECT_CASE_var == WaterCoil_Cooling ) { // 'Coil:Cooling:Water'
 			if ( Sim ) {
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_SimpleHeat ) { // 'Coil:Heating:Water')
 			if ( Sim ) {
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == SteamCoil_AirHeat ) { // 'Coil:Heating:Steam'
@@ -901,6 +904,7 @@ namespace MixedAir {
 		} else if ( SELECT_CASE_var == WaterCoil_DetailedCool ) { // 'Coil:Cooling:Water:DetailedGeometry'
 			if ( Sim ) {
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == Coil_ElectricHeat ) { // 'Coil:Heating:Electric'
@@ -1021,7 +1025,6 @@ namespace MixedAir {
 		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
 		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
 		bool & OAHX, // TRUE indicates a heat exchanger has been found
-		int & AirLoopPass,
 		int & AirLoopIterMax,
 		int & AirLoopIterTot,
 		int & AirLoopNumCalls
@@ -1117,15 +1120,15 @@ namespace MixedAir {
 			// Coil Types
 		} else if ( SELECT_CASE_var == WaterCoil_Cooling ) { // 'Coil:Cooling:Water'
 			if ( Sim ) {
-				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
-				SolveWaterCoilController( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls, CompName, CompIndex, QActual, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
+//				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_SimpleHeat ) { // 'Coil:Heating:Water')
 			if ( Sim ) {
-				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
-				SolveWaterCoilController( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls, CompName, CompIndex, QActual, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
+//				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 			OAHeatingCoil = true;
@@ -1136,8 +1139,8 @@ namespace MixedAir {
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_DetailedCool ) { // 'Coil:Cooling:Water:DetailedGeometry'
 			if ( Sim ) {
-				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
-				SolveWaterCoilController( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls, CompName, CompIndex, QActual, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
+//				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, true );
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 			OACoolingCoil = true;
