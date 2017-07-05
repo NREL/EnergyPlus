@@ -6242,6 +6242,9 @@ WindowMaterial:Blind:EquivalentLayer,
        \minimum -90
        \maximum 90
        \default 45
+       \note Slat angle is +ve if the tip of the slat front face is tilted upward, else  
+       \note the slat angle is -ve if the tip of the slat front face is tilted downward. 
+       \note The slat angle varies between -90 to +90. The default value is 45 degrees.
   N5 , \field Front Side Slat Beam-Diffuse Solar Transmittance
        \note The front side beam-diffuse solar transmittance of the slat at normal
        \note incidence averaged over the entire spectrum of solar radiation.
