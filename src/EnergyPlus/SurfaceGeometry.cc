@@ -9295,7 +9295,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
 		bool allAreEquidistant = true;
 		Real64 firstDistance = -99.;
 		if ( zonePoly.SurfaceFace( faceIndex ).NSides == zonePoly.SurfaceFace( opFaceIndex ).NSides ) { // double check that the number of sides match
@@ -9340,20 +9340,20 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
 	// test if two points on a plane are in the same position based on a small tolerance (based on Vector2dCount comparison)
 	bool
-		isAlmostEqual2dPt(
-			DataVectorTypes::Vector2dCount v1,
-			DataVectorTypes::Vector2dCount v2
-		)
+	isAlmostEqual2dPt(
+		DataVectorTypes::Vector2dCount v1,
+		DataVectorTypes::Vector2dCount v2
+	)
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
@@ -9398,7 +9398,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0254; //  2.54 cm = 1 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
 		return ( abs( (distance(start, end ) - (distance(start, test ) + distance(test, end) ) ) ) < tol );
 	}
 
