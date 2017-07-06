@@ -344,13 +344,38 @@ namespace SurfaceGeometry {
 		Array1S_bool const CeilingHeightEntered
 	);
 
+	struct EdgeOfSurf
+	{
+		int surfNum;
+		Vector start;
+		Vector end;
+		EdgeOfSurf():
+			surfNum( 0 ),
+			start( Vector( 0., 0., 0. ) ),
+			end( Vector( 0., 0., 0. ) )
+		{}
+	};
+
 	bool
 	isEnclosedVolume(
-		DataVectorTypes::Polyhedron const & zonePoly
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<EdgeOfSurf> & edgeNot2
 	);
 
-	int
-	numberOfEdgesNotTwoForEnclosedVolumeTest(
+	std::vector<EdgeOfSurf>
+	edgesInBoth(
+		std::vector<EdgeOfSurf> edges1,
+		std::vector<EdgeOfSurf> edges2
+	);
+
+	bool
+	edgesEqualOnSameSurface(
+		EdgeOfSurf a,
+		EdgeOfSurf b
+	);
+
+	std::vector<EdgeOfSurf>
+	edgesNotTwoForEnclosedVolumeTest(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		std::vector<Vector> const & uniqueVertices
 	);

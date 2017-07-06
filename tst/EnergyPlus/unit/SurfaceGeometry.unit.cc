@@ -692,8 +692,6 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 	HeatTransferAlgosUsed( 1 ) = OverallHeatTransferSolutionAlgo;
 	SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
 
-	compare_err_stream( "" ); // just for debugging
-
 	EXPECT_FALSE( FoundError );
 
 	// test coordinate on existing surface
@@ -2097,7 +2095,8 @@ TEST( SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test )
 
 	EXPECT_EQ( size_t( 8 ), uniqueVertices.size() );
 
-	EXPECT_EQ ( 0, numberOfEdgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices ));
+	std::vector<EdgeOfSurf> e1 = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
+	EXPECT_EQ ( size_t( 0 ) , e1.size() );
 
 	zonePoly.SurfaceFace( 6 ).FacePoints( 4 ).x = 0.;
 	zonePoly.SurfaceFace( 6 ).FacePoints( 4 ).y = 0.;
@@ -2106,7 +2105,8 @@ TEST( SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test )
 	makeListOfUniqueVertices( zonePoly, uniqueVertices );
 	EXPECT_EQ( size_t( 8 ), uniqueVertices.size() );
 
-	EXPECT_EQ( 4, numberOfEdgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices ) );
+	std::vector<EdgeOfSurf> e2 = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
+	EXPECT_EQ( size_t( 4 ), e2.size() );
 
 }
 
@@ -2268,11 +2268,13 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 
 	EXPECT_EQ( size_t( 10 ), uniqueVertices.size() );
 
-	EXPECT_EQ( 6, numberOfEdgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices ) );
+	std::vector<EdgeOfSurf> e1 = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
+	EXPECT_EQ( size_t( 6 ), e1.size() );
 
 	DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints( zonePoly, uniqueVertices ); // this is done after initial test since it is computationally intensive.
 
-	EXPECT_EQ( 0, numberOfEdgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices ) );
+	std::vector<EdgeOfSurf> e2 = edgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices );
+	EXPECT_EQ( size_t( 0 ), e2.size() );
 
  }
 
@@ -2465,11 +2467,12 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	 zonePoly.SurfaceFace( 6 ).FacePoints( 3 ) = Vector( 10., 0., 3. );
 	 zonePoly.SurfaceFace( 6 ).FacePoints( 4 ) = Vector( 10., 8., 3. );
 
-	 EXPECT_TRUE( isEnclosedVolume( zonePoly ) ) ;
+	 std::vector<EdgeOfSurf> edgeNot2;
+	 EXPECT_TRUE( isEnclosedVolume( zonePoly, edgeNot2 ) ) ;
 
 	 // leave gap
 	 zonePoly.SurfaceFace( 1 ).FacePoints( 3 ) = Vector( 9., 0., 0. );
-	 EXPECT_FALSE( isEnclosedVolume( zonePoly ) );
+	 EXPECT_FALSE( isEnclosedVolume( zonePoly, edgeNot2 ) );
 
  }
 
@@ -2540,11 +2543,12 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	 zonePoly.SurfaceFace( 6 ).FacePoints( 3 ) = Vector( 10., 0., 3. );
 	 zonePoly.SurfaceFace( 6 ).FacePoints( 4 ) = Vector( 10., 8., 3. );
 
-	 EXPECT_TRUE( isEnclosedVolume( zonePoly ) );
+	 std::vector<EdgeOfSurf> edgeNot2;
+	 EXPECT_TRUE( isEnclosedVolume( zonePoly, edgeNot2 ) );
 
 	 // leave gap
 	 zonePoly.SurfaceFace( 1 ).FacePoints( 3 ) = Vector( 9., 0., 0. );
-	 EXPECT_FALSE( isEnclosedVolume( zonePoly ) );
+	 EXPECT_FALSE( isEnclosedVolume( zonePoly, edgeNot2 ) );
 
  }
 
