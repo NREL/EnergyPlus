@@ -6304,7 +6304,7 @@ namespace SurfaceGeometry {
 
 		// test for missing materials for algorithms selected
 		NumEMPDMat = GetNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
-		NumPCMat = GetNumObjectsFound( "MaterialProperty:PhaseChange" ); // needs detailed algo
+		NumPCMat = GetNumObjectsFound( "MaterialProperty:PhaseChange" ) + GetNumObjectsFound( "MaterialProperty:PhaseChangeHysteresis" );
 		NumVTCMat = GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
 		NumHAMTMat1 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Settings" );
 		NumHAMTMat2 = GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm" );
@@ -7364,7 +7364,7 @@ namespace SurfaceGeometry {
 			StormWindow( StormWinNum ).DateOff = JulianDay( StormWindow( StormWinNum ).MonthOff, StormWindow( StormWinNum ).DayOfMonthOff, 1 );
 
 			if ( StormWindow( StormWinNum ).DateOn == StormWindow( StormWinNum ).DateOff ) {
-				ShowSevereError( cCurrentModuleObject + ": Date On = Date Off -- not allowed, occured in WindowProperty:StormWindow Input #" + TrimSigDigits( StormWinNum ) );
+				ShowSevereError( cCurrentModuleObject + ": Date On = Date Off -- not allowed, occurred in WindowProperty:StormWindow Input #" + TrimSigDigits( StormWinNum ) );
 				ErrorsFound = true;
 			}
 

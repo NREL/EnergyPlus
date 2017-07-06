@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <ObjexxFCL/gio.hh>
 
 
 using namespace EnergyPlus;
