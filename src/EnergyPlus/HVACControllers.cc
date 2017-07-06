@@ -294,6 +294,7 @@ namespace HVACControllers {
 		int const Operation,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
+		bool & BypassOAController,
 		Optional_bool AllowWarmRestartFlag
 	)
 	{
@@ -375,6 +376,13 @@ namespace HVACControllers {
 				}
 				CheckEquipName( ControlNum ) = false;
 			}
+		}
+
+		if ( ControllerProps( ControlNum ).BypassControllerCalc && BypassOAController ) {
+			IsUpToDateFlag = true;
+			IsConvergedFlag = true;
+			if ( present( AllowWarmRestartFlag ) ) AllowWarmRestartFlag = true;
+			return;
 		}
 
 		// Find the correct ControllerNumber with the AirLoop & CompNum from AirLoop Derived Type

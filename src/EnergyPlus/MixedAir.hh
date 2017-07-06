@@ -525,31 +525,10 @@ namespace MixedAir {
 	);
 
 	void
-	ManageOutsideAirSystemWithController(
-		std::string const & OASysName,
-		bool const FirstHVACIteration,
-		int const AirLoopNum,
-		int & OASysNum,
-		int & AirLoopIterMax,
-		int & AirLoopIterTot,
-		int & AirLoopNumCalls
-	);
-
-	void
 	SimOutsideAirSys(
 		int const OASysNum,
 		bool const FirstHVACIteration,
 		int const AirLoopNum
-	);
-
-	void
-	SimOutsideAirSysWithController(
-		int const OASysNum,
-		bool const FirstHVACIteration,
-		int const AirLoopNum,
-		int & AirLoopIterMax,
-		int & AirLoopIterTot,
-		int & AirLoopNumCalls
 	);
 
 	void
@@ -558,16 +537,6 @@ namespace MixedAir {
 		bool const FirstHVACIteration,
 		int const AirLoopNum
 		);
-
-	void
-	SimOASysComponentsWithController(
-		int const OASysNum,
-		bool const FirstHVACIteration,
-		int const AirLoopNum,
-		int & AirLoopIterMax,
-		int & AirLoopIterTot,
-		int & AirLoopNumCalls
-	);
 
 	void
 	SimOAComponent(
@@ -582,24 +551,6 @@ namespace MixedAir {
 		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
 		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
 		bool & OAHX // TRUE indicates a heat exchanger has been found
-	);
-
-	void
-	SimOAComponentWithController(
-		std::string const & CompType, // the component type
-		std::string const & CompName, // the component Name
-		int const CompTypeNum, // Component Type -- Integerized for this module
-		bool const FirstHVACIteration,
-		int & CompIndex,
-		int const AirLoopNum, // air loop index for economizer lockout coordination
-		bool const Sim, // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
-		int const OASysNum, // index to outside air system
-		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
-		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
-		bool & OAHX, // TRUE indicates a heat exchanger has been found
-		int & AirLoopIterMax,
-		int & AirLoopIterTot,
-		int & AirLoopNumCalls
 	);
 
 	void

@@ -348,6 +348,7 @@ namespace HVACControllers {
 		int const Operation,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
+		bool & BypassOAController,
 		Optional_bool AllowWarmRestartFlag = _
 	);
 
