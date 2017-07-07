@@ -528,6 +528,7 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure4.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure5.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure6.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/PCMModel.png
 )
 
 SET( SOURCE_FILENAME "engineering-reference" )

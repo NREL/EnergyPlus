@@ -7528,7 +7528,7 @@ namespace WaterThermalTanks {
 									ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
 									ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
 									ShowContinueError( "Please send this information to the EnergyPlus support group." );
-									ShowContinueErrorTimeStamp( "This error occured in heating mode." );
+									ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
 								} else {
 									ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedIndex1, PartLoadRatio, PartLoadRatio );
 								}
@@ -7608,7 +7608,7 @@ namespace WaterThermalTanks {
 										ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
 										ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
 										ShowContinueError( "Please send this information to the EnergyPlus support group." );
-										ShowContinueErrorTimeStamp( "This error occured in float mode." );
+										ShowContinueErrorTimeStamp( "This error occurred in float mode." );
 									} else {
 										ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedIndex2, PartLoadRatio, PartLoadRatio );
 									}
@@ -8346,7 +8346,7 @@ namespace WaterThermalTanks {
 									ShowWarningError( HeatPump.Type + " \"" + HeatPump.Name + "\"" );
 									ShowContinueError( "Heat pump water heater speed ratio calculation failed: speed ratio limits " "of 0 to 1 exceeded. speed ratio used = " + RoundSigDigits( SpeedRatio, 3 ) );
 									ShowContinueError( "Please send this information to the EnergyPlus support group." );
-									ShowContinueErrorTimeStamp( "This error occured in heating mode." );
+									ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
 								} else {
 									ShowRecurringWarningErrorAtEnd( HeatPump.Type + " \"" + HeatPump.Name + "\":  Speed ratio calculation failed in heating mode warning continues. Speed ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex1, SpeedRatio, SpeedRatio );
 								}
