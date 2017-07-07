@@ -160,7 +160,6 @@ namespace SimAirServingZones {
 	void
 	SolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,
@@ -182,7 +181,6 @@ namespace SimAirServingZones {
 	void
 	ReSolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,

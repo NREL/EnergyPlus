@@ -2257,8 +2257,6 @@ namespace SimAirServingZones {
 		// and controllers
 		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) { // NumPrimaryAirSys is the number of primary air loops
 
-			AirLoopControlInfo( AirLoopNum ).ConvergedFlag = true;
-			AirLoopNumCalls = 0;
 			// Check to see if System Availability Managers are asking for fans to cycle on or shut off
 			// and set fan on/off flags accordingly.
 			TurnFansOn = false;
@@ -2281,7 +2279,7 @@ namespace SimAirServingZones {
 			for ( AirLoopPass = 1; AirLoopPass <= 2; ++AirLoopPass ) {
 
 				SysReSim = false;
-				AirLoopControlInfo( AirLoopNum ).AirLoopPass = AirLoopPass;
+				AirLoopControlInfo( AirLoopNum ).AirLoopPass = AirLoopPass; // save for use without passing as argument
 
 				// Simulate controllers on air loop with current air mass flow rates
 				SimAirLoop( FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
@@ -2415,7 +2413,7 @@ namespace SimAirServingZones {
 
 		if ( ! DoWarmRestartFlag ) {
 			// Solve controllers with cold start using default initial values
-			SolveAirLoopControllers( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
+			SolveAirLoopControllers( FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
 
 			// Update air loop trackers
 			WarmRestartStatus = iControllerWarmRestartNone;
@@ -2424,7 +2422,7 @@ namespace SimAirServingZones {
 			AirLoopIterTot += IterTot;
 		} else {
 			// First try with speculative warm restart using previous solution
-			ReSolveAirLoopControllers( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
+			ReSolveAirLoopControllers( FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
 
 			// Update air loop trackers
 			WarmRestartStatus = iControllerWarmRestartSuccess;
@@ -2434,7 +2432,7 @@ namespace SimAirServingZones {
 
 			// Retry with cold start using default initial values if speculative warm restart did not work
 			if ( ! AirLoopConvergedFlag ) {
-				SolveAirLoopControllers( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
+				SolveAirLoopControllers( FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
 
 				// Update air loop trackers
 				WarmRestartStatus = iControllerWarmRestartFail;
@@ -2472,7 +2470,6 @@ namespace SimAirServingZones {
 	void
 	SolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,
@@ -2503,7 +2500,6 @@ namespace SimAirServingZones {
 		// Using/Aliasing
 		using namespace DataHVACControllers;
 		using HVACControllers::ManageControllers;
-		using HVACControllers::ControllerProps;
 		using General::CreateSysTimeIntervalString;
 
 		// Locals
@@ -2544,7 +2540,7 @@ namespace SimAirServingZones {
 		static std::string ErrEnvironmentName;
 		// A character string equivalent of ErrCount
 		std::string CharErrOut;
-		static bool BypassOAController;
+		static bool BypassOAController; // logical to tell ManageControllers to sim or not sim controller in OA System (don't sim here)
 
 
 		// FLOW:
@@ -2690,21 +2686,18 @@ namespace SimAirServingZones {
 	{
 
 		// SUBROUTINE INFORMATION
-		//             AUTHOR:  Dimitri Curtil (LBNL)
-		//       DATE WRITTEN:  Feb 2006
-		//           MODIFIED:
-		//      RE-ENGINEERED:  This is reengineered code that used to be in SimAirLoops()
+		//             AUTHOR:  Richard Raustad (FSEC)
+		//       DATE WRITTEN:  July 2017
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine solves for the controllers on the specfied air loop assuming a cold start.
+		// This subroutine solves for the controllers on the specfied air loop OA system assuming a cold start.
 
 		// METHODOLOGY EMPLOYED:
 		// For the specified primary air system:
-		// (1) each component in the system is simulated in natural order, beginning at
-		//     the return air inlet and progressing to the supply air outlets. Node data
-		//     is passed in the same direction.
-		// (2) The controllers and their actions are simulated.
-		// (3) Steps 2 and 3 are repeated until the control criteria are satisfied.
+		// (1) the specific component in the OA system is simulated
+		// (2) The controllers and their actions are simulated
+		// (3) Steps 2 and 3 are repeated until the control criteria are satisfied
+		// (4) convergence is passed back to SolveAirLoopControllers via PrimaryAirSystem( AirLoopNum ).ControlConverged( ControllerIndex )
 
 		// REFERENCES: None
 
@@ -2744,8 +2737,6 @@ namespace SimAirServingZones {
 		bool IsUpToDateFlag;
 		// Iteration counter
 		static int Iter( 0 );
-		// Controller DO loop index
-		int AirLoopControlNum;
 		// Number of times that the maximum iterations was exceeded
 		static int ErrCount( 0 );
 		// Number of times that the maximum iterations was exceeded
@@ -2856,7 +2847,6 @@ namespace SimAirServingZones {
 	void
 	ReSolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,
@@ -2913,7 +2903,7 @@ namespace SimAirServingZones {
 		// TRUE when air loop needs to be refreshed.
 		// Note that it is not used by ManageControllers() in the WARM_RESTART mode.
 		bool IsUpToDateFlag;
-		static bool BypassOAController;
+		static bool BypassOAController; // logical to bypass HVAC controller calcs 
 
 		// FLOW:
 
@@ -2925,7 +2915,7 @@ namespace SimAirServingZones {
 		IterTot = 0;
 
 		AirLoopConvergedFlag = true;
-		BypassOAController = false;
+		BypassOAController = false; // not exactly sure of this but it seems all controllers need to be simulated -- don't bypass
 		IsUpToDateFlag = false;
 		PrimaryAirSystem( AirLoopNum ).ControlConverged = false;
 

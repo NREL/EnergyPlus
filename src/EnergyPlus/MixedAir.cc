@@ -627,7 +627,6 @@ namespace MixedAir {
 		using Humidifiers::SimHumidifier;
 		using SimAirServingZones::SolveWaterCoilController;
 		using HVACControllers::ControllerProps;
-		using SimAirServingZones::SolveWaterCoilController;
 		using WaterCoils::WaterCoil;
 		// Locals
 		// SUBROUTINE ARGUMENTS:
