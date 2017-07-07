@@ -4194,6 +4194,7 @@
     Dimensionless,           !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     ,                        !- Normalization Reference
+    ,                        !- External File Name
     -30,                     !- X Value #1
     0.0000,                  !- Y Value #1
     1.49824556678101,        !- Output Value #1
@@ -4902,6 +4903,7 @@
     Dimensionless,           !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     ,                        !- Normalization Reference
+    ,                        !- External File Name
     -30,                     !- X Value #1
     0.0000,                  !- Y Value #1
     1.510765188,             !- Output Value #1
