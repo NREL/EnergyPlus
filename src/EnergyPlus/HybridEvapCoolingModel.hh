@@ -52,12 +52,13 @@ namespace EnergyPlus {
 		{
 			public:
 			CMode() : ModeID(0.0), Max_Msa(0.0), Min_Msa(0.0),Min_OAF(0.0), Max_OAF(0.0), Minimum_Outside_Air_Temperature(0.0), Maximum_Outside_Air_Temperature(0.0)
-			,Minimum_Outside_Air_Humidity_Ratio(0.0), Maximum_Outside_Air_Humidity_Ratio(0.0) {}
+			,Minimum_Outside_Air_Humidity_Ratio(0.0), Maximum_Outside_Air_Humidity_Ratio(0.0), NormalizationReference(0.0), Correction (0.0) {}
 			
 			//finish init above
 			~CMode();                  // destructor
 			int ModeID;
 			CModeSolutionSpace sol;
+			string ModeName;
 			int Tsa_curve_pointer;
 			int  HRsa_curve_pointer;
 			int  Psa_curve_pointer;
@@ -77,6 +78,8 @@ namespace EnergyPlus {
 			double Maximum_Return_Air_Humidity_Ratio;
 			double Minimum_Return_Air_Relative_Humidity;
 			double Maximum_Return_Air_Relative_Humidity;
+			double NormalizationReference;
+			double Correction;
 			bool CMode::ValidPointer(int curve_pointer);
 			bool CMode::ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
 			bool CMode::ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
@@ -89,10 +92,12 @@ namespace EnergyPlus {
 			bool CMode::InitializeOutsideAirRelativeHumidityConstraints(double min, double max);
 			bool CMode::InitializeReturnAirTemperatureConstraints(double min, double max);
 			bool CMode::InitializeReturnAirHumidityRatioConstraints(double min, double max);
-			bool CMode::InitializeReturnAirRelativeHumidityConstraints(double min, double max);
+			bool CMode::InitializeReturnAirRelativeHumidityConstraints(double min, double max); 
 			bool CMode::GenerateSolutionSpace(double ResolutionMsa, double ResolutionOSA);
 			bool CMode::MeetsOAEnvConstraints(double Tosa, double Wosa, double RHos);
+		private:
 			
+
 			//bool CMode::MeetsSupplyAirTOC(double Tosa);
 			//bool CMode::MeetsSupplyAirRHOC(double Wosa);
 		};
@@ -116,7 +121,8 @@ namespace EnergyPlus {
 			std::string Tsa_Lookup_Name;
 			std::string Mode1_Hsa_Lookup_Name;
 			std::string Mode1_Power_Lookup_Name;
-			Real64 MsaCapacityRatedCond;
+			Real64 SystemMaximumSupplyAirFlowRate;
+			Real64 ScalingFactor;
 			int SchedPtr; // Pointer to the correct schedule
 			Real64 UnitTotalCoolingRate; // unit output to zone, total cooling rate [W]
 			Real64 UnitTotalCoolingEnergy; // unit output to zone, total cooling energy [J]
@@ -137,7 +143,7 @@ namespace EnergyPlus {
 			vector<int>  HRsa_curve_pointer;
 			vector<int>  Psa_curve_pointer;
 			list<CMode*> OperatingModes;
-			Real64 ElectricalPower;
+			Real64 FinalElectricalPower;
 		/*	vector<double> Min_OAF;
 			vector<double> Max_OAF;
 			vector<double> Min_Msa;
@@ -182,16 +188,17 @@ namespace EnergyPlus {
 			Real64 SecOutletEnthalpy;
 			Real64 SecOutletPressure;
 			Real64 SecOutletRH;
+			Real64 ScaledSystemMaximumSupplyAirMassFlowRate;
 			// Default Constructor
 		//	ZoneHybridUnitaryACSystem();
 
 			int Model::GetID();            // accessor function
 			void Model::SetID(int vID) { ID = vID; };    // accessor function
-			void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double communicationStepSize);
+			void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double DesignMinVR, double rTestFlag, double communicationStepSize);
 			//void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode);
-			void Model::Initialize(string fmuLocation);//, ConfigFile* pConfig);
-			CMode* Model::AddNewOperatingMode();
-			void Model::RunTestModel(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR);
+			void Model::Initialize();//, ConfigFile* pConfig);
+			CMode* Model::AddNewOperatingMode(double correction);
+			//void Model::RunTestModel(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR);
 			void Model::InitializeModelParams();
 			void Model::ModelLog(std::string fmuLocation);
 			double Model::CalcHum_ratio_W(double Tdb, double RH, double P);

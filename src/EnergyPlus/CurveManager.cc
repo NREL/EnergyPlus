@@ -5917,6 +5917,20 @@ Label999: ;
 		}
 		return GetCurveName;
 	}
+	double GetNormalPoint(int const CurveIndex)
+	{
+
+		if (CurveIndex > 0 && CurveIndex <= NumCurves) {
+			return TableData(CurveIndex).NormalPoint;
+		}
+		else {
+			std::string s = std::to_string(CurveIndex);
+			ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
+			return 1;
+		}
+		
+	}
+	
 
 	int
 	GetCurveIndex( std::string const & CurveName ) // name of the curve

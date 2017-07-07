@@ -31,7 +31,7 @@ namespace EnergyPlus {//***************
 		using CurveManager::GetCurveType;
 		using CurveManager::GetCurveMinMaxValues;
 		using CurveManager::CurveValue;
-
+		using EnergyPlus::CurveManager::GetNormalPoint;
 		typedef int* MyType;
 		map<string, string> testop;
 		#define  DEF_Tdb 0
@@ -131,27 +131,26 @@ namespace EnergyPlus {//***************
 			case TEMP_CURVE:
 				if( ValidPointer(Tsa_curve_pointer))
 				{
-					Y_val = CurveValue(Tsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+					Y_val = NormalizationReference*CurveValue(Tsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
-				else { Y_val = X_4;//return air temp
+				else { Y_val = X_3;//return air temp
 				}
-				
 				break;
 			case W_CURVE:
 				
 				if (ValidPointer(HRsa_curve_pointer))
 				{
-					Y_val = CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);//0.01;//
+					Y_val = NormalizationReference*CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);//0.01;//
 				}
 				else {
-					Y_val = X_5;//return HR
+					Y_val = X_4;//return HR
 				}
 				break;
 			case POWER_CURVE:
 				
 				if (ValidPointer(Psa_curve_pointer))
 				{
-					Y_val = CurveValue(Psa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+					Y_val = Correction*CurveValue(Psa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
 				else {
 					Y_val = 0;//or set a more reasonable default
@@ -165,6 +164,7 @@ namespace EnergyPlus {//***************
 		}
 		void CMode::InitializeCurve(int curveType, int curve_ID)
 		{
+			
 			switch (curveType)
 			{
 			case TEMP_CURVE:
@@ -185,13 +185,15 @@ namespace EnergyPlus {//***************
 		{
 			double deltaMsa = Max_Msa -Min_Msa;
 			double deltaOAF = Max_OAF - Min_OAF  ;
+			if (deltaMsa < ResolutionMsa) deltaMsa = ResolutionMsa;
+			if (deltaOAF < ResolutionOSA) deltaOAF = ResolutionOSA;
 			double Msastep_size = (deltaMsa * ResolutionMsa);
 			double OAFsteps_size = (deltaOAF * ResolutionOSA);
 
 
-			for (double Msa_val = Min_Msa; Msa_val <= Max_Msa; Msa_val = Msa_val + Msastep_size)
+			for (double Msa_val = Max_Msa ; Msa_val >= Min_Msa ; Msa_val = Msa_val - Msastep_size)
 			{
-				for (double OAF_val = Min_OAF; OAF_val <= Max_OAF; OAF_val = OAF_val + OAFsteps_size)
+				for (double OAF_val = Max_OAF ; OAF_val >= Min_OAF; OAF_val = OAF_val - OAFsteps_size)
 				{
 					//sol.PointX.push_back( i);
 					//sol.PointY.push_back(j);
@@ -217,6 +219,7 @@ namespace EnergyPlus {//***************
 		bool CMode::ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields,  Array1D<bool>  lAlphaBlanks,std::string cCurrentModuleObject)
 		{
 			
+
 			if(!ValidateArrays(Alphas, cAlphaFields, Numbers, cNumericFields, cCurrentModuleObject))
 			{
 				ShowSevereError("Mode description array does not match mode number, in"  + cCurrentModuleObject);
@@ -226,8 +229,20 @@ namespace EnergyPlus {//***************
 			bool ErrorsFound=false;
 			int inter_Alpha = BLOCK_HEADER_OFFSET_Alpha + MODE_BLOCK_OFFSET_Alpha * ModeID;
 			int inter_Number = BLOCK_HEADER_OFFSET_Number + MODE_BLOCK_OFFSET_Number* ModeID;
-
+			std::ostringstream strs;
+			strs << ModeID;
+			
 			int curveID = -1;
+			if (lAlphaBlanks(inter_Alpha-1)) {
+				//InitializeCurve(TEMP_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+				ModeName="Mode"+ strs.str();
+			}
+			else
+			{
+				ModeName = Alphas(inter_Alpha - 1);
+			}
+
+			 curveID = -1;
 			if (lAlphaBlanks(inter_Alpha)) {
 				InitializeCurve(TEMP_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
 			}
@@ -426,7 +441,9 @@ namespace EnergyPlus {//***************
 				RHsaMin_schedule_pointer(0),
 				RHsaMax_schedule_pointer(0),
 				ZoneNodeNum(0),
-				MsaCapacityRatedCond(0),
+				SystemMaximumSupplyAirFlowRate(0),
+				ScaledSystemMaximumSupplyAirMassFlowRate(0),
+				ScalingFactor(0),
 				SchedPtr(0),
 				UnitTotalCoolingRate(0.0),
 				UnitTotalCoolingEnergy(0.0),
@@ -467,7 +484,7 @@ namespace EnergyPlus {//***************
 				SecOutletEnthalpy(0.0),
 				SecOutletPressure(0.0),
 				SecOutletRH(0.0), 
-				Wsa(0.0), ElectricalPower(0.0), SupplyVentilationAir(0.0),
+				Wsa(0.0), FinalElectricalPower(0.0), SupplyVentilationAir(0.0),
 			Initialized(false)
 		{
 			//InitializeModelParams();
@@ -564,31 +581,22 @@ namespace EnergyPlus {//***************
 			if (TroomTemp < TheatingSetpoint) {
 				Q = ((TheatingSetpoint - TroomTemp)*mass * 1006) / (2 * communicationStepSize);
 			}
-
-
 			return -Q;
 		}
 
-		CMode* Model::AddNewOperatingMode()
+		CMode* Model::AddNewOperatingMode(double scaledCorrection)
 		{
 			CMode* pMode = new CMode;
 			pMode->ModeID = ModeCounter;
+			pMode->Correction = scaledCorrection;
+			pMode->NormalizationReference = GetNormalPoint(1);
 			ModeCounter++;
 			OperatingModes.push_back(pMode);
-	
 			return pMode;
 		}
-		void Model::Initialize(std::string fmuLocation)//, ConfigFile* pConfig)
+		void Model::Initialize()//, ConfigFile* pConfig)
 		{
 			if (Initialized) return;
-			std::string dir;
-			std::string file;
-			std::string strfmuLocation(fmuLocation);
-			
-			//	Config->TrimFilename(strfmuLocation,dir);
-			//	cout<<"debug 1"<<strfmuLocation;
-			//Config = new ConfigFile;
-	//		Config->ParseConfigFile(strfmuLocation);
 			Initialized = true;
 			//Iterate through modes of operation
 			ResolutionMsa = 0.2; //msa/msaRATED
@@ -598,8 +606,6 @@ namespace EnergyPlus {//***************
 			{
 				Mode->GenerateSolutionSpace(ResolutionMsa, ResolutionOSA);
 			}
-
-
 			Initialized = true;
 		}
 
@@ -710,67 +716,8 @@ namespace EnergyPlus {//***************
 
 		}
 
-		void Model::RunTestModel(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR)
-		{
-			//double tempHumidity = RHra;
-			OutletTemp = 12;
-			MinOA_Msa= DesignMinVR;
-			double max_Msa = MsaRated;
-			double EIR = 8;
-			Mode = 1;
-			if (RequestedLoad < 0 )
-			{
-				if (Tra != OutletTemp)
-				{
-					optimal_Msa = -RequestedLoad / (1006 * (Tra - OutletTemp));
-					if (optimal_Msa > max_Msa)
-					{
-						optimal_Msa = max_Msa;
-					}
-				}
-				else
-				{
-					optimal_Msa = max_Msa; // not sure anbout that.
-				}
 
-				if (MinOA_Msa > optimal_Msa)
-				{
-					optimal_Msa = MinOA_Msa;
-				}
-			}
-
-			SupplyVentilationAir = optimal_Msa;
-
-			
-			OutletRH = CheckVal_W(RHra);
-			OutletHumRat = PsyWFnTdbRhPb(OutletTemp, OutletRH, InletPressure);
-			OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // is the outlet presure going to be different? //InletEnthalpy - (ZoneCoolingLoad / AirMassFlow);
-			OutletMassFlowRate = optimal_Msa;
-			
-			double QTotUnitOut = 0;
-			double QSensUnitOut = 0;
-			if (OutletEnthalpy < InletEnthalpy)
-			{
-				QTotUnitOut = OutletMassFlowRate * (OutletEnthalpy - InletEnthalpy);
-				QSensUnitOut = OutletMassFlowRate * (PsyHFnTdbW(OutletTemp, OutletHumRat) - PsyHFnTdbW(InletTemp, OutletHumRat));
-			}
-			else
-			{
-				QTotUnitOut = 0;
-				QSensUnitOut = 0;
-			}
-
-			UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
-			UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * SecInHour;
-			UnitSensibleCoolingRate = std::abs(min(0.0, optimal_H_sensible_room * 1000));
-			UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour;
-
-			ElectricalPower = UnitTotalCoolingRate/ EIR;
-		
-		}
-		//void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode) {
-
-		void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double communicationStepSize) {
+		void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double DesignMinVR, double rTestFlag, double communicationStepSize) {
 			
 			using General::RoundSigDigits; 
 			int modenumber = 0;
@@ -782,28 +729,17 @@ namespace EnergyPlus {//***************
 			double EIR, ElectricalPower, SHR, Tma, Wma, Hsa, Hma, Y_DeltaH, H_SENS_ROOM, mode_optimal_power, mode_optimal_point, RequestedCoolingLoad;
 			mode_optimal_power = 0;
 			double PreviousMaxiumOutput = 0;
-			double Wosa = CalcHum_ratio_W(Tosa, RHosa / 100, 101.325);
-			double Wra = CalcHum_ratio_W(Tra, RHra / 100, 101.325);
+			if (RHosa > 1) { ShowSevereError("Unitary hybrid system error, required RH 0-1"); } //should be fractional 
+			if (RHra > 1) { ShowSevereError("Unitary hybrid system error, required RH 0-1"); } //should be fractional 
+			
+			double Wosa = CalcHum_ratio_W(Tosa, RHosa , 101.325);
+			double Wra = CalcHum_ratio_W(Tra, RHra , 101.325);
 			bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, MinVRMetOnce, SAT_OC_Met, SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
 			EnvironmentConditionsMetOnce = SAT_OC_Met = SAT_OC_MetOnce = SARH_OC_Met = SAHR_OC_MetOnce = false;
-			double SupplyAirDBTempAtRefCon = 10;// CalculateSupplyAirDBTempAtRefCon();
-			double MixedAirDBTempAtRefCon = 25;// CalculateMixedAirTemp();
+	
 			MinOA_Msa = DesignMinVR;
 
-			if (CapacityFlag == 1)
-			{
-				MsaRated = CapacityRatedCond;//MsaRated
-			}
-			else
-			{
-				MsaRated = CapacityRatedCond / 1000 * (MixedAirDBTempAtRefCon - SupplyAirDBTempAtRefCon);
-			}
-
 			double averaged_requestedLoad = 0;
-
-		//	*returnVentilationAir = 0;
-		//	*returnSupplyAirMassFlow = 0;
-		//	*bpErrorCode = 0;
 
 			if (rTestFlag == 1)
 			{  
@@ -813,18 +749,21 @@ namespace EnergyPlus {//***************
 
 			if (RequestedLoad < 0)
 			{
+				RequestedLoadToCoolingSetpoint = RequestedLoad;
 				RequestedCoolingLoad = -RequestedLoad / 1000; //convert to kw
 				std::list<CMode*>::const_iterator iterator;
 				for (iterator = OperatingModes.begin(); iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
 				{
 					CMode* pMode = *iterator;
 					CModeSolutionSpace* solutionspace = &(pMode->sol);
+					bool SAHR_OC_MetinMode = false;
+					bool SAT_OC_MetinMode = false;
 					int solution_map_sizeX = solutionspace->PointY.size() - 1;
 					int solution_map_sizeY = solutionspace->PointX.size() - 1;
 					int solution_map_sizeM = solutionspace->PointMeta.size() - 1;
 					if (solution_map_sizeX != solution_map_sizeY)
 					{
-						ShowWarningError("Error in CModeSolutionSpace for mose, called in HybridEvapCooling:dostep");
+						ShowWarningError("Error in solution space mapping, suggest adjusting operating constraints.");
 						//cout << "Error in CModeSolutionSpace for mose ";
 						return;
 					}
@@ -833,17 +772,19 @@ namespace EnergyPlus {//***************
 					//Outside Air Relative Humidity(0 - 100 % )
 					//Outside Air Humidity Ratio(g / g)
 					//Outside Air Temperature(°C)
-					if (pMode->MeetsOAEnvConstraints(Tosa, Wosa, RHosa) == true)//fix this it should not end if it does not meet contraints.
+					if (pMode->MeetsOAEnvConstraints(Tosa, Wosa, 100*RHosa) == true)//fix this it should not end if it does not meet contraints.
 					{
 						EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
 					}
 					else
 					{
 						EnvironmentConditionsMet = false;
+						ShowWarningError("Failed to meet environment conditions for mode: " + RoundSigDigits(double(pMode->ModeID), 1));
 					}
 
 					if (EnvironmentConditionsMet == true)
 					{
+						double NormalizationReference = GetNormalPoint(1);// assumes the model has at least 1 curve and that all are set the same.
 
 						for (point_number = 0;point_number != solution_map_sizeX;point_number++) // within each mode go though all the combinations of solution spaces.
 						{
@@ -852,7 +793,7 @@ namespace EnergyPlus {//***************
 							MsaRatio = solutionspace->PointX[point_number];// fractions of rated mass flow rate, so for some modes this might be low but others hi
 							OSAF = solutionspace->PointY[point_number];
 							// there is no operating condition test, becuase it uses those to make the map so only allowed values are here.
-							Msa = MsaRated * MsaRatio;
+							Msa = NormalizationReference * MsaRatio;
 							//Calculate the ventilation mass flow rate
 							Mvent = Msa * OSAF;
 							if (Mvent > MinOA_Msa) MinVRMet = MinVRMetOnce = true;
@@ -863,28 +804,25 @@ namespace EnergyPlus {//***************
 								//all these points meet the minimum VR requirement
 								solutionspace->PointMeta[point_number] = 1;
 								//'Set B_coefficients for DeltaH from lookup table for the specific mode
-								Tsa = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, TEMP_CURVE); //TEMP_CURVE W_CURVE POWER_CURVE
-																														  //Set B_coefficients for SHR from lookup table for the specific mode
-																														  //Return Air Temperature(°C)
-								if (MeetsSupplyAirTOC(Tsa)) SAT_OC_Met = SAT_OC_MetOnce = true;
+								Tsa = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, Msa, OSAF, modenumber, TEMP_CURVE); //TEMP_CURVE W_CURVE POWER_CURVE
+						
+								if (MeetsSupplyAirTOC(Tsa)) SAT_OC_Met = SAT_OC_MetOnce = SAT_OC_MetinMode=true;
 								else
 								{
 									SAT_OC_Met = false;
 								}
 
-								Wsa = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, W_CURVE);
+								Wsa = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, Msa, OSAF, modenumber, W_CURVE);
 								//Return Air Relative Humidity(0 - 100 % )
 								//Return Air Humidity Ratio(g / g)
-								if (MeetsSupplyAirRHOC(Wsa)) SARH_OC_Met = SAHR_OC_MetOnce = true;
+								if (MeetsSupplyAirRHOC(Wsa)) SARH_OC_Met = SAHR_OC_MetOnce = SAHR_OC_MetinMode= true;
 								else
 								{
-									//Wsa = 0;
-									ShowWarningError("MeetsSupplyAirRHOC failed given a Wsa of"+ RoundSigDigits(Wsa,5));
-									
+									//used RoundSigDigits to convert to text, perhaps correct that.
 									SARH_OC_Met = false;
 								}
 
-								if (SARH_OC_Met == true || SAT_OC_Met == true)
+								if (SARH_OC_Met == true && SAT_OC_Met == true)
 								{
 									//Calculate the delta H 
 									Tma = Tra + OSAF * (Tosa - Tra);
@@ -902,8 +840,8 @@ namespace EnergyPlus {//***************
 
 										//all these points meet the sensible heating load
 										solutionspace->PointMeta[point_number] = 2;
-										double Y_val = Msa*(pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, POWER_CURVE));
-										ElectricalPower = Y_val / 1000;  //kW
+										double Y_val = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, Msa, OSAF, modenumber, POWER_CURVE);
+										ElectricalPower = Y_val;  //kW
 																		 //calculate the electrical power usage
 																		 //ElectricalPower = EIR * Y_DeltaH * H_Rated 'kw?
 																		 //Calculate EIR and SHR
@@ -940,8 +878,8 @@ namespace EnergyPlus {//***************
 										if (H_SENS_ROOM > PreviousMaxiumOutput)
 										{
 											PreviousMaxiumOutput = H_SENS_ROOM;
-											double Y_val = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, MsaRatio, OSAF, modenumber, POWER_CURVE);
-											ElectricalPower = Y_val / 1000;  //kW
+											double Y_val = pMode->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, Msa, OSAF, modenumber, POWER_CURVE);
+											ElectricalPower = Y_val ;  //kW
 																			 //Calculate EIR and SHR
 											EIR = ElectricalPower / Y_DeltaH;
 											SHR = cp * (Tma - Tsa) / (Hma - Hsa);
@@ -970,25 +908,29 @@ namespace EnergyPlus {//***************
 
 						}
 					}
-
+					
+					if (SAT_OC_MetinMode == false) ShowWarningError("Failed to meet supply air T requirements in mode: " + RoundSigDigits(double(pMode->ModeID), 1));
+					if (SAHR_OC_MetinMode == false) ShowWarningError("Failed to meet supply air HR requirements in mode: " + RoundSigDigits(double(pMode->ModeID), 1));
 					modenumber++;
 				}
 				if (EnvironmentConditionsMetOnce == false)
 				{
-					//*bpErrorCode = 1;
+					
 					ErrorCode = 1;
 					count_EnvironmentConditionsMetOnce++;
-
 					//error 
 				}
 				if (SAHR_OC_MetOnce == false)
 				{
+		
+					ShowWarningError("Failed to meet supply air HR requirements in any mode");
 					count_SAHR_OC_MetOnce++;
 					ErrorCode = 2;
 					//error 
 				}
 				if (SAT_OC_MetOnce == false)
 				{
+					ShowWarningError("Failed to meet supply air T requirements in any mode");
 					count_SAT_OC_MetOnce++;
 					ErrorCode = 3;
 					//error 
@@ -1018,20 +960,12 @@ namespace EnergyPlus {//***************
 				}
 				if (optimal_EnvCondMet == false)
 				{
-					ShowWarningError("Environmental conditions exceeded model limits, called in HybridEvapCooling:dostep");
+					ShowWarningError("Environment states were beyond the allowable operating range for any mode");
 					//cout << "Environmental conditions exceeded model limits./n";
 				}
 				if (ErrorCode == 0)
 				{
 
-			/*		*returnQSensible = -optimal_H_sensible_room * 1000;//RequestedLoad/(2);//*communicationStepSize);
-					*returnQLatent = 0;
-					*returnSupplyAirMassFlow = optimal_Msa;
-					*returnSupplyAirTemp = CheckVal_T(optimal_Tsa);
-					*returnSupplyAirRelHum = CheckVal_W(optimal_Wsa);
-					*returnVentilationAir = optimal_Mvent;
-					*FMUmode = optimal_Mode;
-					*ElectricalPowerUse = optimal_power;*/
 					SupplyVentilationAir = optimal_Mvent;
 					OutletTemp = CheckVal_T(optimal_Tsa);//PsyTdbFnHW(ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy, MinHumRat);
 					OutletRH = CheckVal_W(optimal_Wsa);
@@ -1057,36 +991,19 @@ namespace EnergyPlus {//***************
 					UnitSensibleCoolingRate = std::abs(min(0.0, optimal_H_sensible_room * 1000));
 					UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour;
 				
-					ElectricalPower = optimal_power;
+					FinalElectricalPower = 1000*optimal_power;
 				
 				}
 				else
 				{
-					/**returnQSensible = 0;
-					*returnQLatent = 0;
-					*returnSupplyAirMassFlow = 0;
-					*returnSupplyAirTemp = Tra;
-					*returnSupplyAirRelHum = Wra;
-					*returnVentilationAir = 0;
-					*FMUmode = -2;
-					*ElectricalPowerUse = 0;*/
-
 					OutletRH = InletRH;
 					OutletHumRat = InletHumRat;
 					OutletEnthalpy = InletEnthalpy;
 					OutletTemp = InletTemp;
 					OutletMassFlowRate = InletMassFlowRate;
 					Mode = -2;
-
-					UnitTotalCoolingRate = 0;
-					UnitTotalCoolingEnergy = 0;
-					UnitSensibleCoolingRate = 0;
-					UnitSensibleCoolingEnergy = 0;
-
-					ElectricalPower = 0;
-
+					UnitTotalCoolingRate = UnitTotalCoolingEnergy = UnitSensibleCoolingRate = UnitSensibleCoolingEnergy= FinalElectricalPower= 0;
 				}
-
 			}
 			else
 			{ //current heating mode, do nothing
@@ -1094,14 +1011,7 @@ namespace EnergyPlus {//***************
 				UnitTotalCoolingEnergy = 0;// ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingRate * TimeStepSys * SecInHour;
 				UnitSensibleCoolingRate = 0;// std::abs(min(0.0, QSensUnitOut));
 				UnitSensibleCoolingEnergy = 0;// ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingRate * TimeStepSys * SecInHour;
-				/**returnQSensible = 0;
-				*returnQLatent = 0;
-				*returnSupplyAirMassFlow = 0;
-				*returnSupplyAirTemp = Tra;
-				*returnSupplyAirRelHum = Wra;
-				*returnVentilationAir = 0;
-				*FMUmode = -1;
-				*ElectricalPowerUse = 0;*/
+
 
 				SupplyVentilationAir = 0;
 			}
@@ -1116,10 +1026,68 @@ namespace EnergyPlus {//***************
 
 			//	Iterate through solution spaceof mode to identify lowest energy consuming solution for each mode.
 
-
-
 		}
 
 	}
 }
+/*	void Model::RunTestModel(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR)
+{
+//double tempHumidity = RHra;
+OutletTemp = 12;
+MinOA_Msa= DesignMinVR;
+double max_Msa = MsaRated;
+double EIR = 8;
+Mode = 1;
+if (RequestedLoad < 0 )
+{
+if (Tra != OutletTemp)
+{
+optimal_Msa = -RequestedLoad / (1006 * (Tra - OutletTemp));
+if (optimal_Msa > max_Msa)
+{
+optimal_Msa = max_Msa;
+}
+}
+else
+{
+optimal_Msa = max_Msa; // not sure anbout that.
+}
+
+if (MinOA_Msa > optimal_Msa)
+{
+optimal_Msa = MinOA_Msa;
+}
+}
+
+SupplyVentilationAir = optimal_Msa;
+
+
+OutletRH = CheckVal_W(RHra);
+OutletHumRat = PsyWFnTdbRhPb(OutletTemp, OutletRH, InletPressure);
+OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // is the outlet presure going to be different? //InletEnthalpy - (ZoneCoolingLoad / AirMassFlow);
+OutletMassFlowRate = optimal_Msa;
+
+double QTotUnitOut = 0;
+double QSensUnitOut = 0;
+if (OutletEnthalpy < InletEnthalpy)
+{
+QTotUnitOut = OutletMassFlowRate * (OutletEnthalpy - InletEnthalpy);
+QSensUnitOut = OutletMassFlowRate * (PsyHFnTdbW(OutletTemp, OutletHumRat) - PsyHFnTdbW(InletTemp, OutletHumRat));
+}
+else
+{
+QTotUnitOut = 0;
+QSensUnitOut = 0;
+}
+
+UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
+UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * SecInHour;
+UnitSensibleCoolingRate = std::abs(min(0.0, optimal_H_sensible_room * 1000));
+UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour;
+
+FinalElectricalPower = UnitTotalCoolingRate/ EIR;
+
+}*/
+//void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double CapacityRatedCond, int CapacityFlag, double DesignMinVR, double rTestFlag, double *returnQSensible, double *returnQLatent, double *returnSupplyAirMassFlow, double *returnSupplyAirTemp, double *returnSupplyAirRelHum, double *returnVentilationAir, int *FMUmode, double *ElectricalPowerUse, double communicationStepSize, int *bpErrorCode) {
+
 
