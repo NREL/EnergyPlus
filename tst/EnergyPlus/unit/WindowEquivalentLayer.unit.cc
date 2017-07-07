@@ -202,7 +202,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar )
 {
 	// GitHub issue 5750
-	bool ErrorsFound( false );
 	int SurfNum( 0 );
 	int VBMatNum( 0 );
 	Real64 ProfAngVer( 0 );
@@ -561,7 +560,6 @@ TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar )
 TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar )
 {
 	// GitHub issue 5750
-	bool ErrorsFound( false );
 	int SurfNum( 0 );
 	int VBMatNum( 0 );
 	Real64 ProfAngVer( 0 );
