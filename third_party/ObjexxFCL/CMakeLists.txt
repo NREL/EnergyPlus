@@ -233,11 +233,17 @@ set(src
 set( test_src
   tst/unit/Array.unit.cc
   tst/unit/Array1.unit.cc
+  tst/unit/Array1S.unit.cc
   tst/unit/Array2.unit.cc
+  tst/unit/Array2S.unit.cc
   tst/unit/Array3.unit.cc
+  tst/unit/Array3S.unit.cc
   tst/unit/Array4.unit.cc
+  tst/unit/Array4S.unit.cc
   tst/unit/Array5.unit.cc
+  tst/unit/Array5S.unit.cc
   tst/unit/Array6.unit.cc
+  tst/unit/Array6S.unit.cc
   tst/unit/ArrayInitializer.unit.cc
   tst/unit/ArrayS.unit.cc
   tst/unit/Backspace.unit.cc
@@ -249,8 +255,10 @@ set( test_src
   tst/unit/char.functions.unit.cc
   tst/unit/Chunk.unit.cc
   tst/unit/ChunkVector.unit.cc
+  tst/unit/command.unit.cc
   tst/unit/Cstring.unit.cc
   tst/unit/DimensionSlice.unit.cc
+  tst/unit/environment.unit.cc
   tst/unit/floops.unit.cc
   tst/unit/Fmath.unit.cc
   tst/unit/fmt.unit.cc
@@ -261,11 +269,18 @@ set( test_src
   tst/unit/IndexSlice.unit.cc
   tst/unit/main.cc
   tst/unit/MArray.unit.cc
+  tst/unit/MArray1.unit.cc
+  tst/unit/MArray2.unit.cc
+  tst/unit/MArray3.unit.cc
+  tst/unit/MArray4.unit.cc
+  tst/unit/MArray5.unit.cc
+  tst/unit/MArray6.unit.cc
   tst/unit/member.functions.unit.cc
   tst/unit/numeric.unit.cc
   tst/unit/ObjexxFCL.unit.hh
   tst/unit/Optional.unit.cc
   tst/unit/Print.unit.cc
+  tst/unit/random.unit.cc
   tst/unit/Read.unit.cc
   tst/unit/Reference.Optional.unit.cc
   tst/unit/Reference.unit.cc
@@ -273,6 +288,7 @@ set( test_src
   tst/unit/Sticky.unit.cc
   tst/unit/Stream.unit.cc
   tst/unit/string.functions.unit.cc
+  tst/unit/time.unit.cc
   tst/unit/TypeTraits.unit.cc
   tst/unit/ubyte.unit.cc
   tst/unit/Vector2.unit.cc
