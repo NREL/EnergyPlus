@@ -1284,8 +1284,7 @@ unpack( Array1< T > const & a, Array1< bool > const & mask, T const & f )
 	typedef  BArray::size_type  size_type;
 	Array1D< T > r( mask.isize(), f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1304,8 +1303,7 @@ unpack( Array1< T > const & a, Array1< bool > const & mask, Array1< T > const & 
 	typedef  BArray::size_type  size_type;
 	Array1D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1323,8 +1321,7 @@ unpack( Array1< T > const & a, Array2< bool > const & mask, T const & f )
 	typedef  BArray::size_type  size_type;
 	Array2D< T > r( mask.isize1(), mask.isize2(), f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1343,8 +1340,7 @@ unpack( Array1< T > const & a, Array2< bool > const & mask, Array2< T > const & 
 	typedef  BArray::size_type  size_type;
 	Array2D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1362,8 +1358,7 @@ unpack( Array1< T > const & a, Array3< bool > const & mask, T const & f )
 	typedef  BArray::size_type  size_type;
 	Array3D< T > r( mask.isize1(), mask.isize2(), mask.isize3(), f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1382,8 +1377,7 @@ unpack( Array1< T > const & a, Array3< bool > const & mask, Array3< T > const & 
 	typedef  BArray::size_type  size_type;
 	Array3D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1401,8 +1395,7 @@ unpack( Array1< T > const & a, Array4< bool > const & mask, T const & f )
 	typedef  BArray::size_type  size_type;
 	Array4D< T > r( mask.isize1(), mask.isize2(), mask.isize3(), mask.isize4(), f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1421,8 +1414,7 @@ unpack( Array1< T > const & a, Array4< bool > const & mask, Array4< T > const & 
 	typedef  BArray::size_type  size_type;
 	Array4D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1440,8 +1432,7 @@ unpack( Array1< T > const & a, Array5< bool > const & mask, T const & f )
 	typedef  BArray::size_type  size_type;
 	Array5D< T > r( mask.isize1(), mask.isize2(), mask.isize3(), mask.isize4(), mask.isize5(), f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1460,8 +1451,7 @@ unpack( Array1< T > const & a, Array5< bool > const & mask, Array5< T > const & 
 	typedef  BArray::size_type  size_type;
 	Array5D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1479,8 +1469,7 @@ unpack( Array1< T > const & a, Array6< bool > const & mask, T const & f )
 	typedef  BArray::size_type  size_type;
 	Array6D< T > r( mask.isize1(), mask.isize2(), mask.isize3(), mask.isize4(), mask.isize5(), mask.isize6(), f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1499,8 +1488,7 @@ unpack( Array1< T > const & a, Array6< bool > const & mask, Array6< T > const & 
 	typedef  BArray::size_type  size_type;
 	Array6D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1724,9 +1712,8 @@ sum( Array< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  BArray::size_type  size_type;
-	size_type const as( a.size() );
 	T r( 0 );
-	for ( size_type i = 0; i < as; ++i ) {
+	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
 		r += a[ i ];
 	}
 	return r;
@@ -1743,9 +1730,8 @@ sum( Array1< T > const & a, int const dim )
 	static_cast< void >( dim ); // Suppress unused warning
 #endif
 	typedef  BArray::size_type  size_type;
-	size_type const as( a.size() );
 	T r( 0 );
-	for ( size_type i = 0; i < as; ++i ) {
+	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
 		r += a[ i ];
 	}
 	return r;
@@ -1796,10 +1782,9 @@ sum( Array< T > const & a, Array< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	typedef  BArray::size_type  size_type;
-	size_type const as( a.size() );
-	assert( as == mask.size() ); // Fortran compliance requires conformable so this is looser
+	assert( a.size() == mask.size() ); // Fortran compliance requires conformable so this is looser
 	T r( 0 );
-	for ( size_type i = 0; i < as; ++i ) {
+	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
 		if ( mask[ i ] ) r += a[ i ];
 	}
 	return r;
@@ -1844,9 +1829,8 @@ product( Array< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  BArray::size_type  size_type;
-	size_type const as( a.size() );
 	T r( 1 );
-	for ( size_type i = 0; i < as; ++i ) {
+	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
 		r *= a[ i ];
 	}
 	return r;
@@ -1863,9 +1847,8 @@ product( Array1< T > const & a, int const dim )
 	static_cast< void >( dim ); // Suppress unused warning
 #endif
 	typedef  BArray::size_type  size_type;
-	size_type const as( a.size() );
 	T r( 1 );
-	for ( size_type i = 0; i < as; ++i ) {
+	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
 		r *= a[ i ];
 	}
 	return r;
@@ -1916,10 +1899,9 @@ product( Array< T > const & a, Array< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	typedef  BArray::size_type  size_type;
-	size_type const as( a.size() );
-	assert( as == mask.size() ); // Fortran compliance requires conformable so this is looser
+	assert( a.size() == mask.size() ); // Fortran compliance requires conformable so this is looser
 	T r( 1 );
-	for ( size_type i = 0; i < as; ++i ) {
+	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
 		if ( mask[ i ] ) r *= a[ i ];
 	}
 	return r;

@@ -1,5 +1,5 @@
 #ifndef ObjexxFCL_CArrayA_hh_INCLUDED
-#define ObjexxFCL_CArrayA_hh_ Support
+#define ObjexxFCL_CArrayA_hh_INCLUDED
 
 // CArrayA: Memory-Managed C Array Wrapper with Alignment Support
 //

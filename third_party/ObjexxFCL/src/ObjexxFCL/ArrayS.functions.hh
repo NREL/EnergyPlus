@@ -1292,8 +1292,7 @@ unpack( Array1< T > const & a, Array1< bool > const & mask, Array1S< T > const &
 	typedef  BArray::size_type  size_type;
 	Array1D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1312,8 +1311,7 @@ unpack( Array1< T > const & a, Array2< bool > const & mask, Array2S< T > const &
 	typedef  BArray::size_type  size_type;
 	Array2D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1332,8 +1330,7 @@ unpack( Array1< T > const & a, Array3< bool > const & mask, Array3S< T > const &
 	typedef  BArray::size_type  size_type;
 	Array3D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1352,8 +1349,7 @@ unpack( Array1< T > const & a, Array4< bool > const & mask, Array4S< T > const &
 	typedef  BArray::size_type  size_type;
 	Array4D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1372,8 +1368,7 @@ unpack( Array1< T > const & a, Array5< bool > const & mask, Array5S< T > const &
 	typedef  BArray::size_type  size_type;
 	Array5D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
@@ -1392,8 +1387,7 @@ unpack( Array1< T > const & a, Array6< bool > const & mask, Array6S< T > const &
 	typedef  BArray::size_type  size_type;
 	Array6D< T > r( f );
 	size_type i( 0u );
-	for ( size_type l = 0, e = mask.size(), as = a.size(); l < e; ++l ) {
-		assert( i < as );
+	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) {
 			r[ l ] = a[ i ];
 			++i;
