@@ -54163,8 +54163,11 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \key Coil:UserDefined
-       \note Enter the type of supplemental heating coil if included in the unitary system.
+       \note Enter the type of supplemental heating or reheat coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
+       \note This coil supplements heating mode operation or reheats the supply air during dehumidification
+       \note mode operation. If set point based control is used the coils operate to meet their respective
+       \note supply air temperature set point.
   A19, \field Supplemental Heating Coil Name
        \type object-list
        \object-list HeatingCoilName
