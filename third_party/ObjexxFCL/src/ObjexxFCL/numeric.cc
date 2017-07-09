@@ -1,8 +1,8 @@
 // Numeric Support Functions
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -13,10 +13,13 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
 
+// C++ Headers
+#include <cstring>
+
 namespace ObjexxFCL {
 
 int
-selected_int_kind( int const r )
+SELECTED_INT_KIND( int const r )
 {
 	if ( r <= 2 ) {
 		return 1;
@@ -32,8 +35,11 @@ selected_int_kind( int const r )
 }
 
 int
-selected_real_kind( int const p, int const r ) // Fortran 2008 variant with radix argument not supported
+SELECTED_REAL_KIND( int const p, int const r, int const radix )
 {
+	if ( radix != 2 ) return -5; // Unsupported radix
+
+	// Intel Fortran treatment of p
 	int i; // Kind for precision p
 	if ( p < 0 ) {
 		i = -1;
@@ -47,6 +53,7 @@ selected_real_kind( int const p, int const r ) // Fortran 2008 variant with radi
 		i = -1;
 	}
 
+	// Intel Fortran treatment of r
 	int j; // Kind for exponent r
 	if ( r < 0 ) {
 		j = -2;
@@ -60,15 +67,21 @@ selected_real_kind( int const p, int const r ) // Fortran 2008 variant with radi
 		j = -2;
 	}
 
-	if ( ( i == -1 ) && ( j == -2 ) ) {
-		return -3; // Neither is available
+	if ( i == -1 ) {
+		if ( j == -2 ) {
+			return -3; // Neither is available
+		} else {
+			return i;
+		}
+	} else if ( j == -2 ) {
+		return j;
 	} else {
-		return ( i <= j ? i : j );
-	} // Other cases not supported
+		return ( i >= j ? i : j );
+	}
 }
 
 int
-selected_char_kind( std::string const & s )
+SELECTED_CHAR_KIND( std::string const & s )
 {
 	if ( s == "DEFAULT" ) {
 		return 1;
@@ -77,6 +90,12 @@ selected_char_kind( std::string const & s )
 	} else {
 		return -1;
 	}
+}
+
+std::size_t
+SIZEOF( char const * x )
+{
+	return std::strlen( x );
 }
 
 } // ObjexxFCL

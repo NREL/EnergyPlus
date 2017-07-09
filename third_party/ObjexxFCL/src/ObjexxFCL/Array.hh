@@ -3,9 +3,9 @@
 
 // Array: Array Abstract Base Class
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -21,10 +21,7 @@
 #include <ObjexxFCL/ArrayS.hh>
 #include <ObjexxFCL/ArrayTail.hh>
 #include <ObjexxFCL/CArrayA.hh>
-#include <ObjexxFCL/DimensionSlice.hh>
 #include <ObjexxFCL/fmt.hh>
-#include <ObjexxFCL/IndexRange.hh>
-#include <ObjexxFCL/IndexSlice.hh>
 #include <ObjexxFCL/InitializerSentinel.hh>
 #include <ObjexxFCL/MArray.hh>
 #include <ObjexxFCL/ProxySentinel.hh>
@@ -85,9 +82,6 @@ public: // Types
 	typedef  ArrayTail< T >  Tail;
 	typedef  AlignedAllocator< T >  Aligned;
 	typedef  TypeTraits< T >  Traits;
-	typedef  IndexRange  IR;
-	typedef  DimensionSlice  DS;
-	typedef  IndexSlice  IS;
 	typedef  ArrayInitializer< T >  Initializer;
 
 	// STL style
@@ -100,8 +94,6 @@ public: // Types
 	typedef  T const *  const_iterator;
 	typedef  std::reverse_iterator< T * >  reverse_iterator;
 	typedef  std::reverse_iterator< T const * >  const_reverse_iterator;
-	typedef  std::size_t  size_type;
-	typedef  std::ptrdiff_t  difference_type;
 
 	// C++ style
 	typedef  T  Value;
@@ -113,8 +105,6 @@ public: // Types
 	typedef  T const *  ConstIterator;
 	typedef  std::reverse_iterator< T * >  ReverseIterator;
 	typedef  std::reverse_iterator< T const * >  ConstReverseIterator;
-	typedef  std::size_t  Size;
-	typedef  std::ptrdiff_t  Difference;
 
 protected: // Creation
 
@@ -3492,11 +3482,6 @@ private: // Methods
 		::operator delete( mem_ );
 	}
 
-public: // Static Data
-
-	static size_type const npos; // Unbounded "size"
-	static size_type const max_size; // Max array size
-
 protected: // Data
 
 	bool const owner_; // Owner of data array?
@@ -3509,10 +3494,6 @@ protected: // Data
 
 }; // Array
 
-	// Static Data Member Template Definitions
-	template< typename T > typename Array< T >::size_type const Array< T >::npos = static_cast< size_type >( -1 );
-	template< typename T > typename Array< T >::size_type const Array< T >::max_size = npos - static_cast< size_type >( 1 );
-
 // Stream >> Array
 template< typename T >
 inline
@@ -3520,7 +3501,7 @@ std::istream &
 operator >>( std::istream & stream, Array< T > & a )
 {
 	if ( stream && ( a.size() > 0u ) ) {
-		for ( typename Array< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+		for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
 			stream >> a[ i ];
 			if ( ! stream ) break;
 		}
@@ -3540,7 +3521,7 @@ operator <<( std::ostream & stream, Array< T > const & a )
 		std::streamsize const old_precision( stream.precision( Traits::precision ) );
 		stream << std::right << std::showpoint << std::uppercase;
 		int const w( Traits::iwidth );
-		for ( typename Array< T >::size_type i = 0, e = a.size() - 1; i < e; ++i ) {
+		for ( BArray::size_type i = 0, e = a.size() - 1; i < e; ++i ) {
 			stream << std::setw( w ) << a[ i ] << ' ';
 			if ( ! stream ) break;
 		} if ( stream ) stream << std::setw( w ) << a[ a.size() - 1 ];

@@ -3,9 +3,9 @@
 
 // Required Argument Wrapper
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -56,7 +56,7 @@ public: // Creation
 		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
-	// Required Constructor Template
+	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
 	Required( Required< U, Enable > const & o ) :
 	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
@@ -128,7 +128,7 @@ public: // Assignment
 	operator =( U const & val )
 	{
 		assert( ptr_ != nullptr );
-		*ptr_ = val;
+		*ptr_ = T( val );
 		return *this;
 	}
 
@@ -280,7 +280,7 @@ public: // Creation
 		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
-	// Required Constructor Template
+	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
 	Required( Required< U, EnableType > const & o ) :
 	 ptr_( o.ptr_ )
@@ -458,6 +458,15 @@ bool
 PRESENT( Required< T > const & r )
 {
 	return r.present();
+}
+
+// Required Maker
+template< typename T >
+inline
+Required< T >
+make_Required( T const & val )
+{
+	return Required< T >( val );
 }
 
 } // ObjexxFCL

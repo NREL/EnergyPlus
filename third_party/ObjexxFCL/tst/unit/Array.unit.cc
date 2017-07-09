@@ -1,8 +1,8 @@
 // ObjexxFCL::Array Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -14,7 +14,14 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244) // Suppress conversion warnings: Intentional narrowing assignments present
+#endif
 #include <ObjexxFCL/Array.all.hh>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #include "ObjexxFCL.unit.hh"
 
 // C++ Headers
@@ -79,7 +86,7 @@ TEST( ArrayTest, Assignment2DRedimensionDifferentValueType )
 {
 	Array2D_int A( 3, 3, 33 );
 	Array2D_double B( IR( 0, 4 ), IR( 0, 4 ), 4.4 );
-	A = B;
+	A = B; // Causes VC++ C4244 warning
 	EXPECT_TRUE( eq( Array2D_int( IR( 0, 4 ), IR( 0, 4 ), 4 ), A ) );
 }
 
@@ -198,9 +205,9 @@ TEST( ArrayTest, Redimension2D )
 	A.redimension( 5, 5, 55 ); // Redimension by index ranges
 	EXPECT_EQ( IR( 1, 5 ), A.I1() );
 	EXPECT_EQ( IR( 1, 5 ), A.I2() );
-	EXPECT_EQ( 5U, A.size1() );
-	EXPECT_EQ( 5U, A.size2() );
-	EXPECT_EQ( 5U * 5U, A.size() );
+	EXPECT_EQ( 5u, A.size1() );
+	EXPECT_EQ( 5u, A.size2() );
+	EXPECT_EQ( 5u * 5u, A.size() );
 	for ( int i1 = A.l1(); i1 <= A.u1(); ++i1 ) {
 		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
 			if ( i1 <= 4 && i2 <= 4 ) {

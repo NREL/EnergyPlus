@@ -3,9 +3,9 @@
 
 // Format Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -2819,7 +2819,7 @@ private: // Methods
 		Size const wt( std::min( w, ww ) );
 		std::string s( ww, ' ' );
 		void const * vp( &t );
-		s.replace( 0, wt, reinterpret_cast< c_cstring >( vp ), wt );
+		s.replace( 0, wt, reinterpret_cast< char const * >( vp ), wt );
 		stream << spc( ter ) << s;
 	}
 
@@ -2834,10 +2834,10 @@ private: // Methods
 		Size const l( sizeof( b ) );
 		void const * vp( &b );
 		if ( l >= wt ) { // Use all bits of b
-			s.replace( 0, wt, reinterpret_cast< c_cstring >( vp ), wt );
+			s.replace( 0, wt, reinterpret_cast< char const * >( vp ), wt );
 		} else { // Tail-fill with nul: Used for bool that is treated as 4 bytes to correspond with Fortran LOGICAL(4)
 			Size const n( wt - l );
-			s.replace( 0, l, reinterpret_cast< c_cstring >( vp ), l );
+			s.replace( 0, l, reinterpret_cast< char const * >( vp ), l );
 			s.replace( l, n, n, '\0' );
 		}
 		stream << spc( ter ) << s;
@@ -3702,15 +3702,15 @@ protected: // Methods
 	bool
 	is_int_base( std::string const & s ) const
 	{
-		return is_hexidecimal( s, false );
+		return is_hexadecimal( s, false );
 	}
 
 	// Convert String in Integer Base Format to Integer
 	long int
 	read_int_base( std::istream & stream, std::string const & s ) const
 	{
-		if ( is_hexidecimal( s, false ) ) {
-			return hexidecimal_of( s );
+		if ( is_hexadecimal( s, false ) ) {
+			return hexadecimal_of( s );
 		} else { // Bad input
 			io_err( stream );
 			return 0l;

@@ -86,6 +86,7 @@ set(src
   src/ObjexxFCL/ArrayTail.hh
   src/ObjexxFCL/Backspace.cc
   src/ObjexxFCL/Backspace.hh
+  src/ObjexxFCL/BArray.cc
   src/ObjexxFCL/BArray.fwd.hh
   src/ObjexxFCL/BArray.hh
   src/ObjexxFCL/bit.hh
@@ -105,6 +106,8 @@ set(src
   src/ObjexxFCL/ChunkExponent.hh
   src/ObjexxFCL/ChunkVector.fwd.hh
   src/ObjexxFCL/ChunkVector.hh
+  src/ObjexxFCL/command.cc
+  src/ObjexxFCL/command.hh
   src/ObjexxFCL/Cstring.cc
   src/ObjexxFCL/Cstring.fwd.hh
   src/ObjexxFCL/Cstring.hh
@@ -203,8 +206,8 @@ set(src
   src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc
   src/ObjexxFCL/string.functions.hh
-  src/ObjexxFCL/Time_Date.cc
-  src/ObjexxFCL/Time_Date.hh
+  src/ObjexxFCL/time.cc
+  src/ObjexxFCL/time.hh
   src/ObjexxFCL/TraitsA.hh
   src/ObjexxFCL/TraitsB.hh
   src/ObjexxFCL/TraitsE.hh

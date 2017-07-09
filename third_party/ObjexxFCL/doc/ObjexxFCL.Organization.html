@@ -3,26 +3,25 @@
 <head>
 	<meta charset="UTF-8">
 	<title>ObjexxFCL Users Guide: Organization</title>
-	<meta name="description" content="Objexx Fortran Compatibility Library">
+	<meta name="description" content="Objexx Fortran-C++ Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
 	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
-	<link rel="icon" href="favicon.ico" type="image/x-icon">
-	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
 </head>
 <body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 	<tr>
 		<td></td>
-		<td height="70"><a href="ObjexxFCL.html"><img src="images/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
-		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.1</div></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
 		<td></td>
 	</tr>
 	<tr>
 		<td></td>
-		<td colspan="5" height="16" valign="top" bgcolor="#CFD8B4"></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -69,30 +68,6 @@
 					<td>ObjexxFCL Project-specific declarations</td>
 				</tr>
 				<tr class="table_text">
-					<td><font color="#16694A"><b>byte.hh</b></font></td>
-					<td>Single-byte signed integer</td>
-				</tr>
-				<tr class="table_text">
-					<td><font color="#16694A"><b>ubyte.hh</b></font></td>
-					<td>Single-byte unsigned integer</td>
-				</tr>
-				<tr class="table_text">
-					<td><font color="#16694A"><b>CArray.hh</b></font></td>
-					<td>C-style array wrapper</td>
-				</tr>
-				<tr class="table_text">
-					<td><font color="#16694A"><b>CArrayA.hh</b></font></td>
-					<td>C-style array wrapper with alignment support</td>
-				</tr>
-				<tr class="table_text">
-					<td><font color="#16694A"><b>CArrayP.hh</b></font></td>
-					<td>C-style array wrapper/proxy</td>
-				</tr>
-				<tr class="table_text">
-					<td><font color="#16694A"><b>ChunkVector.hh</b></font></td>
-					<td>Chunk-contiguous 1D vector</td>
-				</tr>
-				<tr class="table_text">
 					<td><font color="#16694A"><b>Array<em>N</em>.hh</b></font></td>
 					<td><em>N</em>D Array base class template</td>
 				</tr>
@@ -125,6 +100,34 @@
 					<td><em>N</em>D member array class template</td>
 				</tr>
 				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector2.hh</b></font></td>
+					<td>Fast 2-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector3.hh</b></font></td>
+					<td>Fast 3-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector4.hh</b></font></td>
+					<td>Fast 4-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>CArray.hh</b></font></td>
+					<td>C-style array wrapper</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>CArrayA.hh</b></font></td>
+					<td>C-style array wrapper with alignment support</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>CArrayP.hh</b></font></td>
+					<td>C-style array wrapper/proxy</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>ChunkVector.hh</b></font></td>
+					<td>Chunk-contiguous 1D vector</td>
+				</tr>
+				<tr class="table_text">
 					<td><font color="#16694A"><b>Cstring.hh</b></font></td>
 					<td>C-style string wrapper class</td>
 				</tr>
@@ -151,6 +154,18 @@
 				<tr class="table_text">
 					<td><font color="#16694A"><b>numeric.hh</b></font></td>
 					<td>Numeric intrinsic functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>bit.hh</b></font></td>
+					<td>Bit functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>byte.hh</b></font></td>
+					<td>Single-byte signed integer</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>ubyte.hh</b></font></td>
+					<td>Single-byte unsigned integer</td>
 				</tr>
 				<tr class="table_text">
 					<td><font color="#16694A"><b>gio.hh</b></font></td>
@@ -189,8 +204,20 @@
 					<td>Move to beginning of stream/file</td>
 				</tr>
 				<tr class="table_text">
-					<td><font color="#16694A"><b>Time_Date.hh</b></font></td>
+					<td><font color="#16694A"><b>time.hh</b></font></td>
 					<td>Time and date functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>random.hh</b></font></td>
+					<td>Random number functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>command.hh</b></font></td>
+					<td>Command line functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>environment.hh</b></font></td>
+					<td>Environment variable functions</td>
 				</tr>
 				<tr class="table_text">
 					<td><font color="#16694A"><b>Optional.hh</b></font></td>
@@ -255,13 +282,13 @@
 		<td></td>
 	</tr>
 	<tr>
-		<td><img src="images/spacer.gif" alt="" style="width:25px; height:9px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:100px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:40px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:500px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:40px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:100%; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:25px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
 	</tr>
 </tbody>
 </table>

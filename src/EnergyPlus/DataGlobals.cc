@@ -116,8 +116,8 @@ namespace DataGlobals {
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
 	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
 	Real64 const SecsInDay( SecInHour * HoursInDay ); // Number of seconds in Day
-	Real64 const BigNumber( huge( 1.0 ) ); // Max Number real used for initializations
-	Real64 const rTinyValue( epsilon( 1.0 ) ); // Tiny value to replace use of TINY(x)
+	Real64 const BigNumber( HUGE_( 1.0 ) ); // Max Number real used for initializations
+	Real64 const rTinyValue( EPSILON( 1.0 ) ); // Tiny value to replace use of TINY(x)
 	std::string::size_type const MaxNameLength( 100 ); // Maximum Name Length in Characters -- should be the same
 	// as MaxAlphaArgLength in InputProcessor module
 

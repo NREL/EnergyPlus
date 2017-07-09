@@ -3,31 +3,25 @@
 <head>
 	<meta charset="UTF-8">
 	<title>ObjexxFCL Users Guide: Array</title>
-	<meta name="description" content="Objexx Fortran Compatibility Library">
+	<meta name="description" content="Objexx Fortran-C++ Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
 	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
-	<link rel="icon" href="favicon.ico" type="image/x-icon">
-	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
-	<style type="text/css">
-	<!--
-	.style1 {font-weight: bold}
-	-->
-	</style>
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
 </head>
 <body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 	<tr>
 		<td></td>
-		<td height="70"><a href="ObjexxFCL.html"><img src="images/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
-		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.1</div></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
 		<td></td>
 	</tr>
 	<tr>
 		<td></td>
-		<td colspan="5" height="16" valign="top" bgcolor="#CFD8B4"></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -103,7 +97,7 @@ double x = A( 3, 7 );</pre></td>
 Array2D_int::size_type k( 0 ); // Linear index: A.index( 1, 1 ) == 0
 for ( int j = 1; j &lt;= 10; ++j ) {
    for ( int i = 1; i &lt;= 5; ++i, ++k ) {
-	  A[ k ] = i * j; // [ k ] == ( i, j )
+      A[ k ] = i * j; // [ k ] == ( i, j )
    }
 }</pre></td>
 				</tr>
@@ -122,7 +116,7 @@ B = A;
 A += B;</pre></td>
 			</tr>
 			</table>
-			<p class="body">and the whole-array  assignment of any value that is assignment-compatible with the Array's value type with the operators {=, +=, -=, *=, /=}:</p>
+			<p class="body">and the whole-array assignment of any value that is assignment-compatible with the Array's value type with the operators {=, +=, -=, *=, /=}:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 			<tr>
 				<td bgcolor="#F7F4F7"><pre>Array2D_int A( 3, 3 );
@@ -222,7 +216,7 @@ B.initializer( B_initializer );
 C.initializer_clear();</pre></td>
 				</tr>
 			</table>
-			<p class="body">Arrays without initializer values or functions can be <b>default initialized</b> to the default-constructed value of the data type (zero for numeric types) by defining the OBJEXXFCL_ARRAY_INIT macro when compiling (this is done with a -DOBJEXXFCL_ARRAY_INIT switch to GCC and some other compilers). All source files must be compiled with this definition if any are or undefined behavior may result. There could be a significant performance cost to initializing all arrays this way and it can mask initialization errors so this is recommended primarily for transitional use while migrating and debugging code that depended on a Fortran compiler (such as g77) that did  (non-standard) zero-initialization of arrays.</p>
+			<p class="body">Arrays without initializer values or functions can be <b>default initialized</b> to the default-constructed value of the data type (zero for numeric types) by defining the OBJEXXFCL_ARRAY_INIT macro when compiling (this is done with a -DOBJEXXFCL_ARRAY_INIT switch to GCC and some other compilers). All source files must be compiled with this definition if any are or undefined behavior may result. There could be a significant performance cost to initializing all arrays this way and it can mask initialization errors so this is recommended primarily for transitional use while migrating and debugging code that depended on a Fortran compiler (such as g77) that did (non-standard) zero-initialization of arrays.</p>
 
 			<h3 class="h4">Explicit Dimensioning</h3>
 			<p class="body">Although Fortran 77 does not provide array resizing real Arrays can be dynamically (re)sized via the <span class="source">allocate</span> and <span class="source">dimension</span> member functions:</p>
@@ -329,7 +323,7 @@ C.redimension( B ); // C is now 5 x 5 with 3 x 3 portion preserved</pre></td>
 					<td bgcolor="#F7F4F7"><pre>Array2A_int A; // Default constructed: Detached</pre></td>
 				</tr>
 			</table>
-			<p class="body">Default-constructed argument Arrays can be later attached and dimensioned  with <span class="source">attach</span> and <span class="source">dimension</span> calls as described below.</p>
+			<p class="body">Default-constructed argument Arrays can be later attached and dimensioned with <span class="source">attach</span> and <span class="source">dimension</span> calls as described below.</p>
 			<p class="body">Whole array construction attaches the argument Array to the whole source Array:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
@@ -354,7 +348,7 @@ Array2A_int E( A.a( 1, 1, 3 ), 5, 5 ); // Valid extent known</pre></td>
 				</tr>
 			</table>
 			<p class="body">The D array is passed an element so it is constructed without knowledge of the extent of valid memory it can access. The index ranges specified may be within that valid extent or not. This mechanism allows support of Fortran array passing usage but exposes code to array bounds violations that can't be detected by the argument Array classes.</p>
-			<p class="body">The E array is passed an element using the <span class="source">a</span> function, which  creates an ArrayTail object that knows its size, which allows bounds error detection in debug builds but at some cost in construction time.</p>
+			<p class="body">The E array is passed an element using the <span class="source">a</span> function, which creates an ArrayTail object that knows its size, which allows bounds error detection in debug builds but at some cost in construction time.</p>
 			<p class="body">When single Array argument constructors are used, as when creating an argument Array via pass-by-value, default argument Array dimensions are used:</p>
 			<ul class="body">
 				<li>If the argument is an Array of the same rank as the argument Array then its dimensions are used.</li>
@@ -512,7 +506,7 @@ void g()
 			<p class="body">The faster method is transparent in the call statement but does not provide the function information about the actual size of the underlying array. The safer method uses the <span class="source">a</span> member function to provide a proxy for the array tail section starting at the specified element that allows the function to check for array bounds errors in debug builds.</p>
 
 			<h2 class="h3">Array Size</h2>
-			<p class="body">Array sizes are limited to  2<sup>N</sup>-2 where N is the bit size of std::size_t, so very large arrays are supported on 64-bit platforms where std::size_t is 64 bits. The index range for each dimension is indexed by int, which is still 32 bits on 64-bit platforms, so the size along each dimension is more limited than the total array size on 64-bit platforms. Attempting to create an array with a dimension or total size exceeding these limits is caught by assertion-enabled  debug builds. The operating system on a given platform may further limit the allocatable size.</p>
+			<p class="body">Array sizes are limited to 2<sup>N</sup>-2 where N is the bit size of std::size_t, so very large arrays are supported on 64-bit platforms where std::size_t is 64 bits. The index range for each dimension is indexed by int, which is still 32 bits on 64-bit platforms, so the size along each dimension is more limited than the total array size on 64-bit platforms. Attempting to create an array with a dimension or total size exceeding these limits is caught by assertion-enabled debug builds. The operating system on a given platform may further limit the allocatable size.</p>
 			<p class="body">The size of an Array can be obtained via the <span class="source">size</span> member function. For real Arrays this is the actual array data size and for argument Arrays this is the size of the active array part that it is using, which may be unknown/unbounded. The <span class="source">size_bounded</span> and <span class="source">size_unbounded</span> member functions can be used to test whether the active array has unbounded/unknown extent. The size of the actual array data can be obtained via the <span class="source">array_size</span> member function, and the <span class="source">array_size_bounded</span> and <span class="source">array_size_unbounded</span> member functions can be used to test whether the actual array data has unknown/unbounded extent.</p>
 
 			<h3 class="h4">Array Size Reports</h3>
@@ -603,7 +597,7 @@ C = A + 3; // Adds 3 to each element</pre>
 
 			<h2 class="h3">Special Functions</h2>
 			<p class="body"><b>Array1D</b> arrays have the <span class="source">length</span> and <span class="source">length_squared</span> member functions to compute their L<sub>2</sub> norm length and squared length and the <span class="source">normalize</span> function to normalize the array to unit length. The <span class="source">dot_product</span> function computes the dot (inner) product of two Array1Ds. The <span class="source">cross_product</span> function computes the cross product of two Array1Ds of size 3.</p>
-			<p class="body"><b>Array2D</b> arrays have the boolean <span class="source">square</span> function to test whether the array is square, the <span class="source"><b>to_identity</b></span> function to make a square array into the identity matrix and the <span class="source">to_diag</span> function to make a square array into a diagonal matrix with a uniform value. The <span class="source">transpose</span> function  transposes a square array and the <span class="source">transposed</span> function returns a transposed copy of the array. The <span class="source">identity</span> and <span class="source">diag</span> static functions are named constructors to create identity and diagonal matrices, respectively.</p>
+			<p class="body"><b>Array2D</b> arrays have the boolean <span class="source">square</span> function to test whether the array is square, the <span class="source"><b>to_identity</b></span> function to make a square array into the identity matrix and the <span class="source">to_diag</span> function to make a square array into a diagonal matrix with a uniform value. The <span class="source">transpose</span> function transposes a square array and the <span class="source">transposed</span> function returns a transposed copy of the array. The <span class="source">identity</span> and <span class="source">diag</span> static functions are named constructors to create identity and diagonal matrices, respectively.</p>
 			<p class="body">The <span class="source">swap</span> functions allow two real Arrays of the same rank to efficiently swap their contents. There is a single-argument <span class="source">swap</span> member function and a two-argument <span class="source">swap</span> non-member function. Use <span class="source">A.swap( B )</span> or <span class="source">swap( A, B )</span> (using <span class="source">std::swap( A, B )</span> wil be slower on compilers that don't support the provided overloaded function templates).</p>
 
 			<h2 class="h3">Array Debugging</h2>
@@ -633,7 +627,7 @@ C = A + 3; // Adds 3 to each element</pre>
 				</tr>
 <!--			<tr class="table_text">                                                          -->
 <!--				<td><font color="#16694A"><b>KeyArray<em>N</em>D.hh</b></font></td>            -->
-<!--				<td><em>N</em>D  key-indexed Array class template</td>                         -->
+<!--				<td><em>N</em>D key-indexed Array class template</td>                         -->
 <!--			</tr>                                                                            -->
 				<tr class="table_text">
 					<td><font color="#16694A"><b>Array<em>N</em>.all.hh</b></font></td>
@@ -674,13 +668,13 @@ C = A + 3; // Adds 3 to each element</pre>
 		<td></td>
 	</tr>
 	<tr>
-		<td><img src="images/spacer.gif" alt="" style="width:25px; height:9px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:100px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:40px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:500px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:40px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:100%; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:25px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
 	</tr>
 </tbody>
 </table>

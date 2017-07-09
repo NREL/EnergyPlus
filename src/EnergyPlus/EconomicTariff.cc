@@ -587,7 +587,7 @@ namespace EconomicTariff {
 			if ( len( cAlphaArgs( 9 ) ) > 0 ) {
 				tariff( iInObj ).minMonthChgVal = ProcessNumber( cAlphaArgs( 9 ), isNotNumeric );
 			} else {
-				tariff( iInObj ).minMonthChgVal = -huge( -1.0 ); //set to a very negative value
+				tariff( iInObj ).minMonthChgVal = -HUGE_( -1.0 ); //set to a very negative value
 			}
 			tariff( iInObj ).minMonthChgPt = AssignVariablePt( cAlphaArgs( 9 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, iInObj );
 			//real time pricing
@@ -798,12 +798,12 @@ namespace EconomicTariff {
 		bool isNotNumeric;
 		int jBlk; // loop index for blocks
 		int alphaOffset; // offset used in blocks for alpha array
-		Real64 hugeNumber( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
+		Real64 hugeNumber( 0.0 ); //Autodesk Value not used but suppresses warning about HUGE_() call
 		int jFld;
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Charge:Block";
-		hugeNumber = huge( hugeNumber );
+		hugeNumber = HUGE_( hugeNumber );
 		numChargeBlock = GetNumObjectsFound( CurrentModuleObject );
 		chargeBlock.allocate( numChargeBlock );
 		for ( iInObj = 1; iInObj <= numChargeBlock; ++iInObj ) {
@@ -2643,7 +2643,7 @@ namespace EconomicTariff {
 		Real64 annualAggregate;
 		int annualCnt;
 
-		hugeValue = huge( Real64() );
+		hugeValue = HUGE_( Real64() );
 		//  Clear the isEvaluated flags for all economics variables.
 		for ( nVar = 1; nVar <= numEconVar; ++nVar ) {
 			econVar( nVar ).isEvaluated = false;
@@ -3349,7 +3349,7 @@ namespace EconomicTariff {
 		if ( isMonthly ) {
 			adjSeasonal = adjustmentVals;
 		} else {
-			maximumVal = -huge( Real64() );
+			maximumVal = -HUGE_( Real64() );
 			for ( iMonth = 1; iMonth <= MaxNumMonths; ++iMonth ) {
 				if ( seasonFromMask( iMonth ) == 1 ) {
 					if ( adjustmentVals( iMonth ) > maximumVal ) {
@@ -3598,9 +3598,9 @@ namespace EconomicTariff {
 		int jPeriod;
 		int kMonth;
 		Array1D< Real64 > monthVal( MaxNumMonths );
-		Real64 bigNumber( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
+		Real64 bigNumber( 0.0 ); //Autodesk Value not used but suppresses warning about HUGE_() call
 
-		bigNumber = huge( bigNumber );
+		bigNumber = HUGE_( bigNumber );
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 			//nativeTotalEnergy
 			monthVal = 0.0;
@@ -4367,12 +4367,12 @@ namespace EconomicTariff {
 		//    Get the annual maximum and sum for the econVariable.
 
 		Real64 sumVal;
-		Real64 maximumVal( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
+		Real64 maximumVal( 0.0 ); //Autodesk Value not used but suppresses warning about HUGE_() call
 		Real64 curVal;
 		int jMonth;
 
 		sumVal = 0.0;
-		maximumVal = -huge( maximumVal );
+		maximumVal = -HUGE_( maximumVal );
 		for ( jMonth = 1; jMonth <= 12; ++jMonth ) { //note not all months get printed out if more than 12 are used.- need to fix this later
 			curVal = econVar( varPointer ).values( jMonth );
 			sumVal += curVal;

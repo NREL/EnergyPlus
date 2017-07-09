@@ -3,9 +3,9 @@
 
 // Array1S: 1D Slice Array Proxy
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -1111,7 +1111,8 @@ public: // Subscript
 	T const &
 	operator []( size_type const i ) const
 	{
-		assert( contains( i + 1 ) );
+		assert( i < std::numeric_limits< int >::max() );
+		assert( contains( static_cast< int >( i + 1 ) ) );
 		return data_[ k_ + ( m_ * ( i + 1 ) ) ];
 	}
 
@@ -1119,7 +1120,8 @@ public: // Subscript
 	T &
 	operator []( size_type const i )
 	{
-		assert( contains( i + 1 ) );
+		assert( i < std::numeric_limits< int >::max() );
+		assert( contains( static_cast< int >( i + 1 ) ) );
 		return data_[ k_ + ( m_ * ( i + 1 ) ) ];
 	}
 

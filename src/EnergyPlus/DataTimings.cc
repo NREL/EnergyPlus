@@ -46,7 +46,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <CommandLineInterface.hh>
@@ -560,7 +560,7 @@ namespace DataTimings {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Int32 icount;
 
-		SYSTEM_CLOCK32( icount );
+		SYSTEM_CLOCK( icount );
 
 		calctime = double( icount ) / clockrate; // clockrate is set by main program.
 

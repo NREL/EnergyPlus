@@ -1,14 +1,19 @@
 // ObjexxFCL::Array1 Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
 // Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244) // Suppress conversion warnings: Intentional narrowing assignments present
+#endif
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -25,6 +30,10 @@
 #include <array>
 #include <string>
 #include <vector>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 using namespace ObjexxFCL;
 typedef  IndexRange  IR;
@@ -1540,12 +1549,12 @@ TEST( Array1Test, FunctionIsContiguous )
 TEST( Array1Test, FunctionLUBound )
 {
 	Array1D_double A( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
-	Array1D_int E11( 1, { 1.0 } );
-	Array1D_int E12( 1, { 5.0 } );
+	Array1D_int E11( 1, { 1.0 } ); // May cause conversion warning
+	Array1D_int E12( 1, { 5.0 } ); // May cause conversion warning
 	EXPECT_TRUE( eq( E11, lbound( A ) ) );
 	EXPECT_TRUE( eq( E12, ubound( A ) ) );
-	int const E21 = 1.0;
-	int const E22 = 5.0;
+	int const E21( 1 );
+	int const E22( 5 );
 	EXPECT_EQ( E21, lbound( A, 1 ) );
 	EXPECT_EQ( E22, ubound( A, 1 ) );
 }
@@ -1607,6 +1616,15 @@ TEST( Array1Test, FunctionPack )
 	Array1D_double const E3( { 2.0, 4.0 } );
 	Array1D_bool const M( { false, true, false, true, false } );
 	EXPECT_TRUE( eq( E3, pack( A3, M ) ) );
+}
+
+TEST( Array1Test, FunctionUnpack )
+{
+	Array1D_int const a( { 1, 2, 3 } );
+	Array1D_bool const mask( 5, { true, false, true, false, true } );
+	EXPECT_TRUE( eq( Array1D_int( 5, { 1, 42, 2, 42, 3 } ), unpack( a, mask, 42 ) ) );
+	Array1D_int const f( 5, { 11, 12, 13, 14, 15 } );
+	EXPECT_TRUE( eq( Array1D_int( 5, { 1, 12, 2, 14, 3 } ), unpack( a, mask, f ) ) );
 }
 
 TEST( Array1Test, FunctionCShift )
@@ -1782,15 +1800,72 @@ TEST( Array1Test, FunctionMaxLoc )
 
 TEST( Array1Test, FunctionMatMul )
 {
-	Array1D_int A11( 2, { 2, 3 } );
-	Array1D_int A12( 2, { 5, 7 } );
-	Array2D_int E1( 2, 2, reshape( { 10, 14, 15, 21 }, std::array< int, 2 >{ { 2, 2 } } ) );
+	Array1D_int const A11( 2, { 2, 3 } );
+	Array1D_int const A12( 2, { 5, 7 } );
+	Array2D_int const E1( 2, 2, reshape( { 10, 14, 15, 21 }, std::array< int, 2 >{ { 2, 2 } } ) );
 
 	EXPECT_TRUE( eq( E1, matmul( A11, A12 ) ) );
 
-	Array1D_bool A21( 2, { true, false } );
-	Array1D_bool A22( 2, { false, true } );
-	Array2D_bool E2( 2, 2, reshape( { false, true, false, false }, std::array< int, 2 >{ { 2, 2 } } ) );
+	Array1D_bool const A21( 2, { true, false } );
+	Array1D_bool const A22( 2, { false, true } );
+	Array2D_bool const E2( 2, 2, reshape( { false, true, false, false }, std::array< int, 2 >{ { 2, 2 } } ) );
 
 	EXPECT_TRUE( eq( E2, matmul( A21, A22 ) ) );
+}
+
+TEST( Array1Test, FunctionMerge )
+{
+	{
+		int const a( 1 );
+		int const b( 2 );
+		EXPECT_EQ( a, merge( a, b, true ) );
+		EXPECT_EQ( b, merge( a, b, false ) );
+	}
+
+	{
+		Array1D_int const a( 3, 1 );
+		Array1D_int const b( 3, 2 );
+		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
+	}
+
+	{
+		Array1D_int const a( 3, 1 );
+		int const b( 2 );
+		Array1D_int const B( 3, 2 );
+		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( B, merge( a, b, false ) ) );
+	}
+
+	{
+		int const a( 1 );
+		Array1D_int const A( 3, 1 );
+		Array1D_int const b( 3, 2 );
+		EXPECT_TRUE( eq( A, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
+	}
+
+	{
+		Array1D_int const a( 3, 1 );
+		Array1D_int const b( 3, 2 );
+		Array1D_bool const mask( 3, { true, false, true } );
+		Array1D_int const m( 3, { 1, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
+
+	{
+		Array1D_int const a( 3, 1 );
+		int const b( 2 );
+		Array1D_bool const mask( 3, { true, false, true } );
+		Array1D_int const m( 3, { 1, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
+
+	{
+		int const a( 1 );
+		Array1D_int const b( 3, 2 );
+		Array1D_bool const mask( 3, { true, false, true } );
+		Array1D_int const m( 3, { 1, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
 }

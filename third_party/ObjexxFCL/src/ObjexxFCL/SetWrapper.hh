@@ -3,9 +3,9 @@
 
 // SetWrapper: Insulating Wrapper of std::set that can be Forward Declared
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //

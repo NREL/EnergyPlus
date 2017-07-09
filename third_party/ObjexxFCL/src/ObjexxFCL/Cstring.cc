@@ -1,8 +1,8 @@
 // Cstring: C String Wrapper
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -36,7 +36,7 @@ namespace ObjexxFCL {
 
 	// Has any Character of a cstring?
 	bool
-	Cstring::has_any_of( c_cstring const s ) const
+	Cstring::has_any_of( char const * const s ) const
 	{
 		size_type const s_len( std::strlen( s ) );
 		for ( size_type i = 0; i < std::strlen( str_ ); ++i ) {
@@ -143,7 +143,7 @@ namespace ObjexxFCL {
 
 	// Left Justify
 	Cstring &
-	Cstring::left_justify()
+	Cstring::ljustify()
 	{
 		size_type const len( std::strlen( str_ ) );
 		for ( size_type i = 0; i < len; ++i ) {
@@ -160,7 +160,7 @@ namespace ObjexxFCL {
 
 	// Right Justify
 	Cstring &
-	Cstring::right_justify()
+	Cstring::rjustify()
 	{
 		size_type const len( std::strlen( str_ ) );
 		for ( size_type i = len; i > 0; --i ) {
@@ -179,7 +179,7 @@ namespace ObjexxFCL {
 	Cstring &
 	Cstring::center()
 	{
-		left_justify();
+		ljustify();
 		size_type const len_t( len_trim() );
 		size_type const pad( ( length() - len_t ) / 2 );
 		if ( pad > 0 ) {
@@ -221,7 +221,7 @@ namespace ObjexxFCL {
 
 	// Cstring == cstring Case-Insensitively?
 	bool
-	equali( Cstring const & s, c_cstring const t )
+	equali( Cstring const & s, char const * const t )
 	{
 		typedef  Cstring::size_type  size_type;
 		size_type const s_len( s.length() );
@@ -237,7 +237,7 @@ namespace ObjexxFCL {
 
 	// cstring == Cstring Case-Insensitively?
 	bool
-	equali( c_cstring const s, Cstring const & t )
+	equali( char const * const s, Cstring const & t )
 	{
 		typedef  Cstring::size_type  size_type;
 		size_type const s_len( std::strlen( s ) );

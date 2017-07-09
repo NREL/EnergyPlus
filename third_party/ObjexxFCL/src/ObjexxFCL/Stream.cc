@@ -1,8 +1,8 @@
 // Stream Wrapper Hierarchy
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -29,13 +29,13 @@ namespace ObjexxFCL {
 	{
 		// Directory
 		std::string dir;
-		dir = get_env_var( "TMP" );
+		dir = GET_ENV_VAR( "TMP" );
 		if ( dir.empty() ) {
-			dir = get_env_var( "TMPDIR" );
+			dir = GET_ENV_VAR( "TMPDIR" );
 			if ( dir.empty() ) {
-				dir = get_env_var( "TEMP" );
+				dir = GET_ENV_VAR( "TEMP" );
 				if ( dir.empty() ) {
-					dir = get_env_var( "TEMPDIR" );
+					dir = GET_ENV_VAR( "TEMPDIR" );
 				}
 			}
 		}

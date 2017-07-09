@@ -3,9 +3,9 @@
 
 // ArrayS: Slice Array Proxy Abstract Base Class Template
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -16,10 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/ArrayS.fwd.hh>
 #include <ObjexxFCL/BArray.hh>
-#include <ObjexxFCL/DimensionSlice.hh>
 #include <ObjexxFCL/fmt.hh>
-#include <ObjexxFCL/IndexRange.hh>
-#include <ObjexxFCL/IndexSlice.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -53,9 +50,6 @@ public: // Types
 
 	typedef  ArrayS< T >  Base;
 	typedef  TypeTraits< T >  Traits;
-	typedef  IndexRange  IR;
-	typedef  IndexSlice  IS;
-	typedef  DimensionSlice  DS;
 
 	// STL style
 	typedef  T  value_type;
@@ -63,8 +57,6 @@ public: // Types
 	typedef  T const &  const_reference;
 	typedef  T *  pointer;
 	typedef  T const *  const_pointer;
-	typedef  std::size_t  size_type;
-	typedef  std::ptrdiff_t  difference_type;
 
 	// C++ style
 	typedef  T  Value;
@@ -72,8 +64,6 @@ public: // Types
 	typedef  T const &  ConstReference;
 	typedef  T *  Pointer;
 	typedef  T const *  ConstPointer;
-	typedef  std::size_t  Size;
-	typedef  std::ptrdiff_t  Difference;
 
 protected: // Creation
 

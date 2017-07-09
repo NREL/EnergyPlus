@@ -1,8 +1,8 @@
 // Stream Functions
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -96,7 +96,13 @@ cross_platform_get_line( std::istream & stream, std::string & line, char const d
 				stream_buffer->sbumpc();
 				return stream;
 			}
-			// Flow into default
+#if __cplusplus >= 201500 // C++17
+			[[fallthrough]];
+#elif defined(__clang__)
+			[[clang::fallthrough]]; // Clang
+#elif defined(__GNUC__)
+			[[gnu::fallthrough]]; // GCC C++11 and C++14
+#endif
 		default:
 			if ( saving ) {
 				if ( c == delim ) {

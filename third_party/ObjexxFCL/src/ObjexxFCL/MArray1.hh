@@ -3,9 +3,9 @@
 
 // MArray1: 1D Member Array Proxy
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -895,16 +895,18 @@ public: // Subscript
 	T const &
 	operator []( size_type const i ) const
 	{
-		assert( contains( i + 1 ) );
-		return array_( j1( i + 1 ) ).*pmem_;
+		assert( i < std::numeric_limits< int >::max() );
+		assert( contains( static_cast< int >( i + 1 ) ) );
+		return array_( j1( static_cast< int >( i + 1 ) ) ).*pmem_;
 	}
 
 	// array[ i ]: 0-Based Subscript
 	T &
 	operator []( size_type const i )
 	{
-		assert( contains( i + 1 ) );
-		return array_( j1( i + 1 ) ).*pmem_;
+		assert( i < std::numeric_limits< int >::max() );
+		assert( contains( static_cast< int >( i + 1 ) ) );
+		return array_( j1( static_cast< int >( i + 1 ) ) ).*pmem_;
 	}
 
 public: // Predicate

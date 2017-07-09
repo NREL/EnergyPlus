@@ -3,9 +3,9 @@
 
 // Global I/O Format Wrapper
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -73,7 +73,7 @@ public: // Assignment
 
 	// Move Assignment
 	Fmt &
-	operator =( Fmt && fmt )
+	operator =( Fmt && fmt ) NOEXCEPT
 	{
 		assert ( this != &fmt );
 		if ( format_ ) delete format_;

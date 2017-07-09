@@ -3,9 +3,9 @@
 
 // Stream Wrapper Hierarchy
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -28,7 +28,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef _WIN32
+#ifdef _WIN64
+#define stat _stat64
+#else
 #define stat _stat
+#endif
 #endif
 
 namespace ObjexxFCL {

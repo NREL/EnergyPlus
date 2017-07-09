@@ -50,7 +50,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <TARCOGOutput.hh>

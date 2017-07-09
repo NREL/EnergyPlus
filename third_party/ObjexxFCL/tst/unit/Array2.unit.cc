@@ -1,14 +1,19 @@
 // ObjexxFCL::Array2 Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
 // Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244) // Suppress conversion warnings: Intentional narrowing assignments present
+#endif
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -22,6 +27,10 @@
 // C++ Headers
 #include <array>
 #include <string>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 using namespace ObjexxFCL;
 typedef  IndexRange  IR;
@@ -1132,10 +1141,14 @@ TEST( Array2Test, AssignmentOtherDataType )
 		}
 	}
 
-// These unit tests can generate warnings for certain templated types, that's fine
 #ifdef __llvm__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wliteral-conversion"
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244) // Suppress conversion warnings: Intentional narrowing assignments present
 #endif
 
 	A1 = 2.718; // May cause warnings about conversion
@@ -1151,6 +1164,10 @@ TEST( Array2Test, AssignmentOtherDataType )
 			EXPECT_EQ( i1, A1( i1, i2 ) );
 		}
 	}
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #ifdef __llvm__
 #pragma clang diagnostic pop
@@ -2383,6 +2400,15 @@ TEST( Array2Test, FunctionCount )
 	EXPECT_TRUE( eq( C2, count( A, 2 ) ) );
 }
 
+TEST( Array2Test, FunctionUnpack )
+{
+	Array1D_int const a( 2, { 1, 2 } );
+	Array2D_bool const mask( 2, 2, { true, false, false, true } );
+	EXPECT_TRUE( eq( Array2D_int( 2, 2, { 1, 42, 42, 2 } ), unpack( a, mask, 42 ) ) );
+	Array2D_int const f( 2, 2, { 11, 21, 12, 22 } );
+	EXPECT_TRUE( eq( Array2D_int( 2, 2, { 1, 21, 12, 2 } ), unpack( a, mask, f ) ) );
+}
+
 TEST( Array2Test, FunctionSum )
 {
 	Array2D_int A( 2, 2, { 11, 12, 21, 22 } );
@@ -2561,4 +2587,54 @@ TEST( Array2Test, FunctionMatmul22 )
 	EXPECT_TRUE( eq( R, matmul( A, B ) ) );
 	Array2D_int BT( transposed( B ) );
 	EXPECT_TRUE( eq( R, matmul_T( A, BT ) ) );
+}
+
+TEST( Array2Test, FunctionMerge )
+{
+	{
+		Array2D_int const a( 2, 2, 1 );
+		Array2D_int const b( 2, 2, 2 );
+		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
+	}
+
+	{
+		Array2D_int const a( 2, 2, 1 );
+		int const b( 2 );
+		Array2D_int const B( 2, 2, 2 );
+		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( B, merge( a, b, false ) ) );
+	}
+
+	{
+		int const a( 1 );
+		Array2D_int const b( 2, 2, 2 );
+		Array2D_int const A( 2, 2, 1 );
+		EXPECT_TRUE( eq( A, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
+	}
+
+	{
+		Array2D_int const a( 2, 2, 1 );
+		Array2D_int const b( 2, 2, 2 );
+		Array2D_bool const mask( 2, 2, { true, false, false, true } );
+		Array2D_int const m( 2, 2, { 1, 2, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
+
+	{
+		Array2D_int const a( 2, 2, 1 );
+		int const b( 2 );
+		Array2D_bool const mask( 2, 2, { true, false, false, true } );
+		Array2D_int const m( 2, 2, { 1, 2, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
+
+	{
+		int const a( 1 );
+		Array2D_int const b( 2, 2, 2 );
+		Array2D_bool const mask( 2, 2, { true, false, false, true } );
+		Array2D_int const m( 2, 2, { 1, 2, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
 }
