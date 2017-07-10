@@ -51,8 +51,10 @@ TEST( CommandTest, GetCommand )
 		int length;
 		int status;
 		GET_COMMAND( command, length, status );
+#ifdef OBJEXX_BUILD
 		EXPECT_EQ( "ObjexxFCL.unit", command.substr( 0, 14 ) );
 		EXPECT_TRUE( 14 <= length );
+#endif
 		EXPECT_EQ( 0, status );
 	}
 
@@ -61,8 +63,10 @@ TEST( CommandTest, GetCommand )
 		int length;
 		int status;
 		get_command( command, length, status );
+#ifdef OBJEXX_BUILD
 		EXPECT_EQ( "ObjexxFCL.unit", command.substr( 0, 14 ) );
 		EXPECT_TRUE( 14 <= length );
+#endif
 		EXPECT_EQ( 0, status );
 	}
 }
@@ -74,12 +78,14 @@ TEST( CommandTest, GetCommandArgument )
 		int length;
 		int status;
 		GET_COMMAND_ARGUMENT( 0, value, length, status );
+#ifdef OBJEXX_BUILD
 #ifdef _WIN32
 		EXPECT_EQ( "ObjexxFCL.unit.exe", value );
 		EXPECT_EQ( 18, length );
 #else
 		EXPECT_EQ( "ObjexxFCL.unit", value );
 		EXPECT_EQ( 14, length );
+#endif
 #endif
 		EXPECT_EQ( 0, status );
 	}
@@ -99,12 +105,14 @@ TEST( CommandTest, GetCommandArgument )
 		int length;
 		int status;
 		get_command_argument( 0, value, length, status );
+#ifdef OBJEXX_BUILD
 #ifdef _WIN32
 		EXPECT_EQ( "ObjexxFCL.unit.exe", value );
 		EXPECT_EQ( 18, length );
 #else
 		EXPECT_EQ( "ObjexxFCL.unit", value );
 		EXPECT_EQ( 14, length );
+#endif
 #endif
 		EXPECT_EQ( 0, status );
 	}
@@ -126,12 +134,14 @@ TEST( CommandTest, Getarg )
 		std::string buffer;
 		int status;
 		GETARG( 0, buffer, status );
+#ifdef OBJEXX_BUILD
 #ifdef _WIN32
 		EXPECT_EQ( "ObjexxFCL.unit.exe", buffer );
 		EXPECT_EQ( 18, status );
 #else
 		EXPECT_EQ( "ObjexxFCL.unit", buffer );
 		EXPECT_EQ( 14, status );
+#endif
 #endif
 	}
 
@@ -147,12 +157,14 @@ TEST( CommandTest, Getarg )
 		std::string buffer;
 		int status;
 		getarg( 0, buffer, status );
+#ifdef OBJEXX_BUILD
 #ifdef _WIN32
 		EXPECT_EQ( "ObjexxFCL.unit.exe", buffer );
 		EXPECT_EQ( 18, status );
 #else
 		EXPECT_EQ( "ObjexxFCL.unit", buffer );
 		EXPECT_EQ( 14, status );
+#endif
 #endif
 	}
 
