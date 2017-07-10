@@ -136,13 +136,15 @@ TEST( RandomTest, Irand )
 TEST( RandomTest, RandomSeed )
 {
 	int size;
-	Array1D< int > put( { 11, 22, 33 } );
+	Array1D< int > const put( { 11, 22, 33 } );
 	Array1D< int > get( 3 );
 	// Just run them
 	RANDOM_SEED();
 	RANDOM_SEED( size );
+#ifndef __APPLE__ // MacOS Clang is not handling Optional specialization for abstract types
 	RANDOM_SEED( _, put );
 	RANDOM_SEED( _, _, get );
+#endif
 }
 
 TEST( RandomTest, Srand )
