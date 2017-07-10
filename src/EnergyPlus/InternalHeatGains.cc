@@ -2540,7 +2540,9 @@ namespace InternalHeatGains {
 				SetupOutputVariable( "ITE Air Inlet Dewpoint Temperature [C]", ZoneITEq( Loop ).AirInletDewpointT, "Zone", "Average", ZoneITEq( Loop ).Name );
 				SetupOutputVariable( "ITE Air Inlet Relative Humidity [%]", ZoneITEq( Loop ).AirInletRelHum, "Zone", "Average", ZoneITEq( Loop ).Name );
 				SetupOutputVariable( "ITE Air Outlet Dry-Bulb Temperature [C]", ZoneITEq( Loop ).AirOutletDryBulbT, "Zone", "Average", ZoneITEq( Loop ).Name );
-				if ( ZoneITEq( Loop ).SupplyAirNodeNum != 0 ) SetupOutputVariable( "ITE Supply Heat Index []", ZoneITEq( Loop ).SHI, "Zone", "Average", ZoneITEq( Loop ).Name );
+				if ( ZoneITEq( Loop ).SupplyAirNodeNum != 0 ) {
+					SetupOutputVariable( "ITE Supply Heat Index []", ZoneITEq( Loop ).SHI, "Zone", "Average", ZoneITEq( Loop ).Name );
+				}
 				SetupOutputVariable( "ITE Air Inlet Operating Range Exceeded Time [hr]", ZoneITEq( Loop ).TimeOutOfOperRange, "Zone", "Sum", ZoneITEq( Loop ).Name );
 				SetupOutputVariable( "ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]", ZoneITEq( Loop ).TimeAboveDryBulbT, "Zone", "Sum", ZoneITEq( Loop ).Name );
 				SetupOutputVariable( "ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]", ZoneITEq( Loop ).TimeBelowDryBulbT, "Zone", "Sum", ZoneITEq( Loop ).Name );

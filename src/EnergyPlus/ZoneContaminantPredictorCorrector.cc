@@ -742,7 +742,9 @@ namespace ZoneContaminantPredictorCorrector {
 
 			// Object report variables
 			SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]", ZoneContamGenericBLDiff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).Name );
-			if ( ZoneContamGenericBLDiff( Loop ).SurfNum > 0 ) SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration [ppm]", Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).GenericContam, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).SurfName );
+			if ( ZoneContamGenericBLDiff( Loop ).SurfNum > 0 ) {
+				SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration [ppm]", Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).GenericContam, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).SurfName );
+			}
 
 			ZonePtr = Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).Zone;
 			// Zone total report variables

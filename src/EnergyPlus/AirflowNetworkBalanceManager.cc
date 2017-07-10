@@ -4348,9 +4348,15 @@ namespace AirflowNetworkBalanceManager {
 		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
 			SetupOutputVariable( "AFN Node Temperature [C]", AirflowNetworkNodeSimu( i ).TZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
 			SetupOutputVariable( "AFN Node Humidity Ratio [kgWater/kgDryAir]", AirflowNetworkNodeSimu( i ).WZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
-			if ( Contaminant.CO2Simulation ) SetupOutputVariable( "AFN Node CO2 Concentration [ppm]", AirflowNetworkNodeSimu( i ).CO2Z, "System", "Average", AirflowNetworkNodeData( i ).Name );
-			if ( Contaminant.GenericContamSimulation ) SetupOutputVariable( "AFN Node Generic Air Contaminant Concentration [ppm]", AirflowNetworkNodeSimu( i ).GCZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
-			if ( ! ( SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones ) ) SetupOutputVariable( "AFN Node Total Pressure [Pa]", AirflowNetworkNodeSimu( i ).PZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			if ( Contaminant.CO2Simulation ) {
+				SetupOutputVariable( "AFN Node CO2 Concentration [ppm]", AirflowNetworkNodeSimu( i ).CO2Z, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			}
+			if ( Contaminant.GenericContamSimulation ) {
+				SetupOutputVariable( "AFN Node Generic Air Contaminant Concentration [ppm]", AirflowNetworkNodeSimu( i ).GCZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			}
+			if ( ! ( SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones ) ) {
+				SetupOutputVariable( "AFN Node Total Pressure [Pa]", AirflowNetworkNodeSimu( i ).PZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			}
 			if ( AirflowNetworkNodeData( i ).ExtNodeNum > 0 ) {
 				SetupOutputVariable( "AFN Node Wind Pressure [Pa]", AirflowNetworkNodeSimu( i ).PZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
 			}

@@ -1116,9 +1116,13 @@ namespace SolarShading {
 				} else if ( ! Surface( SurfLoop ).ExtSolar ) { // Not ExtSolar
 					if ( DisplayAdvancedReportVariables ) {
 						// CurrentModuleObject='InteriorWindows(Advanced)'
-						if ( SurfaceWindow( SurfLoop ).OriginalClass != SurfaceClass_TDD_Diffuser ) SetupOutputVariable( "Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]", QRadSWwinAbsTot( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
+						if ( SurfaceWindow( SurfLoop ).OriginalClass != SurfaceClass_TDD_Diffuser ) {
+							SetupOutputVariable( "Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]", QRadSWwinAbsTot( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
+						}
 						SetupOutputVariable( "Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate [W]", SWwinAbsTotalReport( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
-						if ( SurfaceWindow( SurfLoop ).OriginalClass != SurfaceClass_TDD_Diffuser ) SetupOutputVariable( "Surface Window Transmitted Solar Radiation Rate [W]", WinTransSolar( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
+						if ( SurfaceWindow( SurfLoop ).OriginalClass != SurfaceClass_TDD_Diffuser ) {
+							SetupOutputVariable( "Surface Window Transmitted Solar Radiation Rate [W]", WinTransSolar( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
+						}
 						SetupOutputVariable( "Surface Window Transmitted Beam Solar Radiation Rate [W]", WinBmSolar( SurfLoop ), "Zone", "Average", Surface( SurfLoop ).Name );
 
 						//added TH 12/9/2009
@@ -1143,8 +1147,12 @@ namespace SolarShading {
 							SetupOutputVariable( "Surface Window Divider Outside Temperature [C]", SurfaceWindow( SurfLoop ).DividerTempSurfOut, "Zone", "Average", Surface( SurfLoop ).Name );
 						}
 						// Energy
-						if ( SurfaceWindow( SurfLoop ).OriginalClass != SurfaceClass_TDD_Diffuser ) SetupOutputVariable( "Surface Window Total Glazing Layers Absorbed Solar Radiation Energy [J]", QRadSWwinAbsTotEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
-						if ( SurfaceWindow( SurfLoop ).OriginalClass != SurfaceClass_TDD_Diffuser ) SetupOutputVariable( "Surface Window Transmitted Solar Radiation Energy [J]", WinTransSolarEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
+						if ( SurfaceWindow( SurfLoop ).OriginalClass != SurfaceClass_TDD_Diffuser ) {
+							SetupOutputVariable( "Surface Window Total Glazing Layers Absorbed Solar Radiation Energy [J]", QRadSWwinAbsTotEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
+						}
+						if ( SurfaceWindow( SurfLoop ).OriginalClass != SurfaceClass_TDD_Diffuser ) {
+							SetupOutputVariable( "Surface Window Transmitted Solar Radiation Energy [J]", WinTransSolarEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
+						}
 						SetupOutputVariable( "Surface Window Transmitted Beam Solar Radiation Energy [J]", WinBmSolarEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
 
 						SetupOutputVariable( "Surface Window Transmitted Beam To Beam Solar Radiation Energy [J]", WinBmBmSolarEnergy( SurfLoop ), "Zone", "Sum", Surface( SurfLoop ).Name );
