@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>

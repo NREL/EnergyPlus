@@ -185,6 +185,7 @@ namespace HeatBalanceSurfaceManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
+	Array1D< Real64 > SurfaceEnthalpyRead;
 
 	namespace {
 		bool ManageSurfaceHeatBalancefirstTime( true );
@@ -227,6 +228,7 @@ namespace HeatBalanceSurfaceManager {
 		UpdateThermalHistoriesFirstTimeFlag = true;
 		CalculateZoneMRTfirstTime = true;
 		calcHeatBalanceInsideSurfFirstTime = true;
+		SurfaceEnthalpyRead.deallocate();
 	}
 
 	void
@@ -5249,6 +5251,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	if ( calcHeatBalanceInsideSurfFirstTime ) {
 		TempInsOld.allocate( TotSurfaces );
 		RefAirTemp.allocate( TotSurfaces );
+		SurfaceEnthalpyRead.allocate( TotSurfaces );
 		if ( any_eq( HeatTransferAlgosUsed, UseEMPD ) ) {
 			MinIterations = MinEMPDIterations;
 		} else {
@@ -5270,6 +5273,13 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	}
 
 	bool const PartialResimulate( present( ZoneToResimulate ) );
+	SurfaceEnthalpyRead = false;
+	if ( ZnAirRpt.allocated() ) {
+		for ( auto & zar : ZnAirRpt ) {
+			zar.SumEnthalpyM = 0.0;
+			zar.SumEnthalpyH = 0.0;
+		}
+	}
 
 	//Tuned Relevant surfaces (set below) for performance/scalability //Do Store this once for all relevant Zones at higher level
 	std::vector< int > SurfToResimulate;
@@ -5494,7 +5504,20 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 					if ( surface.HeatTransferAlgorithm == HeatTransferModel_HAMT ) ManageHeatBalHAMT( SurfNum, TempSurfInTmp( SurfNum ), TempSurfOutTmp ); //HAMT
 
-					if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) ManageHeatBalFiniteDiff( SurfNum, TempSurfInTmp( SurfNum ), TempSurfOutTmp );
+					if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
+						ManageHeatBalFiniteDiff( SurfNum, TempSurfInTmp( SurfNum ), TempSurfOutTmp );
+						if ( !SurfaceEnthalpyRead( SurfNum ) ) {
+							if ( ZnAirRpt.allocated() ) {
+								ZnAirRpt( ZoneNum ).SumEnthalpyM = 0.0;
+								ZnAirRpt( ZoneNum ).SumEnthalpyH = 0.0;
+							}
+							SurfaceEnthalpyRead( SurfNum ) = true;
+						}
+						if ( ZnAirRpt.allocated() && SurfaceFD.allocated() ) {
+							ZnAirRpt( ZoneNum ).SumEnthalpyM += SurfaceFD( SurfNum ).EnthalpyM;
+							ZnAirRpt( ZoneNum ).SumEnthalpyH += SurfaceFD( SurfNum ).EnthalpyF;
+						}
+					}
 
 					TH11 = TempSurfOutTmp;
 
