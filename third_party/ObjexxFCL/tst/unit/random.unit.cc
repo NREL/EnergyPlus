@@ -141,10 +141,8 @@ TEST( RandomTest, RandomSeed )
 	// Just run them
 	RANDOM_SEED();
 	RANDOM_SEED( size );
-#ifndef __APPLE__ // MacOS Clang is not handling Optional specialization for abstract types
 	RANDOM_SEED( _, put );
 	RANDOM_SEED( _, _, get );
-#endif
 }
 
 TEST( RandomTest, Srand )

@@ -135,8 +135,8 @@ IRANDM( int const iflag )
 void
 RANDOM_SEED(
  Optional< int > size,
- Optional< Array1< int > const > put,
- Optional< Array1< int > > get
+ Optional< Array1D< int > const > put,
+ Optional< Array1D< int > > get
 )
 {
 	static std::vector< int > seed_vals{ int( std::time( NULL ) ), int( std::time( NULL ) ) }; // C++ doesn't provide access to the seed values so we cache them here

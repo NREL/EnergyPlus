@@ -105,8 +105,8 @@ IRAND( int const iflag )
 void
 RANDOM_SEED(
  Optional< int > size = _,
- Optional< Array1< int > const > put = _,
- Optional< Array1< int > > get = _
+ Optional< Array1D< int > const > put = _,
+ Optional< Array1D< int > > get = _
 );
 
 // Random Seed Set
