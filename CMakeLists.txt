@@ -159,7 +159,7 @@ ENDIF()
 ADD_SUBDIRECTORY(third_party/jsoncpp)
 
 # Windows-CalcEngine exterior library
-include(cmake3rdParty/CMakeLists-Windows-CalcEngine.txt)
+include(externalGitHubLibs/CMakeLists-Windows-CalcEngine.txt)
 # Kiva
 option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging only)" OFF )
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)

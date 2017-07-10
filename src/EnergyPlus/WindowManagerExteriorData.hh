@@ -112,12 +112,12 @@ namespace EnergyPlus {
     using Layers_Map = std::map< int, std::shared_ptr< IGU_Layers > >;
 
     // Test if surface is hit by beam defined with vector
-    bool isSurfaceHit( const int t_SurfNum, const EnergyPlus::DataVectorTypes::Vector& t_Ray );
+    bool isSurfaceHit( const int t_SurfNum, const DataVectorTypes::Vector& t_Ray );
 
     // Converts world coordinates (E+) into local surface coordinates that suites better for 
     // WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
     std::pair< double, double > getWCECoordinates( const int t_SurfNum, 
-      const EnergyPlus::DataVectorTypes::Vector& t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction );
+      const DataVectorTypes::Vector& t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction );
 
     // Returns Theta and Phi coordinates of surface BSDF for current Sun position
     std::pair< double, double > getSunWCEAngles( const int t_SurfNum,
@@ -131,7 +131,7 @@ namespace EnergyPlus {
 	  	static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( 
         int const t_SampleDataPtr );
       static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( 
-        EnergyPlus::DataHeatBalance::MaterialProperties const& t_MaterialProperties );
+        DataHeatBalance::MaterialProperties const& t_MaterialProperties );
 	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
 	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
 	  };

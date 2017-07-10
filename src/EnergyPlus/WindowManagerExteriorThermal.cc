@@ -114,7 +114,7 @@ namespace EnergyPlus {
       aSystem->setTolerance( solutionTolerance );
 
       // get previous timestep temperatures solution for faster iterations
-      auto Guess = make_shared< vector< double > >();
+      vector< double > Guess;
       auto totSolidLayers = construction.TotSolidLayers;
       
       // Interior and exterior shading layers have gas between them and IGU but that gas
@@ -127,7 +127,7 @@ namespace EnergyPlus {
       }
 
       for( auto k = 1; k <= 2 * totSolidLayers; ++k ) {
-        Guess->push_back( SurfaceWindow( SurfNum ).ThetaFace( k ) );
+        Guess.push_back( SurfaceWindow( SurfNum ).ThetaFace( k ) );
       }
       aSystem->setInitialGuess( Guess );
       aSystem->solve();
@@ -536,11 +536,11 @@ namespace EnergyPlus {
           gvis.push_back( material.GasVis( j, i ) );
           gcp.push_back( material.GasCp( j, i ) );
         }
-        auto aCon = make_shared< CIntCoeff >( gcon[ 0 ], gcon[ 1 ], gcon[ 2 ] );
-        auto aCp = make_shared< CIntCoeff >( gcp[ 0 ], gcp[ 1 ], gcp[ 2 ] );
-        auto aVis = make_shared< CIntCoeff >( gvis[ 0 ], gvis[ 1 ], gvis[ 2 ] );
-        auto aData = make_shared< CGasData >( gasName, wght, vacuumCoeff, aCp, aCon, aVis );
-        auto aGasItem = make_shared< CGasItem >( fract, aData );
+        auto aCon = CIntCoeff( gcon[ 0 ], gcon[ 1 ], gcon[ 2 ] );
+        auto aCp = CIntCoeff( gcp[ 0 ], gcp[ 1 ], gcp[ 2 ] );
+        auto aVis = CIntCoeff( gvis[ 0 ], gvis[ 1 ], gvis[ 2 ] );
+        auto aData = CGasData( gasName, wght, vacuumCoeff, aCp, aCon, aVis );
+        auto aGasItem = CGasItem( fract, aData );
         aGas->addGasItem( aGasItem );
       }
       return aGas;
