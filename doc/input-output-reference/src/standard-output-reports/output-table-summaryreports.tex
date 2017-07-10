@@ -297,11 +297,23 @@ Zone Air Heat Balance Outdoor Air Transfer Rate
 
 The Opaque Surface Conduction and Other Heat Addition and Opaque Surface Conduction and Other Heat Removal columns are also calculated on an timestep basis as the negative value of the other removal and gain columns so that the total for the timestep sums to zero. These columns are derived strictly from the other columns.
 
-\paragraph{Zone Component Load Summary}\label{zone-component-load-summary}
+\paragraph{Component Load Summary}\label{component-load-summary}
 
-The Zone Component Loads Summary provides an estimate of the heating and cooling peak loads for each zone broken down into various components. This report may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the \emph{Peak Conditions} subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.~ The key used to obtain this report is ZoneComponentLoadSummary. Since including this report may increase the simulation time, new key options have been added that will display all reports but the Zone Component Load Summary those keys used are AllSummaryButZoneComponentLoad and AllSummaryAndMonthlyButZoneComponentLoad.
+Three different component load summary reports can be generated: 
 
-The report has four parts:
+\begin{itemize}
+\tightlist
+\item
+  Zone Component Loads Summary
+\item
+  AirLoop Component Loads Summary
+\item
+  Facility Component Loads Summary
+\end{itemize}
+
+The AirLoop and Facility level reports are generally aggregations of the results reported in the Zone Component Loads Summary report. The Component Loads Summary reports provide an estimate of the heating and cooling peak loads for each zone, airloop or the entire facility broken down into various components. These reports may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. Similarly, the AirLoop Component Load Summary is generated for each AirLoop and a single Facility Component Loads Summary is generated for the entire facility. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the \emph{Peak Conditions} subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.~ The keys used to obtain these reports are ZoneComponentLoadSummary, AirLoopComponentLoadSummary, and FacilityComponentLoadSummary. Since including this report may increase the simulation time, new key options have been added that will display all reports but the Zone Component Load Summary those keys used are AllSummaryButZoneComponentLoad and AllSummaryAndMonthlyButZoneComponentLoad.
+
+The report has six parts:
 
 \begin{itemize}
 \tightlist
@@ -309,7 +321,7 @@ The report has four parts:
   Estimated Cooling Peak Load Components
 \end{itemize}
 
-Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-delay column are estimated using a procedure shown in the Engineering Reference.
+Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-delay column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For People and Lights the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
 
 \begin{itemize}
 \tightlist
@@ -317,7 +329,16 @@ Contains the sensible-instant, sensible-delay, sensible-return air, latent, tota
   Cooling Peak Conditions
 \end{itemize}
 
-Contains the time of the peak load and the outside dry bulb and wet bulb temperatures as well as the outside humidity ratio for that time. It also shows the zone temperature and relative humidity and humidity ratio for that time.
+Contains the time of the peak load and the outside dry bulb and wet bulb temperatures as well as the outside humidity ratio for that time. It also shows the zone temperature and relative humidity and humidity ratio for that time. The airflow and outside airflow as well as the supply air temperature are shown. Also the sensible peak load accounting for the sizing factor is shown along with the difference due to the sizing factor.
+
+\begin{itemize}
+\tightlist
+\item
+  Engineering Checks for Cooling
+\end{itemize}
+
+This table shows some ratios that may be handy in evaluating the results. It contains the percentage of outside air, the airflow per floor area, the airflow per capacity, the floor area per capacity and the capacity per floor area. It also shows the number of people.
+
 
 \begin{itemize}
 \tightlist
@@ -325,7 +346,7 @@ Contains the time of the peak load and the outside dry bulb and wet bulb tempera
   Estimated Heating Peak Load Components
 \end{itemize}
 
-Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-day column are estimated using a procedure shown in the Engineering Reference.
+Contains the sensible-instant, sensible-delay, sensible-return air, latent, total and \%grand total for people, lights, equipment, refrigeration, water use equipment, HVAC equipment loads, power generation equipment, infiltration, zone ventilation, interzone mixing, roof, interzone ceiling, other roof, exterior wall, interzone wall, ground contact wall, other wall, exterior floor, interzone floor, ground contact floor, other floor, fenestration conduction, fenestration solar, opaque door. The values in the sensible-day column are estimated using a procedure shown in the Engineering Reference. Also shown are the related areas for each type of component. For People and Lights the floor area is shown but for walls, fenestration. and other surfaces, the area of that surface is used.
 
 \begin{itemize}
 \tightlist
@@ -333,7 +354,17 @@ Contains the sensible-instant, sensible-delay, sensible-return air, latent, tota
   Heating Peak Conditions
 \end{itemize}
 
-Contains the time of the peak load and the outside dry bulb and wet bulb temperatures as well as the outside humidity ratio for that time. It also shows the zone temperature and the relative humidity and humidity ratio for that time.
+Contains the time of the peak load and the outside dry bulb and wet bulb temperatures as well as the outside humidity ratio for that time. It also shows the zone temperature and the relative humidity and humidity ratio for that time. The airflow and outside airflow as well as the supply air temperature are shown. Also the sensible peak load accounting for the sizing factor is shown along with the difference due to the sizing factor
+
+\begin{itemize}
+\tightlist
+\item
+  Engineering Checks for Heating
+\end{itemize}
+
+This table shows some ratios that may be handy in evaluating the results. It contains the percentage of outside air, the airflow per floor area, the airflow per capacity, the floor area per capacity and the capacity per floor area. It also shows the number of people.
+
+The Air Loop Component Summary tables also include tables that indicate the zones included in the aggregated results for heating and cooling.
 
 \paragraph{Standard 62.1 Summary}\label{standard-62.1-summary}
 
