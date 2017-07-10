@@ -815,7 +815,7 @@ namespace UnitHeater {
 		InNode = UnitHeat( UnitHeatNum ).AirInNode;
 		OutNode = UnitHeat( UnitHeatNum ).AirOutNode;
 
-		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired; // zone load needed
+		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP; // zone load needed
 		if ( UnitHeat( UnitHeatNum ).FanSchedPtr > 0 ) {
 			if ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).FanSchedPtr ) == 0.0 && UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff ) {
 				UnitHeat( UnitHeatNum ).OpMode = CycFanCycCoil;
