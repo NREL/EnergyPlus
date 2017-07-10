@@ -4785,6 +4785,7 @@ WindowMaterial:Glazing,
        \key SpectralAverage
        \key Spectral
        \key BSDF
+       \key SpectralAndAngle
   A3 , \field Window Glass Spectral Data Set Name
        \note Used only when Optical Data Type = Spectral
        \type object-list
@@ -4864,13 +4865,25 @@ WindowMaterial:Glazing,
        \type real
        \minimum> 0.0
        \default 7.2e10
-  N14; \field Poisson's ratio
+  N14, \field Poisson's ratio
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
        \minimum>  0.0
        \maximum<  1.0
        \default 0.22
+  A5 , \field Window Glass Spectral and Incident Angle Transmittance Data Set Table Name
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
+  A6 , \field Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
+  A7 ; \field Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
 
 WindowMaterial:GlazingGroup:Thermochromic,
     \min-fields 3
@@ -6995,6 +7008,80 @@ MaterialProperty:PhaseChange,
        \note for Temperature-enthalpy function corresponding to temperature 16
        \units J/kg
        \type real
+
+MaterialProperty:PhaseChangeHysteresis,
+    \memo Additional properties for temperature dependent thermal conductivity
+    \memo and enthalpy for Phase Change Materials (PCM) with separate melting and freezing curves.
+    \memo HeatBalanceAlgorithm = CondFD (ConductionFiniteDifference) solution algorithm only.
+    \memo Constructions with this should use the detailed CondFD process.
+    \memo Has no effect with other HeatBalanceAlgorithm solution algorithms.
+  A1,  \field Name
+       \required-field
+       \type object-list
+       \object-list MaterialName
+       \note Regular Material Name to which the additional properties will be added.
+       \note this the material name for the basic material properties.
+  N1 , \field Temperature Coefficient for Thermal Conductivity
+       \note The base temperature is 20C.
+       \note This is the thermal conductivity change per degree excursion from 20C.
+       \note This variable conductivity function is overridden by the VariableThermalConductivity object, if present.
+       \units W/m-K2
+       \type real
+       \default 0.0
+  N2 , \field Latent Heat during the Entire Phase Change Process
+       \note The total latent heat absorbed or rejected during the transition from solid to liquid, or back
+       \required-field
+       \units J/kg
+       \type real
+       \minimum> 0
+  N3 , \field Liquid State Specific Heat
+       \note The constant specific heat used for the fully melted (liquid) state
+       \required-field
+       \units J/kg-K
+       \type real
+       \minimum >0
+  N4 , \field High Temperature Difference of Melting Curve
+       \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
+       \required-field
+       \units deltaC
+       \type real
+       \minimum >0
+  N5 , \field Peak Melting Temperature
+       \note The temperature at which the melting curve peaks
+       \required-field
+       \units C
+       \type real
+       \minimum >0
+  N6 , \field Low Temperature Difference of Melting Curve
+       \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
+       \required-field
+       \units deltaC
+       \type real
+       \minimum >0
+  N7 , \field Solid State Specific Heat
+       \note The constant specific heat used for the fully frozen (crystallized) state
+       \required-field
+       \units J/kg-K
+       \type real
+       \minimum >0
+  N8 , \field High Temperature Difference of Freezing Curve
+       \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
+       \required-field
+       \units deltaC
+       \type real
+       \minimum >0
+  N9 , \field Peak Freezing Temperature
+       \note The temperature at which the freezing curve peaks
+       \required-field
+       \units C
+       \type real
+       \minimum >0
+ N10 ; \field Low Temperature Difference of Freezing Curve
+       \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
+       \required-field
+       \units deltaC
+       \type real
+       \minimum >0
 
 MaterialProperty:VariableThermalConductivity,
     \memo Additional properties for temperature dependent thermal conductivity
@@ -24595,8 +24682,6 @@ AirflowNetwork:Distribution:DuctViewFactors,
        \memo calculations.
   A1,  \field Linkage Name
        \required-field
-       \type object-list
-       \object-list AirflowNetworkComponentNames
   N1,  \field Duct Surface Exposure Fraction
        \type real
        \minimum 0.0
@@ -54078,8 +54163,11 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \key Coil:UserDefined
-       \note Enter the type of supplemental heating coil if included in the unitary system.
+       \note Enter the type of supplemental heating or reheat coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
+       \note This coil supplements heating mode operation or reheats the supply air during dehumidification
+       \note mode operation. If set point based control is used the coils operate to meet their respective
+       \note supply air temperature set point.
   A19, \field Supplemental Heating Coil Name
        \type object-list
        \object-list HeatingCoilName
@@ -85277,7 +85365,7 @@ Table:OneIndependentVariable,
 
 Table:TwoIndependentVariables,
        \extensible:3 repeat last three fields
-       \min-fields 22
+       \min-fields 14
        \memo Allows entry of tabular data pairs as alternate input
        \memo for performance curve objects.
        \memo Performance curve objects can be created using these inputs.
@@ -85329,6 +85417,7 @@ Table:TwoIndependentVariables,
        \key MassFlow
        \key Power
        \key Distance
+       \key Angle
        \default Dimensionless
   A5,  \field Input Unit Type for Y
        \type choice
@@ -85338,6 +85427,7 @@ Table:TwoIndependentVariables,
        \key MassFlow
        \key Power
        \key Distance
+       \key Wavelength
        \default Dimensionless
   A6,  \field Output Unit Type
        \type choice
@@ -85350,42 +85440,33 @@ Table:TwoIndependentVariables,
        \note This field is used to normalize the following output data.
        \note The minimum and maximum table output fields are also normalized.
        \note If this field is blank or 1, the table data presented below will be used.
+  A7 , \field External File Name
+       \type alpha
+       \retaincase
   N8 , \field X Value #1
-       \required-field
        \type real
        \begin-extensible
   N9 , \field Y Value #1
-       \required-field
        \type real
   N10, \field Output Value #1
-       \required-field
        \type real
   N11, \field X Value #2
-       \required-field
        \type real
   N12, \field Y Value #2
-       \required-field
        \type real
   N13, \field Output Value #2
-       \required-field
        \type real
   N14, \field X Value #3
-       \required-field
        \type real
   N15, \field Y Value #3
-       \required-field
        \type real
   N16, \field Output Value #3
-       \required-field
        \type real
   N17, \field X Value #4
-       \required-field
        \type real
   N18, \field Y Value #4
-       \required-field
        \type real
   N19, \field Output Value #4
-       \required-field
        \type real
   N20,N21,N22,N23,N24,N25,N26,N27,N28,N29,N30,N31,N32,N33,N34,N35,N36,N37,N38,N39, \note fields as indicated
   N40,N41,N42,N43,N44,N45,N46,N47,N48,N49,N50,N51,N52,N53,N54,N55,N56,N57,N58,N59, \note fields as indicated
@@ -91271,7 +91352,7 @@ Output:Surfaces:List,
    \key ViewFactorInfo
    \key Lines
    \key CostInfo
-   \key DecayCurvesfromZoneComponentLoads
+   \key DecayCurvesFromComponentLoadsSummary
    A2; \field Report Specifications
    \note (IDF, only for Output:Surfaces:List, Lines report --
    \note will print transformed coordinates in IDF style)
@@ -91726,6 +91807,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -91821,6 +91904,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -91916,6 +92001,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92011,6 +92098,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92106,6 +92195,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92201,6 +92292,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92296,6 +92389,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92391,6 +92486,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92486,6 +92583,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92581,6 +92680,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92676,6 +92777,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92771,6 +92874,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92866,6 +92971,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92961,6 +93068,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93056,6 +93165,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93152,6 +93263,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93247,6 +93360,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93342,6 +93457,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93437,6 +93554,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93532,6 +93651,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93627,6 +93748,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93722,6 +93845,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93817,6 +93942,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93912,6 +94039,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94007,6 +94136,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94102,6 +94233,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94197,6 +94330,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94292,6 +94427,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94387,6 +94524,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94482,6 +94621,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94578,6 +94719,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94673,6 +94816,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94768,6 +94913,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94863,6 +95010,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94958,6 +95107,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95053,6 +95204,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95148,6 +95301,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95243,6 +95398,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95338,6 +95495,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95433,6 +95592,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95528,6 +95689,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95623,6 +95786,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95718,6 +95883,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95813,6 +95980,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95908,6 +96077,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96004,6 +96175,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96099,6 +96272,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96194,6 +96369,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96289,6 +96466,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96384,6 +96563,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96479,6 +96660,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96574,6 +96757,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96669,6 +96854,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96764,6 +96951,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96859,6 +97048,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96954,6 +97145,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97049,6 +97242,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97144,6 +97339,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97239,6 +97436,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97334,6 +97533,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97430,6 +97631,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97525,6 +97728,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97620,6 +97825,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97715,6 +97922,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97810,6 +98019,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97905,6 +98116,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98000,6 +98213,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98095,6 +98310,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98190,6 +98407,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98285,6 +98504,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98380,6 +98601,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98475,6 +98698,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98570,6 +98795,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98665,6 +98892,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98760,6 +98989,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98856,6 +99087,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98951,6 +99184,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99046,6 +99281,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99141,6 +99378,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99236,6 +99475,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99331,6 +99572,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99426,6 +99669,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99521,6 +99766,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary

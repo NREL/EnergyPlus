@@ -515,6 +515,8 @@ namespace HeatBalanceAirManager {
 			SetupOutputVariable( "Zone Air Heat Balance System Convective Heat Gain Rate [W]", ZnAirRpt( Loop ).SumNonAirSystem, "System", "Average", Zone( Loop ).Name );
 			SetupOutputVariable( "Zone Air Heat Balance Air Energy Storage Rate [W]", ZnAirRpt( Loop ).CzdTdt, "System", "Average", Zone( Loop ).Name );
 			if ( DisplayAdvancedReportVariables ) {
+				SetupOutputVariable( "Zone Phase Change Material Melting Enthalpy [J/kg]", ZnAirRpt( Loop ).SumEnthalpyM, "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Phase Change Material Freezing Enthalpy [J/kg]", ZnAirRpt( Loop ).SumEnthalpyH, "Zone", "Average", Zone( Loop ).Name );
 				SetupOutputVariable( "Zone Air Heat Balance Deviation Rate [W]", ZnAirRpt( Loop ).imBalance, "System", "Average", Zone( Loop ).Name );
 			}
 		}
@@ -2936,12 +2938,12 @@ namespace HeatBalanceAirManager {
 				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
 					AirModel( ZoneNum ).SimAirModel = true;
-					ValidateComponent( "RoomAirSettings:AirflowNetwork", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
-					if ( IsNotOK ) {
-						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
+					if ( GetNumObjectsFound( "AirflowNetwork:SimulationControl" ) == 0 ) {
+						ShowSevereError( "In " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + cAlphaFieldNames( 3 ) + " = AIRFLOWNETWORK."  );
+						ShowContinueError( "This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage." );
+						ShowContinueError( "AirflowNetwork:SimulationControl not found." );
 						ErrorsFound = true;
 					}
-					// Need to make sure that Room Air controls are used for this one.
 				} else {
 					ShowWarningError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
