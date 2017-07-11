@@ -271,9 +271,8 @@ namespace EnergyPlus {
         shared_ptr< vector< double > > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
         shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
         IGU_BSDFLayers iguLayers = *getLayers( t_Range, t_ConstrNum );
-        size_t i = iguLayers.size();
         shared_ptr< CEquivalentBSDFLayer > aEqLayer = make_shared< CEquivalentBSDFLayer >( commonWl, iguLayers[ 0 ] );        
-        for( auto i = 1; i < iguLayers.size(); ++i ) {
+        for( auto i = 1u; i < iguLayers.size(); ++i ) {
           aEqLayer->addLayer( iguLayers[ i ] );
         }
         shared_ptr< CMultiPaneBSDF > aMultiLayer =
@@ -319,9 +318,8 @@ namespace EnergyPlus {
         // Layer was not requested before. Need to create it now.
         // shared_ptr< vector< double > > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
         IGU_Layers iguLayers = *getLayers( t_Range, t_ConstrNum );
-        size_t i = iguLayers.size();
         shared_ptr< CMultiLayerScattered > aEqLayer = make_shared< CMultiLayerScattered >( iguLayers[ 0 ] );
-        for( auto i = 1; i < iguLayers.size(); ++i ) {
+        for( auto i = 1u; i < iguLayers.size(); ++i ) {
           aEqLayer->addLayer( iguLayers[ i ] );
         }
 
