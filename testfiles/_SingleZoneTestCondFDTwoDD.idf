@@ -2485,10 +2485,10 @@
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.095983,6.096017,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,6.096,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,3.048,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,0,3.048,  !- X,Y,Z ==> Vertex 2 {m}
+    6.095983,6.096017,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,3.048;  !- X,Y,Z ==> Vertex 4 {m}
 
 ! =========================
 
