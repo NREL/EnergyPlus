@@ -1377,7 +1377,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 
 TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 
-	bool ErrorsFound( false ); // function returns true on error
 	std::string const idf_objects = delimited_string( {
 		"Version,8.7;",
 
