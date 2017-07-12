@@ -4534,7 +4534,7 @@ namespace VariableSpeedCoils {
 		//       DATE WRITTEN   12/2014
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Calculates the gross cooling capacity of a varaible-speed heat pump water heater evaporator and
+		// Calculates the gross cooling capacity of a variable-speed heat pump water heater evaporator and
 		// heating capacity of the condenser coil given the rated heating capacity and COP.
 
 		// METHODOLOGY EMPLOYED:

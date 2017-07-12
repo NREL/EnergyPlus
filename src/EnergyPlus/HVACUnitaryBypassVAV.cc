@@ -854,7 +854,7 @@ namespace HVACUnitaryBypassVAV {
 							CBVAV( CBVAVNum ).CondenserNodeNum = GetDXCoilCondenserInletNode( "Coil:Cooling:DX:SingleSpeed", HXDXCoolCoilName, OANodeErrFlag );
 							if ( OANodeErrFlag ) ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 						} else if ( ActualCoolCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
-							CBVAV( CBVAVNum ).DXCoolCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( "Coil:Cooling:DX:VaraibleSpeed", GetHXDXCoilName( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXCoilErrFlag ), DXCoilErrFlag );
+							CBVAV( CBVAVNum ).DXCoolCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( "Coil:Cooling:DX:VariableSpeed", GetHXDXCoilName( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXCoilErrFlag ), DXCoilErrFlag );
 							if ( DXCoilErrFlag ) ShowContinueError( "...occurs in " + CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
 							OANodeErrFlag = false;
 							CBVAV( CBVAVNum ).CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode( GetHXDXCoilName( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXCoilErrFlag ), OANodeErrFlag );

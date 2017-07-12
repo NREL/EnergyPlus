@@ -368,8 +368,8 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0,                       !- Z Origin {m}",
 	"    1,                       !- Type",
 	"    1,                       !- Multiplier",
-	"    autocalculate,           !- Ceiling Height {m}",
-	"    autocalculate;           !- Volume {m3}",
+	"    3.048,                   !- Ceiling Height {m}",
+	"    40.;                     !- Volume {m3}",
 
 	"  BuildingSurface:Detailed,",
 	"    Zn001:Wall001,           !- Name",
