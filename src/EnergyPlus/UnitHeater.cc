@@ -833,7 +833,7 @@ namespace UnitHeater {
 		SetMassFlowRateToZero = false;
 		if ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).SchedPtr ) > 0 ) {
 			if ( ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).FanAvailSchedPtr ) > 0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) {
-				if ( UnitHeat( UnitHeatNum ).FanOffNoHeating && ( ( ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired < SmallLoad ) || ( CurDeadBandOrSetback( ZoneNum ) ) ) ) {
+				if ( UnitHeat( UnitHeatNum ).FanOffNoHeating && ( ( ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP < SmallLoad ) || ( CurDeadBandOrSetback( ZoneNum ) ) ) ) {
 					SetMassFlowRateToZero = true;
 				}
 			} else {
