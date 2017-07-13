@@ -1107,13 +1107,8 @@ namespace EnergyPlus {
 			"  Temperature;             !- Output Unit Type",
 		} );
 
-<<<<<<< HEAD
 		ASSERT_TRUE( process_idf( idf_objects ) );
-
-=======
-		ASSERT_FALSE( process_idf( idf_objects ) );
 		compare_err_stream( "" );
->>>>>>> NREL/develop
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
 

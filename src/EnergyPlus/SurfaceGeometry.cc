@@ -49,11 +49,8 @@
 #include <cassert>
 #include <cmath>
 #include <string>
-<<<<<<< HEAD
 #include <unordered_map>
-=======
 #include <unordered_set>
->>>>>>> NREL/develop
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
@@ -8233,7 +8230,7 @@ namespace SurfaceGeometry {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 				volCalcMethod = zoneVolumeCalculationMethod::floorAreaTimesHeight1;
 			} else if ( isFloorHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
-				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;  
+				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 				volCalcMethod = zoneVolumeCalculationMethod::floorAreaTimesHeight2;
 			} else if ( isCeilingHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).CeilingArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0) {
 			    CalcVolume = Zone( ZoneNum ).CeilingArea * Zone( ZoneNum ).CeilingHeight;
@@ -8416,10 +8413,10 @@ namespace SurfaceGeometry {
 	edgesInBoth(
 		std::vector<EdgeOfSurf> edges1,
 		std::vector<EdgeOfSurf> edges2
-	) 
+	)
 	{
 		// J. Glazer - June 2017
-		// this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20. 
+		// this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20.
 
 		std::vector<EdgeOfSurf> inBoth;
 		for ( auto e1 : edges1 ) {
@@ -8517,7 +8514,7 @@ namespace SurfaceGeometry {
 				}
 			}
 		}
-		// All edges for an enclosed polyhedron should be shared by two (and only two) sides. 
+		// All edges for an enclosed polyhedron should be shared by two (and only two) sides.
 		// So if the count is not two for all edges, the polyhedron is not enclosed
 		std::vector<EdgeOfSurf> edgesNotTwoCount;
 		for ( auto anEdge : uniqueEdges ) {
@@ -8645,7 +8642,7 @@ namespace SurfaceGeometry {
 
 	// test if the ceiling and floor are the same except for their height difference by looking at the corners
 	bool
-	areFloorAndCeilingSame( 
+	areFloorAndCeilingSame(
 		DataVectorTypes::Polyhedron const & zonePoly
 	)
 	{
@@ -8653,7 +8650,7 @@ namespace SurfaceGeometry {
 
 		// check if the floor and ceiling are the same
 		// this is almost equivent to saying, if you ignore the z-coordinate, are the vertices the same
-		// so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they 
+		// so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they
 		// should always be even (they would be two but you might define multiple surfaces that meet in a corner)
 
 		using DataVectorTypes::Vector;
@@ -8727,7 +8724,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				if ( foundWallHeight ) {
-					if ( abs( maxZ - wallHeightZ ) > 0.0254 ) {    //  2.54 cm = 1 inch 
+					if ( abs( maxZ - wallHeightZ ) > 0.0254 ) {    //  2.54 cm = 1 inch
 						areWlHgtSame = false;
 						break;
 					}
@@ -8755,15 +8752,15 @@ namespace SurfaceGeometry {
 		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
 			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
 			if ( Surface( curSurfNum ).Class == SurfaceClass_Floor ) {
-				if ( abs( Surface( curSurfNum ).Tilt - 180. ) > 1. ) {  // with 1 degree angle  
+				if ( abs( Surface( curSurfNum ).Tilt - 180. ) > 1. ) {  // with 1 degree angle
 					isFlrHoriz = false;
 				}
 			} else if ( Surface( curSurfNum ).Class == SurfaceClass_Roof ) { //includes ceilings
-				if ( abs( Surface( curSurfNum ).Tilt ) > 1. ) {  // with 1 degree angle of 
+				if ( abs( Surface( curSurfNum ).Tilt ) > 1. ) {  // with 1 degree angle of
 					isClgHoriz = false;
 				}
 			} else if ( Surface( curSurfNum ).Class == SurfaceClass_Wall ) {
-				if ( abs( Surface( curSurfNum ).Tilt - 90 ) > 1. ) {  // with 1 degree angle  
+				if ( abs( Surface( curSurfNum ).Tilt - 90 ) > 1. ) {  // with 1 degree angle
 					areWlVert = false;
 				}
 			}
@@ -8781,7 +8778,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		// approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the 
+		// approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the
 		// vertices( one counting backwards ) and if it is the same distance than assume that it is the same.
 		using DataVectorTypes::Vector;
 		bool foundOppEqual = false;
@@ -8814,7 +8811,7 @@ namespace SurfaceGeometry {
     }
 
 	// provides a list of indices of polyhedron faces that are facing a specific azimuth
-	std::vector<int> 
+	std::vector<int>
 	listOfFacesFacingAzimuth(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		Real64 const & azimuth
@@ -8835,10 +8832,10 @@ namespace SurfaceGeometry {
 	}
 
 	// returns the index of the face of a polyhedron that is probably opposite of the face index provided
-	int 
+	int
 	findPossibleOppositeFace(
 		DataVectorTypes::Polyhedron const & zonePoly,
-		int const & faceIndex 
+		int const & faceIndex
 	)
 	{
 		// J. Glazer - March 2017
@@ -8871,7 +8868,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		bool allAreEquidistant = true;
 		Real64 firstDistance = -99.;
 		if ( zonePoly.SurfaceFace( faceIndex ).NSides == zonePoly.SurfaceFace( opFaceIndex ).NSides ) { // double check that the number of sides match
@@ -8883,7 +8880,7 @@ namespace SurfaceGeometry {
 				} else {
 					if ( abs( curDistBetwCorners - firstDistance ) > tol ) {
 						allAreEquidistant = false;
-						break; 
+						break;
 					}
 				}
 			}
@@ -8895,7 +8892,7 @@ namespace SurfaceGeometry {
 	}
 
 	// test if two points in space are in the same position based on a small tolerance
-	bool 
+	bool
 	isAlmostEqual3dPt(
 		DataVectorTypes::Vector v1,
 		DataVectorTypes::Vector v2
@@ -8903,7 +8900,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) && ( abs( v1.z - v2.z ) < tol ) ) ;
 	}
 
@@ -8916,7 +8913,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
@@ -8929,7 +8926,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
@@ -8974,7 +8971,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( abs( (distance(start, end ) - (distance(start, test ) + distance(test, end) ) ) ) < tol );
 	}
 

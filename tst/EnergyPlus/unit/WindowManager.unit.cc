@@ -85,12 +85,9 @@ using namespace EnergyPlus::WindowManager;
 TEST_F(EnergyPlusFixture, WindowFrameTest )
 {
 
-<<<<<<< HEAD
-=======
 	DataIPShortCuts::lAlphaFieldBlanks = true;
 	bool ErrorsFound( false );
 
->>>>>>> NREL/develop
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",
 		"Material,",
@@ -433,12 +430,7 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 		"  autocalculate;           !- Volume {m3}"
 	} );
 
-<<<<<<< HEAD
-
 	ASSERT_TRUE( process_idf( idf_objects ) );
-=======
-	ASSERT_FALSE( process_idf( idf_objects ) );
->>>>>>> NREL/develop
 
 	DataHeatBalance::ZoneIntGain.allocate( 1 );
 
@@ -2336,7 +2328,7 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 		"    0.8,                     !- Divider Solar Absorptance",
 		"    0.8,                     !- Divider Visible Absorptance",
 		"    0.9;                     !- Divider Thermal Hemispherical Emissivity",
-	}); 
+	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 

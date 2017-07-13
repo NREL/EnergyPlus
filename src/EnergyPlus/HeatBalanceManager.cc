@@ -1648,15 +1648,10 @@ namespace HeatBalanceManager {
 			}
 			if ( InputProcessor::SameString( MaterialNames( 2 ), "SpectralAverage" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
 			// No need for spectral data for BSDF either
-<<<<<<< HEAD
 			if ( InputProcessor::SameString( MaterialNames( 2 ), "BSDF" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
-			if ( Material( MaterNum ).GlassSpectralDataPtr == 0 && InputProcessor::SameString( MaterialNames( 2 ), "Spectral" ) ) {
-=======
-			if ( SameString( MaterialNames( 2 ), "BSDF" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
-			if ( SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) Material( MaterNum ).GlassSpectralAndAngle = true;
+			if ( InputProcessor::SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) Material( MaterNum ).GlassSpectralAndAngle = true;
 
-			if ( Material( MaterNum ).GlassSpectralDataPtr == 0 && SameString( MaterialNames( 2 ), "Spectral" ) ) {
->>>>>>> NREL/develop
+			if ( Material( MaterNum ).GlassSpectralDataPtr == 0 && InputProcessor::SameString( MaterialNames( 2 ), "Spectral" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + Material( MaterNum ).Name + "\" has " + cAlphaFieldNames( 2 ) + " = Spectral but has no matching MaterialProperty:GlazingSpectralData set" );
 				if ( lAlphaFieldBlanks( 3 ) ) {
@@ -1666,11 +1661,7 @@ namespace HeatBalanceManager {
 				}
 			}
 
-<<<<<<< HEAD
-			if ( ! InputProcessor::SameString( MaterialNames( 2 ), "SpectralAverage" ) && ! InputProcessor::SameString( MaterialNames( 2 ), "Spectral" ) && ! InputProcessor::SameString( MaterialNames( 2 ), "BSDF" ) ) {
-=======
-			if ( ! SameString( MaterialNames( 2 ), "SpectralAverage" ) && ! SameString( MaterialNames( 2 ), "Spectral" ) && ! SameString( MaterialNames( 2 ), "BSDF" ) && ! SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
->>>>>>> NREL/develop
+			if ( ! InputProcessor::SameString( MaterialNames( 2 ), "SpectralAverage" ) && ! InputProcessor::SameString( MaterialNames( 2 ), "Spectral" ) && ! InputProcessor::SameString( MaterialNames( 2 ), "BSDF" ) && ! InputProcessor::SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + Material( MaterNum ).Name + "\", invalid specification." );
 				ShowContinueError( cAlphaFieldNames( 2 ) + " must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value=" + MaterialNames( 2 ) );
@@ -1812,7 +1803,7 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value." );
 				ShowContinueError( cNumericFieldNames( 4 ) + " must be Yes or No, entered value=" + MaterialNames( 4 ) );
 			}
-			// Get SpectralAndAngle table names 
+			// Get SpectralAndAngle table names
 			if ( Material( MaterNum ).GlassSpectralAndAngle ) {
 				if ( lAlphaFieldBlanks( 5 ) ) {
 					ErrorsFound = true;

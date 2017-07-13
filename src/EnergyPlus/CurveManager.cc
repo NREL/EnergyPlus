@@ -412,24 +412,6 @@ namespace CurveManager {
 		// Using/Aliasing
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
-<<<<<<< HEAD
-=======
-		using InputProcessor::SameString;
-		//  USE DataGlobals, ONLY: DisplayExtraWarnings, OutputFileInits
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
->>>>>>> NREL/develop
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumBiQuad; // Number of biquadratic curve objects in the input data file
@@ -2121,17 +2103,7 @@ namespace CurveManager {
 		// Loop over two variable tables and load data
 		CurrentModuleObject = "Table:TwoIndependentVariables";
 		for ( CurveIndex = 1; CurveIndex <= NumTwoVarTab; ++CurveIndex ) {
-<<<<<<< HEAD
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			++CurveNum;
-			++TableNum;
-			NumTableEntries = ( NumNumbers - 7 ) / 3;
-			TableData( TableNum ).X1.allocate( NumTableEntries );
-			TableData( TableNum ).X2.allocate( NumTableEntries );
-			TableData( TableNum ).Y.allocate( NumTableEntries );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-=======
-			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			++TableNum;
 			if ( lAlphaFieldBlanks( 7 ) ) {
@@ -2140,23 +2112,7 @@ namespace CurveManager {
 				TableData( TableNum ).X2.allocate( NumTableEntries );
 				TableData( TableNum ).Y.allocate( NumTableEntries );
 			}
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
-			// Need to verify that this name isn't used in Pressure Curves as well.
-			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
-				if ( CurveFound != 0 ) {
-					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
-					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
-					ErrorsFound = true;
-				}
-			}
->>>>>>> NREL/develop
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).ObjectType = CurveType_TableTwoIV;
 			PerfCurve( CurveNum ).TableIndex = TableNum;
@@ -5933,7 +5889,7 @@ Label999: ;
 	}
 
 	void
-	checkCurveIsNormalizedToOne( 
+	checkCurveIsNormalizedToOne(
 		std::string const callingRoutineObj, // calling routine with object type
 		std::string const objectName,        // parent object where curve is used
 		int const curveIndex,                // index to curve object
@@ -6049,7 +6005,7 @@ Label999: ;
 	{
 
 		// PURPOSE OF THIS FUNCTION:
-		// Set up indenpendent varilable values the same in 3 table data 
+		// Set up indenpendent varilable values the same in 3 table data
 
 		// Using/Aliasing
 		int X1TableNum;

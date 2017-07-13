@@ -5574,13 +5574,8 @@ namespace WaterThermalTanks {
 			HPWHInletDBTemp = HPInletDryBulbTemp;
 			HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, HPInletHumRat, OutBaroPress );
 
-<<<<<<< HEAD
-			// initialize flow rates at speed levels for varaible-speed HPWH
-			if ( ( HPWaterHeater( HPNum ).bIsIHP ) && ( HPWaterHeater( HPNum ).NumofSpeed == 0 ) )//use SCWH coil represents
-=======
 			// initialize flow rates at speed levels for variable-speed HPWH
 			if ( ( HPWaterHeater( HPNum ).bIsIHP ) && ( 0 == HPWaterHeater( HPNum ).NumofSpeed ) )//use SCWH coil represents
->>>>>>> NREL/develop
 			{
 				SizeIHP( HPWaterHeater( HPNum ).DXCoilNum );//
 				//SimIHP(BlankString, HPWaterHeater(HPNum).DXCoilNum,
