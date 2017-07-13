@@ -216,13 +216,13 @@
 #include <fstream>
 #include <algorithm>
 
-json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int EP_UNUSED( depth ), json::parse_event_t event, json &parsed,
-									   unsigned line_num, unsigned line_index) -> bool {
-	EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
-	return true;
-};
-
 namespace EnergyPlus {
+
+	json::parser_callback_t EnergyPlusFixture::call_back = [](int EP_UNUSED(depth), json::parse_event_t event, json &parsed,
+		unsigned line_num, unsigned line_index) -> bool {
+		InputProcessor::state.traverse(event, parsed, line_num, line_index);
+		return true;
+	};
 
 	void EnergyPlusFixture::SetUpTestCase() {
 		bool errors_found = false;
