@@ -486,6 +486,12 @@ namespace VariableSpeedCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	int
+	GetVSCoilCapFTCurveIndex(
+		int const & CoilIndex, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
 	Real64
 	GetVSCoilMinOATCompressor(
 		std::string const & CoilName, // must match coil names for the coil type

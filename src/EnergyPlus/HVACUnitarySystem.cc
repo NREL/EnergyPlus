@@ -1770,6 +1770,7 @@ namespace HVACUnitarySystem {
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 		using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
+		using VariableSpeedCoils::GetVSCoilCapFTCurveIndex;
 		using WaterToAirHeatPump::SimWatertoAirHP;
 		auto & GetWAHPCoilCapacity( WaterToAirHeatPump::GetCoilCapacity );
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
@@ -1962,6 +1963,10 @@ namespace HVACUnitarySystem {
 				TempSize = AutoSize;
 				if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 					DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+					DataIsDXCoil = true;
+				}
+				if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+					DataTotCapCurveIndex = GetVSCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 					DataIsDXCoil = true;
 				}
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
@@ -2226,9 +2231,10 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NumOfSpeeds;
 			DXCoolCap = GetCoilCapacityVariableSpeed( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
 			EqSizing.DesCoolingLoad = DXCoolCap;
-			MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NormSpedLevel );
+			// see PR5273 - RatedAirVolFlowRate is different from MSRatedAirVolFlowRate(MaxSpeed) and causes differences between UnitarySystem air flow rates and coil air flow rates when coil is not autosized.
+			// MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NormSpedLevel );
 			for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedCooling; ++Iter ) {
-				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
+				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( Iter ); // *MulSpeedFlowScale;
 				UnitarySystem( UnitarySysNum ).CoolMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) * StdRhoAir;
 				// it seems the ratio should reference the actual flow rates, not the fan flow ???
 				if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate > 0.0 && UnitarySystem( UnitarySysNum ).FanExists ) {
@@ -2321,9 +2327,10 @@ namespace HVACUnitarySystem {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
 			}
 
-			MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NormSpedLevel );
+			// see PR5273 - RatedAirVolFlowRate is different from MSRatedAirVolFlowRate(MaxSpeed) and causes differences between UnitarySystem air flow rates and coil air flow rates when coil is not autosized.
+			// MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NormSpedLevel );
 			for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedHeating; ++Iter ) {
-				UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
+				UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( Iter ); // * MulSpeedFlowScale;
 				UnitarySystem( UnitarySysNum ).HeatMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) * StdRhoAir;
 				if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate > 0.0 && UnitarySystem( UnitarySysNum ).FanExists ) {
 					UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( Iter ) = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) / UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate;
@@ -3061,7 +3068,7 @@ namespace HVACUnitarySystem {
 				}
 			}
 
-			StartingSpeedRatioInput = 4; // start the index counter at the first input for heating (e.g. 4+0*2)
+			StartingSpeedRatioInput = 5; // start the index counter at the first input for cooling (e.g. 5+0*2)
 			if ( NumOfSpeedCooling > 0 && MaxSpeedNum > 0 ) {
 				DesignSpecMSHP( DesignSpecNum ).CoolingVolFlowRatio.allocate( MaxSpeedNum );
 				for ( SpeedNum = 1; SpeedNum <= NumOfSpeedCooling; ++SpeedNum ) {

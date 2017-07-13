@@ -5769,6 +5769,49 @@ namespace VariableSpeedCoils {
 	}
 
 	int
+	GetVSCoilCapFTCurveIndex(
+		int const & CoilIndex, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   7/2017
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given coil and returns CapFT curve index.  If
+		// incorrect coil index is given, ErrorsFound is returned as true and value is returned
+		// as zero.
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		int CapFTIndex; // returned CapFT curve index of matched coil
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil;
+
+		// Obtains and Allocates WatertoAirHP related parameters from input file
+		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
+			GetVarSpeedCoilInput();
+			GetCoilsInputFlag = false;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( "GetVSCoilCapFTCurveIndex: Could not find Coil" );
+			ErrorsFound = true;
+			CapFTIndex = 0;
+		} else {
+			CapFTIndex = VarSpeedCoil( CoilIndex ).MSCCapFTemp( VarSpeedCoil( CoilIndex ).NumOfSpeeds );
+		}
+
+		return CapFTIndex;
+
+	}
+
+	int
 	GetCoilInletNodeVariableSpeed(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
