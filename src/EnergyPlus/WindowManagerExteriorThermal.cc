@@ -433,10 +433,6 @@ namespace EnergyPlus {
       auto aSolidLayer = make_shared< CIGUSolidLayer >( thickness, conductivity, frontSurface, backSurface );
       auto swRadiation = surface.getSWIncident( t_SurfNum );
       if( swRadiation > 0 ) {
-        auto aIndex = t_Index;
-        if( m_ExteriorShade ) {
-          --aIndex;
-        }
 
         auto absCoeff = QRadSWwinAbs( t_Index, t_SurfNum ) / swRadiation;
         if( ( 2 * t_Index - 1 ) == m_TotLay ) {
