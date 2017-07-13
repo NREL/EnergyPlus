@@ -74,8 +74,12 @@
 
 using json = nlohmann::json;
 
+namespace EnergyPlus {
 class IdfParser {
 public:
+	friend class InputProcessorFixture;
+	friend class EnergyPlusFixture;
+
 	json decode( std::string const & idf, json const & schema );
 
 	json decode( std::string const & idf, json const & schema, bool & success );
@@ -121,8 +125,6 @@ public:
 	}
 
 private:
-	friend class InputProcessorFixture;
-
 	size_t cur_line_num = 1;
 	size_t index_into_cur_line = 0;
 	size_t beginning_of_line_index = 0;
@@ -137,6 +139,9 @@ public:
 		Minimum,
 		ExclusiveMinimum
 	};
+
+	friend class InputProcessorFixture;
+	friend class EnergyPlusFixture;
 
 	void initialize( json const * parsed_schema );
 
@@ -175,14 +180,16 @@ private:
 	std::vector < std::string > errors;
 	std::vector < std::string > warnings;
 };
+}
 
 namespace EnergyPlus {
 
 	class InputProcessor {
-	private:
+	public:
 		friend class EnergyPlusFixture;
 		friend class InputProcessorFixture;
-
+		static State state;
+	private:
 		static
 		std::vector < std::string > const &
 		validation_errors();
@@ -192,13 +199,12 @@ namespace EnergyPlus {
 		validation_warnings();
 
 		static IdfParser idf_parser;
-		static State state;
 		static json schema;
 		static json jdf;
+		//static json::parser_callback_t call_back;
 		static std::unordered_map < std::string, std::string > case_insensitive_object_map;
 		static std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > jdd_jdf_cache_map;
 		static std::map < const json::object_t * const, std::pair < std::string, std::string > > unused_inputs;
-		static std::ostream * echo_stream;
 		static char s[ 129 ];
 
 	public:

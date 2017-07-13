@@ -216,13 +216,13 @@
 #include <fstream>
 #include <algorithm>
 
-json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int EP_UNUSED( depth ), json::parse_event_t event, json &parsed,
-									   unsigned line_num, unsigned line_index) -> bool {
-	EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
-	return true;
-};
-
 namespace EnergyPlus {
+
+	json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int EP_UNUSED( depth ), json::parse_event_t event, json &parsed,
+									   unsigned line_num, unsigned line_index) -> bool {
+		EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
+		return true;
+	};
 
 	void EnergyPlusFixture::SetUpTestCase() {
 		bool errors_found = false;
@@ -249,13 +249,11 @@ namespace EnergyPlus {
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->eio_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::eio_stream = this->eio_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
-		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -483,14 +481,6 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_echo_stream( std::string const & expected_string, bool reset_stream ) {
-		auto const stream_str = this->echo_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->echo_stream->str( std::string() );
-		return are_equal;
-	}
-
 	bool EnergyPlusFixture::compare_err_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->err_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
@@ -533,13 +523,6 @@ namespace EnergyPlus {
 	{
 		auto const has_output = this->mtr_stream->str().size() > 0;
 		if ( reset_stream ) this->mtr_stream->str( std::string() );
-		return has_output;
-	}
-
-	bool EnergyPlusFixture::has_echo_output( bool reset_stream )
-	{
-		auto const has_output = this->echo_stream->str().size() > 0;
-		if ( reset_stream ) this->echo_stream->str( std::string() );
 		return has_output;
 	}
 
@@ -612,7 +595,6 @@ namespace EnergyPlus {
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 
 		InputProcessor::InitializeMaps();
-		InputProcessor::InitFiles();
 		SimulationManager::PostIPProcessing();
 		InputProcessor::state.print_errors();
 

@@ -60,7 +60,7 @@
 #include <sqlite3.h>
 
 #include <fstream>
-#include <iostream>
+#include <iosfwd>
 #include <memory>
 #include <map>
 

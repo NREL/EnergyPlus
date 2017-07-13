@@ -173,13 +173,6 @@ namespace EnergyPlus {
 		// Will return true if string matches the stream and false if it does not
 		bool compare_mtr_stream( std::string const & expected_string, bool reset_stream = true );
 
-		// Compare an expected string against the ECHO stream. The default is to reset the ECHO stream after every call.
-		// It is easier to test successive functions if the ECHO stream is 'empty' before the next call.
-		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-		// if it makes sense for the unit test to continue after returning from function.
-		// Will return true if string matches the stream and false if it does not
-		bool compare_echo_stream( std::string const & expected_string, bool reset_stream = true );
-
 		// Compare an expected string against the ERR stream. The default is to reset the ERR stream after every call.
 		// It is easier to test successive functions if the ERR stream is 'empty' before the next call.
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -216,9 +209,6 @@ namespace EnergyPlus {
 
 		// Check if MTR stream has any output. Useful to make sure there are or are not outputs to MTR.
 		bool has_mtr_output( bool reset_stream = true );
-
-		// Check if ECHO stream has any output. Useful to make sure there are or are not outputs to ECHO.
-		bool has_echo_output( bool reset_stream = true );
 
 		// Check if ERR stream has any output. Useful to make sure there are or are not outputs to ERR.
 		bool has_err_output( bool reset_stream = true );
@@ -272,7 +262,6 @@ namespace EnergyPlus {
 		std::unique_ptr< std::ostringstream > eso_stream;
 		std::unique_ptr< std::ostringstream > eio_stream;
 		std::unique_ptr< std::ostringstream > mtr_stream;
-		std::unique_ptr< std::ostringstream > echo_stream;
 		std::unique_ptr< std::ostringstream > err_stream;
 		std::unique_ptr< std::ostringstream > m_cout_buffer;
 		std::unique_ptr< std::ostringstream > m_cerr_buffer;
