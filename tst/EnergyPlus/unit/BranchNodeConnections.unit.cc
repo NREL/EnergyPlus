@@ -201,7 +201,16 @@ namespace EnergyPlus {
 			"  AllSummaryAndSizingPeriod; !- Report 1 Name",
 
 			"Zone,",
-			" Plenum zone;              !- Name",
+			" Plenum zone,              !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  2.4,                     !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate;           !- Floor Area {m2}",
 
 			"Zone,",
 			"  Space,                   !- Name",
@@ -1098,8 +1107,13 @@ namespace EnergyPlus {
 			"  Temperature;             !- Output Unit Type",
 		} );
 
+<<<<<<< HEAD
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
+=======
+		ASSERT_FALSE( process_idf( idf_objects ) );
+		compare_err_stream( "" );
+>>>>>>> NREL/develop
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
 
@@ -1201,7 +1215,16 @@ namespace EnergyPlus {
 			"  AllSummaryAndSizingPeriod; !- Report 1 Name",
 
 			"Zone,",
-			" Plenum zone;              !- Name",
+			" Plenum zone,              !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  2.4,                     !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate;           !- Floor Area {m2}",
 
 			"Zone,",
 			"  Space,                   !- Name",
