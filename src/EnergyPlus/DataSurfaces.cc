@@ -400,6 +400,10 @@ namespace DataSurfaces {
 	Array2D< Real64 > AWinSurf; // Time step value of factor for beam
 	// absorbed in window glass layers
 
+  // Time step value of factor for diffuse absorbed in window layers
+  Array2D< Real64 > AWinSurfDiffFront;
+  Array2D< Real64 > AWinSurfDiffBack;
+
 	Array2D< Real64 > AWinCFOverlap; // Time step value of factor for beam
 	// absorbed in window glass layers which comes from other windows
 	// It happens sometimes that beam enters one window and hits back of
@@ -805,8 +809,7 @@ namespace DataSurfaces {
       return value;
     }
 
-    double SurfaceData::getSWIncident( const int t_SurfNum ) const 
-    {
+    double SurfaceData::getSWIncident( const int t_SurfNum ) const {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -994,6 +997,8 @@ namespace DataSurfaces {
 		BmToDiffReflFacObs.deallocate();
 		BmToDiffReflFacGnd.deallocate();
 		AWinSurf.deallocate();
+    AWinSurfDiffFront.deallocate();
+    AWinSurfDiffBack.deallocate();
 		AWinCFOverlap.deallocate();
 		AirSkyRadSplit.deallocate();
 		WinTransSolar.deallocate();

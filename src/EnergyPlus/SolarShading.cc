@@ -5614,8 +5614,11 @@ namespace SolarShading {
 						// will not be loaded in that case even if diffuse part of solar radiation is entering through the window
 						if ( FenSolAbsPtr == 0 ) {
 							// Put in the equivalent layer absorptions
+              // Simon: This should not be multiplied with CosInc since Abs coefficient already includes angular
+              // factor
 							for ( Lay = 1; Lay <= SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).NLayers; ++Lay ) {
-                AbWin = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmFtAbs( HourOfDay, TimeStep, Lay ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
+                auto absBeamWin = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmFtAbs( HourOfDay, TimeStep, Lay );
+                AbWin = absBeamWin * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
 
 								// Add contribution of beam reflected from outside and inside reveal
 								AWinSurf( Lay, SurfNum ) = AbWin + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinFtHemAbs( Lay ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBkHemAbs( Lay );
@@ -7159,6 +7162,12 @@ namespace SolarShading {
       
       double BABSZone = 0;
       double BTOTZone = 0;
+      ZoneTransSolar( ZoneNum ) = 0;
+      ZoneTransSolarEnergy( ZoneNum ) = 0;
+		  ZoneBmSolFrExtWinsRep( ZoneNum ) = 0;
+		  ZoneDifSolFrExtWinsRep( ZoneNum ) = 0;
+		  ZoneBmSolFrExtWinsRepEnergy( ZoneNum ) = 0;
+		  ZoneDifSolFrExtWinsRepEnergy( ZoneNum ) = 0;
 
       for( int SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
         if( Surface( SurfNum ).Class != SurfaceClass_Window ) continue;
@@ -7186,14 +7195,43 @@ namespace SolarShading {
         ///////////////////////////////////////////////
         if( SunlitFracWithoutReveal( TimeStep, HourOfDay, SurfNum2 ) > 0.0 ) {
           auto numOfLayers = aLayer->getNumOfLayers();
-          for( size_t Lay = 1; Lay <= numOfLayers; ++Lay ) {
-            auto AbWin = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi ) * 
-              window.OutProjSLFracMult( HourOfDay ) * CosInc;
-            auto AfromReveals = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi ) *
-              window.OutsRevealDiffOntoGlazing +
-              aLayer->getAbsorptance( Side::Back, ScatteringSimple::Diffuse, Theta, Phi ) *
-              window.InsRevealDiffOntoGlazing;
-            AWinSurf( Lay, SurfNum ) = AbWin + AfromReveals;
+          if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
+            auto CurrentState = SurfaceWindow( SurfNum ).ComplexFen.CurrentState;
+            auto & cplxState = SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState );
+            for ( size_t Lay = 1; Lay <= numOfLayers; ++Lay ) {
+              // Simon: Imporant note about this equation is to use BeamSolarRad and not QRadSWOutIncident
+              // is becuase BeamSolarRad is direct normal radiation (looking at the Sun) while QRadSWOutIncident
+              // is normal to window incidence. Since BSDF coefficients are taking into account angle of incidence,
+              // BeamSolarRad should be used in this case
+              QRadSWwinAbs( Lay, SurfNum ) = 
+                cplxState.WinSkyFtAbs( Lay ) * window.SkySolarInc + 
+                cplxState.WinSkyGndAbs( Lay ) * window.GndSolarInc + 
+                AWinSurf( Lay, SurfNum ) * BeamSolarRad + 
+                AWinCFOverlap( Lay, SurfNum ) * BeamSolarRad;
+              QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
+              AWinSurfDiffFront( Lay, SurfNum ) = cplxState.WinSkyGndAbs( Lay );
+            }
+          } else {
+            for( size_t Lay = 1; Lay <= numOfLayers; ++Lay ) {
+              auto AbWinBeam = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi ) * 
+                window.OutProjSLFracMult( HourOfDay );
+              auto AbWinDiffFront = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi );
+              auto AbWinDiffBack = aLayer->getAbsorptanceLayer( Lay, Side::Back, ScatteringSimple::Diffuse, Theta, Phi );
+
+              // Simon: This should not be multiplied with cosine of incident angle. This however gives same
+              // results as BSDF and Winkelmann models.
+              AWinSurf( Lay, SurfNum ) = AbWinBeam * CosInc * SunLitFract * 
+                SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );;
+              AWinSurfDiffFront( Lay, SurfNum ) = AbWinDiffFront;
+              AWinSurfDiffBack( Lay, SurfNum ) = AbWinDiffBack;
+
+              // Simon: Same not as for BSDF. Normal solar radiation should be taken here because angle of
+              // incidence is already taken into account 
+              auto absBeam = AWinSurf( Lay, SurfNum ) * BeamSolarRad;
+              auto absDiff = AWinSurfDiffFront( Lay, SurfNum ) * ( window.SkySolarInc + window.GndSolarInc );
+              QRadSWwinAbs( Lay, SurfNum ) = ( absBeam + absDiff );
+              QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
+            }
           }
         }
 
@@ -7310,6 +7348,12 @@ namespace SolarShading {
 
           }
         }
+        ZoneTransSolar( ZoneNum ) += WinTransSolar( SurfNum ); //[W]
+		    ZoneTransSolarEnergy( ZoneNum ) = ZoneTransSolar( ZoneNum ) * TimeStepZoneSec; //[J]
+		    ZoneBmSolFrExtWinsRep( ZoneNum ) += WinBmSolar( SurfNum );
+		    ZoneDifSolFrExtWinsRep( ZoneNum ) += WinDifSolar( SurfNum );
+		    ZoneBmSolFrExtWinsRepEnergy( ZoneNum ) = ZoneBmSolFrExtWinsRep( ZoneNum ) * TimeStepZoneSec; //[J]
+		    ZoneDifSolFrExtWinsRepEnergy( ZoneNum ) = ZoneDifSolFrExtWinsRep( ZoneNum ) * TimeStepZoneSec; //[J]
       }
       DBZone( ZoneNum ) = BTOTZone - BABSZone;
     }

@@ -55,7 +55,7 @@ namespace EnergyPlus {
     }
 
     bool CWindowModel::isExternalLibraryModel() const {
-      return m_Model == WindowsModel::External;
+      return m_Model == External;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -69,21 +69,21 @@ namespace EnergyPlus {
     shared_ptr< CWindowOpticalModel > CWindowOpticalModel::WindowOpticalModelFactory() {
       // Process input data and counts if number of complex fenestration objects is greater
       // than zero in which case it will use BSDF window model
-      shared_ptr< CWindowOpticalModel > aModel = make_shared< CWindowOpticalModel >();
+      auto aModel = make_shared< CWindowOpticalModel >();
       int numCurrModels = InputProcessor::GetNumObjectsFound( "Construction:ComplexFenestrationState" );
       
       if( numCurrModels > 0 ) {
-        aModel->m_Model = WindowsOpticalModel::BSDF;
+        aModel->m_Model = BSDF;
       }
 
       return aModel;
     }
 
-    WindowsOpticalModel CWindowOpticalModel::getWindowsOpticalModel() {
+    WindowsOpticalModel CWindowOpticalModel::getWindowsOpticalModel() const {
       return m_Model;
     }
 
-    bool CWindowOpticalModel::isSimplifiedModel() {
+    bool CWindowOpticalModel::isSimplifiedModel() const {
       return ( m_Model == WindowsOpticalModel::Simplified );
     }
 

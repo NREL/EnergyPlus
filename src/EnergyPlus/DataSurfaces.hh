@@ -385,6 +385,10 @@ namespace DataSurfaces {
 	extern Array2D< Real64 > AWinSurf; // Time step value of factor for beam
 	// absorbed in window glass layers
 
+  // Time step value of factor for diffuse absorbed in window layers
+  extern Array2D< Real64 > AWinSurfDiffFront;
+  extern Array2D< Real64 > AWinSurfDiffBack;
+
 	extern Array2D< Real64 > AWinCFOverlap; // Time step value of factor for beam
 	// absorbed in window glass layers which comes from other windows
 	// It happens sometimes that beam enters one window and hits back of

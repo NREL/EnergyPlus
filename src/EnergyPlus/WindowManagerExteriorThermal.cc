@@ -67,6 +67,7 @@
 #include <WCETarcog.hpp>
 
 #include "WindowManagerExteriorThermal.hh"
+#include "WindowManagerExteriorData.hh"
 
 namespace EnergyPlus {
 
@@ -186,6 +187,8 @@ namespace EnergyPlus {
           NetIRHeatGainGlass + NetIRHeatGainShade;
         WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 
+				WinGainIRGlazToZoneRep( SurfNum ) = NetIRHeatGainGlass;
+
         // Effective shade and glass emissivities that are used later for energy calculations.
         // This needs to be checked as well. (Simon)
         auto EffShBlEmiss = EpsShIR1 * ( 1.0 + RhoGlIR2 * TauShIR / ( 1.0 - RhoGlIR2 * RhoShIR2 ) );
@@ -217,7 +220,12 @@ namespace EnergyPlus {
         auto NetIRHeatGainGlass = surface.Area * backSurface->getEmissivity() *
           ( sigma * pow( backSurface->getTemperature(), 4 ) - rmir );
 
+        SurfaceWindow( SurfNum ).EffInsSurfTemp = aLayers[ totLayers - 1 ]->getTemperature( Side::Back ) - TKelvin;
+        SurfaceWindow( SurfNum ).EffGlassEmiss = aLayers[ totLayers - 1 ]->getSurface( Side::Back )->getEmissivity();
+
         WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
+        WinGainConvGlazToZoneRep( SurfNum ) = ConvHeatGainFrZoneSideOfGlass;
+				WinGainIRGlazToZoneRep( SurfNum ) = NetIRHeatGainGlass;
 
         WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
       }
@@ -225,6 +233,7 @@ namespace EnergyPlus {
       auto TransDiff = construction.TransDiff;
       WinHeatGain( SurfNum ) -= QS( surface.Zone ) * surface.Area * TransDiff;
       WinHeatTransfer( SurfNum ) -= QS( surface.Zone ) * surface.Area * TransDiff;
+			WinLossSWZoneToOutWinRep( SurfNum ) = QS( Surface( SurfNum ).Zone ) * surface.Area * TransDiff;
       
       for( auto k = 1; k <= surface.getTotLayers(); ++k ) {
         SurfaceWindow( SurfNum ).ThetaFace( 2 * k - 1 ) = thetas( 2 * k - 1 );
@@ -428,20 +437,12 @@ namespace EnergyPlus {
         if( m_ExteriorShade ) {
           --aIndex;
         }
-        auto absCoeff = AWinSurf( aIndex, t_SurfNum );
+
+        auto absCoeff = QRadSWwinAbs( t_Index, t_SurfNum ) / swRadiation;
         if( ( 2 * t_Index - 1 ) == m_TotLay ) {
           absCoeff += QRadThermInAbs( t_SurfNum ) / swRadiation;
         }
-        // if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ||
-        //   material.Group == ComplexWindowShade ) {
-        //   auto aIndex = t_Index;
-        //   if( m_ExteriorShade ) {
-        //     --aIndex;
-        //   }
-        //   absCoeff = QRadSWwinAbs( aIndex, t_SurfNum ) / swRadiation;
-        // } else {
-        //   absCoeff = AWinSurf( t_Index, t_SurfNum );
-        // }
+
         aSolidLayer->setSolarAbsorptance( absCoeff );
       }
       return aSolidLayer;

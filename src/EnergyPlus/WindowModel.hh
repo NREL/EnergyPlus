@@ -49,8 +49,8 @@ namespace EnergyPlus {
 
       static std::shared_ptr< CWindowOpticalModel > WindowOpticalModelFactory();
 
-      WindowsOpticalModel getWindowsOpticalModel();
-      bool isSimplifiedModel();
+      WindowsOpticalModel getWindowsOpticalModel() const;
+      bool isSimplifiedModel() const;
 
     private:
       WindowsOpticalModel m_Model;
