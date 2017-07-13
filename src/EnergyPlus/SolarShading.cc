@@ -7259,8 +7259,7 @@ namespace SolarShading {
           window.InOutProjSLFracMult( HourOfDay );
         double WinTransBmDifSolar = TBmDif * SunLitFract * CosInc * Surface( SurfNum ).Area * 
           window.InOutProjSLFracMult( HourOfDay );
-        BTOTZone += ( TBmBm + TBmDif ) * SunLitFract * CosInc * Surface( SurfNum ).Area * 
-          window.InOutProjSLFracMult( HourOfDay );
+        BTOTZone += WinTransBmBmSolar + WinTransBmDifSolar;
 
         double DifSolarRadiation = window.SkySolarInc + window.GndSolarInc;
         WinBmSolar( SurfNum ) = BeamSolarRad * ( TBmBm + TBmDif ) * Surface( SurfNum ).Area * CosInc;

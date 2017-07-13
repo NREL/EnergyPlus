@@ -3174,8 +3174,8 @@ namespace WindowManager {
 		Real64 TauShIR; // Long-wave transmittance of isolated shade/blind
 		Real64 sconsh; // shade/blind conductance (W/m2-K)
 		int ShadeFlag; // Shading flag
-		Real64 ShadeAbsFac1; // Fractions for apportioning absorbed radiation to shade/blind faces
-		Real64 ShadeAbsFac2;
+		// Real64 ShadeAbsFac1; // Fractions for apportioning absorbed radiation to shade/blind faces
+		// Real64 ShadeAbsFac2;
 		static Array1D< Real64 > AbsRadShadeFace( 2 ); // Solar radiation, short-wave radiation from lights, and long-wave //Tuned Made static
 		//  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
 		Real64 ShadeArea; // shade/blind area (m2)
