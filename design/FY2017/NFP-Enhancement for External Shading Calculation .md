@@ -92,7 +92,7 @@ I've always viewed external (or cached) shading calculations as an all-or-nothin
 
 > Thanks for the great advice. We adopted the suggested approach.
 
-**Stuart Mentzer <Stuart_Mentzer@objexx.com> Thu, Jun 1, 2017**
+**Stuart Mentzer Thu, Jun 1, 2017**
 
 External shading would greatly benefit EnergyPlus for single building modeling as well as this is a big performance/scalability bottleneck. If a preferred external tool can be integrated into the "normal" EnergyPlus in place of or as an optional alternative to the current shading approach I know a few cloud providers who would be very pleased. (Perhaps they would even contribute to this work.)  I'm reaching out. If I hear anything I'll let you know.
 Is reflection also being considered for external treatment? If not the octree system I added for daylighting should be used for reflection to address scalability.
