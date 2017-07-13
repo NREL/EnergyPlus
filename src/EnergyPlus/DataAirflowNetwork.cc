@@ -204,11 +204,6 @@ namespace DataAirflowNetwork {
 	Array1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
 	Array1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
 	Array1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
-	Array1D< MultizoneCPArrayProp > MultizoneCPArrayData;
-	Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
-	Array1D< MultizoneCPValueProp > MultizoneCPValueData;
-	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modification factor
 	Array1D< DeltaCpProp > DeltaCp;
 	Array1D< DeltaCpProp > EPDeltaCP;
 	Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
@@ -279,11 +274,6 @@ namespace DataAirflowNetwork {
 		MultizoneSurfaceCrackData.deallocate();
 		MultizoneSurfaceELAData.deallocate();
 		MultizoneExternalNodeData.deallocate();
-		MultizoneCPArrayData.deallocate();
-		MultizoneCPArrayDataSingleSided.deallocate();
-		MultizoneCPValueData.deallocate();
-		MultizoneCPValueDataTemp.deallocate();
-		MultizoneCPValueDataTempUnMod.deallocate();
 		DeltaCp.deallocate();
 		EPDeltaCP.deallocate();
 		MultizoneCompExhaustFanData.deallocate();

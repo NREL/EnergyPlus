@@ -290,6 +290,8 @@ namespace DataSizing {
 	extern bool HRFlowSizingFlag; // True, if it is a heat recovery heat exchanger flow sizing
 	extern Real64 DataWaterCoilSizCoolDeltaT; // used for sizing cooling coil water design flow rate
 	extern Real64 DataWaterCoilSizHeatDeltaT; // used for sizing heating coil water design flow rate
+	extern bool DataNomCapInpMeth; // True if heating coil is sized by CoilPerfInpMeth == NomCap
+
 	// Types
 
 	struct ZoneSizingInputData
@@ -980,11 +982,15 @@ namespace DataSizing {
 		Real64 DesCoolVolFlowMin; // design minimum system cooling flow rate [m3/s]
 		Array1D< Real64 > HeatFlowSeq; // daily sequence of system heating air mass flow rate
 		//  (zone time step)
+		Array1D< Real64 > SumZoneHeatLoadSeq; // daily sequence of zones summed heating load [W]
+		//  (zone time step)
 		Array1D< Real64 > CoolFlowSeq; // daily sequence of system cooling air mass flow rate
 		//  (zone time step)
 		Array1D< Real64 > SumZoneCoolLoadSeq; // daily sequence of zones summed cooling load [W]
 		//  (zone time step)
 		Array1D< Real64 > CoolZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
+		//  (zone time step)
+		Array1D< Real64 > HeatZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
 		//  (zone time step)
 		Array1D< Real64 > SensCoolCapSeq; // daily sequence of system sensible cooling capacity
 		//  (zone time step)
@@ -1008,6 +1014,8 @@ namespace DataSizing {
 		//  [zone time step]
 		Array1D< Real64 > SysHeatOutHumRatSeq; // daily sequence of system heating outside humidity ratios
 		//   [kg water/kg dry air] [zone time step]
+		Array1D< Real64 > SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
+		Array1D< Real64 > SysDOASLatAddSeq; // daily sequence of latent heat addition rate from DOAS supply air [W]
 		int SystemOAMethod; // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 		Real64 MaxZoneOAFraction; // maximum value of min OA for zones served by system
 		Real64 SysUncOA; // uncorrected system outdoor air flow based on zone people and zone area
@@ -1124,17 +1132,24 @@ namespace DataSizing {
 	{
 		// Members
 		int SensCoolPeakDD; // design day containing the sensible cooling peak
+		std::string cSensCoolPeakDDDate; // date string of design day causing sensible cooling peak
 		int TotCoolPeakDD; // design day containing total cooling peak
+		std::string cTotCoolPeakDDDate; // date string of design day causing total cooling peak
 		int CoolFlowPeakDD; // design day containing the cooling air flow peak
+		std::string cCoolFlowPeakDDDate; // date string of design day causing cooling air flow peak
+		int HeatPeakDD; // design day containing the heating peak
+		std::string cHeatPeakDDDate; // date string of design day causing heating peak
 		Array1D< int > TimeStepAtSensCoolPk; // time step of the sensible cooling peak
 		Array1D< int > TimeStepAtTotCoolPk; // time step of the total cooling peak
 		Array1D< int > TimeStepAtCoolFlowPk; // time step of the cooling air flow peak
+		Array1D< int > TimeStepAtHeatPk; // time step of the heating peak
 
 		// Default Constructor
 		SysSizPeakDDNumData() :
 			SensCoolPeakDD( 0 ),
 			TotCoolPeakDD( 0 ),
-			CoolFlowPeakDD( 0 )
+			CoolFlowPeakDD( 0 ),
+			HeatPeakDD( 0 )
 		{}
 
 	};
@@ -1165,6 +1180,39 @@ namespace DataSizing {
 			DesVolFlowRate( 0.0 ),
 			VolFlowSizingDone( false ),
 			PlantSizFac( 1.0 )
+		{}
+
+	};
+
+	// based on ZoneSizingData but only have member variables that are related to the CheckSum/
+	struct FacilitySizingData
+	{
+		// Members  
+		int CoolDDNum; // design day index of design day causing heating peak
+		int HeatDDNum; // design day index of design day causing heating peak
+		int TimeStepNumAtCoolMax; // time step number (in day) at cooling peak
+		Array1D< Real64 > DOASHeatAddSeq; // daily sequence of zone DOAS heat addition rate (zone time step) [W]
+		Array1D< Real64 > DOASLatAddSeq; // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
+		Array1D< Real64 > CoolOutHumRatSeq; // daily sequence of outdoor humidity ratios (cooling, zone time step)
+		Array1D< Real64 > CoolOutTempSeq; // daily sequence of outdoor temperatures (cooling, zone time step)
+		Array1D< Real64 > CoolZoneTempSeq; // daily sequence of zone temperatures (cooling, zone time step)
+		Array1D< Real64 > CoolLoadSeq; // daily sequence of cooling load (cooling, zone time step)
+		Real64 DesCoolLoad; // zone design cooling load [W]
+		int TimeStepNumAtHeatMax; // time step number (in day) at Heating peak
+		Array1D< Real64 > HeatOutHumRatSeq; // daily sequence of outdoor humidity ratios (heating, zone time step)
+		Array1D< Real64 > HeatOutTempSeq; // daily sequence of outdoor temperatures (heating, zone time step)
+		Array1D< Real64 > HeatZoneTempSeq; // daily sequence of zone temperatures (heating, zone time step)
+		Array1D< Real64 > HeatLoadSeq; // daily sequence of heating load (cooling, zone time step)
+		Real64 DesHeatLoad; // zone design heating load [W]
+		
+	        // Default Constructor
+		FacilitySizingData( ):
+			CoolDDNum( 0 ),
+			HeatDDNum( 0 ),
+			TimeStepNumAtCoolMax( 0 ),
+			DesCoolLoad( 0.0 ),
+			TimeStepNumAtHeatMax( 0 ),
+			DesHeatLoad( 0.0 )
 		{}
 
 	};
@@ -1257,9 +1305,9 @@ namespace DataSizing {
 	extern Array1D< OARequirementsData > OARequirements;
 	extern Array1D< ZoneAirDistributionData > ZoneAirDistribution;
 	extern Array1D< ZoneSizingInputData > ZoneSizingInput; // Input data for zone sizing
-	extern Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design
+	extern Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design)
 	extern Array1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
-	extern Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
+	extern Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data)
 	extern Array1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
 	extern Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
 	extern Array1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
@@ -1275,6 +1323,9 @@ namespace DataSizing {
 	extern Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	extern Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 	extern Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	// used only for Facility Load Component Summary
+	extern Array1D< FacilitySizingData > CalcFacilitySizing; // Data for facility sizing 
+	extern FacilitySizingData CalcFinalFacilitySizing; // Final data for facility sizing 
 
 	// Clears the global data in DataSizing.
 	// Needed for unit tests, should not be normally called.

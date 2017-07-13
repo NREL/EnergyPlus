@@ -3347,7 +3347,11 @@ namespace WindowComplexManager {
 					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 				}
 				// a weighted average of the inlet temperatures.
-				RefAirTemp = SumSysMCpT / SumSysMCp;
+				if ( SumSysMCp > 0.0 ) {
+					RefAirTemp = SumSysMCpT / SumSysMCp;
+				} else {
+					RefAirTemp = MAT( ZoneNum );
+				}
 			} else {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
@@ -3385,7 +3389,11 @@ namespace WindowComplexManager {
 						SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 					}
 					// a weighted average of the inlet temperatures.
-					RefAirTemp = SumSysMCpT / SumSysMCp;
+					if ( SumSysMCp > 0.0 ) {
+						RefAirTemp = SumSysMCpT / SumSysMCp;
+					} else {
+						RefAirTemp = MAT( ZoneNumAdj );
+					}
 				} else {
 					// currently set to mean air temp but should add error warning here
 					RefAirTemp = MAT( ZoneNumAdj );
