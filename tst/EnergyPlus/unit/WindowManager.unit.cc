@@ -86,7 +86,6 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 {
 
 	DataIPShortCuts::lAlphaFieldBlanks = true;
-	bool ErrorsFound( false );
 
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",

@@ -7338,7 +7338,7 @@ namespace SurfaceGeometry {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
 				} else if (InputProcessor::SameString(cAlphaArgs( alpF ), "GroundWater")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
-				} else /* if (SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
+				} else /* if (InputProcessor::SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
 				}
 			} alpF++;
@@ -7350,7 +7350,7 @@ namespace SurfaceGeometry {
 			if ( !lAlphaFieldBlanks( alpF ) ) {
 				if (InputProcessor::SameString(cAlphaArgs( alpF ), "Hourly")) {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
-				} else /* if (SameString(cAlphaArgs( alpF ), "Timestep")) */ {
+				} else /* if (InputProcessor::SameString(cAlphaArgs( alpF ), "Timestep")) */ {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
 				}
 			} alpF++;

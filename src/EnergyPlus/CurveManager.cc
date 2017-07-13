@@ -2201,19 +2201,19 @@ namespace CurveManager {
 				}
 			}
 
-			if ( SameString( Alphas( 4 ), "WAVELENGTH" ) ) {
+			if ( InputProcessor::SameString( Alphas( 4 ), "WAVELENGTH" ) ) {
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) + ": " );
 				ShowContinueError( cAlphaFieldNames( 4 ) + " = WAVELENGTH, and " + cAlphaFieldNames( 5 ) + " = " + Alphas( 5 ) );
 				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
 				ErrorsFound = true;
 			}
-			if ( SameString( Alphas( 4 ), "ANGLE" ) && !SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
+			if ( InputProcessor::SameString( Alphas( 4 ), "ANGLE" ) && !InputProcessor::SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) + ": " );
 				ShowContinueError( cAlphaFieldNames( 4 ) + " = ANGLE, and " + cAlphaFieldNames( 5 ) + " = " + Alphas( 5 ) );
 				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
 				ErrorsFound = true;
 			}
-			if (SameString( Alphas( 4 ), "ANGLE" ) && SameString( Alphas( 5 ), "WAVELENGTH" )) {
+			if ( InputProcessor::SameString( Alphas( 4 ), "ANGLE" ) && InputProcessor::SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
 				PerfCurve( CurveNum ).OpticalProperty = true;
 			}
 
@@ -5109,9 +5109,9 @@ Label999: ;
 				IsCurveInputTypeValid = true;
 			} else if ( InputProcessor::SameString( InInputType, "DISTANCE" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( SameString( InInputType, "WAVELENGTH" ) ) {
+			} else if ( InputProcessor::SameString( InInputType, "WAVELENGTH" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( SameString( InInputType, "ANGLE" ) ) {
+			} else if ( InputProcessor::SameString( InInputType, "ANGLE" ) ) {
 				IsCurveInputTypeValid = true;
 			} else {
 				IsCurveInputTypeValid = false;

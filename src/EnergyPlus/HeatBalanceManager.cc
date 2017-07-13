@@ -1616,7 +1616,7 @@ namespace HeatBalanceManager {
 			Material( MaterNum ).Roughness = VerySmooth;
 			Material( MaterNum ).ROnly = true;
 			Material( MaterNum ).Thickness = MaterialProps( 1 );
-			if ( !SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
+			if ( !InputProcessor::SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
 				Material( MaterNum ).Trans = MaterialProps( 2 );
 				Material( MaterNum ).ReflectSolBeamFront = MaterialProps( 3 );
 				Material( MaterNum ).ReflectSolBeamBack = MaterialProps( 4 );
