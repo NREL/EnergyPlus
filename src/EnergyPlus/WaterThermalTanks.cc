@@ -5092,7 +5092,7 @@ namespace WaterThermalTanks {
 		static int DummyWaterIndex( 1 );
 		static Real64 TankChangeRateScale( 0.0 ); // local temporary for nominal tank change rate
 		static Real64 MaxSideVolFlow( 0.0 ); // local temporary for largest connection design flow
-		int VSCoilID( 0 );// id of varaible-speed HPWH coil
+		int VSCoilID( 0 );// id of variable-speed HPWH coil
 
 		// FLOW:
 
@@ -5628,7 +5628,7 @@ namespace WaterThermalTanks {
 			HPWHInletDBTemp = HPInletDryBulbTemp;
 			HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, HPInletHumRat, OutBaroPress );
 
-			// initialize flow rates at speed levels for varaible-speed HPWH
+			// initialize flow rates at speed levels for variable-speed HPWH
 			if ( ( HPWaterHeater( HPNum ).bIsIHP ) && ( 0 == HPWaterHeater( HPNum ).NumofSpeed ) )//use SCWH coil represents
 			{
 				SizeIHP( HPWaterHeater( HPNum ).DXCoilNum );//
@@ -7753,7 +7753,7 @@ namespace WaterThermalTanks {
 		std::string IterNum; // Max number of iterations for warning message
 		int CompOp; // DX compressor operation; 1=on, 0=off
 		Real64 CondenserDeltaT; // HPWH condenser water temperature difference
-		//new varaibles for variable-speed HPWH
+		//new variables for variable-speed HPWH
 		int MaxSpeedNum( 0 ); // speed number of variable speed HPWH coil
 		int SpeedNum( 1 ); // selected speed number
 		Real64 RhoWater; //water density

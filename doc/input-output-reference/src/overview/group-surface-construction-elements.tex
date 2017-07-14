@@ -1189,11 +1189,13 @@ The name of the glass layer. It corresponds to a layer in a window construction.
 
 \paragraph{Field: Optical Data Type}\label{field-optical-data-type}
 
-Valid values for this field are SpectralAverage, Spectral, BSDF.
+Valid values for this field are SpectralAverage, Spectral, SpectralAndAngle, and BSDF.
 
 If Optical Data Type = SpectralAverage, the values you enter for solar transmittance and reflectance are assumed to be averaged over the solar spectrum, and the values you enter for visible transmittance and reflectance are assumed to be averaged over the solar spectrum and weighted by the response of~ the human eye. There is an EnergyPlus Reference Data Set for WindowMaterial:Glazing that contains spectral average properties for many different types of glass.
 
 If Optical Data Type = Spectral, then, in the following field, you must enter the name of a spectral data set defined with the WindowGlassSpectralData object. In this case, the values of~ solar and visible transmittance and reflectance in the fields below should be blank.
+
+If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with the Table:TwoIndependentVariables object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
 
 If Optical Data Type = BSDF, the Construction:ComplexFenestrationState object must be used to define the window construction layers. The Construction:ComplexFenestrationState object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
 
@@ -1303,6 +1305,20 @@ A measure of the stiffness of an elastic material.~ It is defined as the ratio o
 
 The ratio, when a sample object is stretched, of the contraction or transverse strain (perpendicular to the applied load), to the extension or axial strain (in the direction of the applied load). This value is used only with complex fenestration systems defined through the Construction:ComplexFenestrationState object. The default value for glass is 0.22.
 
+\paragraph{Field: Window Glass Spectral and Incident Angle Transmittance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-transmittance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+\paragraph{Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-front-reflectance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+\paragraph{Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-back-reflectance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+It should be pointed out that when Optical Data Type = SpectralAndAngle for a glass layer in a construction, the table input data are converted into polynomial curve fits with 6 coefficients, so that all outputs of optical properties for the same construction will be curve values for a given incident angle. Therefore, the values may be slightly different from input values.
+  
 IDF examples of Spectral average and using a Spectral data set:
 
 \begin{lstlisting}
@@ -1336,6 +1352,36 @@ MATERIAL:WINDOWGLASS, GLASS - CLEAR SHEET 1 / 8 IN,
       0.84,  ! IR emissivity: front side
       0.84,  ! IR emissivity: back side
       0.798; ! Conductivity {W/m-K}
+      
+\end{lstlisting}
+
+IDF example using a SpectralAndAngle data set:
+
+\begin{lstlisting}
+
+  WindowMaterial:Glazing ,SPECTRAL AND ANGLE GLASS INNER PANE, ! Material name
+    SpectralAndAngle, ! Optical data type {SpectralAverage or Spectral}
+    , !- Name of spectral data set
+
+    0.0099, ! Thickness {m}
+    ,  !- Solar transmittance at normal incidence
+    ,  !- Solar reflectance at normal incidence: front side
+    ,  !- Solar reflectance at normal incidence: back side
+    ,  !- Visible transmittance at normal incidence
+    ,  !- Visible reflectance at normal incidence: front side
+    ,  !- Visible reflectance at normal incidence: back side
+    0.0,   !- IR transmittance at normal incidence
+    0.84,  !- IR emissivity: front side
+    0.84,  !- IR emissivity: back side
+    0.798, !- Conductivity {W/m-K}
+    ,      !- Dirt Correction Factor for Solar and Visible Transmittance
+    ,      !- Solar Diffusing
+    ,      !- Young's modulus
+    ,      !- Poisson's ratio
+    TranmittanceDataSet,  !- Window Glass Spectral and Incident Angle Transmittance Data Set Table Name
+    FrontReflectanceDataSet,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
+    BackReflectanceDataSet;      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
+
 \end{lstlisting}
 
 IDF example of Spectral Data Type = BSDF

@@ -428,6 +428,7 @@ ADD_SIMULATION_TEST(IDF_FILE SmOffPSZ_OnOffStagedControl.idf EPW_FILE USA_IL_Chi
 ADD_SIMULATION_TEST(IDF_FILE SolarCollectorFlatPlateWater.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SolarShadingTest.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SolarShadingTest_SQL.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SpectralAngularOpticalProperties_TableData.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE StackedZonesWithInterzoneIRTLayers.idf EPW_FILE USA_IL_University.of.Illinois-Willard.AP.725315_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SteamSystemAutoSize.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE StormWindow.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
