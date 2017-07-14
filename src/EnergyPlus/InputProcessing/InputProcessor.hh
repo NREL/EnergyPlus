@@ -48,14 +48,10 @@
 #define InputProcessor_hh_INCLUDED
 
 // C++ Headers
-// #include <iosfwd>
-// #include <type_traits>
-// #include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <map>
-// #include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.fwd.hh>
@@ -79,29 +75,8 @@ namespace EnergyPlus {
 
 		friend class EnergyPlusFixture;
 		friend class InputProcessorFixture;
-		static State state;
-	private:
-		static
-		std::vector < std::string > const &
-		validation_errors();
 
-		static
-		std::vector < std::string > const &
-		validation_warnings();
-
-		static IdfParser idf_parser;
-		static json schema;
-		static json jdf;
-		//static json::parser_callback_t call_back;
-		static std::unordered_map< std::string, std::string > case_insensitive_object_map;
-		static std::unordered_map< std::string, std::pair< json::const_iterator, std::vector< json::const_iterator > > > jdd_jdf_cache_map;
-		static std::map< const json::object_t * const, std::pair< std::string, std::string > > unused_inputs;
-		static char s[ 129 ];
-
-	public:
-		static
-		std::pair< bool, std::string >
-		ConvertInsensitiveObjectType( std::string const & objectType );
+		static json::parser_callback_t callback;
 
 		// Clears the global data in InputProcessor.
 		// Needed for unit tests, should not be normally called.
@@ -110,8 +85,8 @@ namespace EnergyPlus {
 		clear_state();
 
 		static
-		void
-		InitFiles();
+		std::pair< bool, std::string >
+		ConvertInsensitiveObjectType( std::string const & objectType );
 
 		static
 		void
@@ -219,6 +194,68 @@ namespace EnergyPlus {
 		static
 		void
 		ReportOrphanRecordObjects();
+
+		struct ObjectInfo
+		{
+			ObjectInfo() = default;
+
+			ObjectInfo( std::string const & objectType, std::string const & objectName )
+			:
+			objectType( objectType ),
+			objectName( objectName )
+			{}
+
+			ObjectInfo( std::string && objectType, std::string && objectName )
+			:
+			objectType( objectType ),
+			objectName( objectName )
+			{}
+
+			std::string objectType = "";
+			std::string objectName = "";
+		};
+
+		struct ObjectCache
+		{
+			ObjectCache() = default;
+
+			ObjectCache( json::const_iterator const & schemaIterator, std::vector< json::const_iterator > const & inputObjectIterators )
+			:
+			schemaIterator( schemaIterator ),
+			inputObjectIterators( inputObjectIterators )
+			{}
+
+			ObjectCache( json::const_iterator && schemaIterator, std::vector< json::const_iterator > && inputObjectIterators )
+			:
+			schemaIterator( schemaIterator ),
+			inputObjectIterators( inputObjectIterators )
+			{}
+
+			json::const_iterator schemaIterator;
+			std::vector< json::const_iterator > inputObjectIterators;
+		};
+
+	private:
+		static
+		std::vector < std::string > const &
+		validationErrors();
+
+		static
+		std::vector < std::string > const &
+		validationWarnings();
+
+		using UnorderedObjectTypeMap = std::unordered_map < std::string, std::string >;
+		using UnorderedObjectCacheMap = std::unordered_map< std::string, ObjectCache >;
+		using UnorderedUnusedObjectMap = std::map< const json::object_t * const, ObjectInfo >;
+
+		static IdfParser idf_parser;
+		static json schema;
+		static json jdf;
+		static State state;
+		static UnorderedObjectTypeMap caseInsensitiveObjectMap;
+		static UnorderedObjectCacheMap objectCacheMap;
+		static UnorderedUnusedObjectMap unusedInputs;
+		static char s[ 129 ];
 
 	}; // InputProcessor
 }

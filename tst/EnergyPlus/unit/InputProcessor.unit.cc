@@ -303,7 +303,7 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		auto const & errors = validation_errors();
+		auto const & errors = validationErrors();
 		EXPECT_EQ(errors.size(), 0ul);
 	}
 
@@ -521,9 +521,9 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		json::parse(jdf.dump(2), EnergyPlusFixture::call_back);
-		auto const & errors = validation_errors();
-		auto const & warnings = validation_warnings();
+		json::parse(jdf.dump(2), InputProcessor::callback);
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
 		EXPECT_TRUE(success);
 	}
@@ -703,9 +703,9 @@ namespace EnergyPlus {
 			}
 		}
 
-		json::parse(jdf.dump(2), EnergyPlusFixture::call_back);
-		auto const & errors = validation_errors();
-		auto const & warnings = validation_warnings();
+		json::parse(jdf.dump(2), InputProcessor::callback);
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
 	}
 
@@ -757,8 +757,8 @@ namespace EnergyPlus {
 				}));
 
 		ASSERT_TRUE( process_idf( idf ) );
-		auto const & errors = validation_errors();
-		auto const & warnings = validation_warnings();
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
 	}
 
@@ -1143,9 +1143,9 @@ namespace EnergyPlus {
 				}));
 		ASSERT_TRUE( process_idf( idf ) );
 		json & jdf = getJDF();
-		json::parse(jdf.dump(2), EnergyPlusFixture::call_back);
-		auto const & errors = validation_errors();
-		auto const & warnings = validation_warnings();
+		json::parse(jdf.dump(2), InputProcessor::callback);
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 2ul);
 		if (errors.size() >= 2) {
 			EXPECT_NE(errors[0].find("You must run the ExpandObjects program for \"HVACTemplate:Thermostat\" at line"), std::string::npos);
@@ -1218,9 +1218,9 @@ namespace EnergyPlus {
 
 		};
 
-		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		auto const & errors = validation_errors();
-		auto const & warnings = validation_warnings();
+		json::parse(root.dump(2), InputProcessor::callback);
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 2ul);
 		EXPECT_EQ(warnings.size(), 0ul);
 		if (errors.size() >= 2) {
@@ -1297,9 +1297,9 @@ namespace EnergyPlus {
 			}
 		};
 
-		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		auto const & errors = validation_errors();
-		auto const & warnings = validation_warnings();
+		json::parse(root.dump(2), InputProcessor::callback);
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 4ul);
 		EXPECT_EQ(warnings.size(), 0ul);
 		if (errors.size() >= 4) {
@@ -1375,9 +1375,9 @@ namespace EnergyPlus {
 				}
 			},
 		};
-		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		auto const & errors = validation_errors();
-		auto const & warnings = validation_warnings();
+		json::parse(root.dump(2), InputProcessor::callback);
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 5ul);
 		EXPECT_EQ(warnings.size(), 0ul);
 		if (errors.size() >= 5) {

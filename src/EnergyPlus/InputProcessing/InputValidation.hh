@@ -75,19 +75,19 @@ namespace EnergyPlus {
 		// friend class InputProcessorFixture;
 		// friend class EnergyPlusFixture;
 
-		void initialize( json const * parsed_schema );
+		void initialize( json const * parsedSchema );
 
-		void traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index );
+		void traverse( json::parse_event_t & event, json & parsed, unsigned lineNumber, unsigned lineIndex );
 
-		void validate( json & parsed, unsigned line_num, unsigned line_index );
+		void validate( json & parsed, unsigned lineNumber, unsigned lineIndex );
 
-		void add_error( ErrorType err, double val, unsigned line_num, unsigned line_index );
+		void addError( ErrorType err, double val, unsigned lineNumber, unsigned lineIndex );
 
-		int print_errors();
+		int printErrors();
 
-		std::vector< std::string > const & validation_errors();
+		std::vector< std::string > const & validationErrors();
 
-		std::vector< std::string > const & validation_warnings();
+		std::vector< std::string > const & validationWarnings();
 
 	private:
 		json const * schema;

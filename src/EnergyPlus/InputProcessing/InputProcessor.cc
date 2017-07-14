@@ -71,32 +71,6 @@
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
 
-//typedef std::unordered_map < std::string, std::string > UnorderedObjectTypeMap;
-//typedef std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > UnorderedObjectCacheMap;
-//typedef std::map < const json::object_t * const, std::pair < std::string, std::string > > UnorderedUnusedObjectMap;
-
-using json = nlohmann::json;
-
-namespace EnergyPlus {
-	// initialization of class static variables
-	json InputProcessor::jdf = json();
-	json InputProcessor::schema = json();
-	IdfParser InputProcessor::idf_parser = IdfParser();
-	State InputProcessor::state = State();
-	char InputProcessor::s[] = { 0 };
-
-	//json::parser_callback_t InputProcessor::call_back = [](int EP_UNUSED(depth), json::parse_event_t event, json &parsed,
-	//	unsigned line_num, unsigned line_index) -> bool {
-	//	InputProcessor::state.traverse(event, parsed, line_num, line_index);
-	//	return true;
-	//};
-
-	std::unordered_map< std::string, std::string > InputProcessor::case_insensitive_object_map = std::unordered_map< std::string, std::string >();
-	std::unordered_map< std::string, std::pair< json::const_iterator, std::vector<json::const_iterator> > > InputProcessor::jdd_jdf_cache_map = std::unordered_map< std::string, std::pair< json::const_iterator, std::vector<json::const_iterator> > >();
-	std::map< const json::object_t * const, std::pair< std::string, std::string > > InputProcessor::unused_inputs = std::map< const json::object_t * const, std::pair< std::string, std::string > >();
-}
-
-
 namespace EnergyPlus {
 // Module containing the input processor routines
 
@@ -104,7 +78,7 @@ namespace EnergyPlus {
 //       AUTHOR         Linda K. Lawrie
 //       DATE WRITTEN   August 1997
 //       MODIFIED       na
-//       RE-ENGINEERED  na
+//       RE-ENGINEERED  Mark Adams 2017
 
 // PURPOSE OF THIS MODULE:
 // To provide the capabilities of reading the input data dictionary
@@ -121,53 +95,52 @@ namespace EnergyPlus {
 // input file and (2) the simulation input data file will be processed
 // with the data therein being supplied to the actual simulation routines.
 
-// OTHER NOTES:
-
-// USE STATEMENTS:
-// Use statements for data only modules
-// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-	using namespace DataStringGlobals;
-	using DataGlobals::MaxNameLength;
-	using DataGlobals::AutoCalculate;
-	using DataGlobals::rTinyValue;
-	using DataGlobals::DisplayAllWarnings;
-	using DataGlobals::DisplayUnusedObjects;
-	using DataGlobals::CacheIPErrorFile;
-	using DataGlobals::DoingInputProcessing;
-	using DataSizing::AutoSize;
-	using namespace DataIPShortCuts;
-	using DataSystemVariables::SortedIDD;
-	using DataSystemVariables::iASCII_CR;
-	using DataSystemVariables::iUnicode_end;
-	using DataGlobals::DisplayInputInAudit;
-
 	static std::string const BlankString;
+
+	using json = nlohmann::json;
+	using UnorderedObjectTypeMap = std::unordered_map < std::string, std::string >;
+	using UnorderedObjectCacheMap = std::unordered_map< std::string, InputProcessor::ObjectCache >;
+	using UnorderedUnusedObjectMap = std::map< const json::object_t * const, InputProcessor::ObjectInfo >;
+
+		// initialization of class static variables
+	json InputProcessor::jdf = json();
+	json InputProcessor::schema = json();
+	IdfParser InputProcessor::idf_parser = IdfParser();
+	State InputProcessor::state = State();
+	char InputProcessor::s[] = { 0 };
+
+	json::parser_callback_t InputProcessor::callback = [](int EP_UNUSED(depth), json::parse_event_t event, json &parsed,
+		unsigned line_num, unsigned line_index) -> bool {
+		InputProcessor::state.traverse(event, parsed, line_num, line_index);
+		return true;
+	};
+
+	UnorderedObjectTypeMap InputProcessor::caseInsensitiveObjectMap = UnorderedObjectTypeMap();
+	UnorderedObjectCacheMap InputProcessor::objectCacheMap = UnorderedObjectCacheMap();
+	UnorderedUnusedObjectMap InputProcessor::unusedInputs = UnorderedUnusedObjectMap();
 
 // Functions
 
-// Clears the global data in InputProcessor.
-// Needed for unit tests, should not be normally called.
 	void
 	InputProcessor::clear_state() {
 		state = State();
 		idf_parser = IdfParser();
 		jdf.clear();
-		jdd_jdf_cache_map.clear();
+		objectCacheMap.clear();
 	}
 
-	std::vector < std::string > const & InputProcessor::validation_errors() {
-		return state.validation_errors();
+	std::vector < std::string > const & InputProcessor::validationErrors() {
+		return state.validationErrors();
 	}
 
-	std::vector < std::string > const & InputProcessor::validation_warnings() {
-		return state.validation_warnings();
+	std::vector < std::string > const & InputProcessor::validationWarnings() {
+		return state.validationWarnings();
 	}
 
 	std::pair< bool, std::string >
 	InputProcessor::ConvertInsensitiveObjectType( std::string const & objectType ) {
-		auto tmp_umit = EnergyPlus::InputProcessor::case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( objectType ) );
-		if ( tmp_umit != EnergyPlus::InputProcessor::case_insensitive_object_map.end() ) {
+		auto tmp_umit = EnergyPlus::InputProcessor::caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( objectType ) );
+		if ( tmp_umit != EnergyPlus::InputProcessor::caseInsensitiveObjectMap.end() ) {
 			return std::make_pair( true, tmp_umit->second );
 		}
 		return std::make_pair( false, "" );
@@ -175,45 +148,47 @@ namespace EnergyPlus {
 
 	void
 	InputProcessor::InitializeMaps() {
-		unused_inputs.clear();
-		jdd_jdf_cache_map.clear();
-		jdd_jdf_cache_map.reserve( jdf.size() );
+		unusedInputs.clear();
+		objectCacheMap.clear();
+		objectCacheMap.reserve( jdf.size() );
 		auto const & schema_properties = schema.at( "properties" );
 
 		for ( auto jdf_iter = jdf.begin(); jdf_iter != jdf.end(); ++jdf_iter ) {
 			auto const & objects = jdf_iter.value();
-			std::vector < json::const_iterator > jdf_obj_iterators_vec;
-			jdf_obj_iterators_vec.reserve( objects.size() );
+			auto const & objectType = jdf_iter.key();
+			ObjectCache objectCache;
+			objectCache.inputObjectIterators.reserve( objects.size() );
 			for ( auto jdf_obj_iter = objects.begin(); jdf_obj_iter != objects.end(); ++jdf_obj_iter ) {
-				jdf_obj_iterators_vec.emplace_back( jdf_obj_iter );
+				objectCache.inputObjectIterators.emplace_back( jdf_obj_iter );
 				auto const * const obj_ptr = jdf_obj_iter.value().get_ptr< const json::object_t * const >();
-				unused_inputs.emplace( obj_ptr, std::make_pair( jdf_iter.key(), jdf_obj_iter.key() ) );
+				unusedInputs.emplace( obj_ptr, ObjectInfo( objectType, jdf_obj_iter.key() ) );
 			}
-			auto const & schema_iter = schema_properties.find( jdf_iter.key() );
-			jdd_jdf_cache_map.emplace( schema_iter.key(), std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) ) );
+			auto const schema_iter = schema_properties.find( objectType );
+			objectCache.schemaIterator = schema_iter;
+			objectCacheMap.emplace( schema_iter.key(), objectCache );
 		}
 	}
 
 	void
 	InputProcessor::ProcessInput() {
-		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
+		std::ifstream jdd_stream( DataStringGlobals::inputJddFileName , std::ifstream::in);
 		if ( !jdd_stream.is_open() ) {
-			ShowFatalError( "JDD file path " + inputJddFileName + " not found" );
+			ShowFatalError( "JDD file path " + DataStringGlobals::inputJddFileName + " not found" );
 			return;
 		}
 		InputProcessor::schema = json::parse(jdd_stream);
 
 		const json & loc = InputProcessor::schema[ "properties" ];
-		case_insensitive_object_map.reserve( loc.size() );
+		caseInsensitiveObjectMap.reserve( loc.size() );
 		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
 			std::string key = it.key();
 			for ( char & c : key ) c = toupper( c );
-			case_insensitive_object_map.emplace( std::move( key ), it.key() );
+			caseInsensitiveObjectMap.emplace( std::move( key ), it.key() );
 		}
 
-		std::ifstream input_stream( inputFileName , std::ifstream::in | std::ios::ate);
+		std::ifstream input_stream( DataStringGlobals::inputFileName , std::ifstream::in | std::ios::ate);
 		if ( !input_stream.is_open() ) {
-			ShowFatalError( "Input file path " + inputFileName + " not found" );
+			ShowFatalError( "Input file path " + DataStringGlobals::inputFileName + " not found" );
 			return;
 		}
 
@@ -237,7 +212,7 @@ namespace EnergyPlus {
 			json const input_file_json = InputProcessor::idf_parser.decode( input_file, InputProcessor::schema );
 			if ( DataGlobals::outputJDFConversion ) {
 				input_file = input_file_json.dump( 4 );
-				std::string convertedIDF( outputDirPathName + inputFileNameOnly + ".jdf" );
+				std::string convertedIDF( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".jdf" );
 				FileSystem::makeNativePath( convertedIDF );
 				std::ofstream convertedFS( convertedIDF, std::ofstream::out );
 				convertedFS << input_file << std::endl;
@@ -257,13 +232,13 @@ namespace EnergyPlus {
 
 		if ( DataGlobals::isJDF && DataGlobals::outputJDFConversion ) {
 			std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
-			std::string convertedJDF( outputDirPathName + inputFileNameOnly + ".idf" );
+			std::string convertedJDF( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf" );
 			FileSystem::makeNativePath( convertedJDF );
 			std::ofstream convertedFS( convertedJDF, std::ofstream::out );
 			convertedFS << encoded << std::endl;
 		}
 
-		auto const num_errors = InputProcessor::state.print_errors();
+		auto const num_errors = InputProcessor::state.printErrors();
 		if ( num_errors ) {
 			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
 		}
@@ -320,8 +295,8 @@ namespace EnergyPlus {
 		auto const & find_obj = jdf.find( ObjectWord );
 
 		if ( find_obj == jdf.end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == case_insensitive_object_map.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
+			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return 0;
 			}
 			return static_cast< int >( jdf[ tmp_umit->second ].size() );
@@ -330,8 +305,8 @@ namespace EnergyPlus {
 		}
 
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == case_insensitive_object_map.end() ) {
+			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
 			}
 		}
@@ -361,13 +336,13 @@ namespace EnergyPlus {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
-		auto find_iterators = jdd_jdf_cache_map.find( Object );
-		if ( find_iterators == jdd_jdf_cache_map.end() ) {
-			auto const tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( Object ) );
-			if ( tmp_umit == case_insensitive_object_map.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
+		auto find_iterators = objectCacheMap.find( Object );
+		if ( find_iterators == objectCacheMap.end() ) {
+			auto const tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( Object ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
-			find_iterators = jdd_jdf_cache_map.find( tmp_umit->second );
+			find_iterators = objectCacheMap.find( tmp_umit->second );
 		}
 
 		NumAlphas = 0;
@@ -378,14 +353,14 @@ namespace EnergyPlus {
 		auto const & is_NumBlank = present(NumBlank);
 		auto const & is_NumericFieldNames = present(NumericFieldNames);
 
-		auto const & jdf_it = find_iterators->second.second.at( Number - 1 );
-		auto const & jdd_it = find_iterators->second.first;
+		auto const & jdf_it = find_iterators->second.inputObjectIterators.at( Number - 1 );
+		auto const & jdd_it = find_iterators->second.schemaIterator;
 		auto const & jdd_it_val = jdd_it.value();
 
 		auto const * const obj_ptr = jdf_it.value().get_ptr< const json::object_t * const >();
-		auto const find_unused = unused_inputs.find( obj_ptr );
-		if ( find_unused != unused_inputs.end() ) {
-			unused_inputs.erase( find_unused );
+		auto const find_unused = unusedInputs.find( obj_ptr );
+		if ( find_unused != unusedInputs.end() ) {
+			unusedInputs.erase( find_unused );
 		}
 
 		// Locations in JSON schema relating to normal fields
@@ -647,8 +622,8 @@ namespace EnergyPlus {
 		json * obj;
 		auto obj_iter = jdf.find( ObjType );
 		if ( obj_iter == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjType ) );
-			if ( tmp_umit == case_insensitive_object_map.end() ) {
+			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				return -1;
 			}
 			obj = &jdf[ tmp_umit->second ];
@@ -687,8 +662,8 @@ namespace EnergyPlus {
 		json * obj;
 		auto obj_iter = jdf.find( ObjType );
 		if ( jdf.find( ObjType ) == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjType ) );
-			if ( tmp_umit == case_insensitive_object_map.end() ) {
+			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				return -1;
 			}
 			obj = &jdf[ tmp_umit->second ];
@@ -871,8 +846,8 @@ namespace EnergyPlus {
 		NumNumeric = 0;
 		json * object;
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == case_insensitive_object_map.end() ) {
+			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				ShowSevereError(
 				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;
@@ -885,8 +860,8 @@ namespace EnergyPlus {
 
 		json * objects;
 		if ( jdf.find( ObjectWord ) == jdf.end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == case_insensitive_object_map.end() ) {
+			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				ShowSevereError(
 				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;
@@ -947,12 +922,12 @@ namespace EnergyPlus {
 		// not "gotten" during the simulation.
 
 		std::unordered_set< std::string > unused_object_types;
-		unused_object_types.reserve( unused_inputs.size() );
+		unused_object_types.reserve( unusedInputs.size() );
 
-		if ( unused_inputs.size() && DisplayUnusedObjects ) {
+		if ( unusedInputs.size() && DataGlobals::DisplayUnusedObjects ) {
 			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the input" );
 			ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
-			if ( ! DisplayAllWarnings ) {
+			if ( ! DataGlobals::DisplayAllWarnings ) {
 				ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all." );
 			} else {
 				ShowContinueError( " Each unused object is shown." );
@@ -961,9 +936,9 @@ namespace EnergyPlus {
 		}
 
 		bool first_iteration = true;
-		for ( auto it = unused_inputs.begin(); it != unused_inputs.end(); ++it ) {
-			auto const & object_type = it->second.first;
-			auto const & name = it->second.second;
+		for ( auto it = unusedInputs.begin(); it != unusedInputs.end(); ++it ) {
+			auto const & object_type = it->second.objectType;
+			auto const & name = it->second.objectName;
 
 			// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
 			if ( has_prefix( object_type, "ZoneHVAC:" ) ) {
@@ -972,9 +947,9 @@ namespace EnergyPlus {
 				ShowContinueError( " -- Object name: " + name );
 			}
 
-			if ( ! DisplayUnusedObjects ) continue;
+			if ( ! DataGlobals::DisplayUnusedObjects ) continue;
 
-			if ( ! DisplayAllWarnings ) {
+			if ( ! DataGlobals::DisplayAllWarnings ) {
 				auto found_type = unused_object_types.find( object_type );
 				if ( found_type != unused_object_types.end() ) {
 					// only show first unused named object of an object class
@@ -1000,8 +975,8 @@ namespace EnergyPlus {
 			}
 		}
 
-		if ( unused_inputs.size() && ! DisplayUnusedObjects ) {
-			u64toa( unused_inputs.size(), s );
+		if ( unusedInputs.size() && ! DataGlobals::DisplayUnusedObjects ) {
+			u64toa( unusedInputs.size(), s );
 			ShowMessage( "There are " + std::string( s ) + " unused objects in input." );
 			ShowMessage( "Use Output:Diagnostics,DisplayUnusedObjects; to see them." );
 		}
@@ -1047,9 +1022,6 @@ namespace EnergyPlus {
 		//    A11,       \field message line 9
 		//    A12;       \field message line 10
 
-		// Using/Aliasing
-		using namespace DataIPShortCuts;
-
 		int NumAlphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve rNumericArgs from IDF
 		int IOStat; // Could be used in the Get Routines, not currently checked
@@ -1059,59 +1031,60 @@ namespace EnergyPlus {
 		int CountM;
 		std::string Multiples;
 
-		cCurrentModuleObject = "Output:PreprocessorMessage";
-		NumPrePM = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		DataIPShortCuts::cCurrentModuleObject = "Output:PreprocessorMessage";
+		NumPrePM = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 		if ( NumPrePM > 0 ) {
-			GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNumbers );
-			cAlphaArgs( { 1, NumAlphas } ) = BlankString;
+			GetObjectDefMaxArgs( DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+			DataIPShortCuts::cAlphaArgs( { 1, NumAlphas } ) = BlankString;
 			for ( CountP = 1; CountP <= NumPrePM; ++CountP ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CountP, cAlphaArgs, NumAlphas, rNumericArgs,
-											   NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-											   cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ).empty() ) cAlphaArgs( 1 ) = "Unknown";
+				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, CountP, DataIPShortCuts::cAlphaArgs, NumAlphas,
+												DataIPShortCuts::rNumericArgs, NumNumbers, IOStat, DataIPShortCuts::lNumericFieldBlanks,
+												DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+												DataIPShortCuts::cNumericFieldNames );
+				if ( DataIPShortCuts::cAlphaArgs( 1 ).empty() ) DataIPShortCuts::cAlphaArgs( 1 ) = "Unknown";
 				if ( NumAlphas > 3 ) {
 					Multiples = "s";
 				} else {
 					Multiples = BlankString;
 				}
-				if ( cAlphaArgs( 2 ).empty() ) cAlphaArgs( 2 ) = "Unknown";
+				if ( DataIPShortCuts::cAlphaArgs( 2 ).empty() ) DataIPShortCuts::cAlphaArgs( 2 ) = "Unknown";
 				{
-					auto const errorType( uppercased( cAlphaArgs( 2 ) ) );
+					auto const errorType( uppercased( DataIPShortCuts::cAlphaArgs( 2 ) ) );
 					if ( errorType == "INFORMATION" ) {
-						ShowMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
+						ShowMessage( DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) +
 									 "\" has the following Information message" + Multiples + ':' );
 					} else if ( errorType == "WARNING" ) {
-						ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
+						ShowWarningError( DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) +
 										  "\" has the following Warning condition" + Multiples + ':' );
 					} else if ( errorType == "SEVERE" ) {
 						ShowSevereError(
-						cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
+						DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) +
 						"\" has the following Severe condition" +
 						Multiples + ':' );
 					} else if ( errorType == "FATAL" ) {
 						ShowSevereError(
-						cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
+						DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) +
 						"\" has the following Fatal condition" +
 						Multiples + ':' );
 						PreP_Fatal = true;
 					} else {
 						ShowSevereError(
-						cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following " +
-						cAlphaArgs( 2 ) +
+						DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\" has the following " +
+						DataIPShortCuts::cAlphaArgs( 2 ) +
 						" condition" + Multiples + ':' );
 					}
 				}
 				CountM = 3;
 				if ( CountM > NumAlphas ) {
-					ShowContinueError( cCurrentModuleObject + " was blank.  Check " + cAlphaArgs( 1 ) +
+					ShowContinueError( DataIPShortCuts::cCurrentModuleObject + " was blank.  Check " + DataIPShortCuts::cAlphaArgs( 1 ) +
 									   " audit trail or error file for possible reasons." );
 				}
 				while ( CountM <= NumAlphas ) {
-					if ( len( cAlphaArgs( CountM ) ) == MaxNameLength ) {
-						ShowContinueError( cAlphaArgs( CountM ) + cAlphaArgs( CountM + 1 ) );
+					if ( len( DataIPShortCuts::cAlphaArgs( CountM ) ) == DataGlobals::MaxNameLength ) {
+						ShowContinueError( DataIPShortCuts::cAlphaArgs( CountM ) + DataIPShortCuts::cAlphaArgs( CountM + 1 ) );
 						CountM += 2;
 					} else {
-						ShowContinueError( cAlphaArgs( CountM ) );
+						ShowContinueError( DataIPShortCuts::cAlphaArgs( CountM ) );
 						++CountM;
 					}
 				}
@@ -1145,9 +1118,6 @@ namespace EnergyPlus {
 		// EnergyManagementSystem:Sensor
 		// EnergyManagementSystem:OutputVariable
 
-		// Using/Aliasing
-		using namespace DataOutputs;
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const OutputVariable( "Output:Variable" );
 		static std::string const MeterCustom( "Meter:Custom" );
@@ -1162,8 +1132,8 @@ namespace EnergyPlus {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string extension_key;
-		OutputVariablesForSimulation.reserve( 1024 );
-		MaxConsideredOutputVariables = 10000;
+		DataOutputs::OutputVariablesForSimulation.reserve( 1024 );
+		DataOutputs::MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
 		auto jdf_objects = jdf.find( OutputVariable );
@@ -1310,8 +1280,8 @@ namespace EnergyPlus {
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					auto const report_name = UtilityRoutines::MakeUPPERCase( extensions.at( "report_name" ) );
 					if ( report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY" ) {
-						for ( int i = 1; i <= NumMonthlyReports; ++i ) {
-							InputProcessor::AddVariablesForMonthlyReport( MonthlyNamedReports( i ) );
+						for ( int i = 1; i <= DataOutputs::NumMonthlyReports; ++i ) {
+							InputProcessor::AddVariablesForMonthlyReport( DataOutputs::MonthlyNamedReports( i ) );
 						}
 					} else {
 						InputProcessor::AddVariablesForMonthlyReport( report_name );

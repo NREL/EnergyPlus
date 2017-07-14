@@ -78,12 +78,12 @@ namespace EnergyPlus {
 			return EnergyPlusFixture::process_idd( idd, errors_found );
 		}
 
-		std::vector < std::string > const & validation_errors() {
-			return InputProcessor::validation_errors();
+		std::vector < std::string > const & validationErrors() {
+			return InputProcessor::validationErrors();
 		}
 
-		std::vector < std::string > const & validation_warnings() {
-			return InputProcessor::validation_warnings();
+		std::vector < std::string > const & validationWarnings() {
+			return InputProcessor::validationWarnings();
 		}
 
 		std::string encodeIDF() {

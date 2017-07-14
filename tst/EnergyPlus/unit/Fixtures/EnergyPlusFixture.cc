@@ -222,12 +222,6 @@ using json = nlohmann::json;
 
 namespace EnergyPlus {
 
-	json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int EP_UNUSED( depth ), json::parse_event_t event, json &parsed,
-									   unsigned line_num, unsigned line_index) -> bool {
-		EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
-		return true;
-	};
-
 	void EnergyPlusFixture::SetUpTestCase() {
 		bool errors_found = false;
 		process_idd("", errors_found);
@@ -237,11 +231,11 @@ namespace EnergyPlus {
 		}
 
 		const json & loc = InputProcessor::schema[ "properties" ];
-		InputProcessor::case_insensitive_object_map.reserve( loc.size() );
+		InputProcessor::caseInsensitiveObjectMap.reserve( loc.size() );
 		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
 			std::string key = it.key();
 			for ( char & c : key ) c = toupper( c );
-			InputProcessor::case_insensitive_object_map.emplace( std::move( key ), it.key() );
+			InputProcessor::caseInsensitiveObjectMap.emplace( std::move( key ), it.key() );
 		}
 	}
 
@@ -600,7 +594,7 @@ namespace EnergyPlus {
 
 		InputProcessor::InitializeMaps();
 		SimulationManager::PostIPProcessing();
-		InputProcessor::state.print_errors();
+		InputProcessor::state.printErrors();
 
 		return true;
 	}

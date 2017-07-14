@@ -66,7 +66,7 @@ namespace EnergyPlus {
 		for ( auto & s : loc ) root_required.emplace( s.get < std::string >(), false );
 	}
 
-	void State::add_error( ErrorType err, double val, unsigned line_num, unsigned line_index ) {
+	void State::addError( ErrorType err, double val, unsigned line_num, unsigned line_index ) {
 		std::string str = "Out of Range: Value \"" + std::to_string( val ) + "\" parsed at line " +
 						  std::to_string( line_num ) + " (index " + std::to_string( line_index ) + ")";
 		if ( err == ErrorType::Maximum ) {
@@ -80,7 +80,7 @@ namespace EnergyPlus {
 		}
 	}
 
-	int State::print_errors() {
+	int State::printErrors() {
 		if ( warnings.size() ) ShowWarningError("Number of validation warnings: " + std::to_string(warnings.size()));
 		for ( auto const & s : warnings ) ShowContinueError( s );
 		if ( errors.size() ) ShowSevereError("Number of validation errors: " + std::to_string(errors.size()));
@@ -88,11 +88,11 @@ namespace EnergyPlus {
 		return static_cast<int> ( errors.size() );
 	}
 
-	std::vector < std::string > const & State::validation_errors() {
+	std::vector < std::string > const & State::validationErrors() {
 		return errors;
 	}
 
-	std::vector < std::string > const & State::validation_warnings() {
+	std::vector < std::string > const & State::validationWarnings() {
 		return warnings;
 	}
 
@@ -287,18 +287,18 @@ namespace EnergyPlus {
 			if ( found_min != loc->end() ) {
 				double const min_val = found_min->get < double >();
 				if ( loc->find( "exclusiveMinimum" ) != loc->end() && val <= min_val ) {
-					add_error( State::ErrorType::ExclusiveMinimum, val, line_num, prev_line_index + prev_key_len );
+					addError( State::ErrorType::ExclusiveMinimum, val, line_num, prev_line_index + prev_key_len );
 				} else if ( val < min_val ) {
-					add_error( State::ErrorType::Minimum, val, line_num, prev_line_index + prev_key_len );
+					addError( State::ErrorType::Minimum, val, line_num, prev_line_index + prev_key_len );
 				}
 			}
 			auto const found_max = loc->find( "maximum" );
 			if ( found_max != loc->end() ) {
 				double const max_val = found_max->get < double >();
 				if ( loc->find( "exclusiveMaximum" ) != loc->end() && val >= max_val ) {
-					add_error( State::ErrorType::ExclusiveMaximum, val, line_num, prev_line_index + prev_key_len );
+					addError( State::ErrorType::ExclusiveMaximum, val, line_num, prev_line_index + prev_key_len );
 				} else if ( val > max_val ) {
-					add_error( State::ErrorType::Maximum, val, line_num, prev_line_index + prev_key_len );
+					addError( State::ErrorType::Maximum, val, line_num, prev_line_index + prev_key_len );
 				}
 			}
 			auto const found_type = loc->find( "type" );
