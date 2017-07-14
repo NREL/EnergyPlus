@@ -1292,7 +1292,7 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
 				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
@@ -1416,7 +1416,7 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
 				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
@@ -1442,9 +1442,9 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).pipeOutDia = rNumericArgs( 8 );
 				slinkyGLHE( GLHENum ).pipeThick = rNumericArgs( 9 );
 
-				if ( InputProcessor::SameString( cAlphaArgs( 4 ), "VERTICAL" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "VERTICAL" ) ) {
 					slinkyGLHE( GLHENum ).verticalConfig = true;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
 					slinkyGLHE( GLHENum ).verticalConfig = false;
 				}
 

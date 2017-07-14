@@ -313,19 +313,19 @@ namespace WaterManager {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					AnyWaterSystemsInModel = true;
 					WaterStorage( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " = " + cAlphaArgs( 1 );
 
 					WaterStorage( Item ).QualitySubCategoryName = cAlphaArgs( 2 );
-					//    If (InputProcessor::SameString(cAlphaArgs(2), 'Mains')) Then
+					//    If (UtilityRoutines::SameString(cAlphaArgs(2), 'Mains')) Then
 					//      WaterStorage(Item)%QualitySubCategory = MainsWater
-					//    ELSEIF (InputProcessor::SameString(cAlphaArgs(2), 'RAINWATER')) Then
+					//    ELSEIF (UtilityRoutines::SameString(cAlphaArgs(2), 'RAINWATER')) Then
 					//      WaterStorage(Item)%QualitySubCategory = RainWater
-					//    ELSEIF (InputProcessor::SameString(cAlphaArgs(2), 'GREYWATER')) Then
+					//    ELSEIF (UtilityRoutines::SameString(cAlphaArgs(2), 'GREYWATER')) Then
 					//      WaterStorage(Item)%QualitySubCategory = GreyWater
-					//    ELSEIF (InputProcessor::SameString(cAlphaArgs(2), 'WELLWATER')) Then
+					//    ELSEIF (UtilityRoutines::SameString(cAlphaArgs(2), 'WELLWATER')) Then
 					//      WaterStorage(Item)%QualitySubCategory =  WellWater
-					//    ELSEIF (InputProcessor::SameString(cAlphaArgs(2), 'BLACKWATER')) Then
+					//    ELSEIF (UtilityRoutines::SameString(cAlphaArgs(2), 'BLACKWATER')) Then
 					//      WaterStorage(Item)%QualitySubCategory = BlackWater
 
 					//    ELSE
@@ -352,13 +352,13 @@ namespace WaterManager {
 
 					WaterStorage( Item ).OverflowTankName = cAlphaArgs( 3 ); // setup later
 
-					if ( InputProcessor::SameString( cAlphaArgs( 4 ), "None" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "None" ) ) {
 						WaterStorage( Item ).ControlSupplyType = NoControlLevel;
-					} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "Mains" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Mains" ) ) {
 						WaterStorage( Item ).ControlSupplyType = MainsFloatValve;
-					} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "GroundwaterWell" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "GroundwaterWell" ) ) {
 						WaterStorage( Item ).ControlSupplyType = WellFloatValve;
-					} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "OtherTank" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "OtherTank" ) ) {
 						WaterStorage( Item ).ControlSupplyType = OtherTankFloatValve;
 					} else {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
@@ -390,9 +390,9 @@ namespace WaterManager {
 
 					WaterStorage( Item ).SupplyTankName = cAlphaArgs( 5 ); //set up later
 
-					if ( InputProcessor::SameString( cAlphaArgs( 6 ), "ScheduledTemperature" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "ScheduledTemperature" ) ) {
 						WaterStorage( Item ).ThermalMode = ScheduledTankTemp;
-					} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), "ThermalModel" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "ThermalModel" ) ) {
 						WaterStorage( Item ).ThermalMode = TankZoneThermalCoupled;
 					} else {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
@@ -424,11 +424,11 @@ namespace WaterManager {
 					}
 
 					if ( WaterStorage( Item ).ThermalMode == TankZoneThermalCoupled ) {
-						if ( InputProcessor::SameString( cAlphaArgs( 8 ), "Schedule" ) ) {
+						if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "Schedule" ) ) {
 							WaterStorage( Item ).AmbientTempIndicator = AmbientTempSchedule;
-						} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "Zone" ) ) {
+						} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "Zone" ) ) {
 							WaterStorage( Item ).AmbientTempIndicator = AmbientTempZone;
-						} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "Outdoors" ) ) {
+						} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "Outdoors" ) ) {
 							WaterStorage( Item ).AmbientTempIndicator = AmbientTempExterior;
 						} else {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
@@ -441,7 +441,7 @@ namespace WaterManager {
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 							ErrorsFound = true;
 						}
-						WaterStorage( Item ).ZoneID = InputProcessor::FindItemInList( cAlphaArgs( 10 ), Zone );
+						WaterStorage( Item ).ZoneID = UtilityRoutines::FindItemInList( cAlphaArgs( 10 ), Zone );
 						if ( ( WaterStorage( Item ).ZoneID == 0 ) && ( WaterStorage( Item ).AmbientTempIndicator == AmbientTempZone ) ) {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -465,20 +465,20 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumRainCollectors; ++Item ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					RainCollector( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 
 					RainCollector( Item ).StorageTankName = cAlphaArgs( 2 );
-					RainCollector( Item ).StorageTankID = InputProcessor::FindItemInList( cAlphaArgs( 2 ), WaterStorage );
+					RainCollector( Item ).StorageTankID = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), WaterStorage );
 					if ( RainCollector( Item ).StorageTankID == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					}
 
-					if ( InputProcessor::SameString( cAlphaArgs( 3 ), "Constant" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Constant" ) ) {
 						RainCollector( Item ).LossFactorMode = ConstantRainLossFactor;
-					} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "Scheduled" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Scheduled" ) ) {
 						RainCollector( Item ).LossFactorMode = ScheduledRainLossFactor;
 					} else {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
@@ -528,7 +528,7 @@ namespace WaterManager {
 					RainCollector( Item ).SurfID.allocate( RainCollector( Item ).NumCollectSurfs );
 					for ( SurfNum = 1; SurfNum <= RainCollector( Item ).NumCollectSurfs; ++SurfNum ) {
 						RainCollector( Item ).SurfName( SurfNum ) = cAlphaArgs( SurfNum + alphaOffset );
-						RainCollector( Item ).SurfID( SurfNum ) = InputProcessor::FindItemInList( cAlphaArgs( SurfNum + alphaOffset ), Surface );
+						RainCollector( Item ).SurfID( SurfNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( SurfNum + alphaOffset ), Surface );
 						if ( RainCollector( Item ).SurfID( SurfNum ) == 0 ) {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( SurfNum + alphaOffset ) + '=' + cAlphaArgs( SurfNum + alphaOffset ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -563,7 +563,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GroundwaterWell( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 					GroundwaterWell( Item ).StorageTankName = cAlphaArgs( 2 );
 
@@ -578,9 +578,9 @@ namespace WaterManager {
 					GroundwaterWell( Item ).PumpEfficiency = rNumericArgs( 5 );
 					GroundwaterWell( Item ).WellRecoveryRate = rNumericArgs( 6 );
 					GroundwaterWell( Item ).NomWellStorageVol = rNumericArgs( 7 );
-					if ( InputProcessor::SameString( cAlphaArgs( 3 ), "Constant" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Constant" ) ) {
 						GroundwaterWell( Item ).GroundwaterTableMode = ConstantWaterTable;
-					} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "Scheduled" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Scheduled" ) ) {
 						GroundwaterWell( Item ).GroundwaterTableMode = ScheduledWaterTable;
 					} else if ( lAlphaFieldBlanks( 3 ) ) {
 						GroundwaterWell( Item ).GroundwaterTableMode = 0;
@@ -617,7 +617,7 @@ namespace WaterManager {
 
 					// setup tanks whose level is controlled by supply from another tank
 					if ( ( WaterStorage( Item ).ControlSupplyType == OtherTankFloatValve ) || ( WaterStorage( Item ).ControlSupplyType == TankMainsBackup ) ) {
-						WaterStorage( Item ).SupplyTankID = InputProcessor::FindItemInList( WaterStorage( Item ).SupplyTankName, WaterStorage );
+						WaterStorage( Item ).SupplyTankID = UtilityRoutines::FindItemInList( WaterStorage( Item ).SupplyTankName, WaterStorage );
 						if ( WaterStorage( Item ).SupplyTankID == 0 ) {
 							ShowSevereError( "Other tank called " + WaterStorage( Item ).SupplyTankName + " not found for " + cCurrentModuleObject + " Named " + WaterStorage( Item ).Name ); // TODO rename point
 							ErrorsFound = true;
@@ -627,7 +627,7 @@ namespace WaterManager {
 						InternalSetupTankSupplyComponent( WaterStorage( Item ).SupplyTankName, cCurrentModuleObject, WaterStorage( Item ).Name, ErrorsFound, Dummy, Dummy );
 					}
 					// setup overflow inputs
-					WaterStorage( Item ).OverflowTankID = InputProcessor::FindItemInList( WaterStorage( Item ).OverflowTankName, WaterStorage );
+					WaterStorage( Item ).OverflowTankID = UtilityRoutines::FindItemInList( WaterStorage( Item ).OverflowTankName, WaterStorage );
 					if ( WaterStorage( Item ).OverflowTankID == 0 ) {
 						// if blank, then okay it is discarded.  but if not blank then error
 						if ( is_blank( WaterStorage( Item ).OverflowTankName ) ) {
@@ -657,7 +657,7 @@ namespace WaterManager {
 				AnyWaterSystemsInModel = true;
 				InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
-				if ( InputProcessor::SameString( cAlphaArgs( 1 ), "ScheduleAndDesignLevel" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "ScheduleAndDesignLevel" ) ) {
 					RainFall.ModeID = RainSchedDesign;
 				} else {
 					ShowSevereError( "Precipitation Model Type of " + cCurrentModuleObject + " is incorrect." );
@@ -690,9 +690,9 @@ namespace WaterManager {
 			if ( NumIrrigation == 1 ) {
 				AnyIrrigationInModel = true;
 				InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
-				if ( InputProcessor::SameString( cAlphaArgs( 1 ), "Schedule" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "Schedule" ) ) {
 					Irrigation.ModeID = IrrSchedDesign;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 1 ), "SmartSchedule" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "SmartSchedule" ) ) {
 					Irrigation.ModeID = IrrSmartSched;
 				} else {
 					ShowSevereError( "Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule" );
@@ -1221,7 +1221,7 @@ namespace WaterManager {
 		Array1D_string oldSupplyCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
-		TankIndex = InputProcessor::FindItemInList( TankName, WaterStorage );
+		TankIndex = UtilityRoutines::FindItemInList( TankName, WaterStorage );
 		if ( TankIndex == 0 ) {
 			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName );
 			ErrorsFound = true;
@@ -1358,7 +1358,7 @@ namespace WaterManager {
 		Array1D_string oldDemandCompTypes;
 		//  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
-		TankIndex = InputProcessor::FindItemInList( TankName, WaterStorage );
+		TankIndex = UtilityRoutines::FindItemInList( TankName, WaterStorage );
 		if ( TankIndex == 0 ) {
 			ShowSevereError( "WaterUse:Storage (Water Storage Tank) =\"" + TankName + "\" not found in " + CompType + " called " + CompName );
 			ErrorsFound = true;

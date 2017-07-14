@@ -436,7 +436,7 @@ namespace FaultsManager {
 
 				int EvapCoolerNum;
 
-				if( InputProcessor::SameString( SELECT_CASE_VAR, "EvaporativeCooler:Indirect:WetCoil" ) ) {
+				if( UtilityRoutines::SameString( SELECT_CASE_VAR, "EvaporativeCooler:Indirect:WetCoil" ) ) {
 					// Read in evaporative cooler is not done yet
 					if ( EvaporativeCoolers::GetInputEvapComponentsFlag ) {
 						EvaporativeCoolers::GetEvapInput();
@@ -444,7 +444,7 @@ namespace FaultsManager {
 					}
 
 					// Check whether the evaporative cooler  name and type match each other;
-					EvapCoolerNum = InputProcessor::FindItemInList( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerName, EvaporativeCoolers::EvapCond, &EvaporativeCoolers::EvapConditions::EvapCoolerName );
+					EvapCoolerNum = UtilityRoutines::FindItemInList( FaultsEvapCoolerFouling( jFault_EvapCoolerFouling ).EvapCoolerName, EvaporativeCoolers::EvapCond, &EvaporativeCoolers::EvapConditions::EvapCoolerName );
 					if ( EvapCoolerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -513,7 +513,7 @@ namespace FaultsManager {
 
 				int ChillerNum;
 
-				if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
+				if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
 					// Read in chiller if not done yet
 					if ( PlantChillers::GetElectricInput ) {
 						PlantChillers::GetElectricChillerInput();
@@ -521,7 +521,7 @@ namespace FaultsManager {
 					}
 
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -538,7 +538,7 @@ namespace FaultsManager {
 						}
   					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
 					// Read in chiller if not done yet
 					if ( ChillerElectricEIR::GetInputEIR ) {
 						ChillerElectricEIR::GetElectricEIRChillerInput();
@@ -546,7 +546,7 @@ namespace FaultsManager {
   					}
 
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -563,7 +563,7 @@ namespace FaultsManager {
 						}
   					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
 
 					// Read in chiller if not done yet
 					if ( ChillerReformulatedEIR::GetInputREIR ) {
@@ -572,7 +572,7 @@ namespace FaultsManager {
 					}
 
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -589,7 +589,7 @@ namespace FaultsManager {
 						}
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
 					// Read in chiller if not done yet
 					if ( PlantChillers::GetConstCOPInput ) {
 						PlantChillers::GetConstCOPChillerInput();
@@ -597,7 +597,7 @@ namespace FaultsManager {
 					}
 
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -614,7 +614,7 @@ namespace FaultsManager {
 						}
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
 					// Read in chiller if not done yet
 					if ( PlantChillers::GetEngineDrivenInput ) {
 						PlantChillers::GetEngineDrivenChillerInput();
@@ -622,7 +622,7 @@ namespace FaultsManager {
 					}
 
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -639,14 +639,14 @@ namespace FaultsManager {
 						}
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
 					// Read in chiller if not done yet
 					if ( PlantChillers::GetGasTurbineInput ) {
 						PlantChillers::GetGTChillerInput();
 						PlantChillers::GetGasTurbineInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -721,7 +721,7 @@ namespace FaultsManager {
 			// Boiler check and link
 			{
 				// Check the boiler name and boiler type
-				int BoilerNum = InputProcessor::FindItemInList( FaultsBoilerFouling( jFault_BoilerFouling ).BoilerName, Boilers::Boiler );
+				int BoilerNum = UtilityRoutines::FindItemInList( FaultsBoilerFouling( jFault_BoilerFouling ).BoilerName, Boilers::Boiler );
 				if ( BoilerNum <= 0 ) {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 					ErrorsFound = true;
@@ -787,9 +787,9 @@ namespace FaultsManager {
 			// Coil check and link
 			{ auto const SELECT_CASE_VAR( FaultsCoilSATSensor( jFault_CoilSAT ).CoilType );
 
-				if ( InputProcessor::SameString( SELECT_CASE_VAR, "Coil:Heating:Electric" ) ||
-					InputProcessor::SameString( SELECT_CASE_VAR, "Coil:Heating:Gas" ) ||
-					InputProcessor::SameString( SELECT_CASE_VAR, "Coil:Heating:Desuperheater" )
+				if ( UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Electric" ) ||
+					UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Gas" ) ||
+					UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Desuperheater" )
 				){
 					// Read in coil input if not done yet
 					if ( HeatingCoils::GetCoilsInputFlag ) {
@@ -797,7 +797,7 @@ namespace FaultsManager {
 						HeatingCoils::GetCoilsInputFlag = false;
 					}
 					// Check the coil name and coil type
-					int CoilNum = InputProcessor::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HeatingCoils::HeatingCoil );
+					int CoilNum = UtilityRoutines::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HeatingCoils::HeatingCoil );
 					if ( CoilNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -807,7 +807,7 @@ namespace FaultsManager {
 						HeatingCoils::HeatingCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
 					}
 
-				} else if ( InputProcessor::SameString( SELECT_CASE_VAR, "Coil:Heating:Steam" ) ) {
+				} else if ( UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Steam" ) ) {
 
 					// Read in coil input if not done yet
 					if ( SteamCoils::GetSteamCoilsInputFlag ) {
@@ -815,7 +815,7 @@ namespace FaultsManager {
 						SteamCoils::GetSteamCoilsInputFlag = false;
 					}
 					// Check the coil name and coil type
-					int CoilNum = InputProcessor::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, SteamCoils::SteamCoil );
+					int CoilNum = UtilityRoutines::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, SteamCoils::SteamCoil );
 					if ( CoilNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -831,9 +831,9 @@ namespace FaultsManager {
 						}
 					}
 
-				} else if ( InputProcessor::SameString( SELECT_CASE_VAR, "Coil:Heating:Water" ) ||
-					InputProcessor::SameString( SELECT_CASE_VAR, "Coil:Cooling:Water" ) ||
-					InputProcessor::SameString( SELECT_CASE_VAR, "Coil:Cooling:Water:Detailedgeometry" )
+				} else if ( UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Water" ) ||
+					UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Cooling:Water" ) ||
+					UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Cooling:Water:Detailedgeometry" )
 				){
 					// Read in coil input if not done yet
 					if( WaterCoils::GetWaterCoilsInputFlag ) {
@@ -841,7 +841,7 @@ namespace FaultsManager {
 						WaterCoils::GetWaterCoilsInputFlag = false;
 					}
 					// Check the coil name and coil type
-					int CoilNum = InputProcessor::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, WaterCoils::WaterCoil );
+					int CoilNum = UtilityRoutines::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, WaterCoils::WaterCoil );
 					if( CoilNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -859,7 +859,7 @@ namespace FaultsManager {
 						HVACControllers::GetControllerInputFlag = false;
 					}
 					// Check the controller name
-					int ControlNum = InputProcessor::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).WaterCoilControllerName, HVACControllers::ControllerProps, &HVACControllers::ControllerPropsType::ControllerName );
+					int ControlNum = UtilityRoutines::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).WaterCoilControllerName, HVACControllers::ControllerProps, &HVACControllers::ControllerPropsType::ControllerName );
 					if( ControlNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" not found." );
 						ErrorsFound = true;
@@ -874,7 +874,7 @@ namespace FaultsManager {
 							ErrorsFound = true;
 						}
 					}
-				} else if ( InputProcessor::SameString( SELECT_CASE_VAR, "CoilSystem:Cooling:DX" ) ){
+				} else if ( UtilityRoutines::SameString( SELECT_CASE_VAR, "CoilSystem:Cooling:DX" ) ){
 					// Read in DXCoolingSystem input if not done yet
 					if ( HVACDXSystem::GetInputFlag ) {
 						HVACDXSystem::GetDXCoolingSystemInput();
@@ -882,7 +882,7 @@ namespace FaultsManager {
 					}
 
 					// Check the coil name and coil type
-					int CoilSysNum = InputProcessor::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACDXSystem::DXCoolingSystem );
+					int CoilSysNum = UtilityRoutines::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACDXSystem::DXCoolingSystem );
 					if( CoilSysNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -891,7 +891,7 @@ namespace FaultsManager {
 						HVACDXSystem::DXCoolingSystem( CoilSysNum ).FaultyCoilSATFlag = true;
 						HVACDXSystem::DXCoolingSystem( CoilSysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
 					}
-				} else if ( InputProcessor::SameString( SELECT_CASE_VAR, "CoilSystem:Heating:DX" ) ){
+				} else if ( UtilityRoutines::SameString( SELECT_CASE_VAR, "CoilSystem:Heating:DX" ) ){
 					// Read in DXCoolingSystem input if not done yet
 					if ( HVACDXHeatPumpSystem::GetInputFlag ) {
 						HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput();
@@ -899,7 +899,7 @@ namespace FaultsManager {
 					}
 
 					// Check the coil name and coil type
-					int CoilSysNum = InputProcessor::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACDXHeatPumpSystem::DXHeatPumpSystem );
+					int CoilSysNum = UtilityRoutines::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACDXHeatPumpSystem::DXHeatPumpSystem );
 					if( CoilSysNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -908,7 +908,7 @@ namespace FaultsManager {
 						HVACDXHeatPumpSystem::DXHeatPumpSystem( CoilSysNum ).FaultyCoilSATFlag = true;
 						HVACDXHeatPumpSystem::DXHeatPumpSystem( CoilSysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
 					}
-				} else if ( InputProcessor::SameString( SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem" ) ){
+				} else if ( UtilityRoutines::SameString( SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem" ) ){
 					// Read in DXCoolingSystem input if not done yet
 					if ( HVACUnitarySystem::GetInputFlag ) {
 						HVACUnitarySystem::GetUnitarySystemInput();
@@ -916,7 +916,7 @@ namespace FaultsManager {
 					}
 
 					// Check the coil name and coil type
-					int UnitarySysNum = InputProcessor::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACUnitarySystem::UnitarySystem );
+					int UnitarySysNum = UtilityRoutines::FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACUnitarySystem::UnitarySystem );
 					if( UnitarySysNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -995,7 +995,7 @@ namespace FaultsManager {
 					CondenserLoopTowers::GetInput = false;
 				}
 				// Check the tower name and tower type
-				int TowerNum = InputProcessor::FindItemInList( FaultsTowerFouling( jFault_TowerFouling ).TowerName, CondenserLoopTowers::SimpleTower );
+				int TowerNum = UtilityRoutines::FindItemInList( FaultsTowerFouling( jFault_TowerFouling ).TowerName, CondenserLoopTowers::SimpleTower );
 				if ( TowerNum <= 0 ) {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 					ErrorsFound = true;
@@ -1005,7 +1005,7 @@ namespace FaultsManager {
 					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingIndex = jFault_TowerFouling;
 
 					// Check the faulty tower type
-					if ( ! InputProcessor::SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsTowerFouling( jFault_TowerFouling ).TowerType )) {
+					if ( ! UtilityRoutines::SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsTowerFouling( jFault_TowerFouling ).TowerType )) {
 						ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type in the fault model is updated. " );
 						FaultsTowerFouling( jFault_TowerFouling ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
 					}
@@ -1079,7 +1079,7 @@ namespace FaultsManager {
 					CondenserLoopTowers::GetInput = false;
 				}
 				// Check the tower name and tower type
-				int TowerNum = InputProcessor::FindItemInList( FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName, CondenserLoopTowers::SimpleTower );
+				int TowerNum = UtilityRoutines::FindItemInList( FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName, CondenserLoopTowers::SimpleTower );
 				if ( TowerNum <= 0 ) {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 					ErrorsFound = true;
@@ -1089,7 +1089,7 @@ namespace FaultsManager {
 					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTIndex = jFault_CondenserSWT;
 
 					// Check the faulty tower type
-					if ( ! InputProcessor::SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType )) {
+					if ( ! UtilityRoutines::SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType )) {
 						ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type is updated. " );
 						FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
 					}
@@ -1153,14 +1153,14 @@ namespace FaultsManager {
 
 				int ChillerNum;
 
-				if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
+				if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
 					// Read in chiller if not done yet
 					if ( PlantChillers::GetElectricInput ) {
 						PlantChillers::GetElectricChillerInput();
 						PlantChillers::GetElectricInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -1170,14 +1170,14 @@ namespace FaultsManager {
 						PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
 					// Read in chiller if not done yet
 					if ( ChillerElectricEIR::GetInputEIR ) {
 						ChillerElectricEIR::GetElectricEIRChillerInput();
 						ChillerElectricEIR::GetInputEIR = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -1187,14 +1187,14 @@ namespace FaultsManager {
 						ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
 					// Read in chiller if not done yet
 					if ( ChillerReformulatedEIR::GetInputREIR ) {
 						ChillerReformulatedEIR::GetElecReformEIRChillerInput();
 						ChillerReformulatedEIR::GetInputREIR = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -1204,14 +1204,14 @@ namespace FaultsManager {
 						ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
 					// Read in chiller if not done yet
 					if ( PlantChillers::GetEngineDrivenInput ) {
 						PlantChillers::GetEngineDrivenChillerInput();
 						PlantChillers::GetEngineDrivenInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -1221,14 +1221,14 @@ namespace FaultsManager {
 						PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
 					// Read in chiller if not done yet
 					if ( PlantChillers::GetGasTurbineInput ) {
 						PlantChillers::GetGTChillerInput();
 						PlantChillers::GetGasTurbineInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -1238,14 +1238,14 @@ namespace FaultsManager {
 						PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
 					// Read in chiller if not done yet
 					if ( PlantChillers::GetConstCOPInput ) {
 						PlantChillers::GetConstCOPChillerInput();
 						PlantChillers::GetConstCOPInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -1255,14 +1255,14 @@ namespace FaultsManager {
 						PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
 					// Read in chiller if not done yet
 					if ( ChillerAbsorption::GetInput ) {
 						ChillerAbsorption::GetBLASTAbsorberInput();
 						ChillerAbsorption::GetInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerAbsorption::BLASTAbsorber );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerAbsorption::BLASTAbsorber );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -1272,14 +1272,14 @@ namespace FaultsManager {
 						ChillerAbsorption::BLASTAbsorber( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
 
-				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
+				} else if( UtilityRoutines::SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
 					// Read in chiller if not done yet
 					if ( ChillerIndirectAbsorption::GetInput ) {
 						ChillerIndirectAbsorption::GetIndirectAbsorberInput();
 						ChillerIndirectAbsorption::GetInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerIndirectAbsorption::IndirectAbsorber );
+					ChillerNum = UtilityRoutines::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerIndirectAbsorption::IndirectAbsorber );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -1308,14 +1308,14 @@ namespace FaultsManager {
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
 
 			// Check whether the specified fan exists in the fan list
-			if ( InputProcessor::FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) <= 0 ) {
+			if ( UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) <= 0 ) {
 				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
 			// Assign fault index to the fan object
 			for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
-				if ( InputProcessor::SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
+				if ( UtilityRoutines::SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
 					Fans::Fan( FanNum ).FaultyFilterFlag = true;
 					Fans::Fan( FanNum ).FaultyFilterIndex = jFault_AirFilter;
 					break;
@@ -1378,7 +1378,7 @@ namespace FaultsManager {
 			FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatName = cAlphaArgs( 2 );
 			FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatType = cAlphaArgs( 3 );
 
-			if ( InputProcessor::SameString( FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
+			if ( UtilityRoutines::SameString( FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
 			// For Humidistat Offset Type: ThermostatOffsetDependent
 
 				// Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
@@ -1506,7 +1506,7 @@ namespace FaultsManager {
 				}
 			}
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( cAlphaArgs( 5 ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( cAlphaArgs( 5 ) ) );
 			if ( SELECT_CASE_var == "FOULEDUARATED" ) {
 				FouledCoils( jFault_FoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
 
@@ -1568,7 +1568,7 @@ namespace FaultsManager {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
 					ErrorsFound = true;
 				} else {
-					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( cAlphaArgs( 4 ) ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( cAlphaArgs( 4 ) ) );
 					if ( SELECT_CASE_var == "CONTROLLER:OUTDOORAIR" ) {
 						FaultsEconomizer( j ).ControllerTypeEnum = iController_AirEconomizer;
 
@@ -1803,7 +1803,7 @@ namespace FaultsManager {
 		FanFound = false;
 
 		for ( int FanNum = 1; FanNum <= NumFans; ++FanNum ) {
-			if ( InputProcessor::SameString( Fan( FanNum ).FanName, FanName ) ) {
+			if ( UtilityRoutines::SameString( Fan( FanNum ).FanName, FanName ) ) {
 				FanMaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;
 				FanDeltaPress = Fan( FanNum ).DeltaPress;
 				FanFound = true;

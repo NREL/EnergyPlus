@@ -249,7 +249,7 @@ namespace CoolTower {
 		for ( CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, CoolTowerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
 			CoolTowerSys( CoolTowerNum ).Name = cAlphaArgs( 1 ); // Name of cooltower
 			CoolTowerSys( CoolTowerNum ).Schedule = cAlphaArgs( 2 ); // Get schedule
 			if ( lAlphaBlanks( 2 ) ) {
@@ -264,7 +264,7 @@ namespace CoolTower {
 			}
 
 			CoolTowerSys( CoolTowerNum ).ZoneName = cAlphaArgs( 3 ); // Name of zone where cooltower is serving
-			CoolTowerSys( CoolTowerNum ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Zone );
+			CoolTowerSys( CoolTowerNum ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( CoolTowerSys( CoolTowerNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );

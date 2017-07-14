@@ -414,14 +414,14 @@ namespace PlantCondLoopOperation {
 		NumPlantOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
+			if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
 		}
 
 		CurrentModuleObject = "CondenserEquipmentOperationSchemes";
 		NumCondOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
+			if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
 		}
 
 		//Load the Plant data structure
@@ -820,7 +820,7 @@ namespace PlantCondLoopOperation {
 		if ( NumSchemes > 0 ) {
 			for ( Num = 1; Num <= NumSchemes; ++Num ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-				if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, AlphArray( 1 ) ) ) break;
+				if ( UtilityRoutines::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, AlphArray( 1 ) ) ) break;
 				if ( Num == NumSchemes ) {
 					ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 					ErrorsFound = true;
@@ -990,7 +990,7 @@ namespace PlantCondLoopOperation {
 		if ( NumSchemes > 0 ) {
 			for ( Num = 1; Num <= NumSchemes; ++Num ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-				if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, AlphArray( 1 ) ) ) break;
+				if ( UtilityRoutines::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, AlphArray( 1 ) ) ) break;
 				if ( Num == NumSchemes ) {
 					ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 					ErrorsFound = true;
@@ -1171,7 +1171,7 @@ namespace PlantCondLoopOperation {
 		FoundIntendedList = false;
 		// find name in set of possible list
 		for ( Num = 1; Num <= TotNumLists; ++Num ) {
-			if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).Name, EquipListsNameList( Num ) ) ) {
+			if ( UtilityRoutines::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).Name, EquipListsNameList( Num ) ) ) {
 				FoundIntendedList = true;
 				// get object item for real this time
 				{ auto const SELECT_CASE_var( EquipListsTypeList( Num ) );
@@ -1280,7 +1280,7 @@ namespace PlantCondLoopOperation {
 		if ( NumSchemes > 0 ) {
 			for ( Num = 1; Num <= NumSchemes; ++Num ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, cAlphaArgs( 1 ) ) ) break;
+				if ( UtilityRoutines::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, cAlphaArgs( 1 ) ) ) break;
 				if ( Num == NumSchemes ) {
 					ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 					ErrorsFound = true;
@@ -1546,7 +1546,7 @@ namespace PlantCondLoopOperation {
 
 			for ( Num = 1; Num <= NumSchemes; ++Num ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( InputProcessor::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, cAlphaArgs( 1 ) ) ) break; //found the correct one
+				if ( UtilityRoutines::SameString( PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, cAlphaArgs( 1 ) ) ) break; //found the correct one
 				if ( Num == NumSchemes ) { // did not find it
 					ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", could not find " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 					ErrorsFound = true;
@@ -1569,7 +1569,7 @@ namespace PlantCondLoopOperation {
 						SetupEMSInternalVariable( "Component Remaining Current Demand Rate", PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + ':' + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).Name, "[W]", PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).EMSIntVarRemainingLoadValue );
 					}
 				}
-				StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
+				StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 				if ( StackMngrNum > 0 ) { // found it
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlSimProgramMngr = StackMngrNum;
 				} else {
@@ -1579,7 +1579,7 @@ namespace PlantCondLoopOperation {
 					ErrorsFound = true;
 				}
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
+					StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -1688,7 +1688,7 @@ namespace PlantCondLoopOperation {
 						auto & this_equip_list( this_op_scheme.EquipList( ListNum ) );
 						for ( int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum ) {
 							auto & this_equip( this_equip_list.Comp( EquipNum ) );
-							ThisTypeOfNum = InputProcessor::FindItem( this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
+							ThisTypeOfNum = UtilityRoutines::FindItem( this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 							errFlag1 = false;
 							ScanPlantLoopsForObject( this_equip.Name, ThisTypeOfNum, DummyLoopNum, LoopSideNum, BranchNum, CompNum, _, _, NumSearchResults, _, LoopNum, errFlag1 );
 

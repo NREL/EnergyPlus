@@ -218,7 +218,7 @@ namespace UnitHeater {
 
 		// Find the correct Unit Heater Equipment
 		if ( CompIndex == 0 ) {
-			UnitHeatNum = InputProcessor::FindItemInList( CompName, UnitHeat );
+			UnitHeatNum = UtilityRoutines::FindItemInList( CompName, UnitHeat );
 			if ( UnitHeatNum == 0 ) {
 				ShowFatalError( "SimUnitHeater: Unit not found=" + CompName );
 			}
@@ -347,7 +347,7 @@ namespace UnitHeater {
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames.allocate( NumNumbers );
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = "";
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = cNumericFields;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitHeat( UnitHeatNum ).Name = Alphas( 1 );
 			UnitHeat( UnitHeatNum ).SchedName = Alphas( 2 );
@@ -377,7 +377,7 @@ namespace UnitHeater {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
+				if ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
 					GetFanType( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).FanType_Num, errFlag, CurrentModuleObject, UnitHeat( UnitHeatNum ).Name );
 
 					{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).FanType_Num );
@@ -415,7 +415,7 @@ namespace UnitHeater {
 						}
 						UnitHeat( UnitHeatNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag );
 					}
-				} else if ( InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
+				} else if ( UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
 					UnitHeat( UnitHeatNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitHeat( UnitHeatNum ).FanName ) ); // call constructor
 					UnitHeat( UnitHeatNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitHeat( UnitHeatNum ).FanName ); //zero-based
@@ -512,11 +512,11 @@ namespace UnitHeater {
 			}
 
 			UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating = Alphas( 10 );
-			if ( ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
+			if ( ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
 				ErrorsFound = true;
 				ShowSevereError( "Illegal " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + '=' + UnitHeat( UnitHeatNum ).Name );
-			} else if ( InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
+			} else if ( UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
 				UnitHeat( UnitHeatNum ).FanOffNoHeating = true;
 			}
 
@@ -537,7 +537,7 @@ namespace UnitHeater {
 
 			UnitHeat( UnitHeatNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 12 )) {
-				UnitHeat( UnitHeatNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 12 ), ZoneHVACSizing );
+				UnitHeat( UnitHeatNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 12 ), ZoneHVACSizing );
 				if (UnitHeat( UnitHeatNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 12 ) + " = " + Alphas( 12 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );

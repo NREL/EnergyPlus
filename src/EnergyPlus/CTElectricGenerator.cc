@@ -147,7 +147,7 @@ namespace CTElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = InputProcessor::FindItemInList( GeneratorName, CTGenerator );
+			GenNum = UtilityRoutines::FindItemInList( GeneratorName, CTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -202,7 +202,7 @@ namespace CTElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = InputProcessor::FindItemInList( CompName, CTGenerator );
+			CompNum = UtilityRoutines::FindItemInList( CompName, CTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimCTPlantHeatRecovery: CT Generator Unit not found=" + CompName );
 				return;
@@ -272,7 +272,7 @@ namespace CTElectricGenerator {
 		//LOAD ARRAYS WITH CT CURVE FIT Generator DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			UtilityRoutines::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
 
 			CTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 

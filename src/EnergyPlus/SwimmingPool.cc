@@ -327,13 +327,13 @@ namespace SwimmingPool {
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			Pool( Item ).Name = Alphas( 1 );
 
 			Pool( Item ).SurfaceName = Alphas( 2 );
 			Pool( Item ).SurfacePtr = 0;
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-				if ( InputProcessor::SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
+				if ( UtilityRoutines::SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
 					Pool( Item ).SurfacePtr = SurfNum;
 					break;
 				}

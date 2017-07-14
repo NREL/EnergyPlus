@@ -64,6 +64,7 @@
 #include <DataAirSystems.hh>
 #include <DataHVACGlobals.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

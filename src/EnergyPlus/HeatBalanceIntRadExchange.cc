@@ -884,8 +884,8 @@ namespace HeatBalanceIntRadExchange {
 			numinx1 = 0;
 
 			for ( index = 2; index <= NumAlphas; index += 2 ) {
-				inx1 = InputProcessor::FindItemInList( cAlphaArgs( index ), ZoneSurfaceNames, N );
-				inx2 = InputProcessor::FindItemInList( cAlphaArgs( index + 1 ), ZoneSurfaceNames, N );
+				inx1 = UtilityRoutines::FindItemInList( cAlphaArgs( index ), ZoneSurfaceNames, N );
+				inx2 = UtilityRoutines::FindItemInList( cAlphaArgs( index + 1 ), ZoneSurfaceNames, N );
 				if ( inx1 == 0 ) {
 					ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name." );
 					ShowContinueError( "...Surface name=\"" + cAlphaArgs( index ) + "\", not in this zone." );

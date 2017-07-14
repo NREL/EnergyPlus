@@ -1056,7 +1056,7 @@ namespace SurfaceGeometry {
 			//Debug    write(outputfiledebug,*) ' adding surface=',curnewsurf
 			SurfaceTmp( CurNewSurf ) = SurfaceTmp( SurfNum );
 			//  Basic parameters are the same for both surfaces.
-			Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone, NumOfZones );
+			Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone, NumOfZones );
 			if ( Found == 0 ) continue;
 			SurfaceTmp( CurNewSurf ).Zone = Found;
 			SurfaceTmp( CurNewSurf ).ZoneName = Zone( Found ).Name;
@@ -1124,7 +1124,7 @@ namespace SurfaceGeometry {
 				//Debug        write(outputfiledebug,*) ' basesurf, extboundcondname=',TRIM(SurfaceTmp(CurNewSurf)%ExtBoundCondName)
 			} else {
 				// subsurface
-				Found = InputProcessor::FindItemInList( "iz-" + SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, FirstTotalSurfaces + CurNewSurf - 1 );
+				Found = UtilityRoutines::FindItemInList( "iz-" + SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, FirstTotalSurfaces + CurNewSurf - 1 );
 				if ( Found > 0 ) {
 					SurfaceTmp( CurNewSurf ).BaseSurfName = "iz-" + SurfaceTmp( SurfNum ).BaseSurfName;
 					SurfaceTmp( CurNewSurf ).BaseSurf = Found;
@@ -1158,10 +1158,10 @@ namespace SurfaceGeometry {
 			if ( ! SurfaceTmp( SurfNum ).HeatTransSurf ) continue;
 
 			// why are we doing this again?  this should have already been done.
-			if ( InputProcessor::SameString( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp( SurfNum ).Name ) ) {
+			if ( UtilityRoutines::SameString( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp( SurfNum ).Name ) ) {
 				Found = SurfNum;
 			} else {
-				Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, TotSurfaces );
+				Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, TotSurfaces );
 			}
 			if ( Found > 0 ) {
 				SurfaceTmp( SurfNum ).BaseSurf = Found;
@@ -1222,7 +1222,7 @@ namespace SurfaceGeometry {
 
 					if ( SurfaceTmp( SurfNum ).Zone == 0 ) continue;
 
-					if ( ! InputProcessor::SameString( SurfaceTmp( SurfNum ).ZoneName, Zone( ZoneNum ).Name ) ) continue;
+					if ( ! UtilityRoutines::SameString( SurfaceTmp( SurfNum ).ZoneName, Zone( ZoneNum ).Name ) ) continue;
 					if ( SurfaceTmp( SurfNum ).Class != BaseSurfIDs( Loop ) ) continue;
 
 					++MovedSurfs;
@@ -1325,7 +1325,7 @@ namespace SurfaceGeometry {
 					if ( Surface( SurfNum ).ExtBoundCondName == Surface( SurfNum ).Name ) {
 						Found = SurfNum;
 					} else {
-						Found = InputProcessor::FindItemInList( Surface( SurfNum ).ExtBoundCondName, Surface, MovedSurfs );
+						Found = UtilityRoutines::FindItemInList( Surface( SurfNum ).ExtBoundCondName, Surface, MovedSurfs );
 					}
 					if ( Found != 0 ) {
 						Surface( SurfNum ).ExtBoundCond = Found;
@@ -2095,9 +2095,9 @@ namespace SurfaceGeometry {
 			CCW = true;
 
 			OK = false;
-			Found = InputProcessor::FindItem( GAlphas( 1 ), AbCorners, 4 );
+			Found = UtilityRoutines::FindItem( GAlphas( 1 ), AbCorners, 4 );
 			if ( Found == 0 ) {
-				Found = InputProcessor::FindItem( GAlphas( 1 ), FlCorners, 4 );
+				Found = UtilityRoutines::FindItem( GAlphas( 1 ), FlCorners, 4 );
 				if ( Found == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + '=' + GAlphas( 1 ) );
 					ErrorsFound = true;
@@ -2113,12 +2113,12 @@ namespace SurfaceGeometry {
 			}
 
 			OK = false;
-			if ( InputProcessor::SameString( GAlphas( 2 ), "CCW" ) || InputProcessor::SameString( GAlphas( 2 ), "Counterclockwise" ) ) {
+			if ( UtilityRoutines::SameString( GAlphas( 2 ), "CCW" ) || UtilityRoutines::SameString( GAlphas( 2 ), "Counterclockwise" ) ) {
 				CCW = true;
 				OutMsg += "Counterclockwise,";
 				OK = true;
 			}
-			if ( InputProcessor::SameString( GAlphas( 2 ), "CW" ) || InputProcessor::SameString( GAlphas( 2 ), "Clockwise" ) ) {
+			if ( UtilityRoutines::SameString( GAlphas( 2 ), "CW" ) || UtilityRoutines::SameString( GAlphas( 2 ), "Clockwise" ) ) {
 				CCW = false;
 				OutMsg += "Clockwise,";
 				OK = true;
@@ -2129,12 +2129,12 @@ namespace SurfaceGeometry {
 			}
 
 			OK = false;
-			if ( InputProcessor::SameString( GAlphas( 3 ), "WCS" ) || InputProcessor::SameString( GAlphas( 3 ), "WorldCoordinateSystem" ) || InputProcessor::SameString( GAlphas( 3 ), "World" ) || InputProcessor::SameString( GAlphas( 3 ), "Absolute" ) ) {
+			if ( UtilityRoutines::SameString( GAlphas( 3 ), "WCS" ) || UtilityRoutines::SameString( GAlphas( 3 ), "WorldCoordinateSystem" ) || UtilityRoutines::SameString( GAlphas( 3 ), "World" ) || UtilityRoutines::SameString( GAlphas( 3 ), "Absolute" ) ) {
 				WorldCoordSystem = true;
 				OutMsg += "WorldCoordinateSystem,";
 				OK = true;
 			}
-			if ( has_prefixi( GAlphas( 3 ), "Rel" ) || has_prefixi( GAlphas( 3 ), "Relative" ) || InputProcessor::SameString( GAlphas( 3 ), "Local" ) ) {
+			if ( has_prefixi( GAlphas( 3 ), "Rel" ) || has_prefixi( GAlphas( 3 ), "Relative" ) || UtilityRoutines::SameString( GAlphas( 3 ), "Local" ) ) {
 				WorldCoordSystem = false;
 				OutMsg += "RelativeCoordinateSystem,";
 				OK = true;
@@ -2147,12 +2147,12 @@ namespace SurfaceGeometry {
 			}
 
 			OK = false;
-			if ( InputProcessor::SameString( GAlphas( 4 ), "WCS" ) || InputProcessor::SameString( GAlphas( 4 ), "WorldCoordinateSystem" ) || InputProcessor::SameString( GAlphas( 4 ), "World" ) || InputProcessor::SameString( GAlphas( 4 ), "Absolute" ) ) {
+			if ( UtilityRoutines::SameString( GAlphas( 4 ), "WCS" ) || UtilityRoutines::SameString( GAlphas( 4 ), "WorldCoordinateSystem" ) || UtilityRoutines::SameString( GAlphas( 4 ), "World" ) || UtilityRoutines::SameString( GAlphas( 4 ), "Absolute" ) ) {
 				DaylRefWorldCoordSystem = true;
 				OutMsg += "WorldCoordinateSystem,";
 				OK = true;
 			}
-			if ( has_prefixi( GAlphas( 4 ), "Rel" ) || has_prefixi( GAlphas( 4 ), "Relative" ) || InputProcessor::SameString( GAlphas( 4 ), "Local" ) || GAlphas( 4 ).empty() ) {
+			if ( has_prefixi( GAlphas( 4 ), "Rel" ) || has_prefixi( GAlphas( 4 ), "Relative" ) || UtilityRoutines::SameString( GAlphas( 4 ), "Local" ) || GAlphas( 4 ).empty() ) {
 				DaylRefWorldCoordSystem = false;
 				OutMsg += "RelativeCoordinateSystem,";
 				OK = true;
@@ -2165,12 +2165,12 @@ namespace SurfaceGeometry {
 			}
 
 			OK = false;
-			if ( InputProcessor::SameString( GAlphas( 5 ), "WCS" ) || InputProcessor::SameString( GAlphas( 5 ), "WorldCoordinateSystem" ) || InputProcessor::SameString( GAlphas( 5 ), "World" ) || InputProcessor::SameString( GAlphas( 5 ), "Absolute" ) ) {
+			if ( UtilityRoutines::SameString( GAlphas( 5 ), "WCS" ) || UtilityRoutines::SameString( GAlphas( 5 ), "WorldCoordinateSystem" ) || UtilityRoutines::SameString( GAlphas( 5 ), "World" ) || UtilityRoutines::SameString( GAlphas( 5 ), "Absolute" ) ) {
 				RectSurfRefWorldCoordSystem = true;
 				OutMsg += "WorldCoordinateSystem";
 				OK = true;
 			}
-			if ( has_prefixi( GAlphas( 5 ), "Rel" ) || has_prefixi( GAlphas( 5 ), "Relative" ) || InputProcessor::SameString( GAlphas( 5 ), "Local" ) || GAlphas( 5 ).empty() ) {
+			if ( has_prefixi( GAlphas( 5 ), "Rel" ) || has_prefixi( GAlphas( 5 ), "Relative" ) || UtilityRoutines::SameString( GAlphas( 5 ), "Local" ) || GAlphas( 5 ).empty() ) {
 				RectSurfRefWorldCoordSystem = false;
 				OutMsg += "RelativeToZoneOrigin";
 				OK = true;
@@ -2702,7 +2702,7 @@ namespace SurfaceGeometry {
 				ArgPointer = 2;
 				if ( Item == 1 ) {
 					if ( cAlphaArgs( 2 ) == "CEILING" ) cAlphaArgs( 2 ) = "ROOF";
-					ClassItem = InputProcessor::FindItemInList( cAlphaArgs( 2 ), BaseSurfCls, 3 );
+					ClassItem = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), BaseSurfCls, 3 );
 					if ( ClassItem == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
 						ErrorsFound = true;
@@ -2714,7 +2714,7 @@ namespace SurfaceGeometry {
 					SurfaceTmp( SurfNum ).Class = BaseSurfIDs( ClassItem );
 				}
 
-				SurfaceTmp( SurfNum ).Construction = InputProcessor::FindItemInList( cAlphaArgs( ArgPointer ), Construct, TotConstructs );
+				SurfaceTmp( SurfNum ).Construction = UtilityRoutines::FindItemInList( cAlphaArgs( ArgPointer ), Construct, TotConstructs );
 
 				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 					ErrorsFound = true;
@@ -2737,7 +2737,7 @@ namespace SurfaceGeometry {
 
 				++ArgPointer;
 				SurfaceTmp( SurfNum ).ZoneName = cAlphaArgs( ArgPointer );
-				ZoneNum = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone, NumOfZones );
+				ZoneNum = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone, NumOfZones );
 
 				if ( ZoneNum != 0 ) {
 					SurfaceTmp( SurfNum ).Zone = ZoneNum;
@@ -2753,14 +2753,14 @@ namespace SurfaceGeometry {
 				++ArgPointer;
 				SurfaceTmp( SurfNum ).ExtBoundCondName = cAlphaArgs( ArgPointer + 1 );
 
-				if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "Outdoors" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "Outdoors" ) ) {
 					SurfaceTmp( SurfNum ).ExtBoundCond = ExternalEnvironment;
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "Adiabatic" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "Adiabatic" ) ) {
 					SurfaceTmp( SurfNum ).ExtBoundCond = UnreconciledZoneSurface;
 					SurfaceTmp( SurfNum ).ExtBoundCondName = SurfaceTmp( SurfNum ).Name;
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "Ground" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "Ground" ) ) {
 					SurfaceTmp( SurfNum ).ExtBoundCond = Ground;
 
 					if ( NoGroundTempObjWarning ) {
@@ -2773,7 +2773,7 @@ namespace SurfaceGeometry {
 					}
 
 					// Added for FCfactor method
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "GroundFCfactorMethod" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "GroundFCfactorMethod" ) ) {
 					SurfaceTmp( SurfNum ).ExtBoundCond = GroundFCfactorMethod;
 					if ( NoFCGroundTempObjWarning ) {
 						if ( ! FCGroundTemps ) {
@@ -2797,8 +2797,8 @@ namespace SurfaceGeometry {
 						}
 					}
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "OtherSideCoefficients" ) ) {
-					Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSC, TotOSC );
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "OtherSideCoefficients" ) ) {
+					Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSC, TotOSC );
 					if ( Found == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer + 1 ) + "=\"" + cAlphaArgs( ArgPointer + 1 ) + "\"." );
 						ShowContinueError( " no OtherSideCoefficients of that name." );
@@ -2812,7 +2812,7 @@ namespace SurfaceGeometry {
 						}
 					}
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "Surface" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "Surface" ) ) {
 					// it has to be another surface which needs to be found
 					// this will be found on the second pass through the surface input
 					// for flagging, set the value to UnreconciledZoneSurface
@@ -2825,12 +2825,12 @@ namespace SurfaceGeometry {
 						ShowContinueError( "..This surface will become an adiabatic surface - no doors/windows allowed." );
 					}
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "Zone" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "Zone" ) ) {
 					// This is the code for an unmatched "other surface"
 					// will be set up later.
 					SurfaceTmp( SurfNum ).ExtBoundCond = UnenteredAdjacentZoneSurface;
 					// check OutsideFaceEnvironment for legal zone
-					Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone, NumOfZones );
+					Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone, NumOfZones );
 					++NeedToAddSurfaces;
 
 					if ( Found == 0 ) {
@@ -2839,7 +2839,7 @@ namespace SurfaceGeometry {
 						ErrorsFound = true;
 					}
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "Foundation" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "Foundation" ) ) {
 
 					if ( !WeatherManager::WeatherFileExists ){
 						ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", using \"Foundation\" type Outside Boundary Condition requires specification of a weather file");
@@ -2874,8 +2874,8 @@ namespace SurfaceGeometry {
 					}
 					SurfaceTmp( SurfNum ).ExtBoundCond = KivaFoundation;
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
-					Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM, TotOSCM );
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
+					Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM, TotOSCM );
 					if ( Found == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer + 1 ) + "=\"" + cAlphaArgs( ArgPointer + 1 ) + "\"." );
 						ErrorsFound = true;
@@ -2883,7 +2883,7 @@ namespace SurfaceGeometry {
 					SurfaceTmp( SurfNum ).OSCMPtr = Found;
 					SurfaceTmp( SurfNum ).ExtBoundCond = OtherSideCondModeledExt;
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "GroundSlabPreprocessorAverage" ) || InputProcessor::SameString( cAlphaArgs( ArgPointer ), "GroundSlabPreprocessorCore" ) || InputProcessor::SameString( cAlphaArgs( ArgPointer ), "GroundSlabPreprocessorPerimeter" ) || InputProcessor::SameString( cAlphaArgs( ArgPointer ), "GroundBasementPreprocessorAverageFloor" ) || InputProcessor::SameString( cAlphaArgs( ArgPointer ), "GroundBasementPreprocessorAverageWall" ) || InputProcessor::SameString( cAlphaArgs( ArgPointer ), "GroundBasementPreprocessorUpperWall" ) || InputProcessor::SameString( cAlphaArgs( ArgPointer ), "GroundBasementPreprocessorLowerWall" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "GroundSlabPreprocessorAverage" ) || UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "GroundSlabPreprocessorCore" ) || UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "GroundSlabPreprocessorPerimeter" ) || UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "GroundBasementPreprocessorAverageFloor" ) || UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "GroundBasementPreprocessorAverageWall" ) || UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "GroundBasementPreprocessorUpperWall" ) || UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "GroundBasementPreprocessorLowerWall" ) ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) + "=\"" + cAlphaArgs( ArgPointer ) + "\"." );
 					ShowContinueError( "The ExpandObjects program has not been run or is not in your EnergyPlus.exe folder." );
 					ErrorsFound = true;
@@ -2896,7 +2896,7 @@ namespace SurfaceGeometry {
 
 				ArgPointer += 2;
 				//Set the logical flag for the exterior solar
-				if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "SunExposed" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "SunExposed" ) ) {
 					SurfaceTmp( SurfNum ).ExtSolar = true;
 
 					if ( ( SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) && ( SurfaceTmp( SurfNum ).ExtBoundCond != OtherSideCondModeledExt ) ) {
@@ -2904,7 +2904,7 @@ namespace SurfaceGeometry {
 						ShowContinueError( "..This surface is not exposed to External Environment.  Sun exposure has no effect." );
 					}
 
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "NoSun" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "NoSun" ) ) {
 					SurfaceTmp( SurfNum ).ExtSolar = false;
 				} else {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) + "=\"" + cAlphaArgs( ArgPointer ) + "\"." );
@@ -2913,9 +2913,9 @@ namespace SurfaceGeometry {
 
 				++ArgPointer;
 				//Set the logical flag for the exterior wind
-				if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "WindExposed" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "WindExposed" ) ) {
 					SurfaceTmp( SurfNum ).ExtWind = true;
-				} else if ( InputProcessor::SameString( cAlphaArgs( ArgPointer ), "NoWind" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( ArgPointer ), "NoWind" ) ) {
 					SurfaceTmp( SurfNum ).ExtWind = false;
 				} else {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) + "=\"" + cAlphaArgs( ArgPointer ) + "\"." );
@@ -3111,7 +3111,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 				SurfaceTmp( SurfNum ).Class = BaseSurfIDs( ClassItem ); // Set class number
 
-				SurfaceTmp( SurfNum ).Construction = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
+				SurfaceTmp( SurfNum ).Construction = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
 
 				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 					ErrorsFound = true;
@@ -3129,7 +3129,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).BaseSurfName = SurfaceTmp( SurfNum ).Name;
 
 				SurfaceTmp( SurfNum ).ZoneName = cAlphaArgs( 3 );
-				ZoneNum = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone, NumOfZones );
+				ZoneNum = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone, NumOfZones );
 
 				if ( ZoneNum != 0 ) {
 					SurfaceTmp( SurfNum ).Zone = ZoneNum;
@@ -3169,7 +3169,7 @@ namespace SurfaceGeometry {
 				} else if ( SurfaceTmp( SurfNum ).ExtBoundCond == UnreconciledZoneSurface ) {
 					if ( GettingIZSurfaces ) {
 						SurfaceTmp( SurfNum ).ExtBoundCondName = cAlphaArgs( OtherSurfaceField );
-						Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone, NumOfZones );
+						Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone, NumOfZones );
 						// see if match to zone, then it's an unentered other surface, else reconciled later
 						if ( Found > 0 ) {
 							++NeedToAddSurfaces;
@@ -3573,7 +3573,7 @@ namespace SurfaceGeometry {
 
 			++SurfNum;
 			SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
-			ValidChk = InputProcessor::FindItemInList( cAlphaArgs( 2 ), SubSurfCls, 6 );
+			ValidChk = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), SubSurfCls, 6 );
 			if ( ValidChk == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
 				ErrorsFound = true;
@@ -3581,7 +3581,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Class = SubSurfIDs( ValidChk ); // Set class number
 			}
 
-			SurfaceTmp( SurfNum ).Construction = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
+			SurfaceTmp( SurfNum ).Construction = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
 
 			if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 				ErrorsFound = true;
@@ -3614,7 +3614,7 @@ namespace SurfaceGeometry {
 			//  The subsurface inherits properties from the base surface
 			//  Exterior conditions, Zone, etc.
 			//  We can figure out the base surface though, because they've all been entered
-			Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, TotSurfaces );
+			Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, TotSurfaces );
 			if ( Found > 0 ) {
 				SurfaceTmp( SurfNum ).BaseSurf = Found;
 				SurfaceTmp( SurfNum ).ExtBoundCond = SurfaceTmp( Found ).ExtBoundCond;
@@ -3665,7 +3665,7 @@ namespace SurfaceGeometry {
 
 			if ( SurfaceTmp( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt || SurfaceTmp( SurfNum ).ExtBoundCond == OtherSideCoefCalcExt ) {
 				if ( ! lAlphaFieldBlanks( 5 ) ) { // Otherside Coef special Name
-					Found = InputProcessor::FindItemInList( cAlphaArgs( 5 ), OSC, TotOSC );
+					Found = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), OSC, TotOSC );
 					if ( Found == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 						ShowContinueError( "...base surface requires that this subsurface have OtherSideCoefficients -- not found." );
@@ -3746,7 +3746,7 @@ namespace SurfaceGeometry {
 
 				if ( ! cAlphaArgs( 6 ).empty() ) {
 					if ( TotWinShadingControl > 0 ) {
-						SurfaceTmp( SurfNum ).WindowShadingControlPtr = InputProcessor::FindItemInList( cAlphaArgs( 6 ), WindowShadingControl, TotWinShadingControl );
+						SurfaceTmp( SurfNum ).WindowShadingControlPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), WindowShadingControl, TotWinShadingControl );
 					}
 					if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
@@ -3903,7 +3903,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 				SurfaceTmp( SurfNum ).Class = SubSurfIDs( ClassItem ); // Set class number
 
-				SurfaceTmp( SurfNum ).Construction = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
+				SurfaceTmp( SurfNum ).Construction = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
 
 				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 					ErrorsFound = true;
@@ -3935,7 +3935,7 @@ namespace SurfaceGeometry {
 				//  The subsurface inherits properties from the base surface
 				//  Exterior conditions, Zone, etc.
 				//  We can figure out the base surface though, because they've all been entered
-				Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, TotSurfaces );
+				Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, TotSurfaces );
 				if ( Found > 0 ) {
 					SurfaceTmp( SurfNum ).BaseSurf = Found;
 					SurfaceTmp( SurfNum ).ExtBoundCond = SurfaceTmp( Found ).ExtBoundCond;
@@ -3974,7 +3974,7 @@ namespace SurfaceGeometry {
 				if ( SurfaceTmp( SurfNum ).ExtBoundCond == UnreconciledZoneSurface ) { // "Surface" Base Surface
 					if ( GettingIZSurfaces ) {
 						SurfaceTmp( SurfNum ).ExtBoundCondName = cAlphaArgs( OtherSurfaceField );
-						IZFound = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone, NumOfZones );
+						IZFound = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone, NumOfZones );
 						if ( IZFound > 0 ) SurfaceTmp( SurfNum ).ExtBoundCond = UnenteredAdjacentZoneSurface;
 					} else { // Interior Window
 						SurfaceTmp( SurfNum ).ExtBoundCondName = SurfaceTmp( SurfNum ).Name;
@@ -4048,7 +4048,7 @@ namespace SurfaceGeometry {
 
 					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
 						if ( TotWinShadingControl > 0 ) {
-							SurfaceTmp( SurfNum ).WindowShadingControlPtr = InputProcessor::FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl, TotWinShadingControl );
+							SurfaceTmp( SurfNum ).WindowShadingControlPtr = UtilityRoutines::FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl, TotWinShadingControl );
 						}
 						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );
@@ -4264,7 +4264,7 @@ namespace SurfaceGeometry {
 				}
 
 				if ( ! lAlphaFieldBlanks( FrameField ) && SurfaceTmp( SurfNum ).FrameDivider == 0 ) {
-					SurfaceTmp( SurfNum ).FrameDivider = InputProcessor::FindItemInList( cAlphaArgs( FrameField ), FrameDivider );
+					SurfaceTmp( SurfNum ).FrameDivider = UtilityRoutines::FindItemInList( cAlphaArgs( FrameField ), FrameDivider );
 					if ( SurfaceTmp( SurfNum ).FrameDivider == 0 ) {
 						if ( ! Construct( SurfaceTmp( SurfNum ).Construction ).WindowTypeEQL ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( FrameField ) + "=\"" + cAlphaArgs( FrameField ) + "\"" );
@@ -4406,7 +4406,7 @@ namespace SurfaceGeometry {
 
 						// Lookup interzone surface of the base surface
 						// (Interzone surfaces have not been assigned yet, but all base surfaces should already be loaded.)
-						Found = InputProcessor::FindItemInList( SurfaceTmp( SurfaceTmp( SurfNum ).BaseSurf ).ExtBoundCondName, SurfaceTmp, SurfNum );
+						Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfaceTmp( SurfNum ).BaseSurf ).ExtBoundCondName, SurfaceTmp, SurfNum );
 						if ( Found != 0 ) SurfaceTmp( Found ).Area -= SurfaceTmp( SurfNum ).Area;
 					}
 
@@ -4681,7 +4681,7 @@ namespace SurfaceGeometry {
 			//  The subsurface inherits properties from the base surface
 			//  Exterior conditions, Zone, etc.
 			//  We can figure out the base surface though, because they've all been entered
-			Found = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, TotSurfaces );
+			Found = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp, TotSurfaces );
 			if ( Found > 0 ) {
 				//SurfaceTmp(SurfNum)%BaseSurf=Found
 				SurfaceTmp( SurfNum ).ExtBoundCond = SurfaceTmp( Found ).ExtBoundCond;
@@ -4855,7 +4855,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Class = SurfaceClass_Shading;
 				SurfaceTmp( SurfNum ).HeatTransSurf = false;
 				// this object references a window or door....
-				Found = InputProcessor::FindItemInList( cAlphaArgs( 2 ), SurfaceTmp, TotSurfaces );
+				Found = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), SurfaceTmp, TotSurfaces );
 				if ( Found > 0 ) {
 					BaseSurfNum = SurfaceTmp( Found ).BaseSurf;
 					SurfaceTmp( SurfNum ).BaseSurfName = SurfaceTmp( Found ).BaseSurfName;
@@ -5181,7 +5181,7 @@ namespace SurfaceGeometry {
 			SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 			SurfaceTmp( SurfNum ).Class = SurfaceClass_IntMass;
 			SurfaceTmp( SurfNum ).HeatTransSurf = true;
-			SurfaceTmp( SurfNum ).Construction = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
+			SurfaceTmp( SurfNum ).Construction = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
 
 			if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 				ErrorsFound = true;
@@ -5194,7 +5194,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).ConstructionStoredInputValue = SurfaceTmp( SurfNum ).Construction;
 			}
 			SurfaceTmp( SurfNum ).ZoneName = cAlphaArgs( 3 );
-			ZoneNum = InputProcessor::FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone, NumOfZones );
+			ZoneNum = UtilityRoutines::FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone, NumOfZones );
 
 			if ( ZoneNum != 0 ) {
 				SurfaceTmp( SurfNum ).Zone = ZoneNum;
@@ -5277,7 +5277,7 @@ namespace SurfaceGeometry {
 		for ( Loop = 1; Loop <= TotShadingSurfaceReflectance; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 1 ), SurfaceTmp, TotSurfaces );
+			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), SurfaceTmp, TotSurfaces );
 			if ( SurfNum == 0 ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid specification" );
 				ShowContinueError( ".. not found " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\"." );
@@ -5301,7 +5301,7 @@ namespace SurfaceGeometry {
 			SurfaceTmp( SurfNum ).ShadowSurfDiffuseSolRefl = ( 1.0 - rNumericArgs( 3 ) ) * rNumericArgs( 1 );
 			SurfaceTmp( SurfNum ).ShadowSurfDiffuseVisRefl = ( 1.0 - rNumericArgs( 3 ) ) * rNumericArgs( 2 );
 			if ( rNumericArgs( 3 ) > 0.0 ) {
-				GlConstrNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
+				GlConstrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
 				if ( GlConstrNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", " + cAlphaFieldNames( 2 ) + " not found=" + cAlphaArgs( 2 ) );
 					ErrorsFound = true;
@@ -5310,13 +5310,13 @@ namespace SurfaceGeometry {
 				}
 				SurfaceTmp( SurfNum ).ShadowSurfGlazingConstruct = GlConstrNum;
 			}
-			SurfNum = InputProcessor::FindItemInList( "Mir-" + cAlphaArgs( 1 ), SurfaceTmp, TotSurfaces );
+			SurfNum = UtilityRoutines::FindItemInList( "Mir-" + cAlphaArgs( 1 ), SurfaceTmp, TotSurfaces );
 			if ( SurfNum == 0 ) continue;
 			SurfaceTmp( SurfNum ).ShadowSurfGlazingFrac = rNumericArgs( 3 );
 			SurfaceTmp( SurfNum ).ShadowSurfDiffuseSolRefl = ( 1.0 - rNumericArgs( 3 ) ) * rNumericArgs( 1 );
 			SurfaceTmp( SurfNum ).ShadowSurfDiffuseVisRefl = ( 1.0 - rNumericArgs( 3 ) ) * rNumericArgs( 2 );
 			if ( rNumericArgs( 3 ) > 0.0 ) {
-				GlConstrNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
+				GlConstrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct, TotConstructs );
 				if ( GlConstrNum != 0 ) {
 					Construct( GlConstrNum ).IsUsed = true;
 				}
@@ -5400,7 +5400,7 @@ namespace SurfaceGeometry {
 			IsBlank = false;
 
 
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExtVentedCavity, Item - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			UtilityRoutines::VerifyName( cAlphaArgs( 1 ), ExtVentedCavity, Item - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...cannot not duplicate other names" );
 				ErrorsFound = true;
@@ -5410,7 +5410,7 @@ namespace SurfaceGeometry {
 
 			ExtVentedCavity( Item ).OSCMName = cAlphaArgs( 2 );
 			if ( ! lAlphaFieldBlanks( 2 ) ) {
-				Found = InputProcessor::FindItemInList( ExtVentedCavity( Item ).OSCMName, OSCM, TotOSCM );
+				Found = UtilityRoutines::FindItemInList( ExtVentedCavity( Item ).OSCMName, OSCM, TotOSCM );
 				if ( Found == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + ExtVentedCavity( Item ).Name + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 					ErrorsFound = true;
@@ -5424,12 +5424,12 @@ namespace SurfaceGeometry {
 
 			Roughness = cAlphaArgs( 3 );
 			//Select the correct Number for the associated ascii name for the roughness type
-			if ( InputProcessor::SameString( Roughness, "VeryRough" ) ) ExtVentedCavity( Item ).BaffleRoughness = VeryRough;
-			if ( InputProcessor::SameString( Roughness, "Rough" ) ) ExtVentedCavity( Item ).BaffleRoughness = Rough;
-			if ( InputProcessor::SameString( Roughness, "MediumRough" ) ) ExtVentedCavity( Item ).BaffleRoughness = MediumRough;
-			if ( InputProcessor::SameString( Roughness, "MediumSmooth" ) ) ExtVentedCavity( Item ).BaffleRoughness = MediumSmooth;
-			if ( InputProcessor::SameString( Roughness, "Smooth" ) ) ExtVentedCavity( Item ).BaffleRoughness = Smooth;
-			if ( InputProcessor::SameString( Roughness, "VerySmooth" ) ) ExtVentedCavity( Item ).BaffleRoughness = VerySmooth;
+			if ( UtilityRoutines::SameString( Roughness, "VeryRough" ) ) ExtVentedCavity( Item ).BaffleRoughness = VeryRough;
+			if ( UtilityRoutines::SameString( Roughness, "Rough" ) ) ExtVentedCavity( Item ).BaffleRoughness = Rough;
+			if ( UtilityRoutines::SameString( Roughness, "MediumRough" ) ) ExtVentedCavity( Item ).BaffleRoughness = MediumRough;
+			if ( UtilityRoutines::SameString( Roughness, "MediumSmooth" ) ) ExtVentedCavity( Item ).BaffleRoughness = MediumSmooth;
+			if ( UtilityRoutines::SameString( Roughness, "Smooth" ) ) ExtVentedCavity( Item ).BaffleRoughness = Smooth;
+			if ( UtilityRoutines::SameString( Roughness, "VerySmooth" ) ) ExtVentedCavity( Item ).BaffleRoughness = VerySmooth;
 
 			// Was it set?
 			if ( ExtVentedCavity( Item ).BaffleRoughness == 0 ) {
@@ -5447,7 +5447,7 @@ namespace SurfaceGeometry {
 			ExtVentedCavity( Item ).SurfPtrs.allocate( ExtVentedCavity( Item ).NumSurfs );
 			ExtVentedCavity( Item ).SurfPtrs = 0;
 			for ( ThisSurf = 1; ThisSurf <= ExtVentedCavity( Item ).NumSurfs; ++ThisSurf ) {
-				Found = InputProcessor::FindItemInList( cAlphaArgs( ThisSurf + AlphaOffset ), Surface, TotSurfaces );
+				Found = UtilityRoutines::FindItemInList( cAlphaArgs( ThisSurf + AlphaOffset ), Surface, TotSurfaces );
 				if ( Found == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + ExtVentedCavity( Item ).Name + "\", invalid " + cAlphaFieldNames( ThisSurf + AlphaOffset ) + "=\"" + cAlphaArgs( ThisSurf + AlphaOffset ) );
 					ErrorsFound = true;
@@ -5577,7 +5577,7 @@ namespace SurfaceGeometry {
 			int alpF = 1;
 			int numF = 1;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, obj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			int Found = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Surface, TotSurfaces );
+			int Found = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Surface, TotSurfaces );
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface" );
 				ErrorsFound = true;
@@ -5615,9 +5615,9 @@ namespace SurfaceGeometry {
 					ErrorsFound = true;
 				}
 				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
-					if ( lAlphaFieldBlanks( alpF ) || InputProcessor::SameString(cAlphaArgs( alpF ), "YES") ) {
+					if ( lAlphaFieldBlanks( alpF ) || UtilityRoutines::SameString(cAlphaArgs( alpF ), "YES") ) {
 						data.isExposedPerimeter.push_back(true);
-					} else if ( InputProcessor::SameString(cAlphaArgs( alpF ), "NO") ) {
+					} else if ( UtilityRoutines::SameString(cAlphaArgs( alpF ), "NO") ) {
 						data.isExposedPerimeter.push_back(false);
 					} else {
 						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + ']' );
@@ -5706,7 +5706,7 @@ namespace SurfaceGeometry {
 		for ( Item = 1; Item <= CountHTAlgoObjectsSingleSurf; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorsFoundSingleSurf = false;
-			Found = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
+			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
 
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
@@ -5899,7 +5899,7 @@ namespace SurfaceGeometry {
 
 			for ( Item1 = 3; Item1 <= NumAlphas; ++Item1 ) {
 
-				Found = InputProcessor::FindItemInList( cAlphaArgs( Item1 ), Surface, TotSurfaces );
+				Found = UtilityRoutines::FindItemInList( cAlphaArgs( Item1 ), Surface, TotSurfaces );
 
 				if ( Found == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
@@ -5942,7 +5942,7 @@ namespace SurfaceGeometry {
 				ErrorsFoundByConstruct = true;
 			}}
 
-			Found = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
+			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
 				ErrorsFoundByConstruct = true;
@@ -6661,7 +6661,7 @@ namespace SurfaceGeometry {
 
 			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), WindowShadingControl, ControlNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			UtilityRoutines::VerifyName( cAlphaArgs( 1 ), WindowShadingControl, ControlNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -6669,8 +6669,8 @@ namespace SurfaceGeometry {
 
 			++ControlNum;
 			WindowShadingControl( ControlNum ).Name = cAlphaArgs( 1 ); // Set the Control Name in the Derived Type
-			WindowShadingControl( ControlNum ).ShadedConstruction = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
-			WindowShadingControl( ControlNum ).ShadingDevice = InputProcessor::FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
+			WindowShadingControl( ControlNum ).ShadedConstruction = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
+			WindowShadingControl( ControlNum ).ShadingDevice = UtilityRoutines::FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
 			WindowShadingControl( ControlNum ).Schedule = GetScheduleIndex( cAlphaArgs( 5 ) );
 			WindowShadingControl( ControlNum ).SetPoint = rNumericArgs( 1 );
 			WindowShadingControl( ControlNum ).SetPoint2 = rNumericArgs( 2 );
@@ -6760,7 +6760,7 @@ namespace SurfaceGeometry {
 			}
 
 			// Error if illegal control type
-			Found = InputProcessor::FindItemInList( ControlType, cValidWindowShadingControlTypes, NumValidWindowShadingControlTypes );
+			Found = UtilityRoutines::FindItemInList( ControlType, cValidWindowShadingControlTypes, NumValidWindowShadingControlTypes );
 			if ( Found == 0 ) {
 				ErrorsFound = true;
 				ShowSevereError( cCurrentModuleObject + "=\"" + WindowShadingControl( ControlNum ).Name + "\" invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
@@ -6814,7 +6814,7 @@ namespace SurfaceGeometry {
 			}
 
 			// Check for illegal shading type name
-			Found = InputProcessor::FindItemInList( cAlphaArgs( 2 ), cValidShadingTypes, NumValidShadingTypes );
+			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), cValidShadingTypes, NumValidShadingTypes );
 			if ( Found == 0 ) {
 				ErrorsFound = true;
 				ShowSevereError( cCurrentModuleObject + "=\"" + WindowShadingControl( ControlNum ).Name + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -7001,8 +7001,8 @@ namespace SurfaceGeometry {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, StormWinNumAlpha, rNumericArgs, StormWinNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++StormWinNum;
-			StormWindow( StormWinNum ).BaseWindowNum = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
-			StormWindow( StormWinNum ).StormWinMaterialNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Material, TotMaterials );
+			StormWindow( StormWinNum ).BaseWindowNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
+			StormWindow( StormWinNum ).StormWinMaterialNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Material, TotMaterials );
 			StormWindow( StormWinNum ).StormWinDistance = rNumericArgs( 1 );
 			StormWindow( StormWinNum ).MonthOn = rNumericArgs( 2 );
 			StormWindow( StormWinNum ).DayOfMonthOn = rNumericArgs( 3 );
@@ -7159,7 +7159,7 @@ namespace SurfaceGeometry {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
+			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
 			if ( SurfNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" not found." );
 				ErrorsFound = true;
@@ -7232,23 +7232,23 @@ namespace SurfaceGeometry {
 
 			if ( SurfNum > 0 ) {
 				AirflowWindows = true;
-				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "IndoorAir" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "IndoorAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowSource = AirFlowWindow_Source_IndoorAir;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 2 ), "OutdoorAir" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "OutdoorAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowSource = AirFlowWindow_Source_OutdoorAir;
 				}
-				if ( InputProcessor::SameString( cAlphaArgs( 3 ), "IndoorAir" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "IndoorAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_IndoorAir;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "OutdoorAir" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "OutdoorAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_OutdoorAir;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "ReturnAir" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "ReturnAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_ReturnAir;
 				}
-				if ( InputProcessor::SameString( cAlphaArgs( 4 ), "AlwaysOnAtMaximumFlow" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "AlwaysOnAtMaximumFlow" ) ) {
 					SurfaceWindow( SurfNum ).AirflowControlType = AirFlowWindow_ControlType_MaxFlow;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "AlwaysOff" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "AlwaysOff" ) ) {
 					SurfaceWindow( SurfNum ).AirflowControlType = AirFlowWindow_ControlType_AlwaysOff;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "ScheduledOnly" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "ScheduledOnly" ) ) {
 					SurfaceWindow( SurfNum ).AirflowControlType = AirFlowWindow_ControlType_Schedule;
 				}
 				SurfaceWindow( SurfNum ).MaxAirflow = rNumericArgs( 1 );
@@ -7334,11 +7334,11 @@ namespace SurfaceGeometry {
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.farFieldWidth = rNumericArgs( numF );} numF++;
 
 			if ( !lAlphaFieldBlanks( alpF ) ) {
-				if (InputProcessor::SameString(cAlphaArgs( alpF ), "ZeroFlux")) {
+				if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "ZeroFlux")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
-				} else if (InputProcessor::SameString(cAlphaArgs( alpF ), "GroundWater")) {
+				} else if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "GroundWater")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
-				} else /* if (InputProcessor::SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
+				} else /* if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
 				}
 			} alpF++;
@@ -7348,9 +7348,9 @@ namespace SurfaceGeometry {
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.maxGrowthCoeff = rNumericArgs( numF );} numF++;
 
 			if ( !lAlphaFieldBlanks( alpF ) ) {
-				if (InputProcessor::SameString(cAlphaArgs( alpF ), "Hourly")) {
+				if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Hourly")) {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
-				} else /* if (InputProcessor::SameString(cAlphaArgs( alpF ), "Timestep")) */ {
+				} else /* if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Timestep")) */ {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
 				}
 			} alpF++;
@@ -7381,7 +7381,7 @@ namespace SurfaceGeometry {
 				HeatBalanceKivaManager::FoundationKiva fndInput;
 
 				fndInput.name = cAlphaArgs( alpF ); alpF++;
-				InputProcessor::IsNameEmpty( fndInput.name, cCurrentModuleObject, ErrorInName );
+				UtilityRoutines::IsNameEmpty( fndInput.name, cCurrentModuleObject, ErrorInName );
 				if ( ErrorInName ) {
 					ErrorsFound = true;
 					continue;
@@ -7395,7 +7395,7 @@ namespace SurfaceGeometry {
 
 				// Interior horizontal insulation
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7439,7 +7439,7 @@ namespace SurfaceGeometry {
 
 				// Interior vertical insulation
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7475,7 +7475,7 @@ namespace SurfaceGeometry {
 
 				// Exterior horizontal insulation
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7519,7 +7519,7 @@ namespace SurfaceGeometry {
 
 				// Exterior vertical insulation
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7559,7 +7559,7 @@ namespace SurfaceGeometry {
 				if ( !lNumericFieldBlanks( numF ) ) {fnd.wall.depthBelowSlab = rNumericArgs( numF );} numF++;
 
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					fndInput.wallConstructionIndex = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Construct );
+					fndInput.wallConstructionIndex = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Construct );
 					if ( fndInput.wallConstructionIndex == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching construction for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing construction = " + cAlphaArgs( alpF ) );
@@ -7579,7 +7579,7 @@ namespace SurfaceGeometry {
 
 				// Footing
 				if ( !lAlphaFieldBlanks( alpF ) ) {
-					int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
+					int index = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Material );
 					if ( index == 0 ) {
 						ErrorsFound = true;
 						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7623,7 +7623,7 @@ namespace SurfaceGeometry {
 					for (int blockNum = 0; blockNum < numBlocks; blockNum++) {
 						Kiva::InputBlock block;
 						if ( !lAlphaFieldBlanks( alpF ) ) {
-							int index = InputProcessor::FindItemInList( cAlphaArgs( alpF ), Material );
+							int index = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Material );
 							if ( index == 0 ) {
 								ErrorsFound = true;
 								ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
@@ -7783,7 +7783,7 @@ namespace SurfaceGeometry {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), OSC, OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			UtilityRoutines::VerifyName( cAlphaArgs( 1 ), OSC, OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -7813,9 +7813,9 @@ namespace SurfaceGeometry {
 
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 
-				if ( InputProcessor::SameString( cAlphaArgs( 3 ), "No" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "No" ) ) {
 					OSC( OSCNum ).SinusoidalConstTempCoef = false;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "Yes" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Yes" ) ) {
 					OSC( OSCNum ).SinusoidalConstTempCoef = true;
 				} else {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
@@ -7930,7 +7930,7 @@ namespace SurfaceGeometry {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat );
 			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), OSCM, OSCMNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			UtilityRoutines::VerifyName( cAlphaArgs( 1 ), OSCM, OSCMNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -8022,12 +8022,12 @@ namespace SurfaceGeometry {
 		NMatInsul = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		for ( Loop = 1; Loop <= NMatInsul; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NAlphas, rNumericArgs, NNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), SurfaceTmp, TotSurfaces );
-			MaterNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Material, TotMaterials );
+			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), SurfaceTmp, TotSurfaces );
+			MaterNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Material, TotMaterials );
 			SchNum = GetScheduleIndex( cAlphaArgs( 4 ) );
-			if ( InputProcessor::SameString( cAlphaArgs( 1 ), "Outside" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "Outside" ) ) {
 				InslType = 1;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 1 ), "Inside" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "Inside" ) ) {
 				InslType = 2;
 			} else {
 				InslType = 0;
@@ -9632,7 +9632,7 @@ namespace SurfaceGeometry {
 
 		// If this construction name already exists, set the surface's shaded construction number to it
 
-		ConstrNewSh = InputProcessor::FindItemInList( ConstrNameSh, Construct );
+		ConstrNewSh = UtilityRoutines::FindItemInList( ConstrNameSh, Construct );
 
 		if ( ConstrNewSh > 0 ) {
 			SurfaceTmp( SurfNum ).ShadedConstruction = ConstrNewSh;
@@ -9818,13 +9818,13 @@ namespace SurfaceGeometry {
 					strip( ChrNum );
 					ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum;
 					// If this construction name already exists, set the surface's storm window construction number to it
-					ConstrNewSt = InputProcessor::FindItemInList( ConstrNameSt, Construct, TotConstructs );
+					ConstrNewSt = UtilityRoutines::FindItemInList( ConstrNameSt, Construct, TotConstructs );
 					ConstrNewStSh = 0;
 					if ( ConstrNewSt > 0 ) Surface( SurfNum ).StormWinConstruction = ConstrNewSt;
 				} else {
 					if ( ! ShAndSt ) break;
 					ConstrNameStSh = "SHADEDCONSTRUCTIONWITHSTORMWIN:" + ChrNum;
-					ConstrNewStSh = InputProcessor::FindItemInList( ConstrNameStSh, Construct, TotConstructs );
+					ConstrNewStSh = UtilityRoutines::FindItemInList( ConstrNameStSh, Construct, TotConstructs );
 					if ( ConstrNewStSh > 0 ) Surface( SurfNum ).StormWinShadedConstruction = ConstrNewStSh;
 				}
 
@@ -9832,7 +9832,7 @@ namespace SurfaceGeometry {
 					// If necessary, create new material corresponding to the air layer between the storm winddow
 					// and the rest of the window
 					MatNameStAir = "AIR:STORMWIN:" + ChrIntDistance + "MM";
-					MatNewStAir = InputProcessor::FindItemInList( MatNameStAir, Material, TotMaterials );
+					MatNewStAir = UtilityRoutines::FindItemInList( MatNameStAir, Material, TotMaterials );
 					if ( MatNewStAir == 0 ) {
 						// Create new material
 						MatNewStAir = TotMaterials + 1;
@@ -10075,7 +10075,7 @@ namespace SurfaceGeometry {
 		w1 = Construct( IConst ).W5FileGlazingSysWidth;
 
 		Const2Name = Construct( IConst ).Name + ":2";
-		IConst2 = InputProcessor::FindItemInList( Const2Name, Construct );
+		IConst2 = UtilityRoutines::FindItemInList( Const2Name, Construct );
 
 		if ( IConst2 == 0 ) { // Only one glazing system on Window5 Data File for this window.
 
@@ -10238,7 +10238,7 @@ namespace SurfaceGeometry {
 		w1 = Construct( IConst ).W5FileGlazingSysWidth;
 
 		Const2Name = Construct( IConst ).Name + ":2";
-		IConst2 = InputProcessor::FindItemInList( Const2Name, Construct );
+		IConst2 = UtilityRoutines::FindItemInList( Const2Name, Construct );
 
 		++AddedSubSurfaces;
 		SurfaceTmp.redimension( ++TotSurfaces );
@@ -10969,7 +10969,7 @@ namespace SurfaceGeometry {
 		// loop through all the surfaces
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 
-			Found = InputProcessor::FindItemInList( Surface( SurfNum ).Name, TmpCandidateSurfaceNames, NumCandidateNames );
+			Found = UtilityRoutines::FindItemInList( Surface( SurfNum ).Name, TmpCandidateSurfaceNames, NumCandidateNames );
 			if ( Found > 0 ) {
 				if ( ! Surface( SurfNum ).HeatTransSurf ) { // not BIPV, must be a shading surf with solar device
 					// Setup missing values to allow shading surfaces to model incident solar and wind
@@ -10982,7 +10982,7 @@ namespace SurfaceGeometry {
 				// boundary condition
 				if ( NumOfICSUnits > 0 ) {
 					for ( CollectorNum = 1; CollectorNum <= NumOfCollectors; ++CollectorNum ) {
-						if ( InputProcessor::SameString( Surface( SurfNum ).Name, TmpCandidateICSSurfaceNames( CollectorNum ) ) && InputProcessor::SameString( TmpCandidateICSBCTypeNames( CollectorNum ), "OTHERSIDECONDITIONSMODEL" ) ) {
+						if ( UtilityRoutines::SameString( Surface( SurfNum ).Name, TmpCandidateICSSurfaceNames( CollectorNum ) ) && UtilityRoutines::SameString( TmpCandidateICSBCTypeNames( CollectorNum ), "OTHERSIDECONDITIONSMODEL" ) ) {
 							Surface( SurfNum ).IsICS = true;
 							Surface( SurfNum ).ICSPtr = CollectorNum;
 						}

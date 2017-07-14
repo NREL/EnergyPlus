@@ -260,7 +260,7 @@ namespace SingleDuct {
 
 		// Find the correct SysNumber with the Component Name
 		if ( CompIndex == 0 ) {
-			SysNum = InputProcessor::FindItemInList( CompName, Sys, &SysDesignParams::SysName );
+			SysNum = UtilityRoutines::FindItemInList( CompName, Sys, &SysDesignParams::SysName );
 			if ( SysNum == 0 ) {
 				ShowFatalError( "SimulateSingleDuct: System not found=" + CompName );
 			}
@@ -453,14 +453,14 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 7 );
-			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
+			if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SimpleHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else if ( Sys( SysNum ).ReheatComp != "" ) {
@@ -492,11 +492,11 @@ namespace SingleDuct {
 			Sys( SysNum ).InletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields( 4 ) );
 			Sys( SysNum ).MaxAirVolFlowRate = Numbers( 1 );
 
-			if ( InputProcessor::SameString( Alphas( 5 ), "Constant" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 5 ), "Constant" ) ) {
 				Sys( SysNum ).ZoneMinAirFracMethod = ConstantMinFrac;
-			} else if ( InputProcessor::SameString( Alphas( 5 ), "FixedFlowRate" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), "FixedFlowRate" ) ) {
 				Sys( SysNum ).ZoneMinAirFracMethod = FixedMin;
-			} else if ( InputProcessor::SameString( Alphas( 5 ), "Scheduled" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), "Scheduled" ) ) {
 				Sys( SysNum ).ZoneMinAirFracMethod = ScheduledMinFrac;
 			} else {
 				ShowSevereError( cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " not found." );
@@ -580,11 +580,11 @@ namespace SingleDuct {
 			if ( Sys( SysNum ).ControllerOffset <= 0.0 ) {
 				Sys( SysNum ).ControllerOffset = 0.001;
 			}
-			if ( InputProcessor::SameString( Alphas( 10 ), "Reverse" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 10 ), "Reverse" ) ) {
 				Sys( SysNum ).DamperHeatingAction = ReverseAction;
-			} else if ( InputProcessor::SameString( Alphas( 10 ), "Normal" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 10 ), "Normal" ) ) {
 				Sys( SysNum ).DamperHeatingAction = Normal;
-			} else if ( InputProcessor::SameString( Alphas( 10 ), "ReverseWithLimits" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 10 ), "ReverseWithLimits" ) ) {
 				Sys( SysNum ).DamperHeatingAction = ReverseActionWithLimits;
 			}
 			else {
@@ -650,7 +650,7 @@ namespace SingleDuct {
 			}
 
 			if ( ! lAlphaBlanks( 11 ) ) {
-				Sys( SysNum ).OARequirementsPtr = InputProcessor::FindItemInList( Alphas( 11 ), OARequirements );
+				Sys( SysNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( Alphas( 11 ), OARequirements );
 				if ( Sys( SysNum ).OARequirementsPtr == 0 ) {
 					ShowSevereError( cAlphaFields( 11 ) + " = " + Alphas( 11 ) + " not found." );
 					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -688,14 +688,14 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctCBVAVReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 5 );
-			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
+			if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SimpleHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else if ( Sys( SysNum ).ReheatComp != "" ) {
@@ -845,14 +845,14 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctConstVolReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 5 );
-			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
+			if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SimpleHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else {
@@ -1006,11 +1006,11 @@ namespace SingleDuct {
 			Sys( SysNum ).InletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields( 4 ) );
 			Sys( SysNum ).MaxAirVolFlowRate = Numbers( 1 );
 
-			if ( InputProcessor::SameString( Alphas( 5 ), "Constant" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 5 ), "Constant" ) ) {
 				Sys( SysNum ).ZoneMinAirFracMethod = ConstantMinFrac;
-			} else if ( InputProcessor::SameString( Alphas( 5 ), "FixedFlowRate" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), "FixedFlowRate" ) ) {
 				Sys( SysNum ).ZoneMinAirFracMethod = FixedMin;
-			} else if ( InputProcessor::SameString( Alphas( 5 ), "Scheduled" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), "Scheduled" ) ) {
 				Sys( SysNum ).ZoneMinAirFracMethod = ScheduledMinFrac;
 			} else {
 				ShowSevereError( cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " not found." );
@@ -1098,7 +1098,7 @@ namespace SingleDuct {
 			}
 
 			if ( ! lAlphaBlanks( 7 ) ) {
-				Sys( SysNum ).OARequirementsPtr = InputProcessor::FindItemInList( Alphas( 7 ), OARequirements );
+				Sys( SysNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( Alphas( 7 ), OARequirements );
 				if ( Sys( SysNum ).OARequirementsPtr == 0 ) {
 					ShowSevereError( cAlphaFields( 7 ) + " = " + Alphas( 7 ) + " not found." );
 					ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -1205,20 +1205,20 @@ namespace SingleDuct {
 			Sys( SysNum ).ReheatComp = Alphas( 7 );
 			Sys( SysNum ).ReheatName = Alphas( 8 );
 			IsNotOK = false;
-			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
+			if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 				Sys( SysNum ).ReheatAirOutletNode = GetHeatingCoilOutletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 				Sys( SysNum ).ReheatCoilMaxCapacity = GetHeatingCoilCapacity( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 				if ( IsNotOK ) ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
 				Sys( SysNum ).ReheatAirOutletNode = GetHeatingCoilOutletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 				Sys( SysNum ).ReheatCoilMaxCapacity = GetHeatingCoilCapacity( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 				if ( IsNotOK ) ShowContinueError( "Occurs for terminal unit " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SimpleHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else if ( Sys( SysNum ).ReheatComp != "" ) {
@@ -1232,9 +1232,9 @@ namespace SingleDuct {
 				ErrorsFound = true;
 			}
 			Sys( SysNum ).FanType = Alphas( 5 );
-			if ( InputProcessor::SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
+			if ( UtilityRoutines::SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
 				Sys( SysNum ).Fan_Num = DataHVACGlobals::FanType_SimpleVAV;
-			} else if ( InputProcessor::SameString( Sys( SysNum ).FanType, "Fan:SystemModel" ) ) {
+			} else if ( UtilityRoutines::SameString( Sys( SysNum ).FanType, "Fan:SystemModel" ) ) {
 				Sys( SysNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
 			} else if ( Sys( SysNum ).FanType != "" ) {
 				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).FanType + '.' );
@@ -1284,7 +1284,7 @@ namespace SingleDuct {
 			}
 
 			AirTermSysInletNodeName = NodeID( Sys( SysNum ).InletNodeNum );
-			if ( ! InputProcessor::SameString( Alphas( 3 ), AirTermSysInletNodeName ) ) {
+			if ( ! UtilityRoutines::SameString( Alphas( 3 ), AirTermSysInletNodeName ) ) {
 				ShowWarningError( RoutineName + "Invalid air terminal object air inlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ShowContinueError( " Specified air inlet node name is = " + Alphas( 3 ) + "." );
 				ShowContinueError( " Expected air inlet node name is = " + AirTermSysInletNodeName + "." );
@@ -1358,7 +1358,7 @@ namespace SingleDuct {
 			//               GetOnlySingleNode(Alphas(4),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
 			//                            NodeType_Air,NodeConnectionType_Outlet,1,ObjectIsParent)
 			AirTermSysOutletNodeName = NodeID( Sys( SysNum ).ReheatAirOutletNode );
-			if ( ! InputProcessor::SameString( Alphas( 4 ), AirTermSysOutletNodeName ) ) {
+			if ( ! UtilityRoutines::SameString( Alphas( 4 ), AirTermSysOutletNodeName ) ) {
 				ShowWarningError( RoutineName + "Invalid air terminal object air outlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ShowContinueError( " Specified air outlet node name is = " + Alphas( 4 ) + "." );
 				ShowContinueError( " Expected air outlet node name is = " + AirTermSysOutletNodeName + "." );
@@ -1637,7 +1637,7 @@ namespace SingleDuct {
 				Sys( SysNum ).MinReheatSteamFlow = SteamDensity * Sys( SysNum ).MinReheatSteamVolFlow;
 			}
 
-			if ( InputProcessor::SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:Reheat" ) || InputProcessor::SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" ) || InputProcessor::SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" ) || InputProcessor::SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:NoReheat" ) ) {
+			if ( UtilityRoutines::SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:Reheat" ) || UtilityRoutines::SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" ) || UtilityRoutines::SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" ) || UtilityRoutines::SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:NoReheat" ) ) {
 				// need the lowest schedule value
 				if ( Sys( SysNum ).ZoneMinAirFracMethod == ScheduledMinFrac ) {
 					Sys( SysNum ).ZoneMinAirFrac = GetScheduleMinValue( Sys( SysNum ).ZoneMinAirFracSchPtr );
@@ -2269,7 +2269,7 @@ namespace SingleDuct {
 				}
 			} else {
 				CheckZoneSizing( Sys( SysNum ).SysType, Sys( SysNum ).SysName );
-				if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
+				if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Water" ) ) {
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", Sys( SysNum ).ReheatName, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", Sys( SysNum ).ReheatName, ErrorsFound );
 					if ( IsAutoSize ) {
@@ -2341,7 +2341,7 @@ namespace SingleDuct {
 				}
 			} else {
 				CheckZoneSizing( Sys( SysNum ).SysType, Sys( SysNum ).SysName );
-				if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
+				if ( UtilityRoutines::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Steam" ) ) {
 					CoilSteamInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", Sys( SysNum ).ReheatName, ErrorsFound );
 					CoilSteamOutletNode = GetCoilSteamOutletNode( "Coil:Heating:Steam", Sys( SysNum ).ReheatName, ErrorsFound );
 					if ( IsAutoSize ) {
@@ -4467,7 +4467,7 @@ namespace SingleDuct {
 			GetInputFlag = false;
 		}
 
-		SDSIndex = InputProcessor::FindItemInList( SDSName, Sys, &SysDesignParams::SysName );
+		SDSIndex = UtilityRoutines::FindItemInList( SDSName, Sys, &SysDesignParams::SysName );
 		if ( SDSIndex == 0 ) {
 			if ( present( ThisObjectType ) ) {
 				ShowSevereError( ThisObjectType() + ", GetHVACSingleDuctSysIndex: Single duct system not found=" + SDSName );
@@ -4515,7 +4515,7 @@ namespace SingleDuct {
 		}
 
 		if ( SysIndex == 0 ) {
-			SysNum = InputProcessor::FindItemInList( SysName, SysATMixer );
+			SysNum = UtilityRoutines::FindItemInList( SysName, SysATMixer );
 			SysIndex = SysNum;
 			if ( SysNum == 0 ) {
 				ShowFatalError( "Object " + SysName + " not found" );
@@ -4580,7 +4580,7 @@ namespace SingleDuct {
 
 		for ( ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, ATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			SysATMixer( ATMixerNum ).Name = cAlphaArgs( 1 );
 			if ( cAlphaArgs( 7 ) == "INLETSIDE" ) {
 				SysATMixer( ATMixerNum ).MixerType = ATMixer_InletSide; // inlet side mixer
@@ -4900,7 +4900,7 @@ namespace SingleDuct {
 			GetATMixerFlag = false;
 		}
 
-		ATMixerIndex = InputProcessor::FindItemInList( ZoneEquipName, SysATMixer );
+		ATMixerIndex = UtilityRoutines::FindItemInList( ZoneEquipName, SysATMixer );
 		if ( ATMixerIndex > 0 ) {
 			ATMixerPriNode = SysATMixer( ATMixerIndex ).PriInNode;
 		}
@@ -4938,7 +4938,7 @@ namespace SingleDuct {
 			GetATMixerFlag = false;
 		}
 
-		ATMixerIndex = InputProcessor::FindItemInList( ZoneEquipName, SysATMixer );
+		ATMixerIndex = UtilityRoutines::FindItemInList( ZoneEquipName, SysATMixer );
 		if ( ATMixerIndex > 0 ) {
 			ATMixerSecNode = SysATMixer( ATMixerIndex ).SecInNode;
 		}
@@ -4976,7 +4976,7 @@ namespace SingleDuct {
 			GetATMixerFlag = false;
 		}
 
-		ATMixerIndex = InputProcessor::FindItemInList( ZoneEquipName, SysATMixer );
+		ATMixerIndex = UtilityRoutines::FindItemInList( ZoneEquipName, SysATMixer );
 		if ( ATMixerIndex > 0 ) {
 			ATMixerOutNode = SysATMixer( ATMixerIndex ).MixedAirOutNode;
 		}
@@ -5030,7 +5030,7 @@ namespace SingleDuct {
 			return;
 		}
 
-		ATMixerIndex = InputProcessor::FindItemInList( ZoneEquipName, SysATMixer, &AirTerminalMixerData::ZoneHVACUnitName );
+		ATMixerIndex = UtilityRoutines::FindItemInList( ZoneEquipName, SysATMixer, &AirTerminalMixerData::ZoneHVACUnitName );
 		if ( ATMixerIndex > 0 ) {
 			ATMixerNum = ATMixerIndex;
 			ATMixerName = SysATMixer( ATMixerIndex ).Name;
@@ -5103,7 +5103,7 @@ namespace SingleDuct {
 			GetATMixerFlag = false;
 		}
 
-		ATMixerIndex = InputProcessor::FindItemInList( ZoneEquipName, SysATMixer );
+		ATMixerIndex = UtilityRoutines::FindItemInList( ZoneEquipName, SysATMixer );
 		if ( ATMixerIndex > 0 ) {
 			ATMixerTypeNum = SysATMixer( ATMixerIndex ).MixerType;
 		}

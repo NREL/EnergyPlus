@@ -901,49 +901,49 @@ namespace SimulationManager {
 		for ( Num1 = 1; Num1 <= Num; ++Num1 ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			for ( NumA = 1; NumA <= NumAlpha; ++NumA ) {
-				if ( InputProcessor::SameString( Alphas( NumA ), "DisplayExtraWarnings" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayExtraWarnings" ) ) {
 					DisplayExtraWarnings = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayAdvancedReportVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayAdvancedReportVariables" ) ) {
 					DisplayAdvancedReportVariables = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayAllWarnings" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayAllWarnings" ) ) {
 					DisplayAllWarnings = true;
 					DisplayExtraWarnings = true;
 					DisplayUnusedObjects = true;
 					DisplayUnusedSchedules = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayUnusedObjects" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayUnusedObjects" ) ) {
 					DisplayUnusedObjects = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayUnusedSchedules" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayUnusedSchedules" ) ) {
 					DisplayUnusedSchedules = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayZoneAirHeatBalanceOffBalance" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayZoneAirHeatBalanceOffBalance" ) ) {
 					DisplayZoneAirHeatBalanceOffBalance = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DoNotMirrorDetachedShading" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DoNotMirrorDetachedShading" ) ) {
 					MakeMirroredDetachedShading = false;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DoNotMirrorAttachedShading" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DoNotMirrorAttachedShading" ) ) {
 					MakeMirroredAttachedShading = false;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "IgnoreInteriorWindowTransmission" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreInteriorWindowTransmission" ) ) {
 					IgnoreInteriorWindowTransmission = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "ReportDuringWarmup" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDuringWarmup" ) ) {
 					ReportDuringWarmup = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayWeatherMissingDataWarnings" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayWeatherMissingDataWarnings" ) ) {
 					DisplayWeatherMissingDataWarnings = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "IgnoreSolarRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreSolarRadiation" ) ) {
 					IgnoreSolarRadiation = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "IgnoreBeamRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreBeamRadiation" ) ) {
 					IgnoreBeamRadiation = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "IgnoreDiffuseRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreDiffuseRadiation" ) ) {
 					IgnoreDiffuseRadiation = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DeveloperFlag" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DeveloperFlag" ) ) {
 					DeveloperFlag = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "TimingFlag" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "TimingFlag" ) ) {
 					TimingFlag = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
 					ReportDetailedWarmupConvergence = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
 					ReportDuringHVACSizingSimulation = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
 					continue;
 					//        CreateMinimalSurfaceVariables=.TRUE.
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "CreateNormalSurfaceVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "CreateNormalSurfaceVariables" ) ) {
 					continue;
 					//        IF (CreateMinimalSurfaceVariables) THEN
 					//          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
@@ -1660,12 +1660,12 @@ namespace SimulationManager {
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << " Parent Node Connection," + NodeConnections( Loop ).NodeName + ',' + NodeConnections( Loop ).ObjectType + ',' + NodeConnections( Loop ).ObjectName + ',' + NodeConnections( Loop ).ConnectionType + ',' + ChrOut;
 			// Build ParentNodeLists
-			if ( InputProcessor::SameString( NodeConnections( Loop ).ConnectionType, "Inlet" ) || InputProcessor::SameString( NodeConnections( Loop ).ConnectionType, "Outlet" ) ) {
+			if ( UtilityRoutines::SameString( NodeConnections( Loop ).ConnectionType, "Inlet" ) || UtilityRoutines::SameString( NodeConnections( Loop ).ConnectionType, "Outlet" ) ) {
 				ParentComponentFound = false;
 				for ( Loop1 = 1; Loop1 <= NumOfActualParents; ++Loop1 ) {
 					if ( ParentNodeList( Loop1 ).CType != NodeConnections( Loop ).ObjectType || ParentNodeList( Loop1 ).CName != NodeConnections( Loop ).ObjectName ) continue;
 					ParentComponentFound = true;
-					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
 					if ( SELECT_CASE_var == "INLET" ) {
 						ParentNodeList( Loop1 ).InletNodeName = NodeConnections( Loop ).NodeName;
 					} else if ( SELECT_CASE_var == "OUTLET" ) {
@@ -1676,7 +1676,7 @@ namespace SimulationManager {
 					++NumOfActualParents;
 					ParentNodeList( NumOfActualParents ).CType = NodeConnections( Loop ).ObjectType;
 					ParentNodeList( NumOfActualParents ).CName = NodeConnections( Loop ).ObjectName;
-					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
 					if ( SELECT_CASE_var == "INLET" ) {
 						ParentNodeList( NumOfActualParents ).InletNodeName = NodeConnections( Loop ).NodeName;
 					} else if ( SELECT_CASE_var == "OUTLET" ) {
@@ -1816,7 +1816,7 @@ namespace SimulationManager {
 				ShowContinueError( "  Inlet Node : " + CompSets( Count ).InletNodeName );
 				ShowContinueError( "  Outlet Node: " + CompSets( Count ).OutletNodeName );
 				++NumNodeConnectionErrors;
-				if ( InputProcessor::SameString( CompSets( Count ).CType, "SolarCollector:UnglazedTranspired" ) ) {
+				if ( UtilityRoutines::SameString( CompSets( Count ).CType, "SolarCollector:UnglazedTranspired" ) ) {
 					ShowContinueError( "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector" );
 				}
 			}

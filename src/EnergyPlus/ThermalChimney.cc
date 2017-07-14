@@ -235,7 +235,7 @@ namespace ThermalChimney {
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+			if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 				continue;
 			}
 
@@ -243,7 +243,7 @@ namespace ThermalChimney {
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );
 
 			// Second Alpha is Zone Name
-			ThermalChimneySys( Loop ).RealZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			ThermalChimneySys( Loop ).RealZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ThermalChimneySys( Loop ).RealZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid Zone" );
 				ShowContinueError( "invalid - not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -296,7 +296,7 @@ namespace ThermalChimney {
 			AllRatiosSummed = 0.0;
 			for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 				ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) = cAlphaArgs( TCZoneNum + 3 );
-				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = InputProcessor::FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone );
+				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone );
 				ThermalChimneySys( Loop ).DistanceThermChimInlet( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 1 );
 				ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 2 );
 				if ( lNumericFieldBlanks( 3 * TCZoneNum + 2 ) ) ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = 1.0;

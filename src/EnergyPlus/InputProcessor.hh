@@ -60,17 +60,14 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.fwd.hh>
-#include <ObjexxFCL/MArray1.fwd.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Optional.fwd.hh>
-#include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/Optional.hh>
 
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
-#include <UtilityRoutines.hh>
 
 using json = nlohmann::json;
 
@@ -202,20 +199,15 @@ namespace EnergyPlus {
 		static json schema;
 		static json jdf;
 		//static json::parser_callback_t call_back;
-		static std::unordered_map < std::string, std::string > case_insensitive_object_map;
-		static std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > jdd_jdf_cache_map;
-		static std::map < const json::object_t * const, std::pair < std::string, std::string > > unused_inputs;
+		static std::unordered_map< std::string, std::string > case_insensitive_object_map;
+		static std::unordered_map< std::string, std::pair< json::const_iterator, std::vector< json::const_iterator > > > jdd_jdf_cache_map;
+		static std::map< const json::object_t * const, std::pair< std::string, std::string > > unused_inputs;
 		static char s[ 129 ];
 
 	public:
 		static
 		std::pair< bool, std::string >
 		ConvertInsensitiveObjectType( std::string const & objectType );
-
-		template < class T >
-		struct is_shared_ptr : std::false_type {};
-		template < class T >
-		struct is_shared_ptr < std::shared_ptr < T > > : std::true_type {};
 
 		// Clears the global data in InputProcessor.
 		// Needed for unit tests, should not be normally called.
@@ -250,13 +242,13 @@ namespace EnergyPlus {
 			int const Number,
 			Array1S_string Alphas,
 			int & NumAlphas,
-			Array1S < Real64 > Numbers,
+			Array1S< Real64 > Numbers,
 			int & NumNumbers,
 			int & Status,
-			Optional < Array1D_bool > NumBlank = _,
-			Optional < Array1D_bool > AlphaBlank = _,
-			Optional < Array1D_string > AlphaFieldNames = _,
-			Optional < Array1D_string > NumericFieldNames = _
+			Optional< Array1D_bool > NumBlank = _,
+			Optional< Array1D_bool > AlphaBlank = _,
+			Optional< Array1D_string > AlphaFieldNames = _,
+			Optional< Array1D_string > NumericFieldNames = _
 		);
 
 
@@ -275,570 +267,6 @@ namespace EnergyPlus {
 			std::string const & ObjName // Name of the object type
 		);
 
-		static
-		Real64
-		ProcessNumber(
-			std::string const & String,
-			bool & ErrorFlag
-		);
-
-		static
-		int
-		FindItemInList(
-			std::string const & String,
-			Array1_string const & ListOfItems,
-			int const NumItems
-		);
-
-
-		static
-		inline
-		int
-		FindItemInList(
-			std::string const & String,
-			Array1_string const & ListOfItems
-		) {
-			return FindItemInList( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		static
-		int
-		FindItemInList(
-			std::string const & String,
-			Array1S_string const ListOfItems,
-			int const NumItems
-		);
-
-		static
-		inline
-		int
-		FindItemInList(
-			std::string const & String,
-			Array1S_string const ListOfItems
-		) {
-			return FindItemInList( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		template < typename A >
-		static
-		inline
-		int
-		FindItemInList(
-			std::string const & String,
-			MArray1 < A, std::string > const & ListOfItems,
-			int const NumItems
-		) {
-			for ( int Count = 1; Count <= NumItems; ++Count ) {
-				if ( String == ListOfItems( Count ) ) return Count;
-			}
-			return 0; // Not found
-		}
-
-		template < typename A >
-		static
-		inline
-		int
-		FindItemInList(
-			std::string const & String,
-			MArray1 < A, std::string > const & ListOfItems
-		) {
-			return FindItemInList( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs and operator[i] and elements need Name
-		static
-		inline
-		int
-		FindItemInList(
-			std::string const & String,
-			Container const & ListOfItems,
-			int const NumItems
-		) {
-			for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
-				if ( String == ListOfItems[ i ].Name ) return int( i + 1 ); // 1-based return index
-			}
-			return 0; // Not found
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs isize() and operator[i] and elements need Name
-		static
-		inline
-		int
-		FindItemInList(
-			std::string const & String,
-			Container const & ListOfItems
-		) {
-			return FindItemInList( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs operator[i] and value_type
-		static
-		inline
-		int
-		FindItemInList(
-			std::string const & String,
-			Container const & ListOfItems,
-			std::string Container::value_type::*name_p,
-			int const NumItems
-		) {
-			for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
-				if ( String == ListOfItems[ i ].*name_p ) return int( i + 1 ); // 1-based return index
-			}
-			return 0; // Not found
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs isize() and operator[i] and value_type
-		static
-		inline
-		int
-		FindItemInList(
-			std::string const & String,
-			Container const & ListOfItems,
-			std::string Container::value_type::*name_p
-		) {
-			return FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
-		}
-
-		static
-		int
-		FindItemInSortedList(
-			std::string const & String,
-			Array1S_string const ListOfItems,
-			int const NumItems
-		);
-
-		inline
-		static
-		int
-		FindItemInSortedList(
-			std::string const & String,
-			Array1S_string const ListOfItems
-		) {
-			return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		template < typename A >
-		static
-		inline
-		int
-		FindItemInSortedList(
-			std::string const & String,
-			MArray1 < A, std::string > const & ListOfItems,
-			int const NumItems
-		) {
-			int Probe( 0 );
-			int LBnd( 0 );
-			int UBnd( NumItems + 1 );
-			bool Found( false );
-			while ( ( !Found ) || ( Probe != 0 ) ) {
-				Probe = ( UBnd - LBnd ) / 2;
-				if ( Probe == 0 ) break;
-				Probe += LBnd;
-				if ( equali( String, ListOfItems( Probe ) ) ) {
-					Found = true;
-					break;
-				} else if ( lessthani( String, ListOfItems( Probe ) ) ) {
-					UBnd = Probe;
-				} else {
-					LBnd = Probe;
-				}
-			}
-			return Probe;
-		}
-
-		template < typename A >
-		static
-		inline
-		int
-		FindItemInSortedList(
-			std::string const & String,
-			MArray1 < A, std::string > const & ListOfItems
-		) {
-			return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		template < typename InputIterator >
-		static
-		inline
-		int
-		FindItem(
-			InputIterator first,
-			InputIterator last,
-			std::string const & str,
-			std::false_type
-		) {
-			using valueType = typename std::iterator_traits < InputIterator >::value_type;
-			//static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
-
-			auto const it = std::find_if( first, last, [ &str ]( const valueType & s ) { return s.name == str; } );
-			if ( it != last ) return it - first + 1; // 1-based return index
-
-			auto const it2 = std::find_if( first, last,
-										   [ &str ]( const valueType & s ) { return equali( s.name, str ); } );
-			if ( it2 != last ) return it2 - first + 1; // 1-based return index
-
-			return 0; // Not found
-		}
-
-		template < typename InputIterator >
-		static
-		inline
-		int
-		FindItem(
-			InputIterator first,
-			InputIterator last,
-			std::string const & str,
-			std::true_type
-		) {
-			using valueType = typename std::iterator_traits < InputIterator >::value_type;
-			//static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
-
-			auto const it = std::find_if( first, last, [ &str ]( const valueType & s ) { return s->name == str; } );
-			if ( it != last ) return it - first + 1; // 1-based return index
-
-			auto const it2 = std::find_if( first, last,
-										   [ &str ]( const valueType & s ) { return equali( s->name, str ); } );
-			if ( it2 != last ) return it2 - first + 1; // 1-based return index
-
-			return 0; // Not found
-		}
-
-		template < typename InputIterator >
-		static
-		inline
-		int
-		FindItem(
-			InputIterator first,
-			InputIterator last,
-			std::string const & str
-		) {
-			return FindItem( first, last, str,
-							 is_shared_ptr < typename std::iterator_traits < InputIterator >::value_type >{ } );
-		}
-
-		static
-		int
-		FindItem(
-			std::string const & String,
-			Array1D_string const & ListOfItems,
-			int const NumItems
-		);
-
-		inline
-		static
-		int
-		FindItem(
-			std::string const & String,
-			Array1D_string const & ListOfItems
-		) {
-			return FindItem( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		static
-		int
-		FindItem(
-			std::string const & String,
-			Array1S_string const ListOfItems,
-			int const NumItems
-		);
-
-		inline
-		static
-		int
-		FindItem(
-			std::string const & String,
-			Array1S_string const ListOfItems
-		) {
-			return FindItem( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		template < typename A >
-		static
-		inline
-		int
-		FindItem(
-			std::string const & String,
-			MArray1 < A, std::string > const & ListOfItems,
-			int const NumItems
-		) {
-			int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
-			if ( item_number != 0 ) return item_number;
-			for ( int Count = 1; Count <= NumItems; ++Count ) {
-				if ( equali( String, ListOfItems( Count ) ) ) return Count;
-			}
-			return 0; // Not found
-		}
-
-		template < typename A >
-		static
-		inline
-		int
-		FindItem(
-			std::string const & String,
-			MArray1 < A, std::string > const & ListOfItems
-		) {
-			return FindItem( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs size() and operator[i] and elements need Name
-		static
-		inline
-		int
-		FindItem(
-			std::string const & String,
-			Container const & ListOfItems,
-			int const NumItems
-		) {
-			int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
-			if ( item_number != 0 ) return item_number;
-			for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
-				if ( equali( String, ListOfItems[ i ].Name ) ) return i + 1; // 1-based return index
-			}
-			return 0; // Not found
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs size() and operator[i] and elements need Name
-		static
-		inline
-		int
-		FindItem(
-			std::string const & String,
-			Container const & ListOfItems
-		) {
-			return FindItem( String, ListOfItems, ListOfItems.isize() );
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs size() and operator[i] and value_type
-		static
-		inline
-		int
-		FindItem(
-			std::string const & String,
-			Container const & ListOfItems,
-			std::string Container::value_type::*name_p,
-			int const NumItems
-		) {
-			int const item_number( FindItemInList( String, ListOfItems, name_p, NumItems ) );
-			if ( item_number != 0 ) return item_number;
-			for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
-				if ( equali( String, ListOfItems[ i ].*name_p ) ) return i + 1; // 1-based return index
-			}
-			return 0; // Not found
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs size() and operator[i] and value_type
-		static
-		inline
-		int
-		FindItem(
-			std::string const & String,
-			Container const & ListOfItems,
-			std::string Container::value_type::*name_p
-		) {
-			return FindItem( String, ListOfItems, name_p, ListOfItems.isize() );
-		}
-
-		static
-		std::string
-		MakeUPPERCase( std::string const & InputString ); // Input String
-
-		std::string
-		deAllCaps( std::string const & );
-
-
-		typedef char const * c_cstring;
-
-		inline
-		static
-		bool
-		SameString( std::string const & s, std::string const & t ) {
-			// case insensitive comparison
-			return equali( s, t );
-		}
-
-		inline
-		static
-		bool
-		SameString( std::string const & s, c_cstring const & t ) {
-			// case insensitive comparison
-			return equali( s, t );
-		}
-
-		inline
-		static
-		bool
-		SameString( c_cstring const & s, std::string const & t ) {
-			// case insensitive comparison
-			return equali( s, t );
-		}
-
-		inline
-		static
-		bool
-		SameString( c_cstring const & s, c_cstring const & t ) {
-			// case insensitive comparison
-			return equali( s, t );
-		}
-
-		template < typename InputIterator >
-		static
-		inline
-		void
-		VerifyName(
-			InputIterator first,
-			InputIterator last,
-			std::string const & NameToVerify,
-			bool & ErrorFound,
-			bool & IsBlank,
-			std::string const & StringToDisplay
-		) {
-			IsBlank = false;
-			ErrorFound = false;
-			if ( NameToVerify.empty() ) {
-				ShowSevereError( StringToDisplay + ", cannot be blank" );
-				ErrorFound = true;
-				IsBlank = true;
-				return;
-			}
-			int Found = FindItem( first, last, NameToVerify );
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
-		}
-
-		static
-		void
-		VerifyName(
-			std::string const & NameToVerify,
-			Array1D_string const & NamesList,
-			int const NumOfNames,
-			bool & ErrorFound,
-			bool & IsBlank,
-			std::string const & StringToDisplay
-		);
-
-		static
-		void
-		VerifyName(
-			std::string const & NameToVerify,
-			Array1S_string const NamesList,
-			int const NumOfNames,
-			bool & ErrorFound,
-			bool & IsBlank,
-			std::string const & StringToDisplay
-		);
-
-		template < typename A >
-		static
-		inline
-		void
-		VerifyName(
-			std::string const & NameToVerify,
-			MArray1 < A, std::string > const & NamesList,
-			int const NumOfNames,
-			bool & ErrorFound,
-			bool & IsBlank,
-			std::string const & StringToDisplay
-		) { // Overload for member arrays: Implemented here to avoid copy to Array_string to forward to other VerifyName
-			ErrorFound = false;
-			if ( NumOfNames > 0 ) {
-				int const Found = FindItem( NameToVerify, NamesList,
-											NumOfNames ); // Calls FindItem overload that accepts member arrays
-				if ( Found != 0 ) {
-					ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-					ErrorFound = true;
-				}
-			}
-
-			if ( NameToVerify.empty() ) {
-				ShowSevereError( StringToDisplay + ", cannot be blank" );
-				ErrorFound = true;
-				IsBlank = true;
-			} else {
-				IsBlank = false;
-			}
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs size() and operator[i] and elements need Name
-		static
-		inline
-		void
-		VerifyName(
-			std::string const & NameToVerify,
-			Container const & NamesList,
-			int const NumOfNames,
-			bool & ErrorFound,
-			bool & IsBlank,
-			std::string const & StringToDisplay
-		) {
-			ErrorFound = false;
-			if ( NumOfNames > 0 ) {
-				int const Found = FindItem( NameToVerify, NamesList,
-											NumOfNames ); // Calls FindItem overload that accepts member arrays
-				if ( Found != 0 ) {
-					ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-					ErrorFound = true;
-				}
-			}
-
-			if ( NameToVerify.empty() ) {
-				ShowSevereError( StringToDisplay + ", cannot be blank" );
-				ErrorFound = true;
-				IsBlank = true;
-			} else {
-				IsBlank = false;
-			}
-		}
-
-		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-		// Container needs size() and operator[i] and value_type
-		static
-		inline
-		void
-		VerifyName(
-			std::string const & NameToVerify,
-			Container const & NamesList,
-			std::string Container::value_type::*name_p,
-			int const NumOfNames,
-			bool & ErrorFound,
-			bool & IsBlank,
-			std::string const & StringToDisplay
-		) {
-			ErrorFound = false;
-			if ( NumOfNames > 0 ) {
-				int const Found = FindItem( NameToVerify, NamesList, name_p, NumOfNames );
-				if ( Found != 0 ) {
-					ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-					ErrorFound = true;
-				}
-			}
-
-			if ( NameToVerify.empty() ) {
-				ShowSevereError( StringToDisplay + ", cannot be blank" );
-				ErrorFound = true;
-				IsBlank = true;
-			} else {
-				IsBlank = false;
-			}
-		}
-
-		static
-		bool
-		IsNameEmpty(
-			std::string & NameToVerify,
-			std::string const & StringToDisplay,
-			bool & ErrorFound
-		);
 		static
 		void
 		RangeCheck(
@@ -886,8 +314,8 @@ namespace EnergyPlus {
 		static
 		void
 		AddRecordToOutputVariableStructure(
-		std::string const & KeyValue,
-		std::string const & VariableName
+			std::string const & KeyValue,
+			std::string const & VariableName
 		);
 
 		static
@@ -897,15 +325,6 @@ namespace EnergyPlus {
 		static
 		void
 		ReportOrphanRecordObjects();
-
-		// void
-		// ShowAuditErrorMessage(
-		// 	std::string const & Severity, // if blank, does not add to sum
-		// 	std::string const & ErrorMessage
-		// );
-
-		std::string
-		IPTrimSigDigits( int const IntegerValue );
 
 	}; // InputProcessor
 }

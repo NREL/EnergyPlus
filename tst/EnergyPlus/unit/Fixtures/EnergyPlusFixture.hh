@@ -53,7 +53,9 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+
+#include <nlohmann/json.hpp>
 
 #include <memory>
 #include <ostream>
@@ -110,7 +112,7 @@ namespace EnergyPlus {
 
 		void clear_all_states();
 
-		static json::parser_callback_t call_back;
+		static nlohmann::json::parser_callback_t call_back;
 
 		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
 		// Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the

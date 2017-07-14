@@ -265,7 +265,7 @@ ControlCompOutput(
 	if ( ControlCompTypeNum != 0 ) {
 		SimCompNum = ControlCompTypeNum;
 	} else {
-		SimCompNum = InputProcessor::FindItemInSortedList( CompType, ListOfComponents, NumComponents );
+		SimCompNum = UtilityRoutines::FindItemInSortedList( CompType, ListOfComponents, NumComponents );
 		ControlCompTypeNum = SimCompNum;
 	}
 
@@ -1559,7 +1559,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << "   Supply Air Path Component," + ChrOut + ',' + SupplyAirPath( BCount ).ComponentType( Count ) + ',' + SupplyAirPath( BCount ).ComponentName( Count ) + ',' + PrimaryAirLoopName;
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( SupplyAirPath( BCount ).ComponentType( Count ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( SupplyAirPath( BCount ).ComponentType( Count ) ) );
 
 			if ( SELECT_CASE_var == "AIRLOOPHVAC:SUPPLYPLENUM" ) {
 				for ( Count2 = 1; Count2 <= NumZoneSupplyPlenums; ++Count2 ) {
@@ -1843,7 +1843,7 @@ TestReturnAirPathIntegrity(
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << "   Return Air Path Component," + ChrOut + ',' + ReturnAirPath( BCount ).ComponentType( Count ) + ',' + ReturnAirPath( BCount ).ComponentName( Count ) + ',' + PrimaryAirLoopName;
 
-			if ( InputProcessor::SameString( ReturnAirPath( BCount ).ComponentType( Count ), "AirLoopHVAC:ZoneMixer" ) ) {
+			if ( UtilityRoutines::SameString( ReturnAirPath( BCount ).ComponentType( Count ), "AirLoopHVAC:ZoneMixer" ) ) {
 				HasMixer = true;
 				MixerComp = Count;
 				++MixerCount;
@@ -1863,7 +1863,7 @@ TestReturnAirPathIntegrity(
 
 		if ( NumComp > 0 ) {
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( NumComp ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( NumComp ) ) );
 
 			if ( SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER" ) {
 				for ( Count2 = 1; Count2 <= NumMixers; ++Count2 ) {
@@ -1927,7 +1927,7 @@ TestReturnAirPathIntegrity(
 
 		if ( NumComp > 1 ) {
 			for ( Count3 = 1; Count3 <= NumComp - 1; ++Count3 ) {
-				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( Count3 ) ) );
+				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( Count3 ) ) );
 
 				if ( SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER" ) {
 					for ( Count2 = 1; Count2 <= NumMixers; ++Count2 ) {

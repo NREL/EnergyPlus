@@ -258,7 +258,7 @@ namespace EnergyPlus {
 			for ( auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
 				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, loopTransformer, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
-				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
+				if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
 					if ( ! foundInFromGridTransformer ) {
 						foundInFromGridTransformer = true;
 						facilityPowerInTransformerIDFObjNum = loopTransformer;
@@ -270,7 +270,7 @@ namespace EnergyPlus {
 						ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " = " + DataIPShortCuts::cAlphaArgs( 3 ) );
 						ShowContinueError("Only one transformer with Usage PowerInFromGrid can be used, first one in input file will be used and the simulation continues...");
 					}
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
 					if ( powerOutTransformerObj_ == nullptr ) {
 						++numPowerOutTransformers_;
 						powerOutTransformerName_ = DataIPShortCuts::cAlphaArgs( 1 );
@@ -635,19 +635,19 @@ namespace EnergyPlus {
 
 			if ( ! DataIPShortCuts::lAlphaFieldBlanks( 3 ) )  {
 				//Load the Generator Control Operation Scheme
-				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "Baseload" ) ) {
+				if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "Baseload" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::baseLoad;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "DemandLimit" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "DemandLimit" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::demandLimit;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackElectrical" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackElectrical" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::trackElectrical;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackSchedule" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackSchedule" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::trackSchedule;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackMeter" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "TrackMeter" ) ) {
 					genOperationScheme_ =  GeneratorOpScheme::trackMeter;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "FollowThermal" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "FollowThermal" ) ) {
 					genOperationScheme_ = GeneratorOpScheme::thermalFollow;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "FollowThermalLimitElectrical" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "FollowThermalLimitElectrical" ) ) {
 					genOperationScheme_ =  GeneratorOpScheme::thermalFollowLimitElectrical;
 				} else {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -671,26 +671,26 @@ namespace EnergyPlus {
 				errorsFound = true;
 			}
 
-			demandMeterName_ = InputProcessor::MakeUPPERCase( DataIPShortCuts::cAlphaArgs( 5 ) );
+			demandMeterName_ = UtilityRoutines::MakeUPPERCase( DataIPShortCuts::cAlphaArgs( 5 ) );
 				// meters may not be "loaded" yet, defered check to later subroutine
 
-			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "AlternatingCurrent" ) ) {
+			if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "AlternatingCurrent" ) ) {
 				bussType = ElectricBussType::aCBuss;
 				DataIPShortCuts::cAlphaArgs( 6 ) = "AlternatingCurrent";
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverter" ) ) {
+			} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverter" ) ) {
 				bussType  = ElectricBussType::dCBussInverter;
 				inverterPresent = true;
 				DataIPShortCuts::cAlphaArgs( 6 ) = "DirectCurrentWithInverter";
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "AlternatingCurrentWithStorage" ) ) {
+			} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "AlternatingCurrentWithStorage" ) ) {
 				bussType  = ElectricBussType::aCBussStorage;
 				storagePresent_ = true;
 				DataIPShortCuts::cAlphaArgs( 6 ) = "AlternatingCurrentWithStorage";
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverterDCStorage" ) ) {
+			} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverterDCStorage" ) ) {
 				bussType  = ElectricBussType::dCBussInverterDCStorage;
 				inverterPresent = true;
 				storagePresent_ = true;
 				DataIPShortCuts::cAlphaArgs( 6 ) = "DirectCurrentWithInverterDCStorage";
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverterACStorage" ) ) {
+			} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "DirectCurrentWithInverterACStorage" ) ) {
 				bussType  = ElectricBussType::dCBussInverterACStorage;
 				inverterPresent = true;
 				storagePresent_ = true;
@@ -734,13 +734,13 @@ namespace EnergyPlus {
 			// Begin new content for grid supply and more control over storage
 			// user selected storage operation scheme
 			if ( ! DataIPShortCuts::lAlphaFieldBlanks( 10 ) ) {
-				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackFacilityElectricDemandStoreExcessOnSite" ) ) {
+				if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackFacilityElectricDemandStoreExcessOnSite" ) ) {
 					storageScheme_ = StorageOpScheme::facilityDemandStoreExcessOnSite;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackMeterDemandStoreExcessOnSite" )  ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackMeterDemandStoreExcessOnSite" )  ) {
 					storageScheme_ = StorageOpScheme::meterDemandStoreExcessOnSite;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackChargeDischargeSchedules" )  ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "TrackChargeDischargeSchedules" )  ) {
 					storageScheme_ = StorageOpScheme::chargeDischargeSchedules;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "FacilityDemandLeveling" )  ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 10 ), "FacilityDemandLeveling" )  ) {
 					storageScheme_ = StorageOpScheme::facilityDemandLeveling;
 				} else {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -895,7 +895,7 @@ namespace EnergyPlus {
 			int iOStat;
 			if ( transformerItemNum > 0 ) {
 				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerItemNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
-				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) { // this is the right kind of transformer
+				if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) { // this is the right kind of transformer
 					transformerObj = std::unique_ptr< ElectricTransformer >( new ElectricTransformer (transformerName_ ) );
 				} else {
 					ShowWarningError( "Transformer named " + transformerName_ + " associated with the load center named " + name_ + " should have " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " set to LoadCenterPowerConditioning." );
@@ -1922,31 +1922,31 @@ namespace EnergyPlus {
 
 		name                   = objectName;
 		typeOfName             = objectType;
-		if ( InputProcessor::SameString( objectType, "Generator:InternalCombustionEngine" ) ) {
+		if ( UtilityRoutines::SameString( objectType, "Generator:InternalCombustionEngine" ) ) {
 			generatorType = GeneratorType::iCEngine;
 			compGenTypeOf_Num   = DataGlobalConstants::iGeneratorICEngine;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_ICEngine;
-		} else if ( InputProcessor::SameString( objectType, "Generator:CombustionTurbine" ) ) {
+		} else if ( UtilityRoutines::SameString( objectType, "Generator:CombustionTurbine" ) ) {
 			generatorType = GeneratorType::combTurbine;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorCombTurbine;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_CTurbine;
-		} else if ( InputProcessor::SameString( objectType, "Generator:MicroTurbine" ) ) {
+		} else if ( UtilityRoutines::SameString( objectType, "Generator:MicroTurbine" ) ) {
 			generatorType = GeneratorType::microturbine;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroturbine;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroTurbine;
-		} else if ( InputProcessor::SameString( objectType, "Generator:Photovoltaic" ) ) {
+		} else if ( UtilityRoutines::SameString( objectType, "Generator:Photovoltaic" ) ) {
 			generatorType = GeneratorType::pV;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
 			compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
-		} else if ( InputProcessor::SameString( objectType, "Generator:FuelCell" ) ) {
+		} else if ( UtilityRoutines::SameString( objectType, "Generator:FuelCell" ) ) {
 			generatorType = GeneratorType::fuelCell;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCStackCooler;
-		} else if ( InputProcessor::SameString( objectType, "Generator:MicroCHP" ) ) {
+		} else if ( UtilityRoutines::SameString( objectType, "Generator:MicroCHP" ) ) {
 			generatorType = GeneratorType::microCHP;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
-		} else if ( InputProcessor::SameString( objectType, "Generator:WindTurbine" ) ) {
+		} else if ( UtilityRoutines::SameString( objectType, "Generator:WindTurbine" ) ) {
 			generatorType = GeneratorType::windTurbine;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorWindTurbine;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Other;
@@ -2157,7 +2157,7 @@ namespace EnergyPlus {
 				}
 			}
 
-			zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
+			zoneNum_ = UtilityRoutines::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
 				if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
@@ -2469,9 +2469,9 @@ namespace EnergyPlus {
 				}
 			}
 
-			if ( InputProcessor::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "SimpleFixed" ) ) {
+			if ( UtilityRoutines::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "SimpleFixed" ) ) {
 				modelType_ = ConverterModelType::simpleConstantEff;
-			} else if ( InputProcessor::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "FunctionOfPower" ) ) {
+			} else if ( UtilityRoutines::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "FunctionOfPower" ) ) {
 				modelType_ = ConverterModelType::curveFuncOfPower;
 			} else {
 				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -2504,7 +2504,7 @@ namespace EnergyPlus {
 
 			standbyPower_ = DataIPShortCuts::rNumericArgs( 3 );
 
-			zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 5 ), DataHeatBalance::Zone );
+			zoneNum_ = UtilityRoutines::FindItemInList( DataIPShortCuts::cAlphaArgs( 5 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
 				if ( DataIPShortCuts::lAlphaFieldBlanks( 5 ) ) {
@@ -2768,7 +2768,7 @@ namespace EnergyPlus {
 				}
 			}
 
-			zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
+			zoneNum_ = UtilityRoutines::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
 				if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
@@ -2807,7 +2807,7 @@ namespace EnergyPlus {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 4 ) + " cannot be blank. But no entry found." );
 					errorsFound = true;
-				} else if ( ! InputProcessor::SameString( CurveManager::GetCurveType( chargeCurveNum_ ), "RectangularHyperbola2" ) ) {
+				} else if ( ! UtilityRoutines::SameString( CurveManager::GetCurveType( chargeCurveNum_ ), "RectangularHyperbola2" ) ) {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 4 ) + '=' + DataIPShortCuts::cAlphaArgs( 4 ) );
 					ShowContinueError( "Curve Type must be RectangularHyperbola2 but was " + CurveManager::GetCurveType( chargeCurveNum_ ) );
@@ -2822,16 +2822,16 @@ namespace EnergyPlus {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 5 ) + " cannot be blank. But no entry found." );
 					errorsFound = true;
-				} else if ( ! InputProcessor::SameString( CurveManager::GetCurveType( dischargeCurveNum_ ), "RectangularHyperbola2" ) ) {
+				} else if ( ! UtilityRoutines::SameString( CurveManager::GetCurveType( dischargeCurveNum_ ), "RectangularHyperbola2" ) ) {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 5 ) + '=' + DataIPShortCuts::cAlphaArgs( 5 ) );
 					ShowContinueError( "Curve Type must be RectangularHyperbola2 but was " + CurveManager::GetCurveType( dischargeCurveNum_ ) );
 					errorsFound = true;
 				}
 
-				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "Yes" ) ) {
+				if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "Yes" ) ) {
 					lifeCalculation_ = BatteyDegredationModelType::lifeCalculationYes;
-				} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "No" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "No" ) ) {
 					lifeCalculation_ = BatteyDegredationModelType::lifeCalculationNo;
 				} else {
 					ShowWarningError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -2850,7 +2850,7 @@ namespace EnergyPlus {
 						ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 						ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 7 ) + " cannot be blank when " + DataIPShortCuts::cAlphaArgs( 6 ) + " = Yes. But no entry found." );
 						errorsFound = true;
-					} else if ( ! InputProcessor::SameString( CurveManager::GetCurveType( lifeCurveNum_ ), "DoubleExponentialDecay" ) ) {
+					} else if ( ! UtilityRoutines::SameString( CurveManager::GetCurveType( lifeCurveNum_ ), "DoubleExponentialDecay" ) ) {
 						ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 						ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 7 ) + '=' + DataIPShortCuts::cAlphaArgs( 7 ) );
 						ShowContinueError( "Curve Type must be DoubleExponentialDecay but was " + CurveManager::GetCurveType( lifeCurveNum_ ) );
@@ -3711,11 +3711,11 @@ namespace EnergyPlus {
 
 			if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
 				usageMode_ = TransformerUse::powerInFromGrid; //default
-			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
+			} else if ( UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
 				usageMode_ = TransformerUse::powerInFromGrid;
-			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
+			} else if ( UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
 				usageMode_ = TransformerUse::powerOutFromBldgToGrid;
-			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) {
+			} else if ( UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) {
 				usageMode_ = TransformerUse::powerBetweenLoadCenterAndBldg;
 
 			} else {
@@ -3724,7 +3724,7 @@ namespace EnergyPlus {
 					errorsFound = true;
 			}
 
-			zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 4 ), DataHeatBalance::Zone );
+			zoneNum_ = UtilityRoutines::FindItemInList( DataIPShortCuts::cAlphaArgs( 4 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
 				if ( DataIPShortCuts::lAlphaFieldBlanks( 4 ) ) {
@@ -3741,9 +3741,9 @@ namespace EnergyPlus {
 			ratedCapacity_ = DataIPShortCuts::rNumericArgs( 2 );
 			phase_         = DataIPShortCuts::rNumericArgs( 3 );
 
-			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Copper" ) ) {
+			if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Copper" ) ) {
 				factorTempCoeff_ = 234.5;
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Aluminum" ) ) {
+			} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Aluminum" ) ) {
 				factorTempCoeff_ = 225.0;
 			} else {
 				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -3753,9 +3753,9 @@ namespace EnergyPlus {
 			tempRise_ = DataIPShortCuts::rNumericArgs( 4 );
 			eddyFrac_ = DataIPShortCuts::rNumericArgs( 5 );
 
-			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "RatedLosses" ) ) {
+			if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "RatedLosses" ) ) {
 				performanceInputMode_ = TransformerPerformanceInput::lossesMethod;
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "NominalEfficiency" ) ) {
+			} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "NominalEfficiency" ) ) {
 				performanceInputMode_ = TransformerPerformanceInput::efficiencyMethod;
 			} else {
 				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" +  DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -3780,9 +3780,9 @@ namespace EnergyPlus {
 					errorsFound = true;
 				}
 			}
-			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 7 ), "Yes" ) ) {
+			if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 7 ), "Yes" ) ) {
 				considerLosses_ = true;
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 7 ), "No" ) ) {
+			} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 7 ), "No" ) ) {
 				considerLosses_ = false;
 			} else {
 				if ( usageMode_ == TransformerUse::powerInFromGrid ) {
@@ -3809,9 +3809,9 @@ namespace EnergyPlus {
 
 				//Meter check deferred because they may have not been "loaded" yet,
 				for ( auto loopCount = 0; loopCount < numWiredMeters; ++loopCount ) {
-					wiredMeterNames_[ loopCount ] = InputProcessor::MakeUPPERCase( DataIPShortCuts::cAlphaArgs( loopCount + numAlphaBeforeMeter + 1 ) );
+					wiredMeterNames_[ loopCount ] = UtilityRoutines::MakeUPPERCase( DataIPShortCuts::cAlphaArgs( loopCount + numAlphaBeforeMeter + 1 ) );
 					//Assign SpecialMeter as TRUE if the meter name is Electricity:Facility or Electricity:HVAC
-					if ( InputProcessor::SameString( wiredMeterNames_[ loopCount ], "Electricity:Facility" ) || InputProcessor::SameString( wiredMeterNames_[ loopCount ], "Electricity:HVAC" ) ) {
+					if ( UtilityRoutines::SameString( wiredMeterNames_[ loopCount ], "Electricity:Facility" ) || UtilityRoutines::SameString( wiredMeterNames_[ loopCount ], "Electricity:HVAC" ) ) {
 						specialMeter_[ loopCount ] = true;
 					} else {
 						specialMeter_[ loopCount ] = false;

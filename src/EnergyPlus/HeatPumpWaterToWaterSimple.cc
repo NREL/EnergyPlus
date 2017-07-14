@@ -174,7 +174,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		int GSHPNum( 0 );
 		if ( CompIndex == 0 ) {
-			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
+			GSHPNum = UtilityRoutines::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterSimple: Specified heat pump not one of valid heat pumps. Heat pump = " + GSHPName );
 			}
@@ -480,7 +480,7 @@ namespace HeatPumpWaterToWaterSimple {
 		//now process companion coils, if any
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			if ( ! GSHP( GSHPNum ).companionName.empty() ) {
-				GSHP( GSHPNum ).companionIndex = InputProcessor::FindItemInList( GSHP( GSHPNum ).companionName, GSHP );
+				GSHP( GSHPNum ).companionIndex = UtilityRoutines::FindItemInList( GSHP( GSHPNum ).companionName, GSHP );
 				if ( GSHP( GSHPNum ).companionIndex == 0 ) {
 					ShowSevereError( "GetEquationFitWaterToWater Input: did not find companion heat pump named '" + GSHP( GSHPNum ).companionName + "' in heat pump called " + GSHP( GSHPNum ).Name );
 					ErrorsFound =  true;

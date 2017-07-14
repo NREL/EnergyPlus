@@ -443,7 +443,7 @@ namespace DemandManager {
 			for ( ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty( AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
+				UtilityRoutines::IsNameEmpty( AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
 				DemandManagerList( ListNum ).Name = AlphArray( 1 );
 
@@ -531,7 +531,7 @@ namespace DemandManager {
 						{ auto const SELECT_CASE_var( AlphArray( MgrNum * 2 + 5 ) );
 						if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") || (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
 
-							DemandManagerList( ListNum ).Manager( MgrNum ) = InputProcessor::FindItemInList( AlphArray( MgrNum * 2 + 6 ), DemandMgr );
+							DemandManagerList( ListNum ).Manager( MgrNum ) = UtilityRoutines::FindItemInList( AlphArray( MgrNum * 2 + 6 ), DemandMgr );
 
 							if ( DemandManagerList( ListNum ).Manager( MgrNum ) == 0 ) {
 								ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( MgrNum * 2 + 6 ) + "=\"" + AlphArray( MgrNum * 2 + 6 ) + "\" not found." );
@@ -762,7 +762,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 
 					for ( LoadNum = 1; LoadNum <= DemandMgr( MgrNum ).NumOfLoads; ++LoadNum ) {
-						LoadPtr = InputProcessor::FindItemInList( AlphArray( LoadNum + 4 ), ExteriorLights );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), ExteriorLights );
 
 						if ( LoadPtr > 0 ) {
 							DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -857,11 +857,11 @@ namespace DemandManager {
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = InputProcessor::FindItemInList( AlphArray( LoadNum + 4 ), LightsObjects );
+					LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), LightsObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += LightsObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = InputProcessor::FindItemInList( AlphArray( LoadNum + 4 ), Lights );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), Lights );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -877,14 +877,14 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = InputProcessor::FindItemInList( AlphArray( Item + 4 ), LightsObjects );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), LightsObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= LightsObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LightsObjects( LoadPtr ).StartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = InputProcessor::FindItemInList( AlphArray( Item + 4 ), Lights );
+							LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), Lights );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -975,11 +975,11 @@ namespace DemandManager {
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = InputProcessor::FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectricObjects );
+					LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectricObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += ZoneElectricObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = InputProcessor::FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectric );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectric );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -995,14 +995,14 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = InputProcessor::FindItemInList( AlphArray( Item + 4 ), ZoneElectricObjects );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), ZoneElectricObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= ZoneElectricObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = ZoneElectricObjects( LoadPtr ).StartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = InputProcessor::FindItemInList( AlphArray( Item + 4 ), ZoneElectric );
+							LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), ZoneElectric );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -1102,11 +1102,11 @@ namespace DemandManager {
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = InputProcessor::FindItemInList( AlphArray( LoadNum + 4 ), TStatObjects );
+					LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), TStatObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += TStatObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = InputProcessor::FindItemInList( AlphArray( LoadNum + 4 ), TempControlledZone );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), TempControlledZone );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -1120,14 +1120,14 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = InputProcessor::FindItemInList( AlphArray( Item + 4 ), TStatObjects );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), TStatObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= TStatObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = TStatObjects( LoadPtr ).TempControlledZoneStartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = InputProcessor::FindItemInList( AlphArray( Item + 4 ), TempControlledZone );
+							LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), TempControlledZone );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;

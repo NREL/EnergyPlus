@@ -221,7 +221,7 @@ namespace MoistureBalanceEMPDManager {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			//Load the material derived type from the input data.
-			MaterNum = InputProcessor::FindItemInList( MaterialNames( 1 ), Material );
+			MaterNum = UtilityRoutines::FindItemInList( MaterialNames( 1 ), Material );
 			if ( MaterNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 				ErrorsFound = true;

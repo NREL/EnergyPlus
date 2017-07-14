@@ -187,7 +187,7 @@ namespace UserDefinedComponents {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = InputProcessor::FindItemInList( EquipName, UserPlantComp );
+			CompNum = UtilityRoutines::FindItemInList( EquipName, UserPlantComp );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Plant Component not found" );
 			}
@@ -296,7 +296,7 @@ namespace UserDefinedComponents {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = InputProcessor::FindItemInList( EquipName, UserCoil );
+			CompNum = UtilityRoutines::FindItemInList( EquipName, UserCoil );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
 			}
@@ -397,7 +397,7 @@ namespace UserDefinedComponents {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = InputProcessor::FindItemInList( CompName, UserZoneAirHVAC );
+			CompNum = UtilityRoutines::FindItemInList( CompName, UserZoneAirHVAC );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
 			}
@@ -490,7 +490,7 @@ namespace UserDefinedComponents {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = InputProcessor::FindItemInList( CompName, UserAirTerminal );
+			CompNum = UtilityRoutines::FindItemInList( CompName, UserAirTerminal );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
 			}
@@ -617,13 +617,13 @@ namespace UserDefinedComponents {
 			CheckUserPlantCompName.dimension( NumUserPlantComps, true );
 			for ( CompLoop = 1; CompLoop <= NumUserPlantComps; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				UserPlantComp( CompLoop ).Name = cAlphaArgs( 1 );
 
 				// now get program manager for model simulations
 				if ( ! lAlphaFieldBlanks( 2 ) ) {
-					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
+					StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserPlantComp( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
@@ -675,7 +675,7 @@ namespace UserDefinedComponents {
 
 						// find program manager for initial setup, begin environment and sizing of this plant connection
 						if ( ! lAlphaFieldBlanks( aArgCount + 4 ) ) {
-							StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( aArgCount + 4 ), EMSProgramCallManager );
+							StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( aArgCount + 4 ), EMSProgramCallManager );
 							if ( StackMngrNum > 0 ) { // found it
 								UserPlantComp( CompLoop ).Loop( ConnectionLoop ).ErlInitProgramMngr = StackMngrNum;
 							} else {
@@ -688,7 +688,7 @@ namespace UserDefinedComponents {
 
 						// find program to call for model simulations for just this plant connection
 						if ( ! lAlphaFieldBlanks( aArgCount + 5 ) ) {
-							StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( aArgCount + 5 ), EMSProgramCallManager );
+							StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( aArgCount + 5 ), EMSProgramCallManager );
 							if ( StackMngrNum > 0 ) { // found it
 								UserPlantComp( CompLoop ).Loop( ConnectionLoop ).ErlSimProgramMngr = StackMngrNum;
 							} else {
@@ -753,7 +753,7 @@ namespace UserDefinedComponents {
 
 				if ( ! lAlphaFieldBlanks( 31 ) ) {
 
-					UserPlantComp( CompLoop ).Zone.ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 31 ), Zone );
+					UserPlantComp( CompLoop ).Zone.ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 31 ), Zone );
 					if ( UserPlantComp( CompLoop ).Zone.ZoneNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 31 ) );
 						ErrorsFound = true;
@@ -798,7 +798,7 @@ namespace UserDefinedComponents {
 			CheckUserCoilName.dimension( NumUserCoils, true );
 			for ( CompLoop = 1; CompLoop <= NumUserCoils; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;
@@ -807,7 +807,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model simulations
 				if ( ! lAlphaFieldBlanks( 2 ) ) {
-					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
+					StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserCoil( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
@@ -820,7 +820,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model initializations
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
+					StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserCoil( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -911,7 +911,7 @@ namespace UserDefinedComponents {
 
 					if ( ! lAlphaFieldBlanks( 13 ) ) {
 
-						UserCoil( CompLoop ).Zone.ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 13 ), Zone );
+						UserCoil( CompLoop ).Zone.ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 13 ), Zone );
 						if ( UserCoil( CompLoop ).Zone.ZoneNum == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 13 ) );
 							ErrorsFound = true;
@@ -945,12 +945,12 @@ namespace UserDefinedComponents {
 			CheckUserZoneAirName.dimension( NumUserZoneAir, true );
 			for ( CompLoop = 1; CompLoop <= NumUserZoneAir; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				UserZoneAirHVAC( CompLoop ).Name = cAlphaArgs( 1 );
 
 				// now get program manager for model simulations
 				if ( ! lAlphaFieldBlanks( 2 ) ) {
-					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
+					StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserZoneAirHVAC( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
@@ -963,7 +963,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model initializations
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
+					StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserZoneAirHVAC( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -1059,7 +1059,7 @@ namespace UserDefinedComponents {
 
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
 
-					UserZoneAirHVAC( CompLoop ).Zone.ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 16 ), Zone );
+					UserZoneAirHVAC( CompLoop ).Zone.ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 16 ), Zone );
 					if ( UserZoneAirHVAC( CompLoop ).Zone.ZoneNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 16 ) );
 						ErrorsFound = true;
@@ -1091,12 +1091,12 @@ namespace UserDefinedComponents {
 			CheckUserAirTerminal.dimension( NumUserAirTerminals, true );
 			for ( CompLoop = 1; CompLoop <= NumUserAirTerminals; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				UserAirTerminal( CompLoop ).Name = cAlphaArgs( 1 );
 
 				// now get program manager for model simulations
 				if ( ! lAlphaFieldBlanks( 2 ) ) {
-					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
+					StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserAirTerminal( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
@@ -1109,7 +1109,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model initializations
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
+					StackMngrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserAirTerminal( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -1227,7 +1227,7 @@ namespace UserDefinedComponents {
 
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
 
-					UserAirTerminal( CompLoop ).Zone.ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 14 ), Zone );
+					UserAirTerminal( CompLoop ).Zone.ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 14 ), Zone );
 					if ( UserAirTerminal( CompLoop ).Zone.ZoneNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 14 ) );
 						ErrorsFound = true;
@@ -1953,7 +1953,7 @@ namespace UserDefinedComponents {
 		}
 
 		if ( NumUserCoils > 0 ) {
-			CoilIndex = InputProcessor::FindItem( CoilName, UserCoil, NumUserCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, UserCoil, NumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -1994,7 +1994,7 @@ namespace UserDefinedComponents {
 		}
 
 		if ( NumUserCoils > 0 ) {
-			CoilIndex = InputProcessor::FindItem( CoilName, UserCoil, NumUserCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, UserCoil, NumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -2038,7 +2038,7 @@ namespace UserDefinedComponents {
 		}
 
 		if ( NumUserCoils > 0 ) {
-			CoilIndex = InputProcessor::FindItem( CoilName, UserCoil, NumUserCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, UserCoil, NumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}

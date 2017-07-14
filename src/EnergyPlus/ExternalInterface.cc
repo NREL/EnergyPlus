@@ -253,11 +253,11 @@ namespace ExternalInterface {
 
 		for ( Loop = 1; Loop <= NumExternalInterfaces; ++Loop ) { // This loop determines whether the external interface is for FMU or BCVTB
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-			if ( InputProcessor::SameString( cAlphaArgs( 1 ), "PtolemyServer" ) ) { // The BCVTB interface is activated.
+			if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "PtolemyServer" ) ) { // The BCVTB interface is activated.
 				++NumExternalInterfacesBCVTB;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) { // The functional mock up unit import interface is activated.
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) { // The functional mock up unit import interface is activated.
 				++NumExternalInterfacesFMUImport;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitExport" ) ) { // The functional mock up unit export interface is activated.
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitExport" ) ) { // The functional mock up unit export interface is activated.
 				++NumExternalInterfacesFMUExport;
 			}
 		}
@@ -456,7 +456,7 @@ namespace ExternalInterface {
 			} else { // Use rest of string
 				iEnd = lenStr;
 			}
-			ele( i ) = InputProcessor::MakeUPPERCase( str.substr( iSta, iEnd - iSta - 1 ) );
+			ele( i ) = UtilityRoutines::MakeUPPERCase( str.substr( iSta, iEnd - iSta - 1 ) );
 		}
 
 	}
@@ -1097,9 +1097,9 @@ namespace ExternalInterface {
 			// this is windows code...
 			for ( j = 1; j <= NumFMUObjects; ++j ) {
 				for ( k = 2; k <= NumFMUObjects; ++k ) {
-					if ( ! InputProcessor::SameString( strippedFileName( j ), strippedFileName( k ) ) ) continue;
+					if ( ! UtilityRoutines::SameString( strippedFileName( j ), strippedFileName( k ) ) ) continue;
 					// base file names are the same
-					if ( InputProcessor::SameString( fullFileName( j ), fullFileName( k ) ) ) continue;
+					if ( UtilityRoutines::SameString( fullFileName( j ), fullFileName( k ) ) ) continue;
 					ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport:" );
 					ShowContinueError( "duplicate file names (but not same file) entered." );
 					ShowContinueError( "...entered file name=\"" + FMU( j ).Name + "\"" );
@@ -1130,10 +1130,10 @@ namespace ExternalInterface {
 				checkInstanceName.allocate( NumFMUInputVariables );
 				for ( l = 1; l <= NumFMUInputVariables; ++l ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-					if ( InputProcessor::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
 						Name_NEW = cAlphaArgs( 4 );
-						if ( ! InputProcessor::SameString( Name_OLD, Name_NEW ) ) {
-							FOUND = InputProcessor::FindItem( Name_NEW, checkInstanceName );
+						if ( ! UtilityRoutines::SameString( Name_OLD, Name_NEW ) ) {
+							FOUND = UtilityRoutines::FindItem( Name_NEW, checkInstanceName );
 							if ( FOUND == 0 ) {
 								checkInstanceName( l ).Name = Name_NEW;
 								FMU( i ).NumInstances = j;
@@ -1289,13 +1289,13 @@ namespace ExternalInterface {
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
 						InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-						if ( InputProcessor::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) && InputProcessor::SameString( cAlphaArgs( 4 ), FMU( i ).Instance( j ).Name ) ) {
+						if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) && UtilityRoutines::SameString( cAlphaArgs( 4 ), FMU( i ).Instance( j ).Name ) ) {
 							FMU( i ).Instance( j ).fmuInputVariable( k ).Name = cAlphaArgs( 5 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey = cAlphaArgs( 1 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).Name = cAlphaArgs( 2 );
 							// verify whether we have duplicate FMU input variables in the idf
 							GlobalNames::VerifyUniqueInterObjectName( UniqueFMUInputVarNames, FMU( i ).Instance( j ).fmuInputVariable( k ).Name, cCurrentModuleObject, FMU( i ).Instance( j ).Name, ErrorsFound );
-//							InputProcessor::VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
+//							UtilityRoutines::VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
 							if ( ErrorsFound ) {
 								StopExternalInterfaceIfError();
 							} else {
@@ -1387,7 +1387,7 @@ namespace ExternalInterface {
 				j = 1;
 				for ( k = 1; k <= NumFMUInputVariables; ++k ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-					if ( InputProcessor::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
 						FMU( i ).TotNumOutputVariablesSchedule = j;
 						++j;
 					}
@@ -1401,7 +1401,7 @@ namespace ExternalInterface {
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
 						InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-						if ( InputProcessor::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) && InputProcessor::SameString( cAlphaArgs( 4 ), FMU( i ).Instance( j ).Name ) ) {
+						if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) && UtilityRoutines::SameString( cAlphaArgs( 4 ), FMU( i ).Instance( j ).Name ) ) {
 							FMU( i ).Instance( j ).fmuOutputVariableSchedule( k ).Name = cAlphaArgs( 5 );
 							FMU( i ).Instance( j ).eplusInputVariableSchedule( k ).Name = cAlphaArgs( 1 );
 							FMU( i ).Instance( j ).eplusInputVariableSchedule( k ).InitialValue = rNumericArgs( 1 );
@@ -1461,7 +1461,7 @@ namespace ExternalInterface {
 				j = 1;
 				for ( k = 1; k <= NumFMUInputVariables; ++k ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-					if ( InputProcessor::SameString( cAlphaArgs( 2 ), FMU( i ).Name ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), FMU( i ).Name ) ) {
 						FMU( i ).TotNumOutputVariablesVariable = j;
 						++j;
 					}
@@ -1475,7 +1475,7 @@ namespace ExternalInterface {
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
 						InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-						if ( InputProcessor::SameString( cAlphaArgs( 2 ), FMU( i ).Name ) && InputProcessor::SameString( cAlphaArgs( 3 ), FMU( i ).Instance( j ).Name ) ) {
+						if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), FMU( i ).Name ) && UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Instance( j ).Name ) ) {
 							FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name = cAlphaArgs( 4 );
 							FMU( i ).Instance( j ).eplusInputVariableVariable( k ).Name = cAlphaArgs( 1 );
 
@@ -1529,7 +1529,7 @@ namespace ExternalInterface {
 				j = 1;
 				for ( k = 1; k <= NumFMUInputVariables; ++k ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-					if ( InputProcessor::SameString( cAlphaArgs( 5 ), FMU( i ).Name ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), FMU( i ).Name ) ) {
 						FMU( i ).TotNumOutputVariablesActuator = j;
 						++j;
 					}
@@ -1543,7 +1543,7 @@ namespace ExternalInterface {
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
 						InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-						if ( InputProcessor::SameString( cAlphaArgs( 5 ), FMU( i ).Name ) && InputProcessor::SameString( cAlphaArgs( 6 ), FMU( i ).Instance( j ).Name ) ) {
+						if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), FMU( i ).Name ) && UtilityRoutines::SameString( cAlphaArgs( 6 ), FMU( i ).Instance( j ).Name ) ) {
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name = cAlphaArgs( 7 );
 							FMU( i ).Instance( j ).eplusInputVariableActuator( k ).Name = cAlphaArgs( 1 );
 
@@ -2236,7 +2236,7 @@ namespace ExternalInterface {
 
 		cCurrentModuleObject = "ExternalInterface";
 		InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
-		if ( ( ! InputProcessor::SameString( cAlphaArgs( 1 ), "PtolemyServer" ) ) && ( ! InputProcessor::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) && ( ! InputProcessor::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitExport" ) ) ) {
+		if ( ( ! UtilityRoutines::SameString( cAlphaArgs( 1 ), "PtolemyServer" ) ) && ( ! UtilityRoutines::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) && ( ! UtilityRoutines::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitExport" ) ) ) {
 			ShowSevereError( "VerifyExternalInterfaceObject: " + cCurrentModuleObject + ", invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\"." );
 			ShowContinueError( "only \"PtolemyServer or FunctionalMockupUnitImport or FunctionalMockupUnitExport\" allowed." );
 			ErrorsFound = true;

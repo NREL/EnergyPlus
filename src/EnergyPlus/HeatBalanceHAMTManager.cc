@@ -370,7 +370,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			InputProcessor::GetObjectItem( cHAMTObject1, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
+			matid = UtilityRoutines::FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject1 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -392,7 +392,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			InputProcessor::GetObjectItem( cHAMTObject2, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
+			matid = UtilityRoutines::FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject2 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -471,7 +471,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			InputProcessor::GetObjectItem( cHAMTObject3, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
+			matid = UtilityRoutines::FindItemInList( AlphaArray( 1 ), Material );
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject3 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
@@ -504,7 +504,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			InputProcessor::GetObjectItem( cHAMTObject4, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
+			matid = UtilityRoutines::FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject4 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -535,7 +535,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			InputProcessor::GetObjectItem( cHAMTObject5, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
+			matid = UtilityRoutines::FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject5 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -569,7 +569,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			InputProcessor::GetObjectItem( cHAMTObject6, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			matid = InputProcessor::FindItemInList( AlphaArray( 1 ), Material );
+			matid = UtilityRoutines::FindItemInList( AlphaArray( 1 ), Material );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject6 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
@@ -603,7 +603,7 @@ namespace HeatBalanceHAMTManager {
 		for ( item = 1; item <= HAMTitems; ++item ) {
 			InputProcessor::GetObjectItem( cHAMTObject7, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			vtcsid = InputProcessor::FindItemInList( AlphaArray( 1 ), Surface );
+			vtcsid = UtilityRoutines::FindItemInList( AlphaArray( 1 ), Surface );
 			if ( vtcsid == 0 ) {
 				ShowSevereError( cHAMTObject7 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
 				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );

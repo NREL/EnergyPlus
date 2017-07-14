@@ -442,7 +442,7 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( CompIndex == 0 ) {
-			DXCoilNum = InputProcessor::FindItemInList( CompName, VarSpeedCoil );
+			DXCoilNum = UtilityRoutines::FindItemInList( CompName, VarSpeedCoil );
 			if ( DXCoilNum == 0 ) {
 				ShowFatalError( "WaterToAirHPVSWEquationFit not found=" + CompName );
 			}
@@ -1045,9 +1045,9 @@ namespace VariableSpeedCoils {
 				}
 			}
 
-			if ( ( InputProcessor::SameString( AlphArray( 6 ), "AirCooled" ) ) || lAlphaBlanks( 6 ) ) {
+			if ( ( UtilityRoutines::SameString( AlphArray( 6 ), "AirCooled" ) ) || lAlphaBlanks( 6 ) ) {
 				VarSpeedCoil( DXCoilNum ).CondenserType = AirCooled;
-			} else if ( InputProcessor::SameString( AlphArray( 6 ), "EvaporativelyCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 6 ), "EvaporativelyCooled" ) ) {
 				VarSpeedCoil( DXCoilNum ).CondenserType = EvapCooled;
 				VarSpeedCoil( DXCoilNum ).ReportEvapCondVars = true;
 			} else {
@@ -1714,7 +1714,7 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( AlphArray( 5 ) ); // convert curve name to number
 
-			if ( InputProcessor::SameString( AlphArray( 6 ), "ReverseCycle" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 6 ), "ReverseCycle" ) ) {
 				if ( VarSpeedCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 5 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", missing" );
@@ -1740,8 +1740,8 @@ namespace VariableSpeedCoils {
 				}
 			}
 
-			if ( InputProcessor::SameString( AlphArray( 6 ), "ReverseCycle" ) ) VarSpeedCoil( DXCoilNum ).DefrostStrategy = ReverseCycle;
-			if ( InputProcessor::SameString( AlphArray( 6 ), "Resistive" ) ) VarSpeedCoil( DXCoilNum ).DefrostStrategy = Resistive;
+			if ( UtilityRoutines::SameString( AlphArray( 6 ), "ReverseCycle" ) ) VarSpeedCoil( DXCoilNum ).DefrostStrategy = ReverseCycle;
+			if ( UtilityRoutines::SameString( AlphArray( 6 ), "Resistive" ) ) VarSpeedCoil( DXCoilNum ).DefrostStrategy = Resistive;
 			if ( VarSpeedCoil( DXCoilNum ).DefrostStrategy == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
 				ShowContinueError( "...illegal " + cAlphaFields( 6 ) + "=\"" + AlphArray( 6 ) + "\"." );
@@ -1749,8 +1749,8 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
-			if ( InputProcessor::SameString( AlphArray( 7 ), "Timed" ) ) VarSpeedCoil( DXCoilNum ).DefrostControl = Timed;
-			if ( InputProcessor::SameString( AlphArray( 7 ), "OnDemand" ) ) VarSpeedCoil( DXCoilNum ).DefrostControl = OnDemand;
+			if ( UtilityRoutines::SameString( AlphArray( 7 ), "Timed" ) ) VarSpeedCoil( DXCoilNum ).DefrostControl = Timed;
+			if ( UtilityRoutines::SameString( AlphArray( 7 ), "OnDemand" ) ) VarSpeedCoil( DXCoilNum ).DefrostControl = OnDemand;
 			if ( VarSpeedCoil( DXCoilNum ).DefrostControl == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
 				ShowContinueError( "...illegal " + cAlphaFields( 7 ) + "=\"" + AlphArray( 7 ) + "\"." );
@@ -2034,9 +2034,9 @@ namespace VariableSpeedCoils {
 				}
 			}
 
-			if ( InputProcessor::SameString( AlphArray( 2 ), "Yes" ) || InputProcessor::SameString( AlphArray( 2 ), "No" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 2 ), "Yes" ) || UtilityRoutines::SameString( AlphArray( 2 ), "No" ) ) {
 				//  initialized to TRUE on allocate
-				if ( InputProcessor::SameString( AlphArray( 2 ), "No" ) ) VarSpeedCoil( DXCoilNum ).FanPowerIncludedInCOP = false;
+				if ( UtilityRoutines::SameString( AlphArray( 2 ), "No" ) ) VarSpeedCoil( DXCoilNum ).FanPowerIncludedInCOP = false;
 				else VarSpeedCoil( DXCoilNum ).FanPowerIncludedInCOP = true;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2045,9 +2045,9 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
-			if ( InputProcessor::SameString( AlphArray( 3 ), "Yes" ) || InputProcessor::SameString( AlphArray( 3 ), "No" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 3 ), "Yes" ) || UtilityRoutines::SameString( AlphArray( 3 ), "No" ) ) {
 				//  initialized to FALSE on allocate
-				if ( InputProcessor::SameString( AlphArray( 3 ), "Yes" ) ) VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP = true;
+				if ( UtilityRoutines::SameString( AlphArray( 3 ), "Yes" ) ) VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP = true;
 				else VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP = false;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2056,9 +2056,9 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
-			if ( InputProcessor::SameString( AlphArray( 4 ), "Yes" ) || InputProcessor::SameString( AlphArray( 4 ), "No" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 4 ), "Yes" ) || UtilityRoutines::SameString( AlphArray( 4 ), "No" ) ) {
 				//  initialized to FALSE on allocate
-				if ( InputProcessor::SameString( AlphArray( 4 ), "Yes" ) ) VarSpeedCoil( DXCoilNum ).CondPumpHeatInCapacity = true;
+				if ( UtilityRoutines::SameString( AlphArray( 4 ), "Yes" ) ) VarSpeedCoil( DXCoilNum ).CondPumpHeatInCapacity = true;
 				else VarSpeedCoil( DXCoilNum ).CondPumpHeatInCapacity = false;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
@@ -2113,9 +2113,9 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
-			if ( InputProcessor::SameString( AlphArray( 9 ), "DryBulbTemperature" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 9 ), "DryBulbTemperature" ) ) {
 				VarSpeedCoil( DXCoilNum ).InletAirTemperatureType = DryBulbIndicator;
-			} else if ( InputProcessor::SameString( AlphArray( 9 ), "WetBulbTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 9 ), "WetBulbTemperature" ) ) {
 				VarSpeedCoil( DXCoilNum ).InletAirTemperatureType = WetBulbIndicator;
 			} else {
 				//   wrong temperature type selection
@@ -5501,16 +5501,16 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		if ( InputProcessor::SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
-			 InputProcessor::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
-			 InputProcessor::SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
-			 InputProcessor::SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
-			 InputProcessor::SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) ) {
-			WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		if ( UtilityRoutines::SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
+			 UtilityRoutines::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
+			 UtilityRoutines::SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
+			 UtilityRoutines::SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
+			 UtilityRoutines::SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) ) {
+			WhichCoil = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 			if ( WhichCoil != 0 ) {
-				if ( InputProcessor::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || InputProcessor::SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ) {
+				if ( UtilityRoutines::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || UtilityRoutines::SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ) {
 					CoilCapacity = VarSpeedCoil( WhichCoil ).RatedCapHeat;
-				} else if ( InputProcessor::SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) ) {
+				} else if ( UtilityRoutines::SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) ) {
 					CoilCapacity = VarSpeedCoil( WhichCoil ).RatedCapWH;
 				} else {
 					CoilCapacity = VarSpeedCoil( WhichCoil ).RatedCapCoolTotal;
@@ -5562,7 +5562,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		IndexNum = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		IndexNum = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 
 		if ( IndexNum == 0 ) {
 			ShowSevereError( "GetCoilIndexVariableSpeed: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
@@ -5604,12 +5604,12 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		if ( InputProcessor::SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
-			 InputProcessor::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
-			 InputProcessor::SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
-			 InputProcessor::SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
-			 InputProcessor::SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) ) {
-			WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		if ( UtilityRoutines::SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
+			 UtilityRoutines::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
+			 UtilityRoutines::SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
+			 UtilityRoutines::SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
+			 UtilityRoutines::SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) ) {
+			WhichCoil = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 			if ( WhichCoil != 0 ) {
 				//CoilAirFlowRate=VarSpeedCoil(WhichCoil)%RatedAirVolFlowRate
 				if ( VarSpeedCoil( WhichCoil ).RatedAirVolFlowRate == AutoSize ) { //means autosize
@@ -5664,7 +5664,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			PLRNumber = VarSpeedCoil( WhichCoil ).PLFFPLR;
 		}
@@ -5713,7 +5713,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = VarSpeedCoil( WhichCoil ).AirInletNodeNum;
 		}
@@ -5762,7 +5762,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = VarSpeedCoil( WhichCoil ).AirOutletNodeNum;
 		}
@@ -5805,7 +5805,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			CondNode = VarSpeedCoil( WhichCoil ).CondenserInletNodeNum;
 		} else {
@@ -5847,7 +5847,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			MinOAT = VarSpeedCoil( WhichCoil ).MinOATCompressor;
 		} else {
@@ -5888,7 +5888,7 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, VarSpeedCoil );
 		if ( WhichCoil != 0 ) {
 			Speeds = VarSpeedCoil( WhichCoil ).NumOfSpeeds;
 		} else {

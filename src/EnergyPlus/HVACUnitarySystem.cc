@@ -384,7 +384,7 @@ namespace HVACUnitarySystem {
 
 		// Find the correct unitary system Number
 		if ( CompIndex == 0 ) {
-			UnitarySysNum = InputProcessor::FindItemInList( UnitarySystemName, UnitarySystem );
+			UnitarySysNum = UtilityRoutines::FindItemInList( UnitarySystemName, UnitarySystem );
 			if ( UnitarySysNum == 0 ) {
 				ShowFatalError( "SimUnitarySystem: Unitary System not found=" + UnitarySystemName );
 			}
@@ -2428,7 +2428,7 @@ namespace HVACUnitarySystem {
 			// water coils must report their size to parent objects (or split out sizing routines for water coils so they can be call from here)
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
 				SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).CoolingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, QActual, UnitarySystem( UnitarySysNum ).FanOpMode, 1.0 );
-				DataConstantUsedForSizing = GetWaterCoilCapacity( InputProcessor::MakeUPPERCase( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ) ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
+				DataConstantUsedForSizing = GetWaterCoilCapacity( UtilityRoutines::MakeUPPERCase( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ) ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
 				EqSizing.DesCoolingLoad = DataConstantUsedForSizing;
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
@@ -2437,7 +2437,7 @@ namespace HVACUnitarySystem {
 				HXCoilName = GetHXDXCoilName( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
 				ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound, true );
 				SimHXAssistedCoolingCoil( BlankString, true, On, 1.0, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, 1, false, 1.0, false );
-				DataConstantUsedForSizing = GetWaterCoilCapacity( InputProcessor::MakeUPPERCase( cAllCoilTypes( ActualCoolCoilType ) ), HXCoilName, ErrFound );
+				DataConstantUsedForSizing = GetWaterCoilCapacity( UtilityRoutines::MakeUPPERCase( cAllCoilTypes( ActualCoolCoilType ) ), HXCoilName, ErrFound );
 				EqSizing.DesCoolingLoad = DataConstantUsedForSizing;
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
@@ -2484,7 +2484,7 @@ namespace HVACUnitarySystem {
 			// water coils must report their size to parent objects (or split out sizing routines for water coils so they can be call from here)
 			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWater ) {
 				SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, QActual, UnitarySystem( UnitarySysNum ).FanOpMode, 1.0 );
-				DataConstantUsedForSizing = GetWaterCoilCapacity( InputProcessor::MakeUPPERCase( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) ), UnitarySystem( UnitarySysNum ).HeatingCoilName, ErrFound );
+				DataConstantUsedForSizing = GetWaterCoilCapacity( UtilityRoutines::MakeUPPERCase( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) ), UnitarySystem( UnitarySysNum ).HeatingCoilName, ErrFound );
 				EqSizing.DesHeatingLoad = DataConstantUsedForSizing;
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
@@ -2987,7 +2987,7 @@ namespace HVACUnitarySystem {
 		for ( DesignSpecNum = 1; DesignSpecNum <= NumDesignSpecMultiSpeedHP; ++DesignSpecNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			DesignSpecMSHP( DesignSpecNum ).Name = Alphas( 1 );
 
@@ -2998,10 +2998,10 @@ namespace HVACUnitarySystem {
 			NumOfSpeedCooling = DesignSpecMSHP( DesignSpecNum ).NumOfSpeedCooling;
 
 			if ( !lAlphaBlanks( 2 ) ) {
-				if ( InputProcessor::SameString( Alphas( 2 ), "Yes" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 2 ), "Yes" ) ) {
 					DesignSpecMSHP( DesignSpecNum ).SingleModeFlag = true;
 				}
-				else if ( InputProcessor::SameString( Alphas( 2 ), "No" ) ) {
+				else if ( UtilityRoutines::SameString( Alphas( 2 ), "No" ) ) {
 					DesignSpecMSHP( DesignSpecNum ).SingleModeFlag = false;
 				}
 				else {
@@ -3132,15 +3132,15 @@ namespace HVACUnitarySystem {
 			UnitarySystemNumericFields( UnitarySysNum ).FieldNames = "";
 			UnitarySystemNumericFields( UnitarySysNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas(iNameAlphaNum), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas(iNameAlphaNum), CurrentModuleObject, ErrorsFound);
 
 			UnitarySystem( UnitarySysNum ).Name = Alphas( iNameAlphaNum );
 
-			if ( InputProcessor::SameString( Alphas( iControlTypeAlphaNum ), "Load" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( iControlTypeAlphaNum ), "Load" ) ) {
 				UnitarySystem( UnitarySysNum ).ControlType = LoadBased;
-			} else if ( InputProcessor::SameString( Alphas( iControlTypeAlphaNum ), "SetPoint" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iControlTypeAlphaNum ), "SetPoint" ) ) {
 				UnitarySystem( UnitarySysNum ).ControlType = SetPointBased;
-			} else if ( InputProcessor::SameString( Alphas( iControlTypeAlphaNum ), "SingleZoneVAV" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iControlTypeAlphaNum ), "SingleZoneVAV" ) ) {
 				UnitarySystem( UnitarySysNum ).ControlType = CCM_ASHRAE;
 				UnitarySystem( UnitarySysNum ).validASHRAECoolCoil = true;
 				UnitarySystem( UnitarySysNum ).validASHRAEHeatCoil = true;
@@ -3151,22 +3151,22 @@ namespace HVACUnitarySystem {
 			}
 
 			//Get the Controlling Zone or Location of the Thermostat
-			UnitarySystem( UnitarySysNum ).ControlZoneNum = InputProcessor::FindItemInList( Alphas( iControlZoneAlphaNum ), Zone );
+			UnitarySystem( UnitarySysNum ).ControlZoneNum = UtilityRoutines::FindItemInList( Alphas( iControlZoneAlphaNum ), Zone );
 
 			if ( ! lAlphaBlanks( iDehumidControlAlphaNum ) ) {
-				if ( InputProcessor::SameString( Alphas( iDehumidControlAlphaNum ), "None" ) || InputProcessor::SameString( Alphas( iDehumidControlAlphaNum ), "Multimode" ) || InputProcessor::SameString( Alphas( iDehumidControlAlphaNum ), "CoolReheat" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( iDehumidControlAlphaNum ), "None" ) || UtilityRoutines::SameString( Alphas( iDehumidControlAlphaNum ), "Multimode" ) || UtilityRoutines::SameString( Alphas( iDehumidControlAlphaNum ), "CoolReheat" ) ) {
 					AirNodeFound = false;
-					if ( InputProcessor::SameString( Alphas( iDehumidControlAlphaNum ), "Multimode" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( iDehumidControlAlphaNum ), "Multimode" ) ) {
 						UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DehumidControl_Multimode;
 						UnitarySystem( UnitarySysNum ).Humidistat = true;
 					}
-					if ( InputProcessor::SameString( Alphas( iDehumidControlAlphaNum ), "CoolReheat" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( iDehumidControlAlphaNum ), "CoolReheat" ) ) {
 						UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DehumidControl_CoolReheat;
 						UnitarySystem( UnitarySysNum ).Humidistat = true;
 						if ( lAlphaBlanks( iSuppHeatCoilNameAlphaNum ) ) {
 						}
 					}
-					if ( InputProcessor::SameString( Alphas( iDehumidControlAlphaNum ), "None" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( iDehumidControlAlphaNum ), "None" ) ) {
 						UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DehumidControl_None;
 						UnitarySystem( UnitarySysNum ).Humidistat = false;
 					}
@@ -3209,7 +3209,7 @@ namespace HVACUnitarySystem {
 			FanName = Alphas( iFanNameAlphaNum );
 			UnitarySystem( UnitarySysNum ).fanName = FanName; //TRANE, for coil selection report
 			if ( ! lAlphaBlanks( iFanTypeAlphaNum ) ) {
-				if ( InputProcessor::SameString( FanType, "Fan:SystemModel" ) ) {
+				if ( UtilityRoutines::SameString( FanType, "Fan:SystemModel" ) ) {
 					if ( ! HVACFan::checkIfFanNameIsAFanSystem( FanName ) ) {
 						ErrorsFound = true;
 					} else {
@@ -3307,8 +3307,8 @@ namespace HVACUnitarySystem {
 			// Add fan to component sets array
 			if ( UnitarySystem( UnitarySysNum ).FanExists ) SetUpCompSets( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iFanTypeAlphaNum ), Alphas( iFanNameAlphaNum ), NodeID( FanInletNode ), NodeID( FanOutletNode ) );
 
-			if ( InputProcessor::SameString( Alphas( iFanPlaceAlphaNum ), "BlowThrough" ) ) UnitarySystem( UnitarySysNum ).FanPlace = BlowThru;
-			if ( InputProcessor::SameString( Alphas( iFanPlaceAlphaNum ), "DrawThrough" ) ) UnitarySystem( UnitarySysNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( Alphas( iFanPlaceAlphaNum ), "BlowThrough" ) ) UnitarySystem( UnitarySysNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( Alphas( iFanPlaceAlphaNum ), "DrawThrough" ) ) UnitarySystem( UnitarySysNum ).FanPlace = DrawThru;
 			if ( UnitarySystem( UnitarySysNum ).FanPlace == 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iFanPlaceAlphaNum ) + " = " + Alphas( iFanPlaceAlphaNum ) );
@@ -3375,27 +3375,27 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).validASHRAEHeatCoil = false;
 			}
 
-			if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:DX:VariableSpeed" ) ) {
+			if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:DX:VariableSpeed" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = CoilDX_MultiSpeedHeating;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Water" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:Water" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingWater;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Steam" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:Steam" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingSteam;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:WaterToAirHeatPump:EquationFit" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:WaterToAirHeatPump:EquationFit" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingWaterToAirHPSimple;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingWaterToAirHP;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingWaterToAirHPVSEquationFit;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Electric:MultiStage" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:Electric:MultiStage" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingElectric_MultiStage;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Gas:MultiStage" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:Gas:MultiStage" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingGas_MultiStage;
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Fuel" ) || InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Electric" ) || InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Desuperheater" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:Electric" ) || UtilityRoutines::SameString( HeatingCoilType, "Coil:Heating:Desuperheater" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
-			} else if ( InputProcessor::SameString( HeatingCoilType, "Coil:UserDefined" ) ) {
+			} else if ( UtilityRoutines::SameString( HeatingCoilType, "Coil:UserDefined" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_UserDefined;
 			} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = GetDXCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag, PrintMessage );
@@ -3969,33 +3969,33 @@ namespace HVACUnitarySystem {
 
 				//       Find the type of coil. do not print message since this may not be the correct coil type.
 				errFlag = false;
-				if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+				if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:DX:MultiSpeed" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:DX:MultiSpeed" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_MultiSpeedCooling;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:Water" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:Water" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_CoolingWater;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_CoolingWaterDetailed;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = GetHXAssistedCoilTypeNum( CoolingCoilType, CoolingCoilName, errFlag, PrintMessage );
-				} else if ( InputProcessor::SameString( CoolingCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = GetHXAssistedCoilTypeNum( CoolingCoilType, CoolingCoilName, errFlag, PrintMessage );
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:WaterToAirHeatPump:EquationFit" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:WaterToAirHeatPump:EquationFit" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_CoolingWaterToAirHPSimple;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_CoolingWaterToAirHP;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_CoolingWaterToAirHPVSEquationFit;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_CoolingTwoSpeed;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:UserDefined" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:UserDefined" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_UserDefined;
-				} else if ( InputProcessor::SameString( CoolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage" ) ) {
+				} else if ( UtilityRoutines::SameString( CoolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling;
 				} else {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
@@ -4168,7 +4168,7 @@ namespace HVACUnitarySystem {
 							ErrorsFound = true;
 						}
 
-						if ( InputProcessor::SameString( ChildCoolingCoilType, "COIL:COOLING:DX:SINGLESPEED" ) ) {
+						if ( UtilityRoutines::SameString( ChildCoolingCoilType, "COIL:COOLING:DX:SINGLESPEED" ) ) {
 
 							errFlag = false;
 							UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr = GetDXCoilAvailSchPtr( ChildCoolingCoilType, ChildCoolingCoilName, errFlag );
@@ -4195,7 +4195,7 @@ namespace HVACUnitarySystem {
 								ErrorsFound = true;
 							}
 
-						} else if ( InputProcessor::SameString( ChildCoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+						} else if ( UtilityRoutines::SameString( ChildCoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
 							UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
 							errFlag = false;
 							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed( ChildCoolingCoilType, ChildCoolingCoilName, errFlag );
@@ -4785,7 +4785,7 @@ namespace HVACUnitarySystem {
 			if ( lAlphaBlanks( iDOASDXCoilAlphaNum ) && NumAlphas < iDOASDXCoilAlphaNum ) {
 				UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
 			} else {
-				if ( InputProcessor::SameString( Alphas( iDOASDXCoilAlphaNum ), "Yes" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( iDOASDXCoilAlphaNum ), "Yes" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = true;
 					if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
 						ShowWarningError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
@@ -4794,9 +4794,9 @@ namespace HVACUnitarySystem {
 						ShowContinueError( "Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues." );
 						UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iDOASDXCoilAlphaNum ), "" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iDOASDXCoilAlphaNum ), "" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
-				} else if ( InputProcessor::SameString( Alphas( iDOASDXCoilAlphaNum ), "No" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iDOASDXCoilAlphaNum ), "No" ) ) {
 					UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil = false;
 				} else {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
@@ -4832,16 +4832,16 @@ namespace HVACUnitarySystem {
 
 			//Get Latent Load Control flag
 			if ( ! lAlphaBlanks( iRunOnLatentLoadAlphaNum ) ) {
-				if ( InputProcessor::SameString( Alphas( iRunOnLatentLoadAlphaNum ), "SensibleOnlyLoadControl" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( iRunOnLatentLoadAlphaNum ), "SensibleOnlyLoadControl" ) ) {
 					UnitarySystem( UnitarySysNum ).RunOnSensibleLoad = true;
 					UnitarySystem( UnitarySysNum ).RunOnLatentLoad = false;
-				} else if ( InputProcessor::SameString( Alphas( iRunOnLatentLoadAlphaNum ), "LatentOnlyLoadControl" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iRunOnLatentLoadAlphaNum ), "LatentOnlyLoadControl" ) ) {
 					UnitarySystem( UnitarySysNum ).RunOnSensibleLoad = false;
 					UnitarySystem( UnitarySysNum ).RunOnLatentLoad = true;
-				} else if ( InputProcessor::SameString( Alphas( iRunOnLatentLoadAlphaNum ), "LatentOrSensibleLoadControl" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iRunOnLatentLoadAlphaNum ), "LatentOrSensibleLoadControl" ) ) {
 					UnitarySystem( UnitarySysNum ).RunOnSensibleLoad = true;
 					UnitarySystem( UnitarySysNum ).RunOnLatentLoad = true;
-				} else if ( InputProcessor::SameString( Alphas( iRunOnLatentLoadAlphaNum ), "LatentWithSensibleLoadControl" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iRunOnLatentLoadAlphaNum ), "LatentWithSensibleLoadControl" ) ) {
 					UnitarySystem( UnitarySysNum ).RunOnSensibleLoad = true;
 					UnitarySystem( UnitarySysNum ).RunOnLatentLoad = true;
 					UnitarySystem( UnitarySysNum ).RunOnLatentOnlyWithSensible = true;
@@ -4858,13 +4858,13 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).SuppHeatCoilName = SuppHeatCoilName;
 			errFlag = false;
 
-			if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Water" ) ) {
+			if ( UtilityRoutines::SameString( SuppHeatCoilType, "Coil:Heating:Water" ) ) {
 				UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
-			} else if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Steam" ) ) {
+			} else if ( UtilityRoutines::SameString( SuppHeatCoilType, "Coil:Heating:Steam" ) ) {
 				UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
-			} else if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Fuel" ) || InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) || InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:DesuperHeater" ) ) {
+			} else if ( UtilityRoutines::SameString( SuppHeatCoilType, "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) || UtilityRoutines::SameString( SuppHeatCoilType, "Coil:Heating:DesuperHeater" ) ) {
 				UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
-			} else if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:UserDefined" ) ) {
+			} else if ( UtilityRoutines::SameString( SuppHeatCoilType, "Coil:UserDefined" ) ) {
 				UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = Coil_UserDefined;
 			}
 
@@ -5098,7 +5098,7 @@ namespace HVACUnitarySystem {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
 					for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-						if ( InputProcessor::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( iNameAlphaNum ) ) && InputProcessor::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) {
+						if ( UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( iNameAlphaNum ) ) && UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) {
 							AirLoopNumber = AirLoopNum;
 							AirLoopFound = true;
 							for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
@@ -5130,7 +5130,7 @@ namespace HVACUnitarySystem {
 			if ( !AirLoopFound && CurOASysNum > 0 ) {
 				for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 					for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum ) {
-						if ( ! InputProcessor::SameString( OutsideAirSys( OASysNum ).ComponentName( OACompNum ), Alphas( iNameAlphaNum ) ) || ! InputProcessor::SameString( OutsideAirSys( OASysNum ).ComponentType( OACompNum ), CurrentModuleObject ) ) continue;
+						if ( ! UtilityRoutines::SameString( OutsideAirSys( OASysNum ).ComponentName( OACompNum ), Alphas( iNameAlphaNum ) ) || ! UtilityRoutines::SameString( OutsideAirSys( OASysNum ).ComponentType( OACompNum ), CurrentModuleObject ) ) continue;
 						AirLoopNumber = OASysNum;
 						OASysFound = true;
 						break;
@@ -5338,7 +5338,7 @@ namespace HVACUnitarySystem {
 			}
 
 			// Determine supply air flow rate sizing method for cooling mode
-			if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = SupplyAirFlowRate;
 
 				if ( ! lNumericBlanks( iMaxCoolAirVolFlowNumericNum ) ) {
@@ -5356,7 +5356,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxCoolAirVolFlowNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
 
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FlowPerFloorArea;
 				if ( ! lNumericBlanks( iCoolFlowPerFloorAreaNumericNum ) ) {
@@ -5382,7 +5382,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "FractionOfAutosizedCoolingValue" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "FractionOfAutosizedCoolingValue" ) ) {
 
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FractionOfAutoSizedCoolingValue;
 				if ( ! lNumericBlanks( iCoolFlowPerFracCoolNumericNum ) ) {
@@ -5407,7 +5407,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerFracCoolNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerCoolingCapacity" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerCoolingCapacity" ) ) {
 
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FlowPerCoolingCapacity;
 				if ( ! lNumericBlanks( iCoolFlowPerCoolCapNumericNum ) ) {
@@ -5432,7 +5432,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerCoolCapNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) || lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) || lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = None;
 				//          UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE. ! ??
 				if( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0 ) {
@@ -5453,7 +5453,7 @@ namespace HVACUnitarySystem {
 			}
 
 			// Determine supply air flow rate sizing method for heating mode
-			if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = SupplyAirFlowRate;
 				if ( ! lNumericBlanks( iMaxHeatAirVolFlowNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iMaxHeatAirVolFlowNumericNum );
@@ -5470,7 +5470,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxHeatAirVolFlowNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FlowPerFloorArea;
 				if ( ! lNumericBlanks( iHeatFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFloorAreaNumericNum );
@@ -5495,7 +5495,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingValue" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingValue" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FractionOfAutoSizedHeatingValue;
 				if ( ! lNumericBlanks( iHeatFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFracCoolNumericNum );
@@ -5519,7 +5519,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerFracCoolNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerHeatingCapacity" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerHeatingCapacity" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FlowPerHeatingCapacity;
 				if ( ! lNumericBlanks( iHeatFlowPerHeatCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerHeatCapNumericNum );
@@ -5543,7 +5543,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerHeatCapNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iHeatSAFMAlphaNum ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iHeatSAFMAlphaNum ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = None;
 				//          UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE. ! ??
 				if( UnitarySystem( UnitarySysNum ).HeatCoilExists && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0 ) {
@@ -5564,7 +5564,7 @@ namespace HVACUnitarySystem {
 			}
 
 			// Determine supply air flow rate sizing method when cooling or heating is not needed
-			if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
 				UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod = SupplyAirFlowRate;
 				if ( ! lNumericBlanks( iMaxNoCoolHeatAirVolFlowNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iMaxNoCoolHeatAirVolFlowNumericNum );
@@ -5581,7 +5581,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxNoCoolHeatAirVolFlowNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
 				UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod = FlowPerFloorArea;
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFloorAreaNumericNum );
@@ -5606,7 +5606,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedCoolingValue" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedCoolingValue" ) ) {
 				UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod = FractionOfAutoSizedCoolingValue;
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFracCoolNumericNum );
@@ -5630,7 +5630,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFracCoolNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingValue" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingValue" ) ) {
 				UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod = FractionOfAutoSizedHeatingValue;
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerFracHeatNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFracHeatNumericNum );
@@ -5654,7 +5654,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFracHeatNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerCoolingCapacity" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerCoolingCapacity" ) ) {
 				UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod = FlowPerCoolingCapacity;
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerCoolCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerCoolCapNumericNum );
@@ -5678,7 +5678,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerCoolCapNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerHeatingCapacity" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerHeatingCapacity" ) ) {
 				UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod = FlowPerHeatingCapacity;
 				if ( ! lNumericBlanks( iNoCoolHeatFlowPerHeatCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerHeatCapNumericNum );
@@ -5702,7 +5702,7 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerHeatCapNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iNoCoolHeatSAFMAlphaNum ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iNoCoolHeatSAFMAlphaNum ) ) {
 				UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod = None;
 				//          UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE. ! ??
 			} else {
@@ -6100,7 +6100,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).DesignSpecMultispeedHPType = Alphas( iDesignSpecMSHPTypeAlphaNum );
 				UnitarySystem( UnitarySysNum ).DesignSpecMultispeedHPName = Alphas( iDesignSpecMSHPNameAlphaNum );
 
-				UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex = InputProcessor::FindItemInList( UnitarySystem( UnitarySysNum ).DesignSpecMultispeedHPName, DesignSpecMSHP );
+				UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex = UtilityRoutines::FindItemInList( UnitarySystem( UnitarySysNum ).DesignSpecMultispeedHPName, DesignSpecMSHP );
 				DesignSpecNum = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
 
 				if ( DesignSpecNum > 0 ) {
@@ -13523,7 +13523,7 @@ namespace HVACUnitarySystem {
 
 		UnitarySysNum = 0;
 		if ( NumUnitarySystem > 0 ) {
-			UnitarySysNum = InputProcessor::FindItemInList( UnitarySysName, UnitarySystem );
+			UnitarySysNum = UtilityRoutines::FindItemInList( UnitarySysName, UnitarySystem );
 			if ( UnitarySysNum > 0 ) {
 				if ( UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil ) {
 					SetDXCoilTypeData( UnitarySystem( UnitarySysNum ).CoolingCoilName );
@@ -13564,7 +13564,7 @@ namespace HVACUnitarySystem {
 		}
 
 		for ( UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum ) {
-			if ( InputProcessor::SameString( UnitarySystemName, UnitarySystem( UnitarySysNum ).Name ) ) {
+			if ( UtilityRoutines::SameString( UnitarySystemName, UnitarySystem( UnitarySysNum ).Name ) ) {
 				if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 					OACoolingCoil = true;
 				}
@@ -13603,7 +13603,7 @@ namespace HVACUnitarySystem {
 
 		GetUnitarySystemDXCoolingCoilIndex = 0;
 		for ( UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum ) {
-			if ( InputProcessor::SameString( UnitarySystemName, UnitarySystem( UnitarySysNum ).Name ) ) {
+			if ( UtilityRoutines::SameString( UnitarySystemName, UnitarySystem( UnitarySysNum ).Name ) ) {
 				if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 					GetUnitarySystemDXCoolingCoilIndex = UnitarySystem( UnitarySysNum ).CoolingCoilIndex;
 				}

@@ -1778,7 +1778,7 @@ namespace CurveManager {
 					GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					// Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
-					if ( !InputProcessor::SameString( Alphas(2), wpcName ) ) {
+					if ( !UtilityRoutines::SameString( Alphas(2), wpcName ) ) {
 						ShowSevereError( "GetCurveInput: Invalid " + cAlphaFieldNames( 2 ) + " = " + Alphas( 2 ) + " in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 						ShowContinueError( "The valid name is " + wpcName );
 						ErrorsFound = true;
@@ -1877,7 +1877,7 @@ namespace CurveManager {
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if (NumPressureCurves > 0) {
-				CurveFound = InputProcessor::FindItemInList(Alphas(1), PressureCurve);
+				CurveFound = UtilityRoutines::FindItemInList(Alphas(1), PressureCurve);
 				if (CurveFound != 0) {
 					ShowSevereError("GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate curve name.");
 					ShowContinueError("...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves.");
@@ -2201,19 +2201,19 @@ namespace CurveManager {
 				}
 			}
 
-			if ( InputProcessor::SameString( Alphas( 4 ), "WAVELENGTH" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 4 ), "WAVELENGTH" ) ) {
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) + ": " );
 				ShowContinueError( cAlphaFieldNames( 4 ) + " = WAVELENGTH, and " + cAlphaFieldNames( 5 ) + " = " + Alphas( 5 ) );
 				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
 				ErrorsFound = true;
 			}
-			if ( InputProcessor::SameString( Alphas( 4 ), "ANGLE" ) && !InputProcessor::SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 4 ), "ANGLE" ) && !UtilityRoutines::SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) + ": " );
 				ShowContinueError( cAlphaFieldNames( 4 ) + " = ANGLE, and " + cAlphaFieldNames( 5 ) + " = " + Alphas( 5 ) );
 				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
 				ErrorsFound = true;
 			}
-			if ( InputProcessor::SameString( Alphas( 4 ), "ANGLE" ) && InputProcessor::SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 4 ), "ANGLE" ) && UtilityRoutines::SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
 				PerfCurve( CurveNum ).OpticalProperty = true;
 			}
 
@@ -5092,26 +5092,26 @@ Label999: ;
 		bool IsCurveInputTypeValid;
 
 		if ( len( InInputType ) > 0 ) {
-			if ( InputProcessor::SameString( InInputType, "DIMENSIONLESS" ) ) {
+			if ( UtilityRoutines::SameString( InInputType, "DIMENSIONLESS" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "TEMPERATURE" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "TEMPERATURE" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "PRESSURE" ) ) { //cpw22Aug2010
+			} else if ( UtilityRoutines::SameString( InInputType, "PRESSURE" ) ) { //cpw22Aug2010
 				IsCurveInputTypeValid = true; //cpw22Aug2010
 				// CR8124 Glazer - Need to use volumetricflow and massflow not just flow
-				//  ELSEIF (InputProcessor::SameString(InInputType,'FLOW')) THEN
+				//  ELSEIF (UtilityRoutines::SameString(InInputType,'FLOW')) THEN
 				//    IsCurveInputTypeValid = .TRUE.
-			} else if ( InputProcessor::SameString( InInputType, "VOLUMETRICFLOW" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "VOLUMETRICFLOW" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "MASSFLOW" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "MASSFLOW" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "POWER" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "POWER" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "DISTANCE" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "DISTANCE" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "WAVELENGTH" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "WAVELENGTH" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "ANGLE" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "ANGLE" ) ) {
 				IsCurveInputTypeValid = true;
 			} else {
 				IsCurveInputTypeValid = false;
@@ -5137,15 +5137,15 @@ Label999: ;
 		// Return value
 		bool IsCurveOutputTypeValid;
 
-		if ( InputProcessor::SameString( InOutputType, "DIMENSIONLESS" ) ) {
+		if ( UtilityRoutines::SameString( InOutputType, "DIMENSIONLESS" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( InputProcessor::SameString( InOutputType, "PRESSURE" ) ) { //cpw22Aug2010
+		} else if ( UtilityRoutines::SameString( InOutputType, "PRESSURE" ) ) { //cpw22Aug2010
 			IsCurveOutputTypeValid = true; //cpw22Aug2010
-		} else if ( InputProcessor::SameString( InOutputType, "TEMPERATURE" ) ) {
+		} else if ( UtilityRoutines::SameString( InOutputType, "TEMPERATURE" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( InputProcessor::SameString( InOutputType, "CAPACITY" ) ) {
+		} else if ( UtilityRoutines::SameString( InOutputType, "CAPACITY" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( InputProcessor::SameString( InOutputType, "POWER" ) ) {
+		} else if ( UtilityRoutines::SameString( InOutputType, "POWER" ) ) {
 			IsCurveOutputTypeValid = true;
 		} else {
 			IsCurveOutputTypeValid = false;
@@ -5304,7 +5304,7 @@ Label999: ;
 		// Given a curve name, returns the curve index
 
 		// METHODOLOGY EMPLOYED:
-		// uses InputProcessor::FindItemInList( to search the curve array for the curve name
+		// uses UtilityRoutines::FindItemInList( to search the curve array for the curve name
 
 		// Return value
 		int GetCurveIndex;
@@ -5317,7 +5317,7 @@ Label999: ;
 		}
 
 		if ( NumCurves > 0 ) {
-			GetCurveIndex = InputProcessor::FindItemInList( CurveName, PerfCurve );
+			GetCurveIndex = UtilityRoutines::FindItemInList( CurveName, PerfCurve );
 		} else {
 			GetCurveIndex = 0;
 		}
@@ -5628,7 +5628,7 @@ Label999: ;
 		//Then try to retrieve a pressure curve object
 		if ( allocated( PressureCurve ) ) {
 			if ( size( PressureCurve ) > 0 ) {
-				TempCurveIndex = InputProcessor::FindItemInList( PressureCurveName, PressureCurve );
+				TempCurveIndex = UtilityRoutines::FindItemInList( PressureCurveName, PressureCurve );
 			} else {
 				TempCurveIndex = 0;
 			}

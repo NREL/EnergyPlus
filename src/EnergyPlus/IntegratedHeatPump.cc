@@ -65,6 +65,7 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <WaterThermalTanks.hh>
+#include <UtilityRoutines.hh>
 #include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
@@ -137,7 +138,7 @@ namespace EnergyPlus {
 			}
 
 			if ( CompIndex == 0 ) {
-				DXCoilNum = InputProcessor::FindItemInList( CompName, IntegratedHeatPumps );
+				DXCoilNum = UtilityRoutines::FindItemInList( CompName, IntegratedHeatPumps );
 				if ( DXCoilNum == 0 ) {
 					ShowFatalError( "Integrated Heat Pump not found=" + CompName );
 				}
@@ -1640,7 +1641,7 @@ namespace EnergyPlus {
 				GetCoilsInputFlag = false;
 			}
 
-			IndexNum = InputProcessor::FindItemInList( CoilName, IntegratedHeatPumps );
+			IndexNum = UtilityRoutines::FindItemInList( CoilName, IntegratedHeatPumps );
 
 			if ( IndexNum == 0 ) {
 				ShowSevereError(
@@ -1681,7 +1682,7 @@ namespace EnergyPlus {
 				GetCoilsInputFlag = false;
 			}
 
-			WhichCoil = InputProcessor::FindItemInList( CoilName, IntegratedHeatPumps );
+			WhichCoil = UtilityRoutines::FindItemInList( CoilName, IntegratedHeatPumps );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = IntegratedHeatPumps( WhichCoil ).AirCoolInletNodeNum;
 			}
@@ -1729,7 +1730,7 @@ namespace EnergyPlus {
 				GetCoilsInputFlag = false;
 			}
 
-			WhichCoil = InputProcessor::FindItemInList(CoilName, IntegratedHeatPumps);
+			WhichCoil = UtilityRoutines::FindItemInList(CoilName, IntegratedHeatPumps);
 			if (WhichCoil != 0) {
 				NodeNumber = IntegratedHeatPumps(WhichCoil).ODAirInletNodeNum;
 			}
@@ -1776,7 +1777,7 @@ namespace EnergyPlus {
 				GetCoilsInputFlag = false;
 			}
 
-			WhichCoil = InputProcessor::FindItemInList(CoilName, IntegratedHeatPumps);
+			WhichCoil = UtilityRoutines::FindItemInList(CoilName, IntegratedHeatPumps);
 			if (WhichCoil != 0) {
 				NodeNumber = IntegratedHeatPumps(WhichCoil).ODAirOutletNodeNum;
 			}
@@ -1824,7 +1825,7 @@ namespace EnergyPlus {
 				GetCoilsInputFlag = false;
 			}
 
-			int WhichCoil = InputProcessor::FindItemInList( CoilName, IntegratedHeatPumps );
+			int WhichCoil = UtilityRoutines::FindItemInList( CoilName, IntegratedHeatPumps );
 			if ( WhichCoil != 0 ) {
 				//this will be called by HPWH parent
 				if ( IntegratedHeatPumps( WhichCoil ).DWHCoilIndex > 0 )
@@ -1882,7 +1883,7 @@ namespace EnergyPlus {
 				GetCoilsInputFlag = false;
 			}
 
-			int WhichCoil = InputProcessor::FindItemInList( CoilName, IntegratedHeatPumps );
+			int WhichCoil = UtilityRoutines::FindItemInList( CoilName, IntegratedHeatPumps );
 			if ( WhichCoil != 0 ) {
 
 				if ( IntegratedHeatPumps( WhichCoil ).IHPCoilsSized == false ) SizeIHP( WhichCoil );

@@ -226,7 +226,7 @@ namespace Fans {
 		}
 
 		if ( CompIndex == 0 ) {
-			FanNum = InputProcessor::FindItemInList( CompName, Fan, &FanEquipConditions::FanName );
+			FanNum = UtilityRoutines::FindItemInList( CompName, Fan, &FanEquipConditions::FanName );
 			if ( FanNum == 0 ) {
 				ShowFatalError( "SimulateFanComponents: Fan not found=" + CompName );
 			}
@@ -481,9 +481,9 @@ namespace Fans {
 				ShowWarningError( cCurrentModuleObject + "=\"" + Fan( FanNum ).FanName + "\" has specified 0.0 max air flow rate. It will not be used in the simulation." );
 			}
 			Fan( FanNum ).MaxAirFlowRateIsAutosizable = true;
-			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "Fraction" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Fraction" ) ) {
 				Fan( FanNum ).FanMinAirFracMethod = MinFrac;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "FixedFlowRate" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "FixedFlowRate" ) ) {
 				Fan( FanNum ).FanMinAirFracMethod = FixedMin;
 			} else {
 				ShowSevereError( cAlphaFieldNames( 3 ) + " should be either Fraction or FixedFlowRate." );
@@ -710,7 +710,7 @@ namespace Fans {
 		// input the night ventilation performance objects
 		for ( NVPerfNum = 1; NVPerfNum <= NumNightVentPerf; ++NVPerfNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			NightVentPerf( NVPerfNum ).FanName = cAlphaArgs( 1 );
 			NightVentPerf( NVPerfNum ).FanEff = rNumericArgs( 1 );
 			NightVentPerf( NVPerfNum ).DeltaPress = rNumericArgs( 2 );
@@ -943,7 +943,7 @@ namespace Fans {
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumFans; ++Loop ) {
-				if ( ! InputProcessor::SameString( Fan( Loop ).FanType, "Fan:ZoneExhaust" ) ) continue;
+				if ( ! UtilityRoutines::SameString( Fan( Loop ).FanType, "Fan:ZoneExhaust" ) ) continue;
 				if ( CheckZoneEquipmentList( Fan( Loop ).FanType, Fan( Loop ).FanName ) ) continue;
 				ShowSevereError( "InitFans: Fan=[" + Fan( Loop ).FanType + ',' + Fan( Loop ).FanName + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
@@ -2501,7 +2501,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		FanIndex = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		FanIndex = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) ) {
 				ShowSevereError( ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName );
@@ -2635,7 +2635,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		FanIndex = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		FanIndex = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) && present( ThisObjectName ) ) {
 				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\"." );
@@ -2687,7 +2687,7 @@ namespace Fans {
 		if ( present( FanIndex ) ) {
 			DesignVolumeFlowRate = Fan( FanIndex ).MaxAirFlowRate;
 		} else {
-			WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+			WhichFan = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 			if ( WhichFan != 0 ) {
 				DesignVolumeFlowRate = Fan( WhichFan ).MaxAirFlowRate;
 			} else {
@@ -2733,7 +2733,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		WhichFan = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).InletNodeNum;
 		} else {
@@ -2777,7 +2777,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		WhichFan = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).OutletNodeNum;
 		} else {
@@ -2821,7 +2821,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+		WhichFan = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			FanAvailSchPtr = Fan( WhichFan ).AvailSchedPtrNum;
 		} else {
@@ -2871,11 +2871,11 @@ namespace Fans {
 				FanType = Fan( WhichFan ).FanType;
 				FanName = Fan( WhichFan ).FanName;
 			} else {
-				WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+				WhichFan = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 				IndexIn = WhichFan;
 			}
 		} else {
-			WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+			WhichFan = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		}
 
 		if ( WhichFan != 0 ) {
@@ -2941,7 +2941,7 @@ namespace Fans {
 		}
 
 		if ( FanNum == 0 ) {
-			WhichFan = InputProcessor::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
+			WhichFan = UtilityRoutines::FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		} else {
 			WhichFan = FanNum;
 		}

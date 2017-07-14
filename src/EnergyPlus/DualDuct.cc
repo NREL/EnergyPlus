@@ -188,7 +188,7 @@ namespace DualDuct {
 
 		// Find the correct DamperNumber with the AirLoop & CompNum from AirLoop Derived Type
 		if ( CompIndex == 0 ) {
-			DamperNum = InputProcessor::FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
+			DamperNum = UtilityRoutines::FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
 			if ( DamperNum == 0 ) {
 				ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );
 			}
@@ -419,7 +419,7 @@ namespace DualDuct {
 				}
 
 				if ( ! lAlphaBlanks( 6 ) ) {
-					Damper( DamperNum ).OARequirementsPtr = InputProcessor::FindItemInList( AlphArray( 6 ), OARequirements );
+					Damper( DamperNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( AlphArray( 6 ), OARequirements );
 					if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 						ShowContinueError( "Occurs in " + cCMO_DDVariableVolume + " = " + Damper( DamperNum ).DamperName );
@@ -505,7 +505,7 @@ namespace DualDuct {
 						}
 					}
 				}
-				Damper( DamperNum ).OARequirementsPtr = InputProcessor::FindItemInList( AlphArray( 6 ), OARequirements );
+				Damper( DamperNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( AlphArray( 6 ), OARequirements );
 				if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 					ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCMO_DDVarVolOA + " = " + Damper( DamperNum ).DamperName );
@@ -2083,7 +2083,7 @@ namespace DualDuct {
 			FirstTimeOnly = false;
 		}
 
-		DamperIndex = InputProcessor::FindItemInList( CompName, DamperNamesARR, NumDualDuctVarVolOA );
+		DamperIndex = UtilityRoutines::FindItemInList( CompName, DamperNamesARR, NumDualDuctVarVolOA );
 		if ( DamperIndex > 0 ) {
 			RecircIsUsed = RecircIsUsedARR( DamperIndex );
 		}

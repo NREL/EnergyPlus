@@ -177,7 +177,7 @@ namespace OutsideEnergySources {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			EqNum = InputProcessor::FindItemInList( EquipName, EnergySource );
+			EqNum = UtilityRoutines::FindItemInList( EquipName, EnergySource );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );
 			}

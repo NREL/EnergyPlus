@@ -136,7 +136,7 @@ namespace DataSurfaceColors {
 		int found;
 
 		WasSet = false;
-		found = InputProcessor::FindItem( String, colorkeys, NumColors );
+		found = UtilityRoutines::FindItem( String, colorkeys, NumColors );
 
 		if ( found != 0 ) {
 			if ( present( ColorType ) ) {

@@ -249,7 +249,7 @@ namespace WindowAC {
 
 		// Find the correct Window AC Equipment
 		if ( CompIndex == 0 ) {
-			WindACNum = InputProcessor::FindItemInList( CompName, WindAC );
+			WindACNum = UtilityRoutines::FindItemInList( CompName, WindAC );
 			if ( WindACNum == 0 ) {
 				ShowFatalError( "SimWindowAC: Unit not found=" + CompName );
 			}
@@ -405,7 +405,7 @@ namespace WindowAC {
 			WindACNumericFields( WindACNum ).FieldNames.allocate( NumNumbers );
 			WindACNumericFields( WindACNum ).FieldNames = "";
 			WindACNumericFields( WindACNum ).FieldNames = cNumericFields;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			WindAC( WindACNum ).Name = Alphas( 1 );
 			WindAC( WindACNum ).UnitType = WindowAC_UnitType; // 'ZoneHVAC:WindowAirConditioner'
@@ -458,7 +458,7 @@ namespace WindowAC {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( InputProcessor::SameString(  WindAC( WindACNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( UtilityRoutines::SameString(  WindAC( WindACNum ).FanType, "Fan:SystemModel" ) ) {
 					WindAC( WindACNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( WindAC( WindACNum ).FanName ) ); // call constructor
 					WindAC( WindACNum ).FanIndex = HVACFan::getFanObjectVectorIndex( WindAC( WindACNum ).FanName );
@@ -508,16 +508,16 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).DXCoilName = Alphas( 10 );
 
-			if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || UtilityRoutines::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || UtilityRoutines::SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 				WindAC( WindACNum ).DXCoilType = Alphas( 9 );
 				CoilNodeErrFlag = false;
-				if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
-				} else if ( InputProcessor::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingHXAssisted;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXHXAsstdCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
-				} else if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" )  ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" )  ) {
 					WindAC( WindACNum ).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
 					WindAC( WindACNum ).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
 					WindAC( WindACNum ).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds( WindAC( WindACNum ).DXCoilName, ErrorsFound );
@@ -542,8 +542,8 @@ namespace WindowAC {
 				WindAC( WindACNum ).OpMode = CycFanCycCoil;
 			}
 
-			if ( InputProcessor::SameString( Alphas( 12 ), "BlowThrough" ) ) WindAC( WindACNum ).FanPlace = BlowThru;
-			if ( InputProcessor::SameString( Alphas( 12 ), "DrawThrough" ) ) WindAC( WindACNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( Alphas( 12 ), "BlowThrough" ) ) WindAC( WindACNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( Alphas( 12 ), "DrawThrough" ) ) WindAC( WindACNum ).FanPlace = DrawThru;
 			if ( WindAC( WindACNum ).FanPlace == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFields( 12 ) + " = " + Alphas( 12 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
@@ -558,7 +558,7 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 14 ) ) {
-				WindAC( WindACNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 14 ), ZoneHVACSizing );
+				WindAC( WindACNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 14 ), ZoneHVACSizing );
 				if ( WindAC( WindACNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 14 ) + " = " + Alphas( 14 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );

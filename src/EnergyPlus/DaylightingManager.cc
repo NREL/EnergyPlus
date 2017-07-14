@@ -4335,7 +4335,7 @@ namespace DaylightingManager {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IllumMap( MapNum ).Name = cAlphaArgs( 1 );
-				IllumMap( MapNum ).Zone = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+				IllumMap( MapNum ).Zone = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 
 				if (IllumMap(MapNum).Zone == 0) {
 					ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
@@ -4613,7 +4613,7 @@ namespace DaylightingManager {
 			cAlphaArgs = "";
 			rNumericArgs = 0.0;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ZoneFound = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			ZoneFound = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneFound == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -4623,9 +4623,9 @@ namespace DaylightingManager {
 			zone_daylight.Name = cAlphaArgs( 1 );  // Field: Name
 			zone_daylight.ZoneName = cAlphaArgs( 2 );  // Field: Zone Name
 
-			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "SPLITFLUX" )){  // Field: Daylighting Method
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "SPLITFLUX" )){  // Field: Daylighting Method
 				zone_daylight.DaylightMethod = SplitFluxDaylighting;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "DELIGHT" )) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DELIGHT" )) {
 				zone_daylight.DaylightMethod = DElightDaylighting;
 			} else if ( lAlphaFieldBlanks( 3 ) ) {
 				zone_daylight.DaylightMethod = SplitFluxDaylighting;
@@ -4645,11 +4645,11 @@ namespace DaylightingManager {
 				zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
 			}
 
-			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "CONTINUOUS" ) ){  // Field: Lighting Control Type
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "CONTINUOUS" ) ){  // Field: Lighting Control Type
 				zone_daylight.LightControlType = Continuous;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "STEPPED" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "STEPPED" ) ) {
 				zone_daylight.LightControlType = Stepped;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "CONTINUOUSOFF" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "CONTINUOUSOFF" ) ) {
 				zone_daylight.LightControlType = ContinuousOff;
 			} else if ( lAlphaFieldBlanks( 5 ) ) {
 				zone_daylight.LightControlType = Continuous;
@@ -4664,7 +4664,7 @@ namespace DaylightingManager {
 			zone_daylight.LightControlProbability = rNumericArgs( 4 ); // Field: Probability Lighting will be Reset When Needed in Manual Stepped Control
 
 			if ( !lAlphaFieldBlanks( 6 )){ // Field: Glare Calculation Daylighting Reference Point Name
-				zone_daylight.glareRefPtNumber = InputProcessor::FindItemInList( cAlphaArgs( 6 ), DaylRefPt, &RefPointData::Name );  // Field: Glare Calculation Daylighting Reference Point Name
+				zone_daylight.glareRefPtNumber = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), DaylRefPt, &RefPointData::Name );  // Field: Glare Calculation Daylighting Reference Point Name
 				if ( zone_daylight.glareRefPtNumber == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" for object named: " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -4719,7 +4719,7 @@ namespace DaylightingManager {
 
 			int countRefPts = 0;
 			for ( refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum ){
-				zone_daylight.DaylRefPtNum(refPtNum) = InputProcessor::FindItemInList( cAlphaArgs( 6 + refPtNum ), DaylRefPt, &RefPointData::Name );  // Field: Daylighting Reference Point Name
+				zone_daylight.DaylRefPtNum(refPtNum) = UtilityRoutines::FindItemInList( cAlphaArgs( 6 + refPtNum ), DaylRefPt, &RefPointData::Name );  // Field: Daylighting Reference Point Name
 				if ( zone_daylight.DaylRefPtNum( refPtNum ) == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 + refPtNum ) + "=\"" + cAlphaArgs( 6 + refPtNum ) + "\" for object named: " + cAlphaArgs(1));
 					ErrorsFound = true;
@@ -4944,7 +4944,7 @@ namespace DaylightingManager {
 		for ( auto & pt : DaylRefPt ){
 			InputProcessor::GetObjectItem( cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			pt.Name = cAlphaArgs( 1 );
-			pt.ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			pt.ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( pt.ZoneNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -5136,7 +5136,7 @@ namespace DaylightingManager {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Surface );
+			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface );
 			if ( SurfNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" not found." );
 			}

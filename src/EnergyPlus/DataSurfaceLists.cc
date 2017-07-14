@@ -185,12 +185,12 @@ namespace DataSurfaceLists {
 			for ( Item = 1; Item <= NumOfSurfaceLists; ++Item ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject1, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject1, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject1, ErrorsFound);
 
 				SurfList( Item ).Name = Alphas( 1 );
 				SurfList( Item ).NumOfSurfaces = NumAlphas - 1;
 
-				NameConflict = InputProcessor::FindItemInList( SurfList( Item ).Name, Surface );
+				NameConflict = UtilityRoutines::FindItemInList( SurfList( Item ).Name, Surface );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
 					ShowSevereError( CurrentModuleObject1 + " = " + SurfList( Item ).Name + " has the same name as a surface; this is not allowed." );
 					ErrorsFound = true;
@@ -208,7 +208,7 @@ namespace DataSurfaceLists {
 				SumOfAllFractions = 0.0;
 				for ( SurfNum = 1; SurfNum <= SurfList( Item ).NumOfSurfaces; ++SurfNum ) {
 					SurfList( Item ).SurfName( SurfNum ) = Alphas( SurfNum + 1 );
-					SurfList( Item ).SurfPtr( SurfNum ) = InputProcessor::FindItemInList( Alphas( SurfNum + 1 ), Surface );
+					SurfList( Item ).SurfPtr( SurfNum ) = UtilityRoutines::FindItemInList( Alphas( SurfNum + 1 ), Surface );
 					if ( SurfList( Item ).SurfPtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( SurfNum + 1 ) + " in " + CurrentModuleObject1 + " statement not found = " + SurfList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
@@ -263,12 +263,12 @@ namespace DataSurfaceLists {
 			for ( Item = 1; Item <= NumOfSurfListVentSlab; ++Item ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject2, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject2, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject2, ErrorsFound);
 
 				SlabList( Item ).Name = Alphas( 1 );
 				SlabList( Item ).NumOfSurfaces = ( ( NumAlphas - 1 ) / 4 );
 
-				NameConflict = InputProcessor::FindItemInList( SlabList( Item ).Name, Surface );
+				NameConflict = UtilityRoutines::FindItemInList( SlabList( Item ).Name, Surface );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
 					ShowSevereError( CurrentModuleObject2 + " = " + SlabList( Item ).Name + " has the same name as a slab; this is not allowed." );
 					ErrorsFound = true;
@@ -294,21 +294,21 @@ namespace DataSurfaceLists {
 				NumArray = 1;
 				for ( SurfNum = 1; SurfNum <= SlabList( Item ).NumOfSurfaces; ++SurfNum ) {
 					SlabList( Item ).ZoneName( SurfNum ) = Alphas( AlphaArray );
-					SlabList( Item ).ZonePtr = InputProcessor::FindItemInList( Alphas( AlphaArray ), Zone );
+					SlabList( Item ).ZonePtr = UtilityRoutines::FindItemInList( Alphas( AlphaArray ), Zone );
 					if ( SlabList( Item ).ZonePtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " Zone not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 					}
 
 					SlabList( Item ).SurfName( SurfNum ) = Alphas( AlphaArray + 1 );
-					SlabList( Item ).SurfPtr( SurfNum ) = InputProcessor::FindItemInList( Alphas( AlphaArray + 1 ), Surface );
+					SlabList( Item ).SurfPtr( SurfNum ) = UtilityRoutines::FindItemInList( Alphas( AlphaArray + 1 ), Surface );
 					if ( SlabList( Item ).SurfPtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " statement not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 
 					}
 					for ( SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList ) {
-						NameConflict = InputProcessor::FindItemInList( SlabList( Item ).SurfName( SurfNum ), SurfList( SrfList ).SurfName, SurfList( SrfList ).NumOfSurfaces );
+						NameConflict = UtilityRoutines::FindItemInList( SlabList( Item ).SurfName( SurfNum ), SurfList( SrfList ).SurfName, SurfList( SrfList ).NumOfSurfaces );
 						if ( NameConflict > 0 ) { // A slab list includes a surface on a surface list--not allowed
 							ShowSevereError( CurrentModuleObject2 + "=\"" + SlabList( Item ).Name + "\", invalid surface specified." );
 							ShowContinueError( "Surface=\"" + SlabList( Item ).SurfName( SurfNum ) + "\" is also on a Surface List." );

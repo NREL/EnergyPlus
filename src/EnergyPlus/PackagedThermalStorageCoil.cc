@@ -198,7 +198,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( CompIndex == 0 ) {
-			TESCoilNum = InputProcessor::FindItemInList( CompName, TESCoil );
+			TESCoilNum = UtilityRoutines::FindItemInList( CompName, TESCoil );
 			if ( TESCoilNum == 0 ) {
 				ShowFatalError( "Thermal Energy Storage Cooling Coil not found=" + CompName );
 			}
@@ -291,7 +291,7 @@ namespace PackagedThermalStorageCoil {
 
 		for ( item = 1; item <= NumTESCoils; ++item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
@@ -349,7 +349,7 @@ namespace PackagedThermalStorageCoil {
 				ErrorsFound = true;
 			}}
 
-			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "USERDEFINEDFLUIDTYPE" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "USERDEFINEDFLUIDTYPE" ) ) {
 				if ( ! ( lAlphaFieldBlanks( 6 ) ) ) {
 					TESCoil( item ).StorageFluidName = cAlphaArgs( 6 );
 					if ( CheckFluidPropertyName( cAlphaArgs( 6 ) ) == 0 ) {
@@ -4650,7 +4650,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = InputProcessor::FindItem( CoilName, TESCoil );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4695,7 +4695,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = InputProcessor::FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4739,7 +4739,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = InputProcessor::FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4783,7 +4783,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = InputProcessor::FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4835,7 +4835,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = InputProcessor::FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}

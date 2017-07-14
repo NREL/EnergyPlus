@@ -146,7 +146,7 @@ namespace HVACDuct {
 
 		// Get the duct component index
 		if ( CompIndex == 0 ) {
-			DuctNum = InputProcessor::FindItemInList( CompName, Duct );
+			DuctNum = UtilityRoutines::FindItemInList( CompName, Duct );
 			if ( DuctNum == 0 ) {
 				ShowFatalError( "SimDuct: Component not found=" + CompName );
 			}
@@ -210,7 +210,7 @@ namespace HVACDuct {
 
 		for ( DuctNum = 1; DuctNum <= NumDucts; ++DuctNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			Duct( DuctNum ).Name = cAlphaArgs( 1 );
 			Duct( DuctNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );

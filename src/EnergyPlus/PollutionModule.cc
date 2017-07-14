@@ -336,7 +336,7 @@ namespace PollutionModule {
 
 			FuelType.FuelTypeNames( Loop ) = cAlphaArgs( 1 );
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( FuelType.FuelTypeNames( Loop ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( FuelType.FuelTypeNames( Loop ) ) );
 			if ( ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) || ( SELECT_CASE_var == "GAS" ) ) {
 				if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
@@ -1210,7 +1210,7 @@ namespace PollutionModule {
 
 			if ( FuelType.FuelTypeNames( Loop ).empty() ) continue;
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( FuelType.FuelTypeNames( Loop ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( FuelType.FuelTypeNames( Loop ) ) );
 			if ( ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) || ( SELECT_CASE_var == "GAS" ) ) {
 				//Pollutants from Natural Gas
 				SetupOutputVariable( "Environmental Impact Natural Gas Source Energy [J]", Pollution.NatGasComp.Source, "System", "Sum", "Site", _, "Source", "NaturalGasEmissions", _, "" );

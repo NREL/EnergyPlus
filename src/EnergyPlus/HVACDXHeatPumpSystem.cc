@@ -197,7 +197,7 @@ namespace HVACDXHeatPumpSystem {
 
 		// Find the correct DXSystemNumber
 		if ( CompIndex == 0 ) {
-			DXSystemNum = InputProcessor::FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
+			DXSystemNum = UtilityRoutines::FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
 			if ( DXSystemNum == 0 ) {
 				ShowFatalError( "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName );
 			}
@@ -334,7 +334,7 @@ namespace HVACDXHeatPumpSystem {
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpSystemType = CurrentModuleObject; // push Object Name into data array
 			DXHeatPumpSystem( DXHeatSysNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -347,13 +347,13 @@ namespace HVACDXHeatPumpSystem {
 				}
 			}
 
-			if ( InputProcessor::SameString( Alphas( 3 ), "Coil:Heating:DX:SingleSpeed" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 3 ), "Coil:Heating:DX:SingleSpeed" ) ) {
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType = Alphas( 3 );
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType_Num = CoilDX_HeatingEmpirical;
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilName = Alphas( 4 );
-			} else if ( InputProcessor::SameString( Alphas( 3 ), "Coil:Heating:DX:VariableSpeed" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 3 ), "Coil:Heating:DX:VariableSpeed" ) ) {
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType = Alphas( 3 );
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType_Num = Coil_HeatingAirToAirVariableSpeed;

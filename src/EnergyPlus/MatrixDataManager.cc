@@ -155,7 +155,7 @@ namespace MatrixDataManager {
 		for ( MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++MatNum;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MatData( MatNum ).Name = cAlphaArgs( 1 );
 			NumRows = std::floor( rNumericArgs( 1 ) );
@@ -207,7 +207,7 @@ namespace MatrixDataManager {
 
 		// METHODOLOGY EMPLOYED:
 		// inputs name of matrix and returns integer index
-		// currently uses InputProcessor::FindItemInList( which is case sensitive
+		// currently uses UtilityRoutines::FindItemInList( which is case sensitive
 
 		// Return value
 		int MatrixIndexPtr; // Function result
@@ -221,7 +221,7 @@ namespace MatrixDataManager {
 		}
 
 		if ( NumMats > 0 ) {
-			MatrixIndexPtr = InputProcessor::FindItemInList( MatrixName, MatData );
+			MatrixIndexPtr = UtilityRoutines::FindItemInList( MatrixName, MatData );
 		} else {
 			MatrixIndexPtr = 0;
 		}

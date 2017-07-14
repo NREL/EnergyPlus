@@ -106,11 +106,11 @@ SetupZoneInternalGain(
 
 	FoundIntGainsType = false;
 	FoundDuplicate = false;
-	UpperCaseObjectType = InputProcessor::MakeUPPERCase( cComponentObject );
-	UpperCaseObjectName = InputProcessor::MakeUPPERCase( cComponentName );
+	UpperCaseObjectType = UtilityRoutines::MakeUPPERCase( cComponentObject );
+	UpperCaseObjectName = UtilityRoutines::MakeUPPERCase( cComponentName );
 
 	// Check if IntGainComp_TypeOfNum and cComponentObject are consistent
-	if ( ! InputProcessor::SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
+	if ( ! UtilityRoutines::SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
 		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain" );
 		ShowContinueError( "Object type character = " + cComponentObject );
 		ShowContinueError( "Type of Num object name = " + ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) );

@@ -261,7 +261,7 @@ namespace PackagedTerminalHeatPump {
 
 		// Find the correct packaged terminal heat pump
 		if ( CompIndex == 0 ) {
-			PTUnitNum = InputProcessor::FindItemInList( CompName, PTUnit );
+			PTUnitNum = UtilityRoutines::FindItemInList( CompName, PTUnit );
 			if ( PTUnitNum == 0 ) {
 				ShowFatalError( "SimPackagedTerminalUnit: Unit not found=" + CompName );
 			}
@@ -793,7 +793,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).FanName = Alphas( 8 );
 
 
-			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+			if ( UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
 				PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 				PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
@@ -833,7 +833,7 @@ namespace PackagedTerminalHeatPump {
 			}
 
 			PTUnit( PTUnitNum ).DXHeatCoilName = Alphas( 10 );
-			if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:DX:SingleSpeed" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:DX:SingleSpeed" ) ) {
 				PTUnit( PTUnitNum ).DXHeatCoilType = Alphas( 9 );
 				PTUnit( PTUnitNum ).DXHeatCoilType_Num = CoilDX_HeatingEmpirical;
 				errFlag = false;
@@ -841,7 +841,7 @@ namespace PackagedTerminalHeatPump {
 				HeatCoilInletNodeNum = GetDXCoilInletNode( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
 				HeatCoilOutletNodeNum = GetDXCoilOutletNode( PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, errFlag );
 				if ( errFlag ) ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-			} else if ( InputProcessor::SameString( Alphas( 9 ), "COIL:HEATING:DX:VARIABLESPEED" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 9 ), "COIL:HEATING:DX:VARIABLESPEED" ) ) {
 				PTUnit( PTUnitNum ).DXHeatCoilType = Alphas( 9 );
 				PTUnit( PTUnitNum ).DXHeatCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
 				PTUnit( PTUnitNum ).DXHeatCoilName = Alphas( 10 );
@@ -870,9 +870,9 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
 			PTUnit( PTUnitNum ).CoolConvergenceTol = Numbers( 9 );
 
-			if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) || UtilityRoutines::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				PTUnit( PTUnitNum ).DXCoolCoilType = Alphas( 11 );
-				if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 					PTUnit( PTUnitNum ).DXCoolCoilType_Num = CoilDX_CoolingSingleSpeed;
 					errFlag = false;
 					GetDXCoilIndex( PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag, PTUnit( PTUnitNum ).DXCoolCoilType );
@@ -880,7 +880,7 @@ namespace PackagedTerminalHeatPump {
 					CoolCoilOutletNodeNum = GetDXCoilOutletNode( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag );
 					PTUnit( PTUnitNum ).CondenserNodeNum = GetCoilCondenserInletNode( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag );
 					if ( errFlag ) ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-				} else if ( InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					PTUnit( PTUnitNum ).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
 					errFlag = false;
 					GetDXCoilIndex( GetHXDXCoilName( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag ), PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag, "Coil:Cooling:DX:SingleSpeed" );
@@ -889,7 +889,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).CondenserNodeNum = GetCoilCondenserInletNode( "Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag ), errFlag );
 					if ( errFlag ) ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 				}
-			} else if ( InputProcessor::SameString( Alphas( 11 ), "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 11 ), "COIL:COOLING:DX:VARIABLESPEED" ) ) {
 				PTUnit( PTUnitNum ).DXCoolCoilType = Alphas( 11 );
 				PTUnit( PTUnitNum ).DXCoolCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
 				PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
@@ -927,12 +927,12 @@ namespace PackagedTerminalHeatPump {
 			SuppHeatCoilType = Alphas( 13 );
 			SuppHeatCoilName = Alphas( 14 );
 			PTUnit( PTUnitNum ).SuppHeatCoilName = SuppHeatCoilName;
-			if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) || UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Water" ) || UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
 				PTUnit( PTUnitNum ).SuppHeatCoilType = SuppHeatCoilType;
-				if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
-					if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) ) {
 						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
-					} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingElectric;
 					}
 					errFlag = false;
@@ -950,7 +950,7 @@ namespace PackagedTerminalHeatPump {
 							ErrorsFound = true;
 						}
 					}
-				} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
 					PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 					errFlag = false;
 					SuppHeatHWInletNodeNum = GetCoilWaterInletNode( SuppHeatCoilType, PTUnit( PTUnitNum ).SuppHeatCoilName, errFlag );
@@ -972,7 +972,7 @@ namespace PackagedTerminalHeatPump {
 						ErrorsFound = true;
 					}
 
-				} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
 					PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
 					errFlag = false;
 					PTUnit( PTUnitNum ).SuppHeatCoilIndex = GetSteamCoilIndex( SuppHeatCoilType, PTUnit( PTUnitNum ).SuppHeatCoilName, errFlag );
@@ -1018,8 +1018,8 @@ namespace PackagedTerminalHeatPump {
 				ShowContinueError( "..." + cNumericFields( 11 ) + " = " + TrimSigDigits( Numbers( 11 ), 1 ) );
 			}
 
-			if ( InputProcessor::SameString( Alphas( 15 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
-			if ( InputProcessor::SameString( Alphas( 15 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( Alphas( 15 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( Alphas( 15 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
 			if ( PTUnit( PTUnitNum ).FanPlace == 0 ) {
 				ShowSevereError( CurrentModuleObject + " illegal " + cAlphaFields( 15 ) + " = " + Alphas( 15 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1227,7 +1227,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 18 )) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 18 ), ZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 18 ), ZoneHVACSizing );
 				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 18 ) + " = " + Alphas( 18 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1247,8 +1247,8 @@ namespace PackagedTerminalHeatPump {
 			//   Initialize last mode of compressor operation
 			PTUnit( PTUnitNum ).LastMode = HeatingMode;
 
-			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
-				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
+			if ( UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) || UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
 					if ( ! CheckScheduleValueMinMax( PTUnit( PTUnitNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume." );
@@ -1482,7 +1482,7 @@ namespace PackagedTerminalHeatPump {
 				ShowContinueError( "In " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 				ErrorsFound = true;
 			}
-			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+			if ( UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
 				PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 				PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
@@ -1529,11 +1529,11 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).ACHeatCoilName = Alphas( 10 );
 			ACHeatCoilName = Alphas( 10 );
 
-			if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Water" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) || UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Water" ) || UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
 				PTUnit( PTUnitNum ).ACHeatCoilType = Alphas( 9 );
-				if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) {
-					if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
-					if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingElectric;
+				if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Fuel" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
+					if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingElectric;
 					PTUnit( PTUnitNum ).ACHeatCoilCap = GetHeatingCoilCapacity( PTUnit( PTUnitNum ).ACHeatCoilType, ACHeatCoilName, ErrorsFound );
 					errFlag = false;
 					HeatCoilInletNodeNum = GetHeatingCoilInletNode( PTUnit( PTUnitNum ).ACHeatCoilType, ACHeatCoilName, errFlag );
@@ -1542,7 +1542,7 @@ namespace PackagedTerminalHeatPump {
 						ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Water" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Water" ) ) {
 					PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingWater;
 					errFlag = false;
 					PTUnit( PTUnitNum ).HotWaterControlNode = GetCoilWaterInletNode( "Coil:Heating:Water", ACHeatCoilName, errFlag );
@@ -1557,7 +1557,7 @@ namespace PackagedTerminalHeatPump {
 						ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
 					PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingSteam;
 					errFlag = false;
 					PTUnit( PTUnitNum ).ACHeatCoilIndex = GetSteamCoilIndex( Alphas( 9 ), ACHeatCoilName, errFlag );
@@ -1593,9 +1593,9 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).HeatConvergenceTol = 0.001;
 			PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
 
-			if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) || UtilityRoutines::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				PTUnit( PTUnitNum ).DXCoolCoilType = Alphas( 11 );
-				if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 					PTUnit( PTUnitNum ).DXCoolCoilType_Num = CoilDX_CoolingSingleSpeed;
 					errFlag = false;
 					GetDXCoilIndex( PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag, PTUnit( PTUnitNum ).DXCoolCoilType );
@@ -1606,7 +1606,7 @@ namespace PackagedTerminalHeatPump {
 						ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 11 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					PTUnit( PTUnitNum ).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
 					errFlag = false;
 					GetDXCoilIndex( GetHXDXCoilName( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag ), PTUnit( PTUnitNum ).DXCoolCoilIndexNum, errFlag, "Coil:Cooling:DX:SingleSpeed" );
@@ -1618,7 +1618,7 @@ namespace PackagedTerminalHeatPump {
 						ErrorsFound = true;
 					}
 				}
-			} else if ( InputProcessor::SameString( Alphas( 11 ), "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 11 ), "COIL:COOLING:DX:VARIABLESPEED" ) ) {
 				PTUnit( PTUnitNum ).DXCoolCoilType = Alphas( 11 );
 				PTUnit( PTUnitNum ).DXCoolCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
 				PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
@@ -1645,8 +1645,8 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			}
 
-			if ( InputProcessor::SameString( Alphas( 13 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
-			if ( InputProcessor::SameString( Alphas( 13 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( Alphas( 13 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( Alphas( 13 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
 			//   default to draw through if not specified in input
 			if ( lAlphaBlanks( 13 ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
 			if ( PTUnit( PTUnitNum ).FanPlace == 0 ) {
@@ -1857,7 +1857,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 16 ) ) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 16 ), ZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 16 ), ZoneHVACSizing );
 				if ( PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 16 ) + " = " + Alphas( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1877,8 +1877,8 @@ namespace PackagedTerminalHeatPump {
 			//   Initialize last mode of compressor operation
 			PTUnit( PTUnitNum ).LastMode = HeatingMode;
 
-			if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) || InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
-				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
+			if ( UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:OnOff" ) || UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) || UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
 					if ( ! CheckScheduleValueMinMax( PTUnit( PTUnitNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume." );
@@ -2047,7 +2047,7 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			} else {
 
-				if ( InputProcessor::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( UtilityRoutines::SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
 					PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 					PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
@@ -2186,9 +2186,9 @@ namespace PackagedTerminalHeatPump {
 
 			if ( NumAlphas >= 19 ) {
 				// get water flow mode info before calling SetSimpleWSHPData
-				if ( InputProcessor::SameString( Alphas( 19 ), "Constant" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterConstant;
-				if ( InputProcessor::SameString( Alphas( 19 ), "Cycling" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterCycling;
-				if ( InputProcessor::SameString( Alphas( 19 ), "ConstantOnDemand" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterConstantOnDemand;
+				if ( UtilityRoutines::SameString( Alphas( 19 ), "Constant" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterConstant;
+				if ( UtilityRoutines::SameString( Alphas( 19 ), "Cycling" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterCycling;
+				if ( UtilityRoutines::SameString( Alphas( 19 ), "ConstantOnDemand" ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterConstantOnDemand;
 				//default to draw through if not specified in input
 				if ( lAlphaBlanks( 19 ) ) PTUnit( PTUnitNum ).WaterCyclingMode = WaterCycling;
 				if ( PTUnit( PTUnitNum ).WaterCyclingMode == 0 ) {
@@ -2221,12 +2221,12 @@ namespace PackagedTerminalHeatPump {
 			SuppHeatCoilType = Alphas( 13 );
 			SuppHeatCoilName = Alphas( 14 );
 			PTUnit( PTUnitNum ).SuppHeatCoilName = SuppHeatCoilName;
-			if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) || UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Water" ) || UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
 				PTUnit( PTUnitNum ).SuppHeatCoilType = SuppHeatCoilType;
-				if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
-					if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Fuel" ) ) {
 						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
-					} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingElectric;
 					}
 					errFlag = false;
@@ -2244,7 +2244,7 @@ namespace PackagedTerminalHeatPump {
 							ErrorsFound = true;
 						}
 					}
-				} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
 					PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 					errFlag = false;
 					SuppHeatHWInletNodeNum = GetCoilWaterInletNode( SuppHeatCoilType, PTUnit( PTUnitNum ).SuppHeatCoilName, errFlag );
@@ -2266,7 +2266,7 @@ namespace PackagedTerminalHeatPump {
 						ErrorsFound = true;
 					}
 
-				} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Steam" ) ) {
 					PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
 					errFlag = false;
 					PTUnit( PTUnitNum ).SuppHeatCoilIndex = GetSteamCoilIndex( SuppHeatCoilType, PTUnit( PTUnitNum ).SuppHeatCoilName, errFlag );
@@ -2316,8 +2316,8 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
-			if ( InputProcessor::SameString( Alphas( 16 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
-			if ( InputProcessor::SameString( Alphas( 16 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( Alphas( 16 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( Alphas( 16 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
 			if ( PTUnit( PTUnitNum ).FanPlace == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
 				ShowContinueError( "Illegal " + cAlphaFields( 16 ) + "=\"" + Alphas( 16 ) + "\"." );
@@ -2339,7 +2339,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 20 ) ) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );

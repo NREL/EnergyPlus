@@ -281,7 +281,7 @@ namespace IceThermalStorage {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			IceStorageNum = InputProcessor::FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
+			IceStorageNum = UtilityRoutines::FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
 			if ( IceStorageNum == 0 ) {
 				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );
 			}
@@ -874,7 +874,7 @@ namespace IceThermalStorage {
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;
@@ -888,9 +888,9 @@ namespace IceThermalStorage {
 
 			// Get Ice Thermal Storage Type
 			IceStorage( IceNum ).ITSType = cAlphaArgs( 2 );
-			if ( InputProcessor::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilInternal" ) ) {
+			if ( UtilityRoutines::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilInternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilInternal;
-			} else if ( InputProcessor::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
+			} else if ( UtilityRoutines::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilExternal;
 			} else {
 				ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -964,7 +964,7 @@ namespace IceThermalStorage {
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;
@@ -1060,9 +1060,9 @@ namespace IceThermalStorage {
 			}
 
 			DetIceStor( IceNum ).ThawProcessIndicator = cAlphaArgs( 9 );
-			if ( InputProcessor::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
+			if ( UtilityRoutines::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceInsideMelt;
-			} else if ( ( InputProcessor::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
+			} else if ( ( UtilityRoutines::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceOutsideMelt;
 			} else {
 				ShowSevereError( "Invalid thaw process indicator of " + cAlphaArgs( 9 ) + " was entered" );

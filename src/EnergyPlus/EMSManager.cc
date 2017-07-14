@@ -684,7 +684,7 @@ namespace EMSManager {
 
 			for ( SensorNum = 1; SensorNum <= NumSensors; ++SensorNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					Sensor( SensorNum ).Name = cAlphaArgs( 1 );
@@ -772,7 +772,7 @@ namespace EMSManager {
 						cAlphaFieldNames, cNumericFieldNames );
 				}
 
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSActuatorUsed( ActuatorNum ).Name = cAlphaArgs( 1 );
@@ -806,11 +806,11 @@ namespace EMSManager {
 				FoundObjectName = false;
 				FoundActuatorName = false;
 				for ( ActuatorVariableNum = 1; ActuatorVariableNum <= numEMSActuatorsAvailable; ++ActuatorVariableNum ) {
-					if ( InputProcessor::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ComponentTypeName, cAlphaArgs( 3 ) ) ) {
+					if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ComponentTypeName, cAlphaArgs( 3 ) ) ) {
 						FoundObjectType = true;
-						if ( InputProcessor::SameString( EMSActuatorAvailable( ActuatorVariableNum ).UniqueIDName, cAlphaArgs( 2 ) ) ) {
+						if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).UniqueIDName, cAlphaArgs( 2 ) ) ) {
 							FoundObjectName = true;
-							if ( InputProcessor::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ControlTypeName, cAlphaArgs( 4 ) ) ) {
+							if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ControlTypeName, cAlphaArgs( 4 ) ) ) {
 								FoundActuatorName = true;
 								break;
 							}
@@ -833,7 +833,7 @@ namespace EMSManager {
 			for ( InternVarNum = 1; InternVarNum <= NumInternalVariablesUsed; ++InternVarNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSInternalVarsUsed( InternVarNum ).Name = cAlphaArgs( 1 );
@@ -854,9 +854,9 @@ namespace EMSManager {
 					FoundObjectType = false;
 					FoundObjectName = false;
 					for ( InternalVarAvailNum = 1; InternalVarAvailNum <= numEMSInternalVarsAvailable; ++InternalVarAvailNum ) {
-						if ( InputProcessor::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName, cAlphaArgs( 3 ) ) ) {
+						if ( UtilityRoutines::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName, cAlphaArgs( 3 ) ) ) {
 							FoundObjectType = true;
-							if ( InputProcessor::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName, cAlphaArgs( 2 ) ) ) {
+							if ( UtilityRoutines::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName, cAlphaArgs( 2 ) ) ) {
 								FoundObjectName = true;
 								break; // InternalVarAvailNum now holds needed index pointer
 							}
@@ -882,7 +882,7 @@ namespace EMSManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				EMSProgramCallManager( CallManagerNum ).Name = cAlphaArgs( 1 );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
@@ -936,7 +936,7 @@ namespace EMSManager {
 						ErrorsFound = true;
 					}
 
-					StackNum = InputProcessor::FindItemInList( cAlphaArgs( AlphaNum ), ErlStack );
+					StackNum = UtilityRoutines::FindItemInList( cAlphaArgs( AlphaNum ), ErlStack );
 
 					if ( StackNum > 0 ) { // found it
 						// check for duplicate and warn.
@@ -1058,7 +1058,7 @@ namespace EMSManager {
 					Sensor( SensorNum ).Index = VarIndex;
 					Sensor( SensorNum ).CheckedOkay = true;
 					// If variable is Schedule Value, then get the schedule id to register it as being used
-					if ( InputProcessor::SameString( Sensor( SensorNum ).OutputVarName, "Schedule Value" ) ) {
+					if ( UtilityRoutines::SameString( Sensor( SensorNum ).OutputVarName, "Schedule Value" ) ) {
 						Sensor( SensorNum ).SchedNum = GetScheduleIndex( Sensor( SensorNum ).UniqueKeyName );
 						if ( Sensor( SensorNum ).SchedNum == 0 ) {
 							Sensor( SensorNum ).CheckedOkay = false;
@@ -1104,11 +1104,11 @@ namespace EMSManager {
 			FoundObjectName = false;
 			FoundActuatorName = false;
 			for ( ActuatorVariableNum = 1; ActuatorVariableNum <= numEMSActuatorsAvailable; ++ActuatorVariableNum ) {
-				if ( InputProcessor::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ComponentTypeName, EMSActuatorUsed( ActuatorNum ).ComponentTypeName ) ) {
+				if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ComponentTypeName, EMSActuatorUsed( ActuatorNum ).ComponentTypeName ) ) {
 					FoundObjectType = true;
-					if ( InputProcessor::SameString( EMSActuatorAvailable( ActuatorVariableNum ).UniqueIDName, EMSActuatorUsed( ActuatorNum ).UniqueIDName ) ) {
+					if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).UniqueIDName, EMSActuatorUsed( ActuatorNum ).UniqueIDName ) ) {
 						FoundObjectName = true;
-						if ( InputProcessor::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ControlTypeName, EMSActuatorUsed( ActuatorNum ).ControlTypeName ) ) {
+						if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ControlTypeName, EMSActuatorUsed( ActuatorNum ).ControlTypeName ) ) {
 							FoundActuatorName = true;
 							break;
 						}
@@ -1168,9 +1168,9 @@ namespace EMSManager {
 			FoundObjectType = false;
 			FoundObjectName = false;
 			for ( InternalVarAvailNum = 1; InternalVarAvailNum <= numEMSInternalVarsAvailable; ++InternalVarAvailNum ) {
-				if ( InputProcessor::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName, EMSInternalVarsUsed( InternVarNum ).InternalDataTypeName ) ) {
+				if ( UtilityRoutines::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName, EMSInternalVarsUsed( InternVarNum ).InternalDataTypeName ) ) {
 					FoundObjectType = true;
-					if ( InputProcessor::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName, EMSInternalVarsUsed( InternVarNum ).UniqueIDName ) ) {
+					if ( UtilityRoutines::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName, EMSInternalVarsUsed( InternVarNum ).UniqueIDName ) ) {
 						FoundObjectName = true;
 						break; // InternalVarAvailNum now holds needed index pointer
 					}
@@ -1319,8 +1319,8 @@ namespace EMSManager {
 			int FoundControlType;
 			for ( int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop ) {
 				if ( ActuatorLoop + 1 <= numEMSActuatorsAvailable ) {
-					FoundTypeName = InputProcessor::FindItemInList( EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName, EMSActuatorAvailable( {ActuatorLoop + 1,numEMSActuatorsAvailable} ), &EMSActuatorAvailableType::ComponentTypeName, numEMSActuatorsAvailable - ( ActuatorLoop + 1 ) );
-					FoundControlType = InputProcessor::FindItemInList( EMSActuatorAvailable( ActuatorLoop ).ControlTypeName, EMSActuatorAvailable( {ActuatorLoop + 1,numEMSActuatorsAvailable} ), &EMSActuatorAvailableType::ControlTypeName, numEMSActuatorsAvailable - ( ActuatorLoop + 1 ) );
+					FoundTypeName = UtilityRoutines::FindItemInList( EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName, EMSActuatorAvailable( {ActuatorLoop + 1,numEMSActuatorsAvailable} ), &EMSActuatorAvailableType::ComponentTypeName, numEMSActuatorsAvailable - ( ActuatorLoop + 1 ) );
+					FoundControlType = UtilityRoutines::FindItemInList( EMSActuatorAvailable( ActuatorLoop ).ControlTypeName, EMSActuatorAvailable( {ActuatorLoop + 1,numEMSActuatorsAvailable} ), &EMSActuatorAvailableType::ControlTypeName, numEMSActuatorsAvailable - ( ActuatorLoop + 1 ) );
 				} else {
 					FoundTypeName = 1;
 					FoundControlType = 1;
@@ -1366,7 +1366,7 @@ namespace EMSManager {
 			for ( int InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop ) {
 				int Found( 0 );
 				if ( InternalDataLoop + 1 <= numEMSInternalVarsAvailable ) {
-					Found = InputProcessor::FindItemInList( EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName, EMSInternalVarsAvailable( {InternalDataLoop + 1,numEMSInternalVarsAvailable} ), &InternalVarsAvailableType::DataTypeName, numEMSInternalVarsAvailable - ( InternalDataLoop + 1 ) );
+					Found = UtilityRoutines::FindItemInList( EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName, EMSInternalVarsAvailable( {InternalDataLoop + 1,numEMSInternalVarsAvailable} ), &InternalVarsAvailableType::DataTypeName, numEMSInternalVarsAvailable - ( InternalDataLoop + 1 ) );
 				}
 				if ( Found == 0 ) {
 					gio::write( OutputEMSFileUnitNum, fmtA ) << "EnergyManagementSystem:InternalVariable Available, *," + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
@@ -1571,7 +1571,7 @@ namespace EMSManager {
 		}}
 
 		for ( Loop = 1; Loop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++Loop ) {
-			if ( ( InputProcessor::SameString( EMSActuatorUsed( Loop ).ComponentTypeName, cComponentTypeName ) ) && ( InputProcessor::SameString( EMSActuatorUsed( Loop ).UniqueIDName, cNodeName ) ) && ( InputProcessor::SameString( EMSActuatorUsed( Loop ).ControlTypeName, cControlTypeName ) ) ) {
+			if ( ( UtilityRoutines::SameString( EMSActuatorUsed( Loop ).ComponentTypeName, cComponentTypeName ) ) && ( UtilityRoutines::SameString( EMSActuatorUsed( Loop ).UniqueIDName, cNodeName ) ) && ( UtilityRoutines::SameString( EMSActuatorUsed( Loop ).ControlTypeName, cControlTypeName ) ) ) {
 				FoundControl = true;
 			}
 
@@ -1590,7 +1590,7 @@ namespace EMSManager {
 
 	returnValue = false;
 	for (auto loop = 1; loop <= NumSensors; ++loop ) {
-		if ( Sensor( loop ).UniqueKeyName == DataLoopNode::NodeID( nodeNum ) && InputProcessor::SameString(Sensor( loop ).OutputVarName ,varName) ) {
+		if ( Sensor( loop ).UniqueKeyName == DataLoopNode::NodeID( nodeNum ) && UtilityRoutines::SameString(Sensor( loop ).OutputVarName ,varName) ) {
 			returnValue = true;
 		}
 	}
@@ -2030,9 +2030,9 @@ SetupEMSActuator(
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
 
-	std::string const UpperCaseObjectType( InputProcessor::MakeUPPERCase( cComponentTypeName ) );
-	std::string const UpperCaseObjectName( InputProcessor::MakeUPPERCase( cUniqueIDName ) );
-	std::string const UpperCaseActuatorName( InputProcessor::MakeUPPERCase( cControlTypeName ) );
+	std::string const UpperCaseObjectType( UtilityRoutines::MakeUPPERCase( cComponentTypeName ) );
+	std::string const UpperCaseObjectName( UtilityRoutines::MakeUPPERCase( cUniqueIDName ) );
+	std::string const UpperCaseActuatorName( UtilityRoutines::MakeUPPERCase( cControlTypeName ) );
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
@@ -2090,9 +2090,9 @@ SetupEMSActuator(
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
 
-	std::string const UpperCaseObjectType( InputProcessor::MakeUPPERCase( cComponentTypeName ) );
-	std::string const UpperCaseObjectName( InputProcessor::MakeUPPERCase( cUniqueIDName ) );
-	std::string const UpperCaseActuatorName( InputProcessor::MakeUPPERCase( cControlTypeName ) );
+	std::string const UpperCaseObjectType( UtilityRoutines::MakeUPPERCase( cComponentTypeName ) );
+	std::string const UpperCaseObjectName( UtilityRoutines::MakeUPPERCase( cUniqueIDName ) );
+	std::string const UpperCaseActuatorName( UtilityRoutines::MakeUPPERCase( cControlTypeName ) );
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
@@ -2150,9 +2150,9 @@ SetupEMSActuator(
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
 
-	std::string const UpperCaseObjectType( InputProcessor::MakeUPPERCase( cComponentTypeName ) );
-	std::string const UpperCaseObjectName( InputProcessor::MakeUPPERCase( cUniqueIDName ) );
-	std::string const UpperCaseActuatorName( InputProcessor::MakeUPPERCase( cControlTypeName ) );
+	std::string const UpperCaseObjectType( UtilityRoutines::MakeUPPERCase( cComponentTypeName ) );
+	std::string const UpperCaseObjectName( UtilityRoutines::MakeUPPERCase( cUniqueIDName ) );
+	std::string const UpperCaseActuatorName( UtilityRoutines::MakeUPPERCase( cControlTypeName ) );
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
@@ -2214,7 +2214,7 @@ SetupEMSInternalVariable(
 	FoundDuplicate = false;
 
 	for ( InternalVarAvailNum = 1; InternalVarAvailNum <= numEMSInternalVarsAvailable; ++InternalVarAvailNum ) {
-		if ( ( InputProcessor::SameString( cDataTypeName, EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName ) ) && ( InputProcessor::SameString( cUniqueIDName, EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName ) ) ) {
+		if ( ( UtilityRoutines::SameString( cDataTypeName, EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName ) ) && ( UtilityRoutines::SameString( cUniqueIDName, EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName ) ) ) {
 			FoundDuplicate = true;
 			break;
 		}
@@ -2280,7 +2280,7 @@ SetupEMSInternalVariable(
 	FoundDuplicate = false;
 
 	for ( InternalVarAvailNum = 1; InternalVarAvailNum <= numEMSInternalVarsAvailable; ++InternalVarAvailNum ) {
-		if ( ( InputProcessor::SameString( cDataTypeName, EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName ) ) && ( InputProcessor::SameString( cUniqueIDName, EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName ) ) ) {
+		if ( ( UtilityRoutines::SameString( cDataTypeName, EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName ) ) && ( UtilityRoutines::SameString( cUniqueIDName, EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName ) ) ) {
 			FoundDuplicate = true;
 			break;
 		}

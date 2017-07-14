@@ -1547,7 +1547,7 @@ namespace General {
 		int TokenMonth;
 		int TokenWeekday;
 
-		FstNum = int( InputProcessor::ProcessNumber( String, errFlag ) );
+		FstNum = int( UtilityRoutines::ProcessNumber( String, errFlag ) );
 		DateType = -1;
 		if ( ! errFlag ) {
 			// Entered single number, do inverse JDay
@@ -1681,17 +1681,17 @@ namespace General {
 			} else if ( Loop == 2 ) {
 				// Field must be Day Month or Month Day (if both numeric, mon / day)
 				InternalError = false;
-				NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
+				NumField1 = int( UtilityRoutines::ProcessNumber( Fields( 1 ), errFlag ) );
 				if ( errFlag ) {
 					// Month day, but first field is not numeric, 2nd must be
-					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField2 = int( UtilityRoutines::ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( errFlag ) {
 						ShowSevereError( "Invalid date field=" + String );
 						InternalError = true;
 					} else {
 						TokenDay = NumField2;
 					}
-					TokenMonth = InputProcessor::FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
+					TokenMonth = UtilityRoutines::FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
 					ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 					if ( ! InternalError ) {
 						DateType = 1;
@@ -1700,7 +1700,7 @@ namespace General {
 					}
 				} else {
 					// Month Day, first field was numeric, if 2nd is, then it's month<num> day<num>
-					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField2 = int( UtilityRoutines::ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( ! errFlag ) {
 						TokenMonth = NumField1;
 						TokenDay = NumField2;
@@ -1712,7 +1712,7 @@ namespace General {
 						}
 					} else { // 2nd field was not numeric.  Must be Month
 						TokenDay = NumField1;
-						TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+						TokenMonth = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
 						ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 						if ( ! InternalError ) {
 							DateType = 1;
@@ -1725,16 +1725,16 @@ namespace General {
 			} else if ( Loop == 3 ) {
 				// Field must be some combination of <num> Weekday Month (if WkDayInMonth true)
 				if ( WkDayInMonth ) {
-					NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
+					NumField1 = int( UtilityRoutines::ProcessNumber( Fields( 1 ), errFlag ) );
 					if ( ! errFlag ) { // the expected result
 						TokenDay = NumField1;
-						TokenWeekday = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
+						TokenWeekday = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 						if ( TokenWeekday == 0 ) {
-							TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
-							TokenWeekday = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
+							TokenMonth = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+							TokenWeekday = UtilityRoutines::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 						} else {
-							TokenMonth = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
+							TokenMonth = UtilityRoutines::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 							if ( TokenMonth == 0 ) InternalError = true;
 						}
 						DateType = 2;
@@ -1744,13 +1744,13 @@ namespace General {
 						if ( Fields( 1 ) == "LA" ) {
 							DateType = 3;
 							NumTokens = 3;
-							TokenWeekday = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
+							TokenWeekday = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenWeekday == 0 ) {
-								TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
-								TokenWeekday = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
+								TokenMonth = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+								TokenWeekday = UtilityRoutines::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 								if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 							} else {
-								TokenMonth = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
+								TokenMonth = UtilityRoutines::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 								if ( TokenMonth == 0 ) InternalError = true;
 							}
 						} else { // error....
@@ -1758,9 +1758,9 @@ namespace General {
 						}
 					}
 				} else { // mm/dd/yyyy or yyyy/mm/dd
-					NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
-					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
-					NumField3 = int( InputProcessor::ProcessNumber( Fields( 3 ), errFlag ) );
+					NumField1 = int( UtilityRoutines::ProcessNumber( Fields( 1 ), errFlag ) );
+					NumField2 = int( UtilityRoutines::ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField3 = int( UtilityRoutines::ProcessNumber( Fields( 3 ), errFlag ) );
 					DateType = 1;
 					// error detection later..
 					if ( NumField1 > 100 ) {
@@ -3250,11 +3250,11 @@ namespace General {
 		// Process the Scan Request
 		DoReport = false;
 
-		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( reportName ) );
+		{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( reportName ) );
 		if ( SELECT_CASE_var == "CONSTRUCTIONS" ) {
 			if ( present( ReportKey ) ) {
-				if ( InputProcessor::SameString( ReportKey, "Constructions" ) ) DoReport = Constructions;
-				if ( InputProcessor::SameString( ReportKey, "Materials" ) ) DoReport = Materials;
+				if ( UtilityRoutines::SameString( ReportKey, "Constructions" ) ) DoReport = Constructions;
+				if ( UtilityRoutines::SameString( ReportKey, "Materials" ) ) DoReport = Materials;
 			}
 		} else if ( SELECT_CASE_var == "VIEWFACTORINFO" ) {
 			DoReport = ViewFactorInfo;
@@ -3267,7 +3267,7 @@ namespace General {
 			//     DoReport=SchRpt
 			//      IF (PRESENT(Option1)) Option1=SchRptOption
 		} else if ( SELECT_CASE_var == "SURFACES" ) {
-			{ auto const SELECT_CASE_var1( InputProcessor::MakeUPPERCase( ReportKey ) ); //Autodesk:OPTIONAL ReportKey used without PRESENT check
+			{ auto const SELECT_CASE_var1( UtilityRoutines::MakeUPPERCase( ReportKey ) ); //Autodesk:OPTIONAL ReportKey used without PRESENT check
 			if ( SELECT_CASE_var1 == "COSTINFO" ) {
 				DoReport = CostInfo;
 			} else if ( SELECT_CASE_var1 == "DXF" ) {
@@ -3365,7 +3365,7 @@ namespace General {
 			TooLong = true;
 		}
 
-		int FoundItem = InputProcessor::FindItemInList( ResultName, ItemNames, NumItems );
+		int FoundItem = UtilityRoutines::FindItemInList( ResultName, ItemNames, NumItems );
 
 		if ( FoundItem != 0 ) {
 			ShowSevereError( calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered." );

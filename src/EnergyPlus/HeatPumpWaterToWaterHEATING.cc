@@ -168,7 +168,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
+			GSHPNum = UtilityRoutines::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterHEATING: Unit not found=" + GSHPName );
 			}
@@ -256,7 +256,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
 
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 

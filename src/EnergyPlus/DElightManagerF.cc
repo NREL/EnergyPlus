@@ -270,7 +270,7 @@ namespace DElightManagerF {
 
 		for ( auto & znDayl : ZoneDaylight ) {
 			if ( znDayl.DaylightMethod == DElightDaylighting ){
-				int const izone = InputProcessor::FindItemInList( znDayl.ZoneName, Zone );
+				int const izone = UtilityRoutines::FindItemInList( znDayl.ZoneName, Zone );
 				if ( izone != 0 ) {
 
 					rLightLevel = GetDesignLightingLevelForZone( izone );
@@ -648,12 +648,12 @@ namespace DElightManagerF {
 			cfs.Name = cAlphaArgs( 1 );
 			cfs.ComplexFeneType = cAlphaArgs( 2 );
 			cfs.surfName = cAlphaArgs( 3 );
-			if ( InputProcessor::FindItemInList( cfs.surfName, Surface ) == 0 ){
+			if ( UtilityRoutines::FindItemInList( cfs.surfName, Surface ) == 0 ){
 				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cfs.surfName + "\"." );
 				ErrorsFound = true;
 			}
 			cfs.wndwName = cAlphaArgs( 4 );
-			if ( InputProcessor::FindItemInList( cfs.surfName, Surface ) == 0 ){
+			if ( UtilityRoutines::FindItemInList( cfs.surfName, Surface ) == 0 ){
 				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 4 ) + "=\"" + cfs.wndwName + "\"." );
 				ErrorsFound = true;
 			}
@@ -734,7 +734,7 @@ namespace DElightManagerF {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Robert J. Hitchcock
 		//       DATE WRITTEN   August 2003
-		//       MODIFIED       From InputProcessor::MakeUPPERCase( function by Linda K. Lawrie
+		//       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:

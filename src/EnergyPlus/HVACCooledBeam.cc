@@ -185,7 +185,7 @@ namespace HVACCooledBeam {
 
 		// Get the  unit index
 		if ( CompIndex == 0 ) {
-			CBNum = InputProcessor::FindItemInList( CompName, CoolBeam );
+			CBNum = UtilityRoutines::FindItemInList( CompName, CoolBeam );
 			if ( CBNum == 0 ) {
 				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + CompName );
 			}
@@ -294,15 +294,15 @@ namespace HVACCooledBeam {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, CBIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			CBNum = CBIndex;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			CoolBeam( CBNum ).Name = Alphas( 1 );
 			CoolBeam( CBNum ).UnitType = CurrentModuleObject;
 			CoolBeam( CBNum ).UnitType_Num = 1;
 			CoolBeam( CBNum ).CBType = Alphas( 3 );
-			if ( InputProcessor::SameString( CoolBeam( CBNum ).CBType, "Passive" ) ) {
+			if ( UtilityRoutines::SameString( CoolBeam( CBNum ).CBType, "Passive" ) ) {
 				CoolBeam( CBNum ).CBType_Num = Passive_Cooled_Beam;
-			} else if ( InputProcessor::SameString( CoolBeam( CBNum ).CBType, "Active" ) ) {
+			} else if ( UtilityRoutines::SameString( CoolBeam( CBNum ).CBType, "Active" ) ) {
 				CoolBeam( CBNum ).CBType_Num = Active_Cooled_Beam;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFields( 3 ) + " = " + CoolBeam( CBNum ).CBType + '.' );

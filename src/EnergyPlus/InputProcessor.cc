@@ -66,6 +66,7 @@
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
 #include <FileSystem.hh>
+#include <UtilityRoutines.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
 
@@ -962,8 +963,6 @@ namespace EnergyPlus {
 	using DataGlobals::DisplayInputInAudit;
 
 	static std::string const BlankString;
-	static gio::Fmt fmtLD( "*" );
-	static gio::Fmt fmtA( "(A)" );
 
 // Functions
 
@@ -987,7 +986,7 @@ namespace EnergyPlus {
 
 	std::pair< bool, std::string >
 	InputProcessor::ConvertInsensitiveObjectType( std::string const & objectType ) {
-		auto tmp_umit = EnergyPlus::InputProcessor::case_insensitive_object_map.find( MakeUPPERCase( objectType ) );
+		auto tmp_umit = EnergyPlus::InputProcessor::case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( objectType ) );
 		if ( tmp_umit != EnergyPlus::InputProcessor::case_insensitive_object_map.end() ) {
 			return std::make_pair( true, tmp_umit->second );
 		}
@@ -1141,7 +1140,7 @@ namespace EnergyPlus {
 		auto const & find_obj = jdf.find( ObjectWord );
 
 		if ( find_obj == jdf.end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
 			if ( tmp_umit == case_insensitive_object_map.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return 0;
 			}
@@ -1151,7 +1150,7 @@ namespace EnergyPlus {
 		}
 
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
 			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
 			}
@@ -1184,7 +1183,7 @@ namespace EnergyPlus {
 
 		auto find_iterators = jdd_jdf_cache_map.find( Object );
 		if ( find_iterators == jdd_jdf_cache_map.end() ) {
-			auto const tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( Object ) );
+			auto const tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( Object ) );
 			if ( tmp_umit == case_insensitive_object_map.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
@@ -1237,7 +1236,7 @@ namespace EnergyPlus {
 				if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
 					Alphas( i + 1 ) = obj.key();
 				} else {
-					Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
+					Alphas( i + 1 ) = UtilityRoutines::MakeUPPERCase( obj.key() );
 				}
 				if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = obj.key().empty();
 				if ( is_AlphaFieldNames ) AlphaFieldNames()( i + 1 ) = field;
@@ -1267,7 +1266,7 @@ namespace EnergyPlus {
 					if ( schema_field_obj.find("retaincase") != schema_field_obj.end() ) {
 						Alphas( i + 1 ) = val;
 					} else {
-						Alphas( i + 1 ) = MakeUPPERCase( val );
+						Alphas( i + 1 ) = UtilityRoutines::MakeUPPERCase( val );
 					}
 				} else {
 					if ( it.value().is_number_integer() ) {
@@ -1325,7 +1324,7 @@ namespace EnergyPlus {
 							if ( schema_field.find("retaincase") != schema_field.end() ) {
 								Alphas( alphas_index + 1 ) = val;
 							} else {
-								Alphas( alphas_index + 1 ) = MakeUPPERCase( val );
+								Alphas( alphas_index + 1 ) = UtilityRoutines::MakeUPPERCase( val );
 							}
 						} else {
 							if ( jdf_field_val.is_number_integer() ) {
@@ -1468,7 +1467,7 @@ namespace EnergyPlus {
 		json * obj;
 		auto obj_iter = jdf.find( ObjType );
 		if ( obj_iter == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
+			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjType ) );
 			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				return -1;
 			}
@@ -1479,9 +1478,9 @@ namespace EnergyPlus {
 
 		int object_item_num = 1;
 		bool found = false;
-		auto const upperObjName = MakeUPPERCase( ObjName );
+		auto const upperObjName = UtilityRoutines::MakeUPPERCase( ObjName );
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
-			if ( MakeUPPERCase( it.key() ) == upperObjName ) {
+			if ( UtilityRoutines::MakeUPPERCase( it.key() ) == upperObjName ) {
 				found = true;
 				break;
 			}
@@ -1508,7 +1507,7 @@ namespace EnergyPlus {
 		json * obj;
 		auto obj_iter = jdf.find( ObjType );
 		if ( jdf.find( ObjType ) == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
+			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjType ) );
 			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				return -1;
 			}
@@ -1519,11 +1518,11 @@ namespace EnergyPlus {
 
 		int object_item_num = 1;
 		bool found = false;
-		auto const upperObjName = MakeUPPERCase( ObjName );
+		auto const upperObjName = UtilityRoutines::MakeUPPERCase( ObjName );
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
 			auto it2 = it.value().find(NameTypeVal);
 
-			if ( ( it2 != it.value().end() ) && ( MakeUPPERCase( it2.value() ) == upperObjName ) ) {
+			if ( ( it2 != it.value().end() ) && ( UtilityRoutines::MakeUPPERCase( it2.value() ) == upperObjName ) ) {
 				found = true;
 				break;
 			}
@@ -1536,352 +1535,6 @@ namespace EnergyPlus {
 			return -1;
 		}
 		return object_item_num;
-	}
-
-	Real64
-	InputProcessor::ProcessNumber(
-		std::string const & String,
-		bool & ErrorFlag
-	) {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function processes a string that should be numeric and
-		// returns the real value of the string.
-
-		// METHODOLOGY EMPLOYED:
-		// FUNCTION ProcessNumber translates the argument (a string)
-		// into a real number.  The string should consist of all
-		// numeric characters (except a decimal point).  Numerics
-		// with exponentiation (i.e. 1.2345E+03) are allowed but if
-		// it is not a valid number an error message along with the
-		// string causing the error is printed out and 0.0 is returned
-		// as the value.
-
-		// REFERENCES:
-		// List directed Fortran input/output.
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const ValidNumerics( "0123456789.+-EeDd" );
-
-		Real64 rProcessNumber = 0.0;
-		//  Make sure the string has all what we think numerics should have
-		std::string const PString( stripped( String ) );
-		std::string::size_type const StringLen( PString.length() );
-		ErrorFlag = false;
-		if ( StringLen == 0 ) return rProcessNumber;
-		int IoStatus( 0 );
-		if ( PString.find_first_not_of( ValidNumerics ) == std::string::npos ) {
-			{
-				IOFlags flags;
-				gio::read( PString, fmtLD, flags ) >> rProcessNumber;
-				IoStatus = flags.ios();
-			}
-			ErrorFlag = false;
-		} else {
-			rProcessNumber = 0.0;
-			ErrorFlag = true;
-		}
-		if ( IoStatus != 0 ) {
-			rProcessNumber = 0.0;
-			ErrorFlag = true;
-		}
-
-		return rProcessNumber;
-
-	}
-
-	int
-	InputProcessor::FindItemInList(
-		std::string const & String,
-		Array1_string const & ListOfItems,
-		int const NumItems
-	) {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function looks up a string in a similar list of
-		// items and returns the index of the item in the list, if
-		// found.  This routine is not case insensitive and doesn't need
-		// for most inputs -- they are automatically turned to UPPERCASE.
-		// If you need case insensitivity use FindItem.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		for ( int Count = 1; Count <= NumItems; ++Count ) {
-			if ( String == ListOfItems( Count ) ) return Count;
-		}
-		return 0; // Not found
-	}
-
-	int
-	InputProcessor::FindItemInList(
-		std::string const & String,
-		Array1S_string const ListOfItems,
-		int const NumItems
-	) {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function looks up a string in a similar list of
-		// items and returns the index of the item in the list, if
-		// found.  This routine is not case insensitive and doesn't need
-		// for most inputs -- they are automatically turned to UPPERCASE.
-		// If you need case insensitivity use FindItem.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		for ( int Count = 1; Count <= NumItems; ++Count ) {
-			if ( String == ListOfItems( Count ) ) return Count;
-		}
-		return 0; // Not found
-	}
-
-
-	int
-	InputProcessor::FindItemInSortedList(
-		std::string const & String,
-		Array1S_string const ListOfItems,
-		int const NumItems
-	) {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function looks up a string in a similar list of
-		// items and returns the index of the item in the list, if
-		// found.  This routine is case insensitive.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		int Probe( 0 );
-		int LBnd( 0 );
-		int UBnd( NumItems + 1 );
-		bool Found( false );
-		while ( ( !Found ) || ( Probe != 0 ) ) {
-			Probe = ( UBnd - LBnd ) / 2;
-			if ( Probe == 0 ) break;
-			Probe += LBnd;
-			if ( equali( String, ListOfItems( Probe ) ) ) {
-				Found = true;
-				break;
-			} else if ( lessthani( String, ListOfItems( Probe ) ) ) {
-				UBnd = Probe;
-			} else {
-				LBnd = Probe;
-			}
-		}
-		return Probe;
-	}
-
-	int
-	InputProcessor::FindItem(
-		std::string const & String,
-		Array1D_string const & ListOfItems,
-		int const NumItems
-	) {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   April 1999
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function looks up a string in a similar list of
-		// items and returns the index of the item in the list, if
-		// found.  This routine is case insensitive.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		int FindItem = FindItemInList( String, ListOfItems, NumItems );
-		if ( FindItem != 0 ) return FindItem;
-
-		for ( int Count = 1; Count <= NumItems; ++Count ) {
-			if ( equali( String, ListOfItems( Count ) ) ) return Count;
-		}
-		return 0; // Not found
-	}
-
-	int
-	InputProcessor::FindItem(
-		std::string const & String,
-		Array1S_string const ListOfItems,
-		int const NumItems
-	) {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   April 1999
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function looks up a string in a similar list of
-		// items and returns the index of the item in the list, if
-		// found.  This routine is case insensitive.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		int FindItem = FindItemInList( String, ListOfItems, NumItems );
-		if ( FindItem != 0 ) return FindItem;
-
-		for ( int Count = 1; Count <= NumItems; ++Count ) {
-			if ( equali( String, ListOfItems( Count ) ) ) return Count;
-		}
-		return 0; // Not found
-	}
-
-	std::string
-	InputProcessor::MakeUPPERCase( std::string const & InputString ) {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   September 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This function returns the Upper Case representation of the InputString.
-
-		// METHODOLOGY EMPLOYED:
-		// Uses the Intrinsic SCAN function to scan the lowercase representation of
-		// characters (DataStringGlobals) for each character in the given string.
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		std::string ResultString( InputString );
-
-		for ( std::string::size_type i = 0, e = len( InputString ); i < e; ++i ) {
-			int const curCharVal = int( InputString[ i ] );
-			if ( ( 97 <= curCharVal && curCharVal <= 122 ) ||
-				 ( 224 <= curCharVal && curCharVal <= 255 ) ) { // lowercase ASCII and accented characters
-				ResultString[ i ] = char( curCharVal - 32 );
-			}
-		}
-
-		return ResultString;
-
-	}
-
-	void
-	InputProcessor::VerifyName(
-		std::string const & NameToVerify,
-		Array1D_string const & NamesList,
-		int const NumOfNames,
-		bool & ErrorFound,
-		bool & IsBlank,
-		std::string const & StringToDisplay
-	) {
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   February 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine verifys that a new name can be added to the
-		// list of names for this item (i.e., that there isn't one of that
-		// name already and that this name is not blank).
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
-
-		ErrorFound = false;
-		if ( NumOfNames > 0 ) {
-			Found = FindItem( NameToVerify, NamesList, NumOfNames );
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
-		}
-
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( StringToDisplay + ", cannot be blank" );
-			ErrorFound = true;
-			IsBlank = true;
-		} else {
-			IsBlank = false;
-		}
-
-	}
-
-	void
-	InputProcessor::VerifyName(
-		std::string const & NameToVerify,
-		Array1S_string const NamesList,
-		int const NumOfNames,
-		bool & ErrorFound,
-		bool & IsBlank,
-		std::string const & StringToDisplay
-	) {
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   February 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine verifys that a new name can be added to the
-		// list of names for this item (i.e., that there isn't one of that
-		// name already and that this name is not blank).
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
-
-		ErrorFound = false;
-		if ( NumOfNames > 0 ) {
-			Found = FindItem( NameToVerify, NamesList, NumOfNames );
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
-		}
-
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( StringToDisplay + ", cannot be blank" );
-			ErrorFound = true;
-			IsBlank = true;
-		} else {
-			IsBlank = false;
-		}
-
-	}
-
-	bool
-	EnergyPlus::InputProcessor::IsNameEmpty (
-		std::string & NameToVerify,
-		std::string const & StringToDisplay,
-		bool & ErrorFound
-	){
-		if ( NameToVerify.empty() ) {
-			ShowSevereError(StringToDisplay + " Name, cannot be blank");
-			ErrorFound = true;
-			NameToVerify = "xxxxx";
-			return true;
-		}
-		return false;
 	}
 
 	void
@@ -2038,7 +1691,7 @@ namespace EnergyPlus {
 		NumNumeric = 0;
 		json * object;
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
 			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				ShowSevereError(
 				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
@@ -2052,7 +1705,7 @@ namespace EnergyPlus {
 
 		json * objects;
 		if ( jdf.find( ObjectWord ) == jdf.end() ) {
-			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			auto tmp_umit = case_insensitive_object_map.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
 			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				ShowSevereError(
 				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
@@ -2475,7 +2128,7 @@ namespace EnergyPlus {
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					auto const report_name = MakeUPPERCase( extensions.at( "report_name" ) );
+					auto const report_name = UtilityRoutines::MakeUPPERCase( extensions.at( "report_name" ) );
 					if ( report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY" ) {
 						for ( int i = 1; i <= NumMonthlyReports; ++i ) {
 							InputProcessor::AddVariablesForMonthlyReport( MonthlyNamedReports( i ) );
@@ -2893,25 +2546,4 @@ namespace EnergyPlus {
 		DataOutputs::NumConsideredOutputVariables++;
 	}
 
-	std::string
-	InputProcessor::IPTrimSigDigits( int const IntegerValue ) {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   March 2002
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function accepts a number as parameter as well as the number of
-		// significant digits after the decimal point to report and returns a string
-		// that is appropriate.
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		std::string String; // Working string
-
-		gio::write( String, fmtLD ) << IntegerValue;
-		return stripped( String );
-
-	}
 }

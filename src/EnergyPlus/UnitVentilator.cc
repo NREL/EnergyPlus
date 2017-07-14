@@ -229,7 +229,7 @@ namespace UnitVentilator {
 
 		// Find the correct Unit Ventilator Equipment
 		if ( CompIndex == 0 ) {
-			UnitVentNum = InputProcessor::FindItemInList( CompName, UnitVent );
+			UnitVentNum = UtilityRoutines::FindItemInList( CompName, UnitVent );
 			if ( UnitVentNum == 0 ) {
 				ShowFatalError( "SimUnitVentilator: Unit not found=" + CompName );
 			}
@@ -373,7 +373,7 @@ namespace UnitVentilator {
 			UnitVentNumericFields( UnitVentNum ).FieldNames.allocate (NumNumbers );
 			UnitVentNumericFields( UnitVentNum ).FieldNames = "";
 			UnitVentNumericFields( UnitVentNum ).FieldNames = cNumericFields;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitVent( UnitVentNum ).Name = Alphas( 1 );
 			UnitVent( UnitVentNum ).SchedName = Alphas( 2 );
@@ -478,7 +478,7 @@ namespace UnitVentilator {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( ! InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( ! UtilityRoutines::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
 					GetFanType( UnitVent( UnitVentNum ).FanName, UnitVent( UnitVentNum ).FanType_Num, errFlag, CurrentModuleObject, UnitVent( UnitVentNum ).Name );
 
 					{ auto const SELECT_CASE_var( UnitVent( UnitVentNum ).FanType_Num );
@@ -521,7 +521,7 @@ namespace UnitVentilator {
 						ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume." );
 						ErrorsFound = true;
 					}}
-				} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+				} else if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
 					UnitVent( UnitVentNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitVent( UnitVentNum ).FanName ) ); // call constructor
 					UnitVent( UnitVentNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitVent( UnitVentNum ).FanName ); //zero-based
@@ -600,7 +600,7 @@ namespace UnitVentilator {
 
 			UnitVent( UnitVentNum ).HVACSizingIndex = 0;
 			if (!lAlphaBlanks( 20 )) {
-				UnitVent( UnitVentNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
+				UnitVent( UnitVentNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (UnitVent( UnitVentNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found.");
 					ShowContinueError( "Occurs in " + cMO_UnitVentilator + " = " + UnitVent(UnitVentNum).Name );
@@ -774,9 +774,9 @@ namespace UnitVentilator {
 					} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 						UnitVent( UnitVentNum ).CCoilType = Cooling_CoilHXAssisted;
 						GetHXCoilTypeAndName( cCoolingCoilType, Alphas( 18 ), ErrorsFound, UnitVent( UnitVentNum ).CCoilPlantType, UnitVent( UnitVentNum ).CCoilPlantName );
-						if ( InputProcessor::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
+						if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 							UnitVent( UnitVentNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-						} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+						} else if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 							UnitVent( UnitVentNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\", invalid" );

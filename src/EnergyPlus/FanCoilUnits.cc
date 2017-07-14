@@ -255,7 +255,7 @@ namespace FanCoilUnits {
 
 		// Find the correct Fan Coil Equipment
 		if ( CompIndex == 0 ) {
-			FanCoilNum = InputProcessor::FindItemInList( CompName, FanCoil );
+			FanCoilNum = UtilityRoutines::FindItemInList( CompName, FanCoil );
 			if ( FanCoilNum == 0 ) {
 				ShowFatalError( "SimFanCoil: Unit not found=" + CompName );
 			}
@@ -403,7 +403,7 @@ namespace FanCoilUnits {
 			FanCoilNumericFields( FanCoilNum ).FieldNames = "";
 			FanCoilNumericFields( FanCoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			FanCoil( FanCoilNum ).Name = Alphas( 1 );
 			FanCoil( FanCoilNum ).UnitType = CurrentModuleObject;
 			FanCoil( FanCoilNum ).UnitType_Num = FanCoilUnit_4Pipe;
@@ -419,14 +419,14 @@ namespace FanCoilUnits {
 				}
 			}
 
-			if ( InputProcessor::SameString( Alphas( 3 ), "ConstantFanVariableFlow" ) || InputProcessor::SameString( Alphas( 3 ), "CyclingFan" ) || InputProcessor::SameString( Alphas( 3 ), "VariableFanVariableFlow" ) || InputProcessor::SameString( Alphas( 3 ), "VariableFanConstantFlow" ) || InputProcessor::SameString( Alphas( 3 ), "MultiSpeedFan" ) || InputProcessor::SameString( Alphas( 3 ), "ASHRAE90VariableFan" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 3 ), "ConstantFanVariableFlow" ) || UtilityRoutines::SameString( Alphas( 3 ), "CyclingFan" ) || UtilityRoutines::SameString( Alphas( 3 ), "VariableFanVariableFlow" ) || UtilityRoutines::SameString( Alphas( 3 ), "VariableFanConstantFlow" ) || UtilityRoutines::SameString( Alphas( 3 ), "MultiSpeedFan" ) || UtilityRoutines::SameString( Alphas( 3 ), "ASHRAE90VariableFan" ) ) {
 				FanCoil( FanCoilNum ).CapCtrlMeth = Alphas( 3 );
-				if ( InputProcessor::SameString( Alphas( 3 ), "ConstantFanVariableFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_ConsFanVarFlow;
-				if ( InputProcessor::SameString( Alphas( 3 ), "CyclingFan" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_CycFan;
-				if ( InputProcessor::SameString( Alphas( 3 ), "VariableFanVariableFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_VarFanVarFlow;
-				if ( InputProcessor::SameString( Alphas( 3 ), "VariableFanConstantFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_VarFanConsFlow;
-				if ( InputProcessor::SameString( Alphas( 3 ), "MultiSpeedFan" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_MultiSpeedFan;
-				if ( InputProcessor::SameString( Alphas( 3 ), "ASHRAE90VariableFan" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 3 ), "ConstantFanVariableFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_ConsFanVarFlow;
+				if ( UtilityRoutines::SameString( Alphas( 3 ), "CyclingFan" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_CycFan;
+				if ( UtilityRoutines::SameString( Alphas( 3 ), "VariableFanVariableFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_VarFanVarFlow;
+				if ( UtilityRoutines::SameString( Alphas( 3 ), "VariableFanConstantFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_VarFanConsFlow;
+				if ( UtilityRoutines::SameString( Alphas( 3 ), "MultiSpeedFan" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_MultiSpeedFan;
+				if ( UtilityRoutines::SameString( Alphas( 3 ), "ASHRAE90VariableFan" ) ) {
 					FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_ASHRAE;
 					FanCoil( FanCoilNum ).DesZoneCoolingLoad = AutoSize;
 					FanCoil( FanCoilNum ).DesZoneHeatingLoad = AutoSize;
@@ -498,24 +498,24 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).MinHotWaterVolFlow = Numbers( 9 );
 			FanCoil( FanCoilNum ).HotControlOffset = Numbers( 10 );
 
-			if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:Water" ) || InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:Water:DetailedGeometry" ) || InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:Water" ) || UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:Water:DetailedGeometry" ) || UtilityRoutines::SameString( Alphas( 11 ), "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 				FanCoil( FanCoilNum ).CCoilType = Alphas( 11 );
-				if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:Water" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:Water" ) ) {
 					FanCoil( FanCoilNum ).CCoilType_Num = CCoil_Water;
 					FanCoil( FanCoilNum ).CCoilPlantName = FanCoil( FanCoilNum ).CCoilName;
 					FanCoil( FanCoilNum ).CCoilPlantTypeOfNum = TypeOf_CoilWaterCooling;
 				}
-				if ( InputProcessor::SameString( Alphas( 11 ), "Coil:Cooling:Water:DetailedGeometry" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:Water:DetailedGeometry" ) ) {
 					FanCoil( FanCoilNum ).CCoilType_Num = CCoil_Detailed;
 					FanCoil( FanCoilNum ).CCoilPlantName = FanCoil( FanCoilNum ).CCoilName;
 					FanCoil( FanCoilNum ).CCoilPlantTypeOfNum = TypeOf_CoilWaterDetailedFlatCooling;
 				}
-				if ( InputProcessor::SameString( Alphas( 11 ), "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 11 ), "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 					FanCoil( FanCoilNum ).CCoilType_Num = CCoil_HXAssist;
 					GetHXCoilTypeAndName( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, ErrorsFound, FanCoil( FanCoilNum ).CCoilPlantType, FanCoil( FanCoilNum ).CCoilPlantName );
-					if ( InputProcessor::SameString( FanCoil( FanCoilNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
+					if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 						FanCoil( FanCoilNum ).CCoilPlantTypeOfNum = TypeOf_CoilWaterCooling;
-					} else if ( InputProcessor::SameString( FanCoil( FanCoilNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+					} else if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 						FanCoil( FanCoilNum ).CCoilPlantTypeOfNum = TypeOf_CoilWaterDetailedFlatCooling;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\", invalid" );
@@ -549,7 +549,7 @@ namespace FanCoilUnits {
 				ErrorsFound = true;
 			}
 
-			if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Water" ) ) {
 				FanCoil( FanCoilNum ).HCoilType_Num = HCoil_Water;
 				FanCoil( FanCoilNum ).HCoilPlantTypeOfNum = TypeOf_CoilWaterSimpleHeating;
 				IsNotOK = false;
@@ -565,7 +565,7 @@ namespace FanCoilUnits {
 						ErrorsFound = true;
 					}
 				}
-			} else if ( InputProcessor::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 				FanCoil( FanCoilNum ).HCoilType_Num = HCoil_Electric;
 				IsNotOK = false;
 				ValidateComponent( FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, IsNotOK, CurrentModuleObject );
@@ -594,7 +594,7 @@ namespace FanCoilUnits {
 
 			FanCoil( FanCoilNum ).HVACSizingIndex = 0;
 			if ( !lAlphaBlanks( 16 ) ) {
-				FanCoil( FanCoilNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 16 ), ZoneHVACSizing );
+				FanCoil( FanCoilNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 16 ), ZoneHVACSizing );
 				if ( FanCoil( FanCoilNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFields( 16 ) + " = " + Alphas( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + cMO_FanCoil + " = " + FanCoil( FanCoilNum ).Name );
@@ -608,7 +608,7 @@ namespace FanCoilUnits {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( ! InputProcessor::SameString( FanCoil( FanCoilNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( ! UtilityRoutines::SameString( FanCoil( FanCoilNum ).FanType, "Fan:SystemModel" ) ) {
 					GetFanType( FanCoil( FanCoilNum ).FanName, FanCoil( FanCoilNum ).FanType_Num, errFlag, CurrentModuleObject, FanCoil( FanCoilNum ).Name );
 					{ auto const SELECT_CASE_var( FanCoil( FanCoilNum ).FanType_Num );
 					if ( ( SELECT_CASE_var == FanType_SimpleConstVolume ) || ( SELECT_CASE_var == FanType_SimpleVAV ) || ( SELECT_CASE_var == FanType_SimpleOnOff ) ) {
@@ -640,7 +640,7 @@ namespace FanCoilUnits {
 						ShowContinueError( "Fan Type must be Fan:OnOff, Fan:ConstantVolume or Fan:VariableVolume." );
 						ErrorsFound = true;
 					}}
-				} else if ( InputProcessor::SameString( FanCoil( FanCoilNum ).FanType, "Fan:SystemModel" ) ) {
+				} else if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).FanType, "Fan:SystemModel" ) ) {
 					FanCoil( FanCoilNum ).FanType_Num   = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( FanCoil( FanCoilNum ).FanName ) ); // call constructor
 					FanCoil( FanCoilNum ).FanIndex      = HVACFan::getFanObjectVectorIndex( FanCoil( FanCoilNum ).FanName ); //zero-based
@@ -1346,7 +1346,7 @@ namespace FanCoilUnits {
 
 				//     If fan is autosized, get fan volumetric flow rate
 				if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
-					if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+					if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 						Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 						FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 					} else {
@@ -1383,7 +1383,7 @@ namespace FanCoilUnits {
 				}
 			}
 		} else if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
-			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 				FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 			} else {
@@ -1584,7 +1584,7 @@ namespace FanCoilUnits {
 					ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", FanCoil( FanCoilNum ).MaxColdWaterVolFlow );
 				}
 			} else {
-				if ( InputProcessor::SameString( FanCoil( FanCoilNum ).CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+				if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 					CoolingCoilName = GetHXDXCoilName( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, ErrorsFound );
 					CoolingCoilType = GetHXCoilType( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, ErrorsFound );
 				} else {
@@ -1756,7 +1756,7 @@ namespace FanCoilUnits {
 		} // if ( CurZoneEqNum > 0 )
 
 		// set the design air flow rates for the heating and cooling coils
-		if ( InputProcessor::SameString( FanCoil( FanCoilNum ).CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+		if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 			CoolingCoilName = GetHXDXCoilName( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, ErrorsFound );
 			CoolingCoilType = GetHXCoilType( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, ErrorsFound );
 		} else {
@@ -2202,7 +2202,7 @@ namespace FanCoilUnits {
 			} else {
 				FanCoil( FanCoilNum ).ElecPower = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 			}
-			
+
 			PowerMet = QUnitOut;
 			LatOutputProvided = LatentOutput;
 
@@ -4141,7 +4141,7 @@ namespace FanCoilUnits {
 						if ( Iter > 70 && SRatio == 0.0 && DelPLR < 0.0 ) Error = 0.0;
 					}
 				}
-				//FanElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio ); // why set the ugly global here? 
+				//FanElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio ); // why set the ugly global here?
 				FanCoil( FanCoilNum ).ElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio );
 			}
 		}
@@ -4500,7 +4500,7 @@ namespace FanCoilUnits {
 			GetFanCoilInputFlag = false;
 		}
 
-		FanCoilIndex = InputProcessor::FindItemInList( FanCoilName, FanCoil );
+		FanCoilIndex = UtilityRoutines::FindItemInList( FanCoilName, FanCoil );
 		if ( FanCoilIndex == 0 ) {
 			ShowSevereError( "GetFanCoilIndex: Fan Coil Unit not found=" + FanCoilName );
 		}

@@ -586,10 +586,10 @@ namespace WindowManager {
 			TotLay = Construct( ConstrNum ).TotLayers;
 
 			// First layer must be glass, shade, screen or blind to be a glazing construction
-			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass && 
-			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade && 
-			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen && 
-			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind && 
+			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind &&
 			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
 
 			ShadeLayNum = 0;
@@ -810,7 +810,7 @@ namespace WindowManager {
 							t( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).Y( ILam );
 							rff( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngFRefleDataPtr ).TableIndex ).Y( ILam );
 							rbb( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngBRefleDataPtr ).TableIndex ).Y( ILam );
-						}						
+						}
 						SolarSprectrumAverage( t, tmpTrans );
 						SolarSprectrumAverage( rff, tmpReflectSolBeamFront );
 						SolarSprectrumAverage( rbb, tmpReflectSolBeamBack );
@@ -7891,11 +7891,11 @@ namespace WindowManager {
 					//     Material(MaterNum)%Trans = (1 - MaterialProps(7)/MaterialProps(6))**2.0
 					SurfaceScreens( ScreenNum ).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt( Material( MatNum ).Trans );
 
-					if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
+					if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = DoNotModel;
-					} else if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
+					} else if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDirectBeam;
-					} else if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
+					} else if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDiffuse;
 					}
 
@@ -9017,7 +9017,7 @@ Label99999: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 			// use default spectrum data, done!
-			if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Default" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "Default" ) ) {
 				RunMeOnceFlag = true;
 				return;
 			}
@@ -9045,7 +9045,7 @@ Label99999: ;
 			for ( Loop = 1; Loop <= NumSiteSpectrum; ++Loop ) {
 				// Step 2 - read user-defined spectrum data
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
-				if ( InputProcessor::SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
 					iSolarSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * nume ) {
@@ -9064,7 +9064,7 @@ Label99999: ;
 						}
 					}
 				}
-				if ( InputProcessor::SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
 					iVisibleSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * numt3 ) {

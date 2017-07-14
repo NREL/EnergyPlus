@@ -370,7 +370,7 @@ namespace MundtSimMgr {
 
 						AirNodeFoundFlag = false;
 						for ( AirNodeNum = AirNodeBeginNum; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum ) {
-							if ( InputProcessor::SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
+							if ( UtilityRoutines::SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
 								LineNode( NodeNum, MundtZoneIndex ).ClassType = AirNode( AirNodeNum ).ClassType;
 								LineNode( NodeNum, MundtZoneIndex ).AirNodeName = AirNode( AirNodeNum ).Name;
 								LineNode( NodeNum, MundtZoneIndex ).Height = AirNode( AirNodeNum ).Height;

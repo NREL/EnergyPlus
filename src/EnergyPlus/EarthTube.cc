@@ -232,7 +232,7 @@ namespace EarthTube {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// First Alpha is Zone Name
-			EarthTubeSys( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Zone );
+			EarthTubeSys( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( EarthTubeSys( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + " not found=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
@@ -391,7 +391,7 @@ namespace EarthTube {
 
 	}
 
-	
+
 	void
 	CheckEarthTubesInZones
 	(
@@ -403,7 +403,7 @@ namespace EarthTube {
 
 		int Loop;
 		int Loop1;
-		
+
 		// Check to make sure there is only one earth tube statement per zone
 		for ( Loop = 1; Loop <= TotEarthTube - 1; ++Loop ) {
 			for ( Loop1 = Loop + 1; Loop1 <= TotEarthTube; ++Loop1 ) {
@@ -416,9 +416,9 @@ namespace EarthTube {
 			}
 		}
 
-		
+
 	}
-	
+
 	void
 	CalcEarthTube()
 	{

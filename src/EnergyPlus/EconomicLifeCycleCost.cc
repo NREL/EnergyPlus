@@ -412,11 +412,11 @@ namespace EconomicLifeCycleCost {
 			//      \key MidYear
 			//      \key BeginningOfYear
 			//      \default EndOfYear
-			if ( InputProcessor::SameString( AlphaArray( 2 ), "EndOfYear" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 2 ), "EndOfYear" ) ) {
 				discountConvension = disConvEndOfYear;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "MidYear" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "MidYear" ) ) {
 				discountConvension = disConvMidYear;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "BeginningOfYear" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "BeginningOfYear" ) ) {
 				discountConvension = disConvBeginOfYear;
 			} else {
 				discountConvension = disConvEndOfYear;
@@ -427,9 +427,9 @@ namespace EconomicLifeCycleCost {
 			//      \key ConstantDollar
 			//      \key CurrentDollar
 			//      \default ConstantDollar
-			if ( InputProcessor::SameString( AlphaArray( 3 ), "ConstantDollar" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 3 ), "ConstantDollar" ) ) {
 				inflationApproach = inflAppConstantDollar;
-			} else if ( InputProcessor::SameString( AlphaArray( 3 ), "CurrentDollar" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 3 ), "CurrentDollar" ) ) {
 				inflationApproach = inflAppCurrentDollar;
 			} else {
 				inflationApproach = inflAppConstantDollar;
@@ -549,27 +549,27 @@ namespace EconomicLifeCycleCost {
 			//      \key StraightLine-40year
 			//      \key None
 			//      \default None
-			if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-3year" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-3year" ) ) {
 				depreciationMethod = depMethMACRS3;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-5year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-5year" ) ) {
 				depreciationMethod = depMethMACRS5;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-7year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-7year" ) ) {
 				depreciationMethod = depMethMACRS7;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-10year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-10year" ) ) {
 				depreciationMethod = depMethMACRS10;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-15year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-15year" ) ) {
 				depreciationMethod = depMethMACRS15;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-20year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-20year" ) ) {
 				depreciationMethod = depMethMACRS20;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "StraightLine-27year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "StraightLine-27year" ) ) {
 				depreciationMethod = depMethStraight27;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "StraightLine-31year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "StraightLine-31year" ) ) {
 				depreciationMethod = depMethStraight31;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "StraightLine-39year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "StraightLine-39year" ) ) {
 				depreciationMethod = depMethStraight39;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "StraightLine-40year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "StraightLine-40year" ) ) {
 				depreciationMethod = depMethStraight40;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "None" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "None" ) ) {
 				depreciationMethod = depMethNone;
 			} else if ( lAlphaFieldBlanks( 6 ) ) {
 				depreciationMethod = depMethNone;
@@ -659,19 +659,19 @@ namespace EconomicLifeCycleCost {
 			//        \key MajorOverhaul
 			//        \key OtherOperational
 			//        \default Maintenance
-			if ( InputProcessor::SameString( AlphaArray( 2 ), "Maintenance" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Maintenance" ) ) {
 				RecurringCosts( iInObj ).category = costCatMaintenance;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "Repair" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Repair" ) ) {
 				RecurringCosts( iInObj ).category = costCatRepair;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "Operation" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Operation" ) ) {
 				RecurringCosts( iInObj ).category = costCatOperation;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "Replacement" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Replacement" ) ) {
 				RecurringCosts( iInObj ).category = costCatReplacement;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "MinorOverhaul" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "MinorOverhaul" ) ) {
 				RecurringCosts( iInObj ).category = costCatMinorOverhaul;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "MajorOverhaul" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "MajorOverhaul" ) ) {
 				RecurringCosts( iInObj ).category = costCatMajorOverhaul;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "OtherOperational" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "OtherOperational" ) ) {
 				RecurringCosts( iInObj ).category = costCatOtherOperational;
 			} else {
 				RecurringCosts( iInObj ).category = costCatMaintenance;
@@ -685,9 +685,9 @@ namespace EconomicLifeCycleCost {
 			//        \key ServicePeriod
 			//        \key BasePeriod
 			//        \default ServicePeriod
-			if ( InputProcessor::SameString( AlphaArray( 3 ), "ServicePeriod" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 3 ), "ServicePeriod" ) ) {
 				RecurringCosts( iInObj ).startOfCosts = startServicePeriod;
-			} else if ( InputProcessor::SameString( AlphaArray( 3 ), "BasePeriod" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 3 ), "BasePeriod" ) ) {
 				RecurringCosts( iInObj ).startOfCosts = startBasePeriod;
 			} else {
 				RecurringCosts( iInObj ).startOfCosts = startServicePeriod;
@@ -828,11 +828,11 @@ namespace EconomicLifeCycleCost {
 			//      \key Salvage
 			//      \key OtherCapital
 			//      \default Construction
-			if ( InputProcessor::SameString( AlphaArray( 2 ), "Construction" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Construction" ) ) {
 				NonrecurringCost( iInObj ).category = costCatConstruction;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "Salvage" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Salvage" ) ) {
 				NonrecurringCost( iInObj ).category = costCatSalvage;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "OtherCapital" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "OtherCapital" ) ) {
 				NonrecurringCost( iInObj ).category = costCatOtherCapital;
 			} else {
 				NonrecurringCost( iInObj ).category = costCatConstruction;
@@ -846,9 +846,9 @@ namespace EconomicLifeCycleCost {
 			//      \key ServicePeriod
 			//      \key BasePeriod
 			//      \default ServicePeriod
-			if ( InputProcessor::SameString( AlphaArray( 3 ), "ServicePeriod" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 3 ), "ServicePeriod" ) ) {
 				NonrecurringCost( iInObj ).startOfCosts = startServicePeriod;
-			} else if ( InputProcessor::SameString( AlphaArray( 3 ), "BasePeriod" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 3 ), "BasePeriod" ) ) {
 				NonrecurringCost( iInObj ).startOfCosts = startBasePeriod;
 			} else {
 				NonrecurringCost( iInObj ).startOfCosts = startServicePeriod;
@@ -1165,29 +1165,29 @@ namespace EconomicLifeCycleCost {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		if ( InputProcessor::SameString( inMonthString, "January" ) ) {
+		if ( UtilityRoutines::SameString( inMonthString, "January" ) ) {
 			MonthToMonthNumber = 1;
-		} else if ( InputProcessor::SameString( inMonthString, "February" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "February" ) ) {
 			MonthToMonthNumber = 2;
-		} else if ( InputProcessor::SameString( inMonthString, "March" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "March" ) ) {
 			MonthToMonthNumber = 3;
-		} else if ( InputProcessor::SameString( inMonthString, "April" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "April" ) ) {
 			MonthToMonthNumber = 4;
-		} else if ( InputProcessor::SameString( inMonthString, "May" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "May" ) ) {
 			MonthToMonthNumber = 5;
-		} else if ( InputProcessor::SameString( inMonthString, "June" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "June" ) ) {
 			MonthToMonthNumber = 6;
-		} else if ( InputProcessor::SameString( inMonthString, "July" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "July" ) ) {
 			MonthToMonthNumber = 7;
-		} else if ( InputProcessor::SameString( inMonthString, "August" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "August" ) ) {
 			MonthToMonthNumber = 8;
-		} else if ( InputProcessor::SameString( inMonthString, "September" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "September" ) ) {
 			MonthToMonthNumber = 9;
-		} else if ( InputProcessor::SameString( inMonthString, "October" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "October" ) ) {
 			MonthToMonthNumber = 10;
-		} else if ( InputProcessor::SameString( inMonthString, "November" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "November" ) ) {
 			MonthToMonthNumber = 11;
-		} else if ( InputProcessor::SameString( inMonthString, "December" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "December" ) ) {
 			MonthToMonthNumber = 12;
 		} else {
 			MonthToMonthNumber = inDefaultMonth;

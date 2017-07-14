@@ -211,7 +211,7 @@ namespace EnergyPlus {
 		GetAirflowNetworkInput();
 
 		//MultizoneZoneData has only 1 element so may be hardcoded
-		auto GetIndex = InputProcessor::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
+		auto GetIndex = UtilityRoutines::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
 		EXPECT_EQ( GetIndex, MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate();
@@ -2247,11 +2247,11 @@ namespace EnergyPlus {
 
 		Real64 PresssureSet = 0.5;
 
-		Schedule( InputProcessor::FindItemInList( "PRESSURE SETPOINT SCHEDULE", Schedule( {1,NumSchedules} )) ).CurrentValue = PresssureSet; // Pressure setpoint
-		Schedule( InputProcessor::FindItemInList( "FANANDCOILAVAILSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // set availability and fan schedule to 1
-		Schedule( InputProcessor::FindItemInList( "ON", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // On
-		Schedule( InputProcessor::FindItemInList( "VENTINGSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 25.55; // VentingSched
-		Schedule( InputProcessor::FindItemInList( "WINDOWVENTSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // WindowVentSched
+		Schedule( UtilityRoutines::FindItemInList( "PRESSURE SETPOINT SCHEDULE", Schedule( {1,NumSchedules} )) ).CurrentValue = PresssureSet; // Pressure setpoint
+		Schedule( UtilityRoutines::FindItemInList( "FANANDCOILAVAILSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // set availability and fan schedule to 1
+		Schedule( UtilityRoutines::FindItemInList( "ON", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // On
+		Schedule( UtilityRoutines::FindItemInList( "VENTINGSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 25.55; // VentingSched
+		Schedule( UtilityRoutines::FindItemInList( "WINDOWVENTSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // WindowVentSched
 
 		AirflowNetworkFanActivated = true;
 		DataEnvironment::OutDryBulbTemp = -17.29025;
@@ -2260,7 +2260,7 @@ namespace EnergyPlus {
 		DataEnvironment::WindSpeed = 4.9;
 		DataEnvironment::WindDir = 270.0;
 
-		int index = InputProcessor::FindItemInList("OA INLET NODE", AirflowNetworkNodeData);
+		int index = UtilityRoutines::FindItemInList("OA INLET NODE", AirflowNetworkNodeData);
 		for ( i = 1; i <= 36; ++i ) {
 			AirflowNetworkNodeSimu( i ).TZ = 23.0;
 			AirflowNetworkNodeSimu( i ).WZ = 0.0008400;
@@ -2424,7 +2424,7 @@ namespace EnergyPlus {
 
 		//changed index 2 to 1 because in new sorted scheedule MultizoneZone(1).VentingSchName ("FREERUNNINGSEASON")
 		// has index 1 which is the .VentSchNum
-		auto GetIndex = InputProcessor::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
+		auto GetIndex = UtilityRoutines::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
 		EXPECT_EQ( GetIndex , MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate( );

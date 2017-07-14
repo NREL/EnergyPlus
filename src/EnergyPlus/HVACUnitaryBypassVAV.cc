@@ -265,7 +265,7 @@ namespace HVACUnitaryBypassVAV {
 
 		// Find the correct changeover-bypass VAV unit
 		if ( CompIndex == 0 ) {
-			CBVAVNum = InputProcessor::FindItemInList( CompName, CBVAV );
+			CBVAVNum = UtilityRoutines::FindItemInList( CompName, CBVAV );
 			if ( CBVAVNum == 0 ) {
 				ShowFatalError( "SimUnitaryBypassVAV: Unit not found=" + CompName );
 			}
@@ -552,7 +552,7 @@ namespace HVACUnitaryBypassVAV {
 			HeatCoilOutletNodeNum = 0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, CBVAVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			CBVAVNum = CBVAVIndex;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			CBVAV( CBVAVNum ).Name = Alphas( 1 );
 			CBVAV( CBVAVNum ).UnitType = CurrentModuleObject;
@@ -697,7 +697,7 @@ namespace HVACUnitaryBypassVAV {
 				ErrorsFound = true;
 				CBVAV( CBVAVNum ).FanVolFlow = 9999.0;
 			} else {
-				if ( InputProcessor::SameString(  CBVAV( CBVAVNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( UtilityRoutines::SameString(  CBVAV( CBVAVNum ).FanType, "Fan:SystemModel" ) ) {
 					CBVAV( CBVAVNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( CBVAV( CBVAVNum ).FanName ) ); // call constructor
 					CBVAV( CBVAVNum ).FanIndex = HVACFan::getFanObjectVectorIndex( CBVAV( CBVAVNum ).FanName );
@@ -714,9 +714,9 @@ namespace HVACUnitaryBypassVAV {
 			}
 
 
-			if ( InputProcessor::SameString( Alphas( 12 ), "BlowThrough" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 12 ), "BlowThrough" ) ) {
 				CBVAV( CBVAVNum ).FanPlace = BlowThru;
-			} else if ( InputProcessor::SameString( Alphas( 12 ), "DrawThrough" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 12 ), "DrawThrough" ) ) {
 				CBVAV( CBVAVNum ).FanPlace = DrawThru;
 			} else {
 				ShowSevereError( CurrentModuleObject + " illegal " + cAlphaFields( 12 ) + " = " + Alphas( 12 ) );
@@ -764,12 +764,12 @@ namespace HVACUnitaryBypassVAV {
 				CBVAV( CBVAVNum ).HeatOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 			}
 
-			if ( InputProcessor::SameString( Alphas( 14 ), "Coil:Cooling:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 14 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || InputProcessor::SameString( Alphas( 14 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) || InputProcessor::SameString( Alphas( 14 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 14 ), "Coil:Cooling:DX:SingleSpeed" ) || UtilityRoutines::SameString( Alphas( 14 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || UtilityRoutines::SameString( Alphas( 14 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) || UtilityRoutines::SameString( Alphas( 14 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 
 				CBVAV( CBVAVNum ).DXCoolCoilType = Alphas( 14 );
 				CBVAV( CBVAVNum ).DXCoolCoilName = Alphas( 15 );
 
-				if ( InputProcessor::SameString( Alphas( 14 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 14 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 					CBVAV( CBVAVNum ).DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
 					CBVAV( CBVAVNum ).DXCoilInletNode = GetDXCoilInletNode( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXErrorsFound );
 					CBVAV( CBVAVNum ).DXCoilOutletNode = GetDXCoilOutletNode( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXErrorsFound );
@@ -788,7 +788,7 @@ namespace HVACUnitaryBypassVAV {
 						CBVAV( CBVAVNum ).CondenserNodeNum = GetDXCoilCondenserInletNode( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, OANodeErrFlag );
 						if ( OANodeErrFlag ) ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 					}
-				} else if ( InputProcessor::SameString( Alphas( 14 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 14 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 					CBVAV( CBVAVNum ).DXCoolCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
 					CBVAV( CBVAVNum ).DXCoilInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXErrorsFound );
 					CBVAV( CBVAVNum ).DXCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXErrorsFound );
@@ -806,7 +806,7 @@ namespace HVACUnitaryBypassVAV {
 
 					}
 
-				} else if ( InputProcessor::SameString( Alphas( 14 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 14 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					CBVAV( CBVAVNum ).DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
 					HXDXCoolCoilName = GetHXDXCoilName( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXErrorsFound );
 					CBVAV( CBVAVNum ).DXCoilInletNode = GetHXDXCoilInletNode( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXErrorsFound );
@@ -834,7 +834,7 @@ namespace HVACUnitaryBypassVAV {
 							if ( OANodeErrFlag ) ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 						}
 					}
-				} else if ( InputProcessor::SameString( Alphas( 14 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 14 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
 					CBVAV( CBVAVNum ).DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
 					CBVAV( CBVAVNum ).DXCoilInletNode = GetDXCoilInletNode( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXErrorsFound );
 					CBVAV( CBVAVNum ).DXCoilOutletNode = GetDXCoilOutletNode( CBVAV( CBVAVNum ).DXCoolCoilType, CBVAV( CBVAVNum ).DXCoolCoilName, DXErrorsFound );
@@ -914,11 +914,11 @@ namespace HVACUnitaryBypassVAV {
 				CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 			}
 
-			if ( InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) || InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:DX:VariableSpeed" ) || InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:Fuel" ) || InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:Electric" ) || InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:Water" ) || InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:Steam" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) || UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:DX:VariableSpeed" ) || UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:Fuel" ) || UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:Electric" ) || UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:Water" ) || UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:Steam" ) ) {
 				CBVAV( CBVAVNum ).HeatCoilType = Alphas( 16 );
 				CBVAV( CBVAVNum ).HeatCoilName = Alphas( 17 );
 
-				if ( InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) ) {
 					CBVAV( CBVAVNum ).HeatCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
 					DXCoilErrFlag = false;
 					CBVAV( CBVAVNum ).MinOATCompressor = GetMinOATDXCoilCompressor( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, DXCoilErrFlag );
@@ -927,7 +927,7 @@ namespace HVACUnitaryBypassVAV {
 					GetDXCoilIndex( CBVAV( CBVAVNum ).HeatCoilName, CBVAV( CBVAVNum ).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV( CBVAVNum ).HeatCoilType );
 					if ( DXCoilErrFlag ) ShowContinueError( "...occurs in " + CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
 
-				} else if ( InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:DX:VariableSpeed" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:DX:VariableSpeed" ) ) {
 					CBVAV( CBVAVNum ).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed;
 					DXCoilErrFlag = false;
 					CBVAV( CBVAVNum ).DXHeatCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, DXCoilErrFlag );
@@ -935,17 +935,17 @@ namespace HVACUnitaryBypassVAV {
 					CBVAV( CBVAVNum ).HeatingCoilInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, DXCoilErrFlag );
 						CBVAV( CBVAVNum ).HeatingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, DXCoilErrFlag );
 					if ( DXCoilErrFlag ) ShowContinueError( "...occurs in " + CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
-				} else if ( InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:Fuel" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:Fuel" ) ) {
 					CBVAV( CBVAVNum ).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
 					CBVAV( CBVAVNum ).MinOATCompressor = -999.9;
 					CBVAV( CBVAVNum ).HeatingCoilInletNode = GetCoilInletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
 					CBVAV( CBVAVNum ).HeatingCoilOutletNode = GetCoilOutletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
-				} else if ( InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:Electric" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:Electric" ) ) {
 					CBVAV( CBVAVNum ).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
 					CBVAV( CBVAVNum ).MinOATCompressor = -999.9;
 					CBVAV( CBVAVNum ).HeatingCoilInletNode = GetCoilInletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
 					CBVAV( CBVAVNum ).HeatingCoilOutletNode = GetCoilOutletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
-				} else if ( InputProcessor::SameString( Alphas( 16 ), "Coil:Heating:Water" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 16 ), "Coil:Heating:Water" ) ) {
 					CBVAV( CBVAVNum ).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
 					errFlag = false;
 					CBVAV( CBVAVNum ).CoilControlNode = GetCoilWaterInletNode( "Coil:Heating:Water", CBVAV( CBVAVNum ).HeatCoilName, errFlag );
@@ -958,7 +958,7 @@ namespace HVACUnitaryBypassVAV {
 						ShowContinueError( "...occurs in " + CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( 16 ), "COIL:HEATING:STEAM" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 16 ), "COIL:HEATING:STEAM" ) ) {
 					CBVAV( CBVAVNum ).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
 					errFlag = false;
 					CBVAV( CBVAVNum ).HeatCoilIndex = GetSteamCoilIndex( "COIL:HEATING:STEAM", CBVAV( CBVAVNum ).HeatCoilName, errFlag );
@@ -1013,11 +1013,11 @@ namespace HVACUnitaryBypassVAV {
 				}
 			}
 
-			if ( InputProcessor::SameString( Alphas( 18 ), "CoolingPriority" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 18 ), "CoolingPriority" ) ) {
 				CBVAV( CBVAVNum ).PriorityControl = CoolingPriority;
-			} else if ( InputProcessor::SameString( Alphas( 18 ), "HeatingPriority" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 18 ), "HeatingPriority" ) ) {
 				CBVAV( CBVAVNum ).PriorityControl = HeatingPriority;
-			} else if ( InputProcessor::SameString( Alphas( 18 ), "ZonePriority" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 18 ), "ZonePriority" ) ) {
 				CBVAV( CBVAVNum ).PriorityControl = ZonePriority;
 			} else {
 				ShowSevereError( CurrentModuleObject + " illegal " + cAlphaFields( 18 ) + " = " + Alphas( 18 ) );
@@ -1046,11 +1046,11 @@ namespace HVACUnitaryBypassVAV {
 			}
 
 			// Dehumidification control mode
-			if ( InputProcessor::SameString( Alphas( 19 ), "None" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 19 ), "None" ) ) {
 				CBVAV( CBVAVNum ).DehumidControlType = DehumidControl_None;
-			} else if ( InputProcessor::SameString( Alphas( 19 ), "" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 19 ), "" ) ) {
 				CBVAV( CBVAVNum ).DehumidControlType = DehumidControl_None;
-			} else if ( InputProcessor::SameString( Alphas( 19 ), "Multimode" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 19 ), "Multimode" ) ) {
 				if ( CBVAV( CBVAVNum ).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) {
 					CBVAV( CBVAVNum ).DehumidControlType = DehumidControl_Multimode;
 				} else {
@@ -1060,7 +1060,7 @@ namespace HVACUnitaryBypassVAV {
 					ShowContinueError( "Setting " + cAlphaFields( 19 ) + " to \"None\" and the simulation continues." );
 					CBVAV( CBVAVNum ).DehumidControlType = DehumidControl_None;
 				}
-			} else if ( InputProcessor::SameString( Alphas( 19 ), "CoolReheat" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 19 ), "CoolReheat" ) ) {
 				if ( CBVAV( CBVAVNum ).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) {
 					CBVAV( CBVAVNum ).DehumidControlType = DehumidControl_CoolReheat;
 				} else {
@@ -1088,13 +1088,13 @@ namespace HVACUnitaryBypassVAV {
 				ShowContinueError( " The fan object type must be Fan:SystemModel, Fan:OnOff or Fan:ConstantVolume." );
 				ErrorsFound = true;
 			} else if ( CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleOnOff || CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleConstVolume ) {
-				if ( CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleOnOff && ! InputProcessor::SameString( CBVAV( CBVAVNum ).FanType, "Fan:OnOff" ) ) {
+				if ( CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleOnOff && ! UtilityRoutines::SameString( CBVAV( CBVAVNum ).FanType, "Fan:OnOff" ) ) {
 					ShowWarningError( CurrentModuleObject + " has " + cAlphaFields( 10 ) + " = " + CBVAV( CBVAVNum ).FanType + " which is inconsistent with the fan object." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 					ShowContinueError( " The fan object (" + CBVAV( CBVAVNum ).FanName + ") is actually a valid fan type and the simulation continues." );
 					ShowContinueError( " Node connections errors may result due to the inconsistent fan type." );
 				}
-				if ( CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleConstVolume && ! InputProcessor::SameString( CBVAV( CBVAVNum ).FanType, "Fan:ConstantVolume" ) ) {
+				if ( CBVAV( CBVAVNum ).FanType_Num == FanType_SimpleConstVolume && ! UtilityRoutines::SameString( CBVAV( CBVAVNum ).FanType, "Fan:ConstantVolume" ) ) {
 					ShowWarningError( CurrentModuleObject + " has " + cAlphaFields( 10 ) + " = " + CBVAV( CBVAVNum ).FanType + " which is inconsistent with fan object." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 					ShowContinueError( " The fan object (" + CBVAV( CBVAVNum ).FanName + ") is actually a valid fan type and the simulation continues." );
@@ -1131,7 +1131,7 @@ namespace HVACUnitaryBypassVAV {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
 					for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-						if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, CBVAV( CBVAVNum ).Name ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CBVAV( CBVAVNum ).UnitType ) ) continue;
+						if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, CBVAV( CBVAVNum ).Name ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CBVAV( CBVAVNum ).UnitType ) ) continue;
 						CBVAV( CBVAVNum ).AirLoopNumber = AirLoopNum;
 						//         Should EXIT here or do other checking?
 						break;

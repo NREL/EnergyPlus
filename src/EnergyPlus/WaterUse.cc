@@ -283,7 +283,7 @@ namespace WaterUse {
 		}
 
 		if ( CompIndex == 0 ) {
-			WaterConnNum = InputProcessor::FindItemInList( CompName, WaterConnections );
+			WaterConnNum = UtilityRoutines::FindItemInList( CompName, WaterConnections );
 			if ( WaterConnNum == 0 ) {
 				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + CompName );
 			}
@@ -402,7 +402,7 @@ namespace WaterUse {
 
 			for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, WaterEquipNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				WaterEquipment( WaterEquipNum ).Name = cAlphaArgs( 1 );
 
 				WaterEquipment( WaterEquipNum ).EndUseSubcatName = cAlphaArgs( 2 );
@@ -454,7 +454,7 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 6 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
-					WaterEquipment( WaterEquipNum ).Zone = InputProcessor::FindItemInList( cAlphaArgs( 7 ), Zone );
+					WaterEquipment( WaterEquipNum ).Zone = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), Zone );
 
 					if ( WaterEquipment( WaterEquipNum ).Zone == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
@@ -497,7 +497,7 @@ namespace WaterUse {
 
 			for ( WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, WaterConnNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				WaterConnections( WaterConnNum ).Name = cAlphaArgs( 1 );
 
 				if ( ( ! lAlphaFieldBlanks( 2 ) ) || ( ! lAlphaFieldBlanks( 3 ) ) ) {
@@ -577,7 +577,7 @@ namespace WaterUse {
 				WaterConnections( WaterConnNum ).WaterEquipment.allocate( NumAlphas - 9 );
 
 				for ( AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum ) {
-					WaterEquipNum = InputProcessor::FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment );
+					WaterEquipNum = UtilityRoutines::FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment );
 
 					if ( WaterEquipNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );
