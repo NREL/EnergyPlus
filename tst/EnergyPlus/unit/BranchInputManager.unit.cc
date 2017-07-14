@@ -52,7 +52,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 using namespace EnergyPlus;
 using namespace BranchInputManager;

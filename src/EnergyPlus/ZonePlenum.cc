@@ -63,7 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <PoweredInductionUnits.hh>
 #include <Psychrometrics.hh>

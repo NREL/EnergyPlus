@@ -78,7 +78,6 @@
 #include <FanCoilUnits.hh>
 #include <HVACStandAloneERV.hh>
 #include <HVACVariableRefrigerantFlow.hh>
-#include <InputProcessor.hh>
 #include <OutdoorAirUnit.hh>
 #include <OutputProcessor.hh>
 #include <PackagedTerminalHeatPump.hh>

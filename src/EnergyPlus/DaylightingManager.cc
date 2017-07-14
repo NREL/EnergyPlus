@@ -80,7 +80,7 @@
 #include <DElightManagerF.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>

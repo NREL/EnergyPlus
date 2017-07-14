@@ -56,7 +56,7 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteShallowGroundTemperatures.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 

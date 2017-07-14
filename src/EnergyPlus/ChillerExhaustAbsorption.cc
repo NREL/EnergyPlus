@@ -69,7 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MicroturbineElectricGenerator.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>

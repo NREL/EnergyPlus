@@ -48,15 +48,14 @@
 #define InputProcessor_hh_INCLUDED
 
 // C++ Headers
-#include <iosfwd>
-#include <type_traits>
-#include <memory>
+// #include <iosfwd>
+// #include <type_traits>
+// #include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <map>
-#include <fstream>
-
+// #include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.fwd.hh>
@@ -69,120 +68,15 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 
-using json = nlohmann::json;
-
 namespace EnergyPlus {
-class IdfParser {
-public:
-	friend class InputProcessorFixture;
-	friend class EnergyPlusFixture;
 
-	json decode( std::string const & idf, json const & schema );
-
-	json decode( std::string const & idf, json const & schema, bool & success );
-
-	std::string encode( json const & root, json const & schema );
-
-	enum class Token : size_t {
-		NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5, NUMBER = 6
-	};
-
-	json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema );
-
-	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
-								json const & obj_loc );
-
-	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
-
-	json parse_number( std::string const & idf, size_t & index, bool & success );
-
-	std::string parse_string( std::string const & idf, size_t & index, bool & success );
-
-	void eat_whitespace( std::string const & idf, size_t & index );
-
-	void eat_comment( std::string const & idf, size_t & index );
-
-	void print_out_line_error( std::string const & idf, bool obj_found );
-
-	void increment_both_index( size_t & index, size_t & line_index );
-
-	void decrement_both_index( size_t & index, size_t & line_index );
-
-	Token look_ahead( std::string const & idf, size_t index );
-
-	Token next_token( std::string const & idf, size_t & index );
-
-	inline std::string rtrim( std::string & s ) {
-		if ( s.size() == 0 ) return std::string();
-		for ( size_t i = s.size() - 1; i > 0; i-- ) {
-			if ( s[ i ] != ' ' ) break;
-			s.erase( i );
-		}
-		return s;
-	}
-
-private:
-	size_t cur_line_num = 1;
-	size_t index_into_cur_line = 0;
-	size_t beginning_of_line_index = 0;
-	char s[ 129 ];
-};
-
-class State {
-public:
-	enum class ErrorType {
-		Maximum,
-		ExclusiveMaximum,
-		Minimum,
-		ExclusiveMinimum
-	};
-
-	friend class InputProcessorFixture;
-	friend class EnergyPlusFixture;
-
-	void initialize( json const * parsed_schema );
-
-	void traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index );
-
-	void validate( json & parsed, unsigned line_num, unsigned line_index );
-
-	void add_error( ErrorType err, double val, unsigned line_num, unsigned line_index );
-
-	int print_errors();
-
-	std::vector < std::string > const & validation_errors();
-
-	std::vector < std::string > const & validation_warnings();
-
-private:
-	json const * schema;
-	std::vector < json const * > stack;
-	std::unordered_map < std::string, bool > obj_required;
-	std::unordered_map < std::string, bool > extensible_required;
-	std::unordered_map < std::string, bool > root_required;
-	// this design decision was made because
-	// the choice was between sorting a vector for binary searching or log time object lookup in a map
-	std::string cur_obj_name = "";
-
-	unsigned prev_line_index = 0;
-	unsigned prev_key_len = 0;
-	unsigned cur_obj_count = 0;
-	bool is_in_extensibles = false;
-	bool does_key_exist = true;
-	bool need_new_object_name = true;
-	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
-	char s[ 129 ];
-	char s2[ 129 ];
-
-	std::vector < std::string > errors;
-	std::vector < std::string > warnings;
-};
-}
-
-namespace EnergyPlus {
+	class IdfParser;
+	class State;
 
 	class InputProcessor {
 	public:
+		using json = nlohmann::json;
+
 		friend class EnergyPlusFixture;
 		friend class InputProcessorFixture;
 		static State state;

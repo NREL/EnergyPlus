@@ -78,7 +78,7 @@
 #include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>

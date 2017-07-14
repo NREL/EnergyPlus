@@ -51,7 +51,7 @@
 #include <PhaseChangeModeling/HysteresisModel.hh>
 #include <DataIPShortCuts.hh>
 #include <UtilityRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 
 namespace EnergyPlus {
 

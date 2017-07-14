@@ -55,7 +55,7 @@
 #include <DataRoomAirModel.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 

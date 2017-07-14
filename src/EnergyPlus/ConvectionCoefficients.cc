@@ -72,7 +72,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>

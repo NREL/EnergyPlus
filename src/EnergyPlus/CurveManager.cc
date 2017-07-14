@@ -66,7 +66,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 

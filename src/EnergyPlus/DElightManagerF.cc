@@ -69,7 +69,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputReportPredefined.hh>
 #include <UtilityRoutines.hh>

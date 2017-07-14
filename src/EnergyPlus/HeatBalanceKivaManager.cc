@@ -70,7 +70,6 @@
 #include <DataZoneControls.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>

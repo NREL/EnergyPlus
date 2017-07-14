@@ -69,7 +69,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
 #include <ScheduleManager.hh>

@@ -55,7 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

@@ -67,7 +67,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/OutAirNodeManager.hh>

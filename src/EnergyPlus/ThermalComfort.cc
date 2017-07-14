@@ -69,7 +69,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>

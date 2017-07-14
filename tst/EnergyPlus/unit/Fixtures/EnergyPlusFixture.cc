@@ -143,7 +143,9 @@
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
@@ -215,6 +217,8 @@
 
 #include <fstream>
 #include <algorithm>
+
+using json = nlohmann::json;
 
 namespace EnergyPlus {
 

@@ -71,7 +71,7 @@
 #include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>

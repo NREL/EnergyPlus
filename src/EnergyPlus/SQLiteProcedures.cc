@@ -55,7 +55,7 @@
 #include "DataHeatBalance.hh"
 #include "DataPrecisionGlobals.hh"
 #include "DataRoomAirModel.hh"
-#include "InputProcessor.hh"
+#include "InputProcessing/InputProcessor.hh"
 #include "UtilityRoutines.hh"
 #include "General.hh"
 #include "ScheduleManager.hh"

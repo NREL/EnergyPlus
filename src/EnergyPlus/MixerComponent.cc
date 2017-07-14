@@ -55,7 +55,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>

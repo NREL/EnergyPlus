@@ -68,7 +68,6 @@
 #include <DataSurfaces.hh>
 #include <DataUCSDSharedData.hh>
 #include <DataZoneEquipment.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -809,8 +808,8 @@ namespace DisplacementVentMgr {
 				//HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) / CeilingHeight, 1.0 ); //Tuned This does not vary in loop
 				//EPTeam-replaces above (cause diffs)      HeightFrac = MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				AIRRATFloor( ZoneNum ) = Zone( ZoneNum ).Volume * min( HeightTransition( ZoneNum ), HeightFloorSubzoneTop ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATFloor( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATFloor( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
-				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
+				AIRRATFloor( ZoneNum ) = Zone( ZoneNum ).Volume * min( HeightTransition( ZoneNum ), HeightFloorSubzoneTop ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATFloor( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATFloor( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 
 				if ( UseZoneTimeStepHistory ) {

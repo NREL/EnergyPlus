@@ -74,7 +74,7 @@
 #include <FuelCellElectricGenerator.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MicroCHPElectricGenerator.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>

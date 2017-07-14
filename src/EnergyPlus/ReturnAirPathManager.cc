@@ -58,7 +58,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixerComponent.hh>
 #include <NodeInputManager.hh>
 #include <UtilityRoutines.hh>

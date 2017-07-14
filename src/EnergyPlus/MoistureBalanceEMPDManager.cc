@@ -64,7 +64,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>

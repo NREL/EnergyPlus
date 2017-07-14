@@ -70,7 +70,7 @@
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>

@@ -59,7 +59,7 @@
 #include <DataHVACGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <UtilityRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <DataIPShortCuts.hh>
 #include <ScheduleManager.hh>
 #include <CurveManager.hh>

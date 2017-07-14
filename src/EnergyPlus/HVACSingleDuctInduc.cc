@@ -68,7 +68,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixerComponent.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>

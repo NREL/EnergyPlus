@@ -67,7 +67,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>

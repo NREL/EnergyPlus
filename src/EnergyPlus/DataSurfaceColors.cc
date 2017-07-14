@@ -48,7 +48,7 @@
 #include <DataSurfaceColors.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {

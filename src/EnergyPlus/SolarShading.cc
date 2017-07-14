@@ -81,7 +81,7 @@
 #include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>

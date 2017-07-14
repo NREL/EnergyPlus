@@ -62,7 +62,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>

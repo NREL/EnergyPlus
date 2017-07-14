@@ -61,7 +61,7 @@
 #include <DataSurfaces.hh>
 #include <DXCoils.hh>
 #include <HeatingCoils.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <PlantChillers.hh>
 #include <UtilityRoutines.hh>
 

@@ -55,7 +55,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {

@@ -52,12 +52,15 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
 
 namespace EnergyPlus {
 
 	class InputProcessorFixture : public EnergyPlusFixture
 	{
 	protected:
+		using json = nlohmann::json;
+
 		static void SetUpTestCase() {
 			EnergyPlusFixture::SetUpTestCase();  // Sets up the base fixture
 		}

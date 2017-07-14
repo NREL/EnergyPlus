@@ -68,7 +68,7 @@
 #include <DataViewFactorInformation.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <WindowEquivalentLayer.hh>
 #include <Timer.h>

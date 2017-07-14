@@ -68,7 +68,6 @@
 #include <DataSurfaces.hh>
 #include <DataUCSDSharedData.hh>
 #include <DataZoneEquipment.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>

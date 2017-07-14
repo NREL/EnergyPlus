@@ -59,7 +59,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DisplayRoutines.hh>
 #include <EconomicTariff.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>

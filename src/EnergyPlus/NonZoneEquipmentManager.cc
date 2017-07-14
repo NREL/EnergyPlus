@@ -47,7 +47,7 @@
 // EnergyPlus Headers
 #include <NonZoneEquipmentManager.hh>
 #include <DataGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <WaterThermalTanks.hh>
 #include <WaterUse.hh>
 

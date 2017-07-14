@@ -70,7 +70,7 @@
 #include <General.hh>
 #include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PipeHeatTransfer.hh>

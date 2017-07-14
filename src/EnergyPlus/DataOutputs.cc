@@ -49,7 +49,6 @@
 
 // EnergyPlus Headers
 #include <DataOutputs.hh>
-#include <InputProcessor.hh>
 #include "UtilityRoutines.hh"
 
 namespace EnergyPlus {

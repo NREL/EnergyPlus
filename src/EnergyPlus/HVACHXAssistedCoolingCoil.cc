@@ -61,7 +61,7 @@
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <HeatRecovery.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>

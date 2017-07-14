@@ -330,8 +330,12 @@ SET( SRC
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
-  InputProcessor.cc
-  InputProcessor.hh
+  InputProcessing/InputProcessor.cc
+  InputProcessing/InputProcessor.hh
+  InputProcessing/IdfParser.cc
+  InputProcessing/IdfParser.hh
+  InputProcessing/InputValidation.cc
+  InputProcessing/InputValidation.hh
   IntegratedHeatPump.cc
   IntegratedHeatPump.hh
   InternalHeatGains.cc

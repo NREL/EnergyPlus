@@ -51,7 +51,6 @@
 #include <HeatBalanceInternalHeatGains.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {

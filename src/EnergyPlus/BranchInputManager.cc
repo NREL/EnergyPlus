@@ -65,7 +65,7 @@
 #include <DataSizing.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <UtilityRoutines.hh>
 

@@ -53,7 +53,6 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {

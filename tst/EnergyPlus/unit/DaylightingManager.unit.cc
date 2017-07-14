@@ -59,7 +59,7 @@
 #include <DaylightingManager.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>

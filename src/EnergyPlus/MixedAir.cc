@@ -87,7 +87,7 @@
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HVACUnitarySystem.hh>
 #include <Humidifiers.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>

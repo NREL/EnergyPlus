@@ -68,7 +68,7 @@
 #include <DataZoneControls.hh>
 #include <EMSManager.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <RuntimeLanguageProcessor.hh>

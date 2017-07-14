@@ -62,7 +62,7 @@
 #include <HVACDXSystem.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACUnitarySystem.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <PlantChillers.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>

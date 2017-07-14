@@ -65,7 +65,6 @@
 #include <DataZoneEquipment.hh>
 #include <DaylightingManager.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
 

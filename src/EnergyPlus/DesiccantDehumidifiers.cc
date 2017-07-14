@@ -74,7 +74,7 @@
 #include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>

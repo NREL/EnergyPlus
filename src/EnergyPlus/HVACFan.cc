@@ -49,7 +49,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <NodeInputManager.hh>
 #include <DataLoopNode.hh>

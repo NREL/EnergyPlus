@@ -70,7 +70,7 @@
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <HeatRecovery.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>

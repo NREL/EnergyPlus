@@ -63,7 +63,7 @@
 #include <DataRuntimeLanguage.hh>
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 #if defined( _WIN32 ) && _MSC_VER < 1900

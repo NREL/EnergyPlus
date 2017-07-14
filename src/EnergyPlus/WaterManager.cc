@@ -62,7 +62,7 @@
 #include <DataSurfaces.hh>
 #include <DataWater.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>

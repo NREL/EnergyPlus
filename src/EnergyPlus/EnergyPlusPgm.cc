@@ -204,7 +204,7 @@
 #include <DisplayRoutines.hh>
 #include <FileSystem.hh>
 #include <FluidProperties.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>

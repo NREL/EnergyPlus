@@ -76,7 +76,7 @@
 #include <Fans.hh>
 #include <General.hh>
 #include <InternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MundtSimMgr.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>

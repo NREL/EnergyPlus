@@ -66,7 +66,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>

@@ -78,7 +78,7 @@
 #include <GeneralRoutines.hh>
 #include <HVACSingleDuctInduc.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixerComponent.hh>
 #include <OutdoorAirUnit.hh>
 #include <PlantUtilities.hh>

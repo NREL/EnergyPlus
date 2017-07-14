@@ -89,7 +89,7 @@
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
 #include <HybridModel.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <LowTempRadiantSystem.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputProcessor.hh>

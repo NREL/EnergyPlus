@@ -76,7 +76,7 @@
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <HybridModel.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
 #include <InternalHeatGains.hh>

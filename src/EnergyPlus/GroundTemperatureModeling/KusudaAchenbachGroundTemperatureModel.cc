@@ -53,7 +53,7 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 

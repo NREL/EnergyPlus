@@ -55,7 +55,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
