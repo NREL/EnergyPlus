@@ -337,11 +337,11 @@ namespace HVACManager {
 		static gio::Fmt Format_30( "(1x,I3,5x,A)" );
 
 		//SYSTEM INITIALIZATION
-		if ( TriggerGetAFN ) {
-			TriggerGetAFN = false;
-			DisplayString( "Initializing HVAC" );
-			ManageAirflowNetworkBalance(); // first call only gets input and returns.
-		}
+		//if ( TriggerGetAFN ) {
+		//	TriggerGetAFN = false;
+		//	DisplayString( "Initializing HVAC" );
+		//	ManageAirflowNetworkBalance(); // first call only gets input and returns.
+		//}
 
 		ZT = MAT;
 		// save for use with thermal comfort control models (Fang, Pierce, and KSU)
@@ -395,12 +395,12 @@ namespace HVACManager {
 		ManageHybridVentilation();
 
 		CalcAirFlowSimple();
-		if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
-			RollBackFlag = false;
-			ManageAirflowNetworkBalance( false );
-		}
+		//if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
+		//	RollBackFlag = false;
+		//	ManageAirflowNetworkBalance( false );
+		//}
 
-		SetHeatToReturnAirFlag();
+		//SetHeatToReturnAirFlag();
 
 		SysDepZoneLoadsLagged = SysDepZoneLoads;
 
@@ -410,16 +410,16 @@ namespace HVACManager {
 
 		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
 
-		SimHVAC();
+		//SimHVAC();
 
-		if ( AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && ! WarmupFlag ) {
-			RunOptCondEntTemp = true;
-			while ( RunOptCondEntTemp ) {
-				SimHVAC();
-			}
-		}
+		//if ( AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && ! WarmupFlag ) {
+		//	RunOptCondEntTemp = true;
+		//	while ( RunOptCondEntTemp ) {
+		//		SimHVAC();
+		//	}
+		//}
 
-		ManageWaterInits();
+		//ManageWaterInits();
 
 		// Only simulate once per zone timestep; must be after SimHVAC
 		if ( FirstTimeStepSysFlag && MetersHaveBeenInitialized ) {
@@ -453,26 +453,26 @@ namespace HVACManager {
 
 				ManageHybridVentilation();
 				CalcAirFlowSimple( SysTimestepLoop );
-				if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
-					RollBackFlag = false;
-					ManageAirflowNetworkBalance( false );
-				}
+				//if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
+				//	RollBackFlag = false;
+				//	ManageAirflowNetworkBalance( false );
+				//}
 
 				UpdateInternalGainValues( true, true );
 
 				ManageZoneAirUpdates( iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
 
 				if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-				SimHVAC();
+				//SimHVAC();
 
-				if ( AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && ! WarmupFlag ) {
-					RunOptCondEntTemp = true;
-					while ( RunOptCondEntTemp ) {
-						SimHVAC();
-					}
-				}
+				//if ( AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && ! WarmupFlag ) {
+				//	RunOptCondEntTemp = true;
+				//	while ( RunOptCondEntTemp ) {
+				//		SimHVAC();
+				//	}
+				//}
 
-				ManageWaterInits();
+				//ManageWaterInits();
 
 				//Need to set the flag back since we do not need to shift the temps back again in the correct step.
 				ShortenTimeStepSys = false;
@@ -496,21 +496,21 @@ namespace HVACManager {
 
 			DetectOscillatingZoneTemp();
 			UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
-			UpdateIceFractions(); // Update fraction of ice stored in TES
-			ManageWater();
+			//UpdateIceFractions(); // Update fraction of ice stored in TES
+			//ManageWater();
 			// update electricity data for net, purchased, sold etc.
 			DummyLogical = false;
 			facilityElectricServiceObj->manageElectricPowerService( false, DummyLogical, true );
 
 			// Update the plant and condenser loop capacitance model temperature history.
-			UpdateNodeThermalHistory();
+			//UpdateNodeThermalHistory();
 
 			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan ); // EMS calling point
 
 			// This is where output processor data is updated for System Timestep reporting
 			if ( ! WarmupFlag ) {
 				if ( DoOutputReporting ) {
-					CalcMoreNodeInfo();
+					//CalcMoreNodeInfo();
 					CalculatePollution();
 					InitEnergyReports();
 					ReportSystemEnergyUse();

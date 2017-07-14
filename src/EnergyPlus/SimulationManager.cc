@@ -348,16 +348,16 @@ namespace SimulationManager {
 		SetupTimePointers( "HVAC", TimeStepSys );
 
 		CheckIfAnyEMS();
-		CheckIfAnyPlant();
+		//CheckIfAnyPlant();
 		CheckIfAnySlabs();
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 		createFacilityElectricPowerServiceObject();
 
-		ManageBranchInput(); // just gets input and returns.
+		//ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;
-		ManageSizing();
+		//ManageSizing();
 
 		BeginFullSimFlag = true;
 		SimsDone = false;
@@ -419,14 +419,14 @@ namespace SimulationManager {
 			CheckControllerLists( ErrFound );
 			if ( ErrFound ) TerminalError = true;
 
-			if ( DoDesDaySim || DoWeathSim ) {
-				ReportLoopConnections();
-				ReportAirLoopConnections();
-				ReportNodeConnections();
-				// Debug reports
-				//      CALL ReportCompSetMeterVariables
-				//      CALL ReportParentChildren
-			}
+			//if ( DoDesDaySim || DoWeathSim ) {
+			//	ReportLoopConnections();
+			//	ReportAirLoopConnections();
+			//	ReportNodeConnections();
+			//	// Debug reports
+			//	//      CALL ReportCompSetMeterVariables
+			//	//      CALL ReportParentChildren
+			//}
 
 			CreateEnergyReportStructure();
 			bool anyEMSRan;

@@ -5310,7 +5310,7 @@ namespace HeatBalanceManager {
 
 		ReportScheduleValues();
 		if ( !WarmupFlag && DoOutputReporting ) {
-			CalcMoreNodeInfo();
+			//CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
 			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
 				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
@@ -5336,7 +5336,7 @@ namespace HeatBalanceManager {
 					PrintEnvrnStampWarmup = false;
 				}
 			}
-			CalcMoreNodeInfo();
+			//CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
 			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
 				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
