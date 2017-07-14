@@ -3699,7 +3699,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
         "UnitarySystemPerformance:Multispeed,",
         "  MultiSpeed Performance,  !- Name",
-        "  1,                       !- Number of Speeds for Heating",
+        "  10,                      !- Number of Speeds for Heating",
         "  3,                       !- Number of Speeds for Cooling",
 		"  No,                      !- Single Mode Operation",
 		"  ,                        !- No Load Supply Air Flow Rate Ratio",
@@ -3710,7 +3710,19 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
         "  autosize,                !- Heating Speed 3 Supply Air Flow Ratio",
         "  autosize,                !- Cooling Speed 3 Supply Air Flow Ratio",
         "  autosize,                !- Heating Speed 4 Supply Air Flow Ratio",
-        "  autosize;                !- Cooling Speed 4 Supply Air Flow Ratio",
+        "  autosize,                !- Cooling Speed 4 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 5 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 5 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 6 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 6 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 7 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 7 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 8 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 8 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 9 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 9 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 10 Supply Air Flow Ratio",
+		"  autosize;                !- Cooling Speed 10 Supply Air Flow Ratio",
 
 		"Fan:OnOff,",
 		"  Supply Fan 1,           !- Name",
@@ -3806,7 +3818,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"  10.0,                    !- Number of Speeds {dimensionless}",
 		"  10.0,                    !- Nominal Speed Level {dimensionless}",
 		"  autosize,                !- Rated Heating Capacity At Selected Nominal Speed Level {w}",
-		"  1.7,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+		"  autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
 		"  HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name",
 		"      ,                    !- Defrost Energy Input Ratio Function of Temperature Curve Name",
 		"  -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
@@ -4265,6 +4277,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity * 0.00005, UnitarySystem( 1 ).MaxHeatAirVolFlow );
 	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity * 0.00005, UnitarySystem( 1 ).MaxCoolAirVolFlow );
 	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, DXCoil( UnitarySystem( 1 ).CoolingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedCooling ) );
+	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity, VarSpeedCoil( UnitarySystem( 1 ).HeatingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedHeating ) );
 
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 1 ), 0.031373, 0.000001 );
 	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 1 ), 0.000001 );
@@ -4281,25 +4294,23 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 2 ), UnitarySystem( 1 ).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 2 ), 0.000001 );
 	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 3 ), UnitarySystem( 1 ).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 3 ), 0.000001 );
 
-	// Coil:*:DX:VariableSpeed coils DO NOT use multispeed performance object information
-	// when and if this is corrected, these numbers will change based on the inputs for the MS performance object
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ), 0.034691, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ), 0.007884, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ) );
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ), 0.037451, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ), 0.015769, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 2 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ) );
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 3 ), 0.040211, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 3 ), 0.023653, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 3 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 3 ) );
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 4 ), 0.045730, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 4 ), 0.031538, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 4 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 4 ) );
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 5 ), 0.051249, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 5 ), 0.039422, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 5 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 5 ) );
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 6 ), 0.056768, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 6 ), 0.047307, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 6 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 6 ) );
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 7 ), 0.062287, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 7 ), 0.055191, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 7 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 7 ) );
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 8 ), 0.067807, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 8 ), 0.063076, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 8 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 8 ) );
-	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 9 ), 0.073326, 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 9 ), 0.070960, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 9 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 9 ) );
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 10 ), 0.078845, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 10 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 10 ) );

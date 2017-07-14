@@ -3543,6 +3543,19 @@ namespace VariableSpeedCoils {
 		} else {
 			rhoA = PsyRhoAirFnPbTdbW( OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 			//HPWH, the mass flow rate will be updated by a revised entering air density
+
+			if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 ) {
+				if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
+					if ( HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).NumOfSpeedCooling != VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) {
+						ShowFatalError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil( DXCoilNum ).Name + " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object." );
+					}
+				} else {
+					if ( HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).NumOfSpeedHeating != VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) {
+						ShowFatalError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil( DXCoilNum ).Name + " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object." );
+					}
+				}
+			}
+
 			for ( Mode = VarSpeedCoil( DXCoilNum ).NumOfSpeeds; Mode >= 1; --Mode ) {
 
 				if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 ) {
