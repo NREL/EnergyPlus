@@ -69,6 +69,7 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HVACFan.hh>
+#include <HVACUnitarySystem.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -3065,6 +3066,7 @@ namespace VariableSpeedCoils {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using CurveManager::CurveValue;
+		using HVACUnitarySystem::DesignSpecMSHP;
 
 		// Locals
 		Real64 QLoadTotal; // placeholder for calculating SHR
@@ -3542,8 +3544,19 @@ namespace VariableSpeedCoils {
 			rhoA = PsyRhoAirFnPbTdbW( OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 			//HPWH, the mass flow rate will be updated by a revised entering air density
 			for ( Mode = VarSpeedCoil( DXCoilNum ).NumOfSpeeds; Mode >= 1; --Mode ) {
-				VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( UpperSpeed ) * VarSpeedCoil( DXCoilNum ).MSRatedPercentTotCap( Mode );
-				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+
+				if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 ) {
+					if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
+						VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).CoolingVolFlowRatio( Mode );
+					} else {
+						VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).HeatingVolFlowRatio( Mode );
+					}
+					VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) / VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+				} else {
+					VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( UpperSpeed ) * VarSpeedCoil( DXCoilNum ).MSRatedPercentTotCap( Mode );
+					VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+				}
+
 				VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) * rhoA;
 				// EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
 				VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedEvapCondVolFlowPerRatedTotCap( Mode );
@@ -5790,9 +5803,6 @@ namespace VariableSpeedCoils {
 		// Return value
 		int CapFTIndex; // returned CapFT curve index of matched coil
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int WhichCoil;
-
 		// Obtains and Allocates WatertoAirHP related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
 			GetVarSpeedCoilInput();
@@ -6049,7 +6059,8 @@ namespace VariableSpeedCoils {
 		int const WSHPNum, // Number of OA Controller
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
-		Optional_int CompanionHeatingCoilNum // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int CompanionHeatingCoilNum, // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int MSHPDesignSpecIndex // index to UnitarySystemPerformance:Multispeed object
 	) {
 
 		// SUBROUTINE INFORMATION:
@@ -6091,6 +6102,10 @@ namespace VariableSpeedCoils {
 		if ( present( CompanionHeatingCoilNum ) ) {
 			VarSpeedCoil( WSHPNum ).CompanionHeatingCoilNum = CompanionHeatingCoilNum;
 			VarSpeedCoil( CompanionHeatingCoilNum ).CompanionCoolingCoilNum = WSHPNum;
+		}
+
+		if ( present( MSHPDesignSpecIndex ) ) {
+			VarSpeedCoil( WSHPNum ).MSHPDesignSpecIndex = MSHPDesignSpecIndex;
 		}
 
 	}

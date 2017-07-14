@@ -1795,7 +1795,7 @@ namespace HVACUnitarySystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Iter; // iteration count
-		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
+//		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		int MSHPIndex; // Index to design Specification object
 		int BranchNum; // Index to branch on air loop
 		Real64 SystemFlow; // AirloopHVAC flow rate [m3/s]
@@ -2231,10 +2231,9 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NumOfSpeeds;
 			DXCoolCap = GetCoilCapacityVariableSpeed( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
 			EqSizing.DesCoolingLoad = DXCoolCap;
-			// see PR5273 - RatedAirVolFlowRate is different from MSRatedAirVolFlowRate(MaxSpeed) and causes differences between UnitarySystem air flow rates and coil air flow rates when coil is not autosized.
-			// MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NormSpedLevel );
+
 			for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedCooling; ++Iter ) {
-				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( Iter ); // *MulSpeedFlowScale;
+				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( Iter );
 				UnitarySystem( UnitarySysNum ).CoolMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) * StdRhoAir;
 				// it seems the ratio should reference the actual flow rates, not the fan flow ???
 				if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate > 0.0 && UnitarySystem( UnitarySysNum ).FanExists ) {
@@ -2327,10 +2326,8 @@ namespace HVACUnitarySystem {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
 			}
 
-			// see PR5273 - RatedAirVolFlowRate is different from MSRatedAirVolFlowRate(MaxSpeed) and causes differences between UnitarySystem air flow rates and coil air flow rates when coil is not autosized.
-			// MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NormSpedLevel );
 			for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedHeating; ++Iter ) {
-				UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( Iter ); // * MulSpeedFlowScale;
+				UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( Iter );
 				UnitarySystem( UnitarySysNum ).HeatMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) * StdRhoAir;
 				if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate > 0.0 && UnitarySystem( UnitarySysNum ).FanExists ) {
 					UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( Iter ) = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) / UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate;
@@ -6226,6 +6223,14 @@ namespace HVACUnitarySystem {
 					}
 				}
 
+			}
+
+			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+				SetVarSpeedCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound, _, _, UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex );
+			}
+
+			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
+				SetVarSpeedCoilData( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrorsFound, _, _, UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex );
 			}
 
 			// set global logicals that denote coil type
