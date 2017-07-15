@@ -33053,7 +33053,12 @@ ZoneHVAC:IdealLoadsAirSystem,
        \note This field is optional, but is required if this
        \note this object is used with other forced air equipment.
        \type node
-  A5 , \field Return Plenum Name
+  A5 , \field System Inlet Air Node Name
+       \note When the Ideal Loads Air System is connected to an AirloopHVAC:ZoneReturnPlenum the
+       \note plenum exhaust node will connect to this System Inlet Node while the Zone Supply
+       \note Air Node specified above will identify the zone inlet node where this Ideal Loads
+       \note Air System is connected. The Zone Exhaust Air Node will be the same as the
+       \note AirloopHVAC:ReturnAirPlenum inlet node.
   N1 , \field Maximum Heating Supply Air Temperature
        \units C
        \minimum> 0

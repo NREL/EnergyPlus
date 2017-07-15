@@ -35,6 +35,10 @@ The name of the outlet air node of the ideal loads object. This should be the sa
 
 The name of the zone exhaust air node of the ideal loads object. This should be the same as one of the zone air exhaust nodes for the zone this component is serving. This node name is required if ZoneHVAC:IdealLoadsAirSystem is used in a zone which also has other forced air HVAC equipment. Otherwise this node name is optional but recommended.
 
+\paragraph{Field: System Inlet Air Node Name}\label{system-inlet-air-node-name}
+
+The name of the plenum exhaust air node connected to the ideal loads object. When an AirloopHVAC:ZoneReturnPlenum is connected to the Ideal Loads Air System the Zone Supply Air Node Name should be the same as one of the zone air inlet nodes and the Zone Exhaust Air Node Name should be the same as one of the zone air exhaust nodes for the zone this component is serving. This node name is required if ZoneHVAC:IdealLoadsAirSystem is used in a zone which also has other forced air HVAC equipment. Otherwise this node name is optional but recommended. In the AirloopHVAC:ZoneReturnPlenum object, one of the plenum exhaust nodes is listed as the plenum Outlet Node Name while the remaining nodes, if needed, are listed in the Induced Air Outlet Node or NodeList Name field.
+
 \paragraph{Field: Maximum Heating Supply Air Temperature}\label{field-maximum-heating-supply-air-temperature-000}
 
 The maximum air temperature (degrees C) of the air used for heating the zone. The default is 50C (122F).

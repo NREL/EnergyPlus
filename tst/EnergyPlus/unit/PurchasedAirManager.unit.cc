@@ -55,18 +55,117 @@
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::PurchasedAirManager;
 using namespace ObjexxFCL;
+using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
-using namespace DataGlobals;
-using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataZoneEnergyDemands;
+using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::PurchasedAirManager;
+using namespace EnergyPlus::ZonePlenum;
 
+class ZoneIdealLoadsTest : public EnergyPlusFixture {
+public:
+	int IdealLoadsSysNum = 1;
+	int NumNodes = 1; // number of zone inlet and zone exhaust nodes
+	bool ErrorsFound = false;
+
+protected:
+	virtual void SetUp() {
+		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+
+//		DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize StdRhoAir
+//		DataEnvironment::OutBaroPress = 101325.0;
+		DataGlobals::NumOfZones = 2;
+		DataHeatBalance::Zone.allocate( NumOfZones );
+		DataZoneEquipment::ZoneEquipConfig.allocate( NumOfZones );
+		DataZoneEquipment::ZoneEquipList.allocate( NumOfZones );
+		DataZoneEquipment::ZoneEquipAvail.dimension( NumOfZones, DataHVACGlobals::NoAction );
+		Zone( 1 ).Name = "EAST ZONE";
+		Zone( 2 ).Name = "PLENUM ZONE";
+		DataZoneEquipment::NumOfZoneEquipLists = 1;
+		Zone( 1 ).IsControlled = true;
+		ZoneEquipConfig( 1 ).IsControlled = true;
+		ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+		ZoneEquipConfig( 1 ).ZoneName = "EAST ZONE";
+		ZoneEquipConfig( 1 ).EquipListName = "ZONEEQUIPMENT";
+		ZoneEquipConfig( 1 ).ZoneNode = 20;
+		ZoneEquipConfig( 1 ).ReturnAirNode = 21;
+		Zone( ZoneEquipConfig( 1 ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( 1 ).ZoneNode;
+		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
+		ZoneEquipList( 1 ).Name = "ZONEEQUIPMENT";
+		int maxEquipCount = 1;
+		ZoneEquipList( 1 ).NumOfEquipTypes = maxEquipCount;
+		ZoneEquipList( 1 ).EquipType.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipType_Num.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipName.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipIndex.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipIndex = 1;
+		ZoneEquipList( 1 ).EquipData.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).CoolingPriority.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).HeatingPriority.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipType( 1 ) = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
+		ZoneEquipList( 1 ).EquipName( 1 ) = "ZONE 1 IDEAL LOADS";
+		ZoneEquipList( 1 ).CoolingPriority( 1 ) = 1;
+		ZoneEquipList( 1 ).HeatingPriority( 1 ) = 1;
+		ZoneEquipList( 1 ).EquipType_Num( 1 ) = DataZoneEquipment::ZoneUnitarySystem_Num;
+		ZoneEquipConfig( 1 ).NumInletNodes = NumNodes;
+		ZoneEquipConfig( 1 ).InletNode.allocate( NumNodes );
+		ZoneEquipConfig( 1 ).AirDistUnitCool.allocate( NumNodes );
+		ZoneEquipConfig( 1 ).AirDistUnitHeat.allocate( NumNodes );
+		ZoneEquipConfig( 1 ).InletNode( 1 ) = 2;
+		ZoneEquipConfig( 1 ).NumExhaustNodes = NumNodes;
+		ZoneEquipConfig( 1 ).ExhaustNode.allocate( NumNodes );
+		ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 1;
+		ZoneEquipConfig( 1 ).EquipListIndex = 1;
+
+		DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate( 1 );
+		DataHeatBalFanSys::ZoneThermostatSetPointHi( 1 ) = 23.9; // 75F
+		DataHeatBalFanSys::ZoneThermostatSetPointLo.allocate( 1 );
+		DataHeatBalFanSys::ZoneThermostatSetPointLo( 1 ) = 23.0; // 73.4F
+
+		//		UnitarySystem.allocate( 1 );
+		FinalZoneSizing.allocate( 1 );
+
+		ZoneEqSizing.allocate( 1 );
+		CurZoneEqNum = 1;
+		CurSysNum = 0;
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
+		ZoneSizingRunDone = true;
+
+		ZoneSysEnergyDemand.allocate( 1 );
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 1000.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = 2000.0;
+
+		TempControlType.allocate( 1 );
+		TempControlType( 1 ) = DataHVACGlobals::SingleHeatingSetPoint;
+
+		ZoneAirHumRat.allocate( 1 );
+		ZoneAirHumRat( 1 ) = 0.07;
+
+		DataZoneEquipment::ZoneEquipInputsFilled = true;
+
+	}
+
+	virtual void TearDown() {
+		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+	}
+};
 
 TEST_F( EnergyPlusFixture, SizePurchasedAirTest_Test1 )
 {
@@ -146,6 +245,7 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 		", !- Availability Schedule Name",
 		"ZONE 1 INLETS, !- Zone Supply Air Node Name",
 		", !- Zone Exhaust Air Node Name",
+		", !- System Inlet Air Node Name",
 		"50, !- Maximum Heating Supply Air Temperature{ C }",
 		"13, !- Minimum Cooling Supply Air Temperature{ C }",
 		"0.015, !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
@@ -167,7 +267,7 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 		", !- Outdoor Air Economizer Type",
 		", !- Heat Recovery Type",
 		", !- Sensible Heat Recovery Effectiveness{ dimensionless }",
-		";                        !- Latent Heat Recovery Effectiveness{ dimensionless }",
+		"; !- Latent Heat Recovery Effectiveness{ dimensionless }",
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -189,3 +289,125 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 
 }
 
+TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
+
+	std::string const idf_objects = delimited_string( {
+
+		"Zone,",
+		"  EAST ZONE,                      !- Name",
+		"  0,                              !- Direction of Relative North{ deg }",
+		"  0,                              !- X Origin{ m }",
+		"  0,                              !- Y Origin{ m }",
+		"  0,                              !- Z Origin{ m }",
+		"  1,                              !- Type",
+		"  1,                              !- Multiplier",
+		"  autocalculate,                  !- Ceiling Height{ m }",
+		"  autocalculate;                  !- Volume{ m3 }",
+
+		"Zone,",
+		"  PLENUM ZONE,                    !- Name",
+		"  0,                              !- Direction of Relative North{ deg }",
+		"  0,                              !- X Origin{ m }",
+		"  0,                              !- Y Origin{ m }",
+		"  0,                              !- Z Origin{ m }",
+		"  1,                              !- Type",
+		"  1,                              !- Multiplier",
+		"  autocalculate,                  !- Ceiling Height{ m }",
+		"  autocalculate;                  !- Volume{ m3 }",
+
+		"ZoneHVAC:IdealLoadsAirSystem,",
+		"  ZONE 1 IDEAL LOADS,             !- Name",
+		"  ,                               !- Availability Schedule Name",
+		"  Zone Inlet Node,                !- Zone Supply Air Node Name",
+		"  Zone Exhaust Node,              !- Zone Exhaust Air Node Name",
+		"  Plenum Outlet Node,             !- System Inlet Air Node Name",
+		"  50,                             !- Maximum Heating Supply Air Temperature{ C }",
+		"  13,                             !- Minimum Cooling Supply Air Temperature{ C }",
+		"  0.015,                          !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+		"  0.009,                          !- Minimum Cooling Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+		"  NoLimit,                        !- Heating Limit",
+		"  autosize,                       !- Maximum Heating Air Flow Rate{ m3 / s }",
+		"  ,                               !- Maximum Sensible Heating Capacity{ W }",
+		"  NoLimit,                        !- Cooling Limit",
+		"  autosize,                       !- Maximum Cooling Air Flow Rate{ m3 / s }",
+		"  ,                               !- Maximum Total Cooling Capacity{ W }",
+		"  ,                               !- Heating Availability Schedule Name",
+		"  ,                               !- Cooling Availability Schedule Name",
+		"  ConstantSupplyHumidityRatio,    !- Dehumidification Control Type",
+		"  ,                               !- Cooling Sensible Heat Ratio{ dimensionless }",
+		"  ConstantSupplyHumidityRatio,    !- Humidification Control Type",
+		"  ,                               !- Design Specification Outdoor Air Object Name",
+		"  ,                               !- Outdoor Air Inlet Node Name",
+		"  ,                               !- Demand Controlled Ventilation Type",
+		"  ,                               !- Outdoor Air Economizer Type",
+		"  ,                               !- Heat Recovery Type",
+		"  ,                               !- Sensible Heat Recovery Effectiveness{ dimensionless }",
+		"  ;                               !- Latent Heat Recovery Effectiveness{ dimensionless }",
+
+		"ZoneHVAC:EquipmentConnections,",
+		"  EAST ZONE,                      !- Zone Name",
+		"  ZoneEquipment,                  !- Zone Conditioning Equipment List Name",
+		"  Zone Inlet Node,                !- Zone Air Inlet Node or NodeList Name",
+		"  Zone Exhaust Node,              !- Zone Air Exhaust Node or NodeList Name",
+		"  Zone Node,                      !- Zone Air Node Name",
+		"  Zone Outlet Node;               !- Zone Return Air Node Name",
+
+		"ZoneHVAC:EquipmentList,",
+		"  ZoneEquipment,                  !- Name",
+		"  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
+		"  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
+		"  1,                              !- Zone Equipment 1 Cooling Sequence",
+		"  1;                              !- Zone Equipment 1 Heating or No - Load Sequence",
+
+		"AirLoopHVAC:ReturnPlenum,",
+		"  DOAS Zone Return Plenum,        !- Name",
+		"  PLENUM ZONE,                    !- Zone Name",
+		"  Plenum Node,                    !- Zone Node Name", // illegal use of non-unique zone node name
+		"  Plenum Outlet Node,             !- Outlet Node Name",
+		"  ,                               !- Induced Air Outlet Node or NodeList Name",
+		"  Zone Exhaust Node;              !- Inlet 1 Node Name",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+
+	DataGlobals::DoWeathSim = true;
+
+	GetZoneData( ErrorsFound ); // read zone data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	GetZoneEquipmentData1(); // read zone equipment configuration and list objects
+
+//	GetPurchasedAir();
+//	GetPurchAirInputFlag = false;
+
+	Real64 SysOutputProvided( 0 );
+	Real64 LatOutputProvided( 0 );
+	std::string PurchAirName( "ZONE 1 IDEAL LOADS" );
+	bool FirstHVACIteration( true );
+	int ControlledZoneNum( 1 );
+	int ActualZoneNum( 1 );
+	int EquipPtr( 0 );
+	SimPurchasedAir( PurchAirName, SysOutputProvided, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum, EquipPtr );
+
+	EXPECT_EQ( PurchAir( 1 ).Name, "ZONE 1 IDEAL LOADS" );
+	// SimPurchasedAir returned the pointer to the Ideal Loads Air System
+	EXPECT_EQ( EquipPtr, 1 );
+	// Ideal loads air system found the plenum it is attached to
+	EXPECT_EQ( PurchAir( 1 ).ReturnPlenumIndex, 1 );
+	// The ideal loads air system inlet air node is equal to the zone return plenum outlet node
+	EXPECT_EQ( PurchAir( 1 ).PlenumExhaustAirNodeNum, ZoneRetPlenCond( 1 ).OutletNode );
+	// The ideal loads air system ZoneSupplyAirNodeNum is equal to the zone air inlet node
+	EXPECT_EQ( PurchAir( 1 ).ZoneSupplyAirNodeNum, ZoneEquipConfig( 1 ).InletNode( 1 ) );
+	// The ideal loads air system ZoneExhaustAirNodeNum is equal to the zone exhaust air node num
+	EXPECT_EQ( PurchAir( 1 ).ZoneExhaustAirNodeNum, ZoneEquipConfig( 1 ).ExhaustNode( 1 ) );
+	// The zone exhaust air node is equal to the zone return plenum inlet air node
+	EXPECT_EQ( ZoneEquipConfig( 1 ).ExhaustNode( 1 ), ZoneRetPlenCond( 1 ).InletNode( 1 ) );
+	// The ideal loads air system has a non-zero mass flow rate
+	EXPECT_GT( PurchAir( 1 ).SupplyAirMassFlowRate, 0.0 );
+	// The ideal loads air system mass flow rate is equal to all nodes attached to this system
+	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).ZoneSupplyAirNodeNum ).MassFlowRate );
+	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).ZoneExhaustAirNodeNum ).MassFlowRate );
+	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).PlenumExhaustAirNodeNum ).MassFlowRate );
+
+}
