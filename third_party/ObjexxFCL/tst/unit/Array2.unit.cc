@@ -2390,6 +2390,101 @@ TEST( Array2Test, Transpose )
 	}
 }
 
+TEST( Array2Test, FunctionAbs )
+{
+	Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
+	Array2D_int const E( 2, 2, { 11, 12, 21, 22 } );
+	EXPECT_TRUE( eq( E, abs( A ) ) );
+}
+
+TEST( Array2Test, FunctionNegation )
+{
+	Array2D_bool const A( 3, 1, { true, false, true } );
+	Array2D_bool const E( 3, 1, { false, true, false } );
+	EXPECT_TRUE( eq( E, !A ) );
+}
+
+TEST( Array2Test, FunctionBitNot )
+{
+	Array2D< uint8_t > const A( 2, 1, { 1, 128 } );
+	Array2D< uint8_t > const E( 2, 1, { 254, 127 } );
+	EXPECT_TRUE( eq( E, bit_not( A ) ) );
+}
+
+TEST( Array2Test, FunctionBitAnd )
+{
+	Array2D< uint8_t > const A( 2, 1, { 1, 128 } );
+	Array2D< uint8_t > const B( 2, 1, { 1, 128 } );
+	Array2D< uint8_t > const Z( 2, 1, { 0, 0 } );
+	Array2D< uint8_t > const O( 2, 1, { 255, 255 } );
+	EXPECT_TRUE( eq( A, bit_and( A, B ) ) );
+	EXPECT_TRUE( eq( Z, bit_and( A, Z ) ) );
+	EXPECT_TRUE( eq( A, bit_and( A, O ) ) );
+
+	Array2D< uint8_t > const I( 2, 1, { 0xF0, 0xAB } );
+	Array2D< uint8_t > const J( 2, 1, { 0xAB, 0xF0 } );
+	Array2D< uint8_t > const K( 2, 1, { 0xA0u, 0xA0u } );
+	EXPECT_TRUE( eq( K, bit_and( I, J ) ) );
+}
+
+TEST( Array2Test, FunctionBitOr )
+{
+	Array2D< uint8_t > const A( 2, 1, { 1, 128 } );
+	Array2D< uint8_t > const B( 2, 1, { 1, 128 } );
+	Array2D< uint8_t > const Z( 2, 1, { 0, 0 } );
+	Array2D< uint8_t > const O( 2, 1, { 255, 255 } );
+	EXPECT_TRUE( eq( A, bit_or( A, B ) ) );
+	EXPECT_TRUE( eq( A, bit_or( A, Z ) ) );
+	EXPECT_TRUE( eq( O, bit_or( A, O ) ) );
+
+	Array2D< uint8_t > const I( 2, 1, { 0xF0, 0xAB } );
+	Array2D< uint8_t > const J( 2, 1, { 0xAB, 0xF0 } );
+	Array2D< uint8_t > const K( 2, 1, { 0xFBu, 0xFBu } );
+	EXPECT_TRUE( eq( K, bit_or( I, J ) ) );
+}
+
+TEST( Array2Test, FunctionBitXor )
+{
+	Array2D< uint8_t > const A( 2, 1, { 1, 128 } );
+	Array2D< uint8_t > const B( 2, 1, { 1, 128 } );
+	Array2D< uint8_t > const Z( 2, 1, { 0, 0 } );
+	EXPECT_TRUE( eq( Z, bit_xor( A, B ) ) );
+	EXPECT_TRUE( eq( A, bit_xor( A, Z ) ) );
+
+	Array2D< uint8_t > const I( 2, 1, { 0xF0, 0xFF } );
+	Array2D< uint8_t > const J( 2, 1, { 0xFF, 0xF0 } );
+	Array2D< uint8_t > const K( 2, 1, { 0x0Fu, 0x0Fu } );
+	EXPECT_TRUE( eq( K, bit_xor( I, J ) ) );
+}
+
+TEST( Array2Test, FunctionPow )
+{
+	Array2D_int A( 2, 2, { 5, -3, 7, -4 } );
+	Array2D_int const E( 2, 2, { 25, 9, 49, 16 } );
+	EXPECT_TRUE( eq( E, pow( A, 2 ) ) );
+}
+
+TEST( Array2Test, FunctionSign )
+{
+	{
+		Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
+		Array2D_int const AP( 2, 2, { 11, 12, 21, 22 } );
+		Array2D_int const AN( 2, 2, { -11, -12, -21, -22 } );
+		EXPECT_TRUE( eq( AP, sign( A, 1 ) ) );
+		EXPECT_TRUE( eq( AP, sign( A, 0 ) ) );
+		EXPECT_TRUE( eq( AN, sign( A, -1 ) ) );
+	}
+
+	{
+		Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
+		Array2D_int const A1( 2, 2, { 1, -1, 1, -1 } );
+		Array2D_int const A0( 2, 2, { 0, -0, 0, -0 } ); // Minuses don't matter
+		EXPECT_TRUE( eq( A1, sign( 1, A ) ) );
+		EXPECT_TRUE( eq( A0, sign( 0, A ) ) );
+		EXPECT_TRUE( eq( A1, sign( -1, A ) ) );
+	}
+}
+
 TEST( Array2Test, FunctionCount )
 {
 	Array2D_bool A( 2, 3, { true, false, false, false, true, true } );
@@ -2427,41 +2522,6 @@ TEST( Array2Test, FunctionProduct )
 	EXPECT_EQ( 60984, product( A ) );
 	EXPECT_TRUE( eq( P1, product( A, 1 ) ) );
 	EXPECT_TRUE( eq( P2, product( A, 2 ) ) );
-}
-
-TEST( Array2Test, FunctionAbs )
-{
-	Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
-	Array2D_int const E( 2, 2, { 11, 12, 21, 22 } );
-	EXPECT_TRUE( eq( E, abs( A ) ) );
-}
-
-TEST( Array2Test, FunctionPow )
-{
-	Array2D_int A( 2, 2, { 5, -3, 7, -4 } );
-	Array2D_int const E( 2, 2, { 25, 9, 49, 16 } );
-	EXPECT_TRUE( eq( E, pow( A, 2 ) ) );
-}
-
-TEST( Array2Test, FunctionSign )
-{
-	{
-		Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
-		Array2D_int const AP( 2, 2, { 11, 12, 21, 22 } );
-		Array2D_int const AN( 2, 2, { -11, -12, -21, -22 } );
-		EXPECT_TRUE( eq( AP, sign( A, 1 ) ) );
-		EXPECT_TRUE( eq( AP, sign( A, 0 ) ) );
-		EXPECT_TRUE( eq( AN, sign( A, -1 ) ) );
-	}
-
-	{
-		Array2D_int A( 2, 2, { 11, -12, 21, -22 } );
-		Array2D_int const A1( 2, 2, { 1, -1, 1, -1 } );
-		Array2D_int const A0( 2, 2, { 0, -0, 0, -0 } ); // Minuses don't matter
-		EXPECT_TRUE( eq( A1, sign( 1, A ) ) );
-		EXPECT_TRUE( eq( A0, sign( 0, A ) ) );
-		EXPECT_TRUE( eq( A1, sign( -1, A ) ) );
-	}
 }
 
 TEST( Array2Test, FunctionMinMaxLoc )

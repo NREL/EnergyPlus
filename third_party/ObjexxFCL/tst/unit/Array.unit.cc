@@ -272,6 +272,14 @@ TEST( ArrayTest, Swap3D )
 	}
 }
 
+TEST( ArrayTest, Pow2D )
+{
+	Array2D_int A( 3, 3, 12 );
+	Array2D_int B( pow( A, 2 ) );
+	Array2D_int S( 3, 3, 144 );
+	EXPECT_TRUE( eq( S, B ) );
+}
+
 TEST( ArrayTest, Cshift2DDim1 )
 {
 	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
@@ -357,14 +365,6 @@ TEST( ArrayTest, Sum2DDim2 )
 {
 	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
 	EXPECT_TRUE( eq( Array1D_int( 3, { 36, 66, 96 } ), sum( A, 2 ) ) );
-}
-
-TEST( ArrayTest, Pow2D )
-{
-	Array2D_int A( 3, 3, 12 );
-	Array2D_int B( pow( A, 2 ) );
-	Array2D_int S( 3, 3, 144 );
-	EXPECT_TRUE( eq( S, B ) );
 }
 
 TEST( ArrayTest, Matmul11 )

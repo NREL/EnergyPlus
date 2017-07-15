@@ -25,7 +25,11 @@ namespace ObjexxFCL {
 
 // Optional Argument Wrapper
 template< typename T, typename Enable >
-class Optional
+class Optional;
+
+// Optional Argument Wrapper: Concrete Type Specialization
+template< typename T >
+class Optional< T, typename std::enable_if< ! std::is_abstract< T >::value >::type >
 {
 
 private: // Friend
@@ -35,6 +39,7 @@ private: // Friend
 public: // Types
 
 	typedef  T  Value;
+	typedef  typename std::enable_if< ! std::is_abstract< T >::value >::type  EnableType;
 	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
 	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
@@ -54,7 +59,7 @@ public: // Creation
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
-	Optional( Optional< U, Enable > const & o ) :
+	Optional( Optional< U, EnableType > const & o ) :
 	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
 	 own_( o.own_ )
 	{}

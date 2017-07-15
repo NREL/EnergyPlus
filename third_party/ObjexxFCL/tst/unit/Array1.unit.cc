@@ -1525,6 +1525,104 @@ TEST( Array1Test, FunctionAllAny )
 	EXPECT_TRUE( any( ! A3 ) );
 }
 
+TEST( Array1Test, FunctionAbs )
+{
+	Array1D_int const A( { -1, -2, -3 } );
+	Array1D_int const E( { 1, 2, 3 } );
+	EXPECT_TRUE( eq( E, abs( A ) ) );
+}
+
+TEST( Array1Test, FunctionNegation )
+{
+	Array1D_bool const A( { true, false, true } );
+	Array1D_bool const E( { false, true, false } );
+	EXPECT_TRUE( eq( E, !A ) );
+}
+
+TEST( Array1Test, FunctionBitNot )
+{
+	Array1D< uint8_t > const A( 2, { 1, 128 } );
+	Array1D< uint8_t > const E( 2, { 254, 127 } );
+	EXPECT_TRUE( eq( E, bit_not( A ) ) );
+}
+
+TEST( Array1Test, FunctionBitAnd )
+{
+	Array1D< uint8_t > const A( 2, { 1, 128 } );
+	Array1D< uint8_t > const B( 2, { 1, 128 } );
+	Array1D< uint8_t > const Z( 2, { 0, 0 } );
+	Array1D< uint8_t > const O( 2, { 255, 255 } );
+	EXPECT_TRUE( eq( A, bit_and( A, B ) ) );
+	EXPECT_TRUE( eq( Z, bit_and( A, Z ) ) );
+	EXPECT_TRUE( eq( A, bit_and( A, O ) ) );
+
+	Array1D< uint8_t > const I( 2, { 0xF0, 0xAB } );
+	Array1D< uint8_t > const J( 2, { 0xAB, 0xF0 } );
+	Array1D< uint8_t > const K( 2, { 0xA0u, 0xA0u } );
+	EXPECT_TRUE( eq( K, bit_and( I, J ) ) );
+}
+
+TEST( Array1Test, FunctionBitOr )
+{
+	Array1D< uint8_t > const A( 2, { 1, 128 } );
+	Array1D< uint8_t > const B( 2, { 1, 128 } );
+	Array1D< uint8_t > const Z( 2, { 0, 0 } );
+	Array1D< uint8_t > const O( 2, { 255, 255 } );
+	EXPECT_TRUE( eq( A, bit_or( A, B ) ) );
+	EXPECT_TRUE( eq( A, bit_or( A, Z ) ) );
+	EXPECT_TRUE( eq( O, bit_or( A, O ) ) );
+
+	Array1D< uint8_t > const I( 2, { 0xF0, 0xAB } );
+	Array1D< uint8_t > const J( 2, { 0xAB, 0xF0 } );
+	Array1D< uint8_t > const K( 2, { 0xFBu, 0xFBu } );
+	EXPECT_TRUE( eq( K, bit_or( I, J ) ) );
+}
+
+TEST( Array1Test, FunctionBitXor )
+{
+	Array1D< uint8_t > const A( 2, { 1, 128 } );
+	Array1D< uint8_t > const B( 2, { 1, 128 } );
+	Array1D< uint8_t > const Z( 2, { 0, 0 } );
+	EXPECT_TRUE( eq( Z, bit_xor( A, B ) ) );
+	EXPECT_TRUE( eq( A, bit_xor( A, Z ) ) );
+
+	Array1D< uint8_t > const I( 2, { 0xF0, 0xFF } );
+	Array1D< uint8_t > const J( 2, { 0xFF, 0xF0 } );
+	Array1D< uint8_t > const K( 2, { 0x0Fu, 0x0Fu } );
+	EXPECT_TRUE( eq( K, bit_xor( I, J ) ) );
+}
+
+TEST( Array1Test, FunctionPow )
+{
+	Array1D_int A( { 1, 2, 3 } );
+	Array1D_int const E( { 1, 4, 9 } );
+	EXPECT_TRUE( eq( E, pow( A, 2 ) ) );
+}
+
+TEST( Array1Test, FunctionSign )
+{
+	Array1D_int A1( { 1, 2, 3 } );
+	Array1D_int const E11( { 1, 2, 3 } );
+	Array1D_int const E12( { -1, -2, -3 } );
+	EXPECT_TRUE( eq( E11, sign( A1, 1 ) ) );
+	EXPECT_TRUE( eq( E11, sign( A1, 0 ) ) );
+	EXPECT_TRUE( eq( E12, sign( A1, -1 ) ) );
+
+	Array1D_int A2( { -1, -2, -3 } );
+	Array1D_int const E21( { 1, 2, 3 } );
+	Array1D_int const E22( { -1, -2, -3 } );
+	EXPECT_TRUE( eq( E21, sign( A2, 1 ) ) );
+	EXPECT_TRUE( eq( E21, sign( A2, 0 ) ) );
+	EXPECT_TRUE( eq( E22, sign( A2, -1 ) ) );
+
+	Array1D_int A3( { 1, -2, 3 } );
+	Array1D_int const E31( { 1, -1, 1 } );
+	Array1D_int const E32( { 0, 0, 0 } );
+	EXPECT_TRUE( eq( E31, sign( 1,  A3 ) ) );
+	EXPECT_TRUE( eq( E32, sign( 0,  A3 ) ) );
+	EXPECT_TRUE( eq( E31, sign( -1, A3 ) ) );
+}
+
 TEST( Array1Test, FunctionCount )
 {
 	Array1D_bool A1( { true, true, true, true, true } );
@@ -1540,7 +1638,7 @@ TEST( Array1Test, FunctionCount )
 	EXPECT_EQ( 0u, count( A3, 1 ) );
 }
 
-TEST( Array1Test, FunctionIsContiguous )
+TEST( Array1Test, FunctionContiguous )
 {
 	Array1D_double A;
 	EXPECT_TRUE( contiguous( A ) );
@@ -1690,44 +1788,6 @@ TEST( Array1Test, FunctionProduct )
 	Array1D_bool M( { true, false, true, false, true } );
 	double const E2 = 15.0;
 	EXPECT_EQ( E2, product( A, M ) );
-}
-
-TEST( Array1Test, FunctionAbs )
-{
-	Array1D_int A( { -1, -2, -3 } );
-	Array1D_int const E( { 1, 2, 3 } );
-	EXPECT_TRUE( eq( E, abs( A ) ) );
-}
-
-TEST( Array1Test, FunctionPow )
-{
-	Array1D_int A( { 1, 2, 3 } );
-	Array1D_int const E( { 1, 4, 9 } );
-	EXPECT_TRUE( eq( E, pow( A, 2 ) ) );
-}
-
-TEST( Array1Test, FunctionSign )
-{
-	Array1D_int A1( { 1, 2, 3 } );
-	Array1D_int const E11( { 1, 2, 3 } );
-	Array1D_int const E12( { -1, -2, -3 } );
-	EXPECT_TRUE( eq( E11, sign( A1, 1 ) ) );
-	EXPECT_TRUE( eq( E11, sign( A1, 0 ) ) );
-	EXPECT_TRUE( eq( E12, sign( A1, -1 ) ) );
-
-	Array1D_int A2( { -1, -2, -3 } );
-	Array1D_int const E21( { 1, 2, 3 } );
-	Array1D_int const E22( { -1, -2, -3 } );
-	EXPECT_TRUE( eq( E21, sign( A2, 1 ) ) );
-	EXPECT_TRUE( eq( E21, sign( A2, 0 ) ) );
-	EXPECT_TRUE( eq( E22, sign( A2, -1 ) ) );
-
-	Array1D_int A3( { 1, -2, 3 } );
-	Array1D_int const E31( { 1, -1, 1 } );
-	Array1D_int const E32( { 0, 0, 0 } );
-	EXPECT_TRUE( eq( E31, sign( 1,  A3 ) ) );
-	EXPECT_TRUE( eq( E32, sign( 0,  A3 ) ) );
-	EXPECT_TRUE( eq( E31, sign( -1, A3 ) ) );
 }
 
 TEST( Array1Test, FunctionMinVal )

@@ -127,7 +127,87 @@ any( Array< bool > const & a )
 	return false;
 }
 
-// negation /////
+// abs /////
+
+template< typename T >
+inline
+Array1D< T >
+abs( Array1< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = std::abs( r[ i ] );
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+abs( Array2< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = std::abs( r[ i ] );
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+abs( Array3< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = std::abs( r[ i ] );
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+abs( Array4< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = std::abs( r[ i ] );
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+abs( Array5< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = std::abs( r[ i ] );
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+abs( Array6< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = std::abs( r[ i ] );
+	}
+	return r;
+}
+
+// Negation /////
 
 inline
 Array1D< bool >
@@ -191,6 +271,1050 @@ operator !( Array6< bool > const & a )
 	Array6D< bool > r( a );
 	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ! r[ i ];
+	}
+	return r;
+}
+
+// Bitwise Not /////
+
+template< typename T >
+inline
+Array1D< T >
+bit_not( Array1< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = ~r[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_not( Array2< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = ~r[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_not( Array3< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = ~r[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_not( Array4< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = ~r[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_not( Array5< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = ~r[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_not( Array6< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = ~r[ i ];
+	}
+	return r;
+}
+
+// Bitwise And /////
+
+template< typename T >
+inline
+Array1D< T >
+bit_and( Array1< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_and( Array2< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_and( Array3< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_and( Array4< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_and( Array5< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_and( Array6< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array1D< T >
+bit_and( T const & a, Array1< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_and( T const & a, Array2< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_and( T const & a, Array3< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_and( T const & a, Array4< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_and( T const & a, Array5< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_and( T const & a, Array6< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array1D< T >
+bit_and( Array1< T > const & a, Array1< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_and( Array2< T > const & a, Array2< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_and( Array3< T > const & a, Array3< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_and( Array4< T > const & a, Array4< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_and( Array5< T > const & a, Array5< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_and( Array6< T > const & a, Array6< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] &= b[ i ];
+	}
+	return r;
+}
+
+// Bitwise Or /////
+
+template< typename T >
+inline
+Array1D< T >
+bit_or( Array1< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_or( Array2< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_or( Array3< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_or( Array4< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_or( Array5< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_or( Array6< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array1D< T >
+bit_or( T const & a, Array1< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_or( T const & a, Array2< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_or( T const & a, Array3< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_or( T const & a, Array4< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_or( T const & a, Array5< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_or( T const & a, Array6< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array1D< T >
+bit_or( Array1< T > const & a, Array1< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_or( Array2< T > const & a, Array2< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_or( Array3< T > const & a, Array3< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_or( Array4< T > const & a, Array4< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_or( Array5< T > const & a, Array5< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_or( Array6< T > const & a, Array6< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] |= b[ i ];
+	}
+	return r;
+}
+
+// Bitwise Xor /////
+
+template< typename T >
+inline
+Array1D< T >
+bit_xor( Array1< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_xor( Array2< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_xor( Array3< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_xor( Array4< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_xor( Array5< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_xor( Array6< T > const & a, T const & b )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array1D< T >
+bit_xor( T const & a, Array1< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_xor( T const & a, Array2< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_xor( T const & a, Array3< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_xor( T const & a, Array4< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_xor( T const & a, Array5< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_xor( T const & a, Array6< T > const & b )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( b );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= a;
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array1D< T >
+bit_xor( Array1< T > const & a, Array1< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array2D< T >
+bit_xor( Array2< T > const & a, Array2< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array3D< T >
+bit_xor( Array3< T > const & a, Array3< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array4D< T >
+bit_xor( Array4< T > const & a, Array4< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array5D< T >
+bit_xor( Array5< T > const & a, Array5< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b[ i ];
+	}
+	return r;
+}
+
+template< typename T >
+inline
+Array6D< T >
+bit_xor( Array6< T > const & a, Array6< T > const & b )
+{
+	assert( a.size_bounded() );
+	assert( conformable( a, b ) );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] ^= b[ i ];
+	}
+	return r;
+}
+
+// pow /////
+
+template< typename T, typename X >
+inline
+Array1D< T >
+pow( Array1< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = T( std::pow( r[ i ], x ) );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array2D< T >
+pow( Array2< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = T( std::pow( r[ i ], x ) );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array3D< T >
+pow( Array3< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = T( std::pow( r[ i ], x ) );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array4D< T >
+pow( Array4< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = T( std::pow( r[ i ], x ) );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array5D< T >
+pow( Array5< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = T( std::pow( r[ i ], x ) );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array6D< T >
+pow( Array6< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = T( std::pow( r[ i ], x ) );
+	}
+	return r;
+}
+
+// sign /////
+
+template< typename T, typename X >
+inline
+Array1D< T >
+sign( Array1< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array1D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( r[ i ], x );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array2D< T >
+sign( Array2< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array2D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( r[ i ], x );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array3D< T >
+sign( Array3< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array3D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( r[ i ], x );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array4D< T >
+sign( Array4< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array4D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( r[ i ], x );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array5D< T >
+sign( Array5< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array5D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( r[ i ], x );
+	}
+	return r;
+}
+
+template< typename T, typename X >
+inline
+Array6D< T >
+sign( Array6< T > const & a, X const & x )
+{
+	assert( a.size_bounded() );
+	Array6D< T > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( r[ i ], x );
+	}
+	return r;
+}
+
+template< typename X, typename T >
+inline
+Array1D< X >
+sign( X const & x, Array1< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array1D< X > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( x, r[ i ] );
+	}
+	return r;
+}
+
+template< typename X, typename T >
+inline
+Array2D< X >
+sign( X const & x, Array2< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array2D< X > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( x, r[ i ] );
+	}
+	return r;
+}
+
+template< typename X, typename T >
+inline
+Array3D< X >
+sign( X const & x, Array3< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array3D< X > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( x, r[ i ] );
+	}
+	return r;
+}
+
+template< typename X, typename T >
+inline
+Array4D< X >
+sign( X const & x, Array4< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array4D< X > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( x, r[ i ] );
+	}
+	return r;
+}
+
+template< typename X, typename T >
+inline
+Array5D< X >
+sign( X const & x, Array5< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array5D< X > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( x, r[ i ] );
+	}
+	return r;
+}
+
+template< typename X, typename T >
+inline
+Array6D< X >
+sign( X const & x, Array6< T > const & a )
+{
+	assert( a.size_bounded() );
+	Array6D< X > r( a );
+	for ( BArray::size_type i = 0, e = a.size(); i < e; ++i ) {
+		r[ i ] = sign( x, r[ i ] );
 	}
 	return r;
 }
@@ -1933,348 +3057,6 @@ product_col( Array2< T > const & a, int const j )
 	size_type l( j - a.l2() );
 	for ( int i = a.l1(), e = a.u1(); i <= e; ++i, l += s2 ) {
 		r *= a[ l ];
-	}
-	return r;
-}
-
-// abs /////
-
-template< typename T >
-inline
-Array1D< T >
-abs( Array1< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array1D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = std::abs( r[ i ] );
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array2D< T >
-abs( Array2< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array2D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = std::abs( r[ i ] );
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array3D< T >
-abs( Array3< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array3D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = std::abs( r[ i ] );
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array4D< T >
-abs( Array4< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array4D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = std::abs( r[ i ] );
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array5D< T >
-abs( Array5< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array5D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = std::abs( r[ i ] );
-	}
-	return r;
-}
-
-template< typename T >
-inline
-Array6D< T >
-abs( Array6< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array6D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = std::abs( r[ i ] );
-	}
-	return r;
-}
-
-// pow /////
-
-template< typename T, typename X >
-inline
-Array1D< T >
-pow( Array1< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array1D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = T( std::pow( r[ i ], x ) );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array2D< T >
-pow( Array2< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array2D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = T( std::pow( r[ i ], x ) );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array3D< T >
-pow( Array3< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array3D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = T( std::pow( r[ i ], x ) );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array4D< T >
-pow( Array4< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array4D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = T( std::pow( r[ i ], x ) );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array5D< T >
-pow( Array5< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array5D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = T( std::pow( r[ i ], x ) );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array6D< T >
-pow( Array6< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array6D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = T( std::pow( r[ i ], x ) );
-	}
-	return r;
-}
-
-// sign /////
-
-template< typename T, typename X >
-inline
-Array1D< T >
-sign( Array1< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array1D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( r[ i ], x );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array2D< T >
-sign( Array2< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array2D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( r[ i ], x );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array3D< T >
-sign( Array3< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array3D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( r[ i ], x );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array4D< T >
-sign( Array4< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array4D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( r[ i ], x );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array5D< T >
-sign( Array5< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array5D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( r[ i ], x );
-	}
-	return r;
-}
-
-template< typename T, typename X >
-inline
-Array6D< T >
-sign( Array6< T > const & a, X const & x )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array6D< T > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( r[ i ], x );
-	}
-	return r;
-}
-
-template< typename X, typename T >
-inline
-Array1D< X >
-sign( X const & x, Array1< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array1D< X > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( x, r[ i ] );
-	}
-	return r;
-}
-
-template< typename X, typename T >
-inline
-Array2D< X >
-sign( X const & x, Array2< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array2D< X > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( x, r[ i ] );
-	}
-	return r;
-}
-
-template< typename X, typename T >
-inline
-Array3D< X >
-sign( X const & x, Array3< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array3D< X > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( x, r[ i ] );
-	}
-	return r;
-}
-
-template< typename X, typename T >
-inline
-Array4D< X >
-sign( X const & x, Array4< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array4D< X > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( x, r[ i ] );
-	}
-	return r;
-}
-
-template< typename X, typename T >
-inline
-Array5D< X >
-sign( X const & x, Array5< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array5D< X > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( x, r[ i ] );
-	}
-	return r;
-}
-
-template< typename X, typename T >
-inline
-Array6D< X >
-sign( X const & x, Array6< T > const & a )
-{
-	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
-	Array6D< X > r( a );
-	for ( size_type i = 0, e = a.size(); i < e; ++i ) {
-		r[ i ] = sign( x, r[ i ] );
 	}
 	return r;
 }

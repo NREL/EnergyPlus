@@ -136,7 +136,7 @@ TEST( RandomTest, Irand )
 TEST( RandomTest, RandomSeed )
 {
 	int size;
-	Array1D< int > const put( { 11, 22, 33 } );
+	Array1D< int > put( { 11, 22, 33 } );
 	Array1D< int > get( 3 );
 	// Just run them
 	RANDOM_SEED();
