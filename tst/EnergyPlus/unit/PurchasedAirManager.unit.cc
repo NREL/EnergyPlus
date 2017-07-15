@@ -58,11 +58,13 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 
 using namespace EnergyPlus;
@@ -73,10 +75,12 @@ using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::PurchasedAirManager;
+using namespace EnergyPlus::ZoneEquipmentManager;
 using namespace EnergyPlus::ZonePlenum;
 
 class ZoneIdealLoadsTest : public EnergyPlusFixture {
@@ -89,59 +93,12 @@ protected:
 	virtual void SetUp() {
 		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
 
-//		DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize StdRhoAir
-//		DataEnvironment::OutBaroPress = 101325.0;
-		DataGlobals::NumOfZones = 2;
-		DataHeatBalance::Zone.allocate( NumOfZones );
-		DataZoneEquipment::ZoneEquipConfig.allocate( NumOfZones );
-		DataZoneEquipment::ZoneEquipList.allocate( NumOfZones );
-		DataZoneEquipment::ZoneEquipAvail.dimension( NumOfZones, DataHVACGlobals::NoAction );
-		Zone( 1 ).Name = "EAST ZONE";
-		Zone( 2 ).Name = "PLENUM ZONE";
-		DataZoneEquipment::NumOfZoneEquipLists = 1;
-		Zone( 1 ).IsControlled = true;
-		ZoneEquipConfig( 1 ).IsControlled = true;
-		ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-		ZoneEquipConfig( 1 ).ZoneName = "EAST ZONE";
-		ZoneEquipConfig( 1 ).EquipListName = "ZONEEQUIPMENT";
-		ZoneEquipConfig( 1 ).ZoneNode = 20;
-		ZoneEquipConfig( 1 ).ReturnAirNode = 21;
-		Zone( ZoneEquipConfig( 1 ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( 1 ).ZoneNode;
-		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
-		ZoneEquipList( 1 ).Name = "ZONEEQUIPMENT";
-		int maxEquipCount = 1;
-		ZoneEquipList( 1 ).NumOfEquipTypes = maxEquipCount;
-		ZoneEquipList( 1 ).EquipType.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
-		ZoneEquipList( 1 ).EquipType_Num.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
-		ZoneEquipList( 1 ).EquipName.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
-		ZoneEquipList( 1 ).EquipIndex.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
-		ZoneEquipList( 1 ).EquipIndex = 1;
-		ZoneEquipList( 1 ).EquipData.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
-		ZoneEquipList( 1 ).CoolingPriority.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
-		ZoneEquipList( 1 ).HeatingPriority.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
-		ZoneEquipList( 1 ).EquipType( 1 ) = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
-		ZoneEquipList( 1 ).EquipName( 1 ) = "ZONE 1 IDEAL LOADS";
-		ZoneEquipList( 1 ).CoolingPriority( 1 ) = 1;
-		ZoneEquipList( 1 ).HeatingPriority( 1 ) = 1;
-		ZoneEquipList( 1 ).EquipType_Num( 1 ) = DataZoneEquipment::ZoneUnitarySystem_Num;
-		ZoneEquipConfig( 1 ).NumInletNodes = NumNodes;
-		ZoneEquipConfig( 1 ).InletNode.allocate( NumNodes );
-		ZoneEquipConfig( 1 ).AirDistUnitCool.allocate( NumNodes );
-		ZoneEquipConfig( 1 ).AirDistUnitHeat.allocate( NumNodes );
-		ZoneEquipConfig( 1 ).InletNode( 1 ) = 2;
-		ZoneEquipConfig( 1 ).NumExhaustNodes = NumNodes;
-		ZoneEquipConfig( 1 ).ExhaustNode.allocate( NumNodes );
-		ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 1;
-		ZoneEquipConfig( 1 ).EquipListIndex = 1;
-
 		DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate( 1 );
 		DataHeatBalFanSys::ZoneThermostatSetPointHi( 1 ) = 23.9; // 75F
 		DataHeatBalFanSys::ZoneThermostatSetPointLo.allocate( 1 );
 		DataHeatBalFanSys::ZoneThermostatSetPointLo( 1 ) = 23.0; // 73.4F
 
-		//		UnitarySystem.allocate( 1 );
 		FinalZoneSizing.allocate( 1 );
-
 		ZoneEqSizing.allocate( 1 );
 		CurZoneEqNum = 1;
 		CurSysNum = 0;
@@ -149,16 +106,28 @@ protected:
 		ZoneSizingRunDone = true;
 
 		ZoneSysEnergyDemand.allocate( 1 );
-		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 1000.0;
-		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = 2000.0;
+		ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 1000.0;
+		ZoneSysEnergyDemand( 1 ).OutputRequiredToHeatingSP = 1000.0;
+		ZoneSysEnergyDemand( 1 ).OutputRequiredToCoolingSP = 2000.0;
+		ZoneSysMoistureDemand.allocate( 1 );
+		NonAirSystemResponse.allocate( 1 );
+		SysDepZoneLoads.allocate( 1 );
+		MassConservation.allocate( 1 );
+		ZoneIntGain.allocate( 1 );
+		SurfaceWindow.allocate( 1 );
+		RefrigCaseCredit.allocate( 1 );
+		ZoneLatentGain.allocate( 1 );
 
 		TempControlType.allocate( 1 );
 		TempControlType( 1 ) = DataHVACGlobals::SingleHeatingSetPoint;
+		CurDeadBandOrSetback.allocate( 1 );
+		DeadBandOrSetback.allocate( 1 );
+		DeadBandOrSetback( 1 ) = false;
 
 		ZoneAirHumRat.allocate( 1 );
 		ZoneAirHumRat( 1 ) = 0.07;
 
-		DataZoneEquipment::ZoneEquipInputsFilled = true;
+		DataZoneEquipment::ZoneEquipInputsFilled = false;
 
 	}
 
@@ -373,26 +342,19 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
 
 	DataGlobals::DoWeathSim = true;
 
-	GetZoneData( ErrorsFound ); // read zone data
+	bool ErrorsFound = false;
+	GetZoneData( ErrorsFound );
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 1;
+	AllocateHeatBalArrays();
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
-	GetZoneEquipmentData1(); // read zone equipment configuration and list objects
-
-//	GetPurchasedAir();
-//	GetPurchAirInputFlag = false;
-
-	Real64 SysOutputProvided( 0 );
-	Real64 LatOutputProvided( 0 );
-	std::string PurchAirName( "ZONE 1 IDEAL LOADS" );
 	bool FirstHVACIteration( true );
-	int ControlledZoneNum( 1 );
-	int ActualZoneNum( 1 );
-	int EquipPtr( 0 );
-	SimPurchasedAir( PurchAirName, SysOutputProvided, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum, EquipPtr );
+	bool SimZone( true );
+	bool SimAir( false );
+	ManageZoneEquipment( FirstHVACIteration, SimZone, SimAir ); // read zone equipment configuration and list objects and simulate ideal loads air system
 
 	EXPECT_EQ( PurchAir( 1 ).Name, "ZONE 1 IDEAL LOADS" );
-	// SimPurchasedAir returned the pointer to the Ideal Loads Air System
-	EXPECT_EQ( EquipPtr, 1 );
 	// Ideal loads air system found the plenum it is attached to
 	EXPECT_EQ( PurchAir( 1 ).ReturnPlenumIndex, 1 );
 	// The ideal loads air system inlet air node is equal to the zone return plenum outlet node
