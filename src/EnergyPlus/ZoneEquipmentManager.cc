@@ -499,19 +499,22 @@ namespace ZoneEquipmentManager {
 				}
 
 				// BG CR 7122 following resets return air node.
-				ZoneReturnAirNode = ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode;
-				if ( ZoneReturnAirNode > 0 ) {
-					Node( ZoneReturnAirNode ).Temp = 20.0;
-					Node( ZoneReturnAirNode ).MassFlowRate = 0.0;
-					Node( ZoneReturnAirNode ).Quality = 1.0;
-					Node( ZoneReturnAirNode ).Press = OutBaroPress;
-					Node( ZoneReturnAirNode ).HumRat = OutHumRat;
-					Node( ZoneReturnAirNode ).Enthalpy = PsyHFnTdbW( Node( ZoneReturnAirNode ).Temp, Node( ZoneReturnAirNode ).HumRat );
-					if ( Contaminant.CO2Simulation ) {
-						Node( ZoneReturnAirNode ).CO2 = OutdoorCO2;
-					}
-					if ( Contaminant.GenericContamSimulation ) {
-						Node( ZoneReturnAirNode ).GenContam = OutdoorGC;
+				int NumRetNodes = ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes;
+				if ( NumRetNodes > 0 ) {
+					for ( int nodeCount = 1; nodeCount <= NumRetNodes; ++nodeCount ) {
+						int returnNode = ZoneEquipConfig( ControlledZoneNum ).ReturnNode( nodeCount );
+						Node( returnNode ).Temp = 20.0;
+						Node( returnNode ).MassFlowRate = 0.0;
+						Node( returnNode ).Quality = 1.0;
+						Node( returnNode ).Press = OutBaroPress;
+						Node( returnNode ).HumRat = OutHumRat;
+						Node( returnNode ).Enthalpy = PsyHFnTdbW( Node( returnNode ).Temp, Node( returnNode ).HumRat );
+						if ( Contaminant.CO2Simulation ) {
+							Node( returnNode ).CO2 = OutdoorCO2;
+						}
+						if ( Contaminant.GenericContamSimulation ) {
+							Node( returnNode ).GenContam = OutdoorGC;
+						}
 					}
 				}
 
@@ -3957,7 +3960,8 @@ namespace ZoneEquipmentManager {
 
 				// Update Return Air Node Conditions; If one Exists
 				int NumRetNodes = ZoneEquipConfig( ZoneNum ).NumReturnNodes;
-				int RetNode1 = ZoneEquipConfig( ZoneNum ).ReturnNode( 1 );
+				int RetNode1 = 0;
+				if ( NumRetNodes > 0 ) RetNode1 = ZoneEquipConfig( ZoneNum ).ReturnNode( 1 );
 				UserReturnNode1MassFlow = 0.0;
 				StdTotalReturnMassFlow = 0.0;
 				if ( RetNode1 > 0 ) {
