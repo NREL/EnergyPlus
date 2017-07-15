@@ -374,7 +374,7 @@
     Main Cooling Coil 1,     !- Name
     System Availability Schedule,  !- Availability Schedule Name
     148300,                  !- Gross Rated Total Cooling Capacity {W}
-    0.85,                    !- Gross Rated Sensible Heat Ratio
+    0.83,                    !- Gross Rated Sensible Heat Ratio
     4.5669,                  !- Gross Rated Cooling COP {W/W}
     8.5,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
@@ -419,6 +419,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     ,                        !- Normalization Reference
+    ,                        !- External File Name
     13.0,                    !- X Value #1
     -10.0,                   !- Y Value #1
     1.00,                    !- Output Value #1
@@ -580,6 +581,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     ,                        !- Normalization Reference
+    ,                        !- External File Name
     12.7,                    !- X Value #1
     -50,                     !- Y Value #1
     0.042,                   !- Output Value #1
