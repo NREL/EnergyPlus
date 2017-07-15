@@ -4878,8 +4878,8 @@ namespace SimAirServingZones {
 					SysCoolRetTemp += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					SysCoolRetHumRat += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					SysCoolZoneAvgTemp += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTempSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-					SysDOASHeatAdd += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAddSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
-					SysDOASLatAdd += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAddSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
+					SysDOASHeatAdd += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAddSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+					SysDOASLatAdd += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAddSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 				} // end of loop over zones cooled by central system
 				// check that there is system mass flow
 				if ( SysSizing( CurOverallSimDay, AirLoopNum ).CoolFlowSeq( TimeStepInDay ) > 0.0 ) {
@@ -4972,11 +4972,11 @@ namespace SimAirServingZones {
 						// sum up the heating mass flow rate for this time step
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						// sum up the zone cooling load to be met by this system for this time step
-						SysSizing( CurOverallSimDay, AirLoopNum ).SumZoneHeatLoadSeq( TimeStepInDay ) += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
+						SysSizing( CurOverallSimDay, AirLoopNum ).SumZoneHeatLoadSeq( TimeStepInDay ) += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						// calculate the return air temperature for this time step
 						SysHeatRetTemp += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetHumRat += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-						SysHeatZoneAvgTemp += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneTempSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
+						SysHeatZoneAvgTemp += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneTempSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					} // end heated zones loop
 					// check that the system flow rate is nonzero
 					if ( SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) > 0.0 ) {
