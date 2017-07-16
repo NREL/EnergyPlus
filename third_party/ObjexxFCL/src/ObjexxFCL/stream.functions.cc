@@ -96,13 +96,14 @@ cross_platform_get_line( std::istream & stream, std::string & line, char const d
 				stream_buffer->sbumpc();
 				return stream;
 			}
-#if __cplusplus >= 201500 // C++17
-			[[fallthrough]];
-#elif defined(__clang__)
-			[[clang::fallthrough]]; // Clang
-#elif defined(__GNUC__)
-			[[gnu::fallthrough]]; // GCC C++11 and C++14
-#endif
+			if ( saving ) {
+				if ( c == delim ) {
+					saving = false;
+				} else {
+					line += static_cast< char >( c );
+				}
+			}
+			break;
 		default:
 			if ( saving ) {
 				if ( c == delim ) {
