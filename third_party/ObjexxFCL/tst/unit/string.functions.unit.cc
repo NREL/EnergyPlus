@@ -320,12 +320,12 @@ TEST( StringFunctionsTest, Conversion )
 
 TEST( StringFunctionsTest, ConversionTo )
 {
-	EXPECT_EQ( false, type_of< bool >( string( "0" ) ) );
-	EXPECT_EQ( true, type_of< bool >( string( "1" ) ) );
-	EXPECT_EQ( false, type_of< bool >( string( "F" ) ) );
-	EXPECT_EQ( true, type_of< bool >( string( "T" ) ) );
-	EXPECT_EQ( false, type_of< bool >( string( "false" ) ) );
-	EXPECT_EQ( true, type_of< bool >( string( "true" ) ) );
+	EXPECT_FALSE( type_of< bool >( string( "0" ) ) );
+	EXPECT_TRUE( type_of< bool >( string( "1" ) ) );
+	EXPECT_FALSE( type_of< bool >( string( "F" ) ) );
+	EXPECT_TRUE( type_of< bool >( string( "T" ) ) );
+	EXPECT_FALSE( type_of< bool >( string( "false" ) ) );
+	EXPECT_TRUE( type_of< bool >( string( "true" ) ) );
 	EXPECT_EQ( 123, type_of< int >( string( "123" ) ) );
 	EXPECT_EQ( short( 123 ), type_of< short int >( string( "123" ) ) );
 	EXPECT_EQ( 123l, type_of< long int >( string( "123" ) ) );
@@ -336,12 +336,12 @@ TEST( StringFunctionsTest, ConversionTo )
 	EXPECT_EQ( 123.75, type_of< double >( string( "123.75" ) ) );
 	EXPECT_EQ( 'X', type_of< char >( string( "X" ) ) );
 
-	EXPECT_EQ( false, bool_of( string( "0" ) ) );
-	EXPECT_EQ( true, bool_of( string( "1" ) ) );
-	EXPECT_EQ( false, bool_of( string( "F" ) ) );
-	EXPECT_EQ( true, bool_of( string( "T" ) ) );
-	EXPECT_EQ( false, bool_of( string( "false" ) ) );
-	EXPECT_EQ( true, bool_of( string( "true" ) ) );
+	EXPECT_FALSE( bool_of( string( "0" ) ) );
+	EXPECT_TRUE( bool_of( string( "1" ) ) );
+	EXPECT_FALSE( bool_of( string( "F" ) ) );
+	EXPECT_TRUE( bool_of( string( "T" ) ) );
+	EXPECT_FALSE( bool_of( string( "false" ) ) );
+	EXPECT_TRUE( bool_of( string( "true" ) ) );
 	EXPECT_EQ( 123, int_of( string( "123" ) ) );
 	EXPECT_EQ( short( 123 ), short_of( string( "123" ) ) );
 	EXPECT_EQ( 123l, long_of( string( "123" ) ) );
@@ -358,12 +358,12 @@ TEST( StringFunctionsTest, ConversionTo )
 	EXPECT_EQ( 43l, hexadecimal_of( string( "0x2B" ) ) );
 	EXPECT_EQ( 43l, hex_of( string( "0x2B" ) ) );
 
-	EXPECT_EQ( false, type_of< bool >( "0" ) );
-	EXPECT_EQ( true, type_of< bool >( "1" ) );
-	EXPECT_EQ( false, type_of< bool >( "F" ) );
-	EXPECT_EQ( true, type_of< bool >( "T" ) );
-	EXPECT_EQ( false, type_of< bool >( "false" ) );
-	EXPECT_EQ( true, type_of< bool >( "true" ) );
+	EXPECT_FALSE( type_of< bool >( "0" ) );
+	EXPECT_TRUE( type_of< bool >( "1" ) );
+	EXPECT_FALSE( type_of< bool >( "F" ) );
+	EXPECT_TRUE( type_of< bool >( "T" ) );
+	EXPECT_FALSE( type_of< bool >( "false" ) );
+	EXPECT_TRUE( type_of< bool >( "true" ) );
 	EXPECT_EQ( 123, type_of< int >( "123" ) );
 	EXPECT_EQ( short( 123 ), type_of< short int >( "123" ) );
 	EXPECT_EQ( 123l, type_of< long int >( "123" ) );
@@ -374,12 +374,12 @@ TEST( StringFunctionsTest, ConversionTo )
 	EXPECT_EQ( 123.75, type_of< double >( "123.75" ) );
 	EXPECT_EQ( 'X', type_of< char >( "X" ) );
 
-	EXPECT_EQ( false, bool_of( "0" ) );
-	EXPECT_EQ( true, bool_of( "1" ) );
-	EXPECT_EQ( false, bool_of( "F" ) );
-	EXPECT_EQ( true, bool_of( "T" ) );
-	EXPECT_EQ( false, bool_of( "false" ) );
-	EXPECT_EQ( true, bool_of( "true" ) );
+	EXPECT_FALSE( bool_of( "0" ) );
+	EXPECT_TRUE( bool_of( "1" ) );
+	EXPECT_FALSE( bool_of( "F" ) );
+	EXPECT_TRUE( bool_of( "T" ) );
+	EXPECT_FALSE( bool_of( "false" ) );
+	EXPECT_TRUE( bool_of( "true" ) );
 	EXPECT_EQ( 123, int_of( "123" ) );
 	EXPECT_EQ( short( 123 ), short_of( "123" ) );
 	EXPECT_EQ( 123l, long_of( "123" ) );
