@@ -37,7 +37,7 @@ The name of the zone exhaust air node of the ideal loads object. This should be 
 
 \paragraph{Field: System Inlet Air Node Name}\label{system-inlet-air-node-name}
 
-The name of the plenum exhaust air node connected to the ideal loads object. When an AirloopHVAC:ZoneReturnPlenum is connected to the Ideal Loads Air System the Zone Supply Air Node Name should be the same as one of the zone air inlet nodes and the Zone Exhaust Air Node Name should be the same as one of the zone air exhaust nodes for the zone this component is serving and one of the AirloopHVAC:ReturnPlenum outlet or induced nodes. In the AirloopHVAC:ZoneReturnPlenum object, one of the plenum exhaust nodes is listed as the plenum Outlet Node Name (required) while the remaining nodes, if needed, are listed in the Induced Air Outlet Node or NodeList Name field.
+The name of the plenum outlet (or induced) air node connected to the ideal loads object. When an AirloopHVAC:ReturnPlenum is connected to the Ideal Loads Air System the Zone Supply Air Node Name should be the same as one of the zone air inlet nodes. The Zone Exhaust Air Node Name should be the same as one of the zone air exhaust nodes and one of the AirloopHVAC:ReturnPlenum inlet nodes. In the AirloopHVAC:ReturnPlenum object, for the first ideal loads air system, the System Inlet Air Node Name is entered as the plenum Outlet Node Name (required field) while all remaining ideal loads air systems, if used, list the System Inlet Air Node Name in the Induced Air Outlet Node or NodeList Name field (see Engineering Reference for schematic).
 
 \paragraph{Field: Maximum Heating Supply Air Temperature}\label{field-maximum-heating-supply-air-temperature-000}
 
