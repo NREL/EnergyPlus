@@ -988,6 +988,85 @@ namespace OutputProcessor {
 // within the OutputProcessor.
 // *****************************************************************************
 
+enum class Unit {
+	kg_s,
+	C,
+	kgWater_kgDryAir,
+	ppm,
+	Pa,
+	m3_s,
+	None,
+	min,
+	W,
+	J,
+	m3,
+	kg,
+	ach,
+	W_W,
+	lux,
+	lum_W,
+	hr,
+	cd_m2,
+	J_kgWater,
+	m_s,
+	W_m2,
+	m,
+	Ah,
+	A,
+	V,
+	deltaC,
+	kmol_s,
+	Kg_s,
+	rev_min,
+	Btu_h_W,
+	W_m2K,
+	J_kg,
+	kg_kg,
+	Perc,
+	deg,
+	s,
+	kg_m3,
+	kg_m2s,
+	J_kgK,
+	L,
+	Kg,
+	K_m,
+	m2,
+	W_m2C,
+	rad,
+	ACH,
+	J_m2,
+	clo,
+	W_K,
+	kgWater_s
+};
+
+std::string
+unitEnumToString(
+	Unit const & unitIn
+);
+
+void
+SetupOutputVariable(
+	std::string const & VariableName, // String Name of variable (with units)
+	Unit const & VariableUnit, // Actual units corresponding to the actual variable
+	Real64 & ActualVariable, // Actual Variable, used to set up pointer
+	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	std::string const & KeyedValue, // Associated Key for this variable
+	Optional_string_const ReportFreq = _, // Internal use -- causes reporting at this freqency
+	Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
+	Optional_string_const EndUseKey = _, // Meter End Use Key (Lights, Heating, Cooling, etc)
+	Optional_string_const EndUseSubKey = _, // Meter End Use Sub Key (General Lights, Task Lights, etc)
+	Optional_string_const GroupKey = _, // Meter Super Group Key (Building, System, Plant)
+	Optional_string_const ZoneKey = _, // Meter Zone Key (zone name)
+	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
+	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
+	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
+);
+
+
+
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable (with units)
@@ -1003,6 +1082,18 @@ SetupOutputVariable(
 	Optional_string_const ZoneKey = _, // Meter Zone Key (zone name)
 	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
 	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
+	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
+);
+
+void
+SetupOutputVariable(
+	std::string const & VariableName, // String Name of variable
+	Unit const & VariableUnit, // Actual units corresponding to the actual variable
+	int & ActualVariable, // Actual Variable, used to set up pointer
+	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	std::string const & KeyedValue, // Associated Key for this variable
+	Optional_string_const ReportFreq = _, // Internal use -- causes reporting at this freqency
 	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
 );
 

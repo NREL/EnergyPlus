@@ -712,41 +712,42 @@ namespace WeatherManager {
 
 			// SetupOutputVariables, CurrentModuleObject='All Simulations'
 
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", OutDryBulbTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Dewpoint Temperature [C]", OutDewPointTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Wetbulb Temperature [C]", OutWetBulbTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]", OutHumRat, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Relative Humidity [%]", OutRelHum, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Barometric Pressure [Pa]", OutBaroPress, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Wind Speed [m/s]", WindSpeed, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Wind Direction [deg]", WindDir, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Sky Temperature [C]", SkyTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Horizontal Infrared Radiation Rate per Area [W/m2]", HorizIRSky, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Diffuse Solar Radiation Rate per Area [W/m2]", DifSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Direct Solar Radiation Rate per Area [W/m2]", BeamSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Precipitation Depth [m]", LiquidPrecipitation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Site Ground Reflected Solar Radiation Rate per Area [W/m2]", GndSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Ground Temperature [C]", GroundTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Surface Ground Temperature [C]", GroundTemp_Surface, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Deep Ground Temperature [C]", GroundTemp_Deep, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Simple Factor Model Ground Temperature [C]", GroundTempFC, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Enthalpy [J/kg]", OutEnthalpy, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Density [kg/m3]", OutAirDensity, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Azimuth Angle [deg]", SolarAzimuthAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Altitude Angle [deg]", SolarAltitudeAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Hour Angle [deg]", HrAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Rain Status []", RptIsRain, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Snow on Ground Status []", RptIsSnow, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Horizontal Sky Illuminance [lux]", HISKF, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Horizontal Beam Illuminance [lux]", HISUNF, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Beam Normal Illuminance [lux]", HISUNFnorm, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Sky Diffuse Solar Radiation Luminous Efficacy [lum/W]", PDIFLW, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Beam Solar Radiation Luminous Efficacy [lum/W]", PDIRLW, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylighting Model Sky Clearness []", SkyClearness, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylighting Model Sky Brightness []", SkyBrightness, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylight Saving Time Status []", DSTIndicator, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Site Day Type Index []", RptDayType, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Site Mains Water Temperature [C]", WaterMainsTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", Unit::C, OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Dewpoint Temperature", Unit::C, OutDewPointTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Wetbulb Temperature", Unit::C, OutWetBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Humidity Ratio", Unit::kgWater_kgDryAir, OutHumRat, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Relative Humidity", Unit::Perc, OutRelHum, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Barometric Pressure", Unit::Pa, OutBaroPress, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Wind Speed", Unit::m_s, WindSpeed, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Wind Direction", Unit::deg, WindDir, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Sky Temperature", Unit::C, SkyTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Horizontal Infrared Radiation Rate per Area", Unit::W_m2, HorizIRSky, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Diffuse Solar Radiation Rate per Area", Unit::W_m2, DifSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Direct Solar Radiation Rate per Area", Unit::W_m2, BeamSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Precipitation Depth", Unit::m, LiquidPrecipitation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Site Ground Reflected Solar Radiation Rate per Area", Unit::W_m2, GndSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Ground Temperature", Unit::C, GroundTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Surface Ground Temperature", Unit::C, GroundTemp_Surface, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Deep Ground Temperature", Unit::C, GroundTemp_Deep, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Simple Factor Model Ground Temperature", Unit::C, GroundTempFC, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Enthalpy", Unit::J_kg, OutEnthalpy, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Density", Unit::kg_m3, OutAirDensity, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Azimuth Angle", Unit::deg, SolarAzimuthAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Altitude Angle", Unit::deg, SolarAltitudeAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Hour Angle", Unit::deg, HrAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Rain Status", Unit::None, RptIsRain, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Snow on Ground Status", Unit::None, RptIsSnow, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Horizontal Sky Illuminance", Unit::lux, HISKF, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Horizontal Beam Illuminance", Unit::lux, HISUNF, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Beam Normal Illuminance", Unit::lux, HISUNFnorm, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Sky Diffuse Solar Radiation Luminous Efficacy", Unit::lum_W, PDIFLW, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Beam Solar Radiation Luminous Efficacy", Unit::lum_W, PDIRLW, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylighting Model Sky Clearness", Unit::None, SkyClearness, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylighting Model Sky Brightness", Unit::None, SkyBrightness, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylight Saving Time Status", Unit::None, DSTIndicator, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Site Day Type Index", Unit::None, RptDayType, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Site Mains Water Temperature", Unit::C, WaterMainsTemp, "Zone", "Average", "Environment" );
+
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Weather Data", "Environment", "Outdoor Dry Bulb", "[C]", EMSOutDryBulbOverrideOn, EMSOutDryBulbOverrideValue );

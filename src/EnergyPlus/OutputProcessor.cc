@@ -5056,6 +5056,209 @@ namespace OutputProcessor {
 // within the OutputProcessor.
 // *****************************************************************************
 
+std::string
+unitEnumToString(
+	Unit const & unitIn
+)
+{
+	switch ( unitIn ) {
+		case Unit::kg_s:
+			return " [kg/s]";
+			break;
+		case Unit::C:
+			return " [C]";
+			break;
+		case Unit::kgWater_kgDryAir:
+			return " [kgWater/kgDryAir]";
+			break;
+		case Unit::ppm:
+			return " [ppm]";
+			break;
+		case Unit::Pa:
+			return " [Pa]";
+			break;
+		case Unit::m3_s:
+			return " [m3/s]";
+			break;
+		case Unit::None:
+			return " [None]";
+			break;
+		case Unit::min:
+			return " [min]";
+			break;
+		case Unit::W:
+			return " [W]";
+			break;
+		case Unit::J:
+			return " [J]";
+			break;
+		case Unit::m3:
+			return " [m3]";
+			break;
+		case Unit::kg:
+			return " [kg]";
+			break;
+		case Unit::ach:
+			return " [ach]";
+			break;
+		case Unit::W_W:
+			return " [W/W]";
+			break;
+		case Unit::lux:
+			return " [lux]";
+			break;
+		case Unit::lum_W:
+			return " [lum/W]";
+			break;
+		case Unit::hr:
+			return " [hr]";
+			break;
+		case Unit::cd_m2:
+			return " [cd/m2]";
+			break;
+		case Unit::J_kgWater:
+			return " [J/kgWater]";
+			break;
+		case Unit::m_s:
+			return " [m/s]";
+			break;
+		case Unit::W_m2:
+			return " [W/m2]";
+			break;
+		case Unit::m:
+			return " [m]";
+			break;
+		case Unit::Ah:
+			return " [Ah]";
+			break;
+		case Unit::A:
+			return " [A]";
+			break;
+		case Unit::V:
+			return " [V]";
+			break;
+		case Unit::deltaC:
+			return " [deltaC]";
+			break;
+		case Unit::kmol_s:
+			return " [kmol/s]";
+			break;
+		case Unit::Kg_s:
+			return " [Kg/s]";
+			break;
+		case Unit::rev_min:
+			return " [rev/min]";
+			break;
+		case Unit::Btu_h_W:
+			return " [Btu/h/W]";
+			break;
+		case Unit::W_m2K:
+			return " [W/m2K]";
+			break;
+		case Unit::J_kg:
+			return " [J/kg]";
+			break;
+		case Unit::kg_kg:
+			return " [kg/kg]";
+			break;
+		case Unit::Perc:
+			return " [Perc]";
+			break;
+		case Unit::deg:
+			return " [deg]";
+			break;
+		case Unit::s:
+			return " [s]";
+			break;
+		case Unit::kg_m3:
+			return " [kg/m3]";
+			break;
+		case Unit::kg_m2s:
+			return " [kg/m2s]";
+			break;
+		case Unit::J_kgK:
+			return " [J/kgK]";
+			break;
+		case Unit::L:
+			return " [L]";
+			break;
+		case Unit::Kg:
+			return " [Kg]";
+			break;
+		case Unit::K_m:
+			return " [K/m]";
+			break;
+		case Unit::m2:
+			return " [m2]";
+			break;
+		case Unit::W_m2C:
+			return " [W/m2C]";
+			break;
+		case Unit::rad:
+			return " [rad]";
+			break;
+		case Unit::ACH:
+			return " [ACH]";
+			break;
+		case Unit::J_m2:
+			return " [J/m2]";
+			break;
+		case Unit::clo:
+			return " [clo]";
+			break;
+		case Unit::W_K:
+			return " [W/K]";
+			break;
+		case Unit::kgWater_s:
+			return " [kgWater/s]";
+			break;
+
+		default:
+			return " [unknown]";
+			break;
+	}
+}
+
+
+void
+SetupOutputVariable(
+	std::string const & VariableName, // String Name of variable (with units)
+	Unit const & VariableUnit, // Actual units corresponding to the actual variable
+	Real64 & ActualVariable, // Actual Variable, used to set up pointer
+	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	std::string const & KeyedValue, // Associated Key for this variable
+	Optional_string_const ReportFreq, // Internal use -- causes reporting at this freqency
+	Optional_string_const ResourceTypeKey, // Meter Resource Type (Electricity, Gas, etc)
+	Optional_string_const EndUseKey, // Meter End Use Key (Lights, Heating, Cooling, etc)
+	Optional_string_const EndUseSubKey, // Meter End Use Sub Key (General Lights, Task Lights, etc)
+	Optional_string_const GroupKey, // Meter Super Group Key (Building, System, Plant)
+	Optional_string_const ZoneKey, // Meter Zone Key (zone name)
+	Optional_int_const ZoneMult, // Zone Multiplier, defaults to 1
+	Optional_int_const ZoneListMult, // Zone List Multiplier, defaults to 1
+	Optional_int_const indexGroupKey // Group identifier for SQL output
+)
+{
+	std::string oldStyleVariableName = VariableName + unitEnumToString(VariableUnit);
+	SetupOutputVariable(oldStyleVariableName, ActualVariable, IndexTypeKey, VariableTypeKey, KeyedValue, ReportFreq, ResourceTypeKey, EndUseKey, EndUseSubKey, GroupKey, ZoneKey, ZoneMult, ZoneListMult, indexGroupKey);
+}
+
+void
+SetupOutputVariable(
+	std::string const & VariableName, // String Name of variable
+	Unit const & VariableUnit, // Actual units corresponding to the actual variable
+	int & ActualVariable, // Actual Variable, used to set up pointer
+	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
+	std::string const & KeyedValue, // Associated Key for this variable
+	Optional_string_const ReportFreq, // Internal use -- causes reporting at this freqency
+	Optional_int_const indexGroupKey // Group identifier for SQL output
+)
+{
+	std::string oldStyleVariableName = VariableName + unitEnumToString( VariableUnit );
+	SetupOutputVariable( oldStyleVariableName, ActualVariable, IndexTypeKey, VariableTypeKey, KeyedValue, ReportFreq, indexGroupKey );
+}
+
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable (with units)
