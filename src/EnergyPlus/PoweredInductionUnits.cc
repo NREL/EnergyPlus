@@ -644,10 +644,10 @@ namespace PoweredInductionUnits {
 
 		for ( PIUNum = 1; PIUNum <= NumPIUs; ++PIUNum ) {
 			// Setup Report variables for the Fan Coils
-			SetupOutputVariable( "Zone Air Terminal Heating Rate [W]", PIU( PIUNum ).HeatingRate, "System", "Average", PIU( PIUNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Heating Energy [J]", PIU( PIUNum ).HeatingEnergy, "System", "Sum", PIU( PIUNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate [W]", PIU( PIUNum ).SensCoolRate, "System", "Average", PIU( PIUNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy [J]", PIU( PIUNum ).SensCoolEnergy, "System", "Sum", PIU( PIUNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Heating Rate", Unit::W, PIU( PIUNum ).HeatingRate, "System", "Average", PIU( PIUNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Heating Energy", Unit::J, PIU( PIUNum ).HeatingEnergy, "System", "Sum", PIU( PIUNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate", Unit::W, PIU( PIUNum ).SensCoolRate, "System", "Average", PIU( PIUNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy", Unit::J, PIU( PIUNum ).SensCoolEnergy, "System", "Sum", PIU( PIUNum ).Name );
 
 		}
 

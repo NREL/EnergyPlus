@@ -603,7 +603,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Scheduled Control Status []", SchedSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Scheduled Control Status", Unit::None, SchedSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -637,7 +637,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Scheduled On Control Status []", SchedOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedOnSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Scheduled On Control Status", Unit::None, SchedOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedOnSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -671,7 +671,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Scheduled Off Control Status []", SchedOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedOffSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Scheduled Off Control Status", Unit::None, SchedOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedOffSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -840,7 +840,7 @@ namespace SystemAvailabilityManager {
 					}
 				}
 
-				SetupOutputVariable( "Availability Manager Night Cycle Control Status []", NCycSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", NCycSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Night Cycle Control Status", Unit::None, NCycSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", NCycSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 		}
@@ -965,10 +965,10 @@ namespace SystemAvailabilityManager {
 					OptStartSysAvailMgrData( SysAvailNum ).NumPreDays = rNumericArgs( 7 );
 				}
 
-				SetupOutputVariable( "Availability Manager Optimum Start Control Status []", OptStartSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Optimum Start Control Status", Unit::None, OptStartSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name );
 
 				// add
-				SetupOutputVariable( "Availability Manager Optimum Start Time Before Occupancy [hr]", OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name, "Daily" );
+				SetupOutputVariable( "Availability Manager Optimum Start Time Before Occupancy", Unit::hr, OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name, "Daily" );
 
 			}
 
@@ -1014,7 +1014,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Differential Thermostat Control Status []", DiffTSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", DiffTSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Differential Thermostat Control Status", Unit::None, DiffTSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", DiffTSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1045,7 +1045,7 @@ namespace SystemAvailabilityManager {
 
 				HiTurnOffSysAvailMgrData( SysAvailNum ).Temp = rNumericArgs( 1 );
 
-				SetupOutputVariable( "Availability Manager High Temperature Turn Off Control Status []", HiTurnOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", HiTurnOffSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager High Temperature Turn Off Control Status", Unit::None, HiTurnOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", HiTurnOffSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1077,7 +1077,7 @@ namespace SystemAvailabilityManager {
 
 				HiTurnOnSysAvailMgrData( SysAvailNum ).Temp = rNumericArgs( 1 );
 
-				SetupOutputVariable( "Availability Manager High Temperature Turn On Control Status []", HiTurnOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", HiTurnOnSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager High Temperature Turn On Control Status", Unit::None, HiTurnOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", HiTurnOnSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1120,7 +1120,7 @@ namespace SystemAvailabilityManager {
 					LoTurnOffSysAvailMgrData( SysAvailNum ).SchedPtr = 0;
 				}
 
-				SetupOutputVariable( "Availability Manager Low Temperature Turn Off Control Status []", LoTurnOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", LoTurnOffSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Low Temperature Turn Off Control Status", Unit::None, LoTurnOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", LoTurnOffSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1152,7 +1152,7 @@ namespace SystemAvailabilityManager {
 
 				LoTurnOnSysAvailMgrData( SysAvailNum ).Temp = rNumericArgs( 1 );
 
-				SetupOutputVariable( "Availability Manager Low Temperature Turn On Control Status []", LoTurnOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", LoTurnOnSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Low Temperature Turn On Control Status", Unit::None, LoTurnOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", LoTurnOnSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1210,7 +1210,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Night Ventilation Control Status []", NVentSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", NVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Night Ventilation Control Status", Unit::None, NVentSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", NVentSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -4523,29 +4523,29 @@ namespace SystemAvailabilityManager {
 		// Set up output variables
 		for ( SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum ) {
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
-				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Status []", HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
-				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Mode []", HybridVentSysAvailMgrData( SysAvailNum ).ControlMode, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Status", Unit::None, HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Mode", Unit::None, HybridVentSysAvailMgrData( SysAvailNum ).ControlMode, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
 			} else {
-				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Status []", HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
-				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Mode []", HybridVentSysAvailMgrData( SysAvailNum ).ControlMode, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
+				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Status", Unit::None, HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
+				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Mode", Unit::None, HybridVentSysAvailMgrData( SysAvailNum ).ControlMode, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
 			}
 
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).MinOperTime > 0 ) {
-				SetupOutputVariable( "Hybrid Ventilation Control HVAC System Operation Elapsed Time [min]", HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Control HVAC System Operation Elapsed Time", Unit::min, HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
 			}
 
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).MinVentTime > 0 ) {
-				SetupOutputVariable( "Hybrid Ventilation Control Natural Ventilation Elapsed Time [min]", HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Control Natural Ventilation Elapsed Time", Unit::min, HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
 			}
 
 			if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_OperT80 ) || CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_OperT90 ) ) {
-				SetupOutputVariable( "Hybrid Ventilation Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
-				SetupOutputVariable( "Hybrid Ventilation Lower Limit Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).minAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
-				SetupOutputVariable( "Hybrid Ventilation Upper Limit Operative Temperature [C]", HybridVentSysAvailMgrData( SysAvailNum ).maxAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Operative Temperature", Unit::C, HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Lower Limit Operative Temperature", Unit::C, HybridVentSysAvailMgrData( SysAvailNum ).minAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Upper Limit Operative Temperature", Unit::C, HybridVentSysAvailMgrData( SysAvailNum ).maxAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
 			}
 
 			if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_CO2 ) ) {
-				SetupOutputVariable( "Hybrid Ventilation CO2 Concentration [ppm]", HybridVentSysAvailMgrData( SysAvailNum ).CO2, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation CO2 Concentration", Unit::ppm, HybridVentSysAvailMgrData( SysAvailNum ).CO2, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
 			}
 		}
 

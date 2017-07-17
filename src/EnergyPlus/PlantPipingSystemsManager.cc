@@ -2054,10 +2054,10 @@ namespace PlantPipingSystemsManager {
 
 			if ( ! PipingSystemSegments( SegmentCtr ).IsActuallyPartOfAHorizontalTrench ) {
 
-				SetupOutputVariable( "Pipe Segment Inlet Temperature [C]", PipingSystemSegments( SegmentCtr ).InletTemperature, "Plant", "Average", PipingSystemSegments( SegmentCtr ).Name );
-				SetupOutputVariable( "Pipe Segment Outlet Temperature [C]", PipingSystemSegments( SegmentCtr ).OutletTemperature, "Plant", "Average", PipingSystemSegments( SegmentCtr ).Name );
+				SetupOutputVariable( "Pipe Segment Inlet Temperature", Unit::C, PipingSystemSegments( SegmentCtr ).InletTemperature, "Plant", "Average", PipingSystemSegments( SegmentCtr ).Name );
+				SetupOutputVariable( "Pipe Segment Outlet Temperature", Unit::C, PipingSystemSegments( SegmentCtr ).OutletTemperature, "Plant", "Average", PipingSystemSegments( SegmentCtr ).Name );
 
-				SetupOutputVariable( "Pipe Segment Fluid Heat Transfer Rate [W]", PipingSystemSegments( SegmentCtr ).FluidHeatLoss, "Plant", "Average", PipingSystemSegments( SegmentCtr ).Name );
+				SetupOutputVariable( "Pipe Segment Fluid Heat Transfer Rate", Unit::W, PipingSystemSegments( SegmentCtr ).FluidHeatLoss, "Plant", "Average", PipingSystemSegments( SegmentCtr ).Name );
 
 			}
 
@@ -2067,21 +2067,21 @@ namespace PlantPipingSystemsManager {
 
 			if ( ! PipingSystemCircuits( PipeCircuitCounter ).IsActuallyPartOfAHorizontalTrench ) {
 
-				SetupOutputVariable( "Pipe Circuit Mass Flow Rate [kg/s]", PipingSystemCircuits( PipeCircuitCounter ).CurCircuitFlowRate, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
+				SetupOutputVariable( "Pipe Circuit Mass Flow Rate", Unit::kg_s, PipingSystemCircuits( PipeCircuitCounter ).CurCircuitFlowRate, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
 
-				SetupOutputVariable( "Pipe Circuit Inlet Temperature [C]", PipingSystemCircuits( PipeCircuitCounter ).InletTemperature, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
-				SetupOutputVariable( "Pipe Circuit Outlet Temperature [C]", PipingSystemCircuits( PipeCircuitCounter ).OutletTemperature, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
+				SetupOutputVariable( "Pipe Circuit Inlet Temperature", Unit::C, PipingSystemCircuits( PipeCircuitCounter ).InletTemperature, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
+				SetupOutputVariable( "Pipe Circuit Outlet Temperature", Unit::C, PipingSystemCircuits( PipeCircuitCounter ).OutletTemperature, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
 
-				SetupOutputVariable( "Pipe Circuit Fluid Heat Transfer Rate [W]", PipingSystemCircuits( PipeCircuitCounter ).FluidHeatLoss, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
+				SetupOutputVariable( "Pipe Circuit Fluid Heat Transfer Rate", Unit::W, PipingSystemCircuits( PipeCircuitCounter ).FluidHeatLoss, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
 
 			} else { // it is a horizontal trench
 
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", PipingSystemCircuits( PipeCircuitCounter ).CurCircuitFlowRate, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", Unit::kg_s, PipingSystemCircuits( PipeCircuitCounter ).CurCircuitFlowRate, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
 
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", PipingSystemCircuits( PipeCircuitCounter ).InletTemperature, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", PipingSystemCircuits( PipeCircuitCounter ).OutletTemperature, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature", Unit::C, PipingSystemCircuits( PipeCircuitCounter ).InletTemperature, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", Unit::C, PipingSystemCircuits( PipeCircuitCounter ).OutletTemperature, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
 
-				SetupOutputVariable( "Ground Heat Exchanger Fluid Heat Transfer Rate [W]", PipingSystemCircuits( PipeCircuitCounter ).FluidHeatLoss, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Fluid Heat Transfer Rate", Unit::W, PipingSystemCircuits( PipeCircuitCounter ).FluidHeatLoss, "Plant", "Average", PipingSystemCircuits( PipeCircuitCounter ).Name );
 
 			}
 
@@ -2103,15 +2103,15 @@ namespace PlantPipingSystemsManager {
 
 		if ( PipingSystemDomains( DomainNum ).HasZoneCoupledSlab ) {
 			// Zone-coupled slab outputs
-			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Heat Flux", Unit::W_m2, PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Temperature", Unit::C, PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		} else if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) {
 			// Zone-coupled basement wall outputs
-			SetupOutputVariable( "GroundDomain Basement Wall Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "GroundDomain Basement Wall Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Wall Interface Heat Flux", Unit::W_m2, PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Wall Interface Temperature", Unit::C, PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 			// Zone-coupled basement floor outputs
-			SetupOutputVariable( "GroundDomain Basement Floor Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "GroundDomain Basement Floor Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Floor Interface Heat Flux", Unit::W_m2, PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Floor Interface Temperature", Unit::C, PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		}
 
 	}

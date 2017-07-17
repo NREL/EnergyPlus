@@ -424,12 +424,12 @@ namespace SteamCoils {
 
 			//Setup the Simple Heating Coil reporting variables
 			//CurrentModuleObject = "Coil:Heating:Steam"
-			SetupOutputVariable( "Heating Coil Heating Energy [J]", SteamCoil( CoilNum ).TotSteamHeatingCoilEnergy, "System", "Sum", SteamCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Heating Rate [W]", SteamCoil( CoilNum ).TotSteamHeatingCoilRate, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Mass Flow Rate [Kg/s]", SteamCoil( CoilNum ).OutletSteamMassFlowRate, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Inlet Temperature [C]", SteamCoil( CoilNum ).InletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Outlet Temperature [C]", SteamCoil( CoilNum ).OutletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Trap Loss Rate [W]", SteamCoil( CoilNum ).LoopLoss, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Heating Energy", Unit::J, SteamCoil( CoilNum ).TotSteamHeatingCoilEnergy, "System", "Sum", SteamCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Heating Rate", Unit::W, SteamCoil( CoilNum ).TotSteamHeatingCoilRate, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Mass Flow Rate", Unit::Kg_s, SteamCoil( CoilNum ).OutletSteamMassFlowRate, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Inlet Temperature", Unit::C, SteamCoil( CoilNum ).InletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Outlet Temperature", Unit::C, SteamCoil( CoilNum ).OutletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Trap Loss Rate", Unit::W, SteamCoil( CoilNum ).LoopLoss, "System", "Average", SteamCoil( CoilNum ).Name );
 
 		}
 

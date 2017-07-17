@@ -385,18 +385,18 @@ namespace loc {
 
 		// Set up the output variables
 		for ( Item = 1; Item <= NumOfSurfaceGHEs; ++Item ) {
-			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", SurfaceGHE( Item ).HeatTransferRate, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Surface Heat Transfer Rate [W]", SurfaceGHE( Item ).SurfHeatTransferRate, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Energy [J]", SurfaceGHE( Item ).Energy, "Plant", "Sum", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", SurfaceGHE( Item ).MassFlowRate, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", SurfaceGHE( Item ).InletTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", SurfaceGHE( Item ).OutletTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Top Surface Temperature [C]", SurfaceGHE( Item ).TopSurfaceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Bottom Surface Temperature [C]", SurfaceGHE( Item ).BtmSurfaceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Top Surface Heat Transfer Energy per Area [J/m2]", SurfaceGHE( Item ).TopSurfaceFlux, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area [J/m2]", SurfaceGHE( Item ).BtmSurfaceFlux, "Plant", "Average", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Surface Heat Transfer Energy [J]", SurfaceGHE( Item ).SurfEnergy, "Plant", "Sum", SurfaceGHE( Item ).Name );
-			SetupOutputVariable( "Ground Heat Exchanger Source Temperature [C]", SurfaceGHE( Item ).SourceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate", Unit::W, SurfaceGHE( Item ).HeatTransferRate, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Surface Heat Transfer Rate", Unit::W, SurfaceGHE( Item ).SurfHeatTransferRate, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Energy", Unit::J, SurfaceGHE( Item ).Energy, "Plant", "Sum", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", Unit::kg_s, SurfaceGHE( Item ).MassFlowRate, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature", Unit::C, SurfaceGHE( Item ).InletTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", Unit::C, SurfaceGHE( Item ).OutletTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Top Surface Temperature", Unit::C, SurfaceGHE( Item ).TopSurfaceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Bottom Surface Temperature", Unit::C, SurfaceGHE( Item ).BtmSurfaceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Top Surface Heat Transfer Energy per Area", Unit::J_m2, SurfaceGHE( Item ).TopSurfaceFlux, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area", Unit::J_m2, SurfaceGHE( Item ).BtmSurfaceFlux, "Plant", "Average", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Surface Heat Transfer Energy", Unit::J, SurfaceGHE( Item ).SurfEnergy, "Plant", "Sum", SurfaceGHE( Item ).Name );
+			SetupOutputVariable( "Ground Heat Exchanger Source Temperature", Unit::C, SurfaceGHE( Item ).SourceTemp, "Plant", "Average", SurfaceGHE( Item ).Name );
 
 		}
 

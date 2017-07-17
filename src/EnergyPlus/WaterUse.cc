@@ -657,56 +657,56 @@ namespace WaterUse {
 		// CurrentModuleObject='WaterUse:Equipment'
 		for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
 
-			SetupOutputVariable( "Water Use Equipment Hot Water Mass Flow Rate [kg/s]", WaterEquipment( WaterEquipNum ).HotMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Hot Water Mass Flow Rate", Unit::kg_s, WaterEquipment( WaterEquipNum ).HotMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Cold Water Mass Flow Rate [kg/s]", WaterEquipment( WaterEquipNum ).ColdMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Cold Water Mass Flow Rate", Unit::kg_s, WaterEquipment( WaterEquipNum ).ColdMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Total Mass Flow Rate [kg/s]", WaterEquipment( WaterEquipNum ).TotalMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Total Mass Flow Rate", Unit::kg_s, WaterEquipment( WaterEquipNum ).TotalMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Hot Water Volume Flow Rate [m3/s]", WaterEquipment( WaterEquipNum ).HotVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Hot Water Volume Flow Rate", Unit::m3_s, WaterEquipment( WaterEquipNum ).HotVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Cold Water Volume Flow Rate [m3/s]", WaterEquipment( WaterEquipNum ).ColdVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Cold Water Volume Flow Rate", Unit::m3_s, WaterEquipment( WaterEquipNum ).ColdVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Total Volume Flow Rate [m3/s]", WaterEquipment( WaterEquipNum ).TotalVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Total Volume Flow Rate", Unit::m3_s, WaterEquipment( WaterEquipNum ).TotalVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Hot Water Volume [m3]", WaterEquipment( WaterEquipNum ).HotVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Hot Water Volume", Unit::m3, WaterEquipment( WaterEquipNum ).HotVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Cold Water Volume [m3]", WaterEquipment( WaterEquipNum ).ColdVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Cold Water Volume", Unit::m3, WaterEquipment( WaterEquipNum ).ColdVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Total Volume [m3]", WaterEquipment( WaterEquipNum ).TotalVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "Water", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
-			SetupOutputVariable( "Water Use Equipment Mains Water Volume [m3]", WaterEquipment( WaterEquipNum ).TotalVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "MainsWater", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+			SetupOutputVariable( "Water Use Equipment Total Volume", Unit::m3, WaterEquipment( WaterEquipNum ).TotalVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "Water", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+			SetupOutputVariable( "Water Use Equipment Mains Water Volume", Unit::m3, WaterEquipment( WaterEquipNum ).TotalVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "MainsWater", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
 
-			SetupOutputVariable( "Water Use Equipment Hot Water Temperature [C]", WaterEquipment( WaterEquipNum ).HotTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Hot Water Temperature", Unit::C, WaterEquipment( WaterEquipNum ).HotTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Cold Water Temperature [C]", WaterEquipment( WaterEquipNum ).ColdTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Cold Water Temperature", Unit::C, WaterEquipment( WaterEquipNum ).ColdTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Target Water Temperature [C]", WaterEquipment( WaterEquipNum ).TargetTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Target Water Temperature", Unit::C, WaterEquipment( WaterEquipNum ).TargetTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Mixed Water Temperature [C]", WaterEquipment( WaterEquipNum ).MixedTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Mixed Water Temperature", Unit::C, WaterEquipment( WaterEquipNum ).MixedTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Drain Water Temperature [C]", WaterEquipment( WaterEquipNum ).DrainTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Drain Water Temperature", Unit::C, WaterEquipment( WaterEquipNum ).DrainTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
-			SetupOutputVariable( "Water Use Equipment Heating Rate [W]", WaterEquipment( WaterEquipNum ).Power, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Heating Rate", Unit::W, WaterEquipment( WaterEquipNum ).Power, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
 
 			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "DISTRICTHEATING", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+				SetupOutputVariable( "Water Use Equipment Heating Energy", Unit::J, WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "DISTRICTHEATING", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
 
 			} else if ( WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).StandAlone ) {
-				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "DISTRICTHEATING", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+				SetupOutputVariable( "Water Use Equipment Heating Energy", Unit::J, WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "DISTRICTHEATING", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
 
 			} else { // The EQUIPMENT is coupled to a plant loop via a CONNECTIONS object
-				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "ENERGYTRANSFER", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+				SetupOutputVariable( "Water Use Equipment Heating Energy", Unit::J, WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "ENERGYTRANSFER", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
 			}
 
 			if ( WaterEquipment( WaterEquipNum ).Zone > 0 ) {
-				SetupOutputVariable( "Water Use Equipment Zone Sensible Heat Gain Rate [W]", WaterEquipment( WaterEquipNum ).SensibleRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
-				SetupOutputVariable( "Water Use Equipment Zone Sensible Heat Gain Energy [J]", WaterEquipment( WaterEquipNum ).SensibleEnergy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+				SetupOutputVariable( "Water Use Equipment Zone Sensible Heat Gain Rate", Unit::W, WaterEquipment( WaterEquipNum ).SensibleRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+				SetupOutputVariable( "Water Use Equipment Zone Sensible Heat Gain Energy", Unit::J, WaterEquipment( WaterEquipNum ).SensibleEnergy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
 
-				SetupOutputVariable( "Water Use Equipment Zone Latent Gain Rate [W]", WaterEquipment( WaterEquipNum ).LatentRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
-				SetupOutputVariable( "Water Use Equipment Zone Latent Gain Energy [J]", WaterEquipment( WaterEquipNum ).LatentEnergy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+				SetupOutputVariable( "Water Use Equipment Zone Latent Gain Rate", Unit::W, WaterEquipment( WaterEquipNum ).LatentRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+				SetupOutputVariable( "Water Use Equipment Zone Latent Gain Energy", Unit::J, WaterEquipment( WaterEquipNum ).LatentEnergy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
 
-				SetupOutputVariable( "Water Use Equipment Zone Moisture Gain Mass Flow Rate [kg/s]", WaterEquipment( WaterEquipNum ).MoistureRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
-				SetupOutputVariable( "Water Use Equipment Zone Moisture Gain Mass [kg]", WaterEquipment( WaterEquipNum ).MoistureMass, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+				SetupOutputVariable( "Water Use Equipment Zone Moisture Gain Mass Flow Rate", Unit::kg_s, WaterEquipment( WaterEquipNum ).MoistureRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+				SetupOutputVariable( "Water Use Equipment Zone Moisture Gain Mass", Unit::kg, WaterEquipment( WaterEquipNum ).MoistureMass, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
 
 				SetupZoneInternalGain( WaterEquipment( WaterEquipNum ).Zone, "WaterUse:Equipment", WaterEquipment( WaterEquipNum ).Name, IntGainTypeOf_WaterUseEquipment, WaterEquipment( WaterEquipNum ).SensibleRateNoMultiplier, _, _, WaterEquipment( WaterEquipNum ).LatentRateNoMultiplier );
 
@@ -718,52 +718,52 @@ namespace WaterUse {
 		// CurrentModuleObject='WaterUse:Connections'
 		for ( WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum ) {
 
-			SetupOutputVariable( "Water Use Connections Hot Water Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).HotMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Hot Water Mass Flow Rate", Unit::kg_s, WaterConnections( WaterConnNum ).HotMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Cold Water Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).ColdMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Cold Water Mass Flow Rate", Unit::kg_s, WaterConnections( WaterConnNum ).ColdMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Total Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).TotalMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Total Mass Flow Rate", Unit::kg_s, WaterConnections( WaterConnNum ).TotalMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Drain Water Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).DrainMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Drain Water Mass Flow Rate", Unit::kg_s, WaterConnections( WaterConnNum ).DrainMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Heat Recovery Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).RecoveryMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Mass Flow Rate", Unit::kg_s, WaterConnections( WaterConnNum ).RecoveryMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Hot Water Volume Flow Rate [m3/s]", WaterConnections( WaterConnNum ).HotVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Hot Water Volume Flow Rate", Unit::m3_s, WaterConnections( WaterConnNum ).HotVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Cold Water Volume Flow Rate [m3/s]", WaterConnections( WaterConnNum ).ColdVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Cold Water Volume Flow Rate", Unit::m3_s, WaterConnections( WaterConnNum ).ColdVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Total Volume Flow Rate [m3/s]", WaterConnections( WaterConnNum ).TotalVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Total Volume Flow Rate", Unit::m3_s, WaterConnections( WaterConnNum ).TotalVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Hot Water Volume [m3]", WaterConnections( WaterConnNum ).HotVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Hot Water Volume", Unit::m3, WaterConnections( WaterConnNum ).HotVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Cold Water Volume [m3]", WaterConnections( WaterConnNum ).ColdVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Cold Water Volume", Unit::m3, WaterConnections( WaterConnNum ).ColdVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Total Volume [m3]", WaterConnections( WaterConnNum ).TotalVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name ); //, &
+			SetupOutputVariable( "Water Use Connections Total Volume", Unit::m3, WaterConnections( WaterConnNum ).TotalVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name ); //, &
 			// ResourceTypeKey='Water', EndUseKey='DHW', EndUseSubKey=EndUseSubcategoryName, GroupKey='Plant')
 			// tHIS WAS double counting
 
-			SetupOutputVariable( "Water Use Connections Hot Water Temperature [C]", WaterConnections( WaterConnNum ).HotTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Hot Water Temperature", Unit::C, WaterConnections( WaterConnNum ).HotTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Cold Water Temperature [C]", WaterConnections( WaterConnNum ).ColdTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Cold Water Temperature", Unit::C, WaterConnections( WaterConnNum ).ColdTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Drain Water Temperature [C]", WaterConnections( WaterConnNum ).DrainTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Drain Water Temperature", Unit::C, WaterConnections( WaterConnNum ).DrainTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Return Water Temperature [C]", WaterConnections( WaterConnNum ).ReturnTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Return Water Temperature", Unit::C, WaterConnections( WaterConnNum ).ReturnTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Waste Water Temperature [C]", WaterConnections( WaterConnNum ).WasteTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Waste Water Temperature", Unit::C, WaterConnections( WaterConnNum ).WasteTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Heat Recovery Water Temperature [C]", WaterConnections( WaterConnNum ).RecoveryTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Water Temperature", Unit::C, WaterConnections( WaterConnNum ).RecoveryTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Heat Recovery Effectiveness []", WaterConnections( WaterConnNum ).Effectiveness, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Effectiveness", Unit::None, WaterConnections( WaterConnNum ).Effectiveness, "System", "Average", WaterConnections( WaterConnNum ).Name );
 
-			SetupOutputVariable( "Water Use Connections Heat Recovery Rate [W]", WaterConnections( WaterConnNum ).RecoveryRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
-			SetupOutputVariable( "Water Use Connections Heat Recovery Energy [J]", WaterConnections( WaterConnNum ).RecoveryEnergy, "System", "Sum", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Rate", Unit::W, WaterConnections( WaterConnNum ).RecoveryRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Energy", Unit::J, WaterConnections( WaterConnNum ).RecoveryEnergy, "System", "Sum", WaterConnections( WaterConnNum ).Name );
 			// Does this go on a meter?
 
 			// To do:  Add report variable for starved flow when tank can't deliver?
 
 			if ( ! WaterConnections( WaterConnNum ).StandAlone ) {
-				SetupOutputVariable( "Water Use Connections Plant Hot Water Energy [J]", WaterConnections( WaterConnNum ).Energy, "System", "Sum", WaterConnections( WaterConnNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "WATERSYSTEMS", _, "Plant" );
+				SetupOutputVariable( "Water Use Connections Plant Hot Water Energy", Unit::J, WaterConnections( WaterConnNum ).Energy, "System", "Sum", WaterConnections( WaterConnNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "WATERSYSTEMS", _, "Plant" );
 			}
 
 		} // WaterConnNum

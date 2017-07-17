@@ -4267,7 +4267,7 @@ namespace Furnaces {
 		for ( HeatOnlyNum = 1; HeatOnlyNum <= NumHeatOnly; ++HeatOnlyNum ) {
 			FurnaceNum = HeatOnlyNum;
 			// Setup Report variables for the Furnace that are not reported in the components themselves
-			SetupOutputVariable( "Unitary System Fan Part Load Ratio []", Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Fan Part Load Ratio", Unit::None, Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "AirLoopHVAC:Unitary:Furnace:HeatOnly", Furnace( FurnaceNum ).Name, "Autosized Supply Air Flow Rate", "[m3/s]", Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideOn, Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideValue );
 			}
@@ -4276,7 +4276,7 @@ namespace Furnaces {
 		for ( UnitaryHeatOnlyNum = NumHeatOnly + 1; UnitaryHeatOnlyNum <= NumHeatOnly + NumUnitaryHeatOnly; ++UnitaryHeatOnlyNum ) {
 			FurnaceNum = UnitaryHeatOnlyNum;
 			// Setup Report variables for Unitary System that are not reported in the components themselves
-			SetupOutputVariable( "Unitary System Fan Part Load Ratio []", Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Fan Part Load Ratio", Unit::None, Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "AirLoopHVAC:UnitaryHeatOnly", Furnace( FurnaceNum ).Name, "Autosized Supply Air Flow Rate", "[m3/s]", Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideOn, Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideValue );
 			}
@@ -4285,8 +4285,8 @@ namespace Furnaces {
 		for ( HeatCoolNum = NumHeatOnly + NumUnitaryHeatOnly + 1; HeatCoolNum <= NumHeatOnly + NumUnitaryHeatOnly + NumHeatCool; ++HeatCoolNum ) {
 			FurnaceNum = HeatCoolNum;
 			// Setup Report variables for the Furnace that are not reported in the components themselves
-			SetupOutputVariable( "Unitary System Fan Part Load Ratio []", Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Compressor Part Load Ratio []", Furnace( FurnaceNum ).CompPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Fan Part Load Ratio", Unit::None, Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Compressor Part Load Ratio", Unit::None, Furnace( FurnaceNum ).CompPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "AirLoopHVAC:Unitary:Furnace:HeatCool", Furnace( FurnaceNum ).Name, "Autosized Supply Air Flow Rate", "[m3/s]", Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideOn, Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideValue );
@@ -4299,8 +4299,8 @@ namespace Furnaces {
 		for ( UnitaryHeatCoolNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + 1; UnitaryHeatCoolNum <= NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool; ++UnitaryHeatCoolNum ) {
 			FurnaceNum = UnitaryHeatCoolNum;
 			// Setup Report variables for Unitary System that are not reported in the components themselves
-			SetupOutputVariable( "Unitary System Fan Part Load Ratio []", Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Compressor Part Load Ratio []", Furnace( FurnaceNum ).CompPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Fan Part Load Ratio", Unit::None, Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Compressor Part Load Ratio", Unit::None, Furnace( FurnaceNum ).CompPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "AirLoopHVAC:UnitaryHeatCool", Furnace( FurnaceNum ).Name, "Autosized Supply Air Flow Rate", "[m3/s]", Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideOn, Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideValue );
 				SetupEMSActuator( "AirLoopHVAC:UnitaryHeatCool", Furnace( FurnaceNum ).Name, "Autosized Supply Air Flow Rate During Cooling Operation", "[m3/s]", Furnace( FurnaceNum ).MaxCoolAirVolFlowEMSOverrideOn, Furnace( FurnaceNum ).MaxCoolAirVolFlowEMSOverrideValue );
@@ -4313,9 +4313,9 @@ namespace Furnaces {
 		for ( HeatPumpNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + 1; HeatPumpNum <= NumFurnaces - NumWaterToAirHeatPump; ++HeatPumpNum ) {
 			FurnaceNum = HeatPumpNum;
 			// Setup Report variables for Unitary System that are not reported in the components themselves
-			SetupOutputVariable( "Unitary System Fan Part Load Ratio []", Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Compressor Part Load Ratio []", Furnace( FurnaceNum ).CompPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Dehumidification Induced Heating Demand Rate [W]", Furnace( FurnaceNum ).DehumidInducedHeatingDemandRate, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Fan Part Load Ratio", Unit::None, Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Compressor Part Load Ratio", Unit::None, Furnace( FurnaceNum ).CompPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Dehumidification Induced Heating Demand Rate", Unit::W, Furnace( FurnaceNum ).DehumidInducedHeatingDemandRate, "System", "Average", Furnace( FurnaceNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "AirLoopHVAC:UnitaryHeatPump:AirToAir", Furnace( FurnaceNum ).Name, "Autosized Supply Air Flow Rate", "[m3/s]", Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideOn, Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideValue );
@@ -4325,12 +4325,12 @@ namespace Furnaces {
 		for ( HeatPumpNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + 1; HeatPumpNum <= NumFurnaces; ++HeatPumpNum ) {
 			FurnaceNum = HeatPumpNum;
 			// Setup Report variables for Unitary System that are not reported in the components themselves
-			SetupOutputVariable( "Unitary System Fan Part Load Ratio []", Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Compressor Part Load Ratio []", Furnace( FurnaceNum ).CompPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Requested Sensible Cooling Rate [W]", Furnace( FurnaceNum ).CoolingCoilSensDemand, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Requested Latent Cooling Rate [W]", Furnace( FurnaceNum ).CoolingCoilLatentDemand, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Requested Heating Rate [W]", Furnace( FurnaceNum ).HeatingCoilSensDemand, "System", "Average", Furnace( FurnaceNum ).Name );
-			SetupOutputVariable( "Unitary System Dehumidification Induced Heating Demand Rate [W]", Furnace( FurnaceNum ).DehumidInducedHeatingDemandRate, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Fan Part Load Ratio", Unit::None, Furnace( FurnaceNum ).FanPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Compressor Part Load Ratio", Unit::None, Furnace( FurnaceNum ).CompPartLoadRatio, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Requested Sensible Cooling Rate", Unit::W, Furnace( FurnaceNum ).CoolingCoilSensDemand, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Requested Latent Cooling Rate", Unit::W, Furnace( FurnaceNum ).CoolingCoilLatentDemand, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Requested Heating Rate", Unit::W, Furnace( FurnaceNum ).HeatingCoilSensDemand, "System", "Average", Furnace( FurnaceNum ).Name );
+			SetupOutputVariable( "Unitary System Dehumidification Induced Heating Demand Rate", Unit::W, Furnace( FurnaceNum ).DehumidInducedHeatingDemandRate, "System", "Average", Furnace( FurnaceNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "AirLoopHVAC:UnitaryHeatPump:WaterToAir", Furnace( FurnaceNum ).Name, "Autosized Supply Air Flow Rate", "[m3/s]", Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideOn, Furnace( FurnaceNum ).DesignFanVolFlowRateEMSOverrideValue );

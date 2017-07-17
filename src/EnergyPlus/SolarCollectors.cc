@@ -503,17 +503,17 @@ namespace SolarCollectors {
 				}
 
 				// Setup report variables
-				SetupOutputVariable( "Solar Collector Incident Angle Modifier []", Collector( CollectorNum ).IncidentAngleModifier, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Incident Angle Modifier", Unit::None, Collector( CollectorNum ).IncidentAngleModifier, "System", "Average", Collector( CollectorNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Efficiency []", Collector( CollectorNum ).Efficiency, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Efficiency", Unit::None, Collector( CollectorNum ).Efficiency, "System", "Average", Collector( CollectorNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Heat Transfer Rate [W]", Collector( CollectorNum ).Power, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Heat Transfer Rate", Unit::W, Collector( CollectorNum ).Power, "System", "Average", Collector( CollectorNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Heat Gain Rate [W]", Collector( CollectorNum ).HeatGain, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Heat Gain Rate", Unit::W, Collector( CollectorNum ).HeatGain, "System", "Average", Collector( CollectorNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Heat Loss Rate [W]", Collector( CollectorNum ).HeatLoss, "System", "Average", Collector( FlatPlateUnitsNum ).Name );
+				SetupOutputVariable( "Solar Collector Heat Loss Rate", Unit::W, Collector( CollectorNum ).HeatLoss, "System", "Average", Collector( FlatPlateUnitsNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Heat Transfer Energy [J]", Collector( CollectorNum ).Energy, "System", "Sum", Collector( FlatPlateUnitsNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Solar Collector Heat Transfer Energy", Unit::J, Collector( CollectorNum ).Energy, "System", "Sum", Collector( FlatPlateUnitsNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
 
 				TestCompSet( CurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Water Nodes" );
 
@@ -730,17 +730,17 @@ namespace SolarCollectors {
 				}
 
 				// Setup report variables
-				SetupOutputVariable( "Solar Collector Transmittance Absorptance Product []", Collector( CollectorNum ).TauAlpha, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Overall Top Heat Loss Coefficient [W/m2-C]", Collector( CollectorNum ).UTopLoss, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Absorber Plate Temperature [C]", Collector( CollectorNum ).TempOfAbsPlate, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Storage Water Temperature [C]", Collector( CollectorNum ).TempOfWater, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Thermal Efficiency []", Collector( CollectorNum ).Efficiency, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Storage Heat Transfer Rate [W]", Collector( CollectorNum ).StoredHeatRate, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Storage Heat Transfer Energy [J]", Collector( CollectorNum ).StoredHeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
-				SetupOutputVariable( "Solar Collector Skin Heat Transfer Rate [W]", Collector( CollectorNum ).SkinHeatLossRate, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Skin Heat Transfer Energy [J]", Collector( CollectorNum ).CollHeatLossEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
-				SetupOutputVariable( "Solar Collector Heat Transfer Rate [W]", Collector( CollectorNum ).HeatRate, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Heat Transfer Energy [J]", Collector( CollectorNum ).HeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Solar Collector Transmittance Absorptance Product", Unit::None, Collector( CollectorNum ).TauAlpha, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Overall Top Heat Loss Coefficient", Unit::W_m2C, Collector( CollectorNum ).UTopLoss, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Absorber Plate Temperature", Unit::C, Collector( CollectorNum ).TempOfAbsPlate, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Storage Water Temperature", Unit::C, Collector( CollectorNum ).TempOfWater, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Thermal Efficiency", Unit::None, Collector( CollectorNum ).Efficiency, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Storage Heat Transfer Rate", Unit::W, Collector( CollectorNum ).StoredHeatRate, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Storage Heat Transfer Energy", Unit::J, Collector( CollectorNum ).StoredHeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Solar Collector Skin Heat Transfer Rate", Unit::W, Collector( CollectorNum ).SkinHeatLossRate, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Skin Heat Transfer Energy", Unit::J, Collector( CollectorNum ).CollHeatLossEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Solar Collector Heat Transfer Rate", Unit::W, Collector( CollectorNum ).HeatRate, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Heat Transfer Energy", Unit::J, Collector( CollectorNum ).HeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
 
 				TestCompSet( CurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Water Nodes" );
 
