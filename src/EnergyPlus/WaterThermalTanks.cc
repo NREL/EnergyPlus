@@ -5092,7 +5092,7 @@ namespace WaterThermalTanks {
 		static int DummyWaterIndex( 1 );
 		static Real64 TankChangeRateScale( 0.0 ); // local temporary for nominal tank change rate
 		static Real64 MaxSideVolFlow( 0.0 ); // local temporary for largest connection design flow
-		int VSCoilID( 0 );// id of varaible-speed HPWH coil
+		int VSCoilID( 0 );// id of variable-speed HPWH coil
 
 		// FLOW:
 
@@ -5628,7 +5628,7 @@ namespace WaterThermalTanks {
 			HPWHInletDBTemp = HPInletDryBulbTemp;
 			HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, HPInletHumRat, OutBaroPress );
 
-			// initialize flow rates at speed levels for varaible-speed HPWH
+			// initialize flow rates at speed levels for variable-speed HPWH
 			if ( ( HPWaterHeater( HPNum ).bIsIHP ) && ( 0 == HPWaterHeater( HPNum ).NumofSpeed ) )//use SCWH coil represents
 			{
 				SizeIHP( HPWaterHeater( HPNum ).DXCoilNum );//
@@ -7528,7 +7528,7 @@ namespace WaterThermalTanks {
 									ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
 									ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
 									ShowContinueError( "Please send this information to the EnergyPlus support group." );
-									ShowContinueErrorTimeStamp( "This error occured in heating mode." );
+									ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
 								} else {
 									ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedIndex1, PartLoadRatio, PartLoadRatio );
 								}
@@ -7608,7 +7608,7 @@ namespace WaterThermalTanks {
 										ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
 										ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
 										ShowContinueError( "Please send this information to the EnergyPlus support group." );
-										ShowContinueErrorTimeStamp( "This error occured in float mode." );
+										ShowContinueErrorTimeStamp( "This error occurred in float mode." );
 									} else {
 										ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedIndex2, PartLoadRatio, PartLoadRatio );
 									}
@@ -7753,7 +7753,7 @@ namespace WaterThermalTanks {
 		std::string IterNum; // Max number of iterations for warning message
 		int CompOp; // DX compressor operation; 1=on, 0=off
 		Real64 CondenserDeltaT; // HPWH condenser water temperature difference
-		//new varaibles for variable-speed HPWH
+		//new variables for variable-speed HPWH
 		int MaxSpeedNum( 0 ); // speed number of variable speed HPWH coil
 		int SpeedNum( 1 ); // selected speed number
 		Real64 RhoWater; //water density
@@ -8346,7 +8346,7 @@ namespace WaterThermalTanks {
 									ShowWarningError( HeatPump.Type + " \"" + HeatPump.Name + "\"" );
 									ShowContinueError( "Heat pump water heater speed ratio calculation failed: speed ratio limits " "of 0 to 1 exceeded. speed ratio used = " + RoundSigDigits( SpeedRatio, 3 ) );
 									ShowContinueError( "Please send this information to the EnergyPlus support group." );
-									ShowContinueErrorTimeStamp( "This error occured in heating mode." );
+									ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
 								} else {
 									ShowRecurringWarningErrorAtEnd( HeatPump.Type + " \"" + HeatPump.Name + "\":  Speed ratio calculation failed in heating mode warning continues. Speed ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex1, SpeedRatio, SpeedRatio );
 								}

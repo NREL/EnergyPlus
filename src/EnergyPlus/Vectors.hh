@@ -157,10 +157,9 @@ namespace Vectors {
 		int & ErrorVertex
 	);
 
-	void
+	Real64
 	CalcPolyhedronVolume(
-		Polyhedron const & Poly,
-		Real64 & Volume
+		Polyhedron const & Poly
 	);
 
 } // Vectors

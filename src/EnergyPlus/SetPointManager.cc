@@ -7898,10 +7898,10 @@ namespace SetPointManager {
 
 		IsNodeOnSetPtManager = false;
 
-		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum ) {
-			if ( SetPtType == SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode ) {
-				for ( NumNode = 1; NumNode <= SchSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++NumNode ) {
-					if ( NodeNum == SchSetPtMgr( SetPtMgrNum ).CtrlNodes( NumNode ) ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum ) {
+			if ( SetPtType == AllSetPtMgr( SetPtMgrNum ).CtrlTypeMode ) {
+				for ( NumNode = 1; NumNode <= AllSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++NumNode ) {
+					if ( NodeNum == AllSetPtMgr( SetPtMgrNum ).CtrlNodes( NumNode ) ) {
 						IsNodeOnSetPtManager = true;
 						break;
 					}
