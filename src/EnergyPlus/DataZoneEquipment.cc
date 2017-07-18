@@ -56,7 +56,6 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
-#include <Fans.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <InputProcessor.hh>
@@ -279,7 +278,6 @@ namespace DataZoneEquipment {
 		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
 		using namespace ScheduleManager;
-		using Fans::GetFanInletNode;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -637,9 +635,6 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "FAN:ZONEEXHAUST" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneExhaustFan_Num;
-						ZoneEquipList( ControlledZoneNum ).EquipData( ZoneEquipTypeNum ).NumInlets = 1;
-						ZoneEquipList( ControlledZoneNum ).EquipData( ZoneEquipTypeNum ).InletNodeNums.allocate( ZoneEquipList( ControlledZoneNum ).EquipData( ZoneEquipTypeNum ).NumInlets = 1 );
-						ZoneEquipList( ControlledZoneNum ).EquipData( ZoneEquipTypeNum ).InletNodeNums( 1 ) = GetFanInletNode( "FAN:ZONEEXHAUST", ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ), GetZoneEquipmentDataErrorsFound );
 
 					} else if ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HeatXchngr_Num;

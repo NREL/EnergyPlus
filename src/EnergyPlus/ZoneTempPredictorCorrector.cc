@@ -4928,8 +4928,6 @@ namespace ZoneTempPredictorCorrector {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::ZoneEquipList;
-		using DataZoneEquipment::ZoneExhaustFan_Num;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
 		using ZonePlenum::NumZoneReturnPlenums;
