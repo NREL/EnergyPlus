@@ -5081,7 +5081,7 @@ unitEnumToString(
 			return " [m3/s]";
 			break;
 		case Unit::None:
-			return " [None]";
+			return " []";
 			break;
 		case Unit::min:
 			return " [min]";
@@ -5162,7 +5162,7 @@ unitEnumToString(
 			return " [kg/kg]";
 			break;
 		case Unit::Perc:
-			return " [Perc]";
+			return " [%]";
 			break;
 		case Unit::deg:
 			return " [deg]";
