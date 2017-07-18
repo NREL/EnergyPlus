@@ -1583,25 +1583,25 @@ namespace WindowManager {
 
     // Loop for BSDF windows
     for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-      // Set shading flags for BSDF windows
-      // Set shading flags. This could be also done inside SurfaceWindow structure, however, order is important
       auto & surfaceWindow( SurfaceWindow( SurfNum ) );
-      if ( Construct( Surface( SurfNum ).Construction ).BSDFInput.BasisType != 0 ) {
-        surfaceWindow.WindowModelType = WindowBSDFModel;
-        // Set shading layer flags for windows
-        auto & construction( Construct( Surface( SurfNum ).Construction ) );
-        auto & surface_window( SurfaceWindow( SurfNum ) );
-        int TotLayers = construction.TotLayers;
-        for ( auto Lay = 1; Lay <= TotLayers; ++Lay ) {
-          int LayPtr = construction.LayerPoint( Lay );
-          auto & material( Material( LayPtr ) );
-          bool isShading = material.Group == ComplexWindowShade;
-          if ( isShading && Lay == 1 ) surface_window.ShadingFlag = ExtShadeOn;
-          if ( isShading && Lay == TotLayers ) surface_window.ShadingFlag = IntShadeOn;
-        }
-      }
 
       if ( surfaceWindow.WindowModelType == WindowBSDFModel ) {
+        // Set shading flags for BSDF windows
+        // Set shading flags. This could be also done inside SurfaceWindow structure, however, order is important
+        if ( Construct( Surface( SurfNum ).Construction ).BSDFInput.BasisType != 0 ) {
+          surfaceWindow.WindowModelType = WindowBSDFModel;
+          // Set shading layer flags for windows
+          auto & construction( Construct( Surface( SurfNum ).Construction ) );
+          auto & surface_window( SurfaceWindow( SurfNum ) );
+          int TotLayers = construction.TotLayers;
+          for ( auto Lay = 1; Lay <= TotLayers; ++Lay ) {
+            int LayPtr = construction.LayerPoint( Lay );
+            auto & material( Material( LayPtr ) );
+            bool isShading = material.Group == ComplexWindowShade;
+            if ( isShading && Lay == 1 ) surface_window.ShadingFlag = ExtShadeOn;
+            if ( isShading && Lay == TotLayers ) surface_window.ShadingFlag = IntShadeOn;
+          }
+        }
         if ( surfaceWindow.ShadingFlag == IntShadeOn ) {
           auto & construction( Construct( Surface( SurfNum ).Construction ) );
           int TotLay = construction.TotLayers;
