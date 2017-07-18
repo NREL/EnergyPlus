@@ -2141,6 +2141,11 @@ namespace ZoneContaminantPredictorCorrector {
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
 					ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 				} // NodeNum
+				if ( !( ZoneEquipConfig( ZoneEquipConfigNum ).AirLoopNum > 0 || ZoneAirMassFlow.EnforceZoneMassBalance || AirflowNetworkNumOfExhFan > 0 ) ) {
+					ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExh / ZoneMult; // Exclude all exhaust fan flow here
+				} else {
+					ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced / ZoneMult; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
+				}
 
 				if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
 					TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;

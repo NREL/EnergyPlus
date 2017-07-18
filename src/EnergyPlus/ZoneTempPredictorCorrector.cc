@@ -4978,8 +4978,6 @@ namespace ZoneTempPredictorCorrector {
 		int ADUInNode;
 		int ADUOutNode;
 		int iList;
-		bool ExhaustNodeFlag;
-		bool ExhaustListFlag;
 
 		// FLOW:
 		MoistureMassFlowRate = 0.0;
@@ -5022,24 +5020,13 @@ namespace ZoneTempPredictorCorrector {
 				ZoneMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
 
-			ExhaustNodeFlag = false;
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
-				ExhaustListFlag = false;
-				for ( iList = 1; iList <= ZoneEquipList( ZoneNum ).NumOfEquipTypes; ++iList ) {
-					if ( ( ZoneEquipList( ZoneNum ).EquipType_Num( iList ) == ZoneExhaustFan_Num ) && 
-						( ZoneEquipList( ZoneNum ).EquipData( iList ).NumInlets > 0 && ZoneEquipList( ZoneNum ).EquipData( iList ).InletNodeNums( 1 ) == ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ) ) {
-						if ( !( ZoneEquipConfig( ZoneEquipConfigNum ).AirLoopNum > 0 || ZoneAirMassFlow.EnforceZoneMassBalance || AirflowNetworkNumOfExhFan > 0 ) ) {
-							ExhaustNodeFlag = true;
-							ExhaustListFlag = true;
-						}
-					}
-				}
-				if ( !ExhaustListFlag ) {
-					ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
-				}
+				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
-			if ( !ExhaustNodeFlag ) {
-				ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
+			if ( !( ZoneEquipConfig( ZoneEquipConfigNum ).AirLoopNum > 0 || ZoneAirMassFlow.EnforceZoneMassBalance || AirflowNetworkNumOfExhFan > 0 ) ) {
+				ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExh / ZoneMult; // Exclude all exhaust fan flow here
+			} else {
+				ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced / ZoneMult; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
 			}
 
 			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
