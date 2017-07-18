@@ -218,6 +218,8 @@ namespace TranspiredCollector {
 	extern Array1D< UTSCDataStruct > UTSC;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimTranspiredCollector(
