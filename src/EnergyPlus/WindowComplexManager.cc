@@ -3218,8 +3218,6 @@ namespace WindowComplexManager {
 		int ZoneNumAdj; // An interzone surface's adjacent zone number
 		int ShadeFlag; // Flag indicating whether shade or blind is on, and shade/blind position
 		int IMix;
-		Real64 EffShBlEmiss; // Effective interior shade or blind emissivity
-		Real64 EffGlEmiss; // Effective inside glass emissivity when interior shade or blind
 
 		Real64 IncidentSolar; // Solar incident on outside of window (W)
 		Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
@@ -3277,6 +3275,7 @@ namespace WindowComplexManager {
 		Real64 outir;
 		Real64 Ebout;
 		Real64 dominantGapWidth; // store value for dominant gap width.  Used for airflow calculations
+    	Real64 edgeGlCorrFac;
 
 		// fill local vars
 
@@ -3508,10 +3507,6 @@ namespace WindowComplexManager {
 				YoungsMod( IGlass ) = Material( LayPtr ).YoungModulus;
 				PoissonsRat( IGlass ) = Material( LayPtr ).PoissonsRatio;
 			} else if ( Material( LayPtr ).Group == ComplexWindowShade ) {
-				if ( CalcCondition == noCondition ) {
-					if ( Lay == 1 ) SurfaceWindow( SurfNum ).ShadingFlag = ExtShadeOn;
-					if ( Lay == TotLay ) SurfaceWindow( SurfNum ).ShadingFlag = IntShadeOn;
-				}
 				++IGlass;
 				TempInt = Material( LayPtr ).ComplexShadePtr;
 				LayerType( IGlass ) = ComplexShade( TempInt ).LayerType;
@@ -3685,8 +3680,21 @@ namespace WindowComplexManager {
 			theta = 273.15;
 		}
 
+    	if( SurfNum != 0 )
+      		edgeGlCorrFac = SurfaceWindow( SurfNum ).EdgeGlCorrFac;
+	    else
+      		edgeGlCorrFac = 1;
+
 		//  call TARCOG
-		TARCOG90( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CalcDeflection, Pa, Pini, Tini, gap, GapDefMax, thick, scon, YoungsMod, PoissonsRat, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, gcon, gvis, gcp, wght, gama, nmix, SupportPlr, PillarSpacing, PillarRadius, theta, LayerDef, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgap, hrgap, shgc, nperr, tarcogErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, hg, hr, hs, he, hi, Ra, Nu, standard, ThermalMod, Debug_mode, Debug_dir, Debug_file, Window_ID, IGU_ID, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, CalcSHGC, NumOfIterations );
+		TARCOG90( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, 
+      		VacuumMaxGapThickness, CalcDeflection, Pa, Pini, Tini, gap, GapDefMax, thick, scon, YoungsMod, PoissonsRat, 
+      		tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, gcon, gvis, gcp, wght, gama, nmix, 
+      		SupportPlr, PillarSpacing, PillarRadius, theta, LayerDef, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, 
+      		hin, hout, hcgap, hrgap, shgc, nperr, tarcogErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, 
+      		SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, 
+      		LaminateB, sumsol, hg, hr, hs, he, hi, Ra, Nu, standard, ThermalMod, Debug_mode, Debug_dir, Debug_file, 
+      		Window_ID, IGU_ID, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, 
+      		HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, CalcSHGC, NumOfIterations, edgeGlCorrFac );
 
 		// process results from TARCOG
 		if ( ( nperr > 0 ) && ( nperr < 1000 ) ) { // process error signal from tarcog
@@ -3873,28 +3881,31 @@ namespace WindowComplexManager {
 			if ( ShadeFlag == IntShadeOn ) {
 				SurfInsideTemp = theta( 2 * ngllayer + 2 ) - KelvinConv;
 
-				// Get properties of inside shading layer
-				ShadingLayPtr = Construct( ConstrNum ).LayerPoint( TotLay );
-				ShadingLayPtr = Material( ShadingLayPtr ).ComplexShadePtr;
-				TauShadeIR = ComplexShade( ShadingLayPtr ).IRTransmittance;
-				EpsShadeIR = ComplexShade( ShadingLayPtr ).FrontEmissivity;
-				RhoShadeIR = max( 0.0, 1.0 - TauShadeIR - EpsShadeIR );
-
-				// Get properties of glass next to inside shading layer
-				GlassLayPtr = Construct( ConstrNum ).LayerPoint( TotLay - 2 );
-				EpsGlassIR = Material( GlassLayPtr ).AbsorpThermalBack;
-				RhoGlassIR = 1 - EpsGlassIR;
-
-				EffShBlEmiss = EpsShadeIR * ( 1.0 + RhoGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR ) );
-				SurfaceWindow( SurfNum ).EffShBlindEmiss = EffShBlEmiss;
-				EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR );
-				SurfaceWindow( SurfNum ).EffGlassEmiss = EffGlEmiss;
+				// // Get properties of inside shading layer
+				// ShadingLayPtr = Construct( ConstrNum ).LayerPoint( TotLay );
+				// ShadingLayPtr = Material( ShadingLayPtr ).ComplexShadePtr;
+				// TauShadeIR = ComplexShade( ShadingLayPtr ).IRTransmittance;
+				// EpsShadeIR = ComplexShade( ShadingLayPtr ).FrontEmissivity;
+				// RhoShadeIR = max( 0.0, 1.0 - TauShadeIR - EpsShadeIR );
+        // 
+				// // Get properties of glass next to inside shading layer
+				// GlassLayPtr = Construct( ConstrNum ).LayerPoint( TotLay - 2 );
+				// EpsGlassIR = Material( GlassLayPtr ).AbsorpThermalBack;
+				// RhoGlassIR = 1 - EpsGlassIR;
+        // 
+				// EffShBlEmiss = EpsShadeIR * ( 1.0 + RhoGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR ) );
+				// SurfaceWindow( SurfNum ).EffShBlindEmiss = EffShBlEmiss;
+				// EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR );
+				// SurfaceWindow( SurfNum ).EffGlassEmiss = EffGlEmiss;
 				//  EffShBlEmiss = InterpSlatAng(SurfaceWindow(SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum)%MovableSlats, &
 				//                    SurfaceWindow(SurfNum)%EffShBlindEmiss)
 				//  EffGlEmiss   = InterpSlatAng(SurfaceWindow(SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum)%MovableSlats, &
 				//                    SurfaceWindow(SurfNum)%EffGlassEmiss)
+        		Real64 EffShBlEmiss = SurfaceWindow( SurfNum ).EffShBlindEmiss[ 0 ];
+        		Real64 EffGlEmiss = SurfaceWindow( SurfNum ).EffGlassEmiss[ 0 ];
 				SurfaceWindow( SurfNum ).EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( theta( 2 * ngllayer ) - KelvinConv ) ) / ( EffShBlEmiss + EffGlEmiss );
-				//ELSE
+        // SurfInsideTemp = SurfaceWindow( SurfNum ).EffInsSurfTemp;
+			  //ELSE
 				//  SurfInsideTemp = theta(2*ngllayer) - TKelvin
 				//END IF
 				//IF(ShadeFlag == ExtShadeOn .OR. ShadeFlag == ExtBlindOn .OR. ShadeFlag == ExtScreenOn) THEN

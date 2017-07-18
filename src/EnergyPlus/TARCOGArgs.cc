@@ -45,6 +45,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -499,6 +500,7 @@ namespace TARCOGArgs {
 		Real64 & Gin,
 		Array1A< Real64 > rir,
 		Array1A< Real64 > vfreevent,
+    	Array1A< Real64 > Ah,
 		int & nperr,
 		std::string & ErrorMessage
 	)
@@ -582,6 +584,10 @@ namespace TARCOGArgs {
 					if ( thick( i ) < SlatThick( i ) ) thick( i ) = SlatThick( i );
 				} else if ( ( ThermalMod == THERM_MOD_ISO15099 ) || ( ThermalMod == THERM_MOD_CSM ) ) {
 					thick( i ) = SlatThick( i );
+          			double slatAngRad = SlatAngle( i ) * 2.0 * M_PI / 360.0;
+          			if( Ah( i ) > 1e-8 ) {
+			      		thick( i ) = C4_VENET * ( SlatWidth( i ) * cos( slatAngRad ) );
+          		}
 				}
 			} // Venetian
 		}

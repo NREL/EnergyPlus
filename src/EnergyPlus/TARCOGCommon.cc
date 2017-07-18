@@ -98,7 +98,8 @@ namespace TARCOGCommon {
 		// Return value
 		bool IsShadingLayer;
 
-		if ( ( layertype == VENETBLIND ) || ( layertype == WOVSHADE ) || ( layertype == PERFORATED ) || ( layertype == BSDF ) ) {
+		if ( ( layertype == VENETBLIND ) || ( layertype == WOVSHADE ) || ( layertype == PERFORATED ) || 
+      ( layertype == BSDF ) || ( layertype == DIFFSHADE ) ) {
 			IsShadingLayer = true;
 		} else {
 			IsShadingLayer = false;
@@ -176,18 +177,36 @@ namespace TARCOGCommon {
 		return LDSumMean;
 	}
 
+  void
+    modifyHcGap(
+      Array1< Real64 > const & hcgap,
+      Array1< Real64 > const & qv,
+      Array1< Real64 > const & hcv,
+      Array1< Real64 > & hcgapMod,
+      int const nlayer,
+      Real64 const edgeGlCorFac
+    )
+  {
+    for( int i = 1; i <= nlayer + 1; ++i ) {
+      if( qv( i ) != 0 ) {
+        hcgapMod( i ) = 0.5 * hcv( i );
+      } else {
+        hcgapMod( i ) = hcgap( i ) * edgeGlCorFac;
+      }
+    }
+  }
+
 	void
 	matrixQBalance(
 		int const nlayer,
 		Array2< Real64 > & a,
 		Array1< Real64 > & b,
-		Array1< Real64 > const & scon,
-		Array1< Real64 > const & thick,
+		Array1< Real64 > const & sconScaled,
 		Array1< Real64 > const & hcgas,
-		Real64 const hcout,
-		Real64 const hcin,
+    Array1< Real64 > & hcgapMod,
 		Array1< Real64 > const & asol,
 		Array1< Real64 > const & qv,
+    Array1< Real64 > const & hcv,
 		Real64 const Tin,
 		Real64 const Tout,
 		Real64 const Gin,
@@ -195,7 +214,8 @@ namespace TARCOGCommon {
 		Array1< Real64 > const & theta,
 		Array1< Real64 > const & tir,
 		Array1< Real64 > const & rir,
-		Array1< Real64 > const & emis
+		Array1< Real64 > const & emis,
+    Real64 const edgeGlCorrFac
 	)
 	{
 
@@ -210,6 +230,7 @@ namespace TARCOGCommon {
 		int k;
 		int front;
 		int back;
+    int vent;
 
 		for ( i = 1; i <= 4 * nlayer; ++i ) {
 			b( i ) = 0.0;
@@ -218,66 +239,89 @@ namespace TARCOGCommon {
 			}
 		}
 
+    modifyHcGap( hcgas, qv, hcv, hcgapMod, nlayer, edgeGlCorrFac );
+
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//!!!!!!!!!!!!!!!!!!!!  build matrix a   !!!!!!!!!!!!!!!!!!!!!!!!!
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-		// Because of build matrix optimization all environmental heat transfer
-		// coefficients were stored in hgas array.  This means that hgas(1) is actually
-		// hout, while hgas(nlayer+1) is actually hin.  Same is valid for hcgas and
-		// hrgas arrays
-		for ( i = 1; i <= nlayer; ++i ) {
-			k = 4 * i - 3;
-			front = 2 * i - 1;
-			back = 2 * i;
-			if ( nlayer != 1 ) {
-				if ( i != 1 ) {
-					a( k - 3, k ) = -hcgas( i );
-					a( k - 1, k ) = -1.0;
-					a( k - 3, k + 1 ) = -hcgas( i );
-					a( k - 1, k + 1 ) = -1.0;
-					a( k - 1, k + 2 ) = rir( front );
-					a( k - 1, k + 3 ) = tir( front );
-				}
-				if ( i != nlayer ) {
-					a( k + 4, k ) = -hcgas( i + 1 );
-					a( k + 6, k ) = -1.0;
-					a( k + 6, k + 2 ) = tir( back );
-					a( k + 6, k + 3 ) = rir( back );
-				}
-			}
-			a( k, k ) = hcgas( i );
-			a( k + 1, k ) = hcgas( i + 1 );
-			a( k + 2, k ) = 1.0;
-			a( k + 3, k ) = 1.0;
-			a( k, k + 1 ) = scon( i ) / thick( i ) + hcgas( i );
-			a( k + 1, k + 1 ) = -scon( i ) / thick( i );
-			a( k + 2, k + 1 ) = 1.0;
-			a( k, k + 2 ) = emis( front ) * StefanBoltzmann * pow_3( theta( front ) );
-			a( k + 2, k + 2 ) = -1.0;
-			a( k + 1, k + 3 ) = emis( back ) * StefanBoltzmann * pow_3( theta( back ) );
-			a( k + 3, k + 3 ) = -1.0;
-		}
+    for( i = 1; i <= nlayer; ++i ) {
+      k = 4 * i - 3;
+      front = 2 * i - 1;
+      back = 2 * i;
+    
+      // first row
+      if( i != 1 ) {
+        a(k - 1, k ) = -hcgapMod( i );
+        a(k - 2, k ) = tir( front ) - 1.0;
+      }
+      a( k, k ) = hcgapMod( i ) + sconScaled( i );
+      a( k + 1, k ) = 1.0;
+      a( k + 3, k ) = -sconScaled( i );
+      if( i != nlayer ) {
+        a( k + 5, k ) = -tir( back );
+      }
+    
+      // second row
+      a( k, k + 1 ) = emis( front ) * StefanBoltzmann * pow_3( theta( front ) );
+      a( k + 1, k + 1 ) = -1.0;
+      if( i != 1 ) {
+        a( k - 2, k + 1 ) = rir( front );
+      }
+      if( i != nlayer) {
+        a( k + 5, k + 1 ) = tir( back );
+      }
+    
+      // third row
+      a( k + 2, k + 2 ) = -1.0;
+      a( k + 3, k + 2 ) = emis( back ) * StefanBoltzmann * pow_3( theta( back ) );
+      if( i != 1 ) {
+        a( k - 2, k + 2) = tir( front );
+      }
+      if( i != nlayer ) {
+        a( k + 5, k + 2 ) = rir( back );
+      }
+    
+      // fourth row
+      a( k, k + 3 ) = sconScaled( i );
+      a( k + 2, k + 3 ) = -1.0;
+      a( k + 3, k + 3 ) = -hcgapMod( i + 1 ) - sconScaled( i );
+      if( i != 1 ) {
+        a( k - 2, k + 3 ) = tir( front );
+      }
+      if( i != nlayer ) {
+        a( k + 4, k + 3 ) = hcgapMod(i + 1);
+        a( k + 5, k + 3 ) = 1.0 - tir( back );
+      }
+    
+    }
 
 		//build matrix b
-		for ( i = 1; i <= nlayer; ++i ) {
-			k = 4 * i - 3;
-			front = 2 * i - 1;
-			back = 2 * i;
-			b( k ) = asol( i ) + 0.5 * qv( i ) + 0.5 * qv( i + 1 );
-			b( k + 1 ) = 0.5 * asol( i ) + 0.5 * qv( i );
-			if ( i == 1 ) {
-				b( k ) += hcout * Tout + Gout;
-				b( k + 1 ) += hcout * Tout + Gout;
-				b( k + 2 ) -= rir( front ) * Gout;
-				b( k + 3 ) -= tir( front ) * Gout;
-			}
-			if ( i == ( nlayer ) ) {
-				b( k ) += hcin * Tin + Gin;
-				b( k + 2 ) -= tir( back ) * Gin;
-				b( k + 3 ) -= rir( back ) * Gin;
-			}
-		}
+
+    for( i = 1; i <= nlayer; ++i ) {
+      k = 4 * i - 3;
+      front = 2 * i - 1;
+      back = 2 * i;
+      vent = i + 1;
+    
+      b( k ) = 0.5 * asol( i ) + 0.5 * qv( vent - 1 );
+      b( k + 3 ) = -0.5 * asol( i ) - 0.5 * qv( vent );
+    
+      if (i == 1) {
+        b( k ) = b( k ) + hcgapMod( i ) * Tout + Gout - tir( front ) * Gout;
+        b( k + 1 ) = b( k + 1 ) - rir( front ) * Gout;
+        b( k + 2 ) = b( k + 2 ) - tir( front ) * Gout;
+        b( k + 3 ) = b( k + 3 ) - tir( front ) * Gout;
+      }
+    
+      if( i == nlayer) {
+        b( k ) = b( k ) + tir( back ) * Gin;
+        b( k + 1 ) = b( k + 1 ) - tir( back ) * Gin;
+        b( k + 2 ) = b( k + 2 ) - rir( back ) * Gin;
+        b( k + 3 ) = b( k + 3 ) - Gin - hcgapMod( i + 1 ) * Tin + tir( back ) * Gin;
+      }
+    
+    }
 
 	}
 

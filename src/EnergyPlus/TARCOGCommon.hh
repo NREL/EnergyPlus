@@ -75,18 +75,27 @@ namespace TARCOGCommon {
 		Real64 const Height
 	);
 
+  void
+  modifyHcGap(
+    Array1< Real64 > const & hcgap,
+    Array1< Real64 > const & qv,
+    Array1< Real64 > const & hcv,
+    Array1< Real64 > & hcgapMod,
+    int const nlayer,
+    Real64 const edgeGlCorrFac
+  );
+
 	void
 	matrixQBalance(
 		int const nlayer,
 		Array2< Real64 > & a,
 		Array1< Real64 > & b,
-		Array1< Real64 > const & scon,
 		Array1< Real64 > const & thick,
 		Array1< Real64 > const & hcgas,
-		Real64 const hcout,
-		Real64 const hcin,
+    Array1< Real64 > & hcgapMod,
 		Array1< Real64 > const & asol,
 		Array1< Real64 > const & qv,
+    Array1< Real64 > const & hcv,
 		Real64 const Tin,
 		Real64 const Tout,
 		Real64 const Gin,
@@ -94,7 +103,8 @@ namespace TARCOGCommon {
 		Array1< Real64 > const & theta,
 		Array1< Real64 > const & tir,
 		Array1< Real64 > const & rir,
-		Array1< Real64 > const & emis
+		Array1< Real64 > const & emis,
+    Real64 const edgeGlCorrFac
 	);
 
 	void

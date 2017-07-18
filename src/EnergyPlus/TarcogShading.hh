@@ -91,6 +91,7 @@ namespace TarcogShading {
 		Array1_int const & LayerType,
 		Array1< Real64 > & Tgaps,
 		Array1< Real64 > & qv,
+    		Array1< Real64 > & hcv,
 		int & nperr,
 		std::string & ErrorMessage,
 		Array1< Real64 > & vfreevent
@@ -193,6 +194,28 @@ namespace TarcogShading {
 		std::string & ErrorMessage,
 		Real64 & speed
 	);
+
+  void
+  updateEffectiveMultipliers(
+    int const nlayer,
+    Real64 const width,
+    Real64 const height,
+    Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+    Array1D< Real64 > & Atop_eff,
+		Array1D< Real64 > & Abot_eff,
+		Array1D< Real64 > & Al_eff,
+		Array1D< Real64 > & Ar_eff,
+		Array1D< Real64 > & Ah_eff,
+    Array1A_int const LayerType,
+    Array1A< Real64 > const SlatAngle,
+    Array1A< Real64 > const gap,
+    int & nperr,
+    std::string & ErrorMessage
+  );
 
 } // TarcogShading
 

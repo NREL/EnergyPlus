@@ -178,6 +178,16 @@ namespace TARCOGParams {
 
 	Real64 const TemperatureQuessDiff( 1.0 ); // in case outside and inside temperatures are identical
 
+  	Real64 const C1_VENET( 0.016 );
+  	Real64 const C2_VENET( -0.63 );
+  	Real64 const C3_VENET( 0.53 );
+  	Real64 const C4_VENET( 0.043 );
+
+  	Real64 const C1_SHADE( 0.05 );
+  	Real64 const C2_SHADE( 1.08 );
+  	Real64 const C3_SHADE( 0.79 );
+  	Real64 const C4_SHADE( 0.50 );
+
 } // TARCOGParams
 
 } // EnergyPlus

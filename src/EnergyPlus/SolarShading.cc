@@ -5896,8 +5896,8 @@ namespace SolarShading {
 						// Shade or screen or blind on, or switchable glazing
 						// (note in the following that diffusing glass is not allowed in a window with
 						// shade, blind or switchable glazing)
-
-						if ( ShadeFlag != IntBlindOn && ShadeFlag != ExtBlindOn && ShadeFlag != BGBlindOn && ShadeFlag != ExtScreenOn ) {
+            			if ( ConstrNumSh != 0 ) {
+						  if ( ShadeFlag != IntBlindOn && ShadeFlag != ExtBlindOn && ShadeFlag != BGBlindOn && ShadeFlag != ExtScreenOn ) {
 
 							// Shade on or switchable glazing
 
@@ -6017,6 +6017,7 @@ namespace SolarShading {
 
 						}
 
+            		  }
 					} // End of check if ShadeFlag > 0 and ShadeFlag < 10
 				}
 
@@ -6072,6 +6073,11 @@ namespace SolarShading {
 				if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) { //Complex Fenestration
 					FenSolAbsPtr = WindowScheduledSolarAbs( SurfNum, ConstrNum );
 					if ( FenSolAbsPtr == 0 ) {
+            			WinTransBmSolar( SurfNum ) = ( TBmBm + TBmDif ) * SunLitFract * CosInc * Surface( SurfNum ).Area * InOutProjSLFracMult;
+
+					  	//added TH 12/9/2009
+					  	WinTransBmBmSolar = TBmBm * SunLitFract * CosInc * Surface( SurfNum ).Area * InOutProjSLFracMult; // m2
+					  	WinTransBmDifSolar = TBmDif * SunLitFract * CosInc * Surface( SurfNum ).Area * InOutProjSLFracMult; // m2
 						WinTransBmSolar( SurfNum ) += SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * NomDiffTrans * Surface( SurfNum ).Area;
 
 						WinTransBmDifSolar += SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * NomDiffTrans * Surface( SurfNum ).Area;
@@ -6091,7 +6097,10 @@ namespace SolarShading {
 
 				if ( SunLitFract > 0.0 && Surface( SurfNum ).Class != SurfaceClass_TDD_Dome ) {
 
-					if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn ) {
+					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && 
+            			( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || 
+            			ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn || 
+            			ShadeFlag == ExtScreenOn ) ) {
 						TBmAll = TBmAllShBlSc;
 					} else {
 						TBmAll = TBmBm + TBmDif;
@@ -6149,7 +6158,11 @@ namespace SolarShading {
 					// is assumed to be zero. The beam-beam transmittance of tubular daylighting devices is also
 					// assumed to be zero.
 
-					if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || SurfaceWindow( SurfNum ).SolarDiffusing || SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser || Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) continue;
+					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel ) 
+            			if( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || 
+            				SurfaceWindow( SurfNum ).SolarDiffusing || 
+            				SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser || 
+            				Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) continue;
 
 					// Find interior beam radiation that is:
 					// (1) absorbed by opaque back surfaces;
@@ -7879,7 +7892,7 @@ namespace SolarShading {
 
 		for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 			SurfaceWindow( ISurf ).ExtIntShadePrevTS = SurfaceWindow( ISurf ).ShadingFlag;
-			SurfaceWindow( ISurf ).ShadingFlag = NoShade;
+			// SurfaceWindow( ISurf ).ShadingFlag = NoShade;
 			SurfaceWindow( ISurf ).FracTimeShadingDeviceOn = 0.0;
 
 			if ( Surface( ISurf ).Class != SurfaceClass_Window ) continue;
@@ -9976,7 +9989,7 @@ namespace SolarShading {
 								// Accumulate transmitted diffuse solar for reporting
 								InitialDifSolInTrans( HeatTransSurfNum ) += DifSolarTransW * per_HTSurfaceArea;
 
-							} else if ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) {
+							} else if ( ConstrNumSh != 0 && ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) ) {
 								// Interior, exterior or between-glass shade, screen or blind in place
 
 								// Init accumulator for transmittance calc below

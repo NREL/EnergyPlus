@@ -166,7 +166,8 @@ namespace ThermalISO15099Calc {
 		Array1A< Real64 > ShadeGapKeffConv,
 		Real64 const SDScalar,
 		int const SHGCCalc, // SHGC calculation switch:
-		int & NumOfIterations
+		int & NumOfIterations,
+    Real64 const egdeGlCorrFac // Edge of glass correction factor
 	);
 
 	void
@@ -232,6 +233,7 @@ namespace ThermalISO15099Calc {
 		Array1< Real64 > const & Al,
 		Array1< Real64 > const & Ar,
 		Array1< Real64 > const & Ah,
+    Array1A< Real64 > const & EffectiveOpenness,
 		Array1< Real64 > const & vvent,
 		Array1< Real64 > const & tvent,
 		Array1_int const & LayerType,
@@ -251,7 +253,8 @@ namespace ThermalISO15099Calc {
 		int const ThermalMod,
 		int const Debug_mode, // Switch for debug output files:
 		Real64 & AchievedErrorTolerance,
-		int & TotalIndex
+		int & TotalIndex,
+    Real64 const edgeGlCorrFac // Edge of glass correction factor
 	);
 
 	void
@@ -362,6 +365,26 @@ namespace ThermalISO15099Calc {
 		Array1< Real64 > & Ra,
 		Array1< Real64 > & Nu
 	);
+
+  void
+  effectiveLayerCond(
+    int const nlayer, 
+    Array1A_int const LayerType, 
+    Array1A< Real64 > const scon, 
+    Array1A< Real64 > const thick, 
+    Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+    Array1A_int const nmix,
+		Array1A< Real64 > const pressure,
+		Array1A< Real64 > const wght,
+		Array2A< Real64 > const gcon,
+		Array2A< Real64 > const gvis,
+		Array2A< Real64 > const gcp,
+    Array1A< Real64 > const EffectiveOpenness,
+    Array1< Real64 > & theta,
+    Array1D< Real64 > & sconScaled, 
+    int & nperr,
+		std::string & ErrorMessage);
 
 	void
 	filmi(

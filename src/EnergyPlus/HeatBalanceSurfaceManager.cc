@@ -1693,19 +1693,21 @@ namespace HeatBalanceSurfaceManager {
 			QsrcHistM = 0.0;
 		}
 		CondFDRelaxFactor = CondFDRelaxFactorInput;
-		for ( auto & e : SurfaceWindow ) {
-			// Initialize window frame and divider temperatures
-			e.FrameTempSurfIn = 23.0;
-			e.FrameTempSurfInOld = 23.0;
-			e.FrameTempSurfOut = 23.0;
-			e.DividerTempSurfIn = 23.0;
-			e.DividerTempSurfInOld = 23.0;
-			e.DividerTempSurfOut = 23.0;
 
-			// Initialize previous-timestep shading indicators
-			e.ExtIntShadePrevTS = 0;
-			e.ShadingFlag = ShadeOff;
-		}
+    // This is already initialized in SurfaceWindow structure constructor. Do not do it again here. Simon
+		// for ( auto & e : SurfaceWindow ) {
+		// 	// Initialize window frame and divider temperatures
+		// 	e.FrameTempSurfIn = 23.0;
+		// 	e.FrameTempSurfInOld = 23.0;
+		// 	e.FrameTempSurfOut = 23.0;
+		// 	e.DividerTempSurfIn = 23.0;
+		// 	e.DividerTempSurfInOld = 23.0;
+		// 	e.DividerTempSurfOut = 23.0;
+    // 
+		// 	// Initialize previous-timestep shading indicators
+		// 	e.ExtIntShadePrevTS = 0;
+		// 	e.ShadingFlag = ShadeOff;
+		// }
 
 		// Perform other initializations that depend on the surface characteristics
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -2828,7 +2830,7 @@ namespace HeatBalanceSurfaceManager {
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( IGlass, SurfNum ) += QS( ZoneNum ) * Construct( ConstrNum ).AbsDiffBack( IGlass );
 						}
-					} else if ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) {
+					} else if ( ConstrNumSh && ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) ) {
 						// Interior, exterior or between-glass shade, screen or blind in place
 						for ( IGlass = 1; IGlass <= Construct( ConstrNumSh ).TotGlassLayers; ++IGlass ) {
 							if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) QRadSWwinAbs( IGlass, SurfNum ) += QS( ZoneNum ) * Construct( ConstrNumSh ).AbsDiffBack( IGlass );
@@ -3360,11 +3362,13 @@ namespace HeatBalanceSurfaceManager {
 							AbsDiffLayWin = Construct( ConstrNum ).AbsDiffBack( Lay );
 
 							// Window with shade, screen or blind
-							if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
-								AbsDiffLayWin = Construct( ConstrNumSh ).AbsDiffBack( Lay );
-							} else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-								AbsDiffLayWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( _, Lay ) );
-							}
+              				if ( ConstrNumSh != 0 ) {
+							  if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
+							  	AbsDiffLayWin = Construct( ConstrNumSh ).AbsDiffBack( Lay );
+							  } else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
+							  	AbsDiffLayWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( _, Lay ) );
+							  }
+              				}
 
 							// Switchable glazing
 							if ( ShadeFlag == SwitchableGlazing ) AbsDiffLayWin = InterpSw( SwitchFac, AbsDiffLayWin, Construct( ConstrNumSh ).AbsDiffBack( Lay ) );
@@ -3377,13 +3381,15 @@ namespace HeatBalanceSurfaceManager {
 
 						// Window with shade, screen or blind
 
-						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
-							TransDiffWin = Construct( ConstrNumSh ).TransDiff;
-							DiffAbsShade = Construct( ConstrNumSh ).AbsDiffBackShade;
-						} else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-							TransDiffWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
-							DiffAbsShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
-						}
+            			if ( ConstrNumSh != 0 ) {
+						  if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
+						  	TransDiffWin = Construct( ConstrNumSh ).TransDiff;
+						  	DiffAbsShade = Construct( ConstrNumSh ).AbsDiffBackShade;
+						  } else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
+						  	TransDiffWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
+						  	DiffAbsShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
+						  }
+           				}
 
 						// Switchable glazing
 
@@ -5634,8 +5640,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								if ( shading_flag == ExtShadeOn || shading_flag == ExtBlindOn || shading_flag == ExtScreenOn ) {
 									// Exterior shade in place
 									ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
-									RoughSurf = Material( Construct( ConstrNumSh ).LayerPoint( 1 ) ).Roughness;
-									EmisOut = Material( Construct( ConstrNumSh ).LayerPoint( 1 ) ).AbsorpThermal;
+                  					if( ConstrNumSh != 0 ) {
+									  RoughSurf = Material( Construct( ConstrNumSh ).LayerPoint( 1 ) ).Roughness;
+									  EmisOut = Material( Construct( ConstrNumSh ).LayerPoint( 1 ) ).AbsorpThermal;
+                  					}
 								}
 
 								// Get the outside effective emissivity for Equivalent layer model

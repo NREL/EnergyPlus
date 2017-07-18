@@ -183,6 +183,7 @@ namespace TARCOGArgs {
 		Real64 & Gin,
 		Array1A< Real64 > rir,
 		Array1A< Real64 > vfreevent,
+    		Array1A< Real64 > Ah,
 		int & nperr,
 		std::string & ErrorMessage
 	);

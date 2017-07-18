@@ -1153,7 +1153,7 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		SurfaceWindowCalc() :
-			ShadingFlag( ShadeOff ),
+			ShadingFlag( NoShade ),
 			ShadingFlagEMSOn( false ),
 			ShadingFlagEMSValue( 0 ),
 			StormWinFlag( -1 ),
