@@ -58,9 +58,13 @@ The inlet and outlet pressure loss of a cavity open to the indoor room, $$ΔP_{z
 
 $$
 ΔP_{z} = 0.5 \cdot \rho \cdot v^2(Z_{in} + Z_{out}) \\
+
 Z_{in/out}=(\frac{A_{s}}{0.6 \cdot A_{eq,in/out}}-1) \\
+
 A_{eq,in/out}=A_{top/bot}+\frac{1}{2} \frac{A_{bot/top}}{A_{bot}+A_{top}} (A_{l}+A_{r}+A_{h}) \\
+
 A_{h}=d_{surface} \cdot W \cdot H \\
+
 A_{s}=d_{gap} \cdot W
 $$
 
@@ -74,9 +78,13 @@ Correlations for horizontal venetian blinds are:
 
 $$
 A_{h}=D_{1} \cdot [d_{surface} \cdot cos( \varphi)^{D_{2}}]^{D_{3}} \cdot A_{s} \\
+
 d_{surface} = 1 - \frac{t}{cos(\varphi) \cdot (p-t)} \\
+
 t^{*}=D_{4} \cdot \omega \cdot cos(\varphi) \\
+
 k^{*} = d_{surface} \cdot k_{c} + (1-d_{surface}) \cdot k_{s} \\
+
 d_{top}=0
 $$
 
@@ -84,6 +92,7 @@ For outside mount:
 
 $$
 d_{left,right} = d_{gap} \\
+
 d_{bottom}=d_{gap}
 $$
 
@@ -91,6 +100,7 @@ For inside mount:
 
 $$
 d_{left,right} = 0 \\
+
 d_{bottom} = 0
 $$
 
@@ -98,8 +108,11 @@ Where:
 
 $$
 D_{1} = 0.016 \\
+
 D_{2} = -0.63 \\
+
 D_{3} = 0.53 \\
+
 D_{4} = 0.043
 $$
 
@@ -109,8 +122,11 @@ Correlations for homogeneous diffuse shade, perforated screens and woven shade a
 
 $$
 A_{h} =C_{1} \cdot (d_{surface})^{C_{2}} \cdot A_{s} \\
+
 A_{l,r}^{*} = C_{3} \cdot A_{l,r} \\
+
 A_{top, bot}^{*} = C_{4} \cdot A_{l,r} \\
+
 k^{*} = d_{surface} \cdot k_{c}+(1-d_{surface}) \cdot k_{s}
 $$
 
@@ -118,8 +134,11 @@ Where:
 
 $$
 C_{1} = 0.05 \\
+
 C_{2} = 1.08 \\
+
 C_{3} = 0.79 \\
+
 C_{4} = 0.50
 $$
 
