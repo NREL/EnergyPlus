@@ -33740,7 +33740,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note Defines Heating convergence tolerance as a fraction of Heating load to be met.
    N8 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
         \type real
-        \minimum -20.0
         \default -8.0
         \units C
         \note Needs to match the corresponding minimum outdoor temperature defined
@@ -46297,7 +46296,6 @@ Coil:Heating:DX:SingleSpeed,
        \note only required if ReverseCycle defrost strategy is specified
   N5 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
        \type real
-       \minimum -20.0
        \default -8.0
        \units C
   N6 , \field Outdoor Dry-Bulb Temperature to Turn On Compressor
@@ -47177,7 +47175,6 @@ Coil:Heating:DX:VariableSpeed,
         \note only required if ReverseCycle defrost strategy is specified
    N5,  \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
         \type real
-        \minimum -50.0
         \default -8.0
         \units C
    N6,  \field Outdoor Dry-Bulb Temperature to Turn On Compressor
@@ -69817,7 +69814,6 @@ WaterHeater:HeatPump:PumpedCondenser,
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
@@ -70069,7 +70065,6 @@ WaterHeater:HeatPump:WrappedCondenser,
   N5 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
