@@ -4977,7 +4977,6 @@ namespace ZoneTempPredictorCorrector {
 		int ADUNum;
 		int ADUInNode;
 		int ADUOutNode;
-		int iList;
 
 		// FLOW:
 		MoistureMassFlowRate = 0.0;
