@@ -18,7 +18,7 @@ In last couple of years LBNL has been working extensively on generating new proc
 
 The ISO 15099 ventilated window model determines surface convection coefficients based on the opening characteristics of layer adjacent to ventilated cavities. The model divides layer openings into four distinct categories: top, bottom, sides and surface (front) as shown in Figure 1.
 
-![Shading Layer 1](/AERC_Figures/Shading_Layer_1-small.png)
+![Shading Layer 1](AERC_Figures/Shading_Layer_1-small.png)
 
 *Figure 1. Illustration of ISO 15099 ventilated shade layer opening locations.*
 
