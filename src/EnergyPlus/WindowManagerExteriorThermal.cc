@@ -365,16 +365,16 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates solid layer object from material properties in EnergyPlus
-      auto absFront = 0.0;
-      auto absBack = 0.0;
+      auto emissFront = 0.0;
+      auto emissBack = 0.0;
       auto transThermalFront = 0.0;
       auto transThermalBack = 0.0;
       auto thickness = 0.0;
       auto conductivity = 0.0;
 
       if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ) {
-        absFront = material.AbsorpThermalFront;
-        absBack = material.AbsorpThermalBack;
+        emissFront = material.AbsorpThermalFront;
+        emissBack = material.AbsorpThermalBack;
         transThermalFront = material.TransThermal;
         transThermalBack = material.TransThermal;
         thickness = material.Thickness;
@@ -385,8 +385,8 @@ namespace EnergyPlus {
         auto blind = Blind( blNum );
         thickness = blind.SlatThickness;
         conductivity = blind.SlatConductivity;
-        absFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRFrontEmiss );
-        absBack = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRBackEmiss );
+        emissFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRFrontEmiss );
+        emissBack = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRBackEmiss );
         transThermalFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRFrontTrans );
         transThermalBack = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRBackTrans );
         if( t_Index == 1 ) {
@@ -395,8 +395,8 @@ namespace EnergyPlus {
 
       }
       if( material.Group == Shade ) {
-        absFront = material.AbsorpThermal;
-        absBack = material.AbsorpThermal;
+        emissFront = material.AbsorpThermal;
+        emissBack = material.AbsorpThermal;
         transThermalFront = material.TransThermal;
         transThermalBack = material.TransThermal;
         thickness = material.Thickness;
@@ -406,8 +406,10 @@ namespace EnergyPlus {
         }
       }
       if( material.Group == Screen ) {
-        absFront = material.AbsorpThermal;
-        absBack = material.AbsorpThermal;
+        // Simon: Existing code already takes into account geometry of Woven and scales down
+        // emissivity for openning area.
+        emissFront = material.AbsorpThermal;
+        emissBack = material.AbsorpThermal;
         transThermalFront = material.TransThermal;
         transThermalBack = material.TransThermal;
         thickness = material.Thickness;
@@ -421,15 +423,15 @@ namespace EnergyPlus {
         auto &shade( ComplexShade( shdPtr ) );
         thickness = shade.Thickness;
         conductivity = shade.Conductivity;
-        absFront = shade.FrontEmissivity;
-        absBack = shade.BackEmissivity;
+        emissFront = shade.FrontEmissivity;
+        emissBack = shade.BackEmissivity;
         transThermalFront = shade.IRTransmittance;
         transThermalBack = shade.IRTransmittance;
         m_InteriorBSDFShade = ( ( 2 * t_Index - 1 ) == m_TotLay );
       }
 
-      shared_ptr< ISurface > frontSurface = make_shared< CSurface >( absFront, transThermalFront );
-      shared_ptr< ISurface > backSurface = make_shared< CSurface >( absBack, transThermalBack );
+      shared_ptr< ISurface > frontSurface = make_shared< CSurface >( emissFront, transThermalFront );
+      shared_ptr< ISurface > backSurface = make_shared< CSurface >( emissBack, transThermalBack );
       auto aSolidLayer = make_shared< CIGUSolidLayer >( thickness, conductivity, frontSurface, backSurface );
       auto swRadiation = surface.getSWIncident( t_SurfNum );
       if( swRadiation > 0 ) {

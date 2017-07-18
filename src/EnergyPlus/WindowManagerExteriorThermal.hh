@@ -119,8 +119,8 @@ namespace EnergyPlus {
       bool isInteriorShade() const;
 
     private:
-      EnergyPlus::DataSurfaces::SurfaceData m_Surface;
-      EnergyPlus::DataSurfaces::SurfaceWindowCalc m_Window;
+      DataSurfaces::SurfaceData m_Surface;
+      DataSurfaces::SurfaceWindowCalc m_Window;
       ShadePosition m_ShadePosition;
       int m_SurfNum;
       size_t m_SolidLayerIndex;
@@ -136,21 +136,21 @@ namespace EnergyPlus {
       int getNumOfLayers() const;
 
       std::shared_ptr< Tarcog::CBaseIGULayer > getSolidLayer(
-        EnergyPlus::DataSurfaces::SurfaceData const & surface,
-        EnergyPlus::DataHeatBalance::MaterialProperties const & material,
+        DataSurfaces::SurfaceData const & surface,
+        DataHeatBalance::MaterialProperties const & material,
         int const t_Index, int const t_SurfNum );
 
       std::shared_ptr< Tarcog::CBaseIGULayer > getGapLayer(
-        EnergyPlus::DataHeatBalance::MaterialProperties const & material ) const;
+        DataHeatBalance::MaterialProperties const & material ) const;
 
       std::shared_ptr< Tarcog::CBaseIGULayer > getShadeToGlassLayer( int const t_Index ) const;
 
       std::shared_ptr< Tarcog::CBaseIGULayer > getComplexGapLayer(
-        EnergyPlus::DataHeatBalance::MaterialProperties const & material ) const;
+        DataHeatBalance::MaterialProperties const & material ) const;
 
-      std::shared_ptr< Gases::CGas > getGas( EnergyPlus::DataHeatBalance::MaterialProperties const & material ) const;
+      std::shared_ptr< Gases::CGas > getGas( DataHeatBalance::MaterialProperties const & material ) const;
       std::shared_ptr< Gases::CGas > getAir() const;
-      EnergyPlus::DataHeatBalance::MaterialProperties* getLayerMaterial( int const t_Index ) const;
+      DataHeatBalance::MaterialProperties* getLayerMaterial( int const t_Index ) const;
 
     };        
   }

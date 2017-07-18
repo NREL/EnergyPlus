@@ -742,8 +742,7 @@ namespace DataSurfaces {
       return RefAirTemp;
     }
 
-    double SurfaceData::getInsideIR( const int t_SurfNum ) const
-    {
+    double SurfaceData::getInsideIR( const int t_SurfNum ) {
       auto & window( SurfaceWindow( t_SurfNum ) );
       double value = window.IRfromParentZone + QHTRadSysSurf( t_SurfNum ) + QHWBaseboardSurf( t_SurfNum ) +
         QSteamBaseboardSurf( t_SurfNum ) + QElecBaseboardSurf( t_SurfNum );
@@ -809,7 +808,7 @@ namespace DataSurfaces {
       return value;
     }
 
-    double SurfaceData::getSWIncident( const int t_SurfNum ) const {
+    double SurfaceData::getSWIncident( const int t_SurfNum ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -821,6 +820,34 @@ namespace DataSurfaces {
       
       return QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
     }
+
+
+    double SurfaceData::getSWBeamIncident( const int t_SurfNum ) {
+	    // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Return total short wave incident from outside beam
+        
+      return QRadSWOutIncidentBeam( t_SurfNum );
+	  }
+
+    double SurfaceData::getSWDiffuseIncident( const int t_SurfNum ) {
+	    // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Return total short wave diffuse incident to the surface
+        
+      return QRadSWOutIncidentSkyDiffuse( t_SurfNum ) + QRadSWOutIncidentGndDiffuse( t_SurfNum ) + 
+        QS( Surface( t_SurfNum ).Zone );
+	  }
 
     int SurfaceData::getTotLayers() const {
       // SUBROUTINE INFORMATION:

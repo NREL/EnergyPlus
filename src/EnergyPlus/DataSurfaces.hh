@@ -890,8 +890,8 @@ namespace DataSurfaces {
     double
     getInsideAirTemperature( const int t_SurfNum ) const;
 
-    double
-    getInsideIR( const int t_SurfNum ) const;
+	  static double
+    getInsideIR( const int t_SurfNum );
 
     double
     getOutsideAirTemperature( const int t_SurfNum ) const;
@@ -899,8 +899,14 @@ namespace DataSurfaces {
     double
     getOutsideIR( const int t_SurfNum ) const;
 
-    double
-    getSWIncident( const int t_SurfNum ) const;
+	  static double
+    getSWIncident( const int t_SurfNum );
+
+	  static double
+    getSWBeamIncident( const int t_SurfNum );
+
+	  static double
+    getSWDiffuseIncident( const int t_SurfNum );
 
     int
     getTotLayers() const;
