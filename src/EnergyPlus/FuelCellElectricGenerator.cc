@@ -263,7 +263,7 @@ namespace FuelCellElectricGenerator {
 		if ( MyOneTimeFlag ) {
 
 			cCurrentModuleObject = "Generator:FuelCell";
-			NumFuelCellGenerators = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFuelCellGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFuelCellGenerators <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -276,7 +276,7 @@ namespace FuelCellElectricGenerator {
 
 			// first load in FuelCell names
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				FuelCell( GeneratorNum ).Name = AlphArray( 1 );
@@ -294,7 +294,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:PowerModule";
-			NumFuelCellPMs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFuelCellPMs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFuelCellPMs <= 0 ) { //Autodesk:Uninit Allowing code to continue past this condition used thisFuelCell uninitialized in EP 8.0
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -302,7 +302,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCPMNum = 1; FCPMNum <= NumFuelCellPMs; ++FCPMNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, FCPMNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, FCPMNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				thisFuelCell = UtilityRoutines::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCPM );
@@ -413,7 +413,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:AirSupply";
-			NumFuelCellAirSups = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFuelCellAirSups = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFuelCellAirSups <= 0 ) { //Autodesk:Uninit thisFuelCell was possibly uninitialized past this condition
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -421,7 +421,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCAirSupNum = 1; FCAirSupNum <= NumFuelCellAirSups; ++FCAirSupNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, FCAirSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, FCAirSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				thisFuelCell = UtilityRoutines::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCAirSup );
@@ -591,7 +591,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:WaterSupply";
-			NumFCWaterSups = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFCWaterSups = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFCWaterSups <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -599,7 +599,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCWaterSupNum = 1; FCWaterSupNum <= NumFCWaterSups; ++FCWaterSupNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, FCWaterSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, FCWaterSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				thisFuelCell = UtilityRoutines::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCWaterSup );
@@ -669,7 +669,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:AuxiliaryHeater";
-			NumFuelCellAuxilHeaters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFuelCellAuxilHeaters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFuelCellAuxilHeaters <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -677,7 +677,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCAuxHeatNum = 1; FCAuxHeatNum <= NumFuelCellAuxilHeaters; ++FCAuxHeatNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, FCAuxHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, FCAuxHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				thisFuelCell = UtilityRoutines::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameFCAuxilHeat );
@@ -730,7 +730,7 @@ namespace FuelCellElectricGenerator {
 
 			// exhaust gas heat exchanger
 			cCurrentModuleObject = "Generator:FuelCell:ExhaustGasToWaterHeatExchanger";
-			NumFCExhaustGasHXs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFCExhaustGasHXs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumFCExhaustGasHXs <= 0 ) {
 				ShowWarningError( "No " + cCurrentModuleObject + " equipment specified in input file" );
 				ShowContinueError( "Fuel Cell model requires an " + cCurrentModuleObject + " object" );
@@ -738,7 +738,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCHXNum = 1; FCHXNum <= NumFCExhaustGasHXs; ++FCHXNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, FCHXNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, FCHXNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				thisFuelCell = UtilityRoutines::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameExhaustHX );
@@ -799,7 +799,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:ElectricalStorage";
-			NumFCElecStorageUnits = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFCElecStorageUnits = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFCElecStorageUnits <= 0 ) {
 				ShowWarningError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -808,7 +808,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( StorageNum = 1; StorageNum <= NumFCElecStorageUnits; ++StorageNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, StorageNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, StorageNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				thisFuelCell = UtilityRoutines::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameElecStorage );
@@ -845,7 +845,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:Inverter";
-			NumFCPowerCondUnits = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFCPowerCondUnits = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFCPowerCondUnits <= 0 ) {
 				ShowWarningError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -855,7 +855,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( FCPCUNum = 1; FCPCUNum <= NumFCPowerCondUnits; ++FCPCUNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, FCPCUNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, FCPCUNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				thisFuelCell = UtilityRoutines::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameInverter );
@@ -895,11 +895,11 @@ namespace FuelCellElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:FuelCell:StackCooler";
-			NumFCStackCoolers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFCStackCoolers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumFCStackCoolers > 0 ) { // get stack cooler input data
 				for ( FCScoolNum = 1; FCScoolNum <= NumFCStackCoolers; ++FCScoolNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, FCScoolNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, FCScoolNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 					UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 					thisFuelCell = UtilityRoutines::FindItemInList( AlphArray( 1 ), FuelCell, &FCDataStruct::NameStackCooler );

@@ -207,11 +207,11 @@ namespace ExteriorEnergyUse {
 		Real64 SchMin; // Min value of schedule for item
 		static Real64 sumDesignLevel( 0.0 ); // for predefined report of design level total
 
-		NumExteriorLights = InputProcessor::GetNumObjectsFound( "Exterior:Lights" );
+		NumExteriorLights = inputProcessor->getNumObjectsFound( "Exterior:Lights" );
 		ExteriorLights.allocate( NumExteriorLights );
 
-		NumFuelEq = InputProcessor::GetNumObjectsFound( "Exterior:FuelEquipment" );
-		NumWtrEq = InputProcessor::GetNumObjectsFound( "Exterior:WaterEquipment" );
+		NumFuelEq = inputProcessor->getNumObjectsFound( "Exterior:FuelEquipment" );
+		NumWtrEq = inputProcessor->getNumObjectsFound( "Exterior:WaterEquipment" );
 		ExteriorEquipment.allocate( NumFuelEq + NumWtrEq );
 		UniqueExteriorEquipNames.reserve( NumFuelEq + NumWtrEq );
 
@@ -222,7 +222,7 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:Lights";
 		for ( Item = 1; Item <= NumExteriorLights; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 			ExteriorLights( Item ).Name = cAlphaArgs( 1 );
@@ -293,7 +293,7 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:FuelEquipment";
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
@@ -359,7 +359,7 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:WaterEquipment";
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 

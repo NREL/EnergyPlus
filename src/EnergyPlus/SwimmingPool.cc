@@ -297,7 +297,7 @@ namespace SwimmingPool {
 		MaxAlphas = 0;
 		MaxNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -314,7 +314,7 @@ namespace SwimmingPool {
 		lNumericBlanks.allocate( MaxNumbers );
 		lNumericBlanks = true;
 
-		NumSwimmingPools = InputProcessor::GetNumObjectsFound( "SwimmingPool:Indoor" );
+		NumSwimmingPools = inputProcessor->getNumObjectsFound( "SwimmingPool:Indoor" );
 		CheckEquipName.allocate( NumSwimmingPools );
 		CheckEquipName = true;
 
@@ -326,7 +326,7 @@ namespace SwimmingPool {
 		CurrentModuleObject = "SwimmingPool:Indoor";
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			Pool( Item ).Name = Alphas( 1 );
 

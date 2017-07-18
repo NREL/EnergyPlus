@@ -67981,6 +67981,7 @@ FluidCooler:TwoSpeed,
 
 GroundHeatExchanger:Vertical,
  \min-fields 20
+ \extensible:2 - repeat last field, remembering to remove ; from "inner" fields.
  \memo Variable short time step vertical ground heat exchanger model based on
  \memo Yavuztruk, C., J.D.Spitler. 1999. A Short Time Step response Factor Model for
  \memo Vertical Ground Loop Heat Exchangers
@@ -68078,6 +68079,7 @@ GroundHeatExchanger:Vertical,
         \minimum 1
         \maximum 100
   N16,  \field G-Function Ln(T/Ts) Value 1
+        \begin-extensible
         \required-field
         \type real
   N17,  \field G-Function G Value 1

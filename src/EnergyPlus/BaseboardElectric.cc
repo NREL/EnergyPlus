@@ -272,7 +272,7 @@ namespace BaseboardElectric {
 
 		cCurrentModuleObject = cCMO_BBRadiator_Electric;
 
-		NumConvElecBaseboards = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumConvElecBaseboards = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// Calculate total number of baseboard units
 		NumBaseboards = NumConvElecBaseboards;
@@ -286,7 +286,7 @@ namespace BaseboardElectric {
 			BaseboardNum = 0;
 			for ( ConvElecBBNum = 1; ConvElecBBNum <= NumConvElecBaseboards; ++ConvElecBBNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ConvElecBBNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ConvElecBBNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames.allocate( NumNums);
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = "";

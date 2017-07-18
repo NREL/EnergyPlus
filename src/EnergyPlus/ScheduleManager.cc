@@ -348,101 +348,101 @@ namespace ScheduleManager {
 		MaxAlps = 0;
 
 		CurrentModuleObject = "ScheduleTypeLimits";
-		NumScheduleTypes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumScheduleTypes = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumScheduleTypes > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:Hourly";
-		NumHrDaySchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumHrDaySchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumHrDaySchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:Interval";
-		NumIntDaySchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumIntDaySchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumIntDaySchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:List";
-		NumLstDaySchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumLstDaySchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumLstDaySchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Week:Daily";
-		NumRegWeekSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumRegWeekSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumRegWeekSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Week:Compact";
-		NumCptWeekSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCptWeekSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumCptWeekSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Year";
-		NumRegSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumRegSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumRegSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Compact";
-		NumCptSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCptSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumCptSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		CurrentModuleObject = "Schedule:File";
-		NumCommaFileSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCommaFileSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumCommaFileSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Constant";
-		NumConstantSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumConstantSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumConstantSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "ExternalInterface:Schedule";
-		NumExternalInterfaceSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumExternalInterfaceSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		// added for FMI
 		if ( NumExternalInterfaceSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		// added for FMU Import
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
-		NumExternalInterfaceFunctionalMockupUnitImportSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitImportSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumExternalInterfaceFunctionalMockupUnitImportSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		// added for FMU Export
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
-		NumExternalInterfaceFunctionalMockupUnitExportSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitExportSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumExternalInterfaceFunctionalMockupUnitExportSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		CurrentModuleObject = "Output:Schedules";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlps = max( MaxAlps, NumAlphas );
 
@@ -459,7 +459,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Compact";
 		MaxNums1 = 0;
 		for ( LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status );
 			// # 'THROUGH" => Number of additional week schedules
 			// # 'FOR' => Number of additional day schedules
 			for ( Count = 3; Count <= NumAlphas; ++Count ) {
@@ -539,7 +539,7 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "ScheduleTypeLimits";
 		for ( LoopIndex = 1; LoopIndex <= NumScheduleTypes; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			ScheduleType( LoopIndex ).Name = Alphas( 1 );
@@ -593,7 +593,7 @@ namespace ScheduleManager {
 		Count = 0;
 		CurrentModuleObject = "Schedule:Day:Hourly";
 		for ( LoopIndex = 1; LoopIndex <= NumHrDaySchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
@@ -643,7 +643,7 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "Schedule:Day:Interval";
 		for ( LoopIndex = 1; LoopIndex <= NumIntDaySchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
@@ -721,7 +721,7 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "Schedule:Day:List";
 		for ( LoopIndex = 1; LoopIndex <= NumLstDaySchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
@@ -841,7 +841,7 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "Schedule:Week:Daily";
 		for ( LoopIndex = 1; LoopIndex <= NumRegWeekSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueWeekScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			WeekSchedule( LoopIndex ).Name = Alphas( 1 );
 			// Rest of Alphas are processed into Pointers
@@ -860,7 +860,7 @@ namespace ScheduleManager {
 		Count = NumRegWeekSchedules;
 		CurrentModuleObject = "Schedule:Week:Compact";
 		for ( LoopIndex = 1; LoopIndex <= NumCptWeekSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			if ( Count > 0 ) {
 				GlobalNames::VerifyUniqueInterObjectName( UniqueWeekScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			}
@@ -904,7 +904,7 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "Schedule:Year";
 		for ( LoopIndex = 1; LoopIndex <= NumRegSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Schedule( LoopIndex ).Name = Alphas( 1 );
 			Schedule( LoopIndex ).SchType = ScheduleInput_year;
@@ -1001,7 +1001,7 @@ namespace ScheduleManager {
 		AddDaySch = NumRegDaySchedules;
 		CurrentModuleObject = "Schedule:Compact";
 		for ( LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
@@ -1283,7 +1283,7 @@ namespace ScheduleManager {
 		}
 		CurrentModuleObject = "Schedule:File";
 		for ( LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
@@ -1595,7 +1595,7 @@ namespace ScheduleManager {
 		// Constant Schedules
 		CurrentModuleObject = "Schedule:Constant";
 		for ( LoopIndex = 1; LoopIndex <= NumConstantSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
@@ -1637,7 +1637,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "ExternalInterface:Schedule";
 		for ( LoopIndex = 1; LoopIndex <= NumExternalInterfaceSchedules; ++LoopIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
@@ -1680,7 +1680,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
 		for ( LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitImportSchedules; ++LoopIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
 				GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport)", ErrorsFound );
@@ -1728,7 +1728,7 @@ namespace ScheduleManager {
 		// added for FMU Export
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
 		for ( LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitExportSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
 				GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport)", ErrorsFound );
@@ -1790,12 +1790,12 @@ namespace ScheduleManager {
 
 		if ( NumScheduleTypes + NumDaySchedules + NumWeekSchedules + NumSchedules > 0 ) { // Report to EIO file
 			CurrentModuleObject = "Output:Schedules";
-			NumFields = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+			NumFields = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 			//    RptSchedule=.FALSE.
 			RptLevel = 1;
 			for ( Count = 1; Count <= NumFields; ++Count ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status );
+				inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status );
 				//      RptSchedule=.TRUE.
 
 				{ auto const SELECT_CASE_var( Alphas( 1 ) );

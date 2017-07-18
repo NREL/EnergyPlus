@@ -291,8 +291,8 @@ namespace HeatPumpWaterToWaterSimple {
 		static bool ErrorsFound( false );
 		bool errFlag;
 
-		NumCoolCoil = InputProcessor::GetNumObjectsFound( HPEqFitCoolingUC );
-		NumHeatCoil = InputProcessor::GetNumObjectsFound( HPEqFitHeatingUC );
+		NumCoolCoil = inputProcessor->getNumObjectsFound( HPEqFitCoolingUC );
+		NumHeatCoil = inputProcessor->getNumObjectsFound( HPEqFitHeatingUC );
 		NumGSHPs = NumCoolCoil + NumHeatCoil;
 
 		if ( NumGSHPs <= 0 ) {
@@ -312,7 +312,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = HPNum;
 
-			InputProcessor::GetObjectItem( HPEqFitCoolingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
+			inputProcessor->getObjectItem( HPEqFitCoolingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
 			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs( 1 ), HPEqFitCoolingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
 			GSHP( GSHPNum ).Name = DataIPShortCuts::cAlphaArgs( 1 );
@@ -396,7 +396,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = NumCoolCoil + HPNum;
 
-			InputProcessor::GetObjectItem( HPEqFitHeatingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
+			inputProcessor->getObjectItem( HPEqFitHeatingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
 			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs( 1 ), HPEqFitHeatingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
 			GSHP( GSHPNum ).Name = DataIPShortCuts::cAlphaArgs( 1 );

@@ -145,7 +145,7 @@ namespace MatrixDataManager {
 		int NumElements;
 
 		cCurrentModuleObject = "Matrix:TwoDimension";
-		NumTwoDimMatrix = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumTwoDimMatrix = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		NumMats = NumTwoDimMatrix;
 
@@ -153,7 +153,7 @@ namespace MatrixDataManager {
 
 		MatNum = 0;
 		for ( MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++MatNum;
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 

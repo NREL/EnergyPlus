@@ -300,8 +300,8 @@ namespace PoweredInductionUnits {
 		// FLOW
 		// find the number of each type of fan coil unit
 		SteamMessageNeeded = true;
-		NumSeriesPIUs = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:SeriesPIU:Reheat" );
-		NumParallelPIUs = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:ParallelPIU:Reheat" );
+		NumSeriesPIUs = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:SeriesPIU:Reheat" );
+		NumParallelPIUs = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:ParallelPIU:Reheat" );
 		NumPIUs = NumSeriesPIUs + NumParallelPIUs;
 		// allocate the data structures
 		PIU.allocate( NumPIUs );
@@ -313,7 +313,7 @@ namespace PoweredInductionUnits {
 
 			cCurrentModuleObject = "AirTerminal:SingleDuct:SeriesPIU:Reheat";
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex;
 			GlobalNames::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
@@ -442,7 +442,7 @@ namespace PoweredInductionUnits {
 
 			cCurrentModuleObject = "AirTerminal:SingleDuct:ParallelPIU:Reheat";
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex + NumSeriesPIUs;
 			GlobalNames::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );

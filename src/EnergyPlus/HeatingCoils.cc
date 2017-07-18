@@ -368,11 +368,11 @@ namespace HeatingCoils {
 		bool errFlag;
 		// Flow
 
-		NumElecCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Electric" );
-		NumElecCoilMultiStage = InputProcessor::GetNumObjectsFound( "Coil:Heating:Electric:MultiStage" );
-		NumFuelCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Fuel" );
-		NumGasCoilMultiStage = InputProcessor::GetNumObjectsFound( "Coil:Heating:Gas:MultiStage" );
-		NumDesuperheaterCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Desuperheater" );
+		NumElecCoil = inputProcessor->getNumObjectsFound( "Coil:Heating:Electric" );
+		NumElecCoilMultiStage = inputProcessor->getNumObjectsFound( "Coil:Heating:Electric:MultiStage" );
+		NumFuelCoil = inputProcessor->getNumObjectsFound( "Coil:Heating:Fuel" );
+		NumGasCoilMultiStage = inputProcessor->getNumObjectsFound( "Coil:Heating:Gas:MultiStage" );
+		NumDesuperheaterCoil = inputProcessor->getNumObjectsFound( "Coil:Heating:Desuperheater" );
 		NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
 		if ( NumHeatingCoils > 0 ) {
 			HeatingCoil.allocate( NumHeatingCoils );
@@ -381,19 +381,19 @@ namespace HeatingCoils {
 			CheckEquipName.dimension( NumHeatingCoils, true );
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Electric", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Electric", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Electric:MultiStage", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Electric:MultiStage", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Fuel", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Fuel", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Gas:MultiStage", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Gas:MultiStage", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Desuperheater", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Desuperheater", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -412,7 +412,7 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Electric";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
@@ -471,7 +471,7 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
@@ -540,7 +540,7 @@ namespace HeatingCoils {
 
 			CurrentModuleObject = "Coil:Heating:Fuel";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
@@ -620,7 +620,7 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Natural_Gas;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
@@ -705,7 +705,7 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Desuperheater";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DesuperheaterCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DesuperheaterCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";

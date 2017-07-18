@@ -560,10 +560,10 @@ namespace NodeInputManager {
 		Array1D< Real64 > rNumbers;
 
 		ErrorsFound = false;
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NCount, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NCount, NumAlphas, NumNumbers );
 		cAlphas.allocate( NumAlphas );
 		rNumbers.allocate( NumNumbers );
-		NumOfNodeLists = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfNodeLists = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NodeLists.allocate( NumOfNodeLists );
 		for ( int i = 1; i <= NumOfNodeLists; ++i ) {
 			NodeLists( i ).Name.clear();
@@ -572,7 +572,7 @@ namespace NodeInputManager {
 
 		NCount = 0;
 		for ( Loop = 1; Loop <= NumOfNodeLists; ++Loop ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
 			if ( UtilityRoutines::IsNameEmpty( cAlphas( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			++NCount;
@@ -813,7 +813,7 @@ namespace NodeInputManager {
 		int NumNums;
 
 		if ( GetOnlySingleNodeFirstTime ) {
-			InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 			GetOnlySingleNodeNodeNums.dimension( NumParams, 0 );
 			GetOnlySingleNodeFirstTime = false;
 		}

@@ -379,14 +379,14 @@ namespace WindowAC {
 		// find the number of each type of window AC unit
 		CurrentModuleObject = "ZoneHVAC:WindowAirConditioner";
 
-		NumWindACCyc = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumWindACCyc = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumWindAC = NumWindACCyc;
 		// allocate the data structures
 		WindAC.allocate( NumWindAC );
 		CheckEquipName.dimension( NumWindAC, true );
 		WindACNumericFields.allocate( NumWindAC );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -398,7 +398,7 @@ namespace WindowAC {
 		// loop over window AC units; get and load the input data
 		for ( WindACIndex = 1; WindACIndex <= NumWindACCyc; ++WindACIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, WindACIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, WindACIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WindACNum = WindACIndex;
 

@@ -226,7 +226,7 @@ namespace PlantComponentTemperatureSources {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "PlantComponent:TemperatureSource";
-		NumSources = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSources = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSources <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -239,7 +239,7 @@ namespace PlantComponentTemperatureSources {
 
 		// fill arrays
 		for ( SourceNum = 1; SourceNum <= NumSources; ++SourceNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			WaterSource( SourceNum ).Name = cAlphaArgs( 1 );

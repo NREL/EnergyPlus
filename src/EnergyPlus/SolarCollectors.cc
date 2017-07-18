@@ -304,26 +304,26 @@ namespace SolarCollectors {
 		MaxAlphas = 0;
 
 		CurrentModuleParamObject = "SolarCollectorPerformance:FlatPlate";
-		NumOfFlatPlateParam = InputProcessor::GetNumObjectsFound( CurrentModuleParamObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
+		NumOfFlatPlateParam = inputProcessor->getNumObjectsFound( CurrentModuleParamObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "SolarCollector:FlatPlate:Water";
-		NumFlatPlateUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumFlatPlateUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleParamObject = "SolarCollectorPerformance:IntegralCollectorStorage";
-		NumOfICSParam = InputProcessor::GetNumObjectsFound( CurrentModuleParamObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
+		NumOfICSParam = inputProcessor->getNumObjectsFound( CurrentModuleParamObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-		NumOfICSUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumOfICSUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -345,7 +345,7 @@ namespace SolarCollectors {
 			for ( FlatPlateParamNum = 1; FlatPlateParamNum <= NumOfFlatPlateParam; ++FlatPlateParamNum ) {
 
 				ParametersNum = FlatPlateParamNum;
-				InputProcessor::GetObjectItem( CurrentModuleParamObject, ParametersNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleParamObject, ParametersNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector module parameters name
 				GlobalNames::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
@@ -419,7 +419,7 @@ namespace SolarCollectors {
 
 				CollectorNum = FlatPlateUnitsNum;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( CurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 				// Collector name
 				GlobalNames::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
@@ -511,7 +511,7 @@ namespace SolarCollectors {
 
 				ParametersNum = ICSParamNum + NumOfFlatPlateParam;
 
-				InputProcessor::GetObjectItem( CurrentModuleParamObject, ICSParamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleParamObject, ICSParamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector module parameters name
 				GlobalNames::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
@@ -593,7 +593,7 @@ namespace SolarCollectors {
 
 				CollectorNum = ICSUnitsNum + NumFlatPlateUnits;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, ICSUnitsNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, ICSUnitsNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector name
 				GlobalNames::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );

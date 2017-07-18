@@ -4066,7 +4066,7 @@ namespace DaylightingManager {
 
 		ErrorsFound = false;
 		cCurrentModuleObject = "Daylighting:Controls";
-		TotDaylightingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotDaylightingControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotDaylightingControls > 0 ) {
 			GetInputDayliteRefPt( ErrorsFound );
 			GetDaylightingControls(TotDaylightingControls, ErrorsFound);
@@ -4252,9 +4252,9 @@ namespace DaylightingManager {
 
 		// TH 6/3/2010, added to report daylight factors
 		cCurrentModuleObject = "Output:DaylightFactors";
-		NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumReports > 0 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( has_prefix( cAlphaArgs( 1 ), "SIZINGDAYS" ) ) {
 				DFSReportSizingDays = true;
 			} else if ( has_prefix( cAlphaArgs( 1 ), "ALLSHADOWCALCULATIONDAYS" ) ) {
@@ -4325,7 +4325,7 @@ namespace DaylightingManager {
 		CheckForGeometricTransform(doTransform, OldAspectRatio, NewAspectRatio);
 
 		cCurrentModuleObject = "Output:IlluminanceMap";
-		TotIllumMaps = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotIllumMaps = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		IllumMap.allocate(TotIllumMaps);
 		IllumMapCalc.allocate(TotIllumMaps);
@@ -4333,7 +4333,7 @@ namespace DaylightingManager {
 
 		if ( TotIllumMaps > 0 ) {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IllumMap( MapNum ).Name = cAlphaArgs( 1 );
 				IllumMap( MapNum ).Zone = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 
@@ -4384,13 +4384,13 @@ namespace DaylightingManager {
 				}
 			} // MapNum
 			cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
-			MapStyleIn = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			MapStyleIn = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if (MapStyleIn == 0) {
 				cAlphaArgs(1) = "COMMA";
 				MapColSep = CharComma; //comma
 			} else if ( MapStyleIn == 1 ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( cAlphaArgs( 1 ) == "COMMA" ) {
 					MapColSep = CharComma; //comma
 				}
@@ -4612,7 +4612,7 @@ namespace DaylightingManager {
 		for ( iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl ) {
 			cAlphaArgs = "";
 			rNumericArgs = 0.0;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ZoneFound = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneFound == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -4939,10 +4939,10 @@ namespace DaylightingManager {
 		int NumNumber;
 
 		cCurrentModuleObject = "Daylighting:ReferencePoint";
-		TotRefPoints = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotRefPoints = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		DaylRefPt.allocate( TotRefPoints );
 		for ( auto & pt : DaylRefPt ){
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			pt.Name = cAlphaArgs( 1 );
 			pt.ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( pt.ZoneNum == 0 ) {
@@ -5129,12 +5129,12 @@ namespace DaylightingManager {
 
 		// Get the total number of Light Well objects
 		cCurrentModuleObject = "DaylightingDevice:LightWell";
-		TotLightWells = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotLightWells = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotLightWells == 0 ) return;
 
 		for ( loop = 1; loop <= TotLightWells; ++loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface );
 			if ( SurfNum == 0 ) {
@@ -10033,8 +10033,8 @@ Label903: ;
 		OldAspectRatio = 1.0;
 		NewAspectRatio = 1.0;
 
-		if ( InputProcessor::GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( inputProcessor->getNumObjectsFound( CurrentModuleObject ) == 1 ) {
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OldAspectRatio = rNumerics( 1 );
 			NewAspectRatio = rNumerics( 2 );
 			transformPlane = cAlphas( 1 );

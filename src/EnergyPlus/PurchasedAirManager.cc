@@ -308,7 +308,7 @@ namespace PurchasedAirManager {
 
 		cCurrentModuleObject = "ZoneHVAC:IdealLoadsAirSystem";
 
-		NumPurchAir = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumPurchAir = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		PurchAir.allocate( NumPurchAir );
 		CheckEquipName.allocate( NumPurchAir );
@@ -320,7 +320,7 @@ namespace PurchasedAirManager {
 			for ( PurchAirNum = 1; PurchAirNum <= NumPurchAir; ++PurchAirNum ) {
 				PurchAir( PurchAirNum ).cObjectName = cCurrentModuleObject;
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, PurchAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, PurchAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				PurchAirNumericFields( PurchAirNum ).FieldNames.allocate( NumNums );
 				PurchAirNumericFields( PurchAirNum ).FieldNames = "";

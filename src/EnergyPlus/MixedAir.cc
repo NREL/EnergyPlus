@@ -914,13 +914,13 @@ namespace MixedAir {
 
 		if ( ! GetOASysInputFlag ) return;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OASystem ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OASystem ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_AirLoopEqList ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_AirLoopEqList ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_ControllerList ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_ControllerList ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -932,7 +932,7 @@ namespace MixedAir {
 		lNumericBlanks.dimension( MaxNums, true );
 
 		CurrentModuleObject = CurrentModuleObjects( CMO_ControllerList );
-		NumControllerLists = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumControllerLists = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		ControllerLists.allocate( NumControllerLists );
 
@@ -940,7 +940,7 @@ namespace MixedAir {
 
 			// create a reference for convenience
 			auto & thisControllerList( ControllerLists( Item ) );
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			thisControllerList.Name = AlphArray( 1 );
 			thisControllerList.NumControllers = ( NumAlphas - 1 ) / 2;
@@ -976,7 +976,7 @@ namespace MixedAir {
 
 		CurrentModuleObject = CurrentModuleObjects( CMO_OASystem );
 
-		NumOASystems = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOASystems = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		OutsideAirSys.allocate( NumOASystems );
 		OASysEqSizing.allocate( NumOASystems );
@@ -987,7 +987,7 @@ namespace MixedAir {
 
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty( AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 			OutsideAirSys( OASysNum ).Name = AlphArray( 1 );
 			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), ControllerListUniqueNames, ErrorsFound );
@@ -1000,9 +1000,9 @@ namespace MixedAir {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), "UNDEFINED", "UNDEFINED", "Air Nodes" );
 
 			if ( ! lAlphaBlanks( 3 ) ) {
-				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CMO_AirLoopEqList ), ComponentListName );
+				ListNum = inputProcessor->getObjectItemNum( CurrentModuleObjects( CMO_AirLoopEqList ), ComponentListName );
 				if ( ListNum > 0 ) {
-					InputProcessor::GetObjectItem( CurrentModuleObjects( CMO_AirLoopEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+					inputProcessor->getObjectItem( CurrentModuleObjects( CMO_AirLoopEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 					NumInList = ( NumAlphas - 1 ) / 2;
 					OutsideAirSys( OASysNum ).NumComponents = NumInList;
 					OutsideAirSys( OASysNum ).ComponentName.allocate( NumInList );
@@ -1028,9 +1028,9 @@ namespace MixedAir {
 			ListNum = 0;
 			NumSimpControllers = 0;
 			if ( ! lAlphaBlanks( 2 ) ) {
-				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CMO_ControllerList ), ControllerListName );
+				ListNum = inputProcessor->getObjectItemNum( CurrentModuleObjects( CMO_ControllerList ), ControllerListName );
 				if ( ListNum > 0 ) {
-					InputProcessor::GetObjectItem( CurrentModuleObjects( CMO_ControllerList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+					inputProcessor->getObjectItem( CurrentModuleObjects( CMO_ControllerList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 					NumInList = ( NumAlphas - 1 ) / 2;
 					OutsideAirSys( OASysNum ).NumControllers = NumInList;
 					OutsideAirSys( OASysNum ).ControllerName.allocate( NumInList );
@@ -1055,7 +1055,7 @@ namespace MixedAir {
 			OutsideAirSys( OASysNum ).NumSimpleControllers = NumSimpControllers;
 
 			if ( ! lAlphaBlanks( 4 ) ) {
-				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CMO_SysAvailMgrList ), AvailManagerListName );
+				ListNum = inputProcessor->getObjectItemNum( CurrentModuleObjects( CMO_SysAvailMgrList ), AvailManagerListName );
 				if ( ListNum <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\" not found." );
 					ErrorsFound = true;
@@ -1267,13 +1267,13 @@ namespace MixedAir {
 			GetOAMixerInputFlag = false;
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
 		MaxAlphas = NumAlphas;
 		MaxNums = NumNums;
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_ERVController ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_ERVController ), NumArg, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_MechVentilation ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_MechVentilation ), NumArg, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
 
@@ -1294,7 +1294,7 @@ namespace MixedAir {
 			int currentOAControllerNum = 0;
 			for ( OutAirNum = NumERVControllers+1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
 				++currentOAControllerNum;
-				InputProcessor::GetObjectItem( CurrentModuleObject, currentOAControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, currentOAControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				GlobalNames::VerifyUniqueInterObjectName( OAControllerUniqueNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 				ProcessOAControllerInputs( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
@@ -1368,12 +1368,12 @@ namespace MixedAir {
 
 		// Process Controller:MechanicalVentilation objects
 		CurrentModuleObject = CurrentModuleObjects( CMO_MechVentilation );
-		NumVentMechControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumVentMechControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumVentMechControllers > 0 ) {
 			VentilationMechanical.allocate( NumVentMechControllers );
 			for ( VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum ) {
 				auto & thisVentilationMechanical( VentilationMechanical( VentMechNum ) );
-				InputProcessor::GetObjectItem( CurrentModuleObject, VentMechNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, VentMechNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				MechVentZoneCount = 0;
 
@@ -1834,8 +1834,8 @@ namespace MixedAir {
 
 
 		if ( AllocateOAControllersFlag ) {
-			NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
-			NumERVControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
+			NumOAControllers = inputProcessor->getNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
+			NumERVControllers = inputProcessor->getNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
 			NumOAControllers += NumERVControllers;
 			OAController.allocate( NumOAControllers );
 			OAControllerUniqueNames.reserve( static_cast< unsigned >( NumOAControllers ) );
@@ -1886,7 +1886,7 @@ namespace MixedAir {
 
 		if ( ! GetOAMixerInputFlag ) return;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAMixer ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OAMixer ), NumArg, NumAlphas, NumNums );
 
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
@@ -1897,14 +1897,14 @@ namespace MixedAir {
 
 		CurrentModuleObject = CurrentModuleObjects( CMO_OAMixer );
 
-		NumOAMixers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOAMixers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumOAMixers > 0 ) {
 
 			OAMixer.allocate( NumOAMixers );
 
 			for ( OutAirNum = 1; OutAirNum <= NumOAMixers; ++OutAirNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 				OAMixer( OutAirNum ).Name = AlphArray( 1 );
@@ -5673,20 +5673,20 @@ namespace MixedAir {
 			GetOASysInputFlag = false;
 		}
 
-		NumControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		NumAirLoop = InputProcessor::GetNumObjectsFound( AirLoopObject );
+		NumControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		NumAirLoop = inputProcessor->getNumObjectsFound( AirLoopObject );
 		AirLoopName = "";
 
 		for ( Item = 1; Item <= NumControllers; ++Item ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat );
 			ControllerListName = cAlphaArgs( 1 );
 			Count = 0;
 
 			// Check AirLoopHVAC -- brute force, get each AirLoopHVAC
 
 			for ( Loop = 1; Loop <= NumAirLoop; ++Loop ) {
-				InputProcessor::GetObjectItem( AirLoopObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat );
+				inputProcessor->getObjectItem( AirLoopObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat );
 				if ( cAlphaArgs( 2 ) != ControllerListName ) continue;
 				++Count;
 				if ( Count == 1 ) AirLoopName = cAlphaArgs( 1 );

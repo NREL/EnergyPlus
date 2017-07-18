@@ -556,11 +556,11 @@ namespace VariableSpeedCoils {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
-		NumCool = InputProcessor::GetNumObjectsFound( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
-		NumHeat = InputProcessor::GetNumObjectsFound( "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
-		NumCoolAS = InputProcessor::GetNumObjectsFound( "COIL:COOLING:DX:VARIABLESPEED" );
-		NumHeatAS = InputProcessor::GetNumObjectsFound( "COIL:HEATING:DX:VARIABLESPEED" );
-		NumHPWHAirToWater = InputProcessor::GetNumObjectsFound( "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" );
+		NumCool = inputProcessor->getNumObjectsFound( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
+		NumHeat = inputProcessor->getNumObjectsFound( "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
+		NumCoolAS = inputProcessor->getNumObjectsFound( "COIL:COOLING:DX:VARIABLESPEED" );
+		NumHeatAS = inputProcessor->getNumObjectsFound( "COIL:HEATING:DX:VARIABLESPEED" );
+		NumHPWHAirToWater = inputProcessor->getNumObjectsFound( "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" );
 		NumVarSpeedCoils = NumCool + NumHeat + NumCoolAS + NumHeatAS + NumHPWHAirToWater;
 		DXCoilNum = 0;
 
@@ -575,22 +575,22 @@ namespace VariableSpeedCoils {
 			DataHeatBalance::HeatReclaimVS_DXCoil.allocate( NumVarSpeedCoils );
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
-		InputProcessor::GetObjectDefMaxArgs( "COIL:COOLING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "COIL:COOLING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "COIL:HEATING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "COIL:HEATING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		//variable speed air-source HPWH
-		InputProcessor::GetObjectDefMaxArgs( "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -609,7 +609,7 @@ namespace VariableSpeedCoils {
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
@@ -974,7 +974,7 @@ namespace VariableSpeedCoils {
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
@@ -1315,7 +1315,7 @@ namespace VariableSpeedCoils {
 
 			++DXCoilNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
@@ -1659,7 +1659,7 @@ namespace VariableSpeedCoils {
 
 			++DXCoilNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
@@ -1975,7 +1975,7 @@ namespace VariableSpeedCoils {
 			++DXCoilNum;
 			AlfaFieldIncre = 1;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;

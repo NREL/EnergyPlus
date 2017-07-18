@@ -230,7 +230,7 @@ namespace PondGroundHeatExchanger {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Pond";
-		NumOfPondGHEs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPondGHEs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( PondGHE ) ) PondGHE.deallocate();
 
@@ -240,7 +240,7 @@ namespace PondGroundHeatExchanger {
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
 
 			// get the input data
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			PondGHE( Item ).WaterIndex = FindGlycol( fluidNameWater );
 

@@ -115,7 +115,7 @@ namespace HVACFan {
 		std::string const & objectName
 	) {
 
-		int testNum = InputProcessor::GetObjectItemNum("Fan:SystemModel", objectName );
+		int testNum = inputProcessor->getObjectItemNum("Fan:SystemModel", objectName );
 		if ( testNum > 0 ) {
 			return true;
 		} else {
@@ -387,8 +387,8 @@ namespace HVACFan {
 		Array1D< Real64 > numericArgs;
 		Array1D_string numericFieldNames;
 		Array1D_bool isNumericFieldBlank;
-		int objectNum = InputProcessor::GetObjectItemNum( locCurrentModuleObject, objectName );
-		InputProcessor::GetObjectDefMaxArgs( locCurrentModuleObject, numTotFields, numAlphas, numNums );
+		int objectNum = inputProcessor->getObjectItemNum( locCurrentModuleObject, objectName );
+		inputProcessor->getObjectDefMaxArgs( locCurrentModuleObject, numTotFields, numAlphas, numNums );
 		if ( numAlphas > 0 ) {
 			alphaArgs.allocate( numAlphas );
 			alphaFieldNames.allocate( numAlphas );
@@ -401,7 +401,7 @@ namespace HVACFan {
 		}
 
 
-		InputProcessor::GetObjectItem( locCurrentModuleObject, objectNum, alphaArgs, numAlphas, numericArgs, numNums, IOStat, isNumericFieldBlank, isAlphaFieldBlank, alphaFieldNames, numericFieldNames  );
+		inputProcessor->getObjectItem( locCurrentModuleObject, objectNum, alphaArgs, numAlphas, numericArgs, numNums, IOStat, isNumericFieldBlank, isAlphaFieldBlank, alphaFieldNames, numericFieldNames  );
 
 		name = alphaArgs( 1 );
 		//TODO how to check for unique names across objects during get input?

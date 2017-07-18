@@ -233,7 +233,7 @@ namespace CoolTower {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// Initializations and allocations
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -241,14 +241,14 @@ namespace CoolTower {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 
-		NumCoolTowers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCoolTowers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		CoolTowerSys.allocate( NumCoolTowers );
 
 		// Obtain inputs
 		for ( CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CoolTowerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CoolTowerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
 			CoolTowerSys( CoolTowerNum ).Name = cAlphaArgs( 1 ); // Name of cooltower
 			CoolTowerSys( CoolTowerNum ).Schedule = cAlphaArgs( 2 ); // Get schedule

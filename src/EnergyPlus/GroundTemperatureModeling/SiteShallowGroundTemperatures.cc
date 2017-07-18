@@ -101,7 +101,7 @@ namespace EnergyPlus {
 		std::shared_ptr< SiteShallowGroundTemps > thisModel( new SiteShallowGroundTemps() );
 
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_SiteShallowGroundTemp );
-		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrObjects = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		thisModel->objectType = objectType;
 		thisModel->objectName = objectName;
@@ -109,7 +109,7 @@ namespace EnergyPlus {
 		if ( numCurrObjects == 1 ) {
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( NumNums < 12 ) {
 				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );

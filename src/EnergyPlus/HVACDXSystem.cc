@@ -370,12 +370,12 @@ namespace HVACDXSystem {
 		// Flow
 
 		CurrentModuleObject = "CoilSystem:Cooling:DX";
-		NumDXSystem = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDXSystem = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		DXCoolingSystem.allocate( NumDXSystem );
 		CheckEquipName.dimension( NumDXSystem, true );
 
-		InputProcessor::GetObjectDefMaxArgs( "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -387,7 +387,7 @@ namespace HVACDXSystem {
 		// Get the data for the DX Cooling System
 		for ( DXCoolSysNum = 1; DXCoolSysNum <= NumDXSystem; ++DXCoolSysNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoolSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoolSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			DXCoolingSystem( DXCoolSysNum ).DXCoolingSystemType = CurrentModuleObject; // push Object Name into data array

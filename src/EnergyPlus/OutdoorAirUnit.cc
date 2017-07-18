@@ -386,10 +386,10 @@ namespace OutdoorAirUnit {
 
 		if ( ! GetOutdoorAirUnitInputFlag ) return;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAUnit ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CO_OAUnit ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAEqList ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CO_OAEqList ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -402,7 +402,7 @@ namespace OutdoorAirUnit {
 		cAlphaArgs.allocate( NumAlphas );
 
 		CurrentModuleObject = CurrentModuleObjects( CO_OAUnit );
-		NumOfOAUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfOAUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		OutAirUnit.allocate( NumOfOAUnits );
 		SupplyFanUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
@@ -413,7 +413,7 @@ namespace OutdoorAirUnit {
 
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs(1),CurrentModuleObject,ErrorsFound);
 
 			//A1
@@ -604,9 +604,9 @@ namespace OutdoorAirUnit {
 			ComponentListName = cAlphaArgs( 16 );
 			OutAirUnit( OAUnitNum ).ComponentListName = ComponentListName;
 			if ( ! lAlphaBlanks( 16 ) ) {
-				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CO_OAEqList ), ComponentListName );
+				ListNum = inputProcessor->getObjectItemNum( CurrentModuleObjects( CO_OAEqList ), ComponentListName );
 				if ( ListNum > 0 ) {
-					InputProcessor::GetObjectItem( CurrentModuleObjects( CO_OAEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+					inputProcessor->getObjectItem( CurrentModuleObjects( CO_OAEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 					NumInList = ( NumAlphas - 1 ) / 2; // potential problem if puts in type but not name
 					if ( mod( NumAlphas - 1, 2 ) != 0 ) ++NumInList;
 					OutAirUnit( OAUnitNum ).NumComponents = NumInList;

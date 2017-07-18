@@ -285,10 +285,10 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		cCurrentModuleObject = "HeatExchanger:FluidToFluid";
 
-		NumberOfPlantFluidHXs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumberOfPlantFluidHXs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumberOfPlantFluidHXs == 0 ) return;
 
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = NumNums;
 		MaxNumAlphas = NumAlphas;
 
@@ -303,7 +303,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			FluidHX.allocate( NumberOfPlantFluidHXs );
 			CheckFluidHXs.dimension( NumberOfPlantFluidHXs, true );
 			for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				FluidHX( CompLoop ).Name = cAlphaArgs( 1 );

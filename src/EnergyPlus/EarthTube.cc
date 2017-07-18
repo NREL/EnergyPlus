@@ -224,12 +224,12 @@ namespace EarthTube {
 		ZnRptET.allocate( NumOfZones );
 
 		cCurrentModuleObject = "ZoneEarthtube";
-		TotEarthTube = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotEarthTube = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		EarthTubeSys.allocate( TotEarthTube );
 
 		for ( Loop = 1; Loop <= TotEarthTube; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// First Alpha is Zone Name
 			EarthTubeSys( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Zone );

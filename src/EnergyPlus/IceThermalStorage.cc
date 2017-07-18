@@ -859,8 +859,8 @@ namespace IceThermalStorage {
 		ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
 
 		//LOAD ARRAYS WITH IceStorage DATA
-		NumIceStorages = InputProcessor::GetNumObjectsFound( cIceStorageSimple ); // by ZG
-		NumDetIceStorages = InputProcessor::GetNumObjectsFound( cIceStorageDetailed );
+		NumIceStorages = inputProcessor->getNumObjectsFound( cIceStorageSimple ); // by ZG
+		NumDetIceStorages = inputProcessor->getNumObjectsFound( cIceStorageDetailed );
 
 		IceStorageTypeMap.allocate( NumIceStorages + NumDetIceStorages );
 		CheckEquipName.allocate( NumIceStorages + NumDetIceStorages );
@@ -873,7 +873,7 @@ namespace IceThermalStorage {
 		cCurrentModuleObject = cIceStorageSimple;
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
@@ -963,7 +963,7 @@ namespace IceThermalStorage {
 
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;

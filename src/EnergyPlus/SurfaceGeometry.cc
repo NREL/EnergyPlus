@@ -366,7 +366,7 @@ namespace SurfaceGeometry {
 			e.TotalSurfArea = 0.0;
 		}
 
-		DetailedWWR = ( InputProcessor::GetNumSectionsFound( "DETAILEDWWR_DEBUG" ) > 0 );
+		DetailedWWR = ( inputProcessor->getNumSectionsFound( "DETAILEDWWR_DEBUG" ) > 0 );
 		if ( DetailedWWR ) {
 			gio::write( OutputFileDebug, fmtA ) << "=======User Entered Classification =================";
 			gio::write( OutputFileDebug, fmtA ) << "Surface,Class,Area,Tilt";
@@ -970,37 +970,37 @@ namespace SurfaceGeometry {
 			}
 		}
 
-		TotDetachedFixed = InputProcessor::GetNumObjectsFound( "Shading:Site:Detailed" );
-		TotDetachedBldg = InputProcessor::GetNumObjectsFound( "Shading:Building:Detailed" );
-		TotRectDetachedFixed = InputProcessor::GetNumObjectsFound( "Shading:Site" );
-		TotRectDetachedBldg = InputProcessor::GetNumObjectsFound( "Shading:Building" );
-		TotHTSurfs = InputProcessor::GetNumObjectsFound( "BuildingSurface:Detailed" );
-		TotDetailedWalls = InputProcessor::GetNumObjectsFound( "Wall:Detailed" );
-		TotDetailedRoofs = InputProcessor::GetNumObjectsFound( "RoofCeiling:Detailed" );
-		TotDetailedFloors = InputProcessor::GetNumObjectsFound( "Floor:Detailed" );
-		TotHTSubs = InputProcessor::GetNumObjectsFound( "FenestrationSurface:Detailed" );
-		TotShdSubs = InputProcessor::GetNumObjectsFound( "Shading:Zone:Detailed" );
-		TotOverhangs = InputProcessor::GetNumObjectsFound( "Shading:Overhang" );
-		TotOverhangsProjection = InputProcessor::GetNumObjectsFound( "Shading:Overhang:Projection" );
-		TotFins = InputProcessor::GetNumObjectsFound( "Shading:Fin" );
-		TotFinsProjection = InputProcessor::GetNumObjectsFound( "Shading:Fin:Projection" );
-		TotIntMass = InputProcessor::GetNumObjectsFound( "InternalMass" );
-		TotRectWindows = InputProcessor::GetNumObjectsFound( "Window" );
-		TotRectDoors = InputProcessor::GetNumObjectsFound( "Door" );
-		TotRectGlazedDoors = InputProcessor::GetNumObjectsFound( "GlazedDoor" );
-		TotRectIZWindows = InputProcessor::GetNumObjectsFound( "Window:Interzone" );
-		TotRectIZDoors = InputProcessor::GetNumObjectsFound( "Door:Interzone" );
-		TotRectIZGlazedDoors = InputProcessor::GetNumObjectsFound( "GlazedDoor:Interzone" );
-		TotRectExtWalls = InputProcessor::GetNumObjectsFound( "Wall:Exterior" );
-		TotRectIntWalls = InputProcessor::GetNumObjectsFound( "Wall:Adiabatic" );
-		TotRectIZWalls = InputProcessor::GetNumObjectsFound( "Wall:Interzone" );
-		TotRectUGWalls = InputProcessor::GetNumObjectsFound( "Wall:Underground" );
-		TotRectRoofs = InputProcessor::GetNumObjectsFound( "Roof" );
-		TotRectCeilings = InputProcessor::GetNumObjectsFound( "Ceiling:Adiabatic" );
-		TotRectIZCeilings = InputProcessor::GetNumObjectsFound( "Ceiling:Interzone" );
-		TotRectGCFloors = InputProcessor::GetNumObjectsFound( "Floor:GroundContact" );
-		TotRectIntFloors = InputProcessor::GetNumObjectsFound( "Floor:Adiabatic" );
-		TotRectIZFloors = InputProcessor::GetNumObjectsFound( "Floor:Interzone" );
+		TotDetachedFixed = inputProcessor->getNumObjectsFound( "Shading:Site:Detailed" );
+		TotDetachedBldg = inputProcessor->getNumObjectsFound( "Shading:Building:Detailed" );
+		TotRectDetachedFixed = inputProcessor->getNumObjectsFound( "Shading:Site" );
+		TotRectDetachedBldg = inputProcessor->getNumObjectsFound( "Shading:Building" );
+		TotHTSurfs = inputProcessor->getNumObjectsFound( "BuildingSurface:Detailed" );
+		TotDetailedWalls = inputProcessor->getNumObjectsFound( "Wall:Detailed" );
+		TotDetailedRoofs = inputProcessor->getNumObjectsFound( "RoofCeiling:Detailed" );
+		TotDetailedFloors = inputProcessor->getNumObjectsFound( "Floor:Detailed" );
+		TotHTSubs = inputProcessor->getNumObjectsFound( "FenestrationSurface:Detailed" );
+		TotShdSubs = inputProcessor->getNumObjectsFound( "Shading:Zone:Detailed" );
+		TotOverhangs = inputProcessor->getNumObjectsFound( "Shading:Overhang" );
+		TotOverhangsProjection = inputProcessor->getNumObjectsFound( "Shading:Overhang:Projection" );
+		TotFins = inputProcessor->getNumObjectsFound( "Shading:Fin" );
+		TotFinsProjection = inputProcessor->getNumObjectsFound( "Shading:Fin:Projection" );
+		TotIntMass = inputProcessor->getNumObjectsFound( "InternalMass" );
+		TotRectWindows = inputProcessor->getNumObjectsFound( "Window" );
+		TotRectDoors = inputProcessor->getNumObjectsFound( "Door" );
+		TotRectGlazedDoors = inputProcessor->getNumObjectsFound( "GlazedDoor" );
+		TotRectIZWindows = inputProcessor->getNumObjectsFound( "Window:Interzone" );
+		TotRectIZDoors = inputProcessor->getNumObjectsFound( "Door:Interzone" );
+		TotRectIZGlazedDoors = inputProcessor->getNumObjectsFound( "GlazedDoor:Interzone" );
+		TotRectExtWalls = inputProcessor->getNumObjectsFound( "Wall:Exterior" );
+		TotRectIntWalls = inputProcessor->getNumObjectsFound( "Wall:Adiabatic" );
+		TotRectIZWalls = inputProcessor->getNumObjectsFound( "Wall:Interzone" );
+		TotRectUGWalls = inputProcessor->getNumObjectsFound( "Wall:Underground" );
+		TotRectRoofs = inputProcessor->getNumObjectsFound( "Roof" );
+		TotRectCeilings = inputProcessor->getNumObjectsFound( "Ceiling:Adiabatic" );
+		TotRectIZCeilings = inputProcessor->getNumObjectsFound( "Ceiling:Interzone" );
+		TotRectGCFloors = inputProcessor->getNumObjectsFound( "Floor:GroundContact" );
+		TotRectIntFloors = inputProcessor->getNumObjectsFound( "Floor:Adiabatic" );
+		TotRectIZFloors = inputProcessor->getNumObjectsFound( "Floor:Interzone" );
 
 		TotOSC = 0;
 
@@ -1929,7 +1929,7 @@ namespace SurfaceGeometry {
 		}
 
 		int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection;
-		int NumDElightCmplxFen = InputProcessor::GetNumObjectsFound( "Daylighting:DElight:ComplexFenestration" );
+		int NumDElightCmplxFen = inputProcessor->getNumObjectsFound( "Daylighting:DElight:ComplexFenestration" );
 		if ( TotShadSurf > 0 && ( NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight() ) ){
 			ShowWarningError( RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored." );
 		}
@@ -2079,14 +2079,14 @@ namespace SurfaceGeometry {
 		static gio::Fmt Format_720( "(A)" );
 
 		cCurrentModuleObject = "GlobalGeometryRules";
-		NumStmt = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumStmt = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		OutMsg = " Surface Geometry,";
 
 		{ auto const SELECT_CASE_var( NumStmt );
 
 		if ( SELECT_CASE_var == 1 ) {
 			// This is the valid case
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, GAlphas, NAlphas, GNum, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, GAlphas, NAlphas, GNum, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Even though these will be validated, set defaults in case error here -- wont
 			// cause aborts in later surface gets (hopefully)
@@ -2325,14 +2325,14 @@ namespace SurfaceGeometry {
 				ClassItem = SurfaceClass_Detached_B;
 			}
 
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, Loop, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, Loop, NumAlphas, NumNumbers );
 			if ( NumAlphas != 2 ) {
 				ShowSevereError( cCurrentModuleObject + ": Object Definition indicates not = 2 Alpha Objects, Number Indicated=" + TrimSigDigits( NumAlphas ) );
 				ErrorsFound = true;
 			}
 
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 					continue;
@@ -2461,14 +2461,14 @@ namespace SurfaceGeometry {
 				ClassItem = SurfaceClass_Detached_B;
 			}
 
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, Loop, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, Loop, NumAlphas, NumNumbers );
 			if ( NumAlphas != 1 ) {
 				ShowSevereError( cCurrentModuleObject + ": Object Definition indicates not = 1 Alpha Objects, Number Indicated=" + TrimSigDigits( NumAlphas ) );
 				ErrorsFound = true;
 			}
 
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 					continue;
@@ -2677,7 +2677,7 @@ namespace SurfaceGeometry {
 				ClassItem = 3;
 			}
 
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp );
 			if ( Item == 1 ) {
 				if ( SurfaceNumAlpha != 8 ) {
 					ShowSevereError( cCurrentModuleObject + ": Object Definition indicates not = 8 Alpha Objects, Number Indicated=" + TrimSigDigits( SurfaceNumAlpha ) );
@@ -2691,7 +2691,7 @@ namespace SurfaceGeometry {
 			}
 
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 					continue;
@@ -3096,7 +3096,7 @@ namespace SurfaceGeometry {
 			}
 
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 					continue;
@@ -3546,7 +3546,7 @@ namespace SurfaceGeometry {
 		GetWindowShadingControlData( ErrorsFound );
 
 		cCurrentModuleObject = "FenestrationSurface:Detailed";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp );
 
 		if ( SurfaceNumAlpha != 7 ) {
 			ShowSevereError( cCurrentModuleObject + ": Object Definition indicates not = 7 Alpha Objects, Number Indicated=" + TrimSigDigits( SurfaceNumAlpha ) );
@@ -3560,7 +3560,7 @@ namespace SurfaceGeometry {
 		NeedToAddSurfaces = 0;
 
 		for ( Loop = 1; Loop <= TotHTSubs; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
@@ -3888,7 +3888,7 @@ namespace SurfaceGeometry {
 			}
 
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 					continue;
@@ -4660,14 +4660,14 @@ namespace SurfaceGeometry {
 		}
 
 		cCurrentModuleObject = "Shading:Zone:Detailed";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, Loop, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, Loop, NumAlphas, NumNumbers );
 		if ( NumAlphas != 3 ) {
 			ShowSevereError( cCurrentModuleObject + ": Object Definition indicates not = 3 Alpha Objects, Number Indicated=" + TrimSigDigits( NumAlphas ) );
 			ErrorsFound = true;
 		}
 
 		for ( Loop = 1; Loop <= TotShdSubs; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
@@ -4844,7 +4844,7 @@ namespace SurfaceGeometry {
 			}
 
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 					continue;
@@ -5171,7 +5171,7 @@ namespace SurfaceGeometry {
 
 		cCurrentModuleObject = "InternalMass";
 		for ( Loop = 1; Loop <= TotIntMass; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
@@ -5271,12 +5271,12 @@ namespace SurfaceGeometry {
 
 		// Get the total number of Shading Surface Reflectance objects
 		cCurrentModuleObject = "ShadingProperty:Reflectance";
-		TotShadingSurfaceReflectance = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotShadingSurfaceReflectance = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		//  IF(TotShadingSurfaceReflectance.EQ.0) RETURN
 
 		for ( Loop = 1; Loop <= TotShadingSurfaceReflectance; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), SurfaceTmp, TotSurfaces );
 			if ( SurfNum == 0 ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid specification" );
@@ -5382,19 +5382,19 @@ namespace SurfaceGeometry {
 		bool ErrorInName;
 
 		cCurrentModuleObject = "SurfaceProperty:ExteriorNaturalVentedCavity";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
 
 		if ( MaxNumNumbers != 8 ) {
 			ShowSevereError( cCurrentModuleObject + ": Object Definition indicates not = 8 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
 			ErrorsFound = true;
 		}
 
-		TotExtVentCav = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotExtVentCav = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		ExtVentedCavity.allocate( TotExtVentCav );
 
 		for ( Item = 1; Item <= TotExtVentCav; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// first handle cAlphaArgs
 			ErrorInName = false;
 			IsBlank = false;
@@ -5571,12 +5571,12 @@ namespace SurfaceGeometry {
 		int NumNumbers;
 
 		std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
-		int numObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numObjects = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( int obj = 1; obj <= numObjects; ++obj ) {
 			int alpF = 1;
 			int numF = 1;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, obj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, obj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			int Found = UtilityRoutines::FindItemInList( cAlphaArgs( alpF ), Surface, TotSurfaces );
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface" );
@@ -5700,11 +5700,11 @@ namespace SurfaceGeometry {
 		for ( auto & e : Surface ) e.HeatTransferAlgorithm = HeatTransferAlgosUsed( 1 );
 
 		cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-		CountHTAlgoObjectsSingleSurf = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		CountHTAlgoObjectsSingleSurf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
 		for ( Item = 1; Item <= CountHTAlgoObjectsSingleSurf; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorsFoundSingleSurf = false;
 			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
 
@@ -5743,10 +5743,10 @@ namespace SurfaceGeometry {
 		} // single surface heat transfer algorithm override
 
 		cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-		CountHTAlgoObjectsMultiSurf = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		CountHTAlgoObjectsMultiSurf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( Item = 1; Item <= CountHTAlgoObjectsMultiSurf; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorsFoundMultiSurf = false;
 			{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 
@@ -5878,9 +5878,9 @@ namespace SurfaceGeometry {
 		} // multi surface heat transfer algo override
 
 		cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-		CountHTAlgoObjectsSurfList = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		CountHTAlgoObjectsSurfList = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		for ( Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorsFoundSurfList = false;
 			{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 
@@ -5923,9 +5923,9 @@ namespace SurfaceGeometry {
 		}
 
 		cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-		CountHTAlgoObjectsSurfList = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		CountHTAlgoObjectsSurfList = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		for ( Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorsFoundByConstruct = false;
 			{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 
@@ -5980,15 +5980,15 @@ namespace SurfaceGeometry {
 		}
 
 		// test for missing materials for algorithms selected
-		NumEMPDMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
-		NumPCMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:PhaseChange" ) + InputProcessor::GetNumObjectsFound( "MaterialProperty:PhaseChangeHysteresis" );
-		NumVTCMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
-		NumHAMTMat1 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Settings" );
-		NumHAMTMat2 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm" );
-		NumHAMTMat3 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Suction" );
-		NumHAMTMat4 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Redistribution" );
-		NumHAMTMat5 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Diffusion" );
-		NumHAMTMat6 = InputProcessor::GetNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity" );
+		NumEMPDMat = inputProcessor->getNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
+		NumPCMat = inputProcessor->getNumObjectsFound( "MaterialProperty:PhaseChange" ) + inputProcessor->getNumObjectsFound( "MaterialProperty:PhaseChangeHysteresis" );
+		NumVTCMat = inputProcessor->getNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
+		NumHAMTMat1 = inputProcessor->getNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Settings" );
+		NumHAMTMat2 = inputProcessor->getNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm" );
+		NumHAMTMat3 = inputProcessor->getNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Suction" );
+		NumHAMTMat4 = inputProcessor->getNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Redistribution" );
+		NumHAMTMat5 = inputProcessor->getNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:Diffusion" );
+		NumHAMTMat6 = inputProcessor->getNumObjectsFound( "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity" );
 		SumHAMTMat = NumHAMTMat1 + NumHAMTMat2 + NumHAMTMat3 + NumHAMTMat4 + NumHAMTMat5 + NumHAMTMat6;
 		msgneeded = false;
 
@@ -6649,7 +6649,7 @@ namespace SurfaceGeometry {
 		// FLOW:
 		// Get the total number of window shading control blocks
 		cCurrentModuleObject = "WindowProperty:ShadingControl";
-		TotWinShadingControl = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotWinShadingControl = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotWinShadingControl == 0 ) return;
 
 		WindowShadingControl.allocate( TotWinShadingControl );
@@ -6657,7 +6657,7 @@ namespace SurfaceGeometry {
 		ControlNum = 0;
 		for ( Loop = 1; Loop <= TotWinShadingControl; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ErrorInName = false;
 			IsBlank = false;
@@ -6991,7 +6991,7 @@ namespace SurfaceGeometry {
 
 		// Get the total number of storm window input objects
 		cCurrentModuleObject = "WindowProperty:StormWindow";
-		TotStormWin = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotStormWin = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotStormWin == 0 ) return;
 
 		StormWindow.allocate( TotStormWin );
@@ -6999,7 +6999,7 @@ namespace SurfaceGeometry {
 		StormWinNum = 0;
 		for ( loop = 1; loop <= TotStormWin; ++loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, StormWinNumAlpha, rNumericArgs, StormWinNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, StormWinNumAlpha, rNumericArgs, StormWinNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++StormWinNum;
 			StormWindow( StormWinNum ).BaseWindowNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
 			StormWindow( StormWinNum ).StormWinMaterialNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Material, TotMaterials );
@@ -7152,12 +7152,12 @@ namespace SurfaceGeometry {
 
 		// Get the total number of window airflow control statements
 		cCurrentModuleObject = "WindowProperty:AirflowControl";
-		TotWinAirflowControl = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotWinAirflowControl = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotWinAirflowControl == 0 ) return;
 
 		for ( Loop = 1; Loop <= TotWinAirflowControl; ++Loop ) { // Loop through all surfaces in the input...
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
 			if ( SurfNum == 0 ) {
@@ -7312,7 +7312,7 @@ namespace SurfaceGeometry {
 
 		// Read Kiva Settings
 		cCurrentModuleObject = "Foundation:Kiva:Settings";
-		int TotKivaStgs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int TotKivaStgs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotKivaStgs > 1 ) {
 			ErrorsFound = true;
@@ -7320,7 +7320,7 @@ namespace SurfaceGeometry {
 		}
 
 		if ( TotKivaStgs == 1) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			int numF = 1;
 			int alpF = 1;
@@ -7361,7 +7361,7 @@ namespace SurfaceGeometry {
 
 		// Read Foundation objects
 		cCurrentModuleObject = "Foundation:Kiva";
-		int TotKivaFnds = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int TotKivaFnds = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if (TotKivaFnds > 0) {
 			kivaManager.defineDefaultFoundation();
@@ -7371,7 +7371,7 @@ namespace SurfaceGeometry {
 			fndNames( 1 ) = "<Default Foundation>";
 
 			for (int Loop = 1; Loop <= TotKivaFnds; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				int numF = 1;
 				int alpF = 1;
@@ -7775,12 +7775,12 @@ namespace SurfaceGeometry {
 		std::string cOSCLimitsString;
 
 		cCurrentModuleObject = "SurfaceProperty:OtherSideCoefficients";
-		TotOSC = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotOSC = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		OSC.allocate( TotOSC );
 
 		OSCNum = 0;
 		for ( Loop = 1; Loop <= TotOSC; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
 			UtilityRoutines::VerifyName( cAlphaArgs( 1 ), OSC, OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
@@ -7921,13 +7921,13 @@ namespace SurfaceGeometry {
 		bool IsBlank;
 
 		cCurrentModuleObject = "SurfaceProperty:OtherSideConditionsModel";
-		TotOSCM = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotOSCM = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		OSCM.allocate( TotOSCM );
 		// OSCM is already initialized in derived type defn.
 
 		OSCMNum = 0;
 		for ( Loop = 1; Loop <= TotOSCM; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat );
 			ErrorInName = false;
 			IsBlank = false;
 			UtilityRoutines::VerifyName( cAlphaArgs( 1 ), OSCM, OSCMNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
@@ -8019,9 +8019,9 @@ namespace SurfaceGeometry {
 		int InslType;
 
 		cCurrentModuleObject = "SurfaceControl:MovableInsulation";
-		NMatInsul = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NMatInsul = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		for ( Loop = 1; Loop <= NMatInsul; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NAlphas, rNumericArgs, NNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NAlphas, rNumericArgs, NNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), SurfaceTmp, TotSurfaces );
 			MaterNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Material, TotMaterials );
 			SchNum = GetScheduleIndex( cAlphaArgs( 4 ) );
@@ -8161,7 +8161,7 @@ namespace SurfaceGeometry {
 		Polyhedron ZoneStruct;
 
 		initmsg = true;
-		ShowZoneSurfaces = ( InputProcessor::GetNumSectionsFound( "SHOWZONESURFACES_DEBUG" ) > 0 );
+		ShowZoneSurfaces = ( inputProcessor->getNumSectionsFound( "SHOWZONESURFACES_DEBUG" ) > 0 );
 
 		enum class zoneVolumeCalculationMethod {
 			enclosed,
@@ -10644,8 +10644,8 @@ namespace SurfaceGeometry {
 		//get user input...
 
 		if ( firstTime ) {
-			if ( InputProcessor::GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( inputProcessor->getNumObjectsFound( CurrentModuleObject ) == 1 ) {
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				OldAspectRatio = rNumerics( 1 );
 				NewAspectRatio = rNumerics( 2 );
 				transformPlane = cAlphas( 1 );
@@ -10912,13 +10912,13 @@ namespace SurfaceGeometry {
 
 		//First collect names of surfaces referenced by active solar components
 		cCurrentModuleObject = "SolarCollector:FlatPlate:Water";
-		NumOfFlatPlateUnits = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfFlatPlateUnits = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-		NumPVTs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumPVTs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "Generator:Photovoltaic";
-		NumPVs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumPVs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-		NumOfICSUnits = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfICSUnits = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		NumCandidateNames = NumOfFlatPlateUnits + NumPVTs + NumPVs + NumOfICSUnits;
 		NumOfCollectors = NumOfFlatPlateUnits + NumOfICSUnits;
@@ -10931,7 +10931,7 @@ namespace SurfaceGeometry {
 			cCurrentModuleObject = "SolarCollector:FlatPlate:Water";
 			for ( CollectorNum = 1; CollectorNum <= NumOfFlatPlateUnits; ++CollectorNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 				TmpCandidateSurfaceNames( CollectorNum ) = cAlphaArgs( 3 );
 				TmpCandidateICSBCTypeNames( CollectorNum ) = "";
@@ -10942,7 +10942,7 @@ namespace SurfaceGeometry {
 			cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
 			for ( PVTnum = 1; PVTnum <= NumPVTs; ++PVTnum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, PVTnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( cCurrentModuleObject, PVTnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 				TmpCandidateSurfaceNames( NumOfFlatPlateUnits + PVTnum ) = cAlphaArgs( 2 );
 			}
@@ -10951,7 +10951,7 @@ namespace SurfaceGeometry {
 		if ( NumPVs > 0 ) {
 			cCurrentModuleObject = "Generator:Photovoltaic";
 			for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 				TmpCandidateSurfaceNames( NumOfFlatPlateUnits + NumPVTs + PVnum ) = cAlphaArgs( 2 );
 			}
 		}
@@ -10959,7 +10959,7 @@ namespace SurfaceGeometry {
 		if ( NumOfICSUnits > 0 ) {
 			cCurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
 			for ( CollectorNum = 1; CollectorNum <= NumOfICSUnits; ++CollectorNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 				TmpCandidateSurfaceNames( NumOfFlatPlateUnits + NumPVTs + NumPVs + CollectorNum ) = cAlphaArgs( 3 );
 				TmpCandidateICSSurfaceNames( NumOfFlatPlateUnits + CollectorNum ) = cAlphaArgs( 3 );
 				TmpCandidateICSBCTypeNames( NumOfFlatPlateUnits + CollectorNum ) = cAlphaArgs( 4 );

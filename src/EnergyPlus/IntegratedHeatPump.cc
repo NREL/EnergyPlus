@@ -530,7 +530,7 @@ namespace EnergyPlus {
 			int ChildCoilIndex( 0 ); //refer to a child coil
 
 
-			NumASIHPs = InputProcessor::GetNumObjectsFound( "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" );
+			NumASIHPs = inputProcessor->getNumObjectsFound( "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" );
 			DXCoilNum = 0;
 
 			if ( NumASIHPs <= 0 ) return;
@@ -539,7 +539,7 @@ namespace EnergyPlus {
 			IntegratedHeatPumps.allocate( NumASIHPs );
 
 			//air-source integrated heat pump
-			InputProcessor::GetObjectDefMaxArgs( "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", NumParams, NumAlphas, NumNums );
 			MaxNums = max( MaxNums, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -559,7 +559,7 @@ namespace EnergyPlus {
 				++DXCoilNum;
 				AlfaFieldIncre = 1;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 				IntegratedHeatPumps( DXCoilNum ).Name = AlphArray( 1 );

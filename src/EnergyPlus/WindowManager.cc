@@ -8995,7 +8995,7 @@ Label99999: ;
 
 		// Step 1 - check whether there is custom solar or visible spectrum
 		cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
-		NumSiteSpectrum = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSiteSpectrum = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// no custom spectrum data, done!
 		if ( NumSiteSpectrum == 0 ) {
@@ -9009,12 +9009,12 @@ Label99999: ;
 			ErrorsFound = true;
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		rNumericArgs.dimension( NumNumbers, 0.0 );
 
 		if ( NumSiteSpectrum == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 			// use default spectrum data, done!
 			if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "Default" ) ) {
@@ -9027,7 +9027,7 @@ Label99999: ;
 			cVisibleSpectrum = cAlphaArgs( 4 );
 
 			cCurrentModuleObject = "Site:SpectrumData";
-			NumSiteSpectrum = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumSiteSpectrum = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumSiteSpectrum == 0 ) { // throw error
 				ShowSevereError( "No " + cCurrentModuleObject + " object is found" );
 				ErrorsFound = true;
@@ -9036,7 +9036,7 @@ Label99999: ;
 			cAlphaArgs.deallocate();
 			rNumericArgs.deallocate();
 
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
 			rNumericArgs.dimension( NumNumbers, 0.0 );
 
@@ -9044,7 +9044,7 @@ Label99999: ;
 			iVisibleSpectrum = 0;
 			for ( Loop = 1; Loop <= NumSiteSpectrum; ++Loop ) {
 				// Step 2 - read user-defined spectrum data
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
 					iSolarSpectrum = Loop;
 					// overwrite the default solar spectrum

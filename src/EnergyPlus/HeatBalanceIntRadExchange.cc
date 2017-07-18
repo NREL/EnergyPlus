@@ -532,7 +532,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
-		NumZonesWithUserFbyS = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		MaxNumOfZoneSurfaces = 0;
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -800,12 +800,12 @@ namespace HeatBalanceIntRadExchange {
 		//unused  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ZoneSurfaceNames
 
 		NoUserInputF = true;
-		UserFZoneIndex = InputProcessor::GetObjectItemNum( "ZoneProperty:UserViewFactors", ZoneName );
+		UserFZoneIndex = inputProcessor->getObjectItemNum( "ZoneProperty:UserViewFactors", ZoneName );
 
 		if ( UserFZoneIndex > 0 ) {
 			NoUserInputF = false;
 
-			InputProcessor::GetObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums < 3 * pow_2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
@@ -863,7 +863,7 @@ namespace HeatBalanceIntRadExchange {
 		Array1D_string ZoneSurfaceNames;
 
 		NoUserInputF = true;
-		UserFZoneIndex = InputProcessor::GetObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", ZoneName );
+		UserFZoneIndex = inputProcessor->getObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", ZoneName );
 
 		if ( UserFZoneIndex > 0 ) {
 			ZoneSurfaceNames.allocate( N );
@@ -872,7 +872,7 @@ namespace HeatBalanceIntRadExchange {
 			}
 			NoUserInputF = false;
 
-			InputProcessor::GetObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums < pow_2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );

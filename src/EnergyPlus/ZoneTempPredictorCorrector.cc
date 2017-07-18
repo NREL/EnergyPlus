@@ -500,13 +500,13 @@ namespace ZoneTempPredictorCorrector {
 
 		// FLOW:
 		cCurrentModuleObject = cZControlTypes( iZC_TStat );
-		NumTStatStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumTStatStatements = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		TStatObjects.allocate( NumTStatStatements );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
 		NumTempControlledZones = 0;
 		for ( Item = 1; Item <= NumTStatStatements; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			TStatObjects( Item ).Name = cAlphaArgs( 1 );
@@ -544,7 +544,7 @@ namespace ZoneTempPredictorCorrector {
 
 			TempControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumTStatStatements; ++Item ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				for ( Item1 = 1; Item1 <= TStatObjects( Item ).NumOfZones; ++Item1 ) {
 					++TempControlledZoneNum;
 					if ( TStatObjects( Item ).ZoneListActive ) {
@@ -619,12 +619,12 @@ namespace ZoneTempPredictorCorrector {
 		} // Check on number of TempControlledZones
 
 		cCurrentModuleObject = ValidControlTypes( SglHeatSetPoint );
-		NumSingleTempHeatingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSingleTempHeatingControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleTempHeatingControls > 0 ) SetPointSingleHeating.allocate( NumSingleTempHeatingControls );
 
 		for ( SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= NumSingleTempHeatingControls; ++SingleTempHeatingControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleTempHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleTempHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointSingleHeating( SingleTempHeatingControlNum ).Name = cAlphaArgs( 1 );
@@ -638,12 +638,12 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleTempHeatingControlNum
 
 		cCurrentModuleObject = ValidControlTypes( SglCoolSetPoint );
-		NumSingleTempCoolingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSingleTempCoolingControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleTempCoolingControls > 0 ) SetPointSingleCooling.allocate( NumSingleTempCoolingControls );
 
 		for ( SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= NumSingleTempCoolingControls; ++SingleTempCoolingControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleTempCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleTempCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointSingleCooling( SingleTempCoolingControlNum ).Name = cAlphaArgs( 1 );
@@ -657,12 +657,12 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleTempCoolingControlNum
 
 		cCurrentModuleObject = ValidControlTypes( SglHCSetPoint );
-		NumSingleTempHeatCoolControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSingleTempHeatCoolControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleTempHeatCoolControls > 0 ) SetPointSingleHeatCool.allocate( NumSingleTempHeatCoolControls );
 
 		for ( SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedName = cAlphaArgs( 2 );
 			SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
@@ -674,12 +674,12 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleTempHeatCoolControlNum
 
 		cCurrentModuleObject = ValidControlTypes( DualSetPoint );
-		NumDualTempHeatCoolControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumDualTempHeatCoolControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumDualTempHeatCoolControls > 0 ) SetPointDualHeatCool.allocate( NumDualTempHeatCoolControls );
 
 		for ( DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, DualTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, DualTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).Name = cAlphaArgs( 1 );
@@ -891,7 +891,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( allocated( TStatControlTypes ) ) TStatControlTypes.deallocate();
 		// This starts the Humidity Control Get Input section
 		cCurrentModuleObject = cZControlTypes( iZC_HStat );
-		NumHumidityControlZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumHumidityControlZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumHumidityControlZones > 0 ) {
 			HumidityControlZone.allocate( NumHumidityControlZones );
@@ -899,7 +899,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		for ( HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, HumidControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, HumidControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
 			HumidityControlZone( HumidControlledZoneNum ).ControlName = cAlphaArgs( 1 );
@@ -933,14 +933,14 @@ namespace ZoneTempPredictorCorrector {
 
 		// Start to read Thermal comfort control objects
 		cCurrentModuleObject = cZControlTypes( iZC_TCTStat );
-		NumComfortTStatStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumComfortTStatStatements = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		ComfortTStatObjects.allocate( NumComfortTStatStatements );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
 		NumComfortControlledZones = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumComfortTStatStatements; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			Item1 = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -979,7 +979,7 @@ namespace ZoneTempPredictorCorrector {
 
 			ComfortControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumComfortTStatStatements; ++Item ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				for ( Item1 = 1; Item1 <= ComfortTStatObjects( Item ).NumOfZones; ++Item1 ) {
 					++ComfortControlledZoneNum;
 					if ( ComfortTStatObjects( Item ).ZoneListActive ) {
@@ -1178,12 +1178,12 @@ namespace ZoneTempPredictorCorrector {
 		// End of Thermal comfort control reading and checking
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglHeatSetPointFanger );
-		NumSingleFangerHeatingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSingleFangerHeatingControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleFangerHeatingControls > 0 ) SetPointSingleHeatingFanger.allocate( NumSingleFangerHeatingControls );
 
 		for ( SingleFangerHeatingControlNum = 1; SingleFangerHeatingControlNum <= NumSingleFangerHeatingControls; ++SingleFangerHeatingControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleFangerHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).Name = cAlphaArgs( 1 );
@@ -1203,14 +1203,14 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerHeatingControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglCoolSetPointFanger );
-		NumSingleFangerCoolingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSingleFangerCoolingControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleFangerCoolingControls > 0 ) {
 			SetPointSingleCoolingFanger.allocate(NumSingleFangerCoolingControls);
 		}
 
 		for ( SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= NumSingleFangerCoolingControls; ++SingleFangerCoolingControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).Name = cAlphaArgs( 1 );
@@ -1231,12 +1231,12 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerCoolingControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( SglHCSetPointFanger );
-		NumSingleFangerHeatCoolControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSingleFangerHeatCoolControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSingleFangerHeatCoolControls > 0 ) SetPointSingleHeatCoolFanger.allocate( NumSingleFangerHeatCoolControls );
 
 		for ( SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= NumSingleFangerHeatCoolControls; ++SingleFangerHeatCoolControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
@@ -1257,12 +1257,12 @@ namespace ZoneTempPredictorCorrector {
 		} // SingleFangerHeatCoolControlNum
 
 		cCurrentModuleObject = ValidComfortControlTypes( DualSetPointFanger );
-		NumDualFangerHeatCoolControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumDualFangerHeatCoolControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumDualFangerHeatCoolControls > 0 ) SetPointDualHeatCoolFanger.allocate( NumDualFangerHeatCoolControls );
 
 		for ( DualFangerHeatCoolControlNum = 1; DualFangerHeatCoolControlNum <= NumDualFangerHeatCoolControls; ++DualFangerHeatCoolControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, DualFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, DualFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
@@ -1502,7 +1502,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-		int NumZoneCapaMultiplier = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int NumZoneCapaMultiplier = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumZoneCapaMultiplier == 0 ) {
 		// Assign default multiplier values to all zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
@@ -1518,7 +1518,7 @@ namespace ZoneTempPredictorCorrector {
 			// Added by S. Lee and R. Zhang in Oct. 2016.
 			// Assign the user inputted multipliers to specified zones
 			for ( int ZoneCapNum = 1; ZoneCapNum <= NumZoneCapaMultiplier; ZoneCapNum++ ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				if( lAlphaFieldBlanks( 2 )){
 				// default multiplier values for all the zones not specified
@@ -1593,13 +1593,13 @@ namespace ZoneTempPredictorCorrector {
 		gio::write( OutputFileInits, Format_701 ) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
 
 		cCurrentModuleObject = cZControlTypes( iZC_OTTStat );
-		NumOpTempControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOpTempControlledZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOpTempControlledZones > 0 ) {
 			AnyOpTempControl = true;
 
 			for ( OpTempContrlNum = 1; OpTempContrlNum <= NumOpTempControlledZones; ++OpTempContrlNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, OpTempContrlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, OpTempContrlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				// find matching name of  ZONECONTROL:THERMOSTAT object
 				found = UtilityRoutines::FindItem( cAlphaArgs( 1 ), TStatObjects );
 				if ( found == 0 ) {
@@ -1750,13 +1750,13 @@ namespace ZoneTempPredictorCorrector {
 
 		// Overcool dehumidificaton GetInput starts here
 		cCurrentModuleObject = cZControlTypes( iZC_TandHStat );
-		NumTempAndHumidityControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumTempAndHumidityControlledZones > 0 ) {
 			AnyZoneTempAndHumidityControl = true;
 
 			for ( TempHumidityCntrlNum = 1; TempHumidityCntrlNum <= NumTempAndHumidityControlledZones; ++TempHumidityCntrlNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, TempHumidityCntrlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, TempHumidityCntrlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				// find matching name of  ZONECONTROL:THERMOSTAT object
 				found = UtilityRoutines::FindItem( cAlphaArgs( 1 ), TStatObjects );
 				if ( found == 0 ) {
@@ -1888,13 +1888,13 @@ namespace ZoneTempPredictorCorrector {
 
 		// Staged thermostat control inputs start
 		cCurrentModuleObject = cZControlTypes( iZC_StagedDual );
-		NumStageControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumStageControlledZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumStageControlledZones > 0 ) StagedTStatObjects.allocate( NumStageControlledZones );
 
 		// Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
 		NumStageCtrZone = 0;
 		for ( Item = 1; Item <= NumStageControlledZones; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			StagedTStatObjects( Item ).Name = cAlphaArgs( 1 );
@@ -1931,7 +1931,7 @@ namespace ZoneTempPredictorCorrector {
 
 			StageControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumStageControlledZones; ++Item ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				for ( Item1 = 1; Item1 <= StagedTStatObjects( Item ).NumOfZones; ++Item1 ) {
 					++StageControlledZoneNum;
 					if ( StagedTStatObjects( Item ).ZoneListActive ) {
@@ -2056,7 +2056,7 @@ namespace ZoneTempPredictorCorrector {
 					}
 				}
 			} //loop over NumStageControlledZones
-			if ( ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) == 0 ) && ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:UnitarySystem" ) == 0 ) && ( InputProcessor::GetNumObjectsFound( "SetpointManager:SingleZone:OneStageCooling" ) == 0 ) && ( InputProcessor::GetNumObjectsFound( "SetpointManager:SingleZone:OneStageHeating" ) == 0 ) ) {
+			if ( ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) == 0 ) && ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:UnitarySystem" ) == 0 ) && ( inputProcessor->getNumObjectsFound( "SetpointManager:SingleZone:OneStageCooling" ) == 0 ) && ( inputProcessor->getNumObjectsFound( "SetpointManager:SingleZone:OneStageHeating" ) == 0 ) ) {
 				ShowWarningError( cCurrentModuleObject + " is applicable to only selected HVAC objects which are missing from input." );
 				ShowContinueError( "Model should include one or more of the following objects:  " );
 				ShowContinueError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, " );

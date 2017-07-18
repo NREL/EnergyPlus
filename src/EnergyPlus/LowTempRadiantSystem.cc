@@ -455,15 +455,15 @@ namespace LowTempRadiantSystem {
 		MaxAlphas = 0;
 		MaxNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
-		InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
-		InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:Electric", NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:Electric", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -474,9 +474,9 @@ namespace LowTempRadiantSystem {
 		lAlphaBlanks.dimension( MaxAlphas, true );
 		lNumericBlanks.dimension( MaxNumbers, true );
 
-		NumOfHydrLowTempRadSys = InputProcessor::GetNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:VariableFlow" );
-		NumOfCFloLowTempRadSys = InputProcessor::GetNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" );
-		NumOfElecLowTempRadSys = InputProcessor::GetNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:Electric" );
+		NumOfHydrLowTempRadSys = inputProcessor->getNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:VariableFlow" );
+		NumOfCFloLowTempRadSys = inputProcessor->getNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" );
+		NumOfElecLowTempRadSys = inputProcessor->getNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:Electric" );
 
 		TotalNumOfRadSystems = NumOfHydrLowTempRadSys + NumOfElecLowTempRadSys + NumOfCFloLowTempRadSys;
 		RadSysTypes.allocate( TotalNumOfRadSystems );
@@ -519,7 +519,7 @@ namespace LowTempRadiantSystem {
 		CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:VariableFlow";
 		for ( Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HydronicRadiantSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HydronicRadiantSysNumericFields( Item ).FieldNames = "";
@@ -854,7 +854,7 @@ namespace LowTempRadiantSystem {
 
 		for ( Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
@@ -1098,7 +1098,7 @@ namespace LowTempRadiantSystem {
 
 		for ( Item = 1; Item <= NumOfElecLowTempRadSys; ++Item ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			ElecRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			ElecRadSysNumericFields( Item ).FieldNames = "";

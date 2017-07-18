@@ -275,23 +275,23 @@ namespace WaterManager {
 		if ( ( MyOneTimeFlag ) && ( ! ( WaterSystemGetInputCalled ) ) ) { //big block for entire subroutine
 
 			cCurrentModuleObject = "WaterUse:Storage";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 			MaxNumNumbers = NumNumbers;
 			MaxNumAlphas = NumAlphas;
 			cCurrentModuleObject = "WaterUse:RainCollector";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 			MaxNumNumbers = max( MaxNumNumbers, NumNumbers );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "WaterUse:Well";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 			MaxNumNumbers = max( MaxNumNumbers, NumNumbers );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "Site:Precipitation";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 			MaxNumNumbers = max( MaxNumNumbers, NumNumbers );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "RoofIrrigation";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 			MaxNumNumbers = max( MaxNumNumbers, NumNumbers );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
@@ -304,13 +304,13 @@ namespace WaterManager {
 
 			MyOneTimeFlag = false;
 			cCurrentModuleObject = "WaterUse:Storage";
-			NumWaterStorageTanks = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumWaterStorageTanks = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumWaterStorageTanks > 0 ) {
 				AnyWaterSystemsInModel = true;
 				if ( ! ( allocated( WaterStorage ) ) ) WaterStorage.allocate( NumWaterStorageTanks );
 
 				for ( Item = 1; Item <= NumWaterStorageTanks; ++Item ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					AnyWaterSystemsInModel = true;
 					WaterStorage( Item ).Name = cAlphaArgs( 1 );
 					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
@@ -456,14 +456,14 @@ namespace WaterManager {
 			} // num water storage tanks > 0
 
 			cCurrentModuleObject = "WaterUse:RainCollector";
-			NumRainCollectors = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumRainCollectors = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumRainCollectors > 0 ) {
 				if ( ! ( allocated( RainCollector ) ) ) RainCollector.allocate( NumRainCollectors );
 				// allow exensible reference to surfaces.
 				AnyWaterSystemsInModel = true;
 
 				for ( Item = 1; Item <= NumRainCollectors; ++Item ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					RainCollector( Item ).Name = cAlphaArgs( 1 );
 					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
@@ -556,12 +556,12 @@ namespace WaterManager {
 			} // (NumRainCollectors > 0)
 
 			cCurrentModuleObject = "WaterUse:Well";
-			NumGroundWaterWells = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumGroundWaterWells = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumGroundWaterWells > 0 ) {
 				AnyWaterSystemsInModel = true;
 				GroundwaterWell.allocate( NumGroundWaterWells );
 				for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GroundwaterWell( Item ).Name = cAlphaArgs( 1 );
 					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
@@ -647,7 +647,7 @@ namespace WaterManager {
 			}
 
 			cCurrentModuleObject = "Site:Precipitation";
-			NumSiteRainFall = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumSiteRainFall = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumSiteRainFall > 1 ) { // throw error
 				ShowSevereError( "Only one " + cCurrentModuleObject + " object is allowed" );
 				ErrorsFound = true;
@@ -655,7 +655,7 @@ namespace WaterManager {
 
 			if ( NumSiteRainFall == 1 ) {
 				AnyWaterSystemsInModel = true;
-				InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "ScheduleAndDesignLevel" ) ) {
 					RainFall.ModeID = RainSchedDesign;
@@ -681,7 +681,7 @@ namespace WaterManager {
 			}
 
 			cCurrentModuleObject = "RoofIrrigation";
-			NumIrrigation = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumIrrigation = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumIrrigation > 1 ) {
 				ShowSevereError( "Only one " + cCurrentModuleObject + " object is allowed" );
 				ErrorsFound = true;
@@ -689,7 +689,7 @@ namespace WaterManager {
 
 			if ( NumIrrigation == 1 ) {
 				AnyIrrigationInModel = true;
-				InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "Schedule" ) ) {
 					Irrigation.ModeID = IrrSchedDesign;
 				} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "SmartSchedule" ) ) {

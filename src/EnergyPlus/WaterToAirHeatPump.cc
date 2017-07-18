@@ -289,8 +289,8 @@ namespace WaterToAirHeatPump {
 
 		// FLOW
 
-		NumCool = InputProcessor::GetNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" );
-		NumHeat = InputProcessor::GetNumObjectsFound( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" );
+		NumCool = inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation" );
+		NumHeat = inputProcessor->getNumObjectsFound( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation" );
 		NumWatertoAirHPs = NumCool + NumHeat;
 		HPNum = 0;
 
@@ -305,10 +305,10 @@ namespace WaterToAirHeatPump {
 			CheckEquipName.dimension( NumWatertoAirHPs, true );
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		AlphArray.allocate( MaxAlphas );
@@ -325,7 +325,7 @@ namespace WaterToAirHeatPump {
 
 			++HPNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			WatertoAirHP( HPNum ).Name = AlphArray( 1 );
@@ -420,7 +420,7 @@ namespace WaterToAirHeatPump {
 
 			++HPNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			WatertoAirHP( HPNum ).Name = AlphArray( 1 );

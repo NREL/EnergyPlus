@@ -286,14 +286,14 @@ namespace SteamCoils {
 		bool errFlag;
 
 		CurrentModuleObject = "Coil:Heating:Steam";
-		NumStmHeat = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumStmHeat = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumSteamCoils = NumStmHeat;
 		if ( NumSteamCoils > 0 ) {
 			SteamCoil.allocate( NumSteamCoils );
 			CheckEquipName.dimension( NumSteamCoils, true );
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNums );
@@ -306,7 +306,7 @@ namespace SteamCoils {
 
 			CoilNum = StmHeatNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );

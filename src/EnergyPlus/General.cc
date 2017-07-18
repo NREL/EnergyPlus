@@ -3043,9 +3043,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:Surfaces:List";
 
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
@@ -3086,9 +3086,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
@@ -3118,7 +3118,7 @@ namespace General {
 				}}
 			}
 
-			RepNum = InputProcessor::GetNumSectionsFound( "Report Variable Dictionary" );
+			RepNum = inputProcessor->getNumSectionsFound( "Report Variable Dictionary" );
 			if ( RepNum > 0 ) {
 				VarDict = true;
 				VarDictOption1 = "REGULAR";
@@ -3127,9 +3127,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:VariableDictionary";
 
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				VarDict = true;
 				VarDictOption1 = cAlphaArgs( 1 );
 				VarDictOption2 = cAlphaArgs( 2 );
@@ -3137,9 +3137,9 @@ namespace General {
 			}
 
 			cCurrentModuleObject = "Output:Constructions";
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( has_prefix( cAlphaArgs( 1 ), "CONSTRUCT" ) ) {
 					Constructions = true;
 				} else if ( has_prefix( cAlphaArgs( 1 ), "MAT" ) ) {
@@ -3155,9 +3155,9 @@ namespace General {
 			}
 
 			cCurrentModuleObject = "Output:EnergyManagementSystem";
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				EMSoutput = true;
 
@@ -3234,9 +3234,9 @@ namespace General {
 			}
 
 			//    cCurrentModuleObject='Output:Schedules'
-			//    NumReports=InputProcessor::GetNumObjectsFound(cCurrentModuleObject)
+			//    NumReports=inputProcessor->getNumObjectsFound(cCurrentModuleObject)
 			//    DO RepNum=1,NumReports
-			//      CALL InputProcessor::GetObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
+			//      CALL inputProcessor->getObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
 			//                     AlphaBlank=lAlphaFieldBlanks,NumBlank=lNumericFieldBlanks,  &
 			//                     AlphaFieldNames=cAlphaFieldNames,NumericFieldNames=cNumericFieldNames)
 			//      SchRpt=.TRUE.

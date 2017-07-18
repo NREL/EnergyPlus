@@ -307,7 +307,7 @@ namespace HighTempRadiantSystem {
 
 		// FLOW:
 		// Initializations and allocations
-		NumOfHighTempRadSys = InputProcessor::GetNumObjectsFound( "ZoneHVAC:HighTemperatureRadiant" );
+		NumOfHighTempRadSys = inputProcessor->getNumObjectsFound( "ZoneHVAC:HighTemperatureRadiant" );
 
 		HighTempRadSys.allocate( NumOfHighTempRadSys );
 		CheckEquipName.allocate( NumOfHighTempRadSys );
@@ -320,7 +320,7 @@ namespace HighTempRadiantSystem {
 		// Obtain all of the user data related to high temperature radiant systems...
 		for ( Item = 1; Item <= NumOfHighTempRadSys; ++Item ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			HighTempRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HighTempRadSysNumericFields( Item ).FieldNames = "";

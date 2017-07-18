@@ -395,13 +395,13 @@ namespace WaterUse {
 		// FLOW:
 
 		cCurrentModuleObject = "WaterUse:Equipment";
-		NumWaterEquipment = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumWaterEquipment = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWaterEquipment > 0 ) {
 			WaterEquipment.allocate( NumWaterEquipment );
 
 			for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, WaterEquipNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, WaterEquipNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				WaterEquipment( WaterEquipNum ).Name = cAlphaArgs( 1 );
 
@@ -490,13 +490,13 @@ namespace WaterUse {
 		}
 
 		cCurrentModuleObject = "WaterUse:Connections";
-		NumWaterConnections = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumWaterConnections = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWaterConnections > 0 ) {
 			WaterConnections.allocate( NumWaterConnections );
 
 			for ( WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, WaterConnNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, WaterConnNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				WaterConnections( WaterConnNum ).Name = cAlphaArgs( 1 );
 

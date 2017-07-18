@@ -842,25 +842,25 @@ namespace RefrigeratedCase {
 		Array1D< Real64 > Numbers; // Numeric items for object
 		Array2D< Real64 > DayValues; // Array of schedule values
 
-		NumSimulationCascadeCondensers = InputProcessor::GetNumObjectsFound( "Refrigeration:Condenser:Cascade" );
-		NumSimulationCases = InputProcessor::GetNumObjectsFound( "Refrigeration:Case" );
-		NumSimulationCaseAndWalkInLists = InputProcessor::GetNumObjectsFound( "Refrigeration:CaseAndWalkInList" );
-		NumRefrigeratedRacks = InputProcessor::GetNumObjectsFound( "Refrigeration:CompressorRack" );
-		NumSimulationSecondarySystems = InputProcessor::GetNumObjectsFound( "Refrigeration:SecondarySystem" );
-		NumSimulationTransferLoadLists = InputProcessor::GetNumObjectsFound( "Refrigeration:TransferLoadList" );
-		NumSimulationWalkIns = InputProcessor::GetNumObjectsFound( "Refrigeration:WalkIn" );
-		NumRefrigSystems = InputProcessor::GetNumObjectsFound( "Refrigeration:System" );
-		NumTransRefrigSystems = InputProcessor::GetNumObjectsFound( "Refrigeration:TranscriticalSystem" );
-		NumSimulationCondAir = InputProcessor::GetNumObjectsFound( "Refrigeration:Condenser:AirCooled" );
-		NumSimulationCondEvap = InputProcessor::GetNumObjectsFound( "Refrigeration:Condenser:EvaporativeCooled" );
-		NumSimulationCondWater = InputProcessor::GetNumObjectsFound( "Refrigeration:Condenser:WaterCooled" );
-		NumSimulationGasCooler = InputProcessor::GetNumObjectsFound( "Refrigeration:GasCooler:AirCooled" );
+		NumSimulationCascadeCondensers = inputProcessor->getNumObjectsFound( "Refrigeration:Condenser:Cascade" );
+		NumSimulationCases = inputProcessor->getNumObjectsFound( "Refrigeration:Case" );
+		NumSimulationCaseAndWalkInLists = inputProcessor->getNumObjectsFound( "Refrigeration:CaseAndWalkInList" );
+		NumRefrigeratedRacks = inputProcessor->getNumObjectsFound( "Refrigeration:CompressorRack" );
+		NumSimulationSecondarySystems = inputProcessor->getNumObjectsFound( "Refrigeration:SecondarySystem" );
+		NumSimulationTransferLoadLists = inputProcessor->getNumObjectsFound( "Refrigeration:TransferLoadList" );
+		NumSimulationWalkIns = inputProcessor->getNumObjectsFound( "Refrigeration:WalkIn" );
+		NumRefrigSystems = inputProcessor->getNumObjectsFound( "Refrigeration:System" );
+		NumTransRefrigSystems = inputProcessor->getNumObjectsFound( "Refrigeration:TranscriticalSystem" );
+		NumSimulationCondAir = inputProcessor->getNumObjectsFound( "Refrigeration:Condenser:AirCooled" );
+		NumSimulationCondEvap = inputProcessor->getNumObjectsFound( "Refrigeration:Condenser:EvaporativeCooled" );
+		NumSimulationCondWater = inputProcessor->getNumObjectsFound( "Refrigeration:Condenser:WaterCooled" );
+		NumSimulationGasCooler = inputProcessor->getNumObjectsFound( "Refrigeration:GasCooler:AirCooled" );
 		NumRefrigCondensers = NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater + NumSimulationCascadeCondensers;
-		NumSimulationCompressors = InputProcessor::GetNumObjectsFound( "Refrigeration:Compressor" );
-		NumSimulationSubcoolers = InputProcessor::GetNumObjectsFound( "Refrigeration:Subcooler" );
-		NumCompressorLists = InputProcessor::GetNumObjectsFound( "Refrigeration:CompressorList" );
-		NumRefrigChillerSets = InputProcessor::GetNumObjectsFound( "ZoneHVAC:RefrigerationChillerSet" );
-		NumSimulationRefrigAirChillers = InputProcessor::GetNumObjectsFound( "Refrigeration:AirChiller" );
+		NumSimulationCompressors = inputProcessor->getNumObjectsFound( "Refrigeration:Compressor" );
+		NumSimulationSubcoolers = inputProcessor->getNumObjectsFound( "Refrigeration:Subcooler" );
+		NumCompressorLists = inputProcessor->getNumObjectsFound( "Refrigeration:CompressorList" );
+		NumRefrigChillerSets = inputProcessor->getNumObjectsFound( "ZoneHVAC:RefrigerationChillerSet" );
+		NumSimulationRefrigAirChillers = inputProcessor->getNumObjectsFound( "Refrigeration:AirChiller" );
 
 		// Set flags used later to avoid unnecessary steps.
 		if ( NumRefrigeratedRacks == 0 ) HaveRefrigRacks = false;
@@ -931,21 +931,21 @@ namespace RefrigeratedCase {
 		DayValues.allocate( NumOfTimeStepInHour, 24 );
 		RefrigPresentInZone.dimension( NumOfZones, false );
 
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CaseAndWalkInList", MaxNumArgs, MaxNumAlphasCaseAndWalkInList, MaxNumNumbersCaseAndWalkInList );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CompressorRack", MaxNumArgs, MaxNumAlphasRack, MaxNumNumbersRack );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:System", MaxNumArgs, MaxNumAlphasSys, MaxNumNumbersSys );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:TranscriticalSystem", MaxNumArgs, MaxNumAlphasTransSys, MaxNumNumbersTransSys );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:AirCooled", MaxNumArgs, MaxNumAlphasConda, MaxNumNumbersConda );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:EvaporativeCooled", MaxNumArgs, MaxNumAlphasConde, MaxNumNumbersConde );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Condenser:WaterCooled", MaxNumArgs, MaxNumAlphasCondw, MaxNumNumbersCondw );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:GasCooler:AirCooled", MaxNumArgs, MaxNumAlphasGasCoolera, MaxNumNumbersGasCoolera );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:Compressor", MaxNumArgs, MaxNumAlphasComp, MaxNumNumbersComp );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:CompressorList", MaxNumArgs, MaxNumAlphasCompressorList, MaxNumNumbersCompressorList );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:WalkIn", MaxNumArgs, MaxNumAlphasWalkIn, MaxNumNumbersWalkIn );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:SecondarySystem", MaxNumArgs, MaxNumAlphasSecond, MaxNumNumbersSecond );
-		InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:RefrigerationChillerSet", MaxNumArgs, MaxNumAlphasChillerSet, MaxNumNumbersChillerSet );
-		InputProcessor::GetObjectDefMaxArgs( "Refrigeration:AirChiller", MaxNumArgs, MaxNumAlphasAirChiller, MaxNumNumbersAirChiller );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:CaseAndWalkInList", MaxNumArgs, MaxNumAlphasCaseAndWalkInList, MaxNumNumbersCaseAndWalkInList );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:CompressorRack", MaxNumArgs, MaxNumAlphasRack, MaxNumNumbersRack );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:System", MaxNumArgs, MaxNumAlphasSys, MaxNumNumbersSys );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:TranscriticalSystem", MaxNumArgs, MaxNumAlphasTransSys, MaxNumNumbersTransSys );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Condenser:AirCooled", MaxNumArgs, MaxNumAlphasConda, MaxNumNumbersConda );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Condenser:EvaporativeCooled", MaxNumArgs, MaxNumAlphasConde, MaxNumNumbersConde );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Condenser:WaterCooled", MaxNumArgs, MaxNumAlphasCondw, MaxNumNumbersCondw );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:GasCooler:AirCooled", MaxNumArgs, MaxNumAlphasGasCoolera, MaxNumNumbersGasCoolera );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Compressor", MaxNumArgs, MaxNumAlphasComp, MaxNumNumbersComp );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:CompressorList", MaxNumArgs, MaxNumAlphasCompressorList, MaxNumNumbersCompressorList );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:WalkIn", MaxNumArgs, MaxNumAlphasWalkIn, MaxNumNumbersWalkIn );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:SecondarySystem", MaxNumArgs, MaxNumAlphasSecond, MaxNumNumbersSecond );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:RefrigerationChillerSet", MaxNumArgs, MaxNumAlphasChillerSet, MaxNumNumbersChillerSet );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:AirChiller", MaxNumArgs, MaxNumAlphasAirChiller, MaxNumNumbersAirChiller );
 
 		MaxNumAlphasAll = max( MaxNumAlphasCase, MaxNumAlphasCaseAndWalkInList, MaxNumAlphasRack, MaxNumAlphasSys, MaxNumAlphasTransSys, MaxNumAlphasConda, MaxNumAlphasConde, MaxNumAlphasCondw, MaxNumAlphasGasCoolera, MaxNumAlphasComp, MaxNumAlphasCompressorList, MaxNumAlphasSecond, MaxNumAlphasWalkIn, MaxNumAlphasChillerSet, MaxNumAlphasAirChiller );
 		MaxNumNumbersAll = max( MaxNumNumbersCase, MaxNumNumbersCaseAndWalkInList, MaxNumNumbersRack, MaxNumNumbersSys, MaxNumNumbersTransSys, MaxNumNumbersConda, MaxNumNumbersConde, MaxNumNumbersCondw, MaxNumNumbersGasCoolera, MaxNumNumbersComp, MaxNumNumbersCompressorList, MaxNumNumbersSecond, MaxNumNumbersWalkIn, MaxNumNumbersChillerSet, MaxNumNumbersAirChiller );
@@ -960,7 +960,7 @@ namespace RefrigeratedCase {
 		if ( NumSimulationCases > 0 ) {
 			CurrentModuleObject = "Refrigeration:Case";
 			for ( CaseNum = 1; CaseNum <= NumSimulationCases; ++CaseNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, CaseNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, CaseNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				++NumDisplayCases;
 
@@ -1485,7 +1485,7 @@ namespace RefrigeratedCase {
 		if ( NumSimulationWalkIns > 0 ) {
 			CurrentModuleObject = "Refrigeration:WalkIn";
 			for ( WalkInID = 1; WalkInID <= NumSimulationWalkIns; ++WalkInID ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, WalkInID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, WalkInID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				WalkIn( WalkInID ).Name = Alphas( 1 );
@@ -1896,7 +1896,7 @@ namespace RefrigeratedCase {
 			for ( CoilID = 1; CoilID <= NumSimulationRefrigAirChillers; ++CoilID ) {
 				//A1
 				AlphaNum = 1;
-				InputProcessor::GetObjectItem( CurrentModuleObject, CoilID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, CoilID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				WarehouseCoil( CoilID ).Name = Alphas( AlphaNum );
@@ -2410,7 +2410,7 @@ namespace RefrigeratedCase {
 
 			CurrentModuleObject = "ZoneHVAC:RefrigerationChillerSet";
 			for ( SetID = 1; SetID <= NumRefrigChillerSets; ++SetID ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, SetID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, SetID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				AlphaNum = 1;
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
@@ -2499,7 +2499,7 @@ namespace RefrigeratedCase {
 		if ( NumSimulationCaseAndWalkInLists > 0 ) {
 			CurrentModuleObject = "Refrigeration:CaseAndWalkInList";
 			for ( ListNum = 1; ListNum <= NumSimulationCaseAndWalkInLists; ++ListNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				CaseAndWalkInList( ListNum ).Name = Alphas( 1 );
 
@@ -2562,7 +2562,7 @@ namespace RefrigeratedCase {
 
 			for ( RackNum = 1; RackNum <= NumRefrigeratedRacks; ++RackNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, RackNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, RackNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				RefrigRack( RackNum ).Name = Alphas( 1 );
@@ -2929,7 +2929,7 @@ namespace RefrigeratedCase {
 			if ( NumSimulationCondAir > 0 ) {
 				CurrentModuleObject = "Refrigeration:Condenser:AirCooled";
 				for ( CondNum = 1; CondNum <= NumSimulationCondAir; ++CondNum ) {
-					InputProcessor::GetObjectItem( CurrentModuleObject, CondNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, CondNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
@@ -3031,7 +3031,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:EvaporativeCooled";
 				for ( CondIndex = 1; CondIndex <= NumSimulationCondEvap; ++CondIndex ) {
 					CondNum = CondIndex + NumSimulationCondAir;
-					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
@@ -3224,7 +3224,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:WaterCooled";
 				for ( CondIndex = 1; CondIndex <= NumSimulationCondWater; ++CondIndex ) {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap;
-					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
@@ -3352,7 +3352,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:Cascade";
 				for ( CondIndex = 1; CondIndex <= NumSimulationCascadeCondensers; ++CondIndex ) {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater;
-					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
@@ -3425,7 +3425,7 @@ namespace RefrigeratedCase {
 			if ( NumSimulationGasCooler > 0 ) {
 				CurrentModuleObject = "Refrigeration:GasCooler:AirCooled";
 				for ( GCNum = 1; GCNum <= NumSimulationGasCooler; ++GCNum ) {
-					InputProcessor::GetObjectItem( CurrentModuleObject, GCNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, GCNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 					GasCooler( GCNum ).Name = Alphas( 1 );
 
@@ -3563,7 +3563,7 @@ namespace RefrigeratedCase {
 			if ( NumSimulationSecondarySystems > 0 ) {
 				CurrentModuleObject = "Refrigeration:SecondarySystem";
 				for ( SecondaryNum = 1; SecondaryNum <= NumSimulationSecondarySystems; ++SecondaryNum ) {
-					InputProcessor::GetObjectItem( CurrentModuleObject, SecondaryNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, SecondaryNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 					Secondary( SecondaryNum ).Name = Alphas( 1 );
@@ -4027,7 +4027,7 @@ namespace RefrigeratedCase {
 
 			CurrentModuleObject = "Refrigeration:Compressor";
 			for ( CompNum = 1; CompNum <= NumSimulationCompressors; ++CompNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, CompNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, CompNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				Compressor( CompNum ).Name = Alphas( 1 );
@@ -4106,7 +4106,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Subcooler";
 				NumSimulationMechSubcoolers = 0;
 				for ( SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum ) {
-					InputProcessor::GetObjectItem( CurrentModuleObject, SubcoolerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, SubcoolerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 					Subcooler( SubcoolerNum ).Name = Alphas( 1 );
@@ -4174,7 +4174,7 @@ namespace RefrigeratedCase {
 			if ( NumSimulationTransferLoadLists > 0 ) {
 				CurrentModuleObject = "Refrigeration:TransferLoadList";
 				for ( ListNum = 1; ListNum <= NumSimulationTransferLoadLists; ++ListNum ) {
-					InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 					UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 					TransferLoadList( ListNum ).Name = Alphas( 1 );
@@ -4222,7 +4222,7 @@ namespace RefrigeratedCase {
 			//**** Read Compressor Lists **********************************************************
 			CurrentModuleObject = "Refrigeration:CompressorList";
 			for ( ListNum = 1; ListNum <= NumCompressorLists; ++ListNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				CompressorLists( ListNum ).NumCompressors = NumAlphas - 1;
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
@@ -4247,7 +4247,7 @@ namespace RefrigeratedCase {
 			CurrentModuleObject = "Refrigeration:System";
 			for ( RefrigSysNum = 1; RefrigSysNum <= NumRefrigSystems; ++RefrigSysNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, RefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, RefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				System( RefrigSysNum ).Name = Alphas( 1 );
@@ -4648,7 +4648,7 @@ namespace RefrigeratedCase {
 					if ( ! allocated( System( RefrigSysNum ).SubcoolerNum ) ) System( RefrigSysNum ).SubcoolerNum.allocate( System( RefrigSysNum ).NumSubcoolers );
 					NumSubcooler = 1;
 					if ( ! lAlphaBlanks( AlphaNum ) ) {
-						System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) = InputProcessor::GetObjectItemNum( "Refrigeration:Subcooler", Alphas( AlphaNum ) );
+						System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) = inputProcessor->getObjectItemNum( "Refrigeration:Subcooler", Alphas( AlphaNum ) );
 						if ( System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) <= 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaNum ) + " defined as \"" + Alphas( AlphaNum ) + "\"." );
 							ErrorsFound = true;
@@ -4658,7 +4658,7 @@ namespace RefrigeratedCase {
 						++NumSubcooler;
 					}
 					if ( ! lAlphaBlanks( AlphaNum + 1 ) ) {
-						System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) = InputProcessor::GetObjectItemNum( "Refrigeration:Subcooler", Alphas( AlphaNum + 1 ) );
+						System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) = inputProcessor->getObjectItemNum( "Refrigeration:Subcooler", Alphas( AlphaNum + 1 ) );
 						if ( System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) <= 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaNum + 1 ) + " defined as \"" + Alphas( AlphaNum + 1 ) + "\"." );
 							ErrorsFound = true;
@@ -4907,7 +4907,7 @@ namespace RefrigeratedCase {
 		if ( NumSimulationSubcoolers > 0 ) {
 			for ( SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum ) {
 				if ( Subcooler( SubcoolerNum ).SubcoolerType == LiquidSuction ) continue;
-				Subcooler( SubcoolerNum ).MechSourceSysID = InputProcessor::GetObjectItemNum( "Refrigeration:System", Subcooler( SubcoolerNum ).MechSourceSys );
+				Subcooler( SubcoolerNum ).MechSourceSysID = inputProcessor->getObjectItemNum( "Refrigeration:System", Subcooler( SubcoolerNum ).MechSourceSys );
 				if ( Subcooler( SubcoolerNum ).MechSourceSysID == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Subcooler( SubcoolerNum ).Name + "\", Mechanical Subcooler has an invalid Source Refrigeration:System=\"" + Subcooler( SubcoolerNum ).MechSourceSys + "\"." );
 					ErrorsFound = true;
@@ -4937,7 +4937,7 @@ namespace RefrigeratedCase {
 		if ( NumTransRefrigSystems > 0 ) {
 			CurrentModuleObject = "Refrigeration:TranscriticalSystem";
 			for ( TransRefrigSysNum = 1; TransRefrigSysNum <= NumTransRefrigSystems; ++TransRefrigSysNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, TransRefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, TransRefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				TransSystem( TransRefrigSysNum ).Name = Alphas( 1 );

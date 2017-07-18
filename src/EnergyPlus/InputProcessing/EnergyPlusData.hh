@@ -44,100 +44,104 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef EnergyPlusData_hh_INCLUDED
+#define EnergyPlusData_hh_INCLUDED
+
+#include <string>
+#include <memory>
+#include <functional>
+#include <unordered_map>
+
+// ObjexxFCL Headers
+
 // EnergyPlus Headers
-#include <NonZoneEquipmentManager.hh>
-#include <DataGlobals.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <WaterThermalTanks.hh>
-#include <WaterUse.hh>
+#include <EnergyPlus.hh>
+
+#include <nlohmann/json.hpp>
 
 namespace EnergyPlus {
 
-namespace NonZoneEquipmentManager {
+enum class ObjectType;
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Peter Graham Ellis
-	//       DATE WRITTEN   January 2004
-	//       MODIFIED       Hudson, ORNL July 2007
-	//       RE-ENGINEERED  na
+class EnergyPlusData
+{
+public:
+	using json = nlohmann::json;
 
-	// PURPOSE OF THIS MODULE:
-
-	// METHODOLOGY EMPLOYED: na
-
-	// REFERENCES: na
-	// OTHER NOTES: na
-	// USE STATEMENTS: na
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS: na
-	// MODULE VARIABLE DECLARATIONS: na
-
-	// SUBROUTINE SPECIFICATIONS:
-
-	// MODULE SUBROUTINES:
-
-	// Functions
-
-	void
-	ManageNonZoneEquipment(
-		bool const FirstHVACIteration,
-		bool & SimNonZoneEquipment // Simulation convergence flag
-	)
+	template< typename T >
+	T *
+	addObject( std::string const & objectName, json const & fields )
 	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Dan Fisher
-		//       DATE WRITTEN   Sept. 2000
-		//       RE-ENGINEERED  Richard Liesen
-		//       DATE MODIFIED  February 2003
-		//       MODIFIED       Hudson, ORNL July 2007
-		//       MODIFIED       B. Grifffith, NREL, April 2008,
-		//                      added calls for just heat recovery part of chillers
-		//       MODIFIED       Removed much for plant upgrade, 2011
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine checks the input file for any non-zone equipment objects and gets their input.
-		// Zone equipment objects are generally triggered to "get input" when they are called for simulation
-		// by the ZoneEquipmentManager because they are referenced by a Zone Equipment List.  In the case of
-		// the NonZoneEquipmentManager, it does not yet have a list of non-zone equipment, so it must make
-		// one here before it knows what to call for simulation.
-
-		// Using/Aliasing
-		using DataGlobals::ZoneSizingCalc;
-		using WaterThermalTanks::SimulateWaterHeaterStandAlone;
-		using WaterUse::SimulateWaterUse;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int WaterHeaterNum; // Water heater object number
-		static int NumOfWaterHeater;
-		static bool CountNonZoneEquip( true );
-
-		// FLOW:
-		if ( CountNonZoneEquip ) {
-			NumOfWaterHeater = inputProcessor->getNumObjectsFound( "WaterHeater:Mixed" ) + inputProcessor->getNumObjectsFound( "WaterHeater:Stratified" );
-			CountNonZoneEquip = false;
-		}
-
-		SimulateWaterUse( FirstHVACIteration ); // simulate non-plant loop water use.
-
-		if ( ! ZoneSizingCalc ) {
-			for ( WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum ) {
-				SimulateWaterHeaterStandAlone( WaterHeaterNum, FirstHVACIteration );
-			}
-		}
-
-		if ( FirstHVACIteration ) {
-			SimNonZoneEquipment = true;
-		} else {
-			SimNonZoneEquipment = false;
-		}
-
+		T * ptr = new T( objectName, fields );
+		EPData[ T::objectType() ][ objectName ] = std::move( unique_void( ptr ) );
+		return ptr;
 	}
 
-} // NonZoneEquipmentManager
+	template< typename T >
+	T *
+	addObject( json const & fields )
+	{
+		static const std::string blankString;
+		T * ptr = new T( fields );
+		EPData[ T::objectType() ][ blankString ] = std::move( unique_void( ptr ) );
+		return ptr;
+	}
 
-} // EnergyPlus
+	template< typename T >
+	T *
+	objectFactory( std::string const & objectName )
+	{
+		auto const it = EPData.find( T::objectType() );
+		if ( it == EPData.end() ) return nullptr;
+		auto const it2 = it->second.find( objectName );
+		if ( it2 == it->second.end() ) return nullptr;
+		void * data = it2->second.get();
+		T * p = static_cast< T * >( data );
+		return p;
+	}
+
+	template< typename T >
+	T *
+	objectFactory()
+	{
+		static const std::string blankString;
+		auto const it = EPData.find( T::objectType() );
+		if ( it == EPData.end() ) return nullptr;
+		auto const it2 = it->second.find( blankString );
+		if ( it2 == it->second.end() ) return nullptr;
+		void * data = it2->second.get();
+		T * p = static_cast< T * >( data );
+		return p;
+	}
+
+private:
+	// taken from https://stackoverflow.com/a/39288979/2358662
+	using deleter_t = std::function< void( void * ) >;
+	using unique_void_ptr = std::unique_ptr< void, deleter_t >;
+
+	template< typename T >
+	auto unique_void( T * ptr ) -> unique_void_ptr
+	{
+		auto deleter = []( void * data ) -> void {
+			T * p = static_cast< T * >( data );
+			delete p;
+		};
+		return std::unique_ptr< void, deleter_t >( ptr, deleter );
+	}
+
+	struct EnumClassHash
+	{
+		template < typename T >
+		std::size_t operator()( T const & t ) const
+		{
+			return static_cast< std::size_t >( t );
+		}
+	};
+
+	std::unordered_map< ObjectType, std::unordered_map< std::string, unique_void_ptr >, EnumClassHash > EPData;
+
+};
+
+}
+
+#endif // EnergyPlusData_hh_INCLUDED

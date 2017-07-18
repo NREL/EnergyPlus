@@ -329,10 +329,10 @@ namespace Photovoltaics {
 		Array1D< SNLModuleParamsStuct > tmpSNLModuleParams; // temporary, for processing input data
 
 		// count how many photovoltaic arrays of different types are in the .idf
-		NumPVs = InputProcessor::GetNumObjectsFound( cPVGeneratorObjectName );
-		NumSimplePVModuleTypes = InputProcessor::GetNumObjectsFound( cPVSimplePerfObjectName );
-		Num1DiodePVModuleTypes = InputProcessor::GetNumObjectsFound( cPVEquiv1DiodePerfObjectName );
-		NumSNLPVModuleTypes = InputProcessor::GetNumObjectsFound( cPVSandiaPerfObjectName );
+		NumPVs = inputProcessor->getNumObjectsFound( cPVGeneratorObjectName );
+		NumSimplePVModuleTypes = inputProcessor->getNumObjectsFound( cPVSimplePerfObjectName );
+		Num1DiodePVModuleTypes = inputProcessor->getNumObjectsFound( cPVEquiv1DiodePerfObjectName );
+		NumSNLPVModuleTypes = inputProcessor->getNumObjectsFound( cPVSandiaPerfObjectName );
 
 		if ( NumPVs <= 0 ) {
 			ShowSevereError( "Did not find any " + cPVGeneratorObjectName );
@@ -344,7 +344,7 @@ namespace Photovoltaics {
 
 		cCurrentModuleObject = cPVGeneratorObjectName;
 		for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			PVarray( PVnum ).Name = cAlphaArgs( 1 );
 
@@ -467,7 +467,7 @@ namespace Photovoltaics {
 			tmpSimpleModuleParams.allocate( NumSimplePVModuleTypes );
 			cCurrentModuleObject = cPVSimplePerfObjectName;
 			for ( ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
@@ -507,7 +507,7 @@ namespace Photovoltaics {
 			tmpTNRSYSModuleParams.allocate( Num1DiodePVModuleTypes );
 			cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
 			for ( ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
@@ -557,7 +557,7 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVSandiaPerfObjectName;
 			for ( ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}

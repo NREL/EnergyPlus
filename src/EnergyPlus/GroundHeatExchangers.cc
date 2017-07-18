@@ -65,10 +65,16 @@
 #include <General.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessing/InputProcessor.hh>
+#include <InputProcessing/EnergyPlusData.hh>
+#include <InputProcessing/ObjectTypes.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <UtilityRoutines.hh>
+
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 namespace EnergyPlus {
 
@@ -173,6 +179,13 @@ namespace GroundHeatExchangers {
 		slinkyGLHE.deallocate();
 	}
 
+	ObjectType GLHEVert::objectType() {
+		return ObjectType::GroundHeatExchangerVertical;
+	}
+
+	ObjectType GLHESlinky::objectType() {
+		return ObjectType::GroundHeatExchangerSlinky;
+	}
 
 	void GLHEBase::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {
 		this->initGLHESimVars();
@@ -1232,6 +1245,121 @@ namespace GroundHeatExchangers {
 
 	//******************************************************************************
 
+	GLHEVert::GLHEVert( std::string const & name, json const & fields )
+	{
+		bool errorsFound = false;
+		std::string const cCurrentModuleObject = "GroundHeatExchanger:Vertical";
+
+		Name = name;
+		UtilityRoutines::IsNameEmpty( Name, cCurrentModuleObject, errorsFound );
+
+		auto const inletNodeName = UtilityRoutines::MakeUPPERCase( fields.at( "inlet_node_name" ) );
+		auto const outletNodeName = UtilityRoutines::MakeUPPERCase( fields.at( "outlet_node_name" ) );
+
+		//get inlet node num
+		inletNodeNum = NodeInputManager::GetOnlySingleNode( inletNodeName, errorsFound, cCurrentModuleObject, Name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+		//get outlet node num
+		outletNodeNum = NodeInputManager::GetOnlySingleNode( outletNodeName, errorsFound, cCurrentModuleObject, Name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+
+		available = true;
+		on = true;
+
+		BranchNodeConnections::TestCompSet( cCurrentModuleObject, Name, inletNodeName, outletNodeName, "Condenser Water Nodes" );
+
+		//load borehole data
+		designFlow = fields.at( "design_flow_rate" );
+		PlantUtilities::RegisterPlantCompDesignFlow( inletNodeNum, designFlow );
+
+		numBoreholes = fields.at( "number_of_bore_holes" );
+		boreholeLength = fields.at( "bore_hole_length" );
+		boreholeRadius = fields.at( "bore_hole_radius" );
+		kGround = fields.at( "ground_thermal_conductivity" );
+		cpRhoGround = fields.at( "ground_thermal_heat_capacity" );
+		tempGround = fields.at( "ground_temperature" );
+		kGrout = fields.at( "grout_thermal_conductivity" );
+		kPipe = fields.at( "pipe_thermal_conductivity" );
+		pipeOutDia = fields.at( "pipe_out_diameter" );
+		UtubeDist = fields.at( "u_tube_distance" );
+		pipeThick = fields.at( "pipe_thickness" );
+		maxSimYears = fields.at( "maximum_length_of_simulation" );
+		gReferenceRatio = fields.at( "g_function_reference_ratio" );
+
+		// total tube length
+		totalTubeLength = numBoreholes * boreholeLength;
+
+		// ground thermal diffusivity
+		diffusivityGround = kGround / cpRhoGround;
+
+		//   Not many checks
+
+		if ( pipeThick >= pipeOutDia / 2.0 ) {
+			ShowSevereError( cCurrentModuleObject + "=\"" + Name + "\", invalid value in field." );
+			ShowContinueError( "...pipe_thickness=[" + General::RoundSigDigits( pipeThick, 3 ) + "]." );
+			ShowContinueError( "...pipe_out_diameter=[" + General::RoundSigDigits( pipeOutDia, 3 ) + "]." );
+			ShowContinueError( "...Radius will be <=0." );
+			errorsFound = true;
+		}
+
+		if ( maxSimYears < DataEnvironment::MaxNumberSimYears ) {
+			ShowWarningError( cCurrentModuleObject + "=\"" + Name + "\", invalid value in field." );
+			ShowContinueError( "...maximum_length_of_simulation less than RunPeriod Request" );
+			ShowContinueError( "Requested input=" + TrimSigDigits( maxSimYears ) + " will be set to " + TrimSigDigits( DataEnvironment::MaxNumberSimYears ) );
+			maxSimYears = DataEnvironment::MaxNumberSimYears;
+		}
+
+		// Get Gfunction data
+		auto const & gFunctions = fields.at( "g_functions" );
+		NPairs = fields.at( "number_of_data_pairs_of_the_g_function" );
+
+		if ( static_cast< size_t >( NPairs ) != gFunctions.size() ) {
+			ShowWarningError( cCurrentModuleObject + "=\"" + Name + "\", invalid value in field." );
+			ShowContinueError( "...number_of_data_pairs_of_the_g_function does not equal number of pairs in g_functions" );
+			ShowContinueError( "Requested input=" + TrimSigDigits( NPairs ) + " will be set to " + TrimSigDigits( gFunctions.size() ) );
+			NPairs = gFunctions.size();
+		}
+
+		if ( gFunctions.size() == 0 ) {
+			ShowWarningError( cCurrentModuleObject + "=\"" + Name + "\", invalid value in field." );
+			ShowContinueError( "...number of g_functions is less than 1." );
+			errorsFound = true;
+		}
+
+		SubAGG = 15;
+		AGG = 192;
+
+		// Allocation of all the dynamic arrays
+		QnMonthlyAgg.dimension( maxSimYears * 12, 0.0 );
+		QnHr.dimension( 730 + AGG + SubAGG, 0.0 );
+		QnSubHr.dimension( ( SubAGG + 1 ) * maxTSinHr + 1, 0.0 );
+		LastHourN.dimension( SubAGG + 1, 0 );
+		prevTimeSteps.dimension( ( SubAGG + 1 ) * maxTSinHr + 1, 0 );
+
+		LNTTS.reserve( NPairs );
+		GFNC.reserve( NPairs );
+
+		for ( auto const & gFunction : gFunctions ) {
+			LNTTS.emplace_back( gFunction.at( "g_function_ln_t_ts_value" ) );
+			GFNC.emplace_back( gFunction.at( "g_function_g_value" ) );
+		}
+
+		SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", boreholeTemp, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", QGLHE, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", inletTemp, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", outletTemp, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", massFlowRate, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", aveFluidTemp, "System", "Average", Name );
+
+		//Check for Errors
+		if ( errorsFound ) {
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+		}
+		numVerticalGLHEs++;
+	}
+
+	GLHESlinky::GLHESlinky( std::string const & name, json const & fields )
+	{
+	}
+
 	void
 	GetGroundHeatExchangerInput()
 	{
@@ -1269,8 +1397,8 @@ namespace GroundHeatExchangers {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 
-		numVerticalGLHEs = InputProcessor::GetNumObjectsFound( "GroundHeatExchanger:Vertical" );
-		numSlinkyGLHEs = InputProcessor::GetNumObjectsFound( "GroundHeatExchanger:Slinky" );
+		numVerticalGLHEs = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:Vertical" );
+		numSlinkyGLHEs = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:Slinky" );
 
 		allocated = false;
 
@@ -1291,7 +1419,7 @@ namespace GroundHeatExchangers {
 			checkEquipName.dimension( numVerticalGLHEs, true );
 
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
 				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
@@ -1415,7 +1543,7 @@ namespace GroundHeatExchangers {
 			checkEquipName.dimension( numSlinkyGLHEs, true );
 
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
 				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );

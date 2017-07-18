@@ -490,11 +490,11 @@ namespace SimAirServingZones {
 		// Object Data
 		Array1D< AirUniqueNodes > TestUniqueNodes;
 
-		InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers );
-		InputProcessor::GetObjectDefMaxArgs( "ConnectorList", NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ConnectorList", NumParams, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
-		InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:ControllerList", NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:ControllerList", NumParams, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -515,11 +515,11 @@ namespace SimAirServingZones {
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
-		InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 		NodeNums.dimension( NumParams, 0 );
 
 		// Find number of primary air systems
-		NumPrimaryAirSys = InputProcessor::GetNumObjectsFound( "AirLoopHVAC" );
+		NumPrimaryAirSys = inputProcessor->getNumObjectsFound( "AirLoopHVAC" );
 		TestUniqueNodes.allocate( NumPrimaryAirSys * 4 ); // used to look at specific nodes that must be unique, fields A6-A9
 
 		PrimaryAirSystem.allocate( NumPrimaryAirSys ); // allocate the primary air sys data array
@@ -553,7 +553,7 @@ namespace SimAirServingZones {
 
 			CurrentModuleObject = "AirLoopHVAC";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, AirSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // get all the input data for the air system
+			inputProcessor->getObjectItem( CurrentModuleObject, AirSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // get all the input data for the air system
 
 			// Assign the air system data to the simulation variables.
 			// Data needed to simulate the system goes into PrimaryAirSystem.
@@ -877,9 +877,9 @@ namespace SimAirServingZones {
 			MixerExists = false;
 
 			if ( ConnectorListName != "" ) {
-				ConListNum = InputProcessor::GetObjectItemNum( "ConnectorList", ConnectorListName );
+				ConListNum = inputProcessor->getObjectItemNum( "ConnectorList", ConnectorListName );
 				if ( ConListNum > 0 ) {
-					InputProcessor::GetObjectItem( "ConnectorList", ConListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+					inputProcessor->getObjectItem( "ConnectorList", ConListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
 					if ( ( UtilityRoutines::SameString( Alphas( 2 ), "Connector:Splitter" ) ) || ( UtilityRoutines::SameString( Alphas( 4 ), "Connector:Splitter" ) ) ) {
 						SplitterExists = true;
 					}
@@ -898,7 +898,7 @@ namespace SimAirServingZones {
 
 			// If there is a SPLITTER, get its data
 			if ( SplitterExists ) {
-				InputProcessor::GetObjectDefMaxArgs( "Connector:Splitter", NumParams, NumAlphas, NumNodes );
+				inputProcessor->getObjectDefMaxArgs( "Connector:Splitter", NumParams, NumAlphas, NumNodes );
 				NodeNames.allocate( NumAlphas );
 				NodeNumbers.allocate( NumAlphas );
 				GetLoopSplitter( PrimaryAirSystem( AirSysNum ).Name, ConnectorListName, PrimaryAirSystem( AirSysNum ).Splitter.Name, PrimaryAirSystem( AirSysNum ).Splitter.Exists, PrimaryAirSystem( AirSysNum ).Splitter.NodeNameIn, PrimaryAirSystem( AirSysNum ).Splitter.NodeNumIn, PrimaryAirSystem( AirSysNum ).Splitter.TotalOutletNodes, NodeNames, NodeNumbers, ErrorsFound );
@@ -952,7 +952,7 @@ namespace SimAirServingZones {
 
 			// If there is a MIXER, get its data
 			if ( MixerExists ) {
-				InputProcessor::GetObjectDefMaxArgs( "Connector:Mixer", NumParams, NumAlphas, NumNodes );
+				inputProcessor->getObjectDefMaxArgs( "Connector:Mixer", NumParams, NumAlphas, NumNodes );
 				NodeNames.allocate( NumAlphas );
 				NodeNumbers.allocate( NumAlphas );
 				GetLoopMixer( PrimaryAirSystem( AirSysNum ).Name, ConnectorListName, PrimaryAirSystem( AirSysNum ).Mixer.Name, PrimaryAirSystem( AirSysNum ).Mixer.Exists, PrimaryAirSystem( AirSysNum ).Mixer.NodeNameOut, PrimaryAirSystem( AirSysNum ).Mixer.NodeNumOut, PrimaryAirSystem( AirSysNum ).Mixer.TotalInletNodes, NodeNames, NodeNumbers, ErrorsFound );
@@ -1007,9 +1007,9 @@ namespace SimAirServingZones {
 			NumControllers = 0;
 			if ( ControllerListName != "" ) { // If not blank, then must be there and valid
 				// Loop through the controller lists until you find the one attached to this primary air system
-				ControllerListNum = InputProcessor::GetObjectItemNum( "AirLoopHVAC:ControllerList", ControllerListName );
+				ControllerListNum = inputProcessor->getObjectItemNum( "AirLoopHVAC:ControllerList", ControllerListName );
 				if ( ControllerListNum > 0 ) {
-					InputProcessor::GetObjectItem( "AirLoopHVAC:ControllerList", ControllerListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+					inputProcessor->getObjectItem( "AirLoopHVAC:ControllerList", ControllerListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
 					//Check the current controller list and if it matches input names
 					NumControllers = ( NumAlphas - 1 ) / 2; //Subtract off the controller list name first
 					// store all the controller data
@@ -1041,7 +1041,7 @@ namespace SimAirServingZones {
 				}
 			}
 			if ( NumOASysSimpControllers > 0 ) {
-				InputProcessor::GetObjectItem( "AirLoopHVAC:ControllerList", OASysContListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+				inputProcessor->getObjectItem( "AirLoopHVAC:ControllerList", OASysContListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
 				// allocate air primary system controller lists if not already done
 				if ( NumControllers == 0 ) {
 					PrimaryAirSystem( AirSysNum ).NumControllers = NumOASysSimpControllers;

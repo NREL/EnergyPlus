@@ -319,7 +319,7 @@ namespace CoolingPanelSimple {
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
 
-		NumCoolingPanels = InputProcessor::GetNumObjectsFound( cCMO_CoolingPanel_Simple );
+		NumCoolingPanels = inputProcessor->getNumObjectsFound( cCMO_CoolingPanel_Simple );
 
 		// Count total number of baseboard units
 
@@ -331,7 +331,7 @@ namespace CoolingPanelSimple {
 		// Get the data from the user input related to cooling panels
 		for ( CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum ) {
 
-			InputProcessor::GetObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 
 			CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames.allocate( NumNumbers );

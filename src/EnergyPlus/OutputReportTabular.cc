@@ -838,7 +838,7 @@ namespace OutputReportTabular {
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
 
-		MonthlyInputCount = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		MonthlyInputCount = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( MonthlyInputCount > 0 ) {
 			WriteTabularFiles = true;
 			// if not a run period using weather do not create reports
@@ -847,11 +847,11 @@ namespace OutputReportTabular {
 				return;
 			}
 		}
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
 		for ( int TabNum = 1, TabNum_end = MonthlyInputCount; TabNum <= TabNum_end; ++TabNum ) { // MonthlyInputCount is modified in the loop
-			InputProcessor::GetObjectItem( CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 
 			if ( TabNum - 1 > 0 ) {
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
@@ -1551,13 +1551,13 @@ namespace OutputReportTabular {
 		Array1D_string objNames;
 		Array1D_int objVarIDs;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
 
 		timeInYear = 0.0; //intialize the time in year counter
 		// determine size of array that holds the IDF description
-		OutputTableBinnedCount = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		OutputTableBinnedCount = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OutputTableBinned.allocate( OutputTableBinnedCount );
 		if ( OutputTableBinnedCount > 0 ) {
 			WriteTabularFiles = true;
@@ -1571,7 +1571,7 @@ namespace OutputReportTabular {
 		BinResultsIntervalCount = 0;
 		BinResultsTableCount = 0;
 		for ( iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OutputTableBinned( iInObj ).keyValue = AlphArray( 1 );
 			OutputTableBinned( iInObj ).varOrMeter = AlphArray( 2 );
 			//if a schedule has been specified assign
@@ -1746,11 +1746,11 @@ namespace OutputReportTabular {
 		Array1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		NumArray.dimension( NumNums, 0.0 );
 
-		NumTabularStyle = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumTabularStyle = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumTabularStyle == 0 ) {
 			AlphArray( 1 ) = "COMMA";
@@ -1759,7 +1759,7 @@ namespace OutputReportTabular {
 			del( 1 ) = CharComma; //comma
 			unitsStyle = unitsStyleNone;
 		} else if ( NumTabularStyle == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// ColumnSeparator
 			if ( UtilityRoutines::SameString( AlphArray( 1 ), "Comma" ) ) {
 				numStyles = 1;
@@ -1937,16 +1937,16 @@ namespace OutputReportTabular {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-		NumTabularPredefined = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumTabularPredefined = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumTabularPredefined == 1 ) {
 			// find out how many fields since the object is extensible
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			// allocate the temporary arrays for the call to get the filed
 			AlphArray.allocate( NumAlphas );
 			// don't really need the NumArray since not expecting any numbers but the call requires it
 			NumArray.dimension( NumNums, 0.0 );
 			// get the object
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			// default all report flags to false (do not get produced)
 			displayTabularBEPS = false;
 			// initialize the names of the predefined monthly report titles
@@ -2369,16 +2369,16 @@ namespace OutputReportTabular {
 		bool isFound;
 
 		isFound = false;
-		NumTabularPredefined = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumTabularPredefined = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumTabularPredefined == 1 ) {
 			// find out how many fields since the object is extensible
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			// allocate the temporary arrays for the call to get the filed
 			AlphArray.allocate( NumAlphas );
 			// don't really need the NumArray since not expecting any numbers but the call requires it
 			NumArray.dimension( NumNums, 0.0 );
 			// get the object
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			// loop through the fields looking for matching report titles
 			for ( iReport = 1; iReport <= NumAlphas; ++iReport ) {
 				if ( UtilityRoutines::SameString( AlphArray( iReport ), "ZoneComponentLoadSummary" ) ) {
@@ -9733,7 +9733,7 @@ namespace OutputReportTabular {
 			totPlugProcess = 0.0;
 			kOpaque = 0;
 
-			DetailedWWR = ( InputProcessor::GetNumSectionsFound( "DETAILEDWWR_DEBUG" ) > 0 );
+			DetailedWWR = ( inputProcessor->getNumSectionsFound( "DETAILEDWWR_DEBUG" ) > 0 );
 
 			if ( DetailedWWR ) {
 				gio::write( OutputFileDebug, fmtA ) << "======90.1 Classification [>=60 & <=120] tilt = wall==================";

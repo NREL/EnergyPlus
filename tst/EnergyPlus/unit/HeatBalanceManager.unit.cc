@@ -114,7 +114,7 @@ namespace EnergyPlus {
 		);
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
-		auto numZones = InputProcessor::GetNumObjectsFound( "Zone" );
+		auto numZones = inputProcessor->getNumObjectsFound( "Zone" );
 		ZoneReOrder.allocate( numZones );
 		GetZoneData( ErrorsFound );
 		GetAirFlowFlag( ErrorsFound );

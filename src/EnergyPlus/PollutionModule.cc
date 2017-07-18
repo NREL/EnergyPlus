@@ -241,12 +241,12 @@ namespace PollutionModule {
 
 		//First determine if the Pollution reporting has been triggered, and is not exit.
 		cCurrentModuleObject = "Output:EnvironmentalImpactFactors";
-		NumPolluteRpt = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumPolluteRpt = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		PollutionReportSetup = true;
 
 		for ( Loop = 1; Loop <= NumPolluteRpt; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			//Call this routine in the Output Processor to setup the correct Facility energy meters that are
 			//  necessary to make sure that the Meter file is opened and written to by the OP so that time stamps
@@ -289,10 +289,10 @@ namespace PollutionModule {
 		GetInputFlagPollution = false;
 
 		cCurrentModuleObject = "EnvironmentalImpactFactors";
-		NumEnvImpactFactors = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumEnvImpactFactors = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumEnvImpactFactors > 0 ) {
 			// Now find and load all of the user inputs and factors.
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 		} else {
 			if ( PollutionReportSetup ) ShowWarningError( cCurrentModuleObject + ": not entered.  Values will be defaulted." );
 		}
@@ -328,11 +328,11 @@ namespace PollutionModule {
 
 		//Compare all of the Fuel Factors and compare to PollutionCalculationFactors List
 		cCurrentModuleObject = "FuelFactors";
-		NumFuelFactors = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumFuelFactors = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( Loop = 1; Loop <= NumFuelFactors; ++Loop ) {
 			// Now find and load all of the user inputs and factors.
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FuelType.FuelTypeNames( Loop ) = cAlphaArgs( 1 );
 

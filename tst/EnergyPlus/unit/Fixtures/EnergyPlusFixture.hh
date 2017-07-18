@@ -222,7 +222,7 @@ namespace EnergyPlus {
 
 		// This function processes an idf snippet and defaults to using the idd cache for the fixture.
 		// The cache should be used for nearly all calls to this function.
-		// This more or less replicates InputProcessor::ProcessInput() but in a more usable fashion for unit testing
+		// This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return false if no errors found and true if errors found

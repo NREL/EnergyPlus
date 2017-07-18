@@ -1849,7 +1849,7 @@ namespace ThermalComfort {
 		int WhichAFList; // Used in validating AngleFactorList
 
 		cCurrentModuleObject = "ComfortViewFactorAngles";
-		NumOfAngleFactorLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfAngleFactorLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		AngleFactorList.allocate( NumOfAngleFactorLists );
 		for ( auto & e : AngleFactorList ) {
 			e.Name.clear();
@@ -1861,7 +1861,7 @@ namespace ThermalComfort {
 
 			AllAngleFacSummed = 0.0;
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			AngleFactorList( Item ).Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
 			AngleFactorList( Item ).ZoneName = cAlphaArgs( 2 );

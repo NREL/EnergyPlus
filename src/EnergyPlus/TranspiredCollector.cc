@@ -314,7 +314,7 @@ namespace TranspiredCollector {
 		std::string CurrentModuleMultiObject; // for ease in renaming.
 
 		CurrentModuleObject = "SolarCollector:UnglazedTranspired";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
 
 		if ( MaxNumNumbers != 11 ) {
 			ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleObject + " Object Definition indicates not = 11 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
@@ -324,23 +324,23 @@ namespace TranspiredCollector {
 		Numbers = 0.0;
 		Alphas = "";
 
-		NumUTSC = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumUTSC = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		CurrentModuleMultiObject = "SolarCollector:UnglazedTranspired:Multisystem";
-		NumUTSCSplitter = InputProcessor::GetNumObjectsFound( CurrentModuleMultiObject );
+		NumUTSCSplitter = inputProcessor->getNumObjectsFound( CurrentModuleMultiObject );
 
 		UTSC.allocate( NumUTSC );
 		CheckEquipName.dimension( NumUTSC, true );
 		SplitterNameOK.dimension( NumUTSCSplitter, false );
 
 		for ( Item = 1; Item <= NumUTSC; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// first handle alphas
 			UTSC( Item ).Name = Alphas( 1 );
 
 			// now check for multisystem
 			if ( NumUTSCSplitter > 0 ) {
-				InputProcessor::GetObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
+				inputProcessor->getObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
 
 				if ( MaxNumNumbersSplit != 0 ) {
 					ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbersSplit ) );
@@ -350,7 +350,7 @@ namespace TranspiredCollector {
 				NumbersSplit = 0.0;
 				AlphasSplit = "";
 				for ( ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit ) {
-					InputProcessor::GetObjectItem( CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit );
+					inputProcessor->getObjectItem( CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit );
 					if ( ! ( UtilityRoutines::SameString( AlphasSplit( 1 ), Alphas( 1 ) ) ) ) continue;
 					SplitterNameOK( ItemSplit ) = true;
 					UTSC( Item ).NumOASysAttached = std::floor( NumAlphasSplit / 4.0 );

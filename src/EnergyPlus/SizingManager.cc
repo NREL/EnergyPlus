@@ -792,8 +792,8 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:OutdoorAir";
-		NumOARequirements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumOARequirements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -808,7 +808,7 @@ namespace SizingManager {
 			//Start Loading the System Input
 			for ( OAIndex = 1; OAIndex <= NumOARequirements; ++OAIndex ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				OARequirements( OAIndex ).Name = Alphas( 1 );
@@ -1012,8 +1012,8 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
-		NumZoneAirDistribution = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumZoneAirDistribution = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -1028,7 +1028,7 @@ namespace SizingManager {
 			//Start Loading the zone air distribution input
 			for ( ZADIndex = 1; ZADIndex <= NumZoneAirDistribution; ++ZADIndex ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, ZADIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, ZADIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				ZoneAirDistribution( ZADIndex ).Name = Alphas( 1 );
@@ -1134,10 +1134,10 @@ namespace SizingManager {
 		int Temp;
 
 		cCurrentModuleObject = "Sizing:Parameters";
-		NumSizParams = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSizParams = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSizParams == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( lNumericFieldBlanks( 1 ) || rNumericArgs( 1 ) < 0.0 ) {
 				GlobalHeatSizingFactor = 1.0;
 			} else {
@@ -1166,13 +1166,13 @@ namespace SizingManager {
 		}
 
 		cCurrentModuleObject = "OutputControl:Sizing:Style";
-		Temp = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		Temp = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( Temp == 0 ) {
 			cAlphaArgs( 1 ) = "Comma";
 			SizingFileColSep = CharComma; //comma
 		} else if ( Temp == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( cAlphaArgs( 1 ) == "COMMA" ) {
 				SizingFileColSep = CharComma; //comma
 				cAlphaArgs( 1 ) = "Comma";
@@ -1259,7 +1259,7 @@ namespace SizingManager {
 		Array1D< GlobalMiscObject > SizingZoneObjects;
 
 		cCurrentModuleObject = "Sizing:Zone";
-		NumSizingZoneStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSizingZoneStatements = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		SizingZoneObjects.allocate( NumSizingZoneStatements );
 
 		if ( NumSizingZoneStatements > 0 ) {
@@ -1271,7 +1271,7 @@ namespace SizingManager {
 		NumZoneSizingInput = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumSizingZoneStatements; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SizingZoneObjects( Item ).Name = cAlphaArgs( 1 );
@@ -1305,7 +1305,7 @@ namespace SizingManager {
 		}
 
 		if ( NumZoneSizingInput > 0 ) {
-			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && ( DoZoneSizing || DoSystemSizing || DoPlantSizing ) ) {
 				ShowSevereError( "Zone Sizing calculations need SizingPeriod:* input. None found." );
 				ErrorsFound = true;
@@ -1315,7 +1315,7 @@ namespace SizingManager {
 			ZoneSizIndex = 0;
 			for ( Item = 1; Item <= NumSizingZoneStatements; ++Item ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= SizingZoneObjects( Item ).NumOfZones; ++Item1 ) {
 					++ZoneSizIndex;
@@ -1804,11 +1804,11 @@ namespace SizingManager {
 
 		InErrFlag = ErrorsFound;
 		cCurrentModuleObject = "Zone";
-		NumZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		ZoneNames.allocate( NumZones );
 
 		for ( Item = 1; Item <= NumZones; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// validation, but no error
 			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), ZoneNames, Item - 1 );
 			if ( Found == 0 ) {
@@ -1819,11 +1819,11 @@ namespace SizingManager {
 		}
 
 		cCurrentModuleObject = "ZoneList";
-		NumZoneLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumZoneLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		ZoneListNames.allocate( NumZoneLists );
 
 		for ( Item = 1; Item <= NumZoneLists; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// validation, but no error
 			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), ZoneListNames, Item - 1 );
 			if ( Found == 0 ) {
@@ -1910,12 +1910,12 @@ namespace SizingManager {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int NumDesDays; // Number of design days in input
 
-		NumAirLoops = InputProcessor::GetNumObjectsFound( "AirLoopHVAC" );
+		NumAirLoops = inputProcessor->getNumObjectsFound( "AirLoopHVAC" );
 		cCurrentModuleObject = "Sizing:System";
-		NumSysSizInput = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSysSizInput = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSysSizInput > 0 ) {
-			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && ( DoSystemSizing || DoPlantSizing ) ) {
 				ShowSevereError( "System Sizing calculations need SizingPeriod:* input. None found." );
 				ErrorsFound = true;
@@ -1924,7 +1924,7 @@ namespace SizingManager {
 		}
 
 		for ( SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SysSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SysSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( iNameAlphaNum ), cCurrentModuleObject, ErrorsFound);
 
 			SysSizInput( SysSizIndex ).AirPriLoopName = cAlphaArgs( iNameAlphaNum );
@@ -2338,10 +2338,10 @@ namespace SizingManager {
 		int NumDesDays; // Number of design days in input
 
 		cCurrentModuleObject = "Sizing:Plant";
-		NumPltSizInput = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumPltSizInput = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumPltSizInput > 0 ) {
-			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && DoPlantSizing ) {
 				ShowSevereError( "Plant Sizing calculations need SizingPeriod:* input" );
 				ErrorsFound = true;
@@ -2361,7 +2361,7 @@ namespace SizingManager {
 		}
 
 		for ( PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PltSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PltSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			PlantSizData( PltSizIndex ).PlantLoopName = cAlphaArgs( 1 );
@@ -2748,8 +2748,8 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
-		NumZoneHVACSizing = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumZoneHVACSizing = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -2771,7 +2771,7 @@ namespace SizingManager {
 				lAlphaBlanks = true;
 				lNumericBlanks = true;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, zSIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, zSIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				ZoneHVACSizing( zSIndex ).Name = Alphas( 1 );

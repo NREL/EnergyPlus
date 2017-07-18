@@ -348,41 +348,41 @@ namespace Fans {
 		// Flow
 		MaxAlphas = 0;
 		MaxNumbers = 0;
-		NumSimpFan = InputProcessor::GetNumObjectsFound( "Fan:ConstantVolume" );
+		NumSimpFan = inputProcessor->getNumObjectsFound( "Fan:ConstantVolume" );
 		if ( NumSimpFan > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "Fan:ConstantVolume", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "Fan:ConstantVolume", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		NumVarVolFan = InputProcessor::GetNumObjectsFound( "Fan:VariableVolume" );
+		NumVarVolFan = inputProcessor->getNumObjectsFound( "Fan:VariableVolume" );
 		if ( NumVarVolFan > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "Fan:VariableVolume", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "Fan:VariableVolume", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		NumOnOff = InputProcessor::GetNumObjectsFound( "Fan:OnOff" );
+		NumOnOff = inputProcessor->getNumObjectsFound( "Fan:OnOff" );
 		if ( NumOnOff > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "Fan:OnOff", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "Fan:OnOff", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		NumZoneExhFan = InputProcessor::GetNumObjectsFound( "Fan:ZoneExhaust" );
+		NumZoneExhFan = inputProcessor->getNumObjectsFound( "Fan:ZoneExhaust" );
 		if ( NumZoneExhFan > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "Fan:ZoneExhaust", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "Fan:ZoneExhaust", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		NumNightVentPerf = InputProcessor::GetNumObjectsFound( "FanPerformance:NightVentilation" );
+		NumNightVentPerf = inputProcessor->getNumObjectsFound( "FanPerformance:NightVentilation" );
 		if ( NumNightVentPerf > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
 		// cpw22Aug2010 Added get max alphas and numbers for ComponentModel fan
-		NumCompModelFan = InputProcessor::GetNumObjectsFound( "Fan:ComponentModel" );
+		NumCompModelFan = inputProcessor->getNumObjectsFound( "Fan:ComponentModel" );
 		if ( NumCompModelFan > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "Fan:ComponentModel", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "Fan:ComponentModel", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
@@ -405,7 +405,7 @@ namespace Fans {
 		for ( SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum ) {
 			FanNum = SimpFanNum;
 			cCurrentModuleObject = "Fan:ConstantVolume";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SimpFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SimpFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -453,7 +453,7 @@ namespace Fans {
 		for ( VarVolFanNum = 1; VarVolFanNum <= NumVarVolFan; ++VarVolFanNum ) {
 			FanNum = NumSimpFan + VarVolFanNum;
 			cCurrentModuleObject = "Fan:VariableVolume";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, VarVolFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, VarVolFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -520,7 +520,7 @@ namespace Fans {
 		for ( ExhFanNum = 1; ExhFanNum <= NumZoneExhFan; ++ExhFanNum ) {
 			FanNum = NumSimpFan + NumVarVolFan + ExhFanNum;
 			cCurrentModuleObject = "Fan:ZoneExhaust";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ExhFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ExhFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -634,7 +634,7 @@ namespace Fans {
 		for ( OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum ) {
 			FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
 			cCurrentModuleObject = "Fan:OnOff";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, OnOffFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, OnOffFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";
@@ -693,7 +693,7 @@ namespace Fans {
 		} // end Number of Simple  ON-OFF FAN Loop
 
 		cCurrentModuleObject = "FanPerformance:NightVentilation";
-		NumNightVentPerf = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumNightVentPerf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumNightVentPerf > 0 ) {
 			NightVentPerf.allocate( NumNightVentPerf );
@@ -709,7 +709,7 @@ namespace Fans {
 		}
 		// input the night ventilation performance objects
 		for ( NVPerfNum = 1; NVPerfNum <= NumNightVentPerf; ++NVPerfNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			NightVentPerf( NVPerfNum ).FanName = cAlphaArgs( 1 );
 			NightVentPerf( NVPerfNum ).FanEff = rNumericArgs( 1 );
@@ -738,7 +738,7 @@ namespace Fans {
 			FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + CompModelFanNum;
 
 			cCurrentModuleObject = "Fan:ComponentModel";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, CompModelFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, CompModelFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
 			FanNumericFields( FanNum ).FieldNames = "";

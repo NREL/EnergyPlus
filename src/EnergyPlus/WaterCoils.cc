@@ -391,9 +391,9 @@ namespace WaterCoils {
 		static int j1( 0 );
 
 		// Flow
-		NumSimpHeat = InputProcessor::GetNumObjectsFound( "Coil:Heating:Water" );
-		NumFlatFin = InputProcessor::GetNumObjectsFound( "Coil:Cooling:Water:DetailedGeometry" );
-		NumCooling = InputProcessor::GetNumObjectsFound( "Coil:Cooling:Water" );
+		NumSimpHeat = inputProcessor->getNumObjectsFound( "Coil:Heating:Water" );
+		NumFlatFin = inputProcessor->getNumObjectsFound( "Coil:Cooling:Water:DetailedGeometry" );
+		NumCooling = inputProcessor->getNumObjectsFound( "Coil:Cooling:Water" );
 		NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
 		if ( NumWaterCoils > 0 ) {
@@ -404,13 +404,13 @@ namespace WaterCoils {
 			CheckEquipName.dimension( NumWaterCoils, true );
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -427,7 +427,7 @@ namespace WaterCoils {
 
 			CoilNum = SimpHeatNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, SimpHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, SimpHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
@@ -527,7 +527,7 @@ namespace WaterCoils {
 
 			CoilNum = NumSimpHeat + FlatFinNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, FlatFinNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, FlatFinNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
@@ -636,7 +636,7 @@ namespace WaterCoils {
 
 			CoilNum = NumSimpHeat + NumFlatFin + CoolingNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CoolingNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CoolingNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";

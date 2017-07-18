@@ -201,7 +201,7 @@ namespace EnergyPlus {
 	{
 		std::string const routineName = "ElectricPowerServiceManager  getPowerManagerInput ";
 
-		numLoadCenters_ = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Distribution" );
+		numLoadCenters_ = inputProcessor->getNumObjectsFound( "ElectricLoadCenter:Distribution" );
 
 		if ( numLoadCenters_ > 0 ){
 			for ( auto iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum ){
@@ -210,34 +210,34 @@ namespace EnergyPlus {
 			}
 		} else {
 			// issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
-			int numGenLists   = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Generators" );
+			int numGenLists   = inputProcessor->getNumObjectsFound( "ElectricLoadCenter:Generators" );
 			if ( numGenLists > 0 ) {
 				ShowWarningError( "ElectricLoadCenter:Generators input object requires an ElectricLoadCenterDistribution input object." );
 			}
-			int numInverters  = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:Simple" );
-				numInverters += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:FunctionOfPower" );
-				numInverters += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:LookUpTable" );
+			int numInverters  = inputProcessor->getNumObjectsFound( "ElectricLoadCenter:Inverter:Simple" );
+				numInverters += inputProcessor->getNumObjectsFound( "ElectricLoadCenter:Inverter:FunctionOfPower" );
+				numInverters += inputProcessor->getNumObjectsFound( "ElectricLoadCenter:Inverter:LookUpTable" );
 			if ( numInverters > 0 ) {
 				ShowWarningError( "ElectricLoadCenter:Inverter:* input objects require an ElectricLoadCenter:Distribution input object." );
 			}
-			int numStorage    = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Storage:Simple" );
-				numStorage   += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Storage:Battery" );
+			int numStorage    = inputProcessor->getNumObjectsFound( "ElectricLoadCenter:Storage:Simple" );
+				numStorage   += inputProcessor->getNumObjectsFound( "ElectricLoadCenter:Storage:Battery" );
 			if ( numStorage > 0 ) {
 				ShowWarningError( "ElectricLoadCenter:Storage:* input objects require an ElectricLoadCenter:Distribution input object." );
 			}
-			int numGenerators  = InputProcessor::GetNumObjectsFound( "Generator:InternalCombustionEngine" );
-				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:CombustionTurbine" );
-				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:MicroCHP" );
-				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:FuelCell" );
-				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:Photovoltaic" );
-				numGenerators += InputProcessor::GetNumObjectsFound( "Generator:WindTurbine" );
+			int numGenerators  = inputProcessor->getNumObjectsFound( "Generator:InternalCombustionEngine" );
+				numGenerators += inputProcessor->getNumObjectsFound( "Generator:CombustionTurbine" );
+				numGenerators += inputProcessor->getNumObjectsFound( "Generator:MicroCHP" );
+				numGenerators += inputProcessor->getNumObjectsFound( "Generator:FuelCell" );
+				numGenerators += inputProcessor->getNumObjectsFound( "Generator:Photovoltaic" );
+				numGenerators += inputProcessor->getNumObjectsFound( "Generator:WindTurbine" );
 			if ( numGenerators > 0 ) {
 				ShowWarningError( "Electric generator input objects require and ElectricLoadCenter:Distribution input object." );
 			}
 				// if user input did not include an Electric Load center, create a simple default one here for reporting purposes
 			//   but only if there are any other electricity components set up (yet) for metering
 			int anyElectricityPresent = GetMeterIndex( "ELECTRICITY:FACILITY" );
-			int anyPlantLoadProfilePresent = InputProcessor::GetNumObjectsFound( "LoadProfile:Plant" );
+			int anyPlantLoadProfilePresent = inputProcessor->getNumObjectsFound( "LoadProfile:Plant" );
 			if ( anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0 ) {
 				elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 0 ) );
 				numLoadCenters_ = 1;
@@ -245,7 +245,7 @@ namespace EnergyPlus {
 		}
 
 		// see if there are any transformers of the type powerInFromGrid
-		numTransformers_ = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Transformer" );
+		numTransformers_ = inputProcessor->getNumObjectsFound( "ElectricLoadCenter:Transformer" );
 
 		if ( numTransformers_ > 0 ) {
 			int numAlphas; // Number of elements in the alpha array
@@ -256,7 +256,7 @@ namespace EnergyPlus {
 
 			DataIPShortCuts::cCurrentModuleObject =  "ElectricLoadCenter:Transformer";
 			for ( auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, loopTransformer, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, loopTransformer, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 				if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
 					if ( ! foundInFromGridTransformer ) {
@@ -616,7 +616,7 @@ namespace EnergyPlus {
 		DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Distribution";
 		errorsFound = false;
 		if ( objectNum > 0 ) {
-			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, objectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, objectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
@@ -625,7 +625,7 @@ namespace EnergyPlus {
 				generatorListName_ = DataIPShortCuts::cAlphaArgs( 2 );
 				// check that
 
-				int testIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Generators", generatorListName_ );
+				int testIndex = inputProcessor->getObjectItemNum( "ElectricLoadCenter:Generators", generatorListName_ );
 				if ( testIndex == 0 ) {
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 2 ) + " = " + DataIPShortCuts::cAlphaArgs( 2 ) );
@@ -850,9 +850,9 @@ namespace EnergyPlus {
 
 		// now that we are done with processing get input for ElectricLoadCenter:Distribution we can call child input objects without IP shortcut problems
 		DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Generators";
-		int genListObjectNum = InputProcessor::GetObjectItemNum( DataIPShortCuts::cCurrentModuleObject, generatorListName_ );
+		int genListObjectNum = inputProcessor->getObjectItemNum( DataIPShortCuts::cCurrentModuleObject, generatorListName_ );
 		if ( genListObjectNum > 0 ){
-			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, genListObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, genListObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			//Calculate the number of generators in list
 			numGenerators = numNums / 2; // note IDD needs Min Fields = 6
@@ -891,10 +891,10 @@ namespace EnergyPlus {
 		if ( ! errorsFound && transformerPresent_ ) {
 
 			DataIPShortCuts::cCurrentModuleObject =  "ElectricLoadCenter:Transformer";
-			int transformerItemNum = InputProcessor::GetObjectItemNum( DataIPShortCuts::cCurrentModuleObject, transformerName_ );
+			int transformerItemNum = inputProcessor->getObjectItemNum( DataIPShortCuts::cCurrentModuleObject, transformerName_ );
 			int iOStat;
 			if ( transformerItemNum > 0 ) {
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerItemNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerItemNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 				if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) { // this is the right kind of transformer
 					transformerObj = std::unique_ptr< ElectricTransformer >( new ElectricTransformer (transformerName_ ) );
 				} else {
@@ -2117,21 +2117,21 @@ namespace EnergyPlus {
 		int testInvertIndex = 0;
 		int invertIDFObjectNum = 0;
 
-		testInvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:LookUpTable",  objectName );
+		testInvertIndex = inputProcessor->getObjectItemNum( "ElectricLoadCenter:Inverter:LookUpTable",  objectName );
 		if ( testInvertIndex > 0) {
 			foundInverter = true;
 			invertIDFObjectNum = testInvertIndex;
 			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:LookUpTable";
 			modelType_ = InverterModelType::cECLookUpTableModel;
 		}
-		testInvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:FunctionOfPower",  objectName );
+		testInvertIndex = inputProcessor->getObjectItemNum( "ElectricLoadCenter:Inverter:FunctionOfPower",  objectName );
 		if ( testInvertIndex > 0) {
 			foundInverter = true;
 			invertIDFObjectNum = testInvertIndex;
 			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:FunctionOfPower";
 			modelType_ = InverterModelType::curveFuncOfPower;
 		}
-		testInvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:Simple",  objectName );
+		testInvertIndex = inputProcessor->getObjectItemNum( "ElectricLoadCenter:Inverter:Simple",  objectName );
 		if ( testInvertIndex > 0) {
 			foundInverter = true;
 			invertIDFObjectNum = testInvertIndex;
@@ -2141,7 +2141,7 @@ namespace EnergyPlus {
 
 		if ( foundInverter ){
 
-			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, invertIDFObjectNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, invertIDFObjectNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
@@ -2448,12 +2448,12 @@ namespace EnergyPlus {
 		bool errorsFound = false;
 		// if/when add object class name to input object this can be simplified. for now search all possible types
 
-		int testConvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Storage:Converter",  objectName );
+		int testConvertIndex = inputProcessor->getObjectItemNum( "ElectricLoadCenter:Storage:Converter",  objectName );
 
 		if ( testConvertIndex > 0 ) {
 			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
 
-			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, testConvertIndex, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, testConvertIndex, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// need a new general approach for verify names are unique across objects,  next gen GlobalNames
@@ -2735,7 +2735,7 @@ namespace EnergyPlus {
 		int testStorageIndex = 0;
 		int storageIDFObjectNum = 0;
 
-		testStorageIndex = InputProcessor::GetObjectItemNum("ElectricLoadCenter:Storage:Simple", objectName );
+		testStorageIndex = inputProcessor->getObjectItemNum("ElectricLoadCenter:Storage:Simple", objectName );
 		if ( testStorageIndex > 0 ) {
 			foundStorage = true;
 			storageIDFObjectNum = testStorageIndex;
@@ -2743,7 +2743,7 @@ namespace EnergyPlus {
 			storageModelMode_ = StorageModelType::simpleBucketStorage;
 		}
 
-		testStorageIndex = InputProcessor::GetObjectItemNum("ElectricLoadCenter:Storage:Battery", objectName );
+		testStorageIndex = inputProcessor->getObjectItemNum("ElectricLoadCenter:Storage:Battery", objectName );
 		if ( testStorageIndex > 0 ) {
 			foundStorage = true;
 			storageIDFObjectNum = testStorageIndex;
@@ -2752,7 +2752,7 @@ namespace EnergyPlus {
 		}
 
 		if ( foundStorage ) {
-			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, storageIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, storageIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
 			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
@@ -3693,9 +3693,9 @@ namespace EnergyPlus {
 		int transformerIDFObjectNum = 0;
 		DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Transformer";
 
-		transformerIDFObjectNum = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Transformer",  objectName );
+		transformerIDFObjectNum = inputProcessor->getObjectItemNum( "ElectricLoadCenter:Transformer",  objectName );
 		if ( transformerIDFObjectNum > 0 ) {
-			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 			name_  = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
 			if ( DataIPShortCuts::lAlphaFieldBlanks( 2 ) ) {

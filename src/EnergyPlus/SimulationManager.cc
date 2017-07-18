@@ -334,7 +334,7 @@ namespace SimulationManager {
 		DoOutputReporting = false;
 		DisplayPerfSimulationFlag = false;
 		DoWeatherInitReporting = false;
-		RunPeriodsInInput = ( InputProcessor::GetNumObjectsFound( "RunPeriod" ) > 0 || InputProcessor::GetNumObjectsFound( "RunPeriod:CustomRange" ) > 0 || FullAnnualRun );
+		RunPeriodsInInput = ( inputProcessor->getNumObjectsFound( "RunPeriod" ) > 0 || inputProcessor->getNumObjectsFound( "RunPeriod:CustomRange" ) > 0 || FullAnnualRun );
 		AskForConnectionsReport = false; // set to false until sizing is finished
 
 		OpenOutputFiles();
@@ -713,9 +713,9 @@ namespace SimulationManager {
 		ErrorsFound = false;
 
 		CurrentModuleObject = "Version";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			std::string::size_type const lenVer( len( MatchVersion ) );
 			if ( ( lenVer > 0 ) && ( MatchVersion[ lenVer - 1 ] == '0' ) ) {
 				Which = static_cast< int >( index( Alphas( 1 ).substr( 0, lenVer - 2 ), MatchVersion.substr( 0, lenVer - 2 ) ) );
@@ -735,10 +735,10 @@ namespace SimulationManager {
 
 		// Do Mini Gets on HB Algorithm and by-surface overrides
 		CurrentModuleObject = "HeatBalanceAlgorithm";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		CondFDAlgo = false;
 		if ( Num > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( Alphas( 1 ) );
 			if ( ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) || ( SELECT_CASE_var == "CONDFD" ) || ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED" ) || ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCESIMPLIFIED" ) ) {
 				CondFDAlgo = true;
@@ -746,10 +746,10 @@ namespace SimulationManager {
 			}}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( Alphas( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -759,10 +759,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( Alphas( 3 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -771,10 +771,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -783,10 +783,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -796,9 +796,9 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "Timestep";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			NumOfTimeStepInHour = Number( 1 );
 			if ( NumOfTimeStepInHour <= 0 || NumOfTimeStepInHour > 60 ) {
 				Alphas( 1 ) = RoundSigDigits( NumOfTimeStepInHour );
@@ -819,16 +819,16 @@ namespace SimulationManager {
 				ShowContinueError( "..." + CurrentModuleObject + " is set to 20." );
 				NumOfTimeStepInHour = 20;
 			}
-			if ( NumOfTimeStepInHour < 4 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 ) {
+			if ( NumOfTimeStepInHour < 4 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 ) {
 				ShowWarningError( CurrentModuleObject + ": Requested number (" + RoundSigDigits( NumOfTimeStepInHour ) + ") is less than the suggested minimum of 4." );
 				ShowContinueError( "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations." );
 			}
-		} else if ( Num == 0 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 && ! CondFDAlgo ) {
+		} else if ( Num == 0 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 && ! CondFDAlgo ) {
 			ShowWarningError( "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4." );
 			NumOfTimeStepInHour = 4;
 		} else if ( Num == 0 && ! CondFDAlgo ) {
 			NumOfTimeStepInHour = 4;
-		} else if ( Num == 0 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 && CondFDAlgo ) {
+		} else if ( Num == 0 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 && CondFDAlgo ) {
 			ShowWarningError( "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20." );
 			ShowContinueError( "...Due to presence of Conduction Finite Difference Algorithm selection." );
 			NumOfTimeStepInHour = 20;
@@ -844,9 +844,9 @@ namespace SimulationManager {
 		TimeStepZoneSec = TimeStepZone * SecInHour;
 
 		CurrentModuleObject = "ConvergenceLimits";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			MinInt = int( Number( 1 ) );
 			if ( MinInt > MinutesPerTimeStep ) {
 				MinInt = MinutesPerTimeStep;
@@ -885,9 +885,9 @@ namespace SimulationManager {
 		DebugOutput = false;
 		EvenDuringWarmup = false;
 		CurrentModuleObject = "Output:DebuggingData";
-		NumDebugOut = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDebugOut = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDebugOut > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			if ( int( Number( 1 ) ) == 1 ) {
 				DebugOutput = true;
 			}
@@ -897,9 +897,9 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "Output:Diagnostics";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( Num1 = 1; Num1 <= Num; ++Num1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			for ( NumA = 1; NumA <= NumAlpha; ++NumA ) {
 				if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayExtraWarnings" ) ) {
 					DisplayExtraWarnings = true;
@@ -957,9 +957,9 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "OutputControl:ReportingTolerances";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( ! lNumericFieldBlanks( 1 ) ) {
 				deviationFromSetPtThresholdHtg = -Number( 1 );
 			} else {
@@ -980,10 +980,10 @@ namespace SimulationManager {
 		DoHVACSizingSimulation = false;
 		HVACSizingSimMaxIterations = 0;
 		CurrentModuleObject = "SimulationControl";
-		NumRunControl = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumRunControl = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumRunControl > 0 ) {
 			RunControlInInput = true;
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( Alphas( 1 ) == "YES" ) DoZoneSizing = true;
 			if ( Alphas( 2 ) == "YES" ) DoSystemSizing = true;
 			if ( Alphas( 3 ) == "YES" ) DoPlantSizing = true;
@@ -1108,11 +1108,11 @@ namespace SimulationManager {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-		NumZoneSizing = InputProcessor::GetNumObjectsFound( "Sizing:Zone" );
-		NumSystemSizing = InputProcessor::GetNumObjectsFound( "Sizing:System" );
-		NumPlantSizing = InputProcessor::GetNumObjectsFound( "Sizing:Plant" );
-		NumDesignDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" );
-		NumRunPeriodDesign = InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+		NumZoneSizing = inputProcessor->getNumObjectsFound( "Sizing:Zone" );
+		NumSystemSizing = inputProcessor->getNumObjectsFound( "Sizing:System" );
+		NumPlantSizing = inputProcessor->getNumObjectsFound( "Sizing:Plant" );
+		NumDesignDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" );
+		NumRunPeriodDesign = inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); WeatherFileAttached = flags.exists(); }
 
@@ -1200,10 +1200,10 @@ namespace SimulationManager {
 		bool ReportingRequested;
 
 		ReportingRequested = false;
-		SimPeriods = ( InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) > 0 || InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) > 0 || InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" ) > 0 || InputProcessor::GetNumObjectsFound( "RunPeriod" ) > 0 );
+		SimPeriods = ( inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) > 0 || inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) > 0 || inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" ) > 0 || inputProcessor->getNumObjectsFound( "RunPeriod" ) > 0 );
 
 		if ( ( DoDesDaySim || DoWeathSim ) && SimPeriods ) {
-			ReportingRequested = ( InputProcessor::GetNumObjectsFound( "Output:Table:SummaryReports" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Table:TimeBins" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Table:Monthly" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Variable" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:MeterFileOnly" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:Cumulative" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:Cumulative:MeterFileOnly" ) > 0 );
+			ReportingRequested = ( inputProcessor->getNumObjectsFound( "Output:Table:SummaryReports" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Table:TimeBins" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Table:Monthly" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Variable" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:MeterFileOnly" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:Cumulative" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:Cumulative:MeterFileOnly" ) > 0 );
 			// Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
 			if ( ! ReportingRequested ) {
 				ShowWarningError( "No reporting elements have been requested. No simulation results produced." );
@@ -2309,7 +2309,7 @@ namespace SimulationManager {
 
 		DoingInputProcessing = false;
 
-		InputProcessor::PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
+		inputProcessor->preProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
 		if ( PreP_Fatal ) {
 			ShowFatalError( "Preprocessor condition(s) cause termination." );
@@ -2320,7 +2320,7 @@ namespace SimulationManager {
 		FluidIndex_EthyleneGlycol = FindGlycol( "EthyleneGlycol" );
 		FluidIndex_PropoleneGlycol = FindGlycol( "PropoleneGlycol" );
 
-		InputProcessor::PreScanReportingVariables();
+		inputProcessor->preScanReportingVariables();
 
 	}
 

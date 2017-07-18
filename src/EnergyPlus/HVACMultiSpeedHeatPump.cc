@@ -592,7 +592,7 @@ namespace HVACMultiSpeedHeatPump {
 
 		CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed"; // Object type for getting and error messages
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -603,7 +603,7 @@ namespace HVACMultiSpeedHeatPump {
 		lAlphaBlanks.dimension( MaxAlphas, true );
 		lNumericBlanks.dimension( MaxNums, true );
 
-		NumMSHeatPumps = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumMSHeatPumps = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumMSHeatPumps <= 0 ) {
 			ShowSevereError( "No " + CurrentModuleObject + " objects specified in input file." );
@@ -626,7 +626,7 @@ namespace HVACMultiSpeedHeatPump {
 			SuppHeatCoilInletNode = 0;
 			SuppHeatCoilOutletNode = 0;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, MSHPNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, MSHPNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			MSHeatPump( MSHPNum ).Name = Alphas( 1 );
@@ -777,7 +777,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( UtilityRoutines::SameString( Alphas( 10 ), "Coil:Heating:DX:MultiSpeed" ) ) {
 				MSHeatPump( MSHPNum ).HeatCoilType = MultiSpeedHeatingCoil;
-				MSHeatPump( MSHPNum ).HeatCoilNum = InputProcessor::GetObjectItemNum( "Coil:Heating:DX:MultiSpeed", Alphas( 11 ) );
+				MSHeatPump( MSHPNum ).HeatCoilNum = inputProcessor->getObjectItemNum( "Coil:Heating:DX:MultiSpeed", Alphas( 11 ) );
 				MSHeatPump( MSHPNum ).DXHeatCoilName = Alphas( 11 );
 				if ( MSHeatPump( MSHPNum ).HeatCoilNum <= 0 ) {
 					ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
@@ -813,7 +813,7 @@ namespace HVACMultiSpeedHeatPump {
 
 				if ( UtilityRoutines::SameString( Alphas( 10 ), "Coil:Heating:Electric:MultiStage" ) ) {
 					MSHeatPump( MSHPNum ).HeatCoilType = Coil_HeatingElectric_MultiStage;
-					MSHeatPump( MSHPNum ).HeatCoilNum = InputProcessor::GetObjectItemNum( "Coil:Heating:Electric:MultiStage", Alphas( 11 ) );
+					MSHeatPump( MSHPNum ).HeatCoilNum = inputProcessor->getObjectItemNum( "Coil:Heating:Electric:MultiStage", Alphas( 11 ) );
 					if ( MSHeatPump( MSHPNum ).HeatCoilNum <= 0 ) {
 						ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 						ShowContinueError( cAlphaFields( 11 ) + " \"" + Alphas( 11 ) + "\" not found." );
@@ -823,7 +823,7 @@ namespace HVACMultiSpeedHeatPump {
 					}
 				} else {
 					MSHeatPump( MSHPNum ).HeatCoilType = Coil_HeatingGas_MultiStage;
-					MSHeatPump( MSHPNum ).HeatCoilNum = InputProcessor::GetObjectItemNum( "Coil:Heating:Gas:MultiStage", Alphas( 11 ) );
+					MSHeatPump( MSHPNum ).HeatCoilNum = inputProcessor->getObjectItemNum( "Coil:Heating:Gas:MultiStage", Alphas( 11 ) );
 					if ( MSHeatPump( MSHPNum ).HeatCoilNum <= 0 ) {
 						ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 						ShowContinueError( cAlphaFields( 11 ) + " \"" + Alphas( 11 ) + "\" not found." );
@@ -970,7 +970,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( UtilityRoutines::SameString( Alphas( 12 ), "Coil:Cooling:DX:MultiSpeed" ) ) {
 				MSHeatPump( MSHPNum ).CoolCoilType = MultiSpeedCoolingCoil;
-				MSHeatPump( MSHPNum ).CoolCoilNum = InputProcessor::GetObjectItemNum( "Coil:Cooling:DX:MultiSpeed", Alphas( 13 ) );
+				MSHeatPump( MSHPNum ).CoolCoilNum = inputProcessor->getObjectItemNum( "Coil:Cooling:DX:MultiSpeed", Alphas( 13 ) );
 				MSHeatPump( MSHPNum ).DXCoolCoilName = Alphas( 13 );
 				if ( MSHeatPump( MSHPNum ).CoolCoilNum <= 0 ) {
 					ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );

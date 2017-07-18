@@ -396,10 +396,10 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Tariff";
-		numTariff = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numTariff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		tariff.allocate( numTariff );
 		for ( iInObj = 1; iInObj <= numTariff; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				//  args are always turned to upper case but this is okay...
@@ -669,10 +669,10 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Qualify";
-		numQualify = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numQualify = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		qualify.allocate( numQualify );
 		for ( iInObj = 1; iInObj <= numQualify; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -740,10 +740,10 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Charge:Simple";
-		numChargeSimple = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numChargeSimple = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		chargeSimple.allocate( numChargeSimple );
 		for ( iInObj = 1; iInObj <= numChargeSimple; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -803,10 +803,10 @@ namespace EconomicTariff {
 
 		CurrentModuleObject = "UtilityCost:Charge:Block";
 		hugeNumber = huge( hugeNumber );
-		numChargeBlock = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numChargeBlock = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		chargeBlock.allocate( numChargeBlock );
 		for ( iInObj = 1; iInObj <= numChargeBlock; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -887,10 +887,10 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Ratchet";
-		numRatchet = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numRatchet = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ratchet.allocate( numRatchet );
 		for ( iInObj = 1; iInObj <= numRatchet; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -944,9 +944,9 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Variable";
-		numEconVarObj = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numEconVarObj = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( iInObj = 1; iInObj <= numEconVarObj; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -1010,7 +1010,7 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Computation";
-		numComputation = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numComputation = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		computation.allocate( numTariff ); //not the number of Computations but the number of tariffs
 		//set default values for computation
 		for ( auto & e : computation ) {
@@ -1020,7 +1020,7 @@ namespace EconomicTariff {
 			e.isUserDef = false;
 		}
 		for ( iInObj = 1; iInObj <= numComputation; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -1082,12 +1082,12 @@ namespace EconomicTariff {
 		int i;
 
 		initializeMonetaryUnit();
-		NumCurrencyType = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCurrencyType = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		selectedMonetaryUnit = 0; // invalid
 		if ( NumCurrencyType == 0 ) {
 			selectedMonetaryUnit = 1; //USD - U.S. Dollar
 		} else if ( NumCurrencyType == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Monetary Unit
 			for ( i = 1; i <= numMonetaryUnit; ++i ) {
 				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), monetaryUnit( i ).code ) ) {

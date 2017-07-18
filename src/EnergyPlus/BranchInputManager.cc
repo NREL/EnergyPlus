@@ -962,7 +962,7 @@ namespace BranchInputManager {
 			MixerName = Mixers( Count ).Name;
 			IsMixer = true;
 			// The number of "components" on a Mixer is the number of branches.  This is the number of alpha arguments -1.
-			InputProcessor::GetObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
 			BComponents.allocate( NumAlphas - 1 );
 			errFlag = false;
 			GetInternalBranchData( LoopName, Mixers( Count ).OutletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
@@ -1113,7 +1113,7 @@ namespace BranchInputManager {
 			SplitterName = Splitters( Count ).Name;
 			IsSplitter = true;
 			// The number of "components" on a Splitter is the number of branches.  This is the number of alpha arguments -1.
-			InputProcessor::GetObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "Branch", NumParams, NumAlphas, NumNumbers );
 			BComponents.allocate( NumAlphas - 1 );
 			errFlag = false;
 			GetInternalBranchData( LoopName, Splitters( Count ).InletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag );
@@ -1368,14 +1368,14 @@ namespace BranchInputManager {
 
 		if ( GetBranchInputOneTimeFlag ) {
 			CurrentModuleObject = "Branch";
-			NumOfBranches = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+			NumOfBranches = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 			if ( NumOfBranches > 0 ) {
 				Branch.allocate( NumOfBranches );
 				for ( auto & e : Branch ) e.AssignedLoopName.clear();
 				ErrFound = false;
-				InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+				inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 				NodeNums.dimension( NumParams, 0 );
-				InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+				inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 				Alphas.allocate( NumAlphas );
 				Numbers.dimension( NumNumbers, 0.0 );
 				cAlphaFields.allocate( NumAlphas );
@@ -1384,7 +1384,7 @@ namespace BranchInputManager {
 				lNumericBlanks.dimension( NumNumbers, true );
 				BCount = 0;
 				for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
-					InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+					inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					if ( UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrFound ) ) continue;
 					++BCount;
 					GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
@@ -1599,13 +1599,13 @@ namespace BranchInputManager {
 
 		ErrFound = false;
 		CurrentModuleObject = "BranchList";
-		NumOfBranchLists = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfBranchLists = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		BranchList.allocate( NumOfBranchLists );
 		for ( auto & e : BranchList ) {
 			e.LoopName.clear();
 			e.LoopType.clear();
 		}
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
@@ -1620,7 +1620,7 @@ namespace BranchInputManager {
 		BCount = 0;
 		for ( Count = 1; Count <= NumOfBranchLists; ++Count ) {
 			CurrentModuleObject = "BranchList";
-			InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			if ( UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrFound ) ) continue;
 
 			++BCount;
@@ -1758,9 +1758,9 @@ namespace BranchInputManager {
 		if ( ! GetConnectorListInputFlag ) return;
 		ErrorsFound = false;
 		CurrentModuleObject = "ConnectorList";
-		NumOfConnectorLists = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfConnectorLists = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ConnectorLists.allocate( NumOfConnectorLists );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		if ( NumAlphas != 5 || NumNumbers != 0 ) {
 			ShowWarningError( "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject + " object. Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)" );
 		}
@@ -1771,7 +1771,7 @@ namespace BranchInputManager {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 		for ( Count = 1; Count <= NumOfConnectorLists; ++Count ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			ConnectorLists( Count ).Name = Alphas( 1 );
 			NumConnectors = ( NumAlphas - 1 ) / 2; // potential problem if puts in type but not name
 			if ( mod( NumAlphas - 1, 2 ) != 0 ) ++NumConnectors;
@@ -2000,9 +2000,9 @@ namespace BranchInputManager {
 
 		if ( ! GetSplitterInputFlag ) return;
 		CurrentModuleObject = cSPLITTER;
-		NumSplitters = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumSplitters = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		Splitters.allocate( NumSplitters );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
@@ -2010,7 +2010,7 @@ namespace BranchInputManager {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 		for ( Count = 1; Count <= NumSplitters; ++Count ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			Splitters( Count ).Name = Alphas( 1 );
 			Splitters( Count ).InletBranchName = Alphas( 2 );
 			Splitters( Count ).NumOutletBranches = NumAlphas - 2;
@@ -2235,9 +2235,9 @@ namespace BranchInputManager {
 
 		CurrentModuleObject = cMIXER;
 
-		NumMixers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumMixers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		Mixers.allocate( NumMixers );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
@@ -2245,7 +2245,7 @@ namespace BranchInputManager {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 		for ( Count = 1; Count <= NumMixers; ++Count ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			Mixers( Count ).Name = Alphas( 1 );
 			Mixers( Count ).OutletBranchName = Alphas( 2 );
 			Mixers( Count ).NumInletBranches = NumAlphas - 2;
@@ -2441,13 +2441,13 @@ namespace BranchInputManager {
 		// Get Inputs
 		CurrentModuleObject = "PlantLoop";
 
-		NumPlantLoops = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+		NumPlantLoops = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		Numbers.allocate( NumNumbers );
 
 		for ( Num = 1; Num <= NumPlantLoops; ++Num ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
 			// Only looking for BranchList here.
 			if ( Alphas( 8 ) == BranchListName ) {
 				FoundPlantLoopName = Alphas( 1 );
@@ -2525,13 +2525,13 @@ namespace BranchInputManager {
 		// Get Inputs
 		CurrentModuleObject = "CondenserLoop";
 
-		NumCondLoops = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+		NumCondLoops = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		Numbers.allocate( NumNumbers );
 
 		for ( Num = 1; Num <= NumCondLoops; ++Num ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
 			// Only looking for BranchList here.
 			if ( Alphas( 8 ) == BranchListName ) {
 				FoundCondLoopName = Alphas( 1 );
@@ -2608,13 +2608,13 @@ namespace BranchInputManager {
 
 		// Get Inputs
 		CurrentModuleObject = "AirLoopHVAC";
-		NumAirLoops = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+		NumAirLoops = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		Numbers.allocate( NumNumbers );
 
 		for ( Num = 1; Num <= NumAirLoops; ++Num ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat );
 			// Only looking for BranchList here.
 			if ( Alphas( 4 ) == BranchListName ) {
 				FoundAirLoopName = Alphas( 1 );

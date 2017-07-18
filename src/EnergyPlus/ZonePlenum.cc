@@ -345,10 +345,10 @@ namespace ZonePlenum {
 		std::string InducedNodeListName;
 
 		// Flow
-		InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums );
 		MaxNums = NumNums;
 		MaxAlphas = NumAlphas;
-		InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:SupplyPlenum", NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:SupplyPlenum", NumArgs, NumAlphas, NumNums );
 		MaxNums = max( NumNums, MaxNums );
 		MaxAlphas = max( NumAlphas, MaxAlphas );
 		AlphArray.allocate( MaxAlphas );
@@ -357,13 +357,13 @@ namespace ZonePlenum {
 		NumArray.dimension( MaxNums, 0.0 );
 		lAlphaBlanks.dimension( MaxAlphas, true );
 		lNumericBlanks.dimension( MaxNums, true );
-		InputProcessor::GetObjectDefMaxArgs( "NodeList", NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumArgs, NumAlphas, NumNums );
 		NodeNums.dimension( NumArgs, 0 );
 
 		InducedNodeListName = "";
 
-		NumZoneReturnPlenums = InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" );
-		NumZoneSupplyPlenums = InputProcessor::GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" );
+		NumZoneReturnPlenums = inputProcessor->getNumObjectsFound( "AirLoopHVAC:ReturnPlenum" );
+		NumZoneSupplyPlenums = inputProcessor->getNumObjectsFound( "AirLoopHVAC:SupplyPlenum" );
 		NumZonePlenums = NumZoneReturnPlenums + NumZoneSupplyPlenums;
 
 		if ( NumZoneReturnPlenums > 0 ) ZoneRetPlenCond.allocate( NumZoneReturnPlenums );
@@ -379,7 +379,7 @@ namespace ZonePlenum {
 
 			CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
@@ -503,7 +503,7 @@ namespace ZonePlenum {
 
 			CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 

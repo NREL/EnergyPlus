@@ -799,12 +799,12 @@ namespace OutputProcessor {
 		}
 
 		cCurrentModuleObject = "Output:Variable";
-		NumOfReqVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfReqVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		ReqRepVars.allocate( NumOfReqVariables );
 
 		for ( Loop = 1; Loop <= NumOfReqVariables; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Check for duplicates?
 
@@ -1515,19 +1515,19 @@ namespace OutputProcessor {
 		BigErrorsFound = false;
 
 		cCurrentModuleObject = "Meter:Custom";
-		NumCustomMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumCustomMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
         //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
 		std::unordered_set< std::string > namesOfMeterCustom;
 		namesOfMeterCustom.reserve( NumCustomMeters );
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			namesOfMeterCustom.emplace( UtilityRoutines::MakeUPPERCase( cAlphaArgs( 1 ) ) );
 		}
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
@@ -1685,10 +1685,10 @@ namespace OutputProcessor {
 		}
 
 		cCurrentModuleObject = "Meter:CustomDecrement";
-		NumCustomDecMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumCustomDecMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( Loop = 1; Loop <= NumCustomDecMeters; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
@@ -5935,11 +5935,11 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter";
-	NumReqMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+	NumReqMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
-		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 		varnameLen = index( Alphas( 1 ), '[' );
 		if ( varnameLen != std::string::npos ) Alphas( 1 ).erase( varnameLen );
@@ -5977,10 +5977,10 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:MeterFileOnly";
-	NumReqMeterFOs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+	NumReqMeterFOs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 	for ( Loop = 1; Loop <= NumReqMeterFOs; ++Loop ) {
 
-		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 		varnameLen = index( Alphas( 1 ), '[' );
 		if ( varnameLen != std::string::npos ) Alphas( 1 ).erase( varnameLen );
@@ -6018,11 +6018,11 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:Cumulative";
-	NumReqMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+	NumReqMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
-		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 		varnameLen = index( Alphas( 1 ), '[' );
 		if ( varnameLen != std::string::npos ) Alphas( 1 ).erase( varnameLen );
@@ -6060,10 +6060,10 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:Cumulative:MeterFileOnly";
-	NumReqMeterFOs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+	NumReqMeterFOs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 	for ( Loop = 1; Loop <= NumReqMeterFOs; ++Loop ) {
 
-		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 		varnameLen = index( Alphas( 1 ), '[' );
 		if ( varnameLen != std::string::npos ) Alphas( 1 ).erase( varnameLen );

@@ -122,14 +122,14 @@ namespace HybridModel {
 
 		// Read hybrid model input
 		CurrentModuleObject = "HybridModel:Zone";
-		NumOfHybridModelZones = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfHybridModelZones = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		HybridModelZone.allocate( NumOfZones );
 
 		if ( NumOfHybridModelZones > 0 ) {
 
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				ZoneListPtr = 0;
 				ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );

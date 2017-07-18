@@ -579,7 +579,7 @@ namespace HVACControllers {
 		// be retrieved by name as they are needed.
 
 		CurrentModuleObject = "Controller:WaterCoil";
-		NumSimpleControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumSimpleControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumControllers = NumSimpleControllers;
 
 		// Allocate stats data structure for each air loop and controller if needed
@@ -602,7 +602,7 @@ namespace HVACControllers {
 		RootFinders.allocate( NumControllers );
 		CheckEquipName.dimension( NumControllers, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNums );
@@ -613,7 +613,7 @@ namespace HVACControllers {
 		// Now find and load all of the simple controllers.
 		if ( NumSimpleControllers > 0 ) {
 			for ( Num = 1; Num <= NumSimpleControllers; ++Num ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 				ControllerProps( Num ).ControllerName = AlphArray( 1 );

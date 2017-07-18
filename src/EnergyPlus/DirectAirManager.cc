@@ -251,7 +251,7 @@ namespace DirectAirManager {
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:Uncontrolled";
 
-		NumDirectAir = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumDirectAir = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumDirectAir > 0 ) {
 
@@ -260,7 +260,7 @@ namespace DirectAirManager {
 
 			for ( DirectAirNum = 1; DirectAirNum <= NumDirectAir; ++DirectAirNum ) {
 				DirectAir( DirectAirNum ).cObjectName = cCurrentModuleObject; // push Object Name into data array
-				InputProcessor::GetObjectItem( cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				DirectAir( DirectAirNum ).EquipID = cAlphaArgs( 1 );
 				DirectAir( DirectAirNum ).Schedule = cAlphaArgs( 2 );

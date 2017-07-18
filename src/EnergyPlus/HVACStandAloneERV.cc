@@ -329,10 +329,10 @@ namespace HVACStandAloneERV {
 		int ZoneInletCZN; // used for warning when zone node not listed in equipment connections
 		int ZoneExhaustCZN; // used for warning when zone node not listed in equipment connections
 
-		InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:EnergyRecoveryVentilator", NumArg, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:EnergyRecoveryVentilator", NumArg, NumAlphas, NumNumbers );
 		MaxAlphas = NumAlphas;
 		MaxNumbers = NumNumbers;
-		InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:EnergyRecoveryVentilator:Controller", NumArg, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:EnergyRecoveryVentilator:Controller", NumArg, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -348,7 +348,7 @@ namespace HVACStandAloneERV {
 		// find the number of each type of Stand Alone ERV unit
 		CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator";
 
-		NumStandAloneERVs = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumStandAloneERVs = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		// allocate the data structures
 		StandAloneERV.allocate( NumStandAloneERVs );
@@ -361,7 +361,7 @@ namespace HVACStandAloneERV {
 		// loop over Stand Alone ERV units; get and load the input data
 		for ( StandAloneERVIndex = 1; StandAloneERVIndex <= NumStandAloneERVs; ++StandAloneERVIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, StandAloneERVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, StandAloneERVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			StandAloneERVNum = StandAloneERVIndex; // separate variables in case other objects read by this module at some point later
 			UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound );
 			StandAloneERV( StandAloneERVNum ).Name = Alphas( 1 );
@@ -555,7 +555,7 @@ namespace HVACStandAloneERV {
 					StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 				}
 
-				if ( InputProcessor::GetObjectItemNum( "ZoneHVAC:EnergyRecoveryVentilator:Controller", StandAloneERV( StandAloneERVNum ).ControllerName ) <= 0 ) {
+				if ( inputProcessor->getObjectItemNum( "ZoneHVAC:EnergyRecoveryVentilator:Controller", StandAloneERV( StandAloneERVNum ).ControllerName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " controller type ZoneHVAC:EnergyRecoveryVentilator:Controller not found = " + Alphas( 6 ) );
 					ErrorsFound = true;
 					StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
@@ -669,18 +669,18 @@ namespace HVACStandAloneERV {
 			SetUpCompSets( StandAloneERV( StandAloneERVNum ).UnitType, StandAloneERV( StandAloneERVNum ).Name, "UNDEFINED", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, CompSetExhaustFanInlet, CompSetExhaustFanOutlet );
 
 			// Verify HX name in Stand Alone ERV object matches name of valid HX object
-			if ( InputProcessor::GetObjectItemNum( "HeatExchanger:AirToAir:SensibleAndLatent", StandAloneERV( StandAloneERVNum ).HeatExchangerName ) <= 0 ) {
+			if ( inputProcessor->getObjectItemNum( "HeatExchanger:AirToAir:SensibleAndLatent", StandAloneERV( StandAloneERVNum ).HeatExchangerName ) <= 0 ) {
 				ShowSevereError( CurrentModuleObject + " heat exchanger type HeatExchanger:AirToAir:SensibleAndLatent not found = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
 				ErrorsFound = true;
 			}
 			// Verify supply air fan name in Stand Alone ERV object matches name of valid fan object
 			if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				if ( InputProcessor::GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
+				if ( inputProcessor->getObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " supply fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
 					ErrorsFound = true;
 				}
 			} else {
-				if ( InputProcessor::GetObjectItemNum( "Fan:SystemModel", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
+				if ( inputProcessor->getObjectItemNum( "Fan:SystemModel", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " supply fan type Fan:SystemModel not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
 					ErrorsFound = true;
 				}
@@ -688,12 +688,12 @@ namespace HVACStandAloneERV {
 
 			// Verify exhaust air fan name in Stand Alone ERV object matches name of valid fan object
 			if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				if ( InputProcessor::GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
+				if ( inputProcessor->getObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " exhaust fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
 					ErrorsFound = true;
 				}
 			} else {
-				if ( InputProcessor::GetObjectItemNum( "Fan:SystemModel", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
+				if ( inputProcessor->getObjectItemNum( "Fan:SystemModel", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " exhaust fan type Fan:SystemModel not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
 					ErrorsFound = true;
 				}
@@ -703,10 +703,10 @@ namespace HVACStandAloneERV {
 
 		int OutAirNum = 0;
 		CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator:Controller";
-		NumERVCtrlrs = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumERVCtrlrs = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		for ( ERVControllerNum = 1; ERVControllerNum <= NumERVCtrlrs; ++ERVControllerNum ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, ERVControllerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, ERVControllerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			MixedAir::CheckOAControllerName( Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++OutAirNum;
 			auto & thisOAController( OAController( OutAirNum ) );

@@ -857,7 +857,7 @@ ValidateComponent(
 
 	IsNotOK = false;
 
-	ItemNum = InputProcessor::GetObjectItemNum( CompType, CompName );
+	ItemNum = inputProcessor->getObjectItemNum( CompType, CompName );
 
 	if ( ItemNum < 0 ) {
 		ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
@@ -905,7 +905,7 @@ ValidateComponent(
 
 		IsNotOK = false;
 
-		ItemNum = InputProcessor::GetObjectItemNum( CompType, CompValType, CompName );
+		ItemNum = inputProcessor->getObjectItemNum( CompType, CompValType, CompName );
 
 		if ( ItemNum < 0 ) {
 			ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
@@ -1628,12 +1628,12 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	}
 
 	if ( NumSplitters == 0 ) {
-		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ZoneSplitter" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ZoneSplitter" ) > 0 ) {
 			GetZoneSplitterInput();
 		}
 	}
 	if ( NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0 ) {
-		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:SupplyPlenum" ) > 0 ) {
 			GetZonePlenumInput();
 		}
 	}
@@ -1989,12 +1989,12 @@ TestReturnAirPathIntegrity(
 	AllNodes.deallocate();
 
 	if ( NumMixers == 0 ) {
-		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
 			GetZoneMixerInput();
 		}
 	}
 	if ( NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0 ) {
-		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ReturnPlenum" ) > 0 ) {
 			GetZonePlenumInput();
 		}
 	}

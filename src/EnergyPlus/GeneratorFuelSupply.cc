@@ -160,7 +160,7 @@ namespace GeneratorFuelSupply {
 
 		if ( MyOneTimeFlag ) {
 			cCurrentModuleObject = "Generator:FuelSupply";
-			NumGeneratorFuelSups = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumGeneratorFuelSups = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumGeneratorFuelSups <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -170,7 +170,7 @@ namespace GeneratorFuelSupply {
 			FuelSupply.allocate( NumGeneratorFuelSups );
 
 			for ( FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				FuelSupply( FuelSupNum ).Name = AlphArray( 1 );

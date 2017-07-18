@@ -189,7 +189,7 @@ namespace ReturnAirPathManager {
 			return;
 		}
 		cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
-		NumReturnAirPaths = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumReturnAirPaths = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumReturnAirPaths > 0 ) {
 
@@ -197,7 +197,7 @@ namespace ReturnAirPathManager {
 
 			for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				inputProcessor->getObjectItem( cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				ReturnAirPath( PathNum ).Name = cAlphaArgs( 1 );

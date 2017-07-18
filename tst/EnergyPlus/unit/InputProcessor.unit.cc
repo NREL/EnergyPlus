@@ -521,7 +521,7 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		json::parse(jdf.dump(2), InputProcessor::callback);
+		json::parse(jdf.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -703,7 +703,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		json::parse(jdf.dump(2), InputProcessor::callback);
+		json::parse(jdf.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -1143,7 +1143,7 @@ namespace EnergyPlus {
 				}));
 		ASSERT_TRUE( process_idf( idf ) );
 		json & jdf = getJDF();
-		json::parse(jdf.dump(2), InputProcessor::callback);
+		json::parse(jdf.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 2ul);
@@ -1218,7 +1218,7 @@ namespace EnergyPlus {
 
 		};
 
-		json::parse(root.dump(2), InputProcessor::callback);
+		json::parse(root.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 2ul);
@@ -1297,7 +1297,7 @@ namespace EnergyPlus {
 			}
 		};
 
-		json::parse(root.dump(2), InputProcessor::callback);
+		json::parse(root.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 4ul);
@@ -1375,7 +1375,7 @@ namespace EnergyPlus {
 				}
 			},
 		};
-		json::parse(root.dump(2), InputProcessor::callback);
+		json::parse(root.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 5ul);
@@ -1697,14 +1697,14 @@ namespace EnergyPlus {
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		std::string const CurrentModuleObject = "Output:SQLite";
 
-		int NumSQLite = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int NumSQLite = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, NumSQLite );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -1714,7 +1714,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "option_type" } ), cAlphaFields ) );
@@ -1748,14 +1748,14 @@ namespace EnergyPlus {
 		ASSERT_TRUE( process_idf ( idf_objects ) );
 		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
-		int NumGasSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int NumGasSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, NumGasSteamHums );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
 		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
@@ -1763,7 +1763,7 @@ namespace EnergyPlus {
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
-		InputProcessor::GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "name", "availability_schedule_name", "thermal_efficiency_modifier_curve_name", "air_inlet_node_name", "air_outlet_node_name", "water_storage_tank_name", "inlet_water_temperature_option" } ), cAlphaFields ) );
@@ -1800,14 +1800,14 @@ namespace EnergyPlus {
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		std::string const CurrentModuleObject = "BuildingSurface:Detailed";
 
-		int numBuildingSurfaceDetailed = InputProcessor::GetNumObjectsFound(CurrentModuleObject);
+		int numBuildingSurfaceDetailed = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 		ASSERT_EQ(1, numBuildingSurfaceDetailed);
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+		inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 		int IOStatus = 0;
 		Array1D_string Alphas(NumAlphas);
 		Array1D<Real64> Numbers(NumNumbers, 0.0);
@@ -1815,7 +1815,7 @@ namespace EnergyPlus {
 		Array1D_bool lAlphaBlanks(NumAlphas, true);
 		Array1D_string cAlphaFields(NumAlphas);
 		Array1D_string cNumericFields(NumNumbers);
-		InputProcessor::GetObjectItem(CurrentModuleObject, numBuildingSurfaceDetailed, Alphas, NumAlphas, Numbers, NumNumbers,
+		inputProcessor->getObjectItem(CurrentModuleObject, numBuildingSurfaceDetailed, Alphas, NumAlphas, Numbers, NumNumbers,
 									  IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
 		EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" }), Alphas));
@@ -1850,14 +1850,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
 
-		int num_curve_biquadratic_objects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, num_curve_biquadratic_objects );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -1867,7 +1867,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 
 		EXPECT_EQ( 7, NumAlphas );
@@ -1907,14 +1907,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
 
-		int num_curve_biquadratic_objects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, num_curve_biquadratic_objects );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -1924,7 +1924,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 
 		EXPECT_EQ( 7, NumAlphas );
@@ -1970,14 +1970,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-		int num_curve_biquadratic_objects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, num_curve_biquadratic_objects );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -1987,7 +1987,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 
 		EXPECT_EQ( 4, NumAlphas );
@@ -2030,14 +2030,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-		int num_curve_biquadratic_objects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, num_curve_biquadratic_objects );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2047,7 +2047,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 
 		EXPECT_EQ( 1, NumAlphas );
@@ -2105,14 +2105,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Sizing:System";
 
-		int NumSizingSystem = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int NumSizingSystem = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, NumSizingSystem );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2122,7 +2122,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, NumSizingSystem, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, NumSizingSystem, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 11, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "WEST ZONE AIR SYSTEM", "SENSIBLE", "NONCOINCIDENT", "YES", "NO", "DESIGNDAY",
@@ -2169,14 +2169,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
-		int NumGasSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int NumGasSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, NumGasSteamHums );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2186,7 +2186,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 7, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "FIXEDINLETWATERTEMPERATURE" } ), Alphas ) );
@@ -2216,14 +2216,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
-		int NumGasSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int NumGasSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, NumGasSteamHums );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2233,7 +2233,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 2, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "", "", "", "", "" } ), Alphas ) );
@@ -2296,14 +2296,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
 
-		int num_unitary_systems = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_unitary_systems = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_unitary_systems );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2313,7 +2313,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_unitary_systems, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_unitary_systems, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 22, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "GASHEAT DXAC FURNACE 1", "LOAD", "EAST ZONE", "NONE", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "ZONE 2 INLET NODE",
@@ -2350,14 +2350,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-		int num_eq_connections = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_eq_connections = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_eq_connections );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2367,7 +2367,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_eq_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_eq_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 6, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "401", "Z401 TERMINAL LIST", "Z401 ZONE INLET", "",
@@ -2399,14 +2399,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Zone";
 
-		int num_zones = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_zones = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_zones );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2416,7 +2416,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 1, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "EAST ZONE", "", "", ""} ), Alphas ) );
@@ -2451,14 +2451,14 @@ namespace EnergyPlus {
 
 		std::string CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-		int num_equipment_connections = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_equipment_connections = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_equipment_connections );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2468,7 +2468,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_equipment_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_equipment_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 6, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "EAST ZONE", "ZONE2EQUIPMENT", "ZONE 2 INLET NODE", "ZONE EXHAUST NODE",
@@ -2481,14 +2481,14 @@ namespace EnergyPlus {
 
 		CurrentModuleObject = "ZoneHVAC:EquipmentList";
 
-		int num_equipment_lists = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_equipment_lists = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_equipment_lists );
 
 		int TotalArgs2 = 0;
 		int NumAlphas2 = 0;
 		int NumNumbers2 = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
 
 		Array1D_string Alphas2( NumAlphas2 );
 		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
@@ -2497,7 +2497,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields2( NumAlphas2 );
 		Array1D_string cNumericFields2( NumNumbers2 );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_equipment_lists, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_equipment_lists, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 		EXPECT_EQ( 3, NumAlphas2 );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZONE2EQUIPMENT", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1" } ), Alphas2 ) );
@@ -2543,14 +2543,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Coil:Heating:Fuel";
 
-		int num_coil_heating_gas = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_coil_heating_gas = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 2,  num_coil_heating_gas );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2560,7 +2560,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 7, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NAME NUMBER ONE", "SCHEDULE_NAME1", "GAS", "THIS_IS_AN_AIR_INLET_NAME", "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME" } ), Alphas ) );
@@ -2574,7 +2574,7 @@ namespace EnergyPlus {
 		int NumAlphas2 = 0;
 		int NumNumbers2 = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
 
 		Array1D_string Alphas2( NumAlphas2 );
 		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
@@ -2583,7 +2583,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields2( NumAlphas2 );
 		Array1D_string cNumericFields2( NumNumbers2 );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 		EXPECT_EQ( 7, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "THE SECOND NAME", "SCHEDULE_NAME2", "GAS", "THIS_IS_AN_AIR_INLET_NAME2", "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2" } ), Alphas2 ) );
@@ -2621,14 +2621,14 @@ namespace EnergyPlus {
 
 		std::string CurrentModuleObject = "ScheduleTypeLimits";
 
-		int num_schedule_type_limits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_schedule_type_limits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_schedule_type_limits );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2638,7 +2638,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_schedule_type_limits, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_schedule_type_limits, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 1, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ANY NUMBER", "", "" } ), Alphas ) );
@@ -2651,14 +2651,14 @@ namespace EnergyPlus {
 
 		CurrentModuleObject = "Schedule:Compact";
 
-		int num_schedule_compact = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_schedule_compact = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 2,  num_schedule_compact );
 
 		TotalArgs = 0;
 		NumAlphas = 0;
 		NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Array1D_string Alphas2( NumAlphas );
 		Array1D< Real64 > Numbers2( NumNumbers, 0.0 );
@@ -2667,7 +2667,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields2( NumAlphas );
 		Array1D_string cNumericFields2( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 		// Container size is 4500 here!
 		EXPECT_EQ( 6, NumAlphas );
@@ -2701,14 +2701,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Fan:OnOff";
 
-		int num_fans = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_fans = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_fans );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2718,7 +2718,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 4, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SUPPLY FAN 1", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "DX COOLING COIL AIR INLET NODE",
@@ -2763,14 +2763,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Curve:Quadratic";
 
-		int num_curve_quad = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_quad = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 3,  num_curve_quad );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2780,7 +2780,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 1, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFFF", "", "" } ), Alphas ) );
@@ -2794,7 +2794,7 @@ namespace EnergyPlus {
 		int NumAlphas2 = 0;
 		int NumNumbers2 = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
 
 		Array1D_string Alphas2( NumAlphas2 );
 		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
@@ -2803,7 +2803,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields2( NumAlphas2 );
 		Array1D_string cNumericFields2( NumNumbers2 );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 		EXPECT_EQ( 1, NumAlphas2 );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFFF", "", "" } ), Alphas2 ) );
@@ -2817,7 +2817,7 @@ namespace EnergyPlus {
 		int NumAlphas3 = 0;
 		int NumNumbers3 = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs3, NumAlphas3, NumNumbers3 );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs3, NumAlphas3, NumNumbers3 );
 
 		Array1D_string Alphas3( NumAlphas3 );
 		Array1D< Real64 > Numbers3( NumNumbers3, 0.0 );
@@ -2826,7 +2826,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields3( NumAlphas3 );
 		Array1D_string cNumericFields3( NumNumbers3 );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3, cAlphaFields3, cNumericFields3 );
+		inputProcessor->getObjectItem( CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3, cAlphaFields3, cNumericFields3 );
 
 		EXPECT_EQ( 1, NumAlphas3 );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "PLFFPLR", "", "" } ), Alphas3 ) );
@@ -2968,14 +2968,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed";
 
-		int num_coils = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_coils = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_coils );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -2985,7 +2985,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 49, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FURNACE ACDXCOIL 1", "DX COOLING COIL AIR INLET NODE", "HEATING COIL AIR INLET NODE", "PLFFPLR", "",
@@ -3070,14 +3070,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-		int num_curve_biquad = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_biquad = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 2,  num_curve_biquad );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -3087,7 +3087,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 4, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFT", "TEMPERATURE", "TEMPERATURE",
@@ -3106,7 +3106,7 @@ namespace EnergyPlus {
 		int NumAlphas2 = 0;
 		int NumNumbers2 = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
 
 		Array1D_string Alphas2( NumAlphas2 );
 		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
@@ -3115,7 +3115,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields2( NumAlphas2 );
 		Array1D_string cNumericFields2( NumNumbers2 );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 		EXPECT_EQ( 4, NumAlphas2 );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFT", "TEMPERATURE", "TEMPERATURE",
@@ -3158,14 +3158,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-		int num_curve_biquad = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_biquad = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1,  num_curve_biquad );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -3175,7 +3175,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquad, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquad, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 4, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLCAPFT SPEED 1", "TEMPERATURE", "TEMPERATURE",

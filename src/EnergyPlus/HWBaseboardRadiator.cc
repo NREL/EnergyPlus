@@ -319,7 +319,7 @@ namespace HWBaseboardRadiator {
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool errFlag;
 
-		NumHWBaseboards = InputProcessor::GetNumObjectsFound( cCMO_BBRadiator_Water );
+		NumHWBaseboards = inputProcessor->getNumObjectsFound( cCMO_BBRadiator_Water );
 
 		// Count total number of baseboard units
 
@@ -331,7 +331,7 @@ namespace HWBaseboardRadiator {
 		// Get the data from the user input related to baseboard heaters
 		for ( BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum ) {
 
-			InputProcessor::GetObjectItem( cCMO_BBRadiator_Water, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCMO_BBRadiator_Water, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames.allocate( NumNumbers );
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames = "";

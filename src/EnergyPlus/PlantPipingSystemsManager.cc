@@ -143,7 +143,7 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   May 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-		int numSlabsCheck( InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Slab ) );
+		int numSlabsCheck( inputProcessor->getNumObjectsFound( ObjName_ZoneCoupled_Slab ) );
 		DataGlobals::AnySlabsInModel = ( numSlabsCheck > 0 );
 	}
 
@@ -155,7 +155,7 @@ namespace PlantPipingSystemsManager {
 		//       DATE WRITTEN   May 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-		int const numBasementsCheck( InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Basement ) );
+		int const numBasementsCheck( inputProcessor->getNumObjectsFound( ObjName_ZoneCoupled_Basement ) );
 		DataGlobals::AnyBasementsInModel = ( numBasementsCheck > 0 );
 	}
 
@@ -487,20 +487,20 @@ namespace PlantPipingSystemsManager {
 		std::string ThisSegmentName;
 
 		// Read number of objects and allocate main data structures - first domains
-		NumGeneralizedDomains = InputProcessor::GetNumObjectsFound( ObjName_ug_GeneralDomain );
-		NumHorizontalTrenches = InputProcessor::GetNumObjectsFound( ObjName_HorizTrench );
-		NumZoneCoupledDomains = InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Slab );
-		NumBasements = InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Basement );
+		NumGeneralizedDomains = inputProcessor->getNumObjectsFound( ObjName_ug_GeneralDomain );
+		NumHorizontalTrenches = inputProcessor->getNumObjectsFound( ObjName_HorizTrench );
+		NumZoneCoupledDomains = inputProcessor->getNumObjectsFound( ObjName_ZoneCoupled_Slab );
+		NumBasements = inputProcessor->getNumObjectsFound( ObjName_ZoneCoupled_Basement );
 		TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
 		PipingSystemDomains.allocate( TotalNumDomains );
 
 		// then circuits
-		NumPipeCircuits = InputProcessor::GetNumObjectsFound( ObjName_Circuit );
+		NumPipeCircuits = inputProcessor->getNumObjectsFound( ObjName_Circuit );
 		TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
 		PipingSystemCircuits.allocate( TotalNumCircuits );
 
 		// then segments
-		NumPipeSegmentsInInput = InputProcessor::GetNumObjectsFound( ObjName_Segment );
+		NumPipeSegmentsInInput = inputProcessor->getNumObjectsFound( ObjName_Segment );
 		NumSegmentsInHorizontalTrenches = GetNumSegmentsForHorizontalTrenches( NumHorizontalTrenches );
 		TotalNumSegments = NumPipeSegmentsInInput + NumSegmentsInHorizontalTrenches;
 		PipingSystemSegments.allocate( TotalNumSegments );
@@ -633,7 +633,7 @@ namespace PlantPipingSystemsManager {
 		for ( HorizontalCtr = 1; HorizontalCtr <= NumHorizontalTrenches; ++HorizontalCtr ) {
 
 			// Set up all the inputs for this domain object
-			InputProcessor::GetObjectItem( ObjName_HorizTrench, HorizontalCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( ObjName_HorizTrench, HorizontalCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			NumPipesInThisHorizontal = rNumericArgs( 3 );
 
@@ -682,7 +682,7 @@ namespace PlantPipingSystemsManager {
 		for ( DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum ) {
 
 			// Set up all the inputs for this domain object
-			InputProcessor::GetObjectItem( ObjName_ug_GeneralDomain, DomainNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( ObjName_ug_GeneralDomain, DomainNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			PipingSystemDomains( DomainNum ).Name = cAlphaArgs( 1 );
@@ -957,7 +957,7 @@ namespace PlantPipingSystemsManager {
 				++DomainCtr;
 
 				// Read all the inputs for this domain object
-				InputProcessor::GetObjectItem( ObjName_ZoneCoupled_Slab, ZoneCoupledDomainCtr, cAlphaArgs,
+				inputProcessor->getObjectItem( ObjName_ZoneCoupled_Slab, ZoneCoupledDomainCtr, cAlphaArgs,
 					NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				// Get the name, validate
@@ -1285,7 +1285,7 @@ namespace PlantPipingSystemsManager {
 			++DomainNum;
 
 			// Read all the inputs for this domain object
-			InputProcessor::GetObjectItem( ObjName_ZoneCoupled_Basement, BasementCtr, cAlphaArgs,
+			inputProcessor->getObjectItem( ObjName_ZoneCoupled_Basement, BasementCtr, cAlphaArgs,
 				NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
@@ -1576,7 +1576,7 @@ namespace PlantPipingSystemsManager {
 		for ( PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter ) {
 
 			// Read all the inputs for this pipe circuit
-			InputProcessor::GetObjectItem( ObjName_Circuit, PipeCircuitCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( ObjName_Circuit, PipeCircuitCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			PipingSystemCircuits( PipeCircuitCounter ).Name = cAlphaArgs( 1 );
@@ -1671,7 +1671,7 @@ namespace PlantPipingSystemsManager {
 		for ( SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr ) {
 
 			// Read all inputs for this pipe segment
-			InputProcessor::GetObjectItem( ObjName_Segment, SegmentCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( ObjName_Segment, SegmentCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			PipingSystemSegments( SegmentCtr ).Name = cAlphaArgs( 1 );
@@ -1804,7 +1804,7 @@ namespace PlantPipingSystemsManager {
 			++CircuitCtr;
 
 			// Read all inputs for this pipe segment
-			InputProcessor::GetObjectItem( ObjName_HorizTrench, HorizontalGHXCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( ObjName_HorizTrench, HorizontalGHXCtr, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Get the name, validate
 			HGHX( HorizontalGHXCtr ).ObjName = cAlphaArgs( 1 );

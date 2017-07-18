@@ -293,31 +293,31 @@ namespace ZoneContaminantPredictorCorrector {
 		MaxAlpha = -100;
 		MaxNumber = -100;
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		IHGNumbers.allocate( MaxNumber );
@@ -326,13 +326,13 @@ namespace ZoneContaminantPredictorCorrector {
 		AlphaName = "";
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-		TotGCGenConstant = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenConstant = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericConstant.allocate( TotGCGenConstant );
 
 		for ( Loop = 1; Loop <= TotGCGenConstant; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericConstant( Loop ).Name = AlphaName( 1 );
 
@@ -412,13 +412,13 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-		TotGCGenPDriven = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenPDriven = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericPDriven.allocate( TotGCGenPDriven );
 
 		for ( Loop = 1; Loop <= TotGCGenPDriven; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericPDriven( Loop ).Name = AlphaName( 1 );
 
@@ -496,13 +496,13 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-		TotGCGenCutoff = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenCutoff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericCutoff.allocate( TotGCGenCutoff );
 
 		for ( Loop = 1; Loop <= TotGCGenCutoff; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericCutoff( Loop ).Name = AlphaName( 1 );
 
@@ -565,13 +565,13 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-		TotGCGenDecay = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenDecay = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDecay.allocate( TotGCGenDecay );
 
 		for ( Loop = 1; Loop <= TotGCGenDecay; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDecay( Loop ).Name = AlphaName( 1 );
 
@@ -635,13 +635,13 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-		TotGCBLDiff = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCBLDiff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericBLDiff.allocate( TotGCBLDiff );
 
 		for ( Loop = 1; Loop <= TotGCBLDiff; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericBLDiff( Loop ).Name = AlphaName( 1 );
 
@@ -704,13 +704,13 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-		TotGCDVS = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCDVS = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDVS.allocate( TotGCDVS );
 
 		for ( Loop = 1; Loop <= TotGCDVS; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDVS( Loop ).Name = AlphaName( 1 );
 
@@ -766,13 +766,13 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-		TotGCDRS = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCDRS = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDRS.allocate( TotGCDRS );
 
 		for ( Loop = 1; Loop <= TotGCDRS; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDRS( Loop ).Name = AlphaName( 1 );
 
@@ -903,14 +903,14 @@ namespace ZoneContaminantPredictorCorrector {
 
 		// FLOW:
 		cCurrentModuleObject = "ZoneControl:ContaminantController";
-		NumContControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumContControlledZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumContControlledZones > 0 ) {
 			ContaminantControlledZone.allocate( NumContControlledZones );
 		}
 
 		for ( ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			ContaminantControlledZone( ContControlledZoneNum ).Name = cAlphaArgs( 1 );

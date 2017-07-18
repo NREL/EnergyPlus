@@ -559,7 +559,7 @@ namespace SolarShading {
 		cAlphaArgs( 1 ) = "";
 		cAlphaArgs( 2 ) = "";
 		cCurrentModuleObject = "ShadowCalculation";
-		NumItems = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumItems = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		NumAlphas = 0;
 		NumNumbers = 0;
 		if ( NumItems > 1 ) {
@@ -567,7 +567,7 @@ namespace SolarShading {
 		}
 
 		if ( NumItems != 0 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ShadowingCalcFrequency = rNumericArgs( 1 );
 		}
 

@@ -193,7 +193,7 @@ namespace CostEstimateManager {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 
-		NumLineItems = InputProcessor::GetNumObjectsFound( "ComponentCost:LineItem" );
+		NumLineItems = inputProcessor->getNumObjectsFound( "ComponentCost:LineItem" );
 
 		if ( NumLineItems == 0 ) {
 			DoCostEstimate = false;
@@ -210,7 +210,7 @@ namespace CostEstimateManager {
 		cCurrentModuleObject = "ComponentCost:LineItem";
 
 		for ( Item = 1; Item <= NumLineItems; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			CostLineItem( Item ).LineName = cAlphaArgs( 1 );
 			CostLineItem( Item ).LineType = cAlphaArgs( 2 );
 			CostLineItem( Item ).ParentObjType = cAlphaArgs( 3 );
@@ -236,9 +236,9 @@ namespace CostEstimateManager {
 		//most input error checking to be performed later within Case construct in Calc routine.
 
 		cCurrentModuleObject = "ComponentCost:Adjustments";
-		NumCostAdjust = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumCostAdjust = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumCostAdjust == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			CurntBldg.MiscCostperSqMeter = rNumericArgs( 1 );
 			CurntBldg.DesignFeeFrac = rNumericArgs( 2 );
 			CurntBldg.ContractorFeeFrac = rNumericArgs( 3 );
@@ -253,9 +253,9 @@ namespace CostEstimateManager {
 		}
 
 		cCurrentModuleObject = "ComponentCost:Reference";
-		NumRefAdjust = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumRefAdjust = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumRefAdjust == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			RefrncBldg.LineItemTot = rNumericArgs( 1 );
 			RefrncBldg.MiscCostperSqMeter = rNumericArgs( 2 );
 			RefrncBldg.DesignFeeFrac = rNumericArgs( 3 );

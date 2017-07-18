@@ -284,13 +284,13 @@ namespace PackagedThermalStorageCoil {
 		int ZoneIndexTrial;
 
 		cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage";
-		NumTESCoils = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumTESCoils = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		TESCoil.allocate( NumTESCoils );
 		CheckEquipName.dimension( NumTESCoils, true );
 
 		for ( item = 1; item <= NumTESCoils; ++item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );

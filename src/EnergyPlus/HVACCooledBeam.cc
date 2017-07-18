@@ -272,12 +272,12 @@ namespace HVACCooledBeam {
 
 		// find the number of cooled beam units
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
-		NumCB = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCB = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		// allocate the data structures
 		CoolBeam.allocate( NumCB );
 		CheckEquipName.dimension( NumCB, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		NumAlphas = 7;
 		NumNumbers = 16;
 		TotalArgs = 23;
@@ -292,7 +292,7 @@ namespace HVACCooledBeam {
 		// loop over cooled beam units; get and load the input data
 		for ( CBIndex = 1; CBIndex <= NumCB; ++CBIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CBIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CBIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			CBNum = CBIndex;
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 

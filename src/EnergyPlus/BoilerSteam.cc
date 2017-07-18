@@ -289,7 +289,7 @@ namespace BoilerSteam {
 
 		SteamFluidIndex = 0;
 		cCurrentModuleObject = "Boiler:Steam";
-		NumBoilers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumBoilers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBoilers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -308,7 +308,7 @@ namespace BoilerSteam {
 
 		//LOAD ARRAYS WITH CURVE FIT Boiler DATA
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueBoilerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {

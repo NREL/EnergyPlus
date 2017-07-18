@@ -86,7 +86,7 @@ namespace EnergyPlus {
 
 		static std::string const RoutineName( "GetBranchInput: " );
 		CurrentModuleObject = "Branch";
-		int	NumOfBranches = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int	NumOfBranches = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		int NumParams;
 		int NumAlphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve numbers from IDF
@@ -105,9 +105,9 @@ namespace EnergyPlus {
 			Branch.allocate( NumOfBranches );
 			for ( auto & e : Branch ) e.AssignedLoopName.clear();
 			bool ErrFound = false;
-			InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 			NodeNums.dimension( NumParams, 0 );
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 			Alphas.allocate( NumAlphas );
 			Numbers.dimension( NumNumbers, 0.0 );
 			cAlphaFields.allocate( NumAlphas );
@@ -117,7 +117,7 @@ namespace EnergyPlus {
 			int BCount = 0;
 			for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
 				UtilityRoutines::VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -247,7 +247,7 @@ namespace EnergyPlus {
 
 		static std::string const RoutineName( "GetBranchInput: " );
 		CurrentModuleObject = "Branch";
-		int	NumOfBranches = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int	NumOfBranches = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		int NumParams;
 		int NumAlphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve numbers from IDF
@@ -266,9 +266,9 @@ namespace EnergyPlus {
 			Branch.allocate( NumOfBranches );
 			for ( auto & e : Branch ) e.AssignedLoopName.clear();
 			bool ErrFound = false;
-			InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 			NodeNums.dimension( NumParams, 0 );
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 			Alphas.allocate( NumAlphas );
 			Numbers.dimension( NumNumbers, 0.0 );
 			cAlphaFields.allocate( NumAlphas );
@@ -278,7 +278,7 @@ namespace EnergyPlus {
 			int BCount = 0;
 			for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
 				UtilityRoutines::VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );

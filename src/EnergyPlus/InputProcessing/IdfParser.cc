@@ -160,7 +160,7 @@ namespace EnergyPlus {
 			} else {
 				std::string obj_name = parse_string( idf, index, success );
 
-				auto const converted = InputProcessor::ConvertInsensitiveObjectType( obj_name );
+				auto const converted = inputProcessor->convertInsensitiveObjectType( obj_name );
 				if ( converted.first ) {
 					obj_name = converted.second;
 				} else {

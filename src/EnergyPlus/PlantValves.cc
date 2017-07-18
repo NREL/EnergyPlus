@@ -217,14 +217,14 @@ namespace PlantValves {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "TemperingValve";
-		NumTemperingValves = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumTemperingValves = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		TemperValve.allocate( NumTemperingValves );
 		CheckEquipName.dimension( NumTemperingValves, true );
 
 		for ( Item = 1; Item <= NumTemperingValves; ++Item ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus );
 			//  <process, noting errors>
 			TemperValve( Item ).Name = Alphas( 1 );
 			// Get Plant Inlet Node

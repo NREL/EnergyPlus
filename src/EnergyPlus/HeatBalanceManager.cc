@@ -335,7 +335,7 @@ namespace HeatBalanceManager {
 			//  The surface octree holds live references to surfaces so it must be updated
 			//   if in the future surfaces are altered after this point
 			if ( TotSurfaces >= DaylightingManager::octreeCrossover ) { // Octree can be active
-				if ( InputProcessor::GetNumObjectsFound( "Daylighting:Controls" ) > 0 ) { // Daylighting is active
+				if ( inputProcessor->getNumObjectsFound( "Daylighting:Controls" ) > 0 ) { // Daylighting is active
 					surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
 				}
 			}
@@ -510,9 +510,9 @@ namespace HeatBalanceManager {
 
 		// Needs to account for Pipe:HeatTransfer/indoor, etc constructions.
 		for ( ONum = 1; ONum <= NumConstrObjects; ++ONum ) {
-			NumObjects = InputProcessor::GetNumObjectsFound( ConstrObjects( ONum ) );
+			NumObjects = inputProcessor->getNumObjectsFound( ConstrObjects( ONum ) );
 			for ( Loop = 1; Loop <= NumObjects; ++Loop ) {
-				InputProcessor::GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
+				inputProcessor->getObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
 				if ( ONum == 5 ) {
 					CNum = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), Construct );
 				} else {
@@ -569,21 +569,21 @@ namespace HeatBalanceManager {
 		bool ValidSimulation; // True is other objects appear to make this a valid simulation.
 
 		ValidSimulation = false;
-		if ( InputProcessor::GetNumObjectsFound( "SolarCollector:FlatPlate:Water" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "SolarCollector:FlatPlate:Water" ) > 0 ) {
 			ValidSimulation = true;
-		} else if ( InputProcessor::GetNumObjectsFound( "Generator:Photovoltaic" ) > 0 ) {
+		} else if ( inputProcessor->getNumObjectsFound( "Generator:Photovoltaic" ) > 0 ) {
 			ValidSimulation = true;
-		} else if ( InputProcessor::GetNumObjectsFound( "Generator:InternalCombustionEngine" ) > 0 ) {
+		} else if ( inputProcessor->getNumObjectsFound( "Generator:InternalCombustionEngine" ) > 0 ) {
 			ValidSimulation = true;
-		} else if ( InputProcessor::GetNumObjectsFound( "Generator:CombustionTurbine" ) > 0 ) {
+		} else if ( inputProcessor->getNumObjectsFound( "Generator:CombustionTurbine" ) > 0 ) {
 			ValidSimulation = true;
-		} else if ( InputProcessor::GetNumObjectsFound( "Generator:FuelCell" ) > 0 ) {
+		} else if ( inputProcessor->getNumObjectsFound( "Generator:FuelCell" ) > 0 ) {
 			ValidSimulation = true;
-		} else if ( InputProcessor::GetNumObjectsFound( "Generator:MicroCHP" ) > 0 ) {
+		} else if ( inputProcessor->getNumObjectsFound( "Generator:MicroCHP" ) > 0 ) {
 			ValidSimulation = true;
-		} else if ( InputProcessor::GetNumObjectsFound( "Generator:MicroTurbine" ) > 0 ) {
+		} else if ( inputProcessor->getNumObjectsFound( "Generator:MicroTurbine" ) > 0 ) {
 			ValidSimulation = true;
-		} else if ( InputProcessor::GetNumObjectsFound( "Generator:WindTurbine" ) > 0 ) {
+		} else if ( inputProcessor->getNumObjectsFound( "Generator:WindTurbine" ) > 0 ) {
 			ValidSimulation = true;
 		}
 
@@ -614,15 +614,15 @@ namespace HeatBalanceManager {
 		MaxSolidWinLayers = 7;
 
 		// Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
-		if ( InputProcessor::GetNumObjectsFound( "Construction:ComplexFenestrationState" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "Construction:ComplexFenestrationState" ) > 0 ) {
 			MaxSolidWinLayers = max( MaxSolidWinLayers, 10 );
 		}
 
 		// then process the rest of the relevant constructions
 		std::string constructName( "Construction:WindowEquivalentLayer" );
-		int numConstructions( InputProcessor::GetNumObjectsFound( constructName ) );
+		int numConstructions( inputProcessor->getNumObjectsFound( constructName ) );
 		for ( int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum ) {
-			InputProcessor::GetObjectItem( constructName, constructionNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( constructName, constructionNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			int numLayersInThisConstruct( NumAlpha - 1 );
 			MaxSolidWinLayers = max( MaxSolidWinLayers, numLayersInThisConstruct );
 		}
@@ -703,10 +703,10 @@ namespace HeatBalanceManager {
 		//Assign the values to the building data
 
 		CurrentModuleObject = "Building";
-		NumObjects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumObjects > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Building Name (remove certain characters)
 			BuildingName = AlphaName( 1 );
 			TMP = index( BuildingName, char( 1 ) );
@@ -839,9 +839,9 @@ namespace HeatBalanceManager {
 		// Above should be validated...
 
 		CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
-		NumObjects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumObjects > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 
@@ -882,9 +882,9 @@ namespace HeatBalanceManager {
 
 		//Get only the first (if more were input)
 		CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
-		NumObjects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumObjects > 0 ) {
-			InputProcessor::GetObjectItem( "SurfaceConvectionAlgorithm:Outside", 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( "SurfaceConvectionAlgorithm:Outside", 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 
 			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
@@ -923,9 +923,9 @@ namespace HeatBalanceManager {
 		gio::write( OutputFileInits, Format_723 ) << AlphaName( 1 );
 
 		CurrentModuleObject = "HeatBalanceAlgorithm";
-		NumObjects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumObjects > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 			//The default is CTF = 0.  Then the moisture solution is EMPD =2
 			if ( ( SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION" ) || ( SELECT_CASE_var == "DEFAULT" ) || ( SELECT_CASE_var == "CTF" ) ) {
@@ -991,19 +991,19 @@ namespace HeatBalanceManager {
 		gio::write( OutputFileInits, Format_724 );
 
 		CurrentModuleObject = "Compliance:Building";
-		NumObjects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumObjects > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Building Rotation for Appendix G
 			BuildingRotationAppendixG = mod( BuildingNumbers( 1 ), 360.0 );
 		}
 
 		// A new object is added by L. Gu, 12/09
 		CurrentModuleObject = "ZoneAirHeatBalanceAlgorithm";
-		NumObjects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumObjects > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( NumAlpha > 0 ) {
 				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 				if ( ( SELECT_CASE_var == "3RDORDERBACKWARDDIFFERENCE" ) || ( SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE" ) ) {
@@ -1033,9 +1033,9 @@ namespace HeatBalanceManager {
 
 		// A new object is added by L. Gu, 06/10
 		CurrentModuleObject = "ZoneAirContaminantBalance";
-		NumObjects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumObjects > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( NumAlpha > 0 ) {
 				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 				if ( SELECT_CASE_var == "YES" ) {
@@ -1110,11 +1110,11 @@ namespace HeatBalanceManager {
 
 		// A new object is added by B. Nigusse, 02/14
 		CurrentModuleObject = "ZoneAirMassFlowConservation";
-		NumObjects = InputProcessor::GetNumObjectsFound(CurrentModuleObject);
+		NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 		ZoneAirMassFlow.EnforceZoneMassBalance = false;
 
 		if ( NumObjects > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( NumAlpha > 0 ) {
 				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 				if ( SELECT_CASE_var == "YES" ) {
@@ -1219,10 +1219,10 @@ namespace HeatBalanceManager {
 
 		// FLOW:
 		CurrentModuleObject = "Site:HeightVariation";
-		NumObjects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumObjects == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums > 0 ) SiteWindExp = NumArray( 1 );
 			if ( NumNums > 1 ) SiteWindBLHeight = NumArray( 2 );
@@ -1349,33 +1349,33 @@ namespace HeatBalanceManager {
 
 		// FLOW:
 
-		RegMat = InputProcessor::GetNumObjectsFound( "Material" );
-		RegRMat = InputProcessor::GetNumObjectsFound( "Material:NoMass" );
-		IRTMat = InputProcessor::GetNumObjectsFound( "Material:InfraredTransparent" );
-		AirMat = InputProcessor::GetNumObjectsFound( "Material:AirGap" );
-		W5GlsMat = InputProcessor::GetNumObjectsFound( "WindowMaterial:Glazing" );
-		W5GlsMatAlt = InputProcessor::GetNumObjectsFound( "WindowMaterial:Glazing:RefractionExtinctionMethod" );
-		W5GasMat = InputProcessor::GetNumObjectsFound( "WindowMaterial:Gas" );
-		W5GasMatMixture = InputProcessor::GetNumObjectsFound( "WindowMaterial:GasMixture" );
-		TotShades = InputProcessor::GetNumObjectsFound( "WindowMaterial:Shade" );
-		TotComplexShades = InputProcessor::GetNumObjectsFound( "WindowMaterial:ComplexShade" );
-		TotComplexGaps = InputProcessor::GetNumObjectsFound( "WindowMaterial:Gap" );
-		TotScreens = InputProcessor::GetNumObjectsFound( "WindowMaterial:Screen" );
-		TotBlinds = InputProcessor::GetNumObjectsFound( "WindowMaterial:Blind" );
-		EcoRoofMat = InputProcessor::GetNumObjectsFound( "Material:RoofVegetation" );
-		TotSimpleWindow = InputProcessor::GetNumObjectsFound( "WindowMaterial:SimpleGlazingSystem" );
+		RegMat = inputProcessor->getNumObjectsFound( "Material" );
+		RegRMat = inputProcessor->getNumObjectsFound( "Material:NoMass" );
+		IRTMat = inputProcessor->getNumObjectsFound( "Material:InfraredTransparent" );
+		AirMat = inputProcessor->getNumObjectsFound( "Material:AirGap" );
+		W5GlsMat = inputProcessor->getNumObjectsFound( "WindowMaterial:Glazing" );
+		W5GlsMatAlt = inputProcessor->getNumObjectsFound( "WindowMaterial:Glazing:RefractionExtinctionMethod" );
+		W5GasMat = inputProcessor->getNumObjectsFound( "WindowMaterial:Gas" );
+		W5GasMatMixture = inputProcessor->getNumObjectsFound( "WindowMaterial:GasMixture" );
+		TotShades = inputProcessor->getNumObjectsFound( "WindowMaterial:Shade" );
+		TotComplexShades = inputProcessor->getNumObjectsFound( "WindowMaterial:ComplexShade" );
+		TotComplexGaps = inputProcessor->getNumObjectsFound( "WindowMaterial:Gap" );
+		TotScreens = inputProcessor->getNumObjectsFound( "WindowMaterial:Screen" );
+		TotBlinds = inputProcessor->getNumObjectsFound( "WindowMaterial:Blind" );
+		EcoRoofMat = inputProcessor->getNumObjectsFound( "Material:RoofVegetation" );
+		TotSimpleWindow = inputProcessor->getNumObjectsFound( "WindowMaterial:SimpleGlazingSystem" );
 
-		W5GlsMatEQL = InputProcessor::GetNumObjectsFound( "WindowMaterial:Glazing:EquivalentLayer" );
-		TotShadesEQL = InputProcessor::GetNumObjectsFound( "WindowMaterial:Shade:EquivalentLayer" );
-		TotDrapesEQL = InputProcessor::GetNumObjectsFound( "WindowMaterial:Drape:EquivalentLayer" );
-		TotBlindsEQL = InputProcessor::GetNumObjectsFound( "WindowMaterial:Blind:EquivalentLayer" );
-		TotScreensEQL = InputProcessor::GetNumObjectsFound( "WindowMaterial:Screen:EquivalentLayer" );
-		W5GapMatEQL = InputProcessor::GetNumObjectsFound( "WindowMaterial:Gap:EquivalentLayer" );
+		W5GlsMatEQL = inputProcessor->getNumObjectsFound( "WindowMaterial:Glazing:EquivalentLayer" );
+		TotShadesEQL = inputProcessor->getNumObjectsFound( "WindowMaterial:Shade:EquivalentLayer" );
+		TotDrapesEQL = inputProcessor->getNumObjectsFound( "WindowMaterial:Drape:EquivalentLayer" );
+		TotBlindsEQL = inputProcessor->getNumObjectsFound( "WindowMaterial:Blind:EquivalentLayer" );
+		TotScreensEQL = inputProcessor->getNumObjectsFound( "WindowMaterial:Screen:EquivalentLayer" );
+		W5GapMatEQL = inputProcessor->getNumObjectsFound( "WindowMaterial:Gap:EquivalentLayer" );
 
 		TotMaterials = RegMat + RegRMat + AirMat + W5GlsMat + W5GlsMatAlt + W5GasMat + W5GasMatMixture + TotShades + TotScreens + TotBlinds + EcoRoofMat + IRTMat + TotSimpleWindow + TotComplexShades + TotComplexGaps + W5GlsMatEQL + TotShadesEQL + TotDrapesEQL + TotBlindsEQL + TotScreensEQL + W5GapMatEQL;
 
-		TotFfactorConstructs = InputProcessor::GetNumObjectsFound( "Construction:FfactorGroundFloor" );
-		TotCfactorConstructs = InputProcessor::GetNumObjectsFound( "Construction:CfactorUndergroundWall" );
+		TotFfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:FfactorGroundFloor" );
+		TotCfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:CfactorUndergroundWall" );
 		if ( TotFfactorConstructs + TotCfactorConstructs >= 1 ) {
 			// Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
 			TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
@@ -1394,7 +1394,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= RegMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}
@@ -1466,7 +1466,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= RegRMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -1527,7 +1527,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= AirMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -1551,7 +1551,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= IRTMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -1601,7 +1601,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= W5GlsMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -1955,7 +1955,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= W5GlsMatAlt; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2026,7 +2026,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= W5GlsMatEQL; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2098,7 +2098,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= W5GasMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2198,7 +2198,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= W5GapMatEQL; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2307,7 +2307,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= W5GasMatMixture; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2369,7 +2369,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotShades; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2435,7 +2435,7 @@ namespace HeatBalanceManager {
 			MaterialProps = 0;
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2502,7 +2502,7 @@ namespace HeatBalanceManager {
 			MaterialProps = 0;
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2568,7 +2568,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotScreens; ++Loop ) {
 
 			//Call GetObjectItem routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2723,7 +2723,7 @@ namespace HeatBalanceManager {
 			MaterialProps = 0;
 
 			//Call GetObjectItem routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -2842,7 +2842,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotBlinds; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -3085,7 +3085,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotBlindsEQL; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -3219,7 +3219,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= EcoRoofMat; ++Loop ) {
 			//Call Input Get Routine to retrieve material data from ecoroof
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -3288,14 +3288,14 @@ namespace HeatBalanceManager {
 		// Thermochromic glazing group
 		// get the number of WindowMaterial:GlazingGroup:Thermochromic objects in the idf file
 		CurrentModuleObject = "WindowMaterial:GlazingGroup:Thermochromic";
-		TotTCGlazings = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotTCGlazings = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( TotTCGlazings >= 1 ) {
 			// Read TC glazings
 			TCGlazings.allocate( TotTCGlazings );
 
 			for ( Loop = 1; Loop <= TotTCGlazings; ++Loop ) {
 				//Get each TCGlazings from the input processor
-				InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 					ShowContinueError( "...All Thermochromic Glazing names must be unique regardless of subtype." );
@@ -3351,7 +3351,7 @@ namespace HeatBalanceManager {
 		cCurrentModuleObject = "WindowMaterial:SimpleGlazingSystem";
 		for ( Loop = 1; Loop <= TotSimpleWindow; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -3469,7 +3469,7 @@ namespace HeatBalanceManager {
 		Real64 RhoB;
 
 		CurrentModuleObject = "MaterialProperty:GlazingSpectralData";
-		TotSpectralData = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotSpectralData = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		SpectralData.allocate( TotSpectralData );
 		if ( TotSpectralData > 0 ) SpecDataProps.allocate( MaxSpectralDataElements * 4 );
 
@@ -3479,7 +3479,7 @@ namespace HeatBalanceManager {
 			// Name is followed by up to 450 sets of normal-incidence measured values of
 			// [wavelength (microns), transmittance, front reflectance, back reflectance] for
 			// wavelengths covering the short-wave solar spectrum (from about 0.25 to 2.5 microns)
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, SpecDataNames, SpecDataNumAlpha, SpecDataProps, SpecDataNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, SpecDataNames, SpecDataNumAlpha, SpecDataProps, SpecDataNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( UtilityRoutines::IsNameEmpty(SpecDataNames( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
@@ -3681,14 +3681,14 @@ namespace HeatBalanceManager {
 		// FLOW:
 
 		//Get the Total number of Constructions from the input
-		TotRegConstructs = InputProcessor::GetNumObjectsFound( "Construction" );
-		TotSourceConstructs = InputProcessor::GetNumObjectsFound( "Construction:InternalSource" );
+		TotRegConstructs = inputProcessor->getNumObjectsFound( "Construction" );
+		TotSourceConstructs = inputProcessor->getNumObjectsFound( "Construction:InternalSource" );
 
-		TotFfactorConstructs = InputProcessor::GetNumObjectsFound( "Construction:FfactorGroundFloor" );
-		TotCfactorConstructs = InputProcessor::GetNumObjectsFound( "Construction:CfactorUndergroundWall" );
-		TotComplexFenStates = InputProcessor::GetNumObjectsFound( "Construction:ComplexFenestrationState" );
-		TotWindow5Constructs = InputProcessor::GetNumObjectsFound( "Construction:WindowDataFile" );
-		TotWinEquivLayerConstructs = InputProcessor::GetNumObjectsFound( "Construction:WindowEquivalentLayer" );
+		TotFfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:FfactorGroundFloor" );
+		TotCfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:CfactorUndergroundWall" );
+		TotComplexFenStates = inputProcessor->getNumObjectsFound( "Construction:ComplexFenestrationState" );
+		TotWindow5Constructs = inputProcessor->getNumObjectsFound( "Construction:WindowDataFile" );
+		TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound( "Construction:WindowEquivalentLayer" );
 
 		WConstructNames.allocate( TotWindow5Constructs );
 
@@ -3725,7 +3725,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotRegConstructs; ++Loop ) { // Loop through all constructs in the input...
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}
@@ -3817,7 +3817,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotSourceConstructs; ++Loop ) { // Loop through all constructs with sources in the input...
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}
@@ -3895,7 +3895,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotWinEquivLayerConstructs; ++Loop ) { // Loop through all constructs with Window EquivalentLayer ...
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}
@@ -3945,7 +3945,7 @@ namespace HeatBalanceManager {
 			// from the Window5 data file and can be referenced only by windows
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(ConstructAlphas( 0 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			++ConstrNum;
@@ -4102,7 +4102,7 @@ namespace HeatBalanceManager {
 		int GroupNum;
 
 		cCurrentModuleObject = "Zone";
-		NumOfZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		Zone.allocate( NumOfZones );
 
@@ -4113,7 +4113,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 
 			rNumericArgs = 0.0; // Zero out just in case
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			TMP = index( cAlphaArgs( 1 ), char( 1 ) );
 			while ( TMP != std::string::npos ) {
 				cAlphaArgs( 1 )[ TMP ] = ',';
@@ -4135,7 +4135,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 			// Check to see if "nominally" controlled -- Zone Name appears in Zone Equip Configuration
 			// relies on zone name being the "name" of the Zone Controlled Equip Configuration
-			if ( InputProcessor::GetObjectItemNum( "ZoneHVAC:EquipmentConnections", "zone_name", Zone( Loop ).Name ) > 0 ) {
+			if ( inputProcessor->getObjectItemNum( "ZoneHVAC:EquipmentConnections", "zone_name", Zone( Loop ).Name ) > 0 ) {
 				Zone( Loop ).isNominalControlled = true;
 			} else {
 				Zone( Loop ).isNominalControlled = false;
@@ -4144,14 +4144,14 @@ namespace HeatBalanceManager {
 
 		// Get ZONE LIST objects
 		cCurrentModuleObject = "ZoneList";
-		NumOfZoneLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfZoneLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfZoneLists > 0 ) {
 
 			ZoneList.allocate( NumOfZoneLists );
 
 			for ( ListNum = 1; ListNum <= NumOfZoneLists; ++ListNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ListNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ListNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				ZoneList( ListNum ).Name = cAlphaArgs( 1 );
@@ -4194,13 +4194,13 @@ namespace HeatBalanceManager {
 
 		// Get ZONE GROUP objects
 		cCurrentModuleObject = "ZoneGroup";
-		NumOfZoneGroups = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfZoneGroups = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfZoneGroups > 0 ) {
 			ZoneGroup.allocate( NumOfZoneGroups );
 
 			for ( GroupNum = 1; GroupNum <= NumOfZoneGroups; ++GroupNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, GroupNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, GroupNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				ZoneGroup( GroupNum ).Name = cAlphaArgs( 1 );
@@ -5155,7 +5155,7 @@ namespace HeatBalanceManager {
 		int Loop;
 
 		CurrentModuleObject = "WindowProperty:FrameAndDivider";
-		TotFrameDivider = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotFrameDivider = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		FrameDivider.allocate( TotFrameDivider );
 		if ( TotFrameDivider == 0 ) return;
 
@@ -5164,7 +5164,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotFrameDivider; ++Loop ) {
 
 			//Call Input Get routine to retrieve frame/divider data
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, FrameDividerNames, FrameDividerNumAlpha, FrameDividerProps, FrameDividerNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, FrameDividerNames, FrameDividerNumAlpha, FrameDividerProps, FrameDividerNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(FrameDividerNames( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			//Load the frame/divider derived type from the input data.
@@ -6204,8 +6204,8 @@ Label1000: ;
 		Rcon = Material( iFCConcreteLayer ).Resistance;
 
 		// Count number of constructions defined with Ffactor or Cfactor method
-		TotFfactorConstructs = InputProcessor::GetNumObjectsFound( "Construction:FfactorGroundFloor" );
-		TotCfactorConstructs = InputProcessor::GetNumObjectsFound( "Construction:CfactorUndergroundWall" );
+		TotFfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:FfactorGroundFloor" );
+		TotCfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:CfactorUndergroundWall" );
 
 		// First create ground floor constructions defined with F factor method if any
 		CurrentModuleObject = "Construction:FfactorGroundFloor";
@@ -6214,7 +6214,7 @@ Label1000: ;
 		for ( Loop = 1; Loop <= TotFfactorConstructs; ++Loop ) {
 
 			// Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}
@@ -6289,7 +6289,7 @@ Label1000: ;
 		for ( Loop = 1; Loop <= TotCfactorConstructs; ++Loop ) { // Loop through all constructs defined with Ffactor method
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}
@@ -6406,20 +6406,20 @@ Label1000: ;
 		cCurrentModuleObject = "SurfaceProperty:SolarIncidentInside";
 
 		// Check if IDD definition is correct
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
 		if ( NumAlpha != 4 ) {
 			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates not = 4 Alpha Objects, Number Indicated=" + TrimSigDigits( NumAlpha ) );
 			ErrorsFound = true;
 		}
 
-		TotSurfIncSolSSG = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotSurfIncSolSSG = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotSurfIncSolSSG > 0 ) {
 			if ( ! allocated( SurfIncSolSSG ) ) {
 				SurfIncSolSSG.allocate( TotSurfIncSolSSG );
 			}
 
 			for ( Loop = 1; Loop <= TotSurfIncSolSSG; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) {
 					ShowContinueError( "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name" );
 					continue;
@@ -6464,14 +6464,14 @@ Label1000: ;
 		//-----------------------------------------------------------------------
 		cCurrentModuleObject = "ComplexFenestrationProperty:SolarAbsorbedLayers";
 
-		TotFenLayAbsSSG = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotFenLayAbsSSG = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotFenLayAbsSSG > 0 ) {
 			if ( ! allocated( FenLayAbsSSG ) ) {
 				FenLayAbsSSG.allocate( TotFenLayAbsSSG );
 			}
 
 			for ( Loop = 1; Loop <= TotFenLayAbsSSG; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) {
 					ShowContinueError( "...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other ComplexFenestrationProperty:SolarAbsorbedLayers name" );
 					continue;
@@ -6961,10 +6961,10 @@ Label1000: ;
 
 		//Reading WindowGap:SupportPillar
 		cCurrentModuleObject = "WindowGap:SupportPillar";
-		W7SupportPillars = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		W7SupportPillars = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		SupportPillar.allocate( W7SupportPillars );
 		for ( Loop = 1; Loop <= W7SupportPillars; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
@@ -6990,10 +6990,10 @@ Label1000: ;
 
 		//Reading WindowGap:DeflectionState
 		cCurrentModuleObject = "WindowGap:DeflectionState";
-		W7DeflectionStates = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		W7DeflectionStates = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		DeflectionState.allocate( W7DeflectionStates );
 		for ( Loop = 1; Loop <= W7DeflectionStates; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
@@ -7012,10 +7012,10 @@ Label1000: ;
 		//Reading WindowMaterial:Gap
 
 		cCurrentModuleObject = "WindowMaterial:Gap";
-		W7MaterialGaps = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		W7MaterialGaps = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		//ALLOCATE(DeflectionState(W7DeflectionStates))
 		for ( Loop = 1; Loop <= W7MaterialGaps; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
@@ -7058,14 +7058,14 @@ Label1000: ;
 
 		//Reading WindowMaterial:ComplexShade
 		cCurrentModuleObject = "WindowMaterial:ComplexShade";
-		TotComplexShades = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotComplexShades = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotComplexShades > 0 ) {
 			ComplexShade.allocate( TotComplexShades ); // Allocate the array Size to the number of complex shades
 		}
 
 		for ( Loop = 1; Loop <= TotComplexShades; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				ShowContinueError( "...All Material names must be unique regardless of subtype." );
@@ -7302,11 +7302,11 @@ Label1000: ;
 
 		//Reading WindowThermalModel:Params
 		cCurrentModuleObject = "WindowThermalModel:Params";
-		TotThermalModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotThermalModels = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		WindowThermalModel.allocate( TotThermalModels );
 
 		for ( Loop = 1; Loop <= TotThermalModels; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 			WindowThermalModel( Loop ).Name = cAlphaArgs( 1 );
@@ -7386,9 +7386,9 @@ Label1000: ;
 
 		//Reading Construction:ComplexFenestrationState
 		locCurrentModuleObject = "Construction:ComplexFenestrationState";
-		TotComplexFenStates = InputProcessor::GetNumObjectsFound( locCurrentModuleObject );
+		TotComplexFenStates = inputProcessor->getNumObjectsFound( locCurrentModuleObject );
 
-		InputProcessor::GetObjectDefMaxArgs( locCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( locCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		if ( ! allocated( locAlphaFieldNames ) ) locAlphaFieldNames.allocate( NumAlphas );
 		if ( ! allocated( locNumericFieldNames ) ) locNumericFieldNames.allocate( NumNumbers );
 		if ( ! allocated( locNumericFieldBlanks ) ) locNumericFieldBlanks.allocate( NumNumbers );
@@ -7398,7 +7398,7 @@ Label1000: ;
 
 		FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
 		for ( Loop = 1; Loop <= TotComplexFenStates; ++Loop ) {
-			InputProcessor::GetObjectItem( locCurrentModuleObject, Loop, locAlphaArgs, NumAlphas, locNumericArgs, NumNumbers, IOStatus, locNumericFieldBlanks, _, locAlphaFieldNames, locNumericFieldNames );
+			inputProcessor->getObjectItem( locCurrentModuleObject, Loop, locAlphaArgs, NumAlphas, locNumericArgs, NumNumbers, IOStatus, locNumericFieldBlanks, _, locAlphaFieldNames, locNumericFieldNames );
 			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, locAlphaArgs( 1 ), CurrentModuleObject, locAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}

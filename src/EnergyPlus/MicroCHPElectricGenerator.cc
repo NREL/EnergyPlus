@@ -269,7 +269,7 @@ namespace MicroCHPElectricGenerator {
 
 			// First get the Micro CHP Parameters so they can be nested in structure later
 			cCurrentModuleObject = "Generator:MicroCHP:NonNormalizedParameters";
-			NumMicroCHPParams = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumMicroCHPParams = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumMicroCHPParams <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -280,7 +280,7 @@ namespace MicroCHPElectricGenerator {
 			CheckEquipName.dimension( NumMicroCHPParams, true );
 
 			for ( CHPParamNum = 1; CHPParamNum <= NumMicroCHPParams; ++CHPParamNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				// Can't validate this name
 				//UtilityRoutines::IsNameEmpty(AlphArray(1),cCurrentModuleObject, ErrorsFound);
 
@@ -361,7 +361,7 @@ namespace MicroCHPElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:MicroCHP";
-			NumMicroCHPs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumMicroCHPs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumMicroCHPs <= 0 ) {
 				// shouldn't ever come here?
@@ -377,7 +377,7 @@ namespace MicroCHPElectricGenerator {
 
 			// load in Micro CHPs
 			for ( GeneratorNum = 1; GeneratorNum <= NumMicroCHPs; ++GeneratorNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				//GENERATOR:MICRO CHP,

@@ -334,8 +334,8 @@ namespace FluidCoolers {
 		//! LKL - still more renaming stuff to go.
 
 		// Get number of all Fluid Coolers specified in the input data file (idf)
-		NumSingleSpeedFluidCoolers = InputProcessor::GetNumObjectsFound( "FluidCooler:SingleSpeed" );
-		NumTwoSpeedFluidCoolers = InputProcessor::GetNumObjectsFound( "FluidCooler:TwoSpeed" );
+		NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound( "FluidCooler:SingleSpeed" );
+		NumTwoSpeedFluidCoolers = inputProcessor->getNumObjectsFound( "FluidCooler:TwoSpeed" );
 		NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
 		if ( NumSimpleFluidCoolers <= 0 ) ShowFatalError( "No fluid cooler objects found in input, however, a branch object has specified a fluid cooler. Search the input for fluid cooler to determine the cause for this error." );
@@ -355,7 +355,7 @@ namespace FluidCoolers {
 		cCurrentModuleObject = cFluidCooler_SingleSpeed;
 		for ( SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = SingleSpeedFluidCoolerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
@@ -402,7 +402,7 @@ namespace FluidCoolers {
 		cCurrentModuleObject = cFluidCooler_TwoSpeed;
 		for ( TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );

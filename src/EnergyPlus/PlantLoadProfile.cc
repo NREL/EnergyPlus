@@ -380,13 +380,13 @@ namespace PlantLoadProfile {
 
 		// FLOW:
 		cCurrentModuleObject = "LoadProfile:Plant";
-		NumOfPlantProfile = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPlantProfile = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfPlantProfile > 0 ) {
 			PlantProfile.allocate( NumOfPlantProfile );
 
 			for ( ProfileNum = 1; ProfileNum <= NumOfPlantProfile; ++ProfileNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				PlantProfile( ProfileNum ).Name = cAlphaArgs( 1 );

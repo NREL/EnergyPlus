@@ -142,7 +142,7 @@ namespace EnergyPlus {
 		int IOStat( 0 );
 		std::string const CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
 
 		Array1D< Real64 > NumArray( NumNums, 0.0 );
 		Array1D_string AlphArray( NumAlphas );
@@ -151,12 +151,12 @@ namespace EnergyPlus {
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_bool lNumericBlanks( NumNums, true );
 
-		NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOAControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OAController.allocate( NumOAControllers );
 
 		ControllerNum = 1;
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 
@@ -165,7 +165,7 @@ namespace EnergyPlus {
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
 
 		ControllerNum = 2;
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ErrorsFound = false;
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
@@ -1372,7 +1372,7 @@ namespace EnergyPlus {
 		int IOStat( 0 );
 		std::string const CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
 
 		Array1D< Real64 > NumArray( NumNums, 0.0 );
 		Array1D_string AlphArray( NumAlphas );
@@ -1381,7 +1381,7 @@ namespace EnergyPlus {
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_bool lNumericBlanks( NumNums, true );
 
-		NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOAControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OAController.allocate( NumOAControllers );
 
 		ControllerNum = 1;
@@ -1411,7 +1411,7 @@ namespace EnergyPlus {
 		HumidityControlZone( 1 ).ActualZoneNum = 1;
 		NumHumidityControlZones = 1;
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 		//compare_err_stream( "" ); // just for debugging

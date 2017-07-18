@@ -597,7 +597,7 @@ namespace UserDefinedComponents {
 		bool errFlag;
 
 		cCurrentModuleObject = "PlantComponent:UserDefined";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = NumNums;
 		MaxNumAlphas = NumAlphas;
 
@@ -611,12 +611,12 @@ namespace UserDefinedComponents {
 		//need to make sure GetEMSInput has run...
 
 		cCurrentModuleObject = "PlantComponent:UserDefined";
-		NumUserPlantComps = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumUserPlantComps = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumUserPlantComps > 0 ) {
 			UserPlantComp.allocate( NumUserPlantComps );
 			CheckUserPlantCompName.dimension( NumUserPlantComps, true );
 			for ( CompLoop = 1; CompLoop <= NumUserPlantComps; ++CompLoop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				UserPlantComp( CompLoop ).Name = cAlphaArgs( 1 );
@@ -792,12 +792,12 @@ namespace UserDefinedComponents {
 		}
 
 		cCurrentModuleObject = "Coil:UserDefined";
-		NumUserCoils = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumUserCoils = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumUserCoils > 0 ) {
 			UserCoil.allocate( NumUserCoils );
 			CheckUserCoilName.dimension( NumUserCoils, true );
 			for ( CompLoop = 1; CompLoop <= NumUserCoils; ++CompLoop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
@@ -939,12 +939,12 @@ namespace UserDefinedComponents {
 		}
 
 		cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
-		NumUserZoneAir = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumUserZoneAir = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumUserZoneAir > 0 ) {
 			UserZoneAirHVAC.allocate( NumUserZoneAir );
 			CheckUserZoneAirName.dimension( NumUserZoneAir, true );
 			for ( CompLoop = 1; CompLoop <= NumUserZoneAir; ++CompLoop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				UserZoneAirHVAC( CompLoop ).Name = cAlphaArgs( 1 );
 
@@ -1085,12 +1085,12 @@ namespace UserDefinedComponents {
 		}
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
-		NumUserAirTerminals = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumUserAirTerminals = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumUserAirTerminals > 0 ) {
 			UserAirTerminal.allocate( NumUserAirTerminals );
 			CheckUserAirTerminal.dimension( NumUserAirTerminals, true );
 			for ( CompLoop = 1; CompLoop <= NumUserAirTerminals; ++CompLoop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				UserAirTerminal( CompLoop ).Name = cAlphaArgs( 1 );
 

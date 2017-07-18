@@ -360,11 +360,11 @@ namespace Pumps {
 		ErrorsFound = false;
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
-		NumVarSpeedPumps = InputProcessor::GetNumObjectsFound( cPump_VarSpeed );
-		NumConstSpeedPumps = InputProcessor::GetNumObjectsFound( cPump_ConSpeed );
-		NumCondensatePumps = InputProcessor::GetNumObjectsFound( cPump_Cond );
-		NumPumpBankSimpleVar = InputProcessor::GetNumObjectsFound( cPumpBank_VarSpeed );
-		NumPumpBankSimpleConst = InputProcessor::GetNumObjectsFound( cPumpBank_ConSpeed );
+		NumVarSpeedPumps = inputProcessor->getNumObjectsFound( cPump_VarSpeed );
+		NumConstSpeedPumps = inputProcessor->getNumObjectsFound( cPump_ConSpeed );
+		NumCondensatePumps = inputProcessor->getNumObjectsFound( cPump_Cond );
+		NumPumpBankSimpleVar = inputProcessor->getNumObjectsFound( cPumpBank_VarSpeed );
+		NumPumpBankSimpleConst = inputProcessor->getNumObjectsFound( cPumpBank_ConSpeed );
 		NumPumps = NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar + NumPumpBankSimpleConst;
 
 		if ( NumPumps <= 0 ) {
@@ -382,7 +382,7 @@ namespace Pumps {
 
 		for ( NumVarPump = 1; NumVarPump <= NumVarSpeedPumps; ++NumVarPump ) {
 			PumpNum = NumVarPump;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, NumVarPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumVarPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
@@ -546,7 +546,7 @@ namespace Pumps {
 
 		for ( NumConstPump = 1; NumConstPump <= NumConstSpeedPumps; ++NumConstPump ) {
 			PumpNum = NumVarSpeedPumps + NumConstPump;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, NumConstPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumConstPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
@@ -662,7 +662,7 @@ namespace Pumps {
 		cCurrentModuleObject = cPump_Cond;
 		for ( NumCondPump = 1; NumCondPump <= NumCondensatePumps; ++NumCondPump ) {
 			PumpNum = NumCondPump + NumVarSpeedPumps + NumConstSpeedPumps;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, NumCondPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumCondPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
@@ -753,7 +753,7 @@ namespace Pumps {
 		cCurrentModuleObject = cPumpBank_VarSpeed;
 		for ( NumVarPumpBankSimple = 1; NumVarPumpBankSimple <= NumPumpBankSimpleVar; ++NumVarPumpBankSimple ) {
 			PumpNum = NumVarPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, NumVarPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumVarPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
@@ -855,7 +855,7 @@ namespace Pumps {
 		cCurrentModuleObject = cPumpBank_ConSpeed;
 		for ( NumConstPumpBankSimple = 1; NumConstPumpBankSimple <= NumPumpBankSimpleConst; ++NumConstPumpBankSimple ) {
 			PumpNum = NumConstPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, NumConstPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumConstPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );

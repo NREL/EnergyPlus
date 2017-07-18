@@ -267,7 +267,7 @@ namespace ElectricBaseboardRadiator {
 
 		cCurrentModuleObject = cCMO_BBRadiator_Electric;
 
-		NumElecBaseboards = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumElecBaseboards = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// object is extensible, no max args needed as IPShortCuts being used
 
@@ -278,7 +278,7 @@ namespace ElectricBaseboardRadiator {
 
 		for ( BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames.allocate(NumNumbers);
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = "";

@@ -540,7 +540,7 @@ namespace HVACUnitaryBypassVAV {
 
 		// find the number of each type of CBVAV unit
 		CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
-		NumCBVAV = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCBVAV = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		// allocate the data structures
 		CBVAV.allocate( NumCBVAV );
@@ -550,7 +550,7 @@ namespace HVACUnitaryBypassVAV {
 		for ( CBVAVIndex = 1; CBVAVIndex <= NumCBVAV; ++CBVAVIndex ) {
 			HeatCoilInletNodeNum = 0;
 			HeatCoilOutletNodeNum = 0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, CBVAVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CBVAVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			CBVAVNum = CBVAVIndex;
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 

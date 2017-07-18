@@ -318,7 +318,7 @@ namespace BaseboardRadiator {
 
 		cCurrentModuleObject = cCMO_BBRadiator_Water;
 
-		NumConvHWBaseboards = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumConvHWBaseboards = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// Calculate total number of baseboard units
 		NumBaseboards = NumConvHWBaseboards;
@@ -331,7 +331,7 @@ namespace BaseboardRadiator {
 			BaseboardNum = 0;
 			for ( ConvHWBaseboardNum = 1; ConvHWBaseboardNum <= NumConvHWBaseboards; ++ConvHWBaseboardNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames.allocate(NumNums);
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";

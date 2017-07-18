@@ -256,7 +256,7 @@ namespace loc {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Surface";
-		int NumOfSurfaceGHEs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int NumOfSurfaceGHEs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( SurfaceGHE ) ) SurfaceGHE.deallocate();
 
@@ -269,7 +269,7 @@ namespace loc {
 		for ( Item = 1; Item <= NumOfSurfaceGHEs; ++Item ) {
 
 			// get the input data
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			// General user input data
 			SurfaceGHE( Item ).Name = cAlphaArgs( 1 );

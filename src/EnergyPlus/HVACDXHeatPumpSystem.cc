@@ -316,12 +316,12 @@ namespace HVACDXHeatPumpSystem {
 		// Flow
 
 		CurrentModuleObject = "CoilSystem:Heating:DX";
-		NumDXHeatPumpSystems = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDXHeatPumpSystems = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		DXHeatPumpSystem.allocate( NumDXHeatPumpSystems );
 		CheckEquipName.dimension( NumDXHeatPumpSystems, true );
 
-		InputProcessor::GetObjectDefMaxArgs( "CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -333,7 +333,7 @@ namespace HVACDXHeatPumpSystem {
 		// Get the data for the DX Cooling System
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpSystemType = CurrentModuleObject; // push Object Name into data array
 			DXHeatPumpSystem( DXHeatSysNum ).Name = Alphas( 1 );

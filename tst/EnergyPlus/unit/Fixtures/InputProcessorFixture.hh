@@ -79,19 +79,19 @@ namespace EnergyPlus {
 		}
 
 		std::vector < std::string > const & validationErrors() {
-			return InputProcessor::validationErrors();
+			return inputProcessor->validationErrors();
 		}
 
 		std::vector < std::string > const & validationWarnings() {
-			return InputProcessor::validationWarnings();
+			return inputProcessor->validationWarnings();
 		}
 
 		std::string encodeIDF() {
-			return InputProcessor::idf_parser.encode(InputProcessor::jdf, InputProcessor::schema);
+			return inputProcessor->idf_parser->encode(inputProcessor->jdf, inputProcessor->schema);
 		}
 
 		json & getJDF() {
-			return InputProcessor::jdf;
+			return inputProcessor->jdf;
 		}
 
 		void eat_whitespace( std::string const & idf, size_t & index ) {
@@ -111,7 +111,7 @@ namespace EnergyPlus {
 
 		json parse_value( std::string const & idf, size_t & index, bool & success ) {
 			IdfParser idfParser;
-			return idfParser.parse_value( idf, index, success, InputProcessor::schema["properties"] );
+			return idfParser.parse_value( idf, index, success, inputProcessor->schema["properties"] );
 		}
 
 		json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {

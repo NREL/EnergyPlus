@@ -242,7 +242,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		static bool ErrorsFound( false );
 		bool errFlag;
 
-		NumGSHPs = InputProcessor::GetNumObjectsFound( ModuleCompNameUC );
+		NumGSHPs = inputProcessor->getNumObjectsFound( ModuleCompNameUC );
 
 		if ( NumGSHPs <= 0 ) {
 			ShowSevereError( "No Equipment found in SimGshp" );
@@ -255,7 +255,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		CheckEquipName.dimension( NumGSHPs, true );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			inputProcessor->getObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
 
 			GSHP( GSHPNum ).Name = AlphArray( 1 );

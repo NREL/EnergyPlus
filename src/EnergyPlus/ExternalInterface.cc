@@ -249,10 +249,10 @@ namespace ExternalInterface {
 		int Loop; // Loop counter
 
 		cCurrentModuleObject = "ExternalInterface";
-		NumExternalInterfaces = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaces = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( Loop = 1; Loop <= NumExternalInterfaces; ++Loop ) { // This loop determines whether the external interface is for FMU or BCVTB
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "PtolemyServer" ) ) { // The BCVTB interface is activated.
 				++NumExternalInterfacesBCVTB;
 			} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) { // The functional mock up unit import interface is activated.
@@ -309,7 +309,7 @@ namespace ExternalInterface {
 			haveExternalInterfaceFMUImport = true;
 			DisplayString( "Instantiating FunctionalMockupUnitImport interface" );
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
-			NumFMUObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFMUObjects = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			VerifyExternalInterfaceObject();
 		} else if ( ( NumExternalInterfacesFMUImport == 1 ) && ( NumExternalInterfacesFMUExport != 0 ) ) {
 			ShowSevereError( "GetExternalInterfaceInput: Cannot have FMU-Import and FMU-Export interface simultaneously." );
@@ -1065,7 +1065,7 @@ namespace ExternalInterface {
 			fullFileName.allocate( NumFMUObjects );
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
 			for ( Loop = 1; Loop <= NumFMUObjects; ++Loop ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 				// Get the FMU name
 				FMU( Loop ).Name = cAlphaArgs( 1 );
 				CheckForActualFileName( cAlphaArgs( 1 ), fileExist, tempFullFileName );
@@ -1119,7 +1119,7 @@ namespace ExternalInterface {
 			// get the names of the input variables each fmu(and the names of the
 			// corresponding output variables in EnergyPlus --).
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:From:Variable";
-			NumFMUInputVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFMUInputVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			// Determine the number of instances for each FMUs
 			for ( i = 1; i <= NumFMUObjects; ++i ) {
 				Name_NEW = "";
@@ -1129,7 +1129,7 @@ namespace ExternalInterface {
 				FMU( i ).Instance.allocate( NumFMUInputVariables );
 				checkInstanceName.allocate( NumFMUInputVariables );
 				for ( l = 1; l <= NumFMUInputVariables; ++l ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
 						Name_NEW = cAlphaArgs( 4 );
 						if ( ! UtilityRoutines::SameString( Name_OLD, Name_NEW ) ) {
@@ -1288,7 +1288,7 @@ namespace ExternalInterface {
 					FMU( i ).Instance( j ).eplusOutputVariable.allocate( NumFMUInputVariables );
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
-						InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+						inputProcessor->getObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 						if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) && UtilityRoutines::SameString( cAlphaArgs( 4 ), FMU( i ).Instance( j ).Name ) ) {
 							FMU( i ).Instance( j ).fmuInputVariable( k ).Name = cAlphaArgs( 5 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey = cAlphaArgs( 1 );
@@ -1381,12 +1381,12 @@ namespace ExternalInterface {
 			// get the names of the output variables each fmu (and the names of the
 			// corresponding input variables in EnergyPlus -- schedule).
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
-			NumFMUInputVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFMUInputVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			for ( i = 1; i <= NumFMUObjects; ++i ) {
 				j = 1;
 				for ( k = 1; k <= NumFMUInputVariables; ++k ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) ) {
 						FMU( i ).TotNumOutputVariablesSchedule = j;
 						++j;
@@ -1400,7 +1400,7 @@ namespace ExternalInterface {
 					FMU( i ).Instance( j ).eplusInputVariableSchedule.allocate( NumFMUInputVariables );
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
-						InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+						inputProcessor->getObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 						if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Name ) && UtilityRoutines::SameString( cAlphaArgs( 4 ), FMU( i ).Instance( j ).Name ) ) {
 							FMU( i ).Instance( j ).fmuOutputVariableSchedule( k ).Name = cAlphaArgs( 5 );
 							FMU( i ).Instance( j ).eplusInputVariableSchedule( k ).Name = cAlphaArgs( 1 );
@@ -1455,12 +1455,12 @@ namespace ExternalInterface {
 			// get the names of the output variables each fmu (and the names of the
 			// corresponding input variables in EnergyPlus -- variable).
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-			NumFMUInputVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFMUInputVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			for ( i = 1; i <= NumFMUObjects; ++i ) {
 				j = 1;
 				for ( k = 1; k <= NumFMUInputVariables; ++k ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), FMU( i ).Name ) ) {
 						FMU( i ).TotNumOutputVariablesVariable = j;
 						++j;
@@ -1474,7 +1474,7 @@ namespace ExternalInterface {
 					FMU( i ).Instance( j ).eplusInputVariableVariable.allocate( NumFMUInputVariables );
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
-						InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+						inputProcessor->getObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 						if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), FMU( i ).Name ) && UtilityRoutines::SameString( cAlphaArgs( 3 ), FMU( i ).Instance( j ).Name ) ) {
 							FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name = cAlphaArgs( 4 );
 							FMU( i ).Instance( j ).eplusInputVariableVariable( k ).Name = cAlphaArgs( 1 );
@@ -1523,12 +1523,12 @@ namespace ExternalInterface {
 			// get the names of the output variables each fmu (and the names of the
 			// corresponding input variables in EnergyPlus -- actuator).
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-			NumFMUInputVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumFMUInputVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			for ( i = 1; i <= NumFMUObjects; ++i ) {
 				j = 1;
 				for ( k = 1; k <= NumFMUInputVariables; ++k ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, k, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), FMU( i ).Name ) ) {
 						FMU( i ).TotNumOutputVariablesActuator = j;
 						++j;
@@ -1542,7 +1542,7 @@ namespace ExternalInterface {
 					FMU( i ).Instance( j ).eplusInputVariableActuator.allocate( NumFMUInputVariables );
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
-						InputProcessor::GetObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+						inputProcessor->getObjectItem( cCurrentModuleObject, l, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 						if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), FMU( i ).Name ) && UtilityRoutines::SameString( cAlphaArgs( 6 ), FMU( i ).Instance( j ).Name ) ) {
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name = cAlphaArgs( 7 );
 							FMU( i ).Instance( j ).eplusInputVariableActuator( k ).Name = cAlphaArgs( 1 );
@@ -1977,9 +1977,9 @@ namespace ExternalInterface {
 		int IOStatus( 0 ); // Used in GetObjectItem
 
 		cCurrentModuleObject = "SimulationControl";
-		int const NumRunControl = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int const NumRunControl = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumRunControl > 0 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 			if ( cAlphaArgs( 5 ) == "NO" ) { // This run does not have a weather file simulation.
 				ShowSevereError( "ExternalInterface: Error in idf file, section SimulationControl:" );
 				ShowContinueError( "When using the ExternalInterface, a run period from the weather file must be specified" );
@@ -2202,7 +2202,7 @@ namespace ExternalInterface {
 		// This subroutine writes a warning if ExternalInterface objects are used in the
 		// idf file, but the ExternalInterface link is not specified.
 
-		int const NumObjects = InputProcessor::GetNumObjectsFound( ObjectWord );
+		int const NumObjects = inputProcessor->getNumObjectsFound( ObjectWord );
 		if ( NumObjects > 0 ) {
 			ShowWarningError( "IDF file contains object \"" + ObjectWord + "\"," );
 			ShowContinueError( "but object \"ExternalInterface\" with appropriate key entry is not specified. Values will not be updated." );
@@ -2235,7 +2235,7 @@ namespace ExternalInterface {
 		int IOStatus( 0 ); // Used in GetObjectItem
 
 		cCurrentModuleObject = "ExternalInterface";
-		InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 		if ( ( ! UtilityRoutines::SameString( cAlphaArgs( 1 ), "PtolemyServer" ) ) && ( ! UtilityRoutines::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) && ( ! UtilityRoutines::SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitExport" ) ) ) {
 			ShowSevereError( "VerifyExternalInterfaceObject: " + cCurrentModuleObject + ", invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\"." );
 			ShowContinueError( "only \"PtolemyServer or FunctionalMockupUnitImport or FunctionalMockupUnitExport\" allowed." );

@@ -277,11 +277,11 @@ namespace PipeHeatTransfer {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "Pipe:Indoor";
-		NumOfPipeHTInt = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTInt = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "Pipe:Outdoor";
-		NumOfPipeHTExt = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTExt = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "Pipe:Underground";
-		NumOfPipeHTUG = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTUG = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
 		// allocate data structures
@@ -295,7 +295,7 @@ namespace PipeHeatTransfer {
 		for ( PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem ) {
 			++Item;
 			// get the object name
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
@@ -400,7 +400,7 @@ namespace PipeHeatTransfer {
 		for ( PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem ) {
 			++Item;
 			// get the object name
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
@@ -484,7 +484,7 @@ namespace PipeHeatTransfer {
 
 			++Item;
 			// get the object name
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );

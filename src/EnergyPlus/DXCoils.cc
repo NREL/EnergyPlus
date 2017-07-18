@@ -896,59 +896,59 @@ namespace DXCoils {
 		Real64 CurveInput; // index used for testing PLF curve output
 
 		// find number of each type of DX coil and calculate the total number
-		NumDoe2DXCoils = InputProcessor::GetNumObjectsFound( "Coil:Cooling:DX:SingleSpeed" );
-		NumDXHeatingCoils = InputProcessor::GetNumObjectsFound( "Coil:Heating:DX:SingleSpeed" );
-		NumDXMulSpeedCoils = InputProcessor::GetNumObjectsFound( "Coil:Cooling:DX:TwoSpeed" );
-		NumDXMulModeCoils = InputProcessor::GetNumObjectsFound( "Coil:Cooling:DX:TwoStageWithHumidityControlMode" );
-		NumDXHeatPumpWaterHeaterPumpedCoils = InputProcessor::GetNumObjectsFound( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterPumped ) );
-		NumDXHeatPumpWaterHeaterWrappedCoils = InputProcessor::GetNumObjectsFound( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped ) );
-		NumDXMulSpeedCoolCoils = InputProcessor::GetNumObjectsFound( "Coil:Cooling:DX:MultiSpeed" );
-		NumDXMulSpeedHeatCoils = InputProcessor::GetNumObjectsFound( "Coil:Heating:DX:MultiSpeed" );
-		NumVRFCoolingCoils = InputProcessor::GetNumObjectsFound( cAllCoilTypes( CoilVRF_Cooling ) );
-		NumVRFHeatingCoils = InputProcessor::GetNumObjectsFound( cAllCoilTypes( CoilVRF_Heating ) );
-		NumVRFCoolingFluidTCtrlCoils = InputProcessor::GetNumObjectsFound( cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ) );
-		NumVRFHeatingFluidTCtrlCoils = InputProcessor::GetNumObjectsFound( cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ) );
+		NumDoe2DXCoils = inputProcessor->getNumObjectsFound( "Coil:Cooling:DX:SingleSpeed" );
+		NumDXHeatingCoils = inputProcessor->getNumObjectsFound( "Coil:Heating:DX:SingleSpeed" );
+		NumDXMulSpeedCoils = inputProcessor->getNumObjectsFound( "Coil:Cooling:DX:TwoSpeed" );
+		NumDXMulModeCoils = inputProcessor->getNumObjectsFound( "Coil:Cooling:DX:TwoStageWithHumidityControlMode" );
+		NumDXHeatPumpWaterHeaterPumpedCoils = inputProcessor->getNumObjectsFound( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterPumped ) );
+		NumDXHeatPumpWaterHeaterWrappedCoils = inputProcessor->getNumObjectsFound( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped ) );
+		NumDXMulSpeedCoolCoils = inputProcessor->getNumObjectsFound( "Coil:Cooling:DX:MultiSpeed" );
+		NumDXMulSpeedHeatCoils = inputProcessor->getNumObjectsFound( "Coil:Heating:DX:MultiSpeed" );
+		NumVRFCoolingCoils = inputProcessor->getNumObjectsFound( cAllCoilTypes( CoilVRF_Cooling ) );
+		NumVRFHeatingCoils = inputProcessor->getNumObjectsFound( cAllCoilTypes( CoilVRF_Heating ) );
+		NumVRFCoolingFluidTCtrlCoils = inputProcessor->getNumObjectsFound( cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ) );
+		NumVRFHeatingFluidTCtrlCoils = inputProcessor->getNumObjectsFound( cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ) );
 
 		NumDXCoils = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterPumpedCoils + NumDXHeatPumpWaterHeaterWrappedCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils + NumVRFHeatingCoils + NumVRFCoolingFluidTCtrlCoils + NumVRFHeatingFluidTCtrlCoils;
 
 		// Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = NumNumbers;
 		MaxAlphas = NumAlphas;
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:DX:TwoSpeed", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Cooling:DX:TwoSpeed", TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:DX:TwoStageWithHumidityControlMode", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Cooling:DX:TwoStageWithHumidityControlMode", TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterPumped ), TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterPumped ), TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped ), TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped ), TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Cooling:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Cooling:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( cAllCoilTypes( CoilVRF_Cooling ), TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cAllCoilTypes( CoilVRF_Cooling ), TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( cAllCoilTypes( CoilVRF_Heating ), TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cAllCoilTypes( CoilVRF_Heating ), TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ), TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ), TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ), TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ), TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "CoilPerformance:DX:Cooling", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "CoilPerformance:DX:Cooling", TotalArgs, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -1002,7 +1002,7 @@ namespace DXCoils {
 		CurrentModuleObject = "Coil:Cooling:DX:SingleSpeed";
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumDoe2DXCoils; ++DXCoilIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
 			// allocate single performance mode for numeric field strings used for sizing routine
@@ -1407,7 +1407,7 @@ namespace DXCoils {
 		CurrentModuleObject = "Coil:Cooling:DX:TwoStageWithHumidityControlMode";
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumDXMulModeCoils; ++DXCoilIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
@@ -1497,10 +1497,10 @@ namespace DXCoils {
 						}
 						DXCoil( DXCoilNum ).CoilPerformanceName( PerfModeNum ) = PerfObjectName;
 						// Get for CoilPerformance object
-						PerfObjectNum = InputProcessor::GetObjectItemNum( PerfObjectType, PerfObjectName );
+						PerfObjectNum = inputProcessor->getObjectItemNum( PerfObjectType, PerfObjectName );
 						if ( PerfObjectNum > 0 ) {
 
-							InputProcessor::GetObjectItem( PerfObjectType, PerfObjectNum, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+							inputProcessor->getObjectItem( PerfObjectType, PerfObjectNum, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 							// allocate performance mode numeric field strings used for sizing routine
 							DXCoilNumericFields( DXCoilNum ).PerfMode( PerfModeNum ).FieldNames.allocate ( NumNumbers2 ); // use MaxNumbers here??
@@ -1870,7 +1870,7 @@ namespace DXCoils {
 
 			++DXCoilNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			// allocate single performance mode for numeric field strings used for sizing routine
 			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
@@ -2250,7 +2250,7 @@ namespace DXCoils {
 
 			++DXCoilNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			// allocate single performance mode for numeric field strings used for sizing routine
 			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
@@ -2745,7 +2745,7 @@ namespace DXCoils {
 		CurrentModuleObject = cAllCoilTypes( CoilDX_HeatPumpWaterHeaterPumped );
 		for ( DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= NumDXHeatPumpWaterHeaterPumpedCoils; ++DXHPWaterHeaterCoilNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXHPWaterHeaterCoilNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXHPWaterHeaterCoilNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
 
@@ -3148,7 +3148,7 @@ namespace DXCoils {
 		CurrentModuleObject = cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped );
 		for ( DXHPWaterHeaterCoilNum = 1; DXHPWaterHeaterCoilNum <= NumDXHeatPumpWaterHeaterWrappedCoils; ++DXHPWaterHeaterCoilNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXHPWaterHeaterCoilNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXHPWaterHeaterCoilNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
 
@@ -3459,7 +3459,7 @@ namespace DXCoils {
 
 			++DXCoilNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			// allocate single performance mode for numeric field strings used for sizing routine (all fields are in this object)
 			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
@@ -3921,7 +3921,7 @@ namespace DXCoils {
 
 			++DXCoilNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			// *** will have to circle back to this one to fix since the multispeed coil has all fields in this coil object ***
 			// allocate single performance mode for numeric field strings used for sizing routine
@@ -4346,7 +4346,7 @@ namespace DXCoils {
 		CurrentModuleObject = cAllCoilTypes( CoilVRF_Cooling );
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumVRFCoolingCoils; ++DXCoilIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
 
@@ -4451,7 +4451,7 @@ namespace DXCoils {
 		CurrentModuleObject = cAllCoilTypes( CoilVRF_Heating );
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumVRFHeatingCoils; ++DXCoilIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
 
@@ -4558,7 +4558,7 @@ namespace DXCoils {
 		CurrentModuleObject = cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling );
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumVRFCoolingFluidTCtrlCoils; ++DXCoilIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
 
@@ -4639,7 +4639,7 @@ namespace DXCoils {
 		CurrentModuleObject = cAllCoilTypes( CoilVRF_FluidTCtrl_Heating );
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumVRFHeatingFluidTCtrlCoils; ++DXCoilIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
 

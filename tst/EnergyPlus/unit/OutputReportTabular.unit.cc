@@ -5860,10 +5860,8 @@ TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 
 
 TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
-	sqlite_test->sqliteBegin();
-	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	EnergyPlus::sqlite->sqliteBegin();
+	EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 	displayTabularVeriSum = true;
 	Latitude = 12.3;
@@ -5935,12 +5933,10 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 
 	WriteVeriSumTable();
 
-	sqlite_test = std::move( EnergyPlus::sqlite );
-
 	auto tabularData = queryResult( "SELECT * FROM TabularData;", "TabularData" );
 	auto strings = queryResult( "SELECT * FROM Strings;", "Strings" );
 	auto stringTypes = queryResult( "SELECT * FROM StringTypes;", "StringTypes" );
-	sqlite_test->sqliteCommit();
+	EnergyPlus::sqlite->sqliteCommit();
 
 	EXPECT_EQ( 123ul, tabularData.size() );
 	// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value

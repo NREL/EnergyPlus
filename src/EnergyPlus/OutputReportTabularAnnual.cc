@@ -109,7 +109,7 @@ namespace EnergyPlus {
 			int curNumDgts( 2 );
 			AnnualFieldSet::AggregationKind curAgg( AnnualFieldSet::AggregationKind::sumOrAvg );
 
-			objCount = InputProcessor::GetNumObjectsFound( currentModuleObject );
+			objCount = inputProcessor->getNumObjectsFound( currentModuleObject );
 			if ( objCount > 0 ) {
 				// if not a run period using weather do not create reports
 				if ( !DataGlobals::DoWeathSim ) {
@@ -117,11 +117,11 @@ namespace EnergyPlus {
 					return;
 				}
 			}
-			InputProcessor::GetObjectDefMaxArgs( currentModuleObject, numParams, numAlphas, numNums );
+			inputProcessor->getObjectDefMaxArgs( currentModuleObject, numParams, numAlphas, numNums );
 			alphArray.allocate( numAlphas );
 			numArray.dimension( numNums, 0.0 );
 			for ( int tabNum = 1 ; tabNum <= objCount; ++tabNum ) {
-				InputProcessor::GetObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
+				inputProcessor->getObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
 				if ( numAlphas >= 5 ) {
 					annualTables.push_back( AnnualTable(alphArray( 1 ), alphArray( 2 ), alphArray( 3 ) ));
 					// the remaining fields are repeating in groups of three and need to be added to the data structure

@@ -289,13 +289,13 @@ namespace HVACSingleDuctInduc {
 
 		// find the number of each type of induction unit
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
-		NumFourPipes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumFourPipes = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumIndUnits = NumFourPipes;
 		// allocate the data structures
 		IndUnit.allocate( NumIndUnits );
 		CheckEquipName.dimension( NumIndUnits, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -307,7 +307,7 @@ namespace HVACSingleDuctInduc {
 		// loop over Series PIUs; get and load the input data
 		for ( IUIndex = 1; IUIndex <= NumFourPipes; ++IUIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, IUIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, IUIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IUNum = IUIndex;
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);

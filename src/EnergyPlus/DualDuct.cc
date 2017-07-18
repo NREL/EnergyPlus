@@ -292,9 +292,9 @@ namespace DualDuct {
 		static Real64 DummyOAFlow( 0.0 );
 
 		// Flow
-		NumDualDuctConstVolDampers = InputProcessor::GetNumObjectsFound( cCMO_DDConstantVolume );
-		NumDualDuctVarVolDampers = InputProcessor::GetNumObjectsFound( cCMO_DDVariableVolume );
-		NumDualDuctVarVolOA = InputProcessor::GetNumObjectsFound( cCMO_DDVarVolOA );
+		NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound( cCMO_DDConstantVolume );
+		NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound( cCMO_DDVariableVolume );
+		NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound( cCMO_DDVarVolOA );
 		NumDampers = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
 		Damper.allocate( NumDampers );
 		UniqueDamperNames.reserve( NumDampers );
@@ -313,7 +313,7 @@ namespace DualDuct {
 
 				CurrentModuleObject = cCMO_DDConstantVolume;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex;
 				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -374,7 +374,7 @@ namespace DualDuct {
 
 				CurrentModuleObject = cCMO_DDVariableVolume;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
 				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -442,7 +442,7 @@ namespace DualDuct {
 
 				CurrentModuleObject = cCMO_DDVarVolOA;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
 				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -2063,7 +2063,7 @@ namespace DualDuct {
 		//  END IF
 
 		if ( FirstTimeOnly ) {
-			NumDualDuctVarVolOA = InputProcessor::GetNumObjectsFound( cCMO_DDVarVolOA );
+			NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound( cCMO_DDVarVolOA );
 			RecircIsUsedARR.allocate( NumDualDuctVarVolOA );
 			DamperNamesARR.allocate( NumDualDuctVarVolOA );
 			if ( NumDualDuctVarVolOA > 0 ) {
@@ -2071,7 +2071,7 @@ namespace DualDuct {
 
 					CurrentModuleObject = cCMO_DDVarVolOA;
 
-					InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+					inputProcessor->getObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					DamperNamesARR( DamperIndex ) = AlphArray( 1 );
 					if ( ! lAlphaBlanks( 5 ) ) {
 						RecircIsUsedARR( DamperIndex ) = true;

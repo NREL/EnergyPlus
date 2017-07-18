@@ -1178,10 +1178,10 @@ namespace ConvectionCoefficients {
 
 		// first get user-defined H models so they can be processed for later objects
 		CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:UserCurve";
-		TotInsideHcUserCurves = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotInsideHcUserCurves = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		HcInsideUserCurve.allocate( TotInsideHcUserCurves );
 		for ( Loop = 1; Loop <= TotInsideHcUserCurves; ++Loop ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			HcInsideUserCurve( Loop ).Name = cAlphaArgs( 1 );
 			{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 			if ( SELECT_CASE_var == "MEANAIRTEMPERATURE" ) {
@@ -1279,10 +1279,10 @@ namespace ConvectionCoefficients {
 		} //end of 'SurfaceConvectionAlgorithm:Inside:UserCurve'
 
 		CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:UserCurve";
-		TotOutsideHcUserCurves = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotOutsideHcUserCurves = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		HcOutsideUserCurve.allocate( TotOutsideHcUserCurves );
 		for ( Loop = 1; Loop <= TotOutsideHcUserCurves; ++Loop ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			HcOutsideUserCurve( Loop ).Name = cAlphaArgs( 1 );
 
 			{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
@@ -1369,9 +1369,9 @@ namespace ConvectionCoefficients {
 		TotIntConvCoeff = 0;
 		TotExtConvCoeff = 0;
 		CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
-		Count = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Count = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( Loop = 1; Loop <= Count; ++Loop ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( Alphas( 2 ) == "INSIDE" ) {
 				++TotIntConvCoeff;
 			}
@@ -1394,9 +1394,9 @@ namespace ConvectionCoefficients {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
-		Count = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Count = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( Loop = 1; Loop <= Count; ++Loop ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( Alphas( 2 ) == "INSIDE" ) {
 				++TotIntConvCoeff;
 			}
@@ -1427,9 +1427,9 @@ namespace ConvectionCoefficients {
 
 		//   Now, get for real and check for consistency
 		CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
-		Count = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Count = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( Loop = 1; Loop <= Count; ++Loop ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			Found = UtilityRoutines::FindItemInList( Alphas( 1 ), Surface );
 			if ( Found == 0 ) {
 				ShowSevereError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", illegal value for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
@@ -1638,9 +1638,9 @@ namespace ConvectionCoefficients {
 		}
 
 		CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
-		Count = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Count = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( Loop = 1; Loop <= Count; ++Loop ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Check Field 1 for validity
 			IsValidType = false;
 			for ( Loop1 = 1; Loop1 <= NumValidSurfaceTypes; ++Loop1 ) {
@@ -1887,10 +1887,10 @@ namespace ConvectionCoefficients {
 		//get SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections
 
 		CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
-		Count = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Count = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		//IF (Count > 1) ! throw  error ... TODO or IP handles it
 		if ( Count == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InsideFaceAdaptiveConvectionAlgo.Name = cAlphaArgs( 1 ); //not used by E+, unique object
 			InsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
@@ -2934,10 +2934,10 @@ namespace ConvectionCoefficients {
 		} //end of 'SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections'
 
 		CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
-		Count = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Count = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		//IF (Count > 1) ! throw  error ... TODO or IP handles it
 		if ( Count == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OutsideFaceAdaptiveConvectionAlgo.Name = cAlphaArgs( 1 ); //not used by E+, unique object
 			OutsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 

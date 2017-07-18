@@ -430,9 +430,9 @@ namespace DemandManager {
 
 		// FLOW:
 		CurrentModuleObject = "DemandManagerAssignmentList";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, ListNum, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, ListNum, NumAlphas, NumNums );
 
-		NumDemandManagerList = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDemandManagerList = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumDemandManagerList > 0 ) {
 			AlphArray.dimension( NumAlphas, BlankString );
@@ -442,7 +442,7 @@ namespace DemandManager {
 
 			for ( ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty( AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
 				DemandManagerList( ListNum ).Name = AlphArray( 1 );
@@ -641,37 +641,37 @@ namespace DemandManager {
 		MaxAlphas = 0;
 		MaxNums = 0;
 		CurrentModuleObject = "DemandManager:ExteriorLights";
-		NumDemandMgrExtLights = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrExtLights = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrExtLights > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:Lights";
-		NumDemandMgrLights = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrLights = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrLights > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:ElectricEquipment";
-		NumDemandMgrElecEquip = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrElecEquip = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrElecEquip > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:Thermostats";
-		NumDemandMgrThermostats = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrThermostats = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrThermostats > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:Ventilation";
-		NumDemandMgrVentilation = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrVentilation = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrVentilation > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
@@ -693,7 +693,7 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
@@ -791,7 +791,7 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
@@ -909,7 +909,7 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
@@ -1027,7 +1027,7 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
@@ -1152,7 +1152,7 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );

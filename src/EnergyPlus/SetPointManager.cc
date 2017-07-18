@@ -631,176 +631,176 @@ namespace SetPointManager {
 		ZoneNum = 0;
 
 		cCurrentModuleObject = "SetpointManager:Scheduled";
-		NumSchSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Scheduled'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSchSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Scheduled'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = NumNums;
 		MaxNumAlphas = NumAlphas;
 
 		cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
-		NumDualSchSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Scheduled:DualSetpoint'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumDualSchSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Scheduled:DualSetpoint'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
-		NumOutAirSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:OutdoorAirReset'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumOutAirSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:OutdoorAirReset'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
-		NumSZRhSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Reheat'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZRhSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Reheat'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
-		NumSZHtSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Heating'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZHtSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Heating'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
-		NumSZClSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Cooling'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZClSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Cooling'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
-		NumSZMinHumSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Humidity:Minimum'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Humidity:Minimum'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
-		NumSZMaxHumSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Humidity:Maximum'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Humidity:Maximum'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MixedAir";
-		NumMixedAirSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MixedAir'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMixedAirSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MixedAir'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
-		NumOAPretreatSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:OutdoorAirPretreat'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumOAPretreatSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:OutdoorAirPretreat'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:Warmest";
-		NumWarmestSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Warmest'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumWarmestSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Warmest'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:Coldest";
-		NumColdestSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Coldest'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumColdestSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Coldest'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
-		NumWarmestSetPtMgrsTempFlow = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:WarmestTemperatureFlow'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumWarmestSetPtMgrsTempFlow = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:WarmestTemperatureFlow'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
-		NumRABFlowSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:ReturnAirBypassFlow'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumRABFlowSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:ReturnAirBypassFlow'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
-		NumMZClgAverageSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Cooling:Average'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZClgAverageSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Cooling:Average'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
-		NumMZHtgAverageSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Heating:Average'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZHtgAverageSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Heating:Average'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
-		NumMZAverageMinHumSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:MinimumHumidity:Average'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZAverageMinHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:MinimumHumidity:Average'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
-		NumMZAverageMaxHumSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:MaximumHumidity:Average'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZAverageMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:MaximumHumidity:Average'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
-		NumMZMinHumSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Humidity:Minimum'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Humidity:Minimum'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
-		NumMZMaxHumSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Humidity:Maximum'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Humidity:Maximum'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
-		NumFollowOATempSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowOutdoorAirTemperature'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumFollowOATempSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowOutdoorAirTemperature'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
-		NumFollowSysNodeTempSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowSystemNodeTemperature'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumFollowSysNodeTempSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowSystemNodeTemperature'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
-		NumGroundTempSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowGroundTemperature'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumGroundTempSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowGroundTemperature'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
-		NumCondEntSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:CondenserEnteringReset'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumCondEntSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:CondenserEnteringReset'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-		NumIdealCondEntSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:CondenserEnteringReset:Ideal'
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:CondenserEnteringReset:Ideal'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
-		NumSZOneStageCoolingSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZOneStageCoolingSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
-		NumSZOneStageHeatingSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZOneStageHeatingSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
-		NumReturnWaterResetChWSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumReturnWaterResetChWSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
-		NumReturnWaterResetHWSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumReturnWaterResetHWSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
@@ -841,7 +841,7 @@ namespace SetPointManager {
 		rNumericArgs.dimension( MaxNumNumbers, 0.0 );
 		lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
-		InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 		NodeNums.dimension( NumParams, 0 );
 
 		if ( NumAllSetPtMgrs > 0 ) AllSetPtMgr.allocate( NumAllSetPtMgrs ); // Allocate the entire Setpoint Manager input data array
@@ -855,7 +855,7 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:Scheduled";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SchSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -941,7 +941,7 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			DualSchSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1021,7 +1021,7 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumOutAirSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			OutAirSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1104,7 +1104,7 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZRhSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SingZoneRhSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1175,7 +1175,7 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZHtSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SingZoneHtSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1245,7 +1245,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZClSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SingZoneClSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1315,7 +1315,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZMinHumSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SZMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1387,7 +1387,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZMaxHumSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SZMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1460,7 +1460,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:MixedAir";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMixedAirSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MixedAirSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1535,7 +1535,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumOAPretreatSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			OAPretreatSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1639,7 +1639,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:Warmest";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			WarmestSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1710,7 +1710,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:Coldest";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			ColdestSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1781,7 +1781,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1859,7 +1859,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			RABFlowSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1912,7 +1912,7 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MZAverageCoolingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -1965,7 +1965,7 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MZAverageHeatingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2018,7 +2018,7 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MZAverageMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2071,7 +2071,7 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MZAverageMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2124,7 +2124,7 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MZMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2177,7 +2177,7 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MZMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2231,7 +2231,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumFollowOATempSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			FollowOATempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2306,7 +2306,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumFollowSysNodeTempSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			FollowSysNodeTempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2383,7 +2383,7 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumGroundTempSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			GroundTempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2498,7 +2498,7 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumCondEntSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			CondEntSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2563,7 +2563,7 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumIdealCondEntSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			IdealCondEntSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2612,7 +2612,7 @@ namespace SetPointManager {
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2678,7 +2678,7 @@ namespace SetPointManager {
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2745,7 +2745,7 @@ namespace SetPointManager {
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 
 			// get the object inputs
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -2795,7 +2795,7 @@ namespace SetPointManager {
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 
 			// get the object inputs
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
@@ -7865,7 +7865,7 @@ namespace SetPointManager {
 		std::string cCurrentModuleObject;
 
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-		NumIdealCondEntSetPtMgrs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumIdealCondEntSetPtMgrs > 0 ) {
 			AnyIdealCondEntSetPointInModel = true;

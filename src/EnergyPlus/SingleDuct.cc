@@ -390,12 +390,12 @@ namespace SingleDuct {
 		std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
 		// Flow
-		NumVAVSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:Reheat" );
-		NumNoRHVAVSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:NoReheat" );
-		NumConstVolSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:ConstantVolume:Reheat" );
-		NumVAVVS = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" );
-		NumCBVAVSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" );
-		NumNoRHCBVAVSys = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" );
+		NumVAVSys = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:VAV:Reheat" );
+		NumNoRHVAVSys = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:VAV:NoReheat" );
+		NumConstVolSys = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:ConstantVolume:Reheat" );
+		NumVAVVS = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan" );
+		NumCBVAVSys = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" );
+		NumNoRHCBVAVSys = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" );
 		NumSys = NumVAVSys + NumConstVolSys + NumNoRHVAVSys + NumVAVVS + NumCBVAVSys + NumNoRHCBVAVSys;
 
 		Sys.allocate( NumSys );
@@ -414,22 +414,22 @@ namespace SingleDuct {
 		MassFlow3 = 0.0;
 		MassFlowDiff = 0.0;
 
-		InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:NoReheat", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:NoReheat", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:ConstantVolume:Reheat", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirTerminal:SingleDuct:ConstantVolume:Reheat", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -445,7 +445,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:Reheat";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex;
 			GlobalNames::VerifyUniqueInterObjectName( SysUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -680,7 +680,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys;
 			GlobalNames::VerifyUniqueInterObjectName( SysUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -837,7 +837,7 @@ namespace SingleDuct {
 
 		for ( SysIndex = 1; SysIndex <= NumConstVolSys; ++SysIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys;
 			GlobalNames::VerifyUniqueInterObjectName( SysUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -982,7 +982,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:NoReheat";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys;
 			GlobalNames::VerifyUniqueInterObjectName( SysUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -1119,7 +1119,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumNoRHVAVSys;
 			GlobalNames::VerifyUniqueInterObjectName( SysUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -1195,7 +1195,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumNoRHVAVSys + NumNoRHCBVAVSys;
 			GlobalNames::VerifyUniqueInterObjectName( SysUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
@@ -1436,7 +1436,7 @@ namespace SingleDuct {
 		// Error check to see if a single duct air terminal is assigned to zone that has zone secondary recirculation
 		// specified in the Sizing:Zone object
 
-		NumZoneSiz = InputProcessor::GetNumObjectsFound( "Sizing:Zone" );
+		NumZoneSiz = inputProcessor->getNumObjectsFound( "Sizing:Zone" );
 		if ( NumZoneSiz > 0 ) {
 			for ( SysIndex = 1; SysIndex <= NumSys; ++SysIndex ) {
 				for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex ) {
@@ -4575,11 +4575,11 @@ namespace SingleDuct {
 		bool errFlag; // error flag from component validation
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
-		NumATMixers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumATMixers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		SysATMixer.allocate( NumATMixers );
 
 		for ( ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			SysATMixer( ATMixerNum ).Name = cAlphaArgs( 1 );
 			if ( cAlphaArgs( 7 ) == "INLETSIDE" ) {

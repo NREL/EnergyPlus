@@ -1148,13 +1148,13 @@ namespace WaterThermalTanks {
 		CheckRefrigerationInput();
 
 		if ( GetWaterThermalTankInputFlag ) {
-			NumWaterHeaterMixed = InputProcessor::GetNumObjectsFound( cMixedWHModuleObj );
-			NumWaterHeaterStratified = InputProcessor::GetNumObjectsFound( cStratifiedWHModuleObj );
-			NumChilledWaterMixed = InputProcessor::GetNumObjectsFound( cMixedCWTankModuleObj );
-			NumChilledWaterStratified = InputProcessor::GetNumObjectsFound( cStratifiedCWTankModuleObj );
+			NumWaterHeaterMixed = inputProcessor->getNumObjectsFound( cMixedWHModuleObj );
+			NumWaterHeaterStratified = inputProcessor->getNumObjectsFound( cStratifiedWHModuleObj );
+			NumChilledWaterMixed = inputProcessor->getNumObjectsFound( cMixedCWTankModuleObj );
+			NumChilledWaterStratified = inputProcessor->getNumObjectsFound( cStratifiedCWTankModuleObj );
 			NumWaterThermalTank = NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + NumChilledWaterStratified;
-			NumHeatPumpWaterHeater = InputProcessor::GetNumObjectsFound( cHPWHPumpedCondenser ) + InputProcessor::GetNumObjectsFound( cHPWHWrappedCondenser );
-			NumWaterHeaterDesuperheater = InputProcessor::GetNumObjectsFound( "Coil:WaterHeating:Desuperheater" );
+			NumHeatPumpWaterHeater = inputProcessor->getNumObjectsFound( cHPWHPumpedCondenser ) + inputProcessor->getNumObjectsFound( cHPWHWrappedCondenser );
+			NumWaterHeaterDesuperheater = inputProcessor->getNumObjectsFound( "Coil:WaterHeating:Desuperheater" );
 
 			if ( NumWaterThermalTank > 0 ) {
 				// Write water heater header for EIO
@@ -1195,7 +1195,7 @@ namespace WaterThermalTanks {
 				cCurrentModuleObject = "Coil:WaterHeating:Desuperheater";
 				for ( DesuperheaterNum = 1; DesuperheaterNum <= NumWaterHeaterDesuperheater; ++DesuperheaterNum ) {
 
-					InputProcessor::GetObjectItem( cCurrentModuleObject, DesuperheaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, DesuperheaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 					if ( errFlag ) {
@@ -1467,7 +1467,7 @@ namespace WaterThermalTanks {
 
 			//   get input for heat pump water heater object
 			if ( NumHeatPumpWaterHeater > 0 ) {
-				int const NumPumpedCondenser = InputProcessor::GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
+				int const NumPumpedCondenser = inputProcessor->getNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
 				int nAlphaOffset; // the difference of array location between alpha items between pumped and wrapped condensers
 				int nNumericOffset; // the difference of array location between numeric items between pumped and wrapped condensers
 				int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
@@ -1497,7 +1497,7 @@ namespace WaterThermalTanks {
 					}
 
 					// Get the lists of IDF arguments
-					InputProcessor::GetObjectItem( cCurrentModuleObject, HPWaterHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, HPWaterHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					// Copy those lists into C++ std::maps
 					std::map< int, std::string > hpwhAlpha;
@@ -2400,7 +2400,7 @@ namespace WaterThermalTanks {
 				cCurrentModuleObject = cMixedWHModuleObj;
 				for ( WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterHeaterMixed; ++WaterThermalTankNum ) {
 
-					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, WaterThermalTankNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
@@ -2832,7 +2832,7 @@ namespace WaterThermalTanks {
 
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified; ++WaterThermalTankNum ) {
 
-					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - NumWaterHeaterMixed, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, WaterThermalTankNum - NumWaterHeaterMixed, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
@@ -3382,7 +3382,7 @@ namespace WaterThermalTanks {
 				cCurrentModuleObject = cMixedCWTankModuleObj; // 'ThermalStorage:ChilledWater:Mixed'
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + NumWaterHeaterStratified + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed; ++WaterThermalTankNum ) {
 
-					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - ( NumWaterHeaterMixed + NumWaterHeaterStratified ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, WaterThermalTankNum - ( NumWaterHeaterMixed + NumWaterHeaterStratified ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
@@ -3594,7 +3594,7 @@ namespace WaterThermalTanks {
 
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + NumChilledWaterStratified; ++WaterThermalTankNum ) {
 
-					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - ( NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, WaterThermalTankNum - ( NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
@@ -3930,7 +3930,7 @@ namespace WaterThermalTanks {
 			// Loop through HPWH's and then search all water heaters for the tank connected to the HPWH
 			if ( NumHeatPumpWaterHeater > 0 ) {
 
-				int const NumPumpedCondenser = InputProcessor::GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
+				int const NumPumpedCondenser = inputProcessor->getNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
 
 					// Create reference to current HPWH object in array.
@@ -4242,12 +4242,12 @@ namespace WaterThermalTanks {
 
 			// Get water heater sizing input.
 			cCurrentModuleObject = "WaterHeater:Sizing";
-			NumWaterHeaterSizing = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumWaterHeaterSizing = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumWaterHeaterSizing > 0 ) {
 
 				for ( WHsizingNum = 1; WHsizingNum <= NumWaterHeaterSizing; ++WHsizingNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, WHsizingNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+					inputProcessor->getObjectItem( cCurrentModuleObject, WHsizingNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 					// find which water heater this object is for
 					WaterThermalTankNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), WaterThermalTank );

@@ -321,43 +321,43 @@ namespace InternalHeatGains {
 		MaxAlpha = -100;
 		MaxNumber = -100;
 		CurrentModuleObject = "People";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "Lights";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ElectricEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "GasEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "HotWaterEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SteamEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "OtherEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 
@@ -384,13 +384,13 @@ namespace InternalHeatGains {
 		// PEOPLE: Includes both information related to the heat balance and thermal comfort
 		// First, allocate and initialize the People derived type
 		CurrentModuleObject = "People";
-		NumPeopleStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumPeopleStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		PeopleObjects.allocate( NumPeopleStatements );
 
 		TotPeople = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumPeopleStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
@@ -432,7 +432,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= PeopleObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -927,13 +927,13 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "Lights";
-		NumLightsStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumLightsStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		LightsObjects.allocate( NumLightsStatements );
 
 		TotLights = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumLightsStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
@@ -975,7 +975,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= LightsObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1189,13 +1189,13 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "ElectricEquipment";
-		NumZoneElectricStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumZoneElectricStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneElectricObjects.allocate( NumZoneElectricStatements );
 
 		TotElecEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumZoneElectricStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
@@ -1237,7 +1237,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= ZoneElectricObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1394,13 +1394,13 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "GasEquipment";
-		NumZoneGasStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumZoneGasStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneGasObjects.allocate( NumZoneGasStatements );
 
 		TotGasEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumZoneGasStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
@@ -1442,7 +1442,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= ZoneGasObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1620,13 +1620,13 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "HotWaterEquipment";
-		NumHotWaterEqStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumHotWaterEqStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		HotWaterEqObjects.allocate( NumHotWaterEqStatements );
 
 		TotHWEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumHotWaterEqStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
@@ -1668,7 +1668,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= HotWaterEqObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1825,13 +1825,13 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "SteamEquipment";
-		NumSteamEqStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumSteamEqStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		SteamEqObjects.allocate( NumSteamEqStatements );
 
 		TotStmEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumSteamEqStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
@@ -1873,7 +1873,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= SteamEqObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -2030,13 +2030,13 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "OtherEquipment";
-		NumOtherEqStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOtherEqStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OtherEqObjects.allocate( NumOtherEqStatements );
 
 		TotOthEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumOtherEqStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
@@ -2078,7 +2078,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= OtherEqObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -2253,7 +2253,7 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-		NumZoneITEqStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumZoneITEqStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		errFlag = false;
 
 		// Note that this object type does not support ZoneList due to node names in input fields
@@ -2265,7 +2265,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				ZoneITEq( Loop ).Name = AlphaName( 1 );
 				ZoneITEq( Loop ).ZonePtr = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
@@ -2558,13 +2558,13 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-		TotBBHeat = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotBBHeat = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneBBHeat.allocate( TotBBHeat );
 
 		for ( Loop = 1; Loop <= TotBBHeat; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 
 			ZoneBBHeat( Loop ).Name = AlphaName( 1 );
@@ -2656,13 +2656,13 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-		TotCO2Gen = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotCO2Gen = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneCO2Gen.allocate( TotCO2Gen );
 
 		for ( Loop = 1; Loop <= TotCO2Gen; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 
 			ZoneCO2Gen( Loop ).Name = AlphaName( 1 );

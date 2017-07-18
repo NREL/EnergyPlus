@@ -327,7 +327,7 @@ namespace SteamBaseboardRadiator {
 		bool SteamMessageNeeded;
 
 		SteamMessageNeeded = true;
-		NumSteamBaseboards = InputProcessor::GetNumObjectsFound( cCMO_BBRadiator_Steam );
+		NumSteamBaseboards = inputProcessor->getNumObjectsFound( cCMO_BBRadiator_Steam );
 
 		// Count total number of baseboard units
 
@@ -338,7 +338,7 @@ namespace SteamBaseboardRadiator {
 		// Get the data from the user input related to baseboard heaters
 		for ( BaseboardNum = 1; BaseboardNum <= NumSteamBaseboards; ++BaseboardNum ) {
 
-			InputProcessor::GetObjectItem( cCMO_BBRadiator_Steam, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCMO_BBRadiator_Steam, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCMO_BBRadiator_Steam, ErrorsFound);
 			SteamBaseboardNumericFields( BaseboardNum ).FieldNames.allocate( NumNumbers );
 			SteamBaseboardNumericFields( BaseboardNum ).FieldNames = "";

@@ -335,21 +335,21 @@ namespace DataZoneEquipment {
 
 		// Look in the input file for zones with air loop and zone equipment attached
 
-		NumOfControlledZones = InputProcessor::GetNumObjectsFound( "ZoneHVAC:EquipmentConnections" );
-		NumOfZoneEquipLists = InputProcessor::GetNumObjectsFound( "ZoneHVAC:EquipmentList" ); // Look for lists of equipment data - there should
+		NumOfControlledZones = inputProcessor->getNumObjectsFound( "ZoneHVAC:EquipmentConnections" );
+		NumOfZoneEquipLists = inputProcessor->getNumObjectsFound( "ZoneHVAC:EquipmentList" ); // Look for lists of equipment data - there should
 		// be as many of these as there are controlled zones
-		InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 		NodeNums.dimension( NumParams, 0 );
-		InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums );
 		MaxAlphas = NumAlphas;
 		MaxNums = NumNums;
-		InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		InputProcessor::GetObjectDefMaxArgs( "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
 		AlphArray.allocate( MaxAlphas );
@@ -362,14 +362,14 @@ namespace DataZoneEquipment {
 		if ( ! allocated( SupplyAirPath ) ) {
 			// Look for and read in the air supply path
 			// component (splitters) information for each zone
-			NumSupplyAirPaths = InputProcessor::GetNumObjectsFound( "AirLoopHVAC:SupplyPath" );
+			NumSupplyAirPaths = inputProcessor->getNumObjectsFound( "AirLoopHVAC:SupplyPath" );
 			SupplyAirPath.allocate( NumSupplyAirPaths );
 		}
 
 		if ( ! allocated( ReturnAirPath ) ) {
 			// Look for and read in the air return path
 			// component (mixers & plenums) information for each zone
-			NumReturnAirPaths = InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ReturnPath" );
+			NumReturnAirPaths = inputProcessor->getNumObjectsFound( "AirLoopHVAC:ReturnPath" );
 			ReturnAirPath.allocate( NumReturnAirPaths );
 		}
 
@@ -400,7 +400,7 @@ namespace DataZoneEquipment {
 
 			CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // Get Equipment | data for one zone
+			inputProcessor->getObjectItem( CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // Get Equipment | data for one zone
 
 			ControlledZoneNum = UtilityRoutines::FindItemInList( AlphArray( 1 ), Zone );
 
@@ -476,10 +476,10 @@ namespace DataZoneEquipment {
 
 			CurrentModuleObject = "ZoneHVAC:EquipmentList";
 
-			ZoneEquipListNum = InputProcessor::GetObjectItemNum( CurrentModuleObject, ZoneEquipConfig( ControlledZoneNum ).EquipListName );
+			ZoneEquipListNum = inputProcessor->getObjectItemNum( CurrentModuleObject, ZoneEquipConfig( ControlledZoneNum ).EquipListName );
 			if ( ZoneEquipListNum > 0 ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+				inputProcessor->getObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
 
@@ -783,7 +783,7 @@ namespace DataZoneEquipment {
 		CurrentModuleObject = "AirLoopHVAC:SupplyPath";
 		for ( PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+			inputProcessor->getObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
 			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 			SupplyAirPath( PathNum ).Name = AlphArray( 1 );
 			SupplyAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
@@ -832,7 +832,7 @@ namespace DataZoneEquipment {
 		CurrentModuleObject = "AirLoopHVAC:ReturnPath";
 		for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+			inputProcessor->getObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
 			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 			ReturnAirPath( PathNum ).Name = AlphArray( 1 );
 			ReturnAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );

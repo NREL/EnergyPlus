@@ -1534,8 +1534,8 @@ namespace BranchNodeConnections {
 			CompSets( NumCompSets ).ParentCName = ParentName;
 			CompSets( NumCompSets ).CType = CompTypeUC;
 			CompSets( NumCompSets ).CName = CompName;
-			CompSets( NumCompSets ).InletNodeName = InletNode;
-			CompSets( NumCompSets ).OutletNodeName = OutletNode;
+			CompSets( NumCompSets ).InletNodeName = UtilityRoutines::MakeUPPERCase( InletNode ); // TODO: Fix this....
+			CompSets( NumCompSets ).OutletNodeName = UtilityRoutines::MakeUPPERCase( OutletNode ); // TODO: Fix this....
 			if ( present( Description ) ) {
 				CompSets( NumCompSets ).Description = Description;
 			} else {

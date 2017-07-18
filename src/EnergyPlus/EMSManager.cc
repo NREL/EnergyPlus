@@ -161,59 +161,59 @@ namespace EMSManager {
 		std::string cCurrentModuleObject;
 
 		cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-		NumSensors = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSensors = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-		numActuatorsUsed = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		numActuatorsUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-		NumProgramCallManagers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumProgramCallManagers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:Program";
-		NumErlPrograms = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumErlPrograms = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-		NumErlSubroutines = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumErlSubroutines = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-		NumUserGlobalVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumUserGlobalVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-		NumEMSOutputVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumEMSOutputVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-		NumEMSMeteredOutputVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumEMSMeteredOutputVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-		NumEMSCurveIndices = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumEMSCurveIndices = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ExternalInterface:Variable";
-		NumExternalInterfaceGlobalVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceGlobalVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMUImport
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-		NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMUExport
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-		NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ExternalInterface:Actuator";
-		NumExternalInterfaceActuatorsUsed = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceActuatorsUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMUImport
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-		NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMUExport
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-		NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-		NumEMSConstructionIndices = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumEMSConstructionIndices = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "Output:EnergyManagementSystem";
-		int NumOutputEMSs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int NumOutputEMSs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMU
 		if ( ( NumSensors + numActuatorsUsed + NumProgramCallManagers + NumErlPrograms
@@ -615,59 +615,59 @@ namespace EMSManager {
 
 		// FLOW:
 		cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = NumNums;
 		MaxNumAlphas = NumAlphas;
 		cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "EnergyManagementSystem:Program";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "ExternalInterface:Variable";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "ExternalInterface:Actuator";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-		InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+		inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 		MaxNumNumbers = max(MaxNumNumbers, NumNums);
 		MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-		InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+		inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 		MaxNumNumbers = max(MaxNumNumbers, NumNums);
 		MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-		InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+		inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 		MaxNumNumbers = max(MaxNumNumbers, NumNums);
 		MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-		InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+		inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 		MaxNumNumbers = max(MaxNumNumbers, NumNums);
 		MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 		//  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
-		//  CALL InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
+		//  CALL inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
 		//  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
 		//  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
 		cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
@@ -683,7 +683,7 @@ namespace EMSManager {
 			Sensor.allocate( NumSensors );
 
 			for ( SensorNum = 1; SensorNum <= NumSensors; ++SensorNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
@@ -747,18 +747,18 @@ namespace EMSManager {
 				// If we process the ExternalInterface actuators, all we need to do is to change the
 				// name of the module object, and shift the ActuatorNum in GetObjectItem
 				if ( ActuatorNum <= numActuatorsUsed ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, ActuatorNum, cAlphaArgs, NumAlphas,
+					inputProcessor->getObjectItem( cCurrentModuleObject, ActuatorNum, cAlphaArgs, NumAlphas,
 						rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				} else if ( ActuatorNum > numActuatorsUsed && ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed ) {
 					cCurrentModuleObject = "ExternalInterface:Actuator";
-					InputProcessor::GetObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed, cAlphaArgs,
+					inputProcessor->getObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed, cAlphaArgs,
 						NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
 						lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				} else if ( ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed
 					&& ActuatorNum <= ( numActuatorsUsed + NumExternalInterfaceActuatorsUsed
 					+ NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed ) ) {
 					cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-					InputProcessor::GetObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed
+					inputProcessor->getObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed
 						- NumExternalInterfaceActuatorsUsed, cAlphaArgs, NumAlphas, rNumericArgs,
 						NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				} else if ( ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed
@@ -766,7 +766,7 @@ namespace EMSManager {
 					+ NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed
 					+ NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed ) {
 					cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-					InputProcessor::GetObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed
+					inputProcessor->getObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed
 						- NumExternalInterfaceActuatorsUsed - NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed,
 						cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
 						cAlphaFieldNames, cNumericFieldNames );
@@ -826,12 +826,12 @@ namespace EMSManager {
 		}
 
 		cCurrentModuleObject = "EnergyManagementSystem:InternalVariable";
-		NumInternalVariablesUsed = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumInternalVariablesUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumInternalVariablesUsed > 0 ) {
 			EMSInternalVarsUsed.allocate( NumInternalVariablesUsed );
 
 			for ( InternVarNum = 1; InternVarNum <= NumInternalVariablesUsed; ++InternVarNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
@@ -880,7 +880,7 @@ namespace EMSManager {
 
 			for ( CallManagerNum = 1; CallManagerNum <= NumProgramCallManagers; ++CallManagerNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				EMSProgramCallManager( CallManagerNum ).Name = cAlphaArgs( 1 );

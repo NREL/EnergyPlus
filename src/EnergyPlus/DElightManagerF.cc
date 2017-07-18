@@ -641,10 +641,10 @@ namespace DElightManagerF {
 
 		static std::string const cCurrentModuleObject( "Daylighting:DELight:ComplexFenestration" );
 
-		TotDElightCFS = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotDElightCFS = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		DElightComplexFene.allocate( TotDElightCFS );
 		for ( auto & cfs : DElightComplexFene ){
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			cfs.Name = cAlphaArgs( 1 );
 			cfs.ComplexFeneType = cAlphaArgs( 2 );
 			cfs.surfName = cAlphaArgs( 3 );
@@ -710,8 +710,8 @@ namespace DElightManagerF {
 		OldAspectRatio = 1.0;
 		NewAspectRatio = 1.0;
 
-		if ( InputProcessor::GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( inputProcessor->getNumObjectsFound( CurrentModuleObject ) == 1 ) {
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OldAspectRatio = rNumerics( 1 );
 			NewAspectRatio = rNumerics( 2 );
 			if ( cAlphas( 1 ) != "XY" ) {

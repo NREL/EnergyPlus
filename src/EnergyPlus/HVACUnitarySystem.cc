@@ -2950,7 +2950,7 @@ namespace HVACUnitarySystem {
 		int iHRWaterOutletNodeAlphaNum; // get input index to unitary system HR water outlet node
 
 		CurrentModuleObject = "AirloopHVAC:UnitarySystem";
-		NumUnitarySystem = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumUnitarySystem = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		UnitarySystem.allocate( NumUnitarySystem );
 		UnitarySystemNumericFields.allocate( NumUnitarySystem );
@@ -2961,13 +2961,13 @@ namespace HVACUnitarySystem {
 		MultiOrVarSpeedHeatCoil = false;
 		MultiOrVarSpeedCoolCoil = false;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		TempAlphas = NumAlphas;
 		TempNumbers = NumNumbers;
 
 		CurrentModuleObject = "UnitarySystemPerformance:Multispeed";
-		NumDesignSpecMultiSpeedHP = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumDesignSpecMultiSpeedHP = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		NumAlphas = max( TempAlphas, NumAlphas );
 		NumNumbers = max( TempNumbers, NumNumbers );
@@ -2986,7 +2986,7 @@ namespace HVACUnitarySystem {
 
 		for ( DesignSpecNum = 1; DesignSpecNum <= NumDesignSpecMultiSpeedHP; ++DesignSpecNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			DesignSpecMSHP( DesignSpecNum ).Name = Alphas( 1 );
@@ -3126,7 +3126,7 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
 			UnitarySystem( UnitarySysNum ).iterationMode.allocate( 20 );
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, UnitarySysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, UnitarySysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			UnitarySystemNumericFields( UnitarySysNum ).FieldNames.allocate( TempNumbers );
 			UnitarySystemNumericFields( UnitarySysNum ).FieldNames = "";

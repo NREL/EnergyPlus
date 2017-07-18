@@ -371,7 +371,7 @@ namespace VentilatedSlab {
 		// Figure out how many Ventilated Slab Systems there are in the input file
 
 		SteamMessageNeeded = true;
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -382,7 +382,7 @@ namespace VentilatedSlab {
 		// make sure data is gotten for surface lists
 		BaseNum = GetNumberOfSurfListVentSlab();
 
-		NumOfVentSlabs = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfVentSlabs = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		// Allocate the local derived type and do one-time initializations for all parts of it
 
 		VentSlab.allocate( NumOfVentSlabs );
@@ -391,7 +391,7 @@ namespace VentilatedSlab {
 
 		for ( Item = 1; Item <= NumOfVentSlabs; ++Item ) { // Begin looping over the entire ventilated slab systems found in the input file...
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			VentSlabNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			VentSlabNumericFields( Item ).FieldNames = cNumericFields;

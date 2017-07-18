@@ -249,12 +249,12 @@ namespace MixerComponent {
 
 		// Flow
 		CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
-		NumMixers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumMixers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumMixers > 0 ) MixerCond.allocate( NumMixers );
 		CheckEquipName.dimension( NumMixers, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		lAlphaBlanks.dimension( NumAlphas, true );
@@ -263,7 +263,7 @@ namespace MixerComponent {
 		NumArray.dimension( NumNums, 0.0 );
 
 		for ( MixerNum = 1; MixerNum <= NumMixers; ++MixerNum ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 			MixerCond( MixerNum ).MixerName = AlphArray( 1 );

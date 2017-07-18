@@ -166,15 +166,15 @@ namespace DataSurfaceLists {
 		// this before getting the radiant system or ventilated slab data.
 
 		ErrorsFound = false;
-		NumOfSurfaceLists = InputProcessor::GetNumObjectsFound( CurrentModuleObject1 );
-		NumOfSurfListVentSlab = InputProcessor::GetNumObjectsFound( CurrentModuleObject2 );
+		NumOfSurfaceLists = inputProcessor->getNumObjectsFound( CurrentModuleObject1 );
+		NumOfSurfListVentSlab = inputProcessor->getNumObjectsFound( CurrentModuleObject2 );
 
 		SurfList.allocate( NumOfSurfaceLists );
 		SlabList.allocate( NumOfSurfListVentSlab );
 
 		if ( NumOfSurfaceLists > 0 ) {
 
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
 			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
@@ -184,7 +184,7 @@ namespace DataSurfaceLists {
 
 			for ( Item = 1; Item <= NumOfSurfaceLists; ++Item ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject1, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject1, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject1, ErrorsFound);
 
 				SurfList( Item ).Name = Alphas( 1 );
@@ -252,7 +252,7 @@ namespace DataSurfaceLists {
 		}
 
 		if ( NumOfSurfListVentSlab > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
 			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
@@ -262,7 +262,7 @@ namespace DataSurfaceLists {
 
 			for ( Item = 1; Item <= NumOfSurfListVentSlab; ++Item ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject2, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject2, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject2, ErrorsFound);
 
 				SlabList( Item ).Name = Alphas( 1 );

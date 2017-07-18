@@ -300,14 +300,14 @@ namespace ZoneAirLoopEquipmentManager {
 			GetAirDistUnitsFlag = false;
 		}
 
-		NumAirDistUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumAirDistUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		AirDistUnit.allocate( NumAirDistUnits );
 
 		if ( NumAirDistUnits > 0 ) {
 
 			for ( AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, AirDistUnitNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+				inputProcessor->getObjectItem( CurrentModuleObject, AirDistUnitNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
 				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 				AirDistUnit( AirDistUnitNum ).Name = AlphArray( 1 );

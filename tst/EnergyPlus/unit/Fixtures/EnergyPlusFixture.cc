@@ -223,6 +223,8 @@ using json = nlohmann::json;
 namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUpTestCase() {
+		EnergyPlus::inputProcessor = InputProcessor::factory();
+
 		bool errors_found = false;
 		process_idd("", errors_found);
 		if ( errors_found ) {
@@ -230,12 +232,10 @@ namespace EnergyPlus {
 			return;
 		}
 
-		const json & loc = InputProcessor::schema[ "properties" ];
-		InputProcessor::caseInsensitiveObjectMap.reserve( loc.size() );
+		const json & loc = inputProcessor->schema[ "properties" ];
+		inputProcessor->caseInsensitiveObjectMap.reserve( loc.size() );
 		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
-			std::string key = it.key();
-			for ( char & c : key ) c = toupper( c );
-			InputProcessor::caseInsensitiveObjectMap.emplace( std::move( key ), it.key() );
+			inputProcessor->caseInsensitiveObjectMap.emplace( UtilityRoutines::MakeUPPERCase( it.key() ), it.key() );
 		}
 	}
 
@@ -264,7 +264,7 @@ namespace EnergyPlus {
 
 		Psychrometrics::InitializePsychRoutines();
 
-		InputProcessor::state.initialize( & InputProcessor::schema );
+		inputProcessor->state->initialize( & inputProcessor->schema );
 	}
 
 	void EnergyPlusFixture::TearDown() {
@@ -547,10 +547,10 @@ namespace EnergyPlus {
 
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
-		InputProcessor::jdf = InputProcessor::idf_parser.decode(idf_snippet, InputProcessor::schema);
+		inputProcessor->jdf = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema);
 
-		if (InputProcessor::jdf.find("Building") == InputProcessor::jdf.end()) {
-			InputProcessor::jdf["Building"] = {
+		if (inputProcessor->jdf.find("Building") == inputProcessor->jdf.end()) {
+			inputProcessor->jdf["Building"] = {
 					{
 							"Bldg",
 							{
@@ -565,8 +565,8 @@ namespace EnergyPlus {
 					}
 			};
 		}
-		if (InputProcessor::jdf.find("GlobalGeometryRules") == InputProcessor::jdf.end()) {
-			InputProcessor::jdf["GlobalGeometryRules"] = {
+		if (inputProcessor->jdf.find("GlobalGeometryRules") == inputProcessor->jdf.end()) {
+			inputProcessor->jdf["GlobalGeometryRules"] = {
 					{
 							"",
 							{
@@ -583,7 +583,7 @@ namespace EnergyPlus {
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
 		int MaxNumeric = 0;
-		InputProcessor::GetMaxSchemaArgs( MaxArgs, MaxAlpha, MaxNumeric );
+		inputProcessor->getMaxSchemaArgs( MaxArgs, MaxAlpha, MaxNumeric );
 
 		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlpha );
 		DataIPShortCuts::cAlphaArgs.allocate( MaxAlpha );
@@ -592,9 +592,9 @@ namespace EnergyPlus {
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 
-		InputProcessor::InitializeMaps();
+		inputProcessor->initializeMaps();
 		SimulationManager::PostIPProcessing();
-		InputProcessor::state.printErrors();
+		inputProcessor->state->printErrors();
 
 		return true;
 	}
@@ -630,7 +630,7 @@ namespace EnergyPlus {
 			return errors_found;
 		}
 
-		InputProcessor::schema = json::parse( *idd_stream );
+		inputProcessor->schema = json::parse( *idd_stream );
 
 		return errors_found;
 	}

@@ -287,7 +287,7 @@ namespace MicroturbineElectricGenerator {
 
 		// FLOW:
 		cCurrentModuleObject = "Generator:MicroTurbine";
-		NumMTGenerators = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumMTGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumMTGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -301,7 +301,7 @@ namespace MicroturbineElectricGenerator {
 
 		// LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			MTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 

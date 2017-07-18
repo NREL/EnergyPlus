@@ -204,12 +204,12 @@ namespace HVACDuct {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 
 		cCurrentModuleObject = "Duct";
-		NumDucts = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumDucts = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		Duct.allocate( NumDucts );
 		CheckEquipName.dimension( NumDucts, true );
 
 		for ( DuctNum = 1; DuctNum <= NumDucts; ++DuctNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			Duct( DuctNum ).Name = cAlphaArgs( 1 );

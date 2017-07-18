@@ -458,13 +458,13 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Tubular";
-		NumOfTDDPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfTDDPipes = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfTDDPipes > 0 ) {
 			TDDPipe.allocate( NumOfTDDPipes );
 
 			for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Pipe name
 				TDDPipe( PipeNum ).Name = cAlphaArgs( 1 );
@@ -686,13 +686,13 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Shelf";
-		NumOfShelf = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfShelf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfShelf > 0 ) {
 			Shelf.allocate( NumOfShelf );
 
 			for ( ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject , ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject , ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Shelf name
 				Shelf( ShelfNum ).Name = cAlphaArgs( 1 );

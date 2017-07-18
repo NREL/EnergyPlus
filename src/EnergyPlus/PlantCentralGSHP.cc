@@ -623,7 +623,7 @@ namespace PlantCentralGSHP {
 
 		if ( AllocatedFlag ) return;
 		cCurrentModuleObject = "CentralHeatPumpSystem";
-		NumWrappers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumWrappers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWrappers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -638,7 +638,7 @@ namespace PlantCentralGSHP {
 
 		// Load arrays with electric EIR chiller data
 		for ( WrapperNum = 1; WrapperNum <= NumWrappers; ++WrapperNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, WrapperNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, WrapperNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			Wrapper( WrapperNum ).Name = cAlphaArgs( 1 );
 
@@ -901,7 +901,7 @@ namespace PlantCentralGSHP {
 		static gio::Fmt Format_550( "('Curve Output = ',11(F7.2))" );
 
 		cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
-		NumChillerHeaters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumChillerHeaters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumChillerHeaters <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -916,7 +916,7 @@ namespace PlantCentralGSHP {
 
 		// Load arrays with electric EIR chiller data
 		for ( ChillerHeaterNum = 1; ChillerHeaterNum <= NumChillerHeaters; ++ChillerHeaterNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ChillerHeater( ChillerHeaterNum ).Name = cAlphaArgs( 1 );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, CHErrorsFound);

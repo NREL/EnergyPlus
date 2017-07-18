@@ -456,10 +456,10 @@ namespace CondenserLoopTowers {
 		Array1D_string AlphArray2( 1 ); // Character string input data array for VS tower coefficients
 
 		// Get number of all cooling towers specified in the input data file (idf)
-		NumSingleSpeedTowers = InputProcessor::GetNumObjectsFound( cCoolingTower_SingleSpeed );
-		NumTwoSpeedTowers = InputProcessor::GetNumObjectsFound( cCoolingTower_TwoSpeed );
-		NumVariableSpeedTowers = InputProcessor::GetNumObjectsFound( cCoolingTower_VariableSpeed );
-		NumVSMerkelTowers = InputProcessor::GetNumObjectsFound( cCoolingTower_VariableSpeedMerkel );
+		NumSingleSpeedTowers = inputProcessor->getNumObjectsFound( cCoolingTower_SingleSpeed );
+		NumTwoSpeedTowers = inputProcessor->getNumObjectsFound( cCoolingTower_TwoSpeed );
+		NumVariableSpeedTowers = inputProcessor->getNumObjectsFound( cCoolingTower_VariableSpeed );
+		NumVSMerkelTowers = inputProcessor->getNumObjectsFound( cCoolingTower_VariableSpeedMerkel );
 		NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
 
 		if ( NumSimpleTowers <= 0 ) ShowFatalError( "No Cooling Tower objects found in input, however, a branch object has specified a cooling tower. Search the input for CoolingTower to determine the cause for this error." );
@@ -478,15 +478,15 @@ namespace CondenserLoopTowers {
 		if ( NumVariableSpeedTowers > 0 ) {
 			VSTower.allocate( NumVariableSpeedTowers );
 			// Allow users to input model coefficients other than default
-			NumVSCoolToolsModelCoeffs = InputProcessor::GetNumObjectsFound( "CoolingTowerPerformance:CoolTools" );
-			NumVSYorkCalcModelCoeffs = InputProcessor::GetNumObjectsFound( "CoolingTowerPerformance:YorkCalc" );
+			NumVSCoolToolsModelCoeffs = inputProcessor->getNumObjectsFound( "CoolingTowerPerformance:CoolTools" );
+			NumVSYorkCalcModelCoeffs = inputProcessor->getNumObjectsFound( "CoolingTowerPerformance:YorkCalc" );
 		}
 
 		// Load data structures with cooling tower input data
 		cCurrentModuleObject = cCoolingTower_SingleSpeed;
 		for ( SingleSpeedTowerNumber = 1; SingleSpeedTowerNumber <= NumSingleSpeedTowers; ++SingleSpeedTowerNumber ) {
 			TowerNum = SingleSpeedTowerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleTowerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
@@ -787,7 +787,7 @@ namespace CondenserLoopTowers {
 		cCurrentModuleObject = cCoolingTower_TwoSpeed;
 		for ( TwoSpeedTowerNumber = 1; TwoSpeedTowerNumber <= NumTwoSpeedTowers; ++TwoSpeedTowerNumber ) {
 			TowerNum = NumSingleSpeedTowers + TwoSpeedTowerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, TwoSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleTowerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
@@ -1119,7 +1119,7 @@ namespace CondenserLoopTowers {
 		cCurrentModuleObject = cCoolingTower_VariableSpeed;
 		for ( VariableSpeedTowerNumber = 1; VariableSpeedTowerNumber <= NumVariableSpeedTowers; ++VariableSpeedTowerNumber ) {
 			TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + VariableSpeedTowerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, VariableSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, VariableSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleTowerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleTower( TowerNum ).VSTower = VariableSpeedTowerNumber;
@@ -1400,7 +1400,7 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).TowerModelType = CoolToolsUserDefined;
 				// Nested Get-input routines below.  Should pull out of here and read in beforehand.
 				for ( VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSCoolToolsModelCoeffs; ++VSModelCoeffNum ) {
-					InputProcessor::GetObjectItem( "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat );
+					inputProcessor->getObjectItem( "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat );
 					if ( ! UtilityRoutines::SameString( AlphArray2( 1 ), SimpleTower( TowerNum ).ModelCoeffObjectName ) ) continue;
 					VSTower( SimpleTower( TowerNum ).VSTower ).FoundModelCoeff = true;
 					// verify the correct number of coefficients for the CoolTools model
@@ -1432,7 +1432,7 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).TowerModelType = YorkCalcUserDefined;
 				// Nested Get-input routines below.  Should pull out of here and read in beforehand.
 				for ( VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSYorkCalcModelCoeffs; ++VSModelCoeffNum ) {
-					InputProcessor::GetObjectItem( "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat );
+					inputProcessor->getObjectItem( "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat );
 					if ( ! UtilityRoutines::SameString( AlphArray2( 1 ), SimpleTower( TowerNum ).ModelCoeffObjectName ) ) continue;
 					VSTower( SimpleTower( TowerNum ).VSTower ).FoundModelCoeff = true;
 					// verify the correct number of coefficients for the YorkCalc model
@@ -1716,7 +1716,7 @@ namespace CondenserLoopTowers {
 		cCurrentModuleObject = cCoolingTower_VariableSpeedMerkel;
 		for ( MerkelVSTowerNum = 1; MerkelVSTowerNum <= NumVSMerkelTowers; ++MerkelVSTowerNum ) {
 			TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + MerkelVSTowerNum;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, MerkelVSTowerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, MerkelVSTowerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleTowerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;

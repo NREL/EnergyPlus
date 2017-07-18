@@ -256,7 +256,7 @@ namespace CTElectricGenerator {
 		//FLOW
 
 		cCurrentModuleObject = "Generator:CombustionTurbine";
-		NumCTGenerators = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumCTGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumCTGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -271,7 +271,7 @@ namespace CTElectricGenerator {
 
 		//LOAD ARRAYS WITH CT CURVE FIT Generator DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
 
 			CTGenerator( GeneratorNum ).Name = AlphArray( 1 );

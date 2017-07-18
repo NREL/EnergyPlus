@@ -366,8 +366,8 @@ namespace EvaporativeFluidCoolers {
 		std::string FluidName;
 
 		// Get number of all evaporative fluid coolers specified in the input data file (idf)
-		NumSingleSpeedEvapFluidCoolers = InputProcessor::GetNumObjectsFound( cEvapFluidCooler_SingleSpeed );
-		NumTwoSpeedEvapFluidCoolers = InputProcessor::GetNumObjectsFound( cEvapFluidCooler_TwoSpeed );
+		NumSingleSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound( cEvapFluidCooler_SingleSpeed );
+		NumTwoSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound( cEvapFluidCooler_TwoSpeed );
 		NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
 		if ( NumSimpleEvapFluidCoolers <= 0 ) ShowFatalError( "No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. Search the input for evaporative fluid cooler to determine the cause for this error." );
@@ -388,7 +388,7 @@ namespace EvaporativeFluidCoolers {
 		cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;
 		for ( SingleSpeedEvapFluidCoolerNumber = 1; SingleSpeedEvapFluidCoolerNumber <= NumSingleSpeedEvapFluidCoolers; ++SingleSpeedEvapFluidCoolerNumber ) {
 			EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
@@ -600,7 +600,7 @@ namespace EvaporativeFluidCoolers {
 		cCurrentModuleObject = cEvapFluidCooler_TwoSpeed;
 		for ( TwoSpeedEvapFluidCoolerNumber = 1; TwoSpeedEvapFluidCoolerNumber <= NumTwoSpeedEvapFluidCoolers; ++TwoSpeedEvapFluidCoolerNumber ) {
 			EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + TwoSpeedEvapFluidCoolerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, TwoSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 

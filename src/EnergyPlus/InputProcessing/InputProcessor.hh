@@ -63,11 +63,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <InputProcessing/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
 	class IdfParser;
 	class State;
+	enum class ObjectType;
 
 	class InputProcessor {
 	public:
@@ -76,7 +78,9 @@ namespace EnergyPlus {
 		friend class EnergyPlusFixture;
 		friend class InputProcessorFixture;
 
-		static json::parser_callback_t callback;
+		json::parser_callback_t callback;
+
+		InputProcessor();
 
 		// Clears the global data in InputProcessor.
 		// Needed for unit tests, should not be normally called.
@@ -85,28 +89,48 @@ namespace EnergyPlus {
 		clear_state();
 
 		static
+		std::unique_ptr< InputProcessor >
+		factory();
+
+		template< typename T >
+		T *
+		objectFactory( std::string const & objectName )
+		{
+			T * p = data->objectFactory< T >( objectName );
+			if ( p != nullptr ) return p;
+			auto const & fields = getFields( T::objectType(), objectName );
+			p = data->addObject< T >( objectName, fields );
+			return p;
+		}
+
+		template< typename T >
+		T *
+		objectFactory()
+		{
+			T * p = data->objectFactory< T >();
+			if ( p != nullptr ) return p;
+			auto const & fields = getFields( T::objectType() );
+			p = data->addObject< T >( fields );
+			return p;
+		}
+
 		std::pair< bool, std::string >
-		ConvertInsensitiveObjectType( std::string const & objectType );
+		convertInsensitiveObjectType( std::string const & objectType );
 
-		static
 		void
-		InitializeMaps();
+		initializeMaps();
 
-		static
 		void
-		ProcessInput();
+		processInput();
 
-		static
 		int
-		GetNumSectionsFound( std::string const & SectionWord );
+		getNumSectionsFound( std::string const & SectionWord );
 
-		static
 		int
-		GetNumObjectsFound( std::string const & ObjectWord );
+		getNumObjectsFound( std::string const & ObjectWord );
 
-		static
 		void
-		GetObjectItem(
+		getObjectItem(
 			std::string const & Object,
 			int const Number,
 			Array1S_string Alphas,
@@ -121,24 +145,21 @@ namespace EnergyPlus {
 		);
 
 
-		static
 		int
-		GetObjectItemNum(
+		getObjectItemNum(
 			std::string const & ObjType, // Object Type (ref: IDD Objects)
 			std::string const & ObjName // Name of the object type
 		);
 
-		static
 		int
-		GetObjectItemNum(
+		getObjectItemNum(
 			std::string const & ObjType, // Object Type (ref: IDD Objects)
 			std::string const & NameTypeVal, // Object "name" field type ( used as search key )
 			std::string const & ObjName // Name of the object type
 		);
 
-		static
 		void
-		RangeCheck(
+		rangeCheck(
 			bool & ErrorsFound, // Set to true if error detected
 			std::string const & WhatFieldString, // Descriptive field for string
 			std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
@@ -151,50 +172,31 @@ namespace EnergyPlus {
 			Optional_string_const WhatObjectName = _ // ObjectName -- used for error messages
 		);
 
-		static
 		void
-		GetMaxSchemaArgs(
+		getMaxSchemaArgs(
 			int & NumArgs,
 			int & NumAlpha,
 			int & NumNumeric
 		);
 
-		static
 		void
-		GetObjectDefMaxArgs(
+		getObjectDefMaxArgs(
 			std::string const & ObjectWord, // Object for definition
 			int & NumArgs, // How many arguments (max) this Object can have
 			int & NumAlpha, // How many Alpha arguments (max) this Object can have
 			int & NumNumeric // How many Numeric arguments (max) this Object can have
 		);
 
-		static
 		void
-		PreProcessorCheck( bool & PreP_Fatal ); // True if a preprocessor flags a fatal error
+		preProcessorCheck( bool & PreP_Fatal ); // True if a preprocessor flags a fatal error
 
-		static
 		void
-		PreScanReportingVariables();
+		preScanReportingVariables();
 
-		static
 		void
-		AddVariablesForMonthlyReport( std::string const & reportName );
+		reportOrphanRecordObjects();
 
-		static
-		void
-		AddRecordToOutputVariableStructure(
-			std::string const & KeyValue,
-			std::string const & VariableName
-		);
-
-		static
-		void
-		ReAllocateAndPreserveOutputVariablesForSimulation();
-
-		static
-		void
-		ReportOrphanRecordObjects();
-
+	private:
 		struct ObjectInfo
 		{
 			ObjectInfo() = default;
@@ -235,29 +237,44 @@ namespace EnergyPlus {
 			std::vector< json::const_iterator > inputObjectIterators;
 		};
 
-	private:
-		static
+		void
+		addVariablesForMonthlyReport( std::string const & reportName );
+
+		void
+		addRecordToOutputVariableStructure(
+			std::string const & KeyValue,
+			std::string const & VariableName
+		);
+
 		std::vector < std::string > const &
 		validationErrors();
 
-		static
 		std::vector < std::string > const &
 		validationWarnings();
+
+		json const &
+		getFields( ObjectType objectType, std::string const & objectName );
+
+		json const &
+		getFields( ObjectType objectType );
 
 		using UnorderedObjectTypeMap = std::unordered_map < std::string, std::string >;
 		using UnorderedObjectCacheMap = std::unordered_map< std::string, ObjectCache >;
 		using UnorderedUnusedObjectMap = std::map< const json::object_t * const, ObjectInfo >;
 
-		static IdfParser idf_parser;
-		static json schema;
-		static json jdf;
-		static State state;
-		static UnorderedObjectTypeMap caseInsensitiveObjectMap;
-		static UnorderedObjectCacheMap objectCacheMap;
-		static UnorderedUnusedObjectMap unusedInputs;
-		static char s[ 129 ];
+		std::unique_ptr< IdfParser > idf_parser;
+		std::unique_ptr< State > state;
+		std::unique_ptr< EnergyPlusData > data;
+		json schema;
+		json jdf;
+		UnorderedObjectTypeMap caseInsensitiveObjectMap;
+		UnorderedObjectCacheMap objectCacheMap;
+		UnorderedUnusedObjectMap unusedInputs;
+		char s[ 129 ] = { 0 };
 
 	}; // InputProcessor
+
+	extern std::unique_ptr< InputProcessor > inputProcessor;
 }
 
 #endif

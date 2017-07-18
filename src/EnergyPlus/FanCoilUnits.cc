@@ -377,14 +377,14 @@ namespace FanCoilUnits {
 		// find the number of each type of fan coil unit
 
 		CurrentModuleObject = cMO_FanCoil;
-		Num4PipeFanCoils = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num4PipeFanCoils = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumFanCoils = Num4PipeFanCoils;
 		// allocate the data structures
 		FanCoil.allocate( NumFanCoils );
 		FanCoilNumericFields.allocate( NumFanCoils );
 		CheckEquipName.dimension( NumFanCoils, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -395,7 +395,7 @@ namespace FanCoilUnits {
 		// loop over 4 pipe fan coil units; get and load the input data
 		for ( FanCoilIndex = 1; FanCoilIndex <= Num4PipeFanCoils; ++FanCoilIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, FanCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, FanCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			FanCoilNum = FanCoilIndex;
 

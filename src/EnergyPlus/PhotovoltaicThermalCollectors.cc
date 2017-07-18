@@ -278,11 +278,11 @@ namespace PhotovoltaicThermalCollectors {
 
 		// first load the performance object info into temporary structure
 		cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
-		NumSimplePVTPerform = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSimplePVTPerform = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumSimplePVTPerform > 0 ) {
 			tmpSimplePVTperf.allocate( NumSimplePVTPerform );
 			for ( Item = 1; Item <= NumSimplePVTPerform; ++Item ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) continue;
 
 				tmpSimplePVTperf( Item ).Name = cAlphaArgs( 1 );
@@ -311,12 +311,12 @@ namespace PhotovoltaicThermalCollectors {
 
 		// now get main PVT objects
 		cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-		NumPVT = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumPVT = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		PVT.allocate( NumPVT );
 		CheckEquipName.dimension( NumPVT, true );
 
 		for ( Item = 1; Item <= NumPVT; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 			PVT( Item ).Name = cAlphaArgs( 1 );

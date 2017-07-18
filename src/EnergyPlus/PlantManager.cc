@@ -70,7 +70,6 @@
 #include <General.hh>
 #include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
-#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PipeHeatTransfer.hh>
@@ -86,6 +85,8 @@
 #include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <InputProcessing/ObjectTypes.hh>
 
 namespace EnergyPlus {
 
@@ -362,9 +363,9 @@ namespace PlantManager {
 
 		// FLOW:
 		CurrentModuleObject = "PlantLoop";
-		NumPlantLoops = InputProcessor::GetNumObjectsFound( CurrentModuleObject ); // Get the number of primary plant loops
+		NumPlantLoops = inputProcessor->getNumObjectsFound( CurrentModuleObject ); // Get the number of primary plant loops
 		CurrentModuleObject = "CondenserLoop";
-		NumCondLoops = InputProcessor::GetNumObjectsFound( CurrentModuleObject ); // Get the number of Condenser loops
+		NumCondLoops = inputProcessor->getNumObjectsFound( CurrentModuleObject ); // Get the number of Condenser loops
 		TotNumLoops = NumPlantLoops + NumCondLoops;
 		ErrFound = false;
 
@@ -391,12 +392,12 @@ namespace PlantManager {
 				PlantLoopNum = LoopNum;
 				this_loop.TypeOfLoop = Plant;
 				CurrentModuleObject = "PlantLoop";
-				InputProcessor::GetObjectItem( CurrentModuleObject, PlantLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, PlantLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			} else {
 				CondLoopNum = LoopNum - NumPlantLoops;
 				this_loop.TypeOfLoop = Condenser;
 				CurrentModuleObject = "CondenserLoop";
-				InputProcessor::GetObjectItem( CurrentModuleObject, CondLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, CondLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			}
 			UtilityRoutines::IsNameEmpty(Alpha( 1 ), CurrentModuleObject, ErrorsFound);
 			this_loop.Name = Alpha( 1 ); // Load the Plant Loop Name
@@ -757,10 +758,10 @@ namespace PlantManager {
 		int TypeOfNum;
 		int LoopNumInArray;
 
-		InputProcessor::GetObjectDefMaxArgs( "Connector:Splitter", NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Connector:Splitter", NumParams, NumAlphas, NumNumbers );
 		MaxNumAlphas = NumAlphas;
 		MaxNumNumbers = NumNumbers;
-		InputProcessor::GetObjectDefMaxArgs( "Connector:Mixer", NumParams, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Connector:Mixer", NumParams, NumAlphas, NumNumbers );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		MaxNumNumbers = max( MaxNumNumbers, NumNumbers );
 		// FLOW:
@@ -971,7 +972,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgVertical, CompNames( CompNum ) );
+							this_comp.compPtr = inputProcessor->objectFactory< GroundHeatExchangers::GLHEVert >( CompNames( CompNum ) );
 						} else if ( UtilityRoutines::SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
@@ -986,7 +987,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgSlinky, CompNames( CompNum ) );
+							this_comp.compPtr = inputProcessor->objectFactory< GroundHeatExchangers::GLHESlinky >( CompNames( CompNum ) );
 						} else if ( UtilityRoutines::SameString( this_comp_type, "Chiller:Electric:EIR" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -4422,10 +4423,10 @@ namespace PlantManager {
 		int numCondenserLoopsCheck;
 
 		cCurrentModuleObject = "PlantLoop";
-		numPlantLoopsCheck = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		numPlantLoopsCheck = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "CondenserLoop";
-		numCondenserLoopsCheck = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		numCondenserLoopsCheck = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( ( numPlantLoopsCheck + numCondenserLoopsCheck ) > 0 ) {
 			AnyPlantInModel = true;

@@ -388,13 +388,13 @@ namespace EconomicLifeCycleCost {
 		int NumObj; // count of objects
 
 		CurrentModuleObject = "LifeCycleCost:Parameters";
-		NumObj = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObj = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumObj == 0 ) {
 			LCCparamPresent = false;
 		} else if ( NumObj == 1 ) {
 			LCCparamPresent = true;
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -634,10 +634,10 @@ namespace EconomicLifeCycleCost {
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:RecurringCosts";
-		numRecurringCosts = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numRecurringCosts = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		RecurringCosts.allocate( numRecurringCosts );
 		for ( iInObj = 1; iInObj <= numRecurringCosts; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -802,15 +802,15 @@ namespace EconomicLifeCycleCost {
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:NonrecurringCost";
-		numNonrecurringCost = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		numComponentCostLineItems = InputProcessor::GetNumObjectsFound( "ComponentCost:LineItem" );
+		numNonrecurringCost = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		numComponentCostLineItems = inputProcessor->getNumObjectsFound( "ComponentCost:LineItem" );
 		if ( numComponentCostLineItems > 0 ) { //leave room for component cost total
 			NonrecurringCost.allocate( numNonrecurringCost + 1 ); //add a place for CostEstimate total
 		} else {
 			NonrecurringCost.allocate( numNonrecurringCost );
 		}
 		for ( iInObj = 1; iInObj <= numNonrecurringCost; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -928,14 +928,14 @@ namespace EconomicLifeCycleCost {
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:UsePriceEscalation";
-		numUsePriceEscalation = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numUsePriceEscalation = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		UsePriceEscalation.allocate( numUsePriceEscalation );
 		for ( iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj ) {
 			UsePriceEscalation( iInObj ).Escalation.allocate( lengthStudyYears );
 		}
 		if ( numUsePriceEscalation > 0 ) {
 			for ( iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				//check to make sure none of the values are another life cycle cost object
 				for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 					if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -1070,14 +1070,14 @@ namespace EconomicLifeCycleCost {
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:UseAdjustment";
-		numUseAdjustment = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numUseAdjustment = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		UseAdjustment.allocate( numUseAdjustment );
 		for ( iInObj = 1; iInObj <= numUseAdjustment; ++iInObj ) {
 			UseAdjustment( iInObj ).Adjustment.allocate( lengthStudyYears );
 		}
 		if ( numUseAdjustment > 0 ) {
 			for ( iInObj = 1; iInObj <= numUseAdjustment; ++iInObj ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				//check to make sure none of the values are another life cycle cost object
 				for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 					if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {

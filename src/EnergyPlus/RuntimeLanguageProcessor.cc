@@ -2695,67 +2695,67 @@ namespace RuntimeLanguageProcessor {
 			GetInput = false;
 
 			cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = NumNums;
 			MaxNumAlphas = NumAlphas;
 			cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:Program";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "ExternalInterface:Variable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "ExternalInterface:Actuator";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-			InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 			MaxNumNumbers = max(MaxNumNumbers, NumNums);
 			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-			InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 			MaxNumNumbers = max(MaxNumNumbers, NumNums);
 			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-			InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 			MaxNumNumbers = max(MaxNumNumbers, NumNums);
 			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-			InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 			MaxNumNumbers = max(MaxNumNumbers, NumNums);
 			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			//  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
-			//  CALL InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
+			//  CALL inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
 			//  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
 			//  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
 			cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
@@ -2779,19 +2779,19 @@ namespace RuntimeLanguageProcessor {
 					// name of the module object, and add an offset for the variable number
 					// This is done in the following IF/THEN section.
 					if ( GlobalNum <= NumUserGlobalVariables ) {
-						InputProcessor::GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
+						inputProcessor->getObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
 							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
 						cCurrentModuleObject = "ExternalInterface:Variable";
-						InputProcessor::GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
+						inputProcessor->getObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
 							rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-						InputProcessor::GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
+						inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
 					}
@@ -2801,7 +2801,7 @@ namespace RuntimeLanguageProcessor {
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-						InputProcessor::GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
+						inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
 							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 					}
@@ -2846,11 +2846,11 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-			NumEMSCurveIndices = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumEMSCurveIndices = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumEMSCurveIndices > 0 ) {
 				CurveIndexVariableNums.dimension( NumEMSCurveIndices, 0 );
 				for ( loop = 1; loop <= NumEMSCurveIndices; ++loop ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					// check if variable name is unique and well formed
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
@@ -2895,11 +2895,11 @@ namespace RuntimeLanguageProcessor {
 			} // NumEMSCurveIndices > 0
 
 			cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-			NumEMSConstructionIndices = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumEMSConstructionIndices = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumEMSConstructionIndices > 0 ) {
 				ConstructionIndexVariableNums.dimension( NumEMSConstructionIndices, 0 );
 				for ( loop = 1; loop <= NumEMSConstructionIndices; ++loop ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					// check if variable name is unique and well formed
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
@@ -2953,7 +2953,7 @@ namespace RuntimeLanguageProcessor {
 			if ( NumErlPrograms > 0 ) {
 				cCurrentModuleObject = "EnergyManagementSystem:Program";
 				for ( StackNum = 1; StackNum <= NumErlPrograms; ++StackNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Programs", errFlag, ErrorsFound );
@@ -2973,7 +2973,7 @@ namespace RuntimeLanguageProcessor {
 			if ( NumErlSubroutines > 0 ) {
 				cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
 				for ( StackNum = NumErlPrograms + 1; StackNum <= NumErlStacks; ++StackNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum - NumErlPrograms, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, StackNum - NumErlPrograms, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Subroutines", errFlag, ErrorsFound );
@@ -2991,11 +2991,11 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
-			NumErlTrendVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumErlTrendVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumErlTrendVariables > 0 ) {
 				TrendVariable.allocate( NumErlTrendVariables );
 				for ( TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
@@ -3077,7 +3077,7 @@ namespace RuntimeLanguageProcessor {
 			if ( NumEMSOutputVariables > 0 ) {
 				cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
 				for ( RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables; ++RuntimeReportVarNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, RuntimeReportVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, RuntimeReportVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					lbracket = index( cAlphaArgs( 1 ), '[' );
@@ -3210,7 +3210,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
 				for ( loop = 1; loop <= NumEMSMeteredOutputVariables; ++loop ) {
 					RuntimeReportVarNum = NumEMSOutputVariables + loop;
-					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 

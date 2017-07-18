@@ -119,7 +119,7 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test )
 	GetZoneData( foundErrors );
 	ASSERT_FALSE( foundErrors );
 
-	int numObjs = InputProcessor::GetNumObjectsFound( "Daylighting:Controls" );
+	int numObjs = inputProcessor->getNumObjectsFound( "Daylighting:Controls" );
 	GetInputDayliteRefPt( foundErrors );
 	compare_err_stream( "" );
 	EXPECT_FALSE( foundErrors );
@@ -223,7 +223,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
 	GetZoneData(foundErrors);
 	ASSERT_FALSE(foundErrors);
 
-	int numObjs = InputProcessor::GetNumObjectsFound("Daylighting:Controls");
+	int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
 	GetInputDayliteRefPt(foundErrors);
 	compare_err_stream("");
 	EXPECT_FALSE(foundErrors);

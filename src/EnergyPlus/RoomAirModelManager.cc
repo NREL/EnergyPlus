@@ -354,12 +354,12 @@ namespace RoomAirModelManager {
 		int found; // test for UtilityRoutines::FindItemInList(
 
 		//access input file and setup
-		numTempDistContrldZones = InputProcessor::GetNumObjectsFound( cUserDefinedControlObject );
+		numTempDistContrldZones = inputProcessor->getNumObjectsFound( cUserDefinedControlObject );
 
-		NumConstantGradient = InputProcessor::GetNumObjectsFound( cTempPatternConstGradientObject );
-		NumTwoGradientInterp = InputProcessor::GetNumObjectsFound( cTempPatternTwoGradientObject );
-		NumNonDimensionalHeight = InputProcessor::GetNumObjectsFound( cTempPatternNDHeightObject );
-		NumSurfaceMapping = InputProcessor::GetNumObjectsFound( cTempPatternSurfMapObject );
+		NumConstantGradient = inputProcessor->getNumObjectsFound( cTempPatternConstGradientObject );
+		NumTwoGradientInterp = inputProcessor->getNumObjectsFound( cTempPatternTwoGradientObject );
+		NumNonDimensionalHeight = inputProcessor->getNumObjectsFound( cTempPatternNDHeightObject );
+		NumSurfaceMapping = inputProcessor->getNumObjectsFound( cTempPatternSurfMapObject );
 
 		NumAirTempPatterns = NumConstantGradient + NumTwoGradientInterp + NumNonDimensionalHeight + NumSurfaceMapping;
 
@@ -379,7 +379,7 @@ namespace RoomAirModelManager {
 
 		for ( ObjNum = 1; ObjNum <= numTempDistContrldZones; ++ObjNum ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//first get zone ID
 			ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum == 0 ) { //throw error
@@ -454,7 +454,7 @@ namespace RoomAirModelManager {
 		cCurrentModuleObject = cTempPatternConstGradientObject;
 		for ( ObjNum = 1; ObjNum <= NumConstantGradient; ++ObjNum ) {
 			thisPattern = ObjNum;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			RoomAirPattern( thisPattern ).Name = cAlphaArgs( 1 );
 			RoomAirPattern( thisPattern ).PatrnID = rNumericArgs( 1 );
@@ -469,7 +469,7 @@ namespace RoomAirModelManager {
 		cCurrentModuleObject = cTempPatternTwoGradientObject;
 		for ( ObjNum = 1; ObjNum <= NumTwoGradientInterp; ++ObjNum ) {
 			thisPattern = NumConstantGradient + ObjNum;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			RoomAirPattern( thisPattern ).PatternMode = TwoGradInterpPattern;
 			RoomAirPattern( thisPattern ).Name = cAlphaArgs( 1 );
 			RoomAirPattern( thisPattern ).PatrnID = rNumericArgs( 1 );
@@ -524,7 +524,7 @@ namespace RoomAirModelManager {
 			thisPattern = NumConstantGradient + NumTwoGradientInterp + ObjNum;
 			RoomAirPattern( thisPattern ).PatternMode = NonDimenHeightPattern;
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			RoomAirPattern( thisPattern ).Name = cAlphaArgs( 1 );
 			RoomAirPattern( thisPattern ).PatrnID = rNumericArgs( 1 );
 			RoomAirPattern( thisPattern ).DeltaTstat = rNumericArgs( 2 );
@@ -563,7 +563,7 @@ namespace RoomAirModelManager {
 			thisPattern = NumConstantGradient + NumTwoGradientInterp + NumNonDimensionalHeight + ObjNum;
 			RoomAirPattern( thisPattern ).PatternMode = SurfMapTempPattern;
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			RoomAirPattern( thisPattern ).Name = cAlphaArgs( 1 );
 			RoomAirPattern( thisPattern ).PatrnID = rNumericArgs( 1 );
 			RoomAirPattern( thisPattern ).DeltaTstat = rNumericArgs( 2 );
@@ -686,7 +686,7 @@ namespace RoomAirModelManager {
 		TotNumOfZoneAirNodes = 0;
 
 		cCurrentModuleObject = "RoomAir:Node";
-		TotNumOfAirNodes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotNumOfAirNodes = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotNumOfAirNodes <= 0 ) {
 			// no air node object is found, terminate the program
@@ -702,7 +702,7 @@ namespace RoomAirModelManager {
 		for ( AirNodeNum = 1; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum ) {
 
 			// get air node objects
-			InputProcessor::GetObjectItem( cCurrentModuleObject, AirNodeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AirNodeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			AirNode( AirNodeNum ).Name = cAlphaArgs( 1 );
@@ -883,7 +883,7 @@ namespace RoomAirModelManager {
 		InfiltratFloorSplit = 0.0;
 
 		cCurrentModuleObject = "RoomAirSettings:OneNodeDisplacementVentilation";
-		NumOfMundtContrl = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfMundtContrl = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumOfMundtContrl > NumOfZones ) {
 			ShowSevereError( "Too many " + cCurrentModuleObject + " objects in input file" );
 			ShowContinueError( "There cannot be more " + cCurrentModuleObject + " objects than number of zones." );
@@ -898,7 +898,7 @@ namespace RoomAirModelManager {
 		// this zone uses Mundt model so get Mundt Model Control
 		// loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
 		for ( ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( ZoneNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 1 ) + " = " + cAlphaArgs( 1 ) );
@@ -949,7 +949,7 @@ namespace RoomAirModelManager {
 
 		if ( ! UCSDModelUsed ) return;
 		cCurrentModuleObject = "RoomAirSettings:ThreeNodeDisplacementVentilation";
-		TotUCSDDV = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotUCSDDV = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotUCSDDV <= 0 ) return;
 
@@ -957,7 +957,7 @@ namespace RoomAirModelManager {
 
 		for ( Loop = 1; Loop <= TotUCSDDV; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDDV( Loop ).ZoneName = cAlphaArgs( 1 );
 			ZoneUCSDDV( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Zone );
@@ -1035,7 +1035,7 @@ namespace RoomAirModelManager {
 
 		if ( ! UCSDModelUsed ) return;
 		cCurrentModuleObject = "RoomAirSettings:CrossVentilation";
-		TotUCSDCV = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotUCSDCV = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotUCSDCV <= 0 ) return;
 
@@ -1043,7 +1043,7 @@ namespace RoomAirModelManager {
 
 		for ( Loop = 1; Loop <= TotUCSDCV; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDCV( Loop ).ZoneName = cAlphaArgs( 1 );
 			ZoneUCSDCV( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Zone );
@@ -1168,9 +1168,9 @@ namespace RoomAirModelManager {
 			return;
 		}
 		cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
-		TotUCSDUI = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotUCSDUI = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionExterior";
-		TotUCSDUE = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotUCSDUE = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotUCSDUI <= 0 && TotUCSDUE <= 0 ) return;
 
@@ -1180,7 +1180,7 @@ namespace RoomAirModelManager {
 
 		cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
 		for ( Loop = 1; Loop <= TotUCSDUI; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDUI( Loop ).ZoneName = cAlphaArgs( 1 );
 			ZoneUCSDUI( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Zone );
@@ -1239,7 +1239,7 @@ namespace RoomAirModelManager {
 
 		cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionExterior";
 		for ( Loop = 1; Loop <= TotUCSDUE; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// First is Zone Name
 			ZoneUCSDUE( Loop ).ZoneName = cAlphaArgs( 1 );
 			ZoneUCSDUE( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Zone );
@@ -1361,7 +1361,7 @@ namespace RoomAirModelManager {
 		int RAFNNum;
 
 		cCurrentModuleObject = "RoomAirSettings:AirflowNetwork";
-		NumOfRoomAirflowNetControl = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfRoomAirflowNetControl = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumOfRoomAirflowNetControl == 0 ) return;
 		if ( NumOfRoomAirflowNetControl > NumOfZones ) {
 			ShowSevereError( "Too many " + cCurrentModuleObject + " objects in input file" );
@@ -1374,7 +1374,7 @@ namespace RoomAirModelManager {
 		}
 
 		for ( Loop = 1; Loop <= NumOfRoomAirflowNetControl; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone, NumOfZones );
 			if ( ZoneNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -1425,9 +1425,9 @@ namespace RoomAirModelManager {
 		} // loop thru NumOfRoomAirflowNetControl
 
 		cCurrentModuleObject = "RoomAir:Node:AirflowNetwork";
-		TotNumOfRoomAFNNodes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotNumOfRoomAFNNodes = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		for ( Loop = 1; Loop <= TotNumOfRoomAFNNodes; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _,
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _,
 				lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone, NumOfZones );
 			if ( ZoneNum == 0 ) {
@@ -1470,10 +1470,10 @@ namespace RoomAirModelManager {
 		} // loop thru TotNumOfRoomAFNNodes
 
 		cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:AdjacentSurfaceList";
-		TotNumOfRAFNNodeSurfLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotNumOfRAFNNodeSurfLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		for ( Loop = 1; Loop <= TotNumOfRAFNNodeSurfLists; ++Loop ) {
 			foundList = false;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				// find surface list
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
@@ -1527,10 +1527,10 @@ namespace RoomAirModelManager {
 		} // loop thru TotNumOfRAFNNodeSurfLists
 
 		cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:InternalGains";
-		TotNumOfRAFNNodeGainsLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotNumOfRAFNNodeGainsLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		for ( Loop = 1; Loop <= TotNumOfRAFNNodeGainsLists; ++Loop ) {
 			foundList = false;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			if ( mod( ( NumAlphas + NumNumbers - 1 ), 3 ) != 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Extensible field set are not evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumAlphas + NumNumbers - 1 ) );
@@ -1594,9 +1594,9 @@ namespace RoomAirModelManager {
 
 		// Get data of HVAC equipment
 		cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:HVACEquipment";
-		TotNumOfRAFNNodeHVACLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotNumOfRAFNNodeHVACLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		for ( Loop = 1; Loop <= TotNumOfRAFNNodeHVACLists; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			if ( mod( ( NumAlphas + NumNumbers - 1 ), 4 ) != 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Extensible field set are not evenly divisable by 4. Number of data entries = " + RoundSigDigits( NumAlphas + NumNumbers - 1 ) );
@@ -1638,7 +1638,7 @@ namespace RoomAirModelManager {
 							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).Name = cAlphaArgs( 3 + ( EquipLoop - 1 ) * 2 );
 
 							// verify type and name and get pointer to device in HVAC equipment type and name structure array
-							TotNumEquip = InputProcessor::GetNumObjectsFound( ZoneHVACTerminalTypes( TypeNum ) );
+							TotNumEquip = inputProcessor->getNumObjectsFound( ZoneHVACTerminalTypes( TypeNum ) );
 							if ( TotNumEquip == 0 ) {
 								ShowSevereError( "GetRoomAirflowNetworkData: No such " + cAlphaFieldNames( 2 + ( EquipLoop - 1 ) * 2 ) + " = " + cAlphaArgs( 2 + ( EquipLoop - 1 ) * 2 ) );
 								ShowContinueError( "is available in the input file in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -2613,7 +2613,7 @@ namespace RoomAirModelManager {
 
 		if ( TypeNum == 0 ) return EquipFind;
 
-		InputProcessor::GetObjectDefMaxArgs( EquipType, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( EquipType, TotalArgs, NumAlphas, NumNumbers );
 
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
@@ -2633,7 +2633,7 @@ namespace RoomAirModelManager {
 		}
 
 		for ( I = 1; I <= TotNumEquip; ++I ) {
-			InputProcessor::GetObjectItem( EquipType, I, Alphas, NumAlphas, Numbers, NumNumbers, Status );
+			inputProcessor->getObjectItem( EquipType, I, Alphas, NumAlphas, Numbers, NumNumbers, Status );
 			if ( UtilityRoutines::SameString( Alphas( 1 ), EquipName ) ) {
 				EquipFind = true;
 				break;

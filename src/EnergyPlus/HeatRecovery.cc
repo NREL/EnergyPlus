@@ -372,10 +372,10 @@ namespace HeatRecovery {
 		static std::string HeatExchPerfType; // Desiccant balanced heat exchanger performance data type
 		static std::string const RoutineName( "GetHeatRecoveryInput: " ); // include trailing blank space
 
-		NumAirToAirPlateExchs = InputProcessor::GetNumObjectsFound( "HeatExchanger:AirToAir:FlatPlate" );
-		NumAirToAirGenericExchs = InputProcessor::GetNumObjectsFound( "HeatExchanger:AirToAir:SensibleAndLatent" );
-		NumDesiccantBalancedExchs = InputProcessor::GetNumObjectsFound( "HeatExchanger:Desiccant:BalancedFlow" );
-		NumDesBalExchsPerfDataType1 = InputProcessor::GetNumObjectsFound( "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1" );
+		NumAirToAirPlateExchs = inputProcessor->getNumObjectsFound( "HeatExchanger:AirToAir:FlatPlate" );
+		NumAirToAirGenericExchs = inputProcessor->getNumObjectsFound( "HeatExchanger:AirToAir:SensibleAndLatent" );
+		NumDesiccantBalancedExchs = inputProcessor->getNumObjectsFound( "HeatExchanger:Desiccant:BalancedFlow" );
+		NumDesBalExchsPerfDataType1 = inputProcessor->getNumObjectsFound( "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1" );
 		NumHeatExchangers = NumAirToAirPlateExchs + NumAirToAirGenericExchs + NumDesiccantBalancedExchs;
 
 		// allocate the data array
@@ -392,7 +392,7 @@ namespace HeatRecovery {
 		// loop over the air to air plate heat exchangers and load their input data
 		for ( ExchIndex = 1; ExchIndex <= NumAirToAirPlateExchs; ++ExchIndex ) {
 			cCurrentModuleObject = "HeatExchanger:AirToAir:FlatPlate";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ExchNum = ExchIndex;
 
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
@@ -455,7 +455,7 @@ namespace HeatRecovery {
 		// loop over the air to air generic heat exchangers and load their input data
 		for ( ExchIndex = 1; ExchIndex <= NumAirToAirGenericExchs; ++ExchIndex ) {
 			cCurrentModuleObject = "HeatExchanger:AirToAir:SensibleAndLatent";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ExchNum = ExchIndex + NumAirToAirPlateExchs;
 
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
@@ -566,7 +566,7 @@ namespace HeatRecovery {
 		// loop over the desiccant balanced heat exchangers and load their input data
 		for ( ExchIndex = 1; ExchIndex <= NumDesiccantBalancedExchs; ++ExchIndex ) {
 			cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
 
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
@@ -630,7 +630,7 @@ namespace HeatRecovery {
 
 		for ( PerfDataIndex = 1; PerfDataIndex <= NumDesBalExchsPerfDataType1; ++PerfDataIndex ) {
 			cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PerfDataIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PerfDataIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			PerfDataNum = PerfDataIndex;
 
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames.allocate( NumNumbers );

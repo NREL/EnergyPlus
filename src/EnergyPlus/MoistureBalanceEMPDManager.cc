@@ -208,7 +208,7 @@ namespace MoistureBalanceEMPDManager {
 
 		// Load the additional EMPD Material properties
 		cCurrentModuleObject = "MaterialProperty:MoisturePenetrationDepth:Settings";
-		EMPDMat = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		EMPDMat = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( EMPDMat == 0 ) {
 			ShowSevereError( "EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found." );
@@ -218,7 +218,7 @@ namespace MoistureBalanceEMPDManager {
 		for ( Loop = 1; Loop <= EMPDMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			//Load the material derived type from the input data.
 			MaterNum = UtilityRoutines::FindItemInList( MaterialNames( 1 ), Material );

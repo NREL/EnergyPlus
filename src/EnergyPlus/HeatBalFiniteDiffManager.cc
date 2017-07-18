@@ -281,8 +281,8 @@ namespace HeatBalFiniteDiffManager {
 		// user settings for numerical parameters
 		cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
-		if ( InputProcessor::GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( inputProcessor->getNumObjectsFound( cCurrentModuleObject ) > 0 ) {
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
 
@@ -312,8 +312,8 @@ namespace HeatBalFiniteDiffManager {
 
 		} // settings object
 
-		pcMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:PhaseChange" );
-		vcMat = InputProcessor::GetNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
+		pcMat = inputProcessor->getNumObjectsFound( "MaterialProperty:PhaseChange" );
+		vcMat = inputProcessor->getNumObjectsFound( "MaterialProperty:VariableThermalConductivity" );
 
 		MaterialFD.allocate( TotMaterials );
 
@@ -325,7 +325,7 @@ namespace HeatBalFiniteDiffManager {
 			for ( Loop = 1; Loop <= pcMat; ++Loop ) {
 
 				//Call Input Get routine to retrieve material data
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				//Load the material derived type from the input data.
 				MaterNum = UtilityRoutines::FindItemInList( MaterialNames( 1 ), Material );
@@ -399,7 +399,7 @@ namespace HeatBalFiniteDiffManager {
 			for ( Loop = 1; Loop <= vcMat; ++Loop ) {
 
 				//Call Input Get routine to retrieve material data
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				//Load the material derived type from the input data.
 				MaterNum = UtilityRoutines::FindItemInList( MaterialNames( 1 ), Material );

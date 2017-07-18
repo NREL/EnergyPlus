@@ -227,14 +227,14 @@ namespace ThermalChimney {
 		ZnRptThermChim.allocate( NumOfZones );
 
 		cCurrentModuleObject = "ZoneThermalChimney";
-		TotThermalChimney = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotThermalChimney = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		ThermalChimneySys.allocate( TotThermalChimney );
 		ThermalChimneyReport.allocate( TotThermalChimney );
 
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 				continue;
 			}
