@@ -24,7 +24,7 @@ The ISO 15099 ventilated window model determines surface convection coefficients
 
 The ISO 15099 model for ventilated cavities through perforated surfaces with connection to the indoor environment, such as solar screens, is shown to have poor accuracy in predicting heat flux as it is currently implemented in the EnergyPlus software program.
 
-![Comparison of Simlated and Measured](AERC_Figures\Comparison_of_Simlated_and_Measured.jpeg)
+![Comparison of Simlated and Measured](AERC_Figures/Comparison_of_Simlated_and_Measured.jpeg)
 
 *Figure 2. Comparison of measured and simulated heat flux of shade system*
 
@@ -40,7 +40,7 @@ Current BSDF window model (tarcog) will be updated for proposed changes.
 
 Program will be tested against series of input files generated for AERC project. Test series will include representative subset of windows varied over shading device openness, IR transmittance and conductivity. Results will be compared for different IGU configurations. One example for such comparison is given in Figure 3.
 
-![](AERC_Figures\AERC_Results.png)
+![](AERC_Figures/AERC_Results.png)
 
 *Figure 3. AERC Results*
 
