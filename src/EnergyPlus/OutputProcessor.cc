@@ -5153,7 +5153,7 @@ unitEnumToString(
 			return " [Btu/h/W]";
 			break;
 		case Unit::W_m2K:
-			return " [W/m2K]";
+			return " [W/m2-K]";
 			break;
 		case Unit::J_kg:
 			return " [J/kg]";
@@ -5174,10 +5174,10 @@ unitEnumToString(
 			return " [kg/m3]";
 			break;
 		case Unit::kg_m2s:
-			return " [kg/m2s]";
+			return " [kg/m2-s]";
 			break;
 		case Unit::J_kgK:
-			return " [J/kgK]";
+			return " [J/kg-K]";
 			break;
 		case Unit::L:
 			return " [L]";
@@ -5192,7 +5192,7 @@ unitEnumToString(
 			return " [m2]";
 			break;
 		case Unit::W_m2C:
-			return " [W/m2C]";
+			return " [W/m2-C]";
 			break;
 		case Unit::rad:
 			return " [rad]";
