@@ -33054,11 +33054,14 @@ ZoneHVAC:IdealLoadsAirSystem,
        \note this object is used with other forced air equipment.
        \type node
   A5 , \field System Inlet Air Node Name
-       \note When the Ideal Loads Air System is connected to an AirloopHVAC:ZoneReturnPlenum the
-       \note plenum exhaust node will connect to this System Inlet Node while the Zone Supply
-       \note Air Node specified above will identify the zone inlet node where this Ideal Loads
-       \note Air System is connected. The Zone Exhaust Air Node will be the same as the
-       \note AirloopHVAC:ReturnAirPlenum inlet node.
+       \note This field is only required when the Ideal Loads Air System is connected to an
+       \note AirloopHVAC:ZoneReturnPlenum, otherwise leave this field blank. When connected to a plenum
+       \note the return plenum Outlet Node Name (or Induced Air Outlet Node Name when connecting multiple
+       \note ideal loads air sytems) is entered here. The two ideal loads air system node name fields described above,
+       \note the Zone Supply Air Node Name and the Zone Exhaust Air Node Name must also be entered.
+       \note The Zone Supply Air Node Name must match a zone inlet air node name for the zone where this
+       \note Ideal Loads Air System is connected. The Zone Exhaust Air Node Name must match an inlet air
+       \note node name of an AirloopHVAC:ReturnAirPlenum object.
   N1 , \field Maximum Heating Supply Air Temperature
        \units C
        \minimum> 0
@@ -42372,6 +42375,7 @@ ZoneHVAC:EquipmentConnections,
        \object-list ZoneNames
   A2 , \field Zone Conditioning Equipment List Name
        \note Enter the name of a ZoneHVAC:EquipmentList object.
+       \required-field
        \type object-list
        \object-list ZoneEquipmentLists
   A3 , \field Zone Air Inlet Node or NodeList Name
