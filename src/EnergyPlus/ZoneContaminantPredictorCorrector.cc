@@ -2141,11 +2141,6 @@ namespace ZoneContaminantPredictorCorrector {
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
 					ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 				} // NodeNum
-				if ( !( ZoneEquipConfig( ZoneEquipConfigNum ).AirLoopNum > 0 || ZoneAirMassFlow.EnforceZoneMassBalance || AirflowNetworkNumOfExhFan > 0 ) ) {
-					ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExh / ZoneMult; // Exclude all exhaust fan flow here
-				} else {
-					ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced / ZoneMult; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
-				}
 
 				if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
 					TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;
@@ -2224,7 +2219,7 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( ZoneMassFlowRate > 0.0 ) {
 				if ( Contaminant.CO2Simulation ) {
 					B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + ( CO2MassFlowRate ) + MixingMassFlowCO2( ZoneNum );
-					A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 						// Multizone airflow calculated in AirflowNetwork
 						B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
@@ -2285,7 +2280,7 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( ZoneMassFlowRate > 0.0 ) {
 				if ( Contaminant.GenericContamSimulation ) {
 					B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + ( GCMassFlowRate ) + MixingMassFlowGC( ZoneNum );
-					A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 						// Multizone airflow calculated in AirflowNetwork
 						B = GCGain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC ) + GCMassFlowRate;
