@@ -381,16 +381,13 @@ namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord ) {
 		sqlite_test->sqliteBegin();
-		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Calculated Cooling Design Air Flow Rate [m3/s]", 6.37 );
-		sqlite_test->addSQLiteSystemSizingRecord( "VAV_2", "User Cooling Design Air Flow Rate", 5.1 );
+		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Cooling", "Sensible",23.3, 6.3, 6.03, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00" );
 		auto result = queryResult("SELECT * FROM SystemSizes;", "SystemSizes");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(2ul, result.size());
-		std::vector<std::string> testResult0 {"1", "VAV_1", "Calculated Cooling Design Air Flow Rate", "6.37", "m3/s"};
-		std::vector<std::string> testResult1 {"2", "VAV_2", "User Cooling Design Air Flow Rate", "5.1", ""};
+		ASSERT_EQ(1ul, result.size());
+		std::vector<std::string> testResult0 {"1", "VAV_1", "Cooling", "Sensible","23.3", "6.3", "6.03", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00" };
 		EXPECT_EQ(testResult0, result[0]);
-		EXPECT_EQ(testResult1, result[1]);
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteComponentSizingRecord ) {
