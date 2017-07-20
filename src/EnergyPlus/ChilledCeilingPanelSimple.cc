@@ -1015,7 +1015,7 @@ namespace CoolingPanelSimple {
 		
 		RegisterPlantCompDesignFlow( CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
 
-		bool SizeUASuccessFlag = false;
+		bool SizeUASuccessFlag = true;
 		SizeCoolingPanelUA( CoolingPanelNum, SizeUASuccessFlag );
 		if ( ! SizeUASuccessFlag ) ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
 
