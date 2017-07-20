@@ -158,6 +158,12 @@ namespace PoweredInductionUnits {
 	Array1D< PowIndUnitData > PIU;
 
 	void
+	clear_state()
+	{
+		PIU.deallocate();
+	}
+
+	void
 	SimPIU(
 		std::string const & CompName, // name of the PIU
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step

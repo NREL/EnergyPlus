@@ -250,6 +250,9 @@ namespace PoweredInductionUnits {
 	void
 	PIUInducesPlenumAir( int const NodeNum ); // induced air node number
 
+	void
+	clear_state();
+
 } // PoweredInductionUnits
 
 } // EnergyPlus
