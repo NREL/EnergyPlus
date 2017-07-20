@@ -59,8 +59,6 @@
 
 namespace EnergyPlus {
 
-	enum class ObjectType;
-
 namespace GroundHeatExchangers {
 
 	using json = nlohmann::json;
@@ -176,7 +174,7 @@ namespace GroundHeatExchangers {
 
 	};
 
-	struct GLHEVert:GLHEBase
+	struct GLHEVert : GLHEBase
 	{
 		// Destructor
 		~GLHEVert(){}
@@ -196,6 +194,12 @@ namespace GroundHeatExchangers {
 
 		GLHEVert( std::string const & name, json const & fields );
 
+		GLHEVert( GLHEVert const &  ) = delete;
+		GLHEVert & operator=( GLHEVert const &  ) = delete;
+
+		GLHEVert(GLHEVert&&) = default;
+		GLHEVert& operator=(GLHEVert&&) = default;
+
 		void
 		calcGFunctions();
 
@@ -214,12 +218,16 @@ namespace GroundHeatExchangers {
 		);
 
 		static
-		ObjectType
-		objectType();
+		std::string const &
+		canonicalObjectType();
+
+		static
+		std::size_t
+		objectTypeHash();
 
 	};
 
-	struct GLHESlinky:GLHEBase
+	struct GLHESlinky : GLHEBase
 	{
 
 		// Destructor
@@ -246,6 +254,12 @@ namespace GroundHeatExchangers {
 		GLHESlinky() = default;
 
 		GLHESlinky( std::string const & name, json const & fields );
+
+		GLHESlinky( GLHESlinky const & ) = delete;
+		GLHESlinky & operator=( GLHESlinky const & ) = delete;
+
+		GLHESlinky(GLHESlinky&&) = default;
+		GLHESlinky& operator=(GLHESlinky&&) = default;
 
 		void
 		calcHXResistance();
@@ -345,20 +359,24 @@ namespace GroundHeatExchangers {
 		);
 
 		static
-		ObjectType
-		objectType();
+		std::string const &
+		canonicalObjectType();
+
+		static
+		std::size_t
+		objectTypeHash();
 
 	};
 
 	// Object Data
-	extern Array1D< GLHEVert > verticalGLHE; // Vertical GLHEs
-	extern Array1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
+	// extern Array1D< GLHEVert > verticalGLHE; // Vertical GLHEs
+	// extern Array1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
 
 	void
 	clear_state();
 
-	void
-	GetGroundHeatExchangerInput();
+	// void
+	// GetGroundHeatExchangerInput();
 
 } // GroundHeatExchangers
 

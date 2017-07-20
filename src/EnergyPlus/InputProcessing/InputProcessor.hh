@@ -98,7 +98,7 @@ namespace EnergyPlus {
 		{
 			T * p = data->objectFactory< T >( objectName );
 			if ( p != nullptr ) return p;
-			auto const & fields = getFields( T::objectType(), objectName );
+			auto const & fields = getFields( T::canonicalObjectType(), objectName );
 			p = data->addObject< T >( objectName, fields );
 			return p;
 		}
@@ -109,7 +109,7 @@ namespace EnergyPlus {
 		{
 			T * p = data->objectFactory< T >();
 			if ( p != nullptr ) return p;
-			auto const & fields = getFields( T::objectType() );
+			auto const & fields = getFields( T::canonicalObjectType() );
 			p = data->addObject< T >( fields );
 			return p;
 		}
@@ -253,10 +253,10 @@ namespace EnergyPlus {
 		validationWarnings();
 
 		json const &
-		getFields( ObjectType objectType, std::string const & objectName );
+		getFields( std::string const & objectType, std::string const & objectName );
 
 		json const &
-		getFields( ObjectType objectType );
+		getFields( std::string const & objectType );
 
 		using UnorderedObjectTypeMap = std::unordered_map < std::string, std::string >;
 		using UnorderedObjectCacheMap = std::unordered_map< std::string, ObjectCache >;

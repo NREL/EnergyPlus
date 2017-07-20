@@ -59,7 +59,7 @@
 #include <InputProcessing/IdfParser.hh>
 #include <InputProcessing/InputValidation.hh>
 #include <InputProcessing/EnergyPlusData.hh>
-#include <InputProcessing/ObjectTypes.hh>
+// #include <InputProcessing/ObjectTypes.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
 #include <DataPrecisionGlobals.hh>
@@ -122,15 +122,15 @@ namespace EnergyPlus {
 	}
 
 	json const &
-	InputProcessor::getFields( ObjectType objectType, std::string const & objectName )
+	InputProcessor::getFields( std::string const & objectType, std::string const & objectName )
 	{
-		auto const found_type = objectTypeMap.find( objectType );
-		if ( found_type == objectTypeMap.end() ) {
-			ShowFatalError( "ObjectType (" + std::to_string( static_cast< int >( objectType ) ) + ") is not yet implemented" );
-		}
-		auto const it = jdf.find( found_type->second );
+		// auto const found_type = objectTypeMap.find( objectType );
+		// if ( found_type == objectTypeMap.end() ) {
+		// 	ShowFatalError( "ObjectType (" + std::to_string( static_cast< int >( objectType ) ) + ") is not yet implemented" );
+		// }
+		auto const it = jdf.find( objectType );
 		if ( it == jdf.end() ) {
-			ShowFatalError( "ObjectType (" + found_type->second + ") requested was not found in input" );
+			ShowFatalError( "ObjectType (" + objectType + ") requested was not found in input" );
 		}
 		auto const & objs = it.value();
 		auto const it2 = objs.find( objectName );
@@ -141,27 +141,27 @@ namespace EnergyPlus {
 					return it3.value();
 				}
 			}
-			ShowFatalError( "Name \"" + objectName + "\" requested was not found in input for ObjectType (" + found_type->second + ")"  );
+			ShowFatalError( "Name \"" + objectName + "\" requested was not found in input for ObjectType (" + objectType + ")"  );
 		}
 		return it2.value();
 	}
 
 	json const &
-	InputProcessor::getFields( ObjectType objectType )
+	InputProcessor::getFields( std::string const & objectType )
 	{
 		static const std::string blankString;
-		auto const found_type = objectTypeMap.find( objectType );
-		if ( found_type == objectTypeMap.end() ) {
-			ShowFatalError( "ObjectType (" + std::to_string( static_cast< int >( objectType ) ) + ") is not yet implemented" );
-		}
-		auto const it = jdf.find( found_type->second );
+		// auto const found_type = objectTypeMap.find( objectType );
+		// if ( found_type == objectTypeMap.end() ) {
+		// 	ShowFatalError( "ObjectType (" + std::to_string( static_cast< int >( objectType ) ) + ") is not yet implemented" );
+		// }
+		auto const it = jdf.find( objectType );
 		if ( it == jdf.end() ) {
-			ShowFatalError( "ObjectType (" + found_type->second + ") requested was not found in input" );
+			ShowFatalError( "ObjectType (" + objectType + ") requested was not found in input" );
 		}
 		auto const & objs = it.value();
 		auto const it2 = objs.find( blankString );
 		if ( it2 == objs.end() ) {
-			ShowFatalError( "Name \"\" requested was not found in input for ObjectType (" + found_type->second + ")"  );
+			ShowFatalError( "Name \"\" requested was not found in input for ObjectType (" + objectType + ")"  );
 		}
 		return it2.value();
 	}

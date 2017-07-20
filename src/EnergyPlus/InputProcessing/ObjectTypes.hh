@@ -57,21 +57,34 @@
 
 namespace EnergyPlus {
 
-enum class ObjectType {
-	GroundHeatExchangerSlinky,
-	GroundHeatExchangerVertical
-};
+// class ObjectTypes
+// {
+// public:
+// 	ObjectTypes();
 
-struct EnumClassHash
-{
-	template < typename T >
-	std::size_t operator()( T const & t ) const
-	{
-		return static_cast< std::size_t >( t );
-	}
-};
+// 	ObjectType objectType( std::string const & objectType );
 
-extern std::unordered_map< ObjectType, std::string, EnumClassHash > const objectTypeMap;
+// 	std::string objectType( ObjectType objectType );
+
+// private:
+// 	struct EnumClassHash
+// 	{
+// 		template < typename T >
+// 		std::size_t operator()( T const & t ) const
+// 		{
+// 			return static_cast< std::size_t >( t );
+// 		}
+// 	};
+
+// 	std::unordered_map< ObjectType, std::string, EnumClassHash > objectTypeMap;
+// 	std::unordered_map< std::string, ObjectType > stringTypeMap;
+
+// public:
+// 	enum class ObjectType {
+// 		GroundHeatExchangerSlinky,
+// 		GroundHeatExchangerVertical
+// 	};
+// };
 
 }
 

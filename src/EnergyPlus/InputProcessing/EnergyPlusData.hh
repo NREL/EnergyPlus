@@ -51,6 +51,7 @@
 #include <memory>
 #include <functional>
 #include <unordered_map>
+#include <iterator>
 
 // ObjexxFCL Headers
 
@@ -61,7 +62,288 @@
 
 namespace EnergyPlus {
 
-enum class ObjectType;
+template< typename T >
+class ObjectPtr
+{
+public:
+
+	ObjectPtr() = default;
+	ObjectPtr( T * rhs ) : m_data( rhs ) {}
+	ObjectPtr( ObjectPtr const & rhs ) : m_data( rhs.m_data ) {}
+
+	inline T & operator*() const { return * m_data; }
+	inline T * operator->() const { return m_data; }
+
+private:
+	T * m_data = nullptr;
+
+};
+
+template< typename T >
+class ObjectVector
+{
+public:
+
+	class iterator;
+	class const_iterator;
+
+	ObjectVector() = default;
+
+	ObjectVector( T * ptr, std::size_t size ) :
+		m_data( ptr ),
+		m_size( size )
+	{}
+
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
+
+	// Active Array Size
+	size_type
+	size() const {
+		return m_size;
+	}
+
+	// Active Array Empty?
+	bool
+	empty() const
+	{
+		return ( m_size == 0u );
+	}
+
+	// Begin Iterator
+	const_iterator
+	begin() const {
+		return const_iterator( m_data );
+	}
+
+	// Begin Iterator
+	iterator
+	begin() {
+		return iterator( m_data );
+	}
+
+	// End Iterator
+	const_iterator
+	end() const {
+		return ( ( m_data != nullptr ) && ( m_size != 0 ) ? const_iterator( m_data + m_size ) : const_iterator() );
+	}
+
+	// End Iterator
+	iterator
+	end() {
+		return ( ( m_data != nullptr ) && ( m_size != 0 ) ? iterator( m_data + m_size ) : iterator() );
+	}
+
+	// Reverse Begin Iterator
+	const_iterator
+	rbegin() const {
+		return const_reverse_iterator( ( m_data != nullptr ) && ( m_size != 0 ) ? const_iterator( m_data + m_size ) : const_iterator() );
+	}
+
+	// Reverse Begin Iterator
+	iterator
+	rbegin() {
+		return reverse_iterator( ( m_data != nullptr ) && ( m_size != 0 ) ? iterator( m_data + m_size ) : iterator() );
+	}
+
+	// Reverse End Iterator
+	const_iterator
+	rend() const {
+		return const_iterator( m_data );
+	}
+
+	// Reverse End Iterator
+	iterator
+	rend() {
+		return iterator( m_data );
+	}
+
+	// // Data Pointer
+	// T const *
+	// data() const {
+	// 	return m_data;
+	// }
+
+	// // Data Pointer
+	// T *
+	// data() {
+	// 	return m_data;
+	// }
+
+	// array[ i ] const: Linear Subscript
+	T const &
+	operator []( size_type const i ) const
+	{
+		assert( ( i < m_size ) || ( m_size == 0 ) );
+		return m_data[ i ];
+	}
+
+	// array[ i ]: Linear Subscript
+	T &
+	operator []( size_type const i )
+	{
+		assert( ( i < m_size ) || ( m_size == 0 ) );
+		return m_data[ i ];
+	}
+
+private:
+	size_type m_size = 0;
+	T * m_data = nullptr;
+
+};
+
+// taken from https://stackoverflow.com/a/31886483/2358662
+template< typename T >
+class ObjectVector< T >::iterator : public std::iterator< std::random_access_iterator_tag, T >
+{
+public:
+	using difference_type = typename std::iterator< std::random_access_iterator_tag, T >::difference_type;
+
+	iterator() : m_ptr( nullptr ) {}
+	iterator( T* rhs ) : m_ptr( rhs ) {}
+	iterator( const iterator &rhs ) : m_ptr( rhs.m_ptr ) {}
+	inline iterator& operator+=( difference_type rhs ) { m_ptr += rhs; return *this; }
+	inline iterator& operator-=( difference_type rhs ) { m_ptr -= rhs; return *this; }
+	inline T& operator*() const { return *m_ptr; }
+	inline T* operator->() const { return m_ptr; }
+	inline T& operator[]( difference_type rhs ) const { return m_ptr[ rhs ]; }
+
+	inline iterator& operator++() { ++m_ptr; return *this; }
+	inline iterator& operator--() { --m_ptr; return *this; }
+	inline iterator operator++( int ) const { iterator tmp( *this ); ++m_ptr; return tmp; }
+	inline iterator operator--( int ) const { iterator tmp( *this ); --m_ptr; return tmp; }
+	inline difference_type operator-(const iterator& rhs) const {return iterator( m_ptr - rhs.ptr ); }
+	inline iterator operator+( difference_type rhs ) const { return iterator( m_ptr+rhs ); }
+	inline iterator operator-( difference_type rhs ) const { return iterator( m_ptr-rhs ); }
+	friend inline iterator operator+( difference_type lhs, const iterator& rhs ) { return iterator( lhs + rhs.m_ptr ); }
+	friend inline iterator operator-( difference_type lhs, const iterator& rhs ) { return iterator( lhs - rhs.m_ptr ); }
+
+	inline bool operator==( const iterator& rhs ) const { return m_ptr == rhs.m_ptr; }
+	inline bool operator!=( const iterator& rhs ) const { return m_ptr != rhs.m_ptr; }
+	inline bool operator>( const iterator& rhs ) const { return m_ptr > rhs.m_ptr; }
+	inline bool operator<( const iterator& rhs ) const { return m_ptr < rhs.m_ptr; }
+	inline bool operator>=( const iterator& rhs ) const { return m_ptr >= rhs.m_ptr; }
+	inline bool operator<=( const iterator& rhs ) const { return m_ptr <= rhs.m_ptr; }
+private:
+	T * m_ptr;
+};
+
+template< typename T >
+class ObjectVector< T >::const_iterator : public std::iterator< std::random_access_iterator_tag, T >
+{
+public:
+	using difference_type = typename std::iterator< std::random_access_iterator_tag, T >::difference_type;
+
+	const_iterator() : m_ptr( nullptr ) {}
+	const_iterator( T const * rhs ) : m_ptr( rhs ) {}
+	const_iterator( const const_iterator &rhs ) : m_ptr( rhs.m_ptr ) {}
+	inline const_iterator& operator+=( difference_type rhs ) { m_ptr += rhs; return *this; }
+	inline const_iterator& operator-=( difference_type rhs ) { m_ptr -= rhs; return *this; }
+	inline T const & operator*() const { return *m_ptr; }
+	inline T const * operator->() const { return m_ptr; }
+	inline T const & operator[]( difference_type rhs ) const { return m_ptr[ rhs ]; }
+
+	inline const_iterator& operator++() { ++m_ptr; return *this; }
+	inline const_iterator& operator--() { --m_ptr; return *this; }
+	inline const_iterator operator++( int ) const { const_iterator tmp( *this ); ++m_ptr; return tmp; }
+	inline const_iterator operator--( int ) const { const_iterator tmp( *this ); --m_ptr; return tmp; }
+	inline difference_type operator-(const const_iterator& rhs) const {return const_iterator( m_ptr - rhs.ptr ); }
+	inline const_iterator operator+( difference_type rhs ) const { return const_iterator( m_ptr+rhs ); }
+	inline const_iterator operator-( difference_type rhs ) const { return const_iterator( m_ptr-rhs ); }
+	friend inline const_iterator operator+( difference_type lhs, const const_iterator& rhs ) { return const_iterator( lhs + rhs.m_ptr ); }
+	friend inline const_iterator operator-( difference_type lhs, const const_iterator& rhs ) { return const_iterator( lhs - rhs.m_ptr ); }
+
+	inline bool operator==( const const_iterator& rhs ) const { return m_ptr == rhs.m_ptr; }
+	inline bool operator!=( const const_iterator& rhs ) const { return m_ptr != rhs.m_ptr; }
+	inline bool operator>( const const_iterator& rhs ) const { return m_ptr > rhs.m_ptr; }
+	inline bool operator<( const const_iterator& rhs ) const { return m_ptr < rhs.m_ptr; }
+	inline bool operator>=( const const_iterator& rhs ) const { return m_ptr >= rhs.m_ptr; }
+	inline bool operator<=( const const_iterator& rhs ) const { return m_ptr <= rhs.m_ptr; }
+private:
+	T const * m_ptr;
+};
+
+template< class T >
+class ObjectTypeData
+{
+public:
+	using json = nlohmann::json;
+
+	ObjectTypeData() = default;
+
+	T *
+	addObject( std::string const & objectName, json const & fields ) {
+		storage.emplace_back( objectName, fields );
+		nameMap.emplace( objectName, storage.size() - 1 );
+		return storage.data() + storage.size() - 1;
+	}
+
+	T *
+	addObject( json const & fields ) {
+		assert( storage.size() <= 1 );
+		storage.emplace( fields );
+		return storage.data();
+	}
+
+	ObjectVector< T >
+	addObjects( json const & objs ) {
+		assert( objs.is_object() );
+
+		// std::vector< T * > output;
+
+		storage.reserve( objs.size() );
+		nameMap.reserve( objs.size() );
+		// output.reserve( objs.size() );
+
+		for ( auto it = objs.begin(); it != objs.end(); ++it ) {
+			auto last_index = storage.size();
+			storage.emplace_back( it.key(), it.value() );
+			nameMap.emplace( it.key(), last_index );
+			// output.emplace_back( storage.data() + last_index );
+		}
+		// return output;
+		return ObjectVector< T >( storage.data(), storage.size() );
+	}
+
+	T *
+	objectFactory( std::string const & objectName )
+	{
+		if ( storage.size() == 0 ) return nullptr;
+		auto const it = nameMap.find( objectName );
+		if ( it == nameMap.end() ) return nullptr;
+		return storage.data() + it->second;
+	}
+
+	T *
+	objectFactory()
+	{
+		assert( storage.size() <= 1 );
+		if ( storage.size() == 0 ) return nullptr;
+		return storage.data();
+	}
+
+	ObjectVector< T >
+	objectsFactory()
+	{
+		// std::vector< T * > output;
+		// output.reserve( storage.size() );
+		// for ( std::size_t i = 0; i < storage.size(); ++i ) {
+		// 	output.emplace_back( storage.data() + i );
+		// }
+		// return output;
+		return ObjectVector< T >( storage.data(), storage.size() );
+	}
+
+	std::size_t
+	numObjects() const
+	{
+		return storage.size();
+	}
+
+private:
+	std::vector< T > storage;
+	std::unordered_map< std::string, std::size_t > nameMap;
+};
 
 class EnergyPlusData
 {
@@ -72,8 +354,16 @@ public:
 	T *
 	addObject( std::string const & objectName, json const & fields )
 	{
-		T * ptr = new T( objectName, fields );
-		EPData[ T::objectType() ][ objectName ] = std::move( unique_void( ptr ) );
+		T * ptr;
+		auto const it = EPData.find( T::objectTypeHash() );
+		if ( it != EPData.end() ) {
+			auto cast_ptr = static_cast< ObjectTypeData< T > * >( it->second.get() );
+			ptr = cast_ptr->addObject( objectName, fields );
+		} else {
+			auto obj = new ObjectTypeData< T >();
+			ptr = obj->addObject( objectName, fields );
+			EPData.emplace( T::objectTypeHash(), std::move( unique_void( obj ) ) );
+		}
 		return ptr;
 	}
 
@@ -81,37 +371,66 @@ public:
 	T *
 	addObject( json const & fields )
 	{
-		static const std::string blankString;
-		T * ptr = new T( fields );
-		EPData[ T::objectType() ][ blankString ] = std::move( unique_void( ptr ) );
+		T * ptr;
+		auto const it = EPData.find( T::objectTypeHash() );
+		if ( it != EPData.end() ) {
+			auto cast_ptr = static_cast< ObjectTypeData< T > * >( it->second.get() );
+			ptr = cast_ptr->addObject( fields );
+		} else {
+			auto obj = new ObjectTypeData< T >();
+			ptr = obj->addObject( fields );
+			EPData.emplace( T::objectTypeHash(), std::move( unique_void( obj ) ) );
+		}
 		return ptr;
+	}
+
+	template< typename T >
+	ObjectVector< T >
+	addObjects( json const & objs )
+	{
+		assert( objs.is_object() );
+
+		ObjectVector< T > ptrs;
+		auto const it = EPData.find( T::objectTypeHash() );
+		if ( it != EPData.end() ) {
+			auto cast_ptr = static_cast< ObjectTypeData< T > * >( it->second.get() );
+			ptrs = cast_ptr->addObjects( objs );
+		} else {
+			auto obj = new ObjectTypeData< T >();
+			ptrs = obj->addObjects( objs );
+			EPData.emplace( T::objectTypeHash(), std::move( unique_void( obj ) ) );
+		}
+		return ptrs;
 	}
 
 	template< typename T >
 	T *
 	objectFactory( std::string const & objectName )
 	{
-		auto const it = EPData.find( T::objectType() );
+		auto const it = EPData.find( T::objectTypeHash() );
 		if ( it == EPData.end() ) return nullptr;
-		auto const it2 = it->second.find( objectName );
-		if ( it2 == it->second.end() ) return nullptr;
-		void * data = it2->second.get();
-		T * p = static_cast< T * >( data );
-		return p;
+		auto cast_ptr = static_cast< ObjectTypeData< T > * >( it->second.get() );
+		return cast_ptr->objectFactory( objectName );
 	}
 
 	template< typename T >
 	T *
 	objectFactory()
 	{
-		static const std::string blankString;
-		auto const it = EPData.find( T::objectType() );
+		auto const it = EPData.find( T::objectTypeHash() );
 		if ( it == EPData.end() ) return nullptr;
-		auto const it2 = it->second.find( blankString );
-		if ( it2 == it->second.end() ) return nullptr;
-		void * data = it2->second.get();
-		T * p = static_cast< T * >( data );
-		return p;
+		auto cast_ptr = static_cast< ObjectTypeData< T > * >( it->second.get() );
+		return cast_ptr->objectFactory();
+	}
+
+	template< typename T >
+	ObjectVector< T >
+	objectsFactory()
+	{
+		auto const it = EPData.find( T::objectTypeHash() );
+		if ( it == EPData.end() ) return nullptr;
+		auto cast_ptr = static_cast< ObjectTypeData< T > * >( it->second.get() );
+		return cast_ptr->objectsFactory();
 	}
 
 private:
@@ -129,16 +448,7 @@ private:
 		return std::unique_ptr< void, deleter_t >( ptr, deleter );
 	}
 
-	struct EnumClassHash
-	{
-		template < typename T >
-		std::size_t operator()( T const & t ) const
-		{
-			return static_cast< std::size_t >( t );
-		}
-	};
-
-	std::unordered_map< ObjectType, std::unordered_map< std::string, unique_void_ptr >, EnumClassHash > EPData;
+	std::unordered_map< std::size_t, unique_void_ptr > EPData;
 
 };
 

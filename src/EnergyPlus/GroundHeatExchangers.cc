@@ -66,7 +66,6 @@
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <InputProcessing/EnergyPlusData.hh>
-#include <InputProcessing/ObjectTypes.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -152,11 +151,11 @@ namespace GroundHeatExchangers {
 	// Recommended size, the product of Minimum subhourly history required and
 	// the maximum no of system time steps in an hour
 
-	Array1D_bool checkEquipName;
+	// Array1D_bool checkEquipName;
 
 	// Object Data
-	Array1D< GLHEVert > verticalGLHE;
-	Array1D< GLHESlinky > slinkyGLHE;
+	// Array1D< GLHEVert > verticalGLHE;
+	// Array1D< GLHESlinky > slinkyGLHE;
 
 	// MODULE SUBROUTINES:
 
@@ -174,17 +173,29 @@ namespace GroundHeatExchangers {
 		GetInput = true;
 		errorsFound = false;
 		prevTimeSteps.deallocate();
-		checkEquipName.deallocate();
-		verticalGLHE.deallocate();
-		slinkyGLHE.deallocate();
+		// checkEquipName.deallocate();
+		// verticalGLHE.deallocate();
+		// slinkyGLHE.deallocate();
 	}
 
-	ObjectType GLHEVert::objectType() {
-		return ObjectType::GroundHeatExchangerVertical;
+	std::string const & GLHEVert::canonicalObjectType() {
+		static const std::string objectType = "GroundHeatExchanger:Vertical";
+		return objectType;
 	}
 
-	ObjectType GLHESlinky::objectType() {
-		return ObjectType::GroundHeatExchangerSlinky;
+	std::size_t GLHEVert::objectTypeHash() {
+		static const std::size_t objectTypeHash = std::hash< std::string>{}( canonicalObjectType() );
+		return objectTypeHash;
+	}
+
+	std::string const & GLHESlinky::canonicalObjectType() {
+		static const std::string objectType = "GroundHeatExchanger:Slinky";
+		return objectType;
+	}
+
+	std::size_t GLHESlinky::objectTypeHash() {
+		static const std::size_t objectTypeHash = std::hash< std::string>{}( canonicalObjectType() );
+		return objectTypeHash;
 	}
 
 	void GLHEBase::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {
@@ -198,23 +209,23 @@ namespace GroundHeatExchangers {
 	}
 
 	PlantComponent * GLHEBase::factory( int const objectType, std::string objectName ) {
-		if ( GetInput ) {
-			GetGroundHeatExchangerInput();
-			GetInput = false;
-		}
-		if ( objectType == DataPlant::TypeOf_GrndHtExchgVertical ) {
-			for ( auto & ghx : verticalGLHE ) {
-				if ( ghx.Name == objectName ) {
-					return &ghx;
-				}
-			}
-		} else if ( objectType == DataPlant::TypeOf_GrndHtExchgSlinky ) {
-			for ( auto & ghx : slinkyGLHE ) {
-				if ( ghx.Name == objectName ) {
-					return &ghx;
-				}
-			}
-		}
+		// if ( GetInput ) {
+		// 	GetGroundHeatExchangerInput();
+		// 	GetInput = false;
+		// }
+		// if ( objectType == DataPlant::TypeOf_GrndHtExchgVertical ) {
+		// 	for ( auto & ghx : verticalGLHE ) {
+		// 		if ( ghx.Name == objectName ) {
+		// 			return &ghx;
+		// 		}
+		// 	}
+		// } else if ( objectType == DataPlant::TypeOf_GrndHtExchgSlinky ) {
+		// 	for ( auto & ghx : slinkyGLHE ) {
+		// 		if ( ghx.Name == objectName ) {
+		// 			return &ghx;
+		// 		}
+		// 	}
+		// }
 		// If we didn't find it, fatal
 		ShowFatalError( "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );
 		// Shut up the compiler
@@ -1360,305 +1371,305 @@ namespace GroundHeatExchangers {
 	{
 	}
 
-	void
-	GetGroundHeatExchangerInput()
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Dan Fisher
-		//       DATE WRITTEN:    August, 2000
-		//       MODIFIED         Arun Murugappan
-		//       RE-ENGINEERED    na
+	// void
+	// GetGroundHeatExchangerInput()
+	// {
+	// 	// SUBROUTINE INFORMATION:
+	// 	//       AUTHOR:          Dan Fisher
+	// 	//       DATE WRITTEN:    August, 2000
+	// 	//       MODIFIED         Arun Murugappan
+	// 	//       RE-ENGINEERED    na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine needs a description.
+	// 	// PURPOSE OF THIS SUBROUTINE:
+	// 	// This subroutine needs a description.
 
-		// METHODOLOGY EMPLOYED:
-		// Needs description, as appropriate.
+	// 	// METHODOLOGY EMPLOYED:
+	// 	// Needs description, as appropriate.
 
-		// Using/Aliasing
-		using namespace DataIPShortCuts;
-		using NodeInputManager::GetOnlySingleNode;
-		using BranchNodeConnections::TestCompSet;
-		using General::TrimSigDigits;
-		using General::RoundSigDigits;
-		using DataEnvironment::MaxNumberSimYears;
-		using PlantUtilities::RegisterPlantCompDesignFlow;
+	// 	// Using/Aliasing
+	// 	using namespace DataIPShortCuts;
+	// 	using NodeInputManager::GetOnlySingleNode;
+	// 	using BranchNodeConnections::TestCompSet;
+	// 	using General::TrimSigDigits;
+	// 	using General::RoundSigDigits;
+	// 	using DataEnvironment::MaxNumberSimYears;
+	// 	using PlantUtilities::RegisterPlantCompDesignFlow;
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int GLHENum;
-		int numAlphas; // Number of elements in the alpha array
-		int numNums; // Number of elements in the numeric array. "numNums" :)
-		int IOStat; // IO Status when calling get input subroutine
-		int indexNum;
-		int pairNum;
-		bool allocated;
+	// 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+	// 	int GLHENum;
+	// 	int numAlphas; // Number of elements in the alpha array
+	// 	int numNums; // Number of elements in the numeric array. "numNums" :)
+	// 	int IOStat; // IO Status when calling get input subroutine
+	// 	int indexNum;
+	// 	int pairNum;
+	// 	bool allocated;
 
-		// VERTICAL GLHE
+	// 	// VERTICAL GLHE
 
-		//GET NUMBER OF ALL EQUIPMENT TYPES
+	// 	//GET NUMBER OF ALL EQUIPMENT TYPES
 
-		numVerticalGLHEs = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:Vertical" );
-		numSlinkyGLHEs = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:Slinky" );
+	// 	numVerticalGLHEs = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:Vertical" );
+	// 	numSlinkyGLHEs = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:Slinky" );
 
-		allocated = false;
+	// 	allocated = false;
 
-		if ( numVerticalGLHEs <= 0 && numSlinkyGLHEs <= 0 ) {
-			ShowSevereError( "Error processing inputs for slinky and vertical GLHE objects" );
-			ShowContinueError( "Simulation indicated these objects were found, but input processor doesn't find any" );
-			ShowContinueError( "Check inputs for GroundHeatExchanger:Vertical and GroundHeatExchanger:Slinky" );
-			ShowContinueError( "Also check plant/branch inputs for references to invalid/deleted objects" );
-			errorsFound = true;
-		}
+	// 	if ( numVerticalGLHEs <= 0 && numSlinkyGLHEs <= 0 ) {
+	// 		ShowSevereError( "Error processing inputs for slinky and vertical GLHE objects" );
+	// 		ShowContinueError( "Simulation indicated these objects were found, but input processor doesn't find any" );
+	// 		ShowContinueError( "Check inputs for GroundHeatExchanger:Vertical and GroundHeatExchanger:Slinky" );
+	// 		ShowContinueError( "Also check plant/branch inputs for references to invalid/deleted objects" );
+	// 		errorsFound = true;
+	// 	}
 
-		if ( numVerticalGLHEs > 0 ) {
+	// 	if ( numVerticalGLHEs > 0 ) {
 
-			cCurrentModuleObject = "GroundHeatExchanger:Vertical";
+	// 		cCurrentModuleObject = "GroundHeatExchanger:Vertical";
 
-			verticalGLHE.allocate( numVerticalGLHEs );
+	// 		verticalGLHE.allocate( numVerticalGLHEs );
 
-			checkEquipName.dimension( numVerticalGLHEs, true );
+	// 		checkEquipName.dimension( numVerticalGLHEs, true );
 
-			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
-				inputProcessor->getObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
+	// 		for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
+	// 			inputProcessor->getObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+	// 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
-				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
+	// 			verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
-				//get inlet node num
-				verticalGLHE( GLHENum ).inletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+	// 			//get inlet node num
+	// 			verticalGLHE( GLHENum ).inletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-				//get outlet node num
-				verticalGLHE( GLHENum ).outletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				verticalGLHE( GLHENum ).available = true;
-				verticalGLHE( GLHENum ).on = true;
+	// 			//get outlet node num
+	// 			verticalGLHE( GLHENum ).outletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+	// 			verticalGLHE( GLHENum ).available = true;
+	// 			verticalGLHE( GLHENum ).on = true;
 
-				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Condenser Water Nodes" );
+	// 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Condenser Water Nodes" );
 
-				//load borehole data
-				verticalGLHE( GLHENum ).designFlow = rNumericArgs( 1 );
-				RegisterPlantCompDesignFlow( verticalGLHE( GLHENum ).inletNodeNum, verticalGLHE( GLHENum ).designFlow );
+	// 			//load borehole data
+	// 			verticalGLHE( GLHENum ).designFlow = rNumericArgs( 1 );
+	// 			RegisterPlantCompDesignFlow( verticalGLHE( GLHENum ).inletNodeNum, verticalGLHE( GLHENum ).designFlow );
 
-				verticalGLHE( GLHENum ).numBoreholes = rNumericArgs( 2 );
-				verticalGLHE( GLHENum ).boreholeLength = rNumericArgs( 3 );
-				verticalGLHE( GLHENum ).boreholeRadius = rNumericArgs( 4 );
-				verticalGLHE( GLHENum ).kGround = rNumericArgs( 5 );
-				verticalGLHE( GLHENum ).cpRhoGround = rNumericArgs( 6 );
-				verticalGLHE( GLHENum ).tempGround = rNumericArgs( 7 );
-				verticalGLHE( GLHENum ).kGrout = rNumericArgs( 8 );
-				verticalGLHE( GLHENum ).kPipe = rNumericArgs( 9 );
-				verticalGLHE( GLHENum ).pipeOutDia = rNumericArgs( 10 );
-				verticalGLHE( GLHENum ).UtubeDist = rNumericArgs( 11 );
-				verticalGLHE( GLHENum ).pipeThick = rNumericArgs( 12 );
-				verticalGLHE( GLHENum ).maxSimYears = rNumericArgs( 13 );
-				verticalGLHE( GLHENum ).gReferenceRatio = rNumericArgs( 14 );
+	// 			verticalGLHE( GLHENum ).numBoreholes = rNumericArgs( 2 );
+	// 			verticalGLHE( GLHENum ).boreholeLength = rNumericArgs( 3 );
+	// 			verticalGLHE( GLHENum ).boreholeRadius = rNumericArgs( 4 );
+	// 			verticalGLHE( GLHENum ).kGround = rNumericArgs( 5 );
+	// 			verticalGLHE( GLHENum ).cpRhoGround = rNumericArgs( 6 );
+	// 			verticalGLHE( GLHENum ).tempGround = rNumericArgs( 7 );
+	// 			verticalGLHE( GLHENum ).kGrout = rNumericArgs( 8 );
+	// 			verticalGLHE( GLHENum ).kPipe = rNumericArgs( 9 );
+	// 			verticalGLHE( GLHENum ).pipeOutDia = rNumericArgs( 10 );
+	// 			verticalGLHE( GLHENum ).UtubeDist = rNumericArgs( 11 );
+	// 			verticalGLHE( GLHENum ).pipeThick = rNumericArgs( 12 );
+	// 			verticalGLHE( GLHENum ).maxSimYears = rNumericArgs( 13 );
+	// 			verticalGLHE( GLHENum ).gReferenceRatio = rNumericArgs( 14 );
 
-				// total tube length
-				verticalGLHE( GLHENum ).totalTubeLength = verticalGLHE( GLHENum ).numBoreholes * verticalGLHE( GLHENum ).boreholeLength;
+	// 			// total tube length
+	// 			verticalGLHE( GLHENum ).totalTubeLength = verticalGLHE( GLHENum ).numBoreholes * verticalGLHE( GLHENum ).boreholeLength;
 
-				// ground thermal diffusivity
-				verticalGLHE( GLHENum ).diffusivityGround = verticalGLHE( GLHENum ).kGround / verticalGLHE( GLHENum ).cpRhoGround;
+	// 			// ground thermal diffusivity
+	// 			verticalGLHE( GLHENum ).diffusivityGround = verticalGLHE( GLHENum ).kGround / verticalGLHE( GLHENum ).cpRhoGround;
 
-				//   Not many checks
+	// 			//   Not many checks
 
-				if ( verticalGLHE( GLHENum ).pipeThick >= verticalGLHE( GLHENum ).pipeOutDia / 2.0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
-					ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( verticalGLHE( GLHENum ).pipeThick, 3 ) + "]." );
-					ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( verticalGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
-					ShowContinueError( "...Radius will be <=0." );
-					errorsFound = true;
-				}
+	// 			if ( verticalGLHE( GLHENum ).pipeThick >= verticalGLHE( GLHENum ).pipeOutDia / 2.0 ) {
+	// 				ShowSevereError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
+	// 				ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( verticalGLHE( GLHENum ).pipeThick, 3 ) + "]." );
+	// 				ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( verticalGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
+	// 				ShowContinueError( "...Radius will be <=0." );
+	// 				errorsFound = true;
+	// 			}
 
-				if ( verticalGLHE( GLHENum ).maxSimYears < MaxNumberSimYears ) {
-					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
-					ShowContinueError( "..." + cNumericFieldNames( 13 ) + " less than RunPeriod Request" );
-					ShowContinueError( "Requested input=" + TrimSigDigits( verticalGLHE( GLHENum ).maxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
-					verticalGLHE( GLHENum ).maxSimYears = MaxNumberSimYears;
-				}
+	// 			if ( verticalGLHE( GLHENum ).maxSimYears < MaxNumberSimYears ) {
+	// 				ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
+	// 				ShowContinueError( "..." + cNumericFieldNames( 13 ) + " less than RunPeriod Request" );
+	// 				ShowContinueError( "Requested input=" + TrimSigDigits( verticalGLHE( GLHENum ).maxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
+	// 				verticalGLHE( GLHENum ).maxSimYears = MaxNumberSimYears;
+	// 			}
 
-				// Get Gfunction data
-				indexNum = 15;
-				verticalGLHE( GLHENum ).NPairs = rNumericArgs( indexNum );
+	// 			// Get Gfunction data
+	// 			indexNum = 15;
+	// 			verticalGLHE( GLHENum ).NPairs = rNumericArgs( indexNum );
 
-				// Get Gfunc error handling
-				if ( verticalGLHE( GLHENum ).NPairs < 1 ) {
-					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
-					ShowContinueError( "..." + cNumericFieldNames( indexNum ) + " is less than 1." );
-					errorsFound = true;
-				} else if ( numNums != ( indexNum + ( verticalGLHE( GLHENum ).NPairs * 2 ) ) ) {
-					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid number of input fields." );
-					errorsFound = true;
-				}
+	// 			// Get Gfunc error handling
+	// 			if ( verticalGLHE( GLHENum ).NPairs < 1 ) {
+	// 				ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
+	// 				ShowContinueError( "..." + cNumericFieldNames( indexNum ) + " is less than 1." );
+	// 				errorsFound = true;
+	// 			} else if ( numNums != ( indexNum + ( verticalGLHE( GLHENum ).NPairs * 2 ) ) ) {
+	// 				ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid number of input fields." );
+	// 				errorsFound = true;
+	// 			}
 
-				verticalGLHE( GLHENum ).SubAGG = 15;
-				verticalGLHE( GLHENum ).AGG = 192;
+	// 			verticalGLHE( GLHENum ).SubAGG = 15;
+	// 			verticalGLHE( GLHENum ).AGG = 192;
 
-				// Allocation of all the dynamic arrays
-				verticalGLHE( GLHENum ).LNTTS.dimension( verticalGLHE( GLHENum ).NPairs, 0.0 );
-				verticalGLHE( GLHENum ).GFNC.dimension( verticalGLHE( GLHENum ).NPairs, 0.0 );
-				verticalGLHE( GLHENum ).QnMonthlyAgg.dimension( verticalGLHE( GLHENum ).maxSimYears * 12, 0.0 );
-				verticalGLHE( GLHENum ).QnHr.dimension( 730 + verticalGLHE( GLHENum ).AGG + verticalGLHE( GLHENum ).SubAGG, 0.0 );
-				verticalGLHE( GLHENum ).QnSubHr.dimension( ( verticalGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1, 0.0 );
-				verticalGLHE( GLHENum ).LastHourN.dimension( verticalGLHE( GLHENum ).SubAGG + 1, 0 );
+	// 			// Allocation of all the dynamic arrays
+	// 			verticalGLHE( GLHENum ).LNTTS.dimension( verticalGLHE( GLHENum ).NPairs, 0.0 );
+	// 			verticalGLHE( GLHENum ).GFNC.dimension( verticalGLHE( GLHENum ).NPairs, 0.0 );
+	// 			verticalGLHE( GLHENum ).QnMonthlyAgg.dimension( verticalGLHE( GLHENum ).maxSimYears * 12, 0.0 );
+	// 			verticalGLHE( GLHENum ).QnHr.dimension( 730 + verticalGLHE( GLHENum ).AGG + verticalGLHE( GLHENum ).SubAGG, 0.0 );
+	// 			verticalGLHE( GLHENum ).QnSubHr.dimension( ( verticalGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1, 0.0 );
+	// 			verticalGLHE( GLHENum ).LastHourN.dimension( verticalGLHE( GLHENum ).SubAGG + 1, 0 );
 
-				if ( ! allocated ) {
-					prevTimeSteps.allocate( ( verticalGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
-					prevTimeSteps = 0.0;
-					allocated = true;
-				}
+	// 			if ( ! allocated ) {
+	// 				prevTimeSteps.allocate( ( verticalGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
+	// 				prevTimeSteps = 0.0;
+	// 				allocated = true;
+	// 			}
 
-				indexNum = 16;
-				for ( pairNum = 1; pairNum <= verticalGLHE( GLHENum ).NPairs; ++pairNum ) {
-					verticalGLHE( GLHENum ).LNTTS( pairNum ) = rNumericArgs( indexNum );
-					verticalGLHE( GLHENum ).GFNC( pairNum ) = rNumericArgs( indexNum + 1 );
-					indexNum += 2;
-				}
-				//Check for Errors
-				if ( errorsFound ) {
-					ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
-				}
-			}
+	// 			indexNum = 16;
+	// 			for ( pairNum = 1; pairNum <= verticalGLHE( GLHENum ).NPairs; ++pairNum ) {
+	// 				verticalGLHE( GLHENum ).LNTTS( pairNum ) = rNumericArgs( indexNum );
+	// 				verticalGLHE( GLHENum ).GFNC( pairNum ) = rNumericArgs( indexNum + 1 );
+	// 				indexNum += 2;
+	// 			}
+	// 			//Check for Errors
+	// 			if ( errorsFound ) {
+	// 				ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+	// 			}
+	// 		}
 
-			//Set up report variables
-			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
-				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", verticalGLHE( GLHENum ).boreholeTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", verticalGLHE( GLHENum ).QGLHE, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", verticalGLHE( GLHENum ).inletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", verticalGLHE( GLHENum ).outletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", verticalGLHE( GLHENum ).massFlowRate, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", verticalGLHE( GLHENum ).aveFluidTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-			}
+	// 		//Set up report variables
+	// 		for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
+	// 			SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", verticalGLHE( GLHENum ).boreholeTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", verticalGLHE( GLHENum ).QGLHE, "System", "Average", verticalGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", verticalGLHE( GLHENum ).inletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", verticalGLHE( GLHENum ).outletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", verticalGLHE( GLHENum ).massFlowRate, "System", "Average", verticalGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", verticalGLHE( GLHENum ).aveFluidTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+	// 		}
 
-		}
+	// 	}
 
-		// SLINKY GLHE
+	// 	// SLINKY GLHE
 
-		allocated = false;
+	// 	allocated = false;
 
-		if ( numSlinkyGLHEs > 0 ) {
+	// 	if ( numSlinkyGLHEs > 0 ) {
 
-			cCurrentModuleObject = "GroundHeatExchanger:Slinky";
+	// 		cCurrentModuleObject = "GroundHeatExchanger:Slinky";
 
-			slinkyGLHE.allocate( numSlinkyGLHEs );
+	// 		slinkyGLHE.allocate( numSlinkyGLHEs );
 
-			checkEquipName.dimension( numSlinkyGLHEs, true );
+	// 		checkEquipName.dimension( numSlinkyGLHEs, true );
 
-			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
-				inputProcessor->getObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
+	// 		for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
+	// 			inputProcessor->getObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+	// 			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
-				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
+	// 			slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
-				//get inlet node num
-				slinkyGLHE( GLHENum ).inletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+	// 			//get inlet node num
+	// 			slinkyGLHE( GLHENum ).inletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-				//get outlet node num
-				slinkyGLHE( GLHENum ).outletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				slinkyGLHE( GLHENum ).available = true;
-				slinkyGLHE( GLHENum ).on = true;
+	// 			//get outlet node num
+	// 			slinkyGLHE( GLHENum ).outletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+	// 			slinkyGLHE( GLHENum ).available = true;
+	// 			slinkyGLHE( GLHENum ).on = true;
 
-				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Condenser Water Nodes" );
+	// 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Condenser Water Nodes" );
 
-				//load data
-				slinkyGLHE( GLHENum ).designFlow = rNumericArgs( 1 );
-				RegisterPlantCompDesignFlow( slinkyGLHE( GLHENum ).inletNodeNum, slinkyGLHE( GLHENum ).designFlow );
+	// 			//load data
+	// 			slinkyGLHE( GLHENum ).designFlow = rNumericArgs( 1 );
+	// 			RegisterPlantCompDesignFlow( slinkyGLHE( GLHENum ).inletNodeNum, slinkyGLHE( GLHENum ).designFlow );
 
-				slinkyGLHE( GLHENum ).kGround = rNumericArgs( 2 );
-				slinkyGLHE( GLHENum ).cpRhoGround = rNumericArgs( 3 ) * rNumericArgs( 4 );
-				slinkyGLHE( GLHENum ).kPipe = rNumericArgs( 5 );
-				slinkyGLHE( GLHENum ).rhoPipe = rNumericArgs( 6 );
-				slinkyGLHE( GLHENum ).cpPipe = rNumericArgs( 7 );
-				slinkyGLHE( GLHENum ).pipeOutDia = rNumericArgs( 8 );
-				slinkyGLHE( GLHENum ).pipeThick = rNumericArgs( 9 );
+	// 			slinkyGLHE( GLHENum ).kGround = rNumericArgs( 2 );
+	// 			slinkyGLHE( GLHENum ).cpRhoGround = rNumericArgs( 3 ) * rNumericArgs( 4 );
+	// 			slinkyGLHE( GLHENum ).kPipe = rNumericArgs( 5 );
+	// 			slinkyGLHE( GLHENum ).rhoPipe = rNumericArgs( 6 );
+	// 			slinkyGLHE( GLHENum ).cpPipe = rNumericArgs( 7 );
+	// 			slinkyGLHE( GLHENum ).pipeOutDia = rNumericArgs( 8 );
+	// 			slinkyGLHE( GLHENum ).pipeThick = rNumericArgs( 9 );
 
-				if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "VERTICAL" ) ) {
-					slinkyGLHE( GLHENum ).verticalConfig = true;
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
-					slinkyGLHE( GLHENum ).verticalConfig = false;
-				}
+	// 			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "VERTICAL" ) ) {
+	// 				slinkyGLHE( GLHENum ).verticalConfig = true;
+	// 			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
+	// 				slinkyGLHE( GLHENum ).verticalConfig = false;
+	// 			}
 
-				slinkyGLHE( GLHENum ).coilDiameter = rNumericArgs( 10 );
-				slinkyGLHE( GLHENum ).coilPitch = rNumericArgs( 11 );
-				slinkyGLHE( GLHENum ).trenchDepth = rNumericArgs( 12 );
-				slinkyGLHE( GLHENum ).trenchLength = rNumericArgs( 13 );
-				slinkyGLHE( GLHENum ).numTrenches = rNumericArgs( 14 );
-				slinkyGLHE( GLHENum ).trenchSpacing = rNumericArgs( 15 );
-				slinkyGLHE( GLHENum ).maxSimYears = rNumericArgs( 16 );
+	// 			slinkyGLHE( GLHENum ).coilDiameter = rNumericArgs( 10 );
+	// 			slinkyGLHE( GLHENum ).coilPitch = rNumericArgs( 11 );
+	// 			slinkyGLHE( GLHENum ).trenchDepth = rNumericArgs( 12 );
+	// 			slinkyGLHE( GLHENum ).trenchLength = rNumericArgs( 13 );
+	// 			slinkyGLHE( GLHENum ).numTrenches = rNumericArgs( 14 );
+	// 			slinkyGLHE( GLHENum ).trenchSpacing = rNumericArgs( 15 );
+	// 			slinkyGLHE( GLHENum ).maxSimYears = rNumericArgs( 16 );
 
-				// Number of coils
-				slinkyGLHE( GLHENum ).numCoils = slinkyGLHE( GLHENum ).trenchLength / slinkyGLHE( GLHENum ).coilPitch;
+	// 			// Number of coils
+	// 			slinkyGLHE( GLHENum ).numCoils = slinkyGLHE( GLHENum ).trenchLength / slinkyGLHE( GLHENum ).coilPitch;
 
-				// Total tube length
-				slinkyGLHE( GLHENum ).totalTubeLength = Pi * slinkyGLHE( GLHENum ).coilDiameter * slinkyGLHE( GLHENum ).trenchLength
-													* slinkyGLHE( GLHENum ). numTrenches / slinkyGLHE( GLHENum ). coilPitch;
+	// 			// Total tube length
+	// 			slinkyGLHE( GLHENum ).totalTubeLength = Pi * slinkyGLHE( GLHENum ).coilDiameter * slinkyGLHE( GLHENum ).trenchLength
+	// 												* slinkyGLHE( GLHENum ). numTrenches / slinkyGLHE( GLHENum ). coilPitch;
 
-				// Get Gfunction data
-				slinkyGLHE( GLHENum ).SubAGG = 15;
-				slinkyGLHE( GLHENum ).AGG = 192;
+	// 			// Get Gfunction data
+	// 			slinkyGLHE( GLHENum ).SubAGG = 15;
+	// 			slinkyGLHE( GLHENum ).AGG = 192;
 
-				// Average coil depth
-				if ( slinkyGLHE( GLHENum ).verticalConfig ) {
-					// Vertical configuration
-					if ( slinkyGLHE( GLHENum ).trenchDepth - slinkyGLHE(GLHENum).coilDiameter < 0.0 ) {
-						// Error: part of the coil is above ground
-						ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).Name + "\", invalid value in field." );
-						ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).trenchDepth, 3 ) + "]." );
-						ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).coilDepth, 3 ) + "]." );
-						ShowContinueError( "...Average coil depth will be <=0." );
-						errorsFound = true;
+	// 			// Average coil depth
+	// 			if ( slinkyGLHE( GLHENum ).verticalConfig ) {
+	// 				// Vertical configuration
+	// 				if ( slinkyGLHE( GLHENum ).trenchDepth - slinkyGLHE(GLHENum).coilDiameter < 0.0 ) {
+	// 					// Error: part of the coil is above ground
+	// 					ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).Name + "\", invalid value in field." );
+	// 					ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).trenchDepth, 3 ) + "]." );
+	// 					ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).coilDepth, 3 ) + "]." );
+	// 					ShowContinueError( "...Average coil depth will be <=0." );
+	// 					errorsFound = true;
 
-					} else {
-						// Entire coil is below ground
-						slinkyGLHE( GLHENum ).coilDepth = slinkyGLHE( GLHENum ).trenchDepth - ( slinkyGLHE( GLHENum ).coilDiameter / 2.0 );
-					}
+	// 				} else {
+	// 					// Entire coil is below ground
+	// 					slinkyGLHE( GLHENum ).coilDepth = slinkyGLHE( GLHENum ).trenchDepth - ( slinkyGLHE( GLHENum ).coilDiameter / 2.0 );
+	// 				}
 
-				} else {
-					// Horizontal configuration
-					slinkyGLHE( GLHENum ). coilDepth = slinkyGLHE( GLHENum ).trenchDepth;
-				}
+	// 			} else {
+	// 				// Horizontal configuration
+	// 				slinkyGLHE( GLHENum ). coilDepth = slinkyGLHE( GLHENum ).trenchDepth;
+	// 			}
 
-				// Thermal diffusivity of the ground
-				slinkyGLHE( GLHENum ).diffusivityGround = slinkyGLHE( GLHENum ).kGround / slinkyGLHE( GLHENum ).cpRhoGround;
+	// 			// Thermal diffusivity of the ground
+	// 			slinkyGLHE( GLHENum ).diffusivityGround = slinkyGLHE( GLHENum ).kGround / slinkyGLHE( GLHENum ).cpRhoGround;
 
-				if ( ! allocated ) {
-					prevTimeSteps.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
-					prevTimeSteps = 0.0;
-					allocated = true;
-				}
+	// 			if ( ! allocated ) {
+	// 				prevTimeSteps.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
+	// 				prevTimeSteps = 0.0;
+	// 				allocated = true;
+	// 			}
 
-				//   Not many checks
+	// 			//   Not many checks
 
-				if ( slinkyGLHE( GLHENum ).pipeThick >= slinkyGLHE( GLHENum ).pipeOutDia / 2.0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).Name + "\", invalid value in field." );
-					ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).pipeThick, 3 ) + "]." );
-					ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
-					ShowContinueError( "...Radius will be <=0." );
-					errorsFound = true;
-				}
+	// 			if ( slinkyGLHE( GLHENum ).pipeThick >= slinkyGLHE( GLHENum ).pipeOutDia / 2.0 ) {
+	// 				ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).Name + "\", invalid value in field." );
+	// 				ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).pipeThick, 3 ) + "]." );
+	// 				ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
+	// 				ShowContinueError( "...Radius will be <=0." );
+	// 				errorsFound = true;
+	// 			}
 
-				// Initialize ground temperature model and get pointer reference
-				slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
-				if ( slinkyGLHE ( GLHENum ).groundTempModel ) {
-					errorsFound = slinkyGLHE ( GLHENum ).groundTempModel->errorsFound;
-				}
+	// 			// Initialize ground temperature model and get pointer reference
+	// 			slinkyGLHE( GLHENum ).groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ) , cAlphaArgs( 6 ) );
+	// 			if ( slinkyGLHE ( GLHENum ).groundTempModel ) {
+	// 				errorsFound = slinkyGLHE ( GLHENum ).groundTempModel->errorsFound;
+	// 			}
 
-				//Check for Errors
-				if ( errorsFound ) {
-					ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
-				}
-			}
+	// 			//Check for Errors
+	// 			if ( errorsFound ) {
+	// 				ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+	// 			}
+	// 		}
 
-			//Set up report variables
-			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
-				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", slinkyGLHE( GLHENum ).boreholeTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", slinkyGLHE( GLHENum ).QGLHE, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", slinkyGLHE( GLHENum ).inletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", slinkyGLHE( GLHENum ).outletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", slinkyGLHE( GLHENum ).massFlowRate, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", slinkyGLHE( GLHENum ).aveFluidTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-			}
-		}
+	// 		//Set up report variables
+	// 		for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
+	// 			SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", slinkyGLHE( GLHENum ).boreholeTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", slinkyGLHE( GLHENum ).QGLHE, "System", "Average", slinkyGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", slinkyGLHE( GLHENum ).inletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", slinkyGLHE( GLHENum ).outletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", slinkyGLHE( GLHENum ).massFlowRate, "System", "Average", slinkyGLHE( GLHENum ).Name );
+	// 			SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", slinkyGLHE( GLHENum ).aveFluidTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+	// 		}
+	// 	}
 
-	}
+	// }
 
 	//******************************************************************************
 

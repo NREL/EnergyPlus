@@ -52,9 +52,32 @@
 
 namespace EnergyPlus {
 
-std::unordered_map< ObjectType, std::string, EnumClassHash > const objectTypeMap {
-	{ ObjectType::GroundHeatExchangerSlinky, "GroundHeatExchanger:Slinky" },
-	{ ObjectType::GroundHeatExchangerVertical, "GroundHeatExchanger:Vertical" }
-};
+	// ObjectTypes::ObjectTypes() {
+	// 	objectTypeMap = {
+	// 		{ ObjectType::GroundHeatExchangerSlinky, "GroundHeatExchanger:Slinky" },
+	// 		{ ObjectType::GroundHeatExchangerVertical, "GroundHeatExchanger:Vertical" }
+	// 	};
+	// 	stringTypeMap.reserve(  objectTypeMap.size() );
+	// 	for ( auto const & pair : objectTypeMap ) {
+	// 		stringTypeMap.emplace( pair.second, pair.first );
+	// 	}
+	// }
+
+	// ObjectType ObjectTypes::objectType( std::string const & objectType )
+	// {
+	// 	if ( stringTypeMap.find( objectType ) == stringTypeMap.end() ) {
+	// 		ShowWarningError( "Requested Object Type not found in Definitions: " + objectType );
+	// 	}
+	// }
+
+	// std::string ObjectTypes::objectType( ObjectType objectType )
+	// {
+
+	// }
+
+// std::unordered_map< ObjectType, std::string, EnumClassHash > const objectTypeMap {
+// 	{ ObjectType::GroundHeatExchangerSlinky, "GroundHeatExchanger:Slinky" },
+// 	{ ObjectType::GroundHeatExchangerVertical, "GroundHeatExchanger:Vertical" }
+// };
 
 }
