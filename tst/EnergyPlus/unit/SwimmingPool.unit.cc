@@ -127,7 +127,6 @@ TEST_F( EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap )
 TEST_F( EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex )
 {
 
-	int PoolNum;
 	bool MyPlantScanFlagPool;
 	
 	// Tests for CalcSwimmingPoolEvap--Evaporate Rate Calculation for Swimming Pools
@@ -136,19 +135,24 @@ TEST_F( EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex )
 
 
 	NumSwimmingPools = 2;
+	TotNumLoops = 2;
 	Pool.allocate( NumSwimmingPools );
 	MyPlantScanFlagPool	= true;
 	Pool( 1 ).Name = "FirstPool";
 	Pool( 2 ).Name = "SecondPool";
 	Pool( 1 ).WaterInletNode = 1;
-	Pool( 2 ).WaterInletNode = 2;
-	PlantLoop.allocate( 2 );
+	Pool( 2 ).WaterInletNode = 11;
+	PlantLoop.allocate( TotNumLoops );
 	PlantLoop( 1 ).LoopSide.allocate( 2 );
 	PlantLoop( 2 ).LoopSide.allocate( 2 );
 	PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
 	PlantLoop( 1 ).LoopSide( 2 ).Branch.allocate( 1 );
 	PlantLoop( 2 ).LoopSide( 1 ).Branch.allocate( 1 );
 	PlantLoop( 2 ).LoopSide( 2 ).Branch.allocate( 1 );
+	PlantLoop( 1 ).LoopSide( 1 ).TotalBranches = 1;
+	PlantLoop( 1 ).LoopSide( 2 ).TotalBranches = 1;
+	PlantLoop( 2 ).LoopSide( 1 ).TotalBranches = 1;
+	PlantLoop( 2 ).LoopSide( 2 ).TotalBranches = 1;
 	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 1;
 	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).TotalComponents = 1;
 	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 1;
@@ -174,6 +178,7 @@ TEST_F( EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex )
 	EXPECT_EQ( MyPlantScanFlagPool, false );
 	
 	// Test 2
+	MyPlantScanFlagPool	= true;
 	InitSwimmingPoolPlantLoopIndex( 2, MyPlantScanFlagPool );
 	EXPECT_EQ( Pool( 2 ).HWLoopNum, 2 );
 	EXPECT_EQ( Pool( 2 ).HWLoopSide, 2 );
