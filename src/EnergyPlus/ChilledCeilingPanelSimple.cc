@@ -1015,16 +1015,16 @@ namespace CoolingPanelSimple {
 		
 		RegisterPlantCompDesignFlow( CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
 
-		bool SizeUAErrorFlag = false;
-		SizeCoolingPanelUA( CoolingPanelNum, SizeUAErrorFlag );
-		if ( SizeUAErrorFlag ) ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
+		bool SizeUASuccessFlag = false;
+		SizeCoolingPanelUA( CoolingPanelNum, SizeUASuccessFlag );
+		if ( ! SizeUASuccessFlag ) ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
 
 	}
 
 	void
 	SizeCoolingPanelUA(
 					 int const CoolingPanelNum,
-					 bool & SizeUAError
+					 bool & SizeUASuccess
 					 )
 	{
 		// SUBROUTINE INFORMATION:
@@ -1043,7 +1043,7 @@ namespace CoolingPanelSimple {
 		Real64 Tzoner;
 		Real64 RatCapToTheoMax; // Ratio of unit capacity to theoretical maximum output based on rated parameters
 
-		SizeUAError = false;
+		SizeUASuccess = true;
 		Cp = 4120.0; // Just an approximation, don't need to get an exact number
 		MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
 		MDotXCp = Cp * MDot;
@@ -1057,20 +1057,20 @@ namespace CoolingPanelSimple {
 			ShowContinueError( "Check the rated input for temperatures, flow, and capacity for this unit." );
 			ShowContinueError( "The ratio of the capacity to the rated theoretical maximum must be less than unity." );
 			ShowContinueError( "The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high or the rated flow being too low." );
-			SizeUAError = true;
+			SizeUASuccess = false;
 			CoolingPanel( CoolingPanelNum ).UA = 1.0;
 		}
 		if ( Tinletr >= Tzoner ) {
 			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
 			ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
-			SizeUAError = true;
+			SizeUASuccess = false;
 			CoolingPanel( CoolingPanelNum ).UA = 1.0;
 		} else {
 			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - RatCapToTheoMax );
 			if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
 				ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
 				ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
-				SizeUAError = true;
+				SizeUASuccess = false;
 			}
 		}
 		

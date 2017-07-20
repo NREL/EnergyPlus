@@ -109,10 +109,10 @@ namespace EnergyPlus {
 	{
 		
 		int CoolingPanelNum; // Cooling panel number
-		bool SizeUAErrorFlag;
+		bool SizeUASuccessFlag;
 		
 		CoolingPanelNum = 1;
-		SizeUAErrorFlag = false;
+		SizeUASuccessFlag = false;
 
 		CoolingPanelSimple::CoolingPanel.allocate( CoolingPanelNum );
 
@@ -123,24 +123,24 @@ namespace EnergyPlus {
 		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 4000.0;
 		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
 		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 21.0;
-		SizeCoolingPanelUA( CoolingPanelNum, SizeUAErrorFlag );
-		EXPECT_EQ( SizeUAErrorFlag, false );
+		SizeCoolingPanelUA( CoolingPanelNum, SizeUASuccessFlag );
+		EXPECT_EQ( SizeUASuccessFlag, true );
 
 		// Capacity too high case
 		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
 		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 5000.0;
 		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
 		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 21.0;
-		SizeCoolingPanelUA( CoolingPanelNum, SizeUAErrorFlag );
-		EXPECT_EQ( SizeUAErrorFlag, true );
+		SizeCoolingPanelUA( CoolingPanelNum, SizeUASuccessFlag );
+		EXPECT_EQ( SizeUASuccessFlag, false );
 
 		// Water temperature higher than zone temperature (not cooling) case
 		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
 		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 4000.0;
 		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 21.0;
 		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 20.0;
-		SizeCoolingPanelUA( CoolingPanelNum, SizeUAErrorFlag );
-		EXPECT_EQ( SizeUAErrorFlag, true );
+		SizeCoolingPanelUA( CoolingPanelNum, SizeUASuccessFlag );
+		EXPECT_EQ( SizeUASuccessFlag, false );
 		
 	}
 }
