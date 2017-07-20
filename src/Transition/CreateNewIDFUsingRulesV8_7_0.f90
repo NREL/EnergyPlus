@@ -427,7 +427,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    OutArgs(35) = 'MutuallyExclusive'
                  END IF
 
-              CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT')
+             CASE('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT')
                   ObjectName='AirflowNetwork:Distribution:Component:Duct'
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.

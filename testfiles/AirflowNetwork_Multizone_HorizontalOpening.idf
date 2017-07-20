@@ -1067,10 +1067,10 @@
     12.19200,6.096000,3.048;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Surface_20,              !- Name
+    Surface_20_T,            !- Name
     ROOF,                    !- Surface Type
     ROOF34,                  !- Construction Name
-    NORTH_ZONE,              !- Zone Name
+    NORTH_ZONE_T,            !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

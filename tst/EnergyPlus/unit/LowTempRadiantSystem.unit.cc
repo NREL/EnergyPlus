@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
@@ -448,7 +447,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    0.0000000E+00,           !- Z Origin {m}",
 		"    1,                       !- Type",
 		"    1,                       !- Multiplier",
-		"    autocalculate,           !- Ceiling Height {m}",
+		"    2.5,                     !- Ceiling Height {m}",
 		"    autocalculate;           !- Volume {m3}",
 
 		"  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
