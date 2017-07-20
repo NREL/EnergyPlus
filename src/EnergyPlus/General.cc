@@ -3143,7 +3143,7 @@ namespace General {
 					ViewFactorInfo = true;
 					ViewRptOption1 = cAlphaArgs( 2 );
 
-				} else if ( SELECT_CASE_var == "DECAYCURVESFROMZONECOMPONENTLOADS" ) { //Should the Radiant to Convective Decay Curves from the load component report appear in the EIO file
+				} else if ( SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY" ) { //Should the Radiant to Convective Decay Curves from the load component report appear in the EIO file
 					ShowDecayCurvesInEIO = true;
 
 				} else if ( SELECT_CASE_var == "" ) {
@@ -3449,6 +3449,23 @@ namespace General {
 			errFlag = true;
 		}
 
+	}
+
+	// This is from OpenStudio
+	std::vector <std::string> splitString( const std::string &string, char delimiter )
+	{
+		std::vector<std::string> results;
+		if ( !string.empty( ) ) { // Only do work if there is work to do
+			std::stringstream stream( string );
+			std::string substring;
+			while ( std::getline( stream, substring, delimiter ) ) { // Loop and fill the results vector
+				results.push_back( substring );
+			}
+			if ( *( string.end( ) - 1 ) == ',' ) { // Add an empty string if the last char is the delimiter
+				results.push_back( std::string( ) );
+			}
+		}
+		return results;
 	}
 
 } // General

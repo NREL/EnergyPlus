@@ -98,6 +98,7 @@
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SimAirServingZones.hh>
+#include <SizingManager.hh>
 #include <SystemAvailabilityManager.hh>
 #include <SystemReports.hh>
 //#include <ThermalChimney.hh>
@@ -252,6 +253,7 @@ namespace HVACManager {
 
 		using NodeInputManager::CalcMoreNodeInfo;
 		using ZoneEquipmentManager::UpdateZoneSizing;
+		using SizingManager::UpdateFacilitySizing;
 		using OutputReportTabular::UpdateTabularReports; // added for writing tabular output reports
 		using OutputReportTabular::GatherComponentLoadsHVAC;
 		using DataGlobals::CompLoadReportIsReq;
@@ -527,6 +529,7 @@ namespace HVACManager {
 				}
 				if ( ZoneSizingCalc ) {
 					UpdateZoneSizing( DuringDay );
+					UpdateFacilitySizing( DuringDay );
 				}
 			} else if ( ! KickOffSimulation && DoOutputReporting && ReportDuringWarmup ) {
 				if ( BeginDayFlag && ! PrintEnvrnStampWarmupPrinted ) {

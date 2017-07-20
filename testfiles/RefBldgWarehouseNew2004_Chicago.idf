@@ -407,14 +407,6 @@
 ! ***COMMON CONSTRUCTIONS AND MATERIALS***
 
   Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
-  Construction,
     InteriorFurnishings,     !- Name
     Std Wood 6inch;          !- Outside Layer
 
@@ -803,10 +795,10 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     FineStorage,             !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
+    Zone,                    !- Outside Boundary Condition
+    BulkStorage,             !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     45.7178,30.4785,8.5340,  !- X,Y,Z ==> Vertex 1 {m}
@@ -883,10 +875,10 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     Office,                  !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
+    Zone,                    !- Outside Boundary Condition
+    FineStorage,             !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     25.9067,0.0000,4.2670,  !- X,Y,Z ==> Vertex 1 {m}
@@ -899,10 +891,10 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     Office,                  !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
+    Zone,                    !- Outside Boundary Condition
+    FineStorage,             !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     25.9067,9.1435,4.2670,  !- X,Y,Z ==> Vertex 1 {m}
