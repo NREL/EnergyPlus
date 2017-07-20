@@ -371,6 +371,12 @@ namespace EnergyPlus {
       auto transThermalBack = 0.0;
       auto thickness = 0.0;
       auto conductivity = 0.0;
+      auto createOpenness = false;
+      auto Atop = 0.0;
+      auto Abot = 0.0;
+      auto Aleft = 0.0;
+      auto Aright = 0.0;
+      auto Afront = 0.0;
 
       if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ) {
         emissFront = material.AbsorpThermalFront;
@@ -385,6 +391,11 @@ namespace EnergyPlus {
         auto blind = Blind( blNum );
         thickness = blind.SlatThickness;
         conductivity = blind.SlatConductivity;
+        Atop = blind.BlindTopOpeningMult;
+        Abot = blind.BlindBottomOpeningMult;
+        Aleft = blind.BlindLeftOpeningMult;
+        Aright = blind.BlindRightOpeningMult;
+        Afront = m_Window.BlindAirFlowPermeability;
         emissFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRFrontEmiss );
         emissBack = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRBackEmiss );
         transThermalFront = InterpSlatAng( m_Window.SlatAngThisTS, m_Window.MovableSlats, blind.IRFrontTrans );
@@ -401,6 +412,11 @@ namespace EnergyPlus {
         transThermalBack = material.TransThermal;
         thickness = material.Thickness;
         conductivity = material.Conductivity;
+        Atop = material.WinShadeTopOpeningMult;
+        Abot = material.WinShadeBottomOpeningMult;
+        Aleft = material.WinShadeLeftOpeningMult;
+        Aright = material.WinShadeRightOpeningMult;
+        Afront = material.WinShadeAirFlowPermeability;
         if( t_Index == 1 ) {
           m_ExteriorShade = true;
         }
@@ -414,6 +430,11 @@ namespace EnergyPlus {
         transThermalBack = material.TransThermal;
         thickness = material.Thickness;
         conductivity = material.Conductivity;
+        Atop = material.WinShadeTopOpeningMult;
+        Abot = material.WinShadeBottomOpeningMult;
+        Aleft = material.WinShadeLeftOpeningMult;
+        Aright = material.WinShadeRightOpeningMult;
+        Afront = material.WinShadeAirFlowPermeability;
         if( t_Index == 1 ) {
           m_ExteriorShade = true;
         }
@@ -427,12 +448,22 @@ namespace EnergyPlus {
         emissBack = shade.BackEmissivity;
         transThermalFront = shade.IRTransmittance;
         transThermalBack = shade.IRTransmittance;
+        Afront = shade.FrontOpeningMultiplier;
+        Atop = shade.TopOpeningMultiplier;
+        Abot = shade.BottomOpeningMultiplier;
+        Aleft = shade.LeftOpeningMultiplier;
+        Aright= shade.RightOpeningMultiplier;
+        createOpenness = true;
         m_InteriorBSDFShade = ( ( 2 * t_Index - 1 ) == m_TotLay );
       }
 
       shared_ptr< ISurface > frontSurface = make_shared< CSurface >( emissFront, transThermalFront );
       shared_ptr< ISurface > backSurface = make_shared< CSurface >( emissBack, transThermalBack );
       auto aSolidLayer = make_shared< CIGUSolidLayer >( thickness, conductivity, frontSurface, backSurface );
+      if( createOpenness ) {
+        aSolidLayer = make_shared< CIGUShadeLayer >( aSolidLayer, 
+          make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront ) );
+      }
       auto swRadiation = surface.getSWIncident( t_SurfNum );
       if( swRadiation > 0 ) {
 
