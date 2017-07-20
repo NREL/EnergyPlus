@@ -194,12 +194,6 @@ namespace GroundHeatExchangers {
 
 		GLHEVert( std::string const & name, json const & fields );
 
-		GLHEVert( GLHEVert const &  ) = delete;
-		GLHEVert & operator=( GLHEVert const &  ) = delete;
-
-		GLHEVert(GLHEVert&&) = default;
-		GLHEVert& operator=(GLHEVert&&) = default;
-
 		void
 		calcGFunctions();
 
@@ -254,12 +248,6 @@ namespace GroundHeatExchangers {
 		GLHESlinky() = default;
 
 		GLHESlinky( std::string const & name, json const & fields );
-
-		GLHESlinky( GLHESlinky const & ) = delete;
-		GLHESlinky & operator=( GLHESlinky const & ) = delete;
-
-		GLHESlinky(GLHESlinky&&) = default;
-		GLHESlinky& operator=(GLHESlinky&&) = default;
 
 		void
 		calcHXResistance();

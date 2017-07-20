@@ -594,7 +594,7 @@ namespace EnergyPlus {
 
 		inputProcessor->initializeMaps();
 		SimulationManager::PostIPProcessing();
-		inputProcessor->state->printErrors();
+		// inputProcessor->state->printErrors();
 
 		return true;
 	}

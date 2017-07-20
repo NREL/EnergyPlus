@@ -44,73 +44,78 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef IdfParser_hh_INCLUDED
-#define IdfParser_hh_INCLUDED
+#ifndef InputProcessing_IdfParser_hh_INCLUDED
+#define InputProcessing_IdfParser_hh_INCLUDED
 
-// C++ Headers
 #include <string>
-
-// EnergyPlus Headers
-#include <EnergyPlus.hh>
-
+#include <unordered_map>
 #include <nlohmann/json.hpp>
 
 namespace EnergyPlus {
-
-	class IdfParser {
-	public:
-		using json = nlohmann::json;
-
-		json decode( std::string const & idf, json const & schema );
-
-		json decode( std::string const & idf, json const & schema, bool & success );
-
-		std::string encode( json const & root, json const & schema );
-
-		enum class Token : size_t {
-			NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5, NUMBER = 6
-		};
-
-		json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema );
-
-		json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
-									json const & obj_loc );
-
-		json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
-
-		json parse_number( std::string const & idf, size_t & index, bool & success );
-
-		std::string parse_string( std::string const & idf, size_t & index, bool & success );
-
-		void eat_whitespace( std::string const & idf, size_t & index );
-
-		void eat_comment( std::string const & idf, size_t & index );
-
-		void print_out_line_error( std::string const & idf, bool obj_found );
-
-		void increment_both_index( size_t & index, size_t & line_index );
-
-		void decrement_both_index( size_t & index, size_t & line_index );
-
-		Token look_ahead( std::string const & idf, size_t index );
-
-		Token next_token( std::string const & idf, size_t & index );
-
-		inline std::string rtrim( std::string & s ) {
-			if ( s.size() == 0 ) return std::string();
-			for ( size_t i = s.size() - 1; i > 0; i-- ) {
-				if ( s[ i ] != ' ' ) break;
-				s.erase( i );
-			}
-			return s;
-		}
-
-	private:
-		size_t cur_line_num = 1;
-		size_t index_into_cur_line = 0;
-		size_t beginning_of_line_index = 0;
-		char s[ 129 ];
-	};
+	class InputProcessorFixture;
 }
 
-#endif // IdfParser_hh_INCLUDED
+class IdfParser {
+public:
+	friend class EnergyPlus::InputProcessorFixture;
+	using json = nlohmann::json;
+
+	IdfParser() = default;
+
+	json decode( std::string const & idf, json const & schema );
+
+	json decode( std::string const & idf, json const & schema, bool & success );
+
+	std::string encode( json const & root, json const & schema );
+
+	std::string normalizeObjectType( std::string const & objectType );
+
+	enum class Token : size_t {
+		NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5, NUMBER = 6
+	};
+
+private:
+	size_t cur_line_num = 1;
+	size_t index_into_cur_line = 0;
+	size_t beginning_of_line_index = 0;
+	char s[ 129 ];
+	std::unordered_map< std::string, std::string > objectTypeMap;
+	std::vector< std::string > errors;
+	std::vector< std::string > warnings;
+
+	void increment_both_index( size_t & index, size_t & line_index );
+
+	void decrement_both_index( size_t & index, size_t & line_index );
+
+	json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema );
+
+	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
+								json const & obj_loc );
+
+	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
+
+	json parse_number( std::string const & idf, size_t & index, bool & success );
+
+	std::string parse_string( std::string const & idf, size_t & index, bool & success );
+
+	void eat_whitespace( std::string const & idf, size_t & index );
+
+	void eat_comment( std::string const & idf, size_t & index );
+
+	Token look_ahead( std::string const & idf, size_t index );
+
+	Token next_token( std::string const & idf, size_t & index );
+
+	std::string & rtrim( std::string & s );
+
+	inline std::string convertToUpper( std::string s ) {
+		size_t len = s.size();
+		for ( size_t i = 0 ; i < len ; ++i ) {
+			char c = s[ i ];
+			s[i] = ( 'a' <= c && c <= 'z' ) ? c ^ 0x20 : c; // ASCII only, which is fine
+		}
+		return s;
+	}
+};
+
+#endif // InputProcessing_IdfParser_hh_INCLUDED

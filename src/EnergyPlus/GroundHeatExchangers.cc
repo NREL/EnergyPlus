@@ -65,7 +65,6 @@
 #include <General.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessing/InputProcessor.hh>
-#include <InputProcessing/EnergyPlusData.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>

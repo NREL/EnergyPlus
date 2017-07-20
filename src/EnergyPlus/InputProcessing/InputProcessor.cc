@@ -58,7 +58,7 @@
 #include <InputProcessing/InputProcessor.hh>
 #include <InputProcessing/IdfParser.hh>
 #include <InputProcessing/InputValidation.hh>
-#include <InputProcessing/EnergyPlusData.hh>
+#include <InputProcessing/DataStorage.hh>
 // #include <InputProcessing/ObjectTypes.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
@@ -106,7 +106,7 @@ namespace EnergyPlus {
 	InputProcessor::InputProcessor() :
 		idf_parser( std::unique_ptr< IdfParser >( new IdfParser() ) ),
 		state( std::unique_ptr< State >( new State() ) ),
-		data( std::unique_ptr< EnergyPlusData >( new EnergyPlusData() ) )
+		data( std::unique_ptr< DataStorage >( new DataStorage() ) )
 	{
 		const auto state_ptr = state.get();
 		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index ) -> bool {
@@ -280,7 +280,8 @@ namespace EnergyPlus {
 			convertedFS << encoded << std::endl;
 		}
 
-		auto const num_errors = state->printErrors();
+		auto const num_errors = state->validationErrors().size();
+		// TODO: Need to add error outputting for idf parsing and validation
 		if ( num_errors ) {
 			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
 		}

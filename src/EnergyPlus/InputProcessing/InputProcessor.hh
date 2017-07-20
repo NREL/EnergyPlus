@@ -63,13 +63,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
-#include <InputProcessing/EnergyPlusData.hh>
+#include <InputProcessing/DataStorage.hh>
+
+class IdfParser;
+class State;
 
 namespace EnergyPlus {
-
-	class IdfParser;
-	class State;
-	enum class ObjectType;
 
 	class InputProcessor {
 	public:
@@ -264,7 +263,7 @@ namespace EnergyPlus {
 
 		std::unique_ptr< IdfParser > idf_parser;
 		std::unique_ptr< State > state;
-		std::unique_ptr< EnergyPlusData > data;
+		std::unique_ptr< DataStorage > data;
 		json schema;
 		json jdf;
 		UnorderedObjectTypeMap caseInsensitiveObjectMap;

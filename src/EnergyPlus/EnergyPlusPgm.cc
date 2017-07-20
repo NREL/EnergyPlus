@@ -206,7 +206,7 @@
 #include <FluidProperties.hh>
 #include <InputProcessing/IdfParser.hh>
 #include <InputProcessing/InputValidation.hh>
-#include <InputProcessing/EnergyPlusData.hh>
+#include <InputProcessing/DataStorage.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>

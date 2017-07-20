@@ -47,72 +47,60 @@
 #ifndef InputValidation_hh_INCLUDED
 #define InputValidation_hh_INCLUDED
 
-// C++ Headers
 #include <string>
 #include <vector>
 #include <unordered_map>
 
-// ObjexxFCL Headers
-
-// EnergyPlus Headers
-#include <EnergyPlus.hh>
-
 #include <nlohmann/json.hpp>
 
-namespace EnergyPlus {
+class State {
+public:
+	using json = nlohmann::json;
 
-	class State {
-	public:
-		using json = nlohmann::json;
-
-		enum class ErrorType {
-			Maximum,
-			ExclusiveMaximum,
-			Minimum,
-			ExclusiveMinimum
-		};
-
-		// friend class InputProcessorFixture;
-		// friend class EnergyPlusFixture;
-
-		void initialize( json const * parsedSchema );
-
-		void traverse( json::parse_event_t & event, json & parsed, unsigned lineNumber, unsigned lineIndex );
-
-		void validate( json & parsed, unsigned lineNumber, unsigned lineIndex );
-
-		void addError( ErrorType err, double val, unsigned lineNumber, unsigned lineIndex );
-
-		int printErrors();
-
-		std::vector< std::string > const & validationErrors();
-
-		std::vector< std::string > const & validationWarnings();
-
-	private:
-		json const * schema;
-		std::vector< json const * > stack;
-		std::unordered_map< std::string, bool > obj_required;
-		std::unordered_map< std::string, bool > extensible_required;
-		std::unordered_map< std::string, bool > root_required;
-		// this design decision was made because
-		// the choice was between sorting a vector for binary searching or log time object lookup in a map
-		std::string cur_obj_name = "";
-
-		unsigned prev_line_index = 0;
-		unsigned prev_key_len = 0;
-		unsigned cur_obj_count = 0;
-		bool is_in_extensibles = false;
-		bool does_key_exist = true;
-		bool need_new_object_name = true;
-		json::parse_event_t last_seen_event = json::parse_event_t::object_start;
-		char s[ 129 ];
-		char s2[ 129 ];
-
-		std::vector< std::string > errors;
-		std::vector< std::string > warnings;
+	enum class ErrorType {
+		Maximum,
+		ExclusiveMaximum,
+		Minimum,
+		ExclusiveMinimum
 	};
 
-}
+	// friend class InputProcessorFixture;
+	// friend class EnergyPlusFixture;
+
+	void initialize( json const * parsedSchema );
+
+	void traverse( json::parse_event_t & event, json & parsed, unsigned lineNumber, unsigned lineIndex );
+
+	void validate( json & parsed, unsigned lineNumber, unsigned lineIndex );
+
+	std::vector< std::string > const & validationErrors();
+
+	std::vector< std::string > const & validationWarnings();
+
+private:
+	void addError( ErrorType err, double val, unsigned lineNumber, unsigned lineIndex );
+
+	json const * schema;
+	std::vector< json const * > stack;
+	std::unordered_map< std::string, bool > obj_required;
+	std::unordered_map< std::string, bool > extensible_required;
+	std::unordered_map< std::string, bool > root_required;
+	// this design decision was made because
+	// the choice was between sorting a vector for binary searching or log time object lookup in a map
+	std::string cur_obj_name = "";
+
+	unsigned prev_line_index = 0;
+	unsigned prev_key_len = 0;
+	unsigned cur_obj_count = 0;
+	bool is_in_extensibles = false;
+	bool does_key_exist = true;
+	bool need_new_object_name = true;
+	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
+	char s[ 129 ];
+	char s2[ 129 ];
+
+	std::vector< std::string > errors;
+	std::vector< std::string > warnings;
+};
 
 #endif // InputValidation_hh_INCLUDED

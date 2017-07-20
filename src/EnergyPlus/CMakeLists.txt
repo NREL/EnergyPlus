@@ -336,9 +336,7 @@ SET( SRC
   InputProcessing/IdfParser.hh
   InputProcessing/InputValidation.cc
   InputProcessing/InputValidation.hh
-  InputProcessing/EnergyPlusData.hh
-  InputProcessing/ObjectTypes.hh
-  InputProcessing/ObjectTypes.cc
+  InputProcessing/DataStorage.hh
   IntegratedHeatPump.cc
   IntegratedHeatPump.hh
   InternalHeatGains.cc
