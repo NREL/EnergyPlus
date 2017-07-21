@@ -3,7 +3,7 @@ Provide Additional LEED Related Features
 
 **Jason Glazer, GARD Analytics**
 
- - July 20, 2017
+ - July 21, 2017
 
 
 ## Justification for New Feature ##
@@ -14,7 +14,7 @@ The current Leadership in Energy and Environmental Design (LEED) Summary Report 
 
 Based on the feedback from the [NFP to Update the LEED Summary Report](https://github.com/NREL/EnergyPlus/blob/Update_LEED_Reporting/design/FY2017/NFP-UpdateLEEDSummaryReport.md) we have decided to limit the changes to EnergyPlus to those that need to be in the calculation engine and use OpenStudio measure to create the output report. This NFP has a narrower scope and the original NFP file was left in place for reference.
 
-Other feedback received as to no make explicit list of end-uses but just continue to allow any string to differentiate them.
+Other feedback received was not have an explicit list of end-uses but just continue to allow any string to differentiate them.
 
 ## Overview ##
 
