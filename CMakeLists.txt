@@ -2,9 +2,9 @@ Project(EnergyPlus)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
-  CMAKE_POLICY(SET CMP0054 NEW) # CMake 3.1 added this policy
-endif()
+#if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
+#  CMAKE_POLICY(SET CMP0054 NEW) # CMake 3.1 added this policy
+#endif()
 
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
@@ -43,14 +43,16 @@ else()
   set(GIT_DIR "")
 endif()
 
-# Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Release' as none was specified.")
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-    "MinSizeRel" "RelWithDebInfo")
-endif()
+ADD_SUBDIRECTORY(alpine)
+
+## Set a default build type if none was specified
+#if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+#  message(STATUS "Setting build type to 'Release' as none was specified.")
+#  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+#  # Set the possible values of build type for cmake-gui
+#  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+#    "MinSizeRel" "RelWithDebInfo")
+#endif()
 
 set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
@@ -69,6 +71,7 @@ mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 # we are making python a required dependency, so find it here...starting off by requiring at least 2.7
 find_package(PythonInterp 2.7 REQUIRED)
+
 
 # then we can add python-based tests for it
 if ( BUILD_TESTING )
