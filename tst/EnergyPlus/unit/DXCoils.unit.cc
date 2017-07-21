@@ -943,7 +943,6 @@ namespace EnergyPlus {
 		Real64 InletAirHumRat;
 		const Real64 TotalCap( 1303.5987246916557 );
 		const Real64 AirVolFlowRate( 0.085422486640000003 );
-		Real64 AirMassFlowRate;
 		const Real64 SHR( 0.88 );
 		Real64 AirPressure;
 		Real64 CBF_expected;
@@ -951,22 +950,21 @@ namespace EnergyPlus {
 
 		AirPressure = StdPressureSeaLevel;
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(InletDBTemp, InletWBTemp, AirPressure );
-		AirMassFlowRate = AirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW( AirPressure, InletDBTemp, InletAirHumRat );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirVolFlowRate, SHR, true );
 		CBF_expected = 0.17268167698750708;
 		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
 
 		// push inlet condition towards saturation curve to test CBF calculation robustness
 		InletWBTemp = 19.7; // 19.72 DB / 19.7 WB
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
-		EXPECT_NEAR( CBF_calculated, 0.00021141, 0.0000001 );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirVolFlowRate, SHR, true );
+		EXPECT_NEAR( CBF_calculated, 0.00020826, 0.0000001 );
 
 		InletDBTemp = 13.1; // colder and much less likely inlet air temperature
 		InletWBTemp = 13.08; // 13.1 DB / 13.08 WB - hard to find ADP (needed mod to CalcCBF function)
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( InletDBTemp, InletWBTemp, AirPressure );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
-		EXPECT_NEAR( CBF_calculated, 0.0001531, 0.0000001 );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirVolFlowRate, SHR, true );
+		EXPECT_NEAR( CBF_calculated, 0.0001572, 0.0000001 );
 	}
 
 	TEST_F( EnergyPlusFixture, DXCoilEvapCondPumpSizingTest ) {
@@ -1477,17 +1475,16 @@ namespace EnergyPlus {
 		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 		std::string const CallingRoutine( "DXCoil_ValidateADPFunction" );
 
-		Real64 DesMassFlow = DXCoil( 1 ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
-		Real64 CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+		Real64 CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DXCoil( 1 ).RatedAirVolFlowRate( 1 ), DXCoil( 1 ).RatedSHR( 1 ), true );
 
-		EXPECT_NEAR( 0.747472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
-		EXPECT_NEAR( 0.1012203, CBF_calculated, 0.0000001 );
+		EXPECT_NEAR( 0.788472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
+		EXPECT_NEAR( 0.0003944, CBF_calculated, 0.0000001 );
 
 		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // simulate outlet condition right at the saturation curve
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
 
 		SizeDXCoil( 1 );
-		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DXCoil( 1 ).RatedAirVolFlowRate( 1 ), DXCoil( 1 ).RatedSHR( 1 ), true );
 
 		EXPECT_NEAR( 0.67608322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
 		EXPECT_NEAR( 0.0003243, CBF_calculated, 0.0000001 );
@@ -1496,7 +1493,7 @@ namespace EnergyPlus {
 		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
 
 		SizeDXCoil( 1 );
-		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DXCoil( 1 ).RatedAirVolFlowRate( 1 ), DXCoil( 1 ).RatedSHR( 1 ), true );
 
 		EXPECT_NEAR( 0.64408322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
 		EXPECT_NEAR( 0.0028271, CBF_calculated, 0.0000001 );
