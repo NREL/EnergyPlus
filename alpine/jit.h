@@ -70,6 +70,7 @@ public:
           return JITSymbol(nullptr);
         },
         [](const std::string &Name) {
+          //std::cout << "looking for symbol outside JIT engine: " << Name << std::endl << std::flush;
           if (auto SymAddr =
                 RTDyldMemoryManager::getSymbolAddressInProcess(Name))
             return JITSymbol(SymAddr, JITSymbolFlags::Exported);
@@ -114,7 +115,7 @@ public:
   }
 
   JITSymbol findSymbol(const std::string Name) {
-    std::cout << "find symbol: " << Name << std::endl << std::flush;
+    //std::cout << "find symbol: " << Name << std::endl << std::flush;
     std::string MangledName;
     raw_string_ostream MangledNameStream(MangledName);
     Mangler::getNameWithPrefix(MangledNameStream, Name, DL);
