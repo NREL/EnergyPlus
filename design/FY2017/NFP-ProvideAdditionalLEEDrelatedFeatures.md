@@ -37,12 +37,12 @@ as well as reaching out to stakeholders. More details are available at  [NFP to 
 
 Several issues related to the LEED reporting may be separately addressed, including: 
 
-https://github.com/NREL/EnergyPlus/issues/5672 EAp2-4/5. Demand data taken from Design Days instead of from Annual Peak
-https://github.com/NREL/EnergyPlus/issues/5559 Add LEED reporting of peak end use and EFLH
-https://github.com/NREL/EnergyPlus/issues/5895 LEED Summary EAp2-4/5 Report Problems
-https://github.com/NREL/EnergyPlus/issues/5613 LEED Tables service water heating doesn't appear
-https://github.com/NREL/EnergyPlus/issues/5956 Report VAV minimum volume setpoint
-https://github.com/NREL/EnergyPlus/issues/5298 Outdoor Air Summary report improvements 
+- https://github.com/NREL/EnergyPlus/issues/5672 EAp2-4/5. Demand data taken from Design Days instead of from Annual Peak
+- https://github.com/NREL/EnergyPlus/issues/5559 Add LEED reporting of peak end use and EFLH
+- https://github.com/NREL/EnergyPlus/issues/5895 LEED Summary EAp2-4/5 Report Problems
+- https://github.com/NREL/EnergyPlus/issues/5613 LEED Tables service water heating doesn't appear
+- https://github.com/NREL/EnergyPlus/issues/5956 Report VAV minimum volume setpoint
+- https://github.com/NREL/EnergyPlus/issues/5298 Outdoor Air Summary report improvements 
 
 
 ## Testing/Validation/Data Sources ##
