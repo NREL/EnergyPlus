@@ -1191,7 +1191,9 @@ namespace ReportSizingManager {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-						NominalCapacityDes = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
+//						NominalCapacityDes = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
+						Real64 VentilationLoad = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak ) *  ( DesMassFlow * FinalZoneSizing( CurZoneEqNum ).MinOA ) * ( CoilInTemp - FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak );
+						NominalCapacityDes = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad + max( 0.0, VentilationLoad );
 					}
 					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
 					if ( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
