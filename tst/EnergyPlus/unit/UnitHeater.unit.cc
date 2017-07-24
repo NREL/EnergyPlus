@@ -1898,7 +1898,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 		"    UnitHeater_SupplyFan,    !- Supply Air Fan Name",
 		"    0.18880,                 !- Maximum Supply Air Flow Rate {m3/s}",
 		"    Coil:Heating:Electric,   !- Heating Coil Object Type",
-		"    UnitHeater_ElectHeater,  !- Heating Coil Name",
+		"    UnitHeater_ElectricHeater,  !- Heating Coil Name",
 		"    ,                        !- Supply Air Fan Operating Mode Schedule Name",
 		"    No,                      !- Supply Air Fan Operation During No Heating",
 		"    ,                        !- Maximum Hot Water or Steam Flow Rate {m3/s}",
@@ -1920,7 +1920,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 		"    General;                 !- End-Use Subcategory",
 
 		"Coil:Heating:Electric,",
-		"    UnitHeater_ElectHeater,  !- Name",
+		"    UnitHeater_ElectricHeater,  !- Name",
 		"    Alwayson,                !- Availability Schedule Name",
 		"    1,                       !- Efficiency",
 		"    15235.58538,             !- Nominal Capacity {W}",
@@ -2426,9 +2426,35 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 	// second priority zone equipment is unit heater
 	EXPECT_EQ( ZoneEquipmentManager::PrioritySimOrder( 2 ).EquipType, "ZONEHVAC:UNITHEATER" );
 	EXPECT_EQ( ZoneEquipmentManager::PrioritySimOrder( 2 ).EquipName, "UNITHEATER" );
-	EXPECT_EQ( HeatingCoils::HeatingCoil( 2 ).Name, "UNITHEATER_ELECTHEATER" );
+	EXPECT_EQ( HeatingCoils::HeatingCoil( 2 ).Name, "UNITHEATER_ELECTRICHEATER" );
 	// check the reheat coil output
 	EXPECT_NEAR( HeatingCoils::HeatingCoil( 1 ).HeatingCoilRate, 7015.5, 1.0 );
 	// check the unit heater heating coil output
 	EXPECT_EQ( HeatingCoils::HeatingCoil( 2 ).HeatingCoilRate, 0.0 );
+
+	// re-set the hour of the day
+	DataGlobals::TimeStep = 1;
+	DataGlobals::HourOfDay = 24;
+	DataGlobals::CurrentTime = 24.0;
+	// set zone air node condition
+	Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp = 20.0;
+	Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat = 0.005;
+	Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat );
+	// set the zone loads
+	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 0.0;
+	ZoneSysEnergyDemand( 1 ).OutputRequiredToHeatingSP = 15000.0;
+	ZoneSysEnergyDemand( 1 ).OutputRequiredToCoolingSP = 20000.0;
+	// local variables
+	bool SimZoneEquipment = true;
+	bool SimAirLoops = true;
+	bool FirstHVACIteration = false;
+	// re-simulate the zone HVAC equipment per the priority order
+	ZoneEquipmentManager::ManageZoneEquipment( FirstHVACIteration, SimZoneEquipment, SimAirLoops );
+	// check the reheat coil nominal capacity
+	EXPECT_NEAR( HeatingCoils::HeatingCoil( 1 ).NominalCapacity, 17542.3, 1.0 );
+	// check the reheat coil outputis the full capacity
+	EXPECT_NEAR( HeatingCoils::HeatingCoil( 1 ).HeatingCoilRate, 17542.3, 1.0 );
+	// check the unit heater heating coil is handling the remaning load
+	EXPECT_NEAR( HeatingCoils::HeatingCoil( 2 ).HeatingCoilRate, 223.7, 1.0 );
+
 }
