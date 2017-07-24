@@ -16,6 +16,8 @@ Based on the feedback from the [NFP to Update the LEED Summary Report](https://g
 
 Other feedback received was not have an explicit list of end-uses but just continue to allow any string to differentiate them.
 
+Add total operating hours to schedule, these would be hours where the schedule had a value greater than zero.
+
 ## Overview ##
 
 The scope of work for this NFP is to enhance the functionality of reporting for LEED:
@@ -85,7 +87,7 @@ Some strings used in the end-use subcategory fields have special meaning to cate
 
 The following changes will be made to EnergyPlus output to provide input to the OpenStudio measure
 
-- Add table to show each schedule EFLH. The table would show the first object referencing that schedule (if simple to do).
+- Add table to show each schedule EFLH. The table would show the first object referencing that schedule (if simple to do). Also add hours with values greater than zero.
 
 - Add table to show the setpoint schedule values at 11am and 11pm and the first object referencing that schedule.
 
@@ -97,22 +99,27 @@ EnergyPlus output reporting would enhanced only to add new outputs that are not 
 <table border="1" cellpadding="4" cellspacing="0">
   <tr><td></td>
     <td align="right">Equivalent Full Load Hours of Operation Per Year</td>
+    <td align="right">Hours Greater than Zero Per Year</td>
   </tr>
   <tr>
     <td align="right">LIGHTS-1</td>
     <td align="right">3066</td>
+    <td align="right">5780</td>
   </tr>
   <tr>
     <td align="right">EQUIP-1</td>
     <td align="right">3430</td>
+    <td align="right">5780</td>
   </tr>
   <tr>
     <td align="right">Always On Sch</td>
+    <td align="right">8760</td>
     <td align="right">8760</td>
   </tr>
   <tr>
     <td align="right">OCCUPY-1</td>
     <td align="right">2758</td>
+    <td align="right">4703</td>
   </tr>
 </table>
 
