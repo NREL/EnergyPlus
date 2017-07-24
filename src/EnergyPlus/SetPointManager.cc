@@ -4675,8 +4675,7 @@ namespace SetPointManager {
 
 	void
 	DefineOutsideAirSetPointManager::calculate(
-		Optional_int_const NodeNum, // When Init Calls this routine, it passes the cur node number
-		Optional_bool_const InitFlag // When Init Calls this routine, it passes True
+		Optional_int_const NodeNum // When Init Calls this routine, it passes the cur node number
 	)
 	{
 
@@ -4725,21 +4724,13 @@ namespace SetPointManager {
 
 		if ( CtrlType == iCtrlVarType_MaxTemp ) {
 			SetPt = SetTempAtOutLow;
-			this->SetPtHi = SetPt;
 		} else if ( CtrlType == iCtrlVarType_MinTemp ) {
 			SetPt = SetTempAtOutHigh;
-			this->SetPtLo = SetPt;
 		} else {
 			SetPt = CalcSetPoint( OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh );
-			this->SetPtLo = SetTempAtOutHigh;
-			this->SetPtHi = SetTempAtOutLow;
 		}
 
-		if ( present( InitFlag ) ) {
-			Node( NodeNum ).TempSetPoint = SetPt; //Setpoint for Initial Routine
-		} else {
-			this->SetPt = SetPt; //Setpoint for Calc Routine
-		}
+		this->SetPt = SetPt; //Setpoint for Calc Routine
 
 	}
 

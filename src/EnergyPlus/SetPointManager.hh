@@ -296,8 +296,7 @@ namespace SetPointManager {
 		{}
 
 		void calculate(
-			Optional_int_const NodeNum = _, // When Init Calls this routine, it passes the cur node number
-			Optional_bool_const InitFlag = _ // When Init Calls this routine, it passes True
+			Optional_int_const NodeNum = _ // When Init Calls this routine, it passes the cur node number
 		);
 
 		Real64
