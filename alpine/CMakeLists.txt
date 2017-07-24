@@ -19,8 +19,8 @@ if(NOT EXISTS ${BOOST_ROOT})
   include(FindOrDownloadBoost)
 endif()
 
-#include_directories(SYSTEM third-party/zlib)
-#add_subdirectory(third-party/zlib)
+add_subdirectory(third-party/FMUParser ${CMAKE_CURRENT_BINARY_DIR}/FMUParser)
+include_directories(third-party/FMUParser/)
 
 set(LLVM_PROJECT_ROOT_DIR "${CMAKE_SOURCE_DIR}/build-third-party/llvm-prefix/src/llvm-install/" CACHE PATH "The root of the llvm project install tree")
 find_package(LLVM REQUIRED CONFIG NO_DEFAULT_PATH PATHS "${LLVM_PROJECT_ROOT_DIR}")
@@ -106,6 +106,7 @@ target_link_libraries(alpine
   clangLex
   clangParse
   clangCodeGen
+  alpparser
 )
 
 if( APPLE )

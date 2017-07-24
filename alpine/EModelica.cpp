@@ -50,6 +50,7 @@ extern "C" {
   #include <fmi1_types.h>
   #include <fmi1_functions.h>
   #include <jmi_types.h>
+  #include "xml_parser_cosim.h"
 
   extern char *C_GUID;
   extern int fmi_runtime_options_map_length;
@@ -91,6 +92,7 @@ EModelica::EModelica() {
 EModelica::~EModelica() {
   m_vm->DestroyJavaVM();
   llvm::llvm_shutdown();
+  fmiFreeModelInstance();
 }
 
 void EModelica::compileModel(const std::string & moFilePath) {
@@ -280,5 +282,11 @@ fmiStatus EModelica::fmiGetReal(const fmiValueReference vr[], size_t nvr, fmiRea
 
 fmiStatus EModelica::fmiSetReal(const fmiValueReference vr[], size_t nvr, const fmiReal value[]) {
   return m_fmiSetReal(m_c, vr, nvr, value);
+}
+
+fmiValueReference EModelica::scalarVariableValueReference(const std::string & variableName) const {
+  ModelDescription*  md = parse("mo-build/modelDescription.xml");
+  ScalarVariable * var = getVariableByName(md, variableName.c_str());
+  return getValueReference(var);
 }
 

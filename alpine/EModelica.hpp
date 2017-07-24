@@ -34,6 +34,8 @@ class EModelica {
 
   void compileModel(const std::string & moFilePath);
 
+  fmiValueReference scalarVariableValueReference(const std::string & variableName) const;
+
   fmiStatus fmiSetTime(fmiReal);
   fmiStatus fmiInitialize(fmiBoolean toleranceControlled, fmiReal relativeTolerance, fmiEventInfo* eventInfo);
   fmiStatus fmiGetContinuousStates(fmiReal states[], size_t nx);

@@ -65,10 +65,7 @@ int main(int argc, const char **argv, char * const *envp) {
 
   fmiValueReference inputRefs[1];
   double inputs[1];
-  // 46 corresponds to:
-	//	<ScalarVariable name="cop" valueReference="46" variability="continuous" causality="input" alias="noAlias">
-  //	as found in the FMU's xml file
-  inputRefs[0] = 46;
+  inputRefs[0] = emo.scalarVariableValueReference("cop");
 
   // allocate memory 
   nx = 2;
