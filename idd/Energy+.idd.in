@@ -63178,11 +63178,16 @@ Boiler:HotWater,
        \type real
        \units W
        \minimum 0.0
-  N10; \field Sizing Factor
+  N10, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A8 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Boiler:Steam,
        \memo This boiler model is an adaptation of the empirical model from the Building
@@ -63233,11 +63238,16 @@ Boiler:Steam,
        \type node
   A4 , \field Steam Outlet Node Name
        \type node
-  N11; \field Sizing Factor
+  N11, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A5 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Chiller:Electric:EIR,
 \min-fields 23
@@ -63441,11 +63451,16 @@ Chiller:Electric:EIR,
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A15; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A15, \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
        \type node
+  A16; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Chiller:Electric:ReformulatedEIR,
 \min-fields 22
@@ -63638,11 +63653,16 @@ Chiller:Electric:ReformulatedEIR,
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A14; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A14, \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
        \type node
+  A15; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Chiller:Electric,
     \min-fields 27
@@ -63781,11 +63801,16 @@ Chiller:Electric,
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A12; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A12, \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
        \type node
+  A13; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Chiller:Absorption:Indirect,
    \min-fields 17
@@ -66186,11 +66211,16 @@ CoolingTower:SingleSpeed,
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N25; \field Sizing Factor
+  N25, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A13; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 CoolingTower:TwoSpeed,
        \min-fields 24
@@ -66491,11 +66521,16 @@ CoolingTower:TwoSpeed,
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N33; \field Sizing Factor
+  N33, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A12; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 CoolingTower:VariableSpeed:Merkel,
        \min-fields 24
@@ -67008,11 +67043,16 @@ CoolingTower:VariableSpeed,
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N17; \field Sizing Factor
+  N17, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A14; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 CoolingTowerPerformance:CoolTools,
        \min-fields 44
@@ -69187,10 +69227,15 @@ WaterHeater:Mixed,
        \note StorageTank mode always requests flow unless tank is at its Maximum Temperature Limit
        \note IndirectHeatPrimarySetpoint mode requests flow whenever primary setpoint calls for heat
        \note IndirectHeatAlternateSetpoint mode requests flow whenever alternate indirect setpoint calls for heat
-  A19; \field Indirect Alternate Setpoint Temperature Schedule Name
+  A19, \field Indirect Alternate Setpoint Temperature Schedule Name
        \note This field is only used if the previous is set to IndirectHeatAlternateSetpoint
        \type object-list
        \object-list ScheduleNames
+  A20; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 WaterHeater:Stratified,
        \memo Water heater with stratified, multi-node water tank. May be used to model a tankless

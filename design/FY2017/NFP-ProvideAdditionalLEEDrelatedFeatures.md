@@ -18,6 +18,8 @@ Other feedback received was not have an explicit list of end-uses but just conti
 
 Add total operating hours to schedule, these would be hours where the schedule had a value greater than zero.
 
+Add CoolingTower:VariableSpeed to list of objects.
+
 ## Overview ##
 
 The scope of work for this NFP is to enhance the functionality of reporting for LEED:
@@ -68,6 +70,7 @@ Many objects such as Lights and ElectricEquipment have an End-Use Subcategory fi
  - Chiller:Electric
  - CoolingTower:SingleSpeed
  - CoolingTower:TwoSpeed
+ - CoolingTower:VariableSpeed
  - WaterHeater:Mixed
 
 Using the following (or similar) field:
@@ -81,6 +84,8 @@ Using the following (or similar) field:
 ```
 
 Some strings used in the end-use subcategory fields have special meaning to categorize them on in the EAp2-4/5 Performance Rating Method Compliance table but this special categorization will be removed and replaced with all end use subcategories provided by the user being shown on the EAp2-4/5 table.
+
+All new End-Use Subcategory fields will be added to the end of the objects to minimize transitioning issues.
 
 
 ## Outputs Description ##
