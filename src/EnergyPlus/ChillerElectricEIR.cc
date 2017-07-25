@@ -776,6 +776,11 @@ namespace ChillerElectricEIR {
 				}
 			}
 
+			if ( NumAlphas > 15 ) {
+				ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory = cAlphaArgs( 16 );
+			} else {
+				ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory = "General";
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -786,7 +791,7 @@ namespace ChillerElectricEIR {
 			SetupOutputVariable( "Chiller Part Load Ratio []", ElectricEIRChillerReport( EIRChillerNum ).ChillerPartLoadRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Cycling Ratio []", ElectricEIRChillerReport( EIRChillerNum ).ChillerCyclingRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Electric Power [W]", ElectricEIRChillerReport( EIRChillerNum ).Power, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory, "Plant" );
 
 			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", ElectricEIRChillerReport( EIRChillerNum ).QEvap, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).EvapEnergy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );

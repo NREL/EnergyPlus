@@ -203,6 +203,7 @@ namespace ChillerElectricEIR {
 		bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
 		int FaultyChillerFoulingIndex;  // Index of the fault object corresponding to the chiller
 		Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
 
 		// Default Constructor
 		ElectricEIRChillerSpecs() :
