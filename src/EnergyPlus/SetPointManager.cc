@@ -3920,17 +3920,13 @@ namespace SetPointManager {
 					if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
 						// Call the CALC routine, with an optional argument to only set
 						// the initialization NODE(:)% setpoint, and not the OutAirSetPtMgr(:)%SetPt
-						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum, true );
-						Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPtLo;
-						Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPtHi;
+						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum );
 					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
 						// set to low oudoor air temp reset value
-						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum, true );
-						Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPtHi;
+						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum );
 					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
 						// set to high oudoor air temp reset value
-						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum, true );
-						Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPtLo;
+						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum );
 					}
 				}
 			}
@@ -7438,16 +7434,10 @@ namespace SetPointManager {
 
 				if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
 					Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the setpoint
-					Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPtLo;
-					Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPtHi;
 				} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
 					Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the high temperature setpoint
-					Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPtLo;
-					Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the high temperature setpoint
 				} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
 					Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the low temperature setpoint
-					Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the low temperature setpoint
-					Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPtHi;
 				}
 			}
 
