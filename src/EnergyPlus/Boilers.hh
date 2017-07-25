@@ -145,6 +145,7 @@ namespace Boilers {
 		bool FaultyBoilerFoulingFlag; // True if the boiler has fouling fault
 		int FaultyBoilerFoulingIndex;  // Index of the fault object corresponding to the boiler
 		Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
 
 		// Default Constructor
 		BoilerSpecs() :
