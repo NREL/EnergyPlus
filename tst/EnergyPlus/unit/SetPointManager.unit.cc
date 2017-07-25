@@ -1192,13 +1192,13 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
 	SetPointManager::SimSetPointManagers();
 	SetPointManager::UpdateSetPointManagers();
 	// check OA Reset Set Point Manager sim
-	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPoint );
+	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPointHi );
 	// change the low outdoor air setpoint reset value to 60.0C 
 	SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 = 60.0;
 	// re simulate OA Reset Set Point Manager
 	SetPointManager::SimSetPointManagers();
 	SetPointManager::UpdateSetPointManagers();
 	// check the new reset value is set
-	EXPECT_EQ( 60.0, DataLoopNode::Node( 1 ).TempSetPoint );
+	EXPECT_EQ( 60.0, DataLoopNode::Node( 1 ).TempSetPointHi );
 
 }
