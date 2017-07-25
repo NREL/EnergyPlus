@@ -20471,9 +20471,6 @@ Lights,
        \default 1.0
   A5 , \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20557,9 +20554,6 @@ ElectricEquipment,
        \default 0
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20637,9 +20631,6 @@ GasEquipment,
        \note The maximum value assumes to be 10 times of the recommended value.
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20705,9 +20696,6 @@ HotWaterEquipment,
        \default 0
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20772,9 +20760,6 @@ SteamEquipment,
        \default 0
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20863,9 +20848,6 @@ OtherEquipment,
        \note The default value assumes the equipment is fully vented.
   A6 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -21034,14 +21016,17 @@ ElectricEquipment:ITE:AirCooled,
        \maximum 1.0
        \default 1.0
   A16, \field CPU End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-CPU
   A17, \field Fan End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-Fans
   A18; \field Electric Power Supply End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-UPS
@@ -21085,6 +21070,7 @@ ZoneBaseboard:OutdoorTemperatureControlled,
        \maximum 1.0
        \default 0
   A4 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -24986,9 +24972,6 @@ Exterior:Lights,
        \key AstronomicalClock
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -25028,9 +25011,6 @@ Exterior:FuelEquipment,
        \ip-units W
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -25057,9 +25037,6 @@ Exterior:WaterEquipment,
        \minimum 0
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -42505,6 +42482,7 @@ Fan:SystemModel,
         \minimum 0.0
         \maximum 1.0
   A9 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -42601,6 +42579,7 @@ Fan:ConstantVolume,
        \type node
        \required-field
   A5 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -42678,6 +42657,7 @@ Fan:VariableVolume,
        \type node
        \required-field
   A6 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -42738,6 +42718,7 @@ Fan:OnOff,
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
   A7 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -42773,6 +42754,7 @@ Fan:ZoneExhaust,
        \type node
        \required-field
   A5 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -43059,6 +43041,7 @@ Fan:ComponentModel,
         \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes constant VFD efficiency (0.97)
   A19 ; \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -69225,6 +69208,7 @@ WaterHeater:Stratified,
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
   A2 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -73474,8 +73458,10 @@ EnergyManagementSystem:MeteredOutputVariable,
        \key HeatRecoveryForCooling
        \key HeatRecoveryForHeating
   A8 , \field End-Use Subcategory
-       \type alpha
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note enter a user-defined subcategory for this metered output
+       \type alpha
+       \retaincase
   A9 ; \field Units
        \note optional but will result in dimensionless units for blank
        \note EnergyPlus units are standard SI units
@@ -76041,6 +76027,7 @@ Refrigeration:CompressorRack,
         \note conditions are the outdoor air conditions for the current timestep
         \note (e.g., no adjustment for height above ground).
   A13 , \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76279,6 +76266,7 @@ Refrigeration:Condenser:AirCooled,
         \note (e.g., no adjustment for height above ground).
         \note If the condenser rejects heat to a conditioned zone, enter the zone name here.
   A5 ,  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76422,6 +76410,7 @@ Refrigeration:Condenser:EvaporativeCooled,
         \note shutdown/draining of the water cooling system in cold climate applications.
         \note For periods with schedule values of 0, the condenser operates as Air Cooled.
   A6,   \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76514,6 +76503,7 @@ Refrigeration:Condenser:WaterCooled,
         \default 10.0
         \note related to the minimum allowed refrigeration system condensing temperature
   A6 ,  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76644,6 +76634,7 @@ Refrigeration:GasCooler:AirCooled,
         \note conditions are the outdoor air conditions for the current timestep
         \note (e.g., no adjustment for height above ground).
   A5 ,  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76829,6 +76820,7 @@ Refrigeration:Compressor,
         \note This is used if the compressor rating is based upon
         \note degrees of subcooling
    A4 , \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -77098,6 +77090,7 @@ Refrigeration:System,
         \type object-list
         \object-list ZoneNames
   A11,  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -77200,6 +77193,7 @@ Refrigeration:TranscriticalSystem,
         \type object-list
         \object-list ZoneNames
   A11;  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -77361,7 +77355,8 @@ Refrigeration:SecondarySystem,
         \note This value refers to the refrigerant circulating within the primary system providing
         \note    cooling to the chiller for the secondary loop, not to the fluid circulating
         \note    within the secondary loop itself.
-  A9;  \field End-Use Subcategory
+  A9;   \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -81766,6 +81761,7 @@ WaterUse:Equipment,
        \type alpha
        \reference WaterUseEquipmentNames
   A2 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
