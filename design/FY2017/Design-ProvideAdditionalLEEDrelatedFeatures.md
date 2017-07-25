@@ -18,7 +18,7 @@ The IDD file will be modified to include the new end-use subcategory field for t
  - ChillerElectricEIR.cc (for Chiller:Electric:EIR)
  - ChillerReformulatedEIR.cc (Chiller:Electric:ReformulatedEIR)
  - PlantChillers.cc (for Chiller:Electric)
- - CondenserLoopTower.cc (for CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, CoolingTower:VariableSpeed)
+ - CondenserLoopTower.cc (for CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, CoolingTower:VariableSpeed, CoolingTower:VariableSpeed:Merkel)
  - WaterThermalTaks.cc (for WaterHeater:Mixed)
 
 ## Adding the Schedule-EFLH Table

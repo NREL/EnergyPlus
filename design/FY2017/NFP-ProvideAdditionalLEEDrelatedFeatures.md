@@ -71,6 +71,7 @@ Many objects such as Lights and ElectricEquipment have an End-Use Subcategory fi
  - CoolingTower:SingleSpeed
  - CoolingTower:TwoSpeed
  - CoolingTower:VariableSpeed
+ - CoolingTower:VariableSpeed:Merkel 
  - WaterHeater:Mixed
 
 Using the following (or similar) field:
