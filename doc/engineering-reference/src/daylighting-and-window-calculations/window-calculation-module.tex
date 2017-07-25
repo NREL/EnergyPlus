@@ -392,6 +392,8 @@ The spectral-average visible property is
 
 where \({E_s}(\lambda )\) is the solar spectral irradiance function and \(V(\lambda )\) is the photopic response function of the eye. The default functions are shown in Table~\ref{table:solar-spectral-irradiance-function.} and Table~\ref{table:photopic-response-function.}. They can be overwritten by user defined solar and/or visible spectrum using the objects Site:SolarAndVisibleSpectrum and Site:SpectrumData. They are expressed as a set of values followed by the corresponding wavelengths for values.
 
+When a choice of Spectral is entered as the optical data type, the correlations to store the glazing system's angular performance are generated based on angular performance at 10 degree increments. When a choice of SpectralAndAngle is entered as the optical data type, the correlations for the glazing system will be generated using 10 degree increments or more if the SpectralAndAngle properties include data for more angles.  For each incident angle, the properties of the SpectralAndAngle layer(s) is calculated by linear interpolation, and then the performance of the entire glazing system is calculated for that angle.  The glazing system properties at each angle are used to generate polynomial curve fits with 6 coefficients as a function of cosine of incident angle. The polynomial curves are then used in the simulation to calculate optical properties at each timestep.
+
 If a glazing layer has optical properties that are roughly constant with wavelength, the wavelength-dependent values of \(T_{i,i}\), \(R^{f}_{i,i}\) and \(R^{b}_{i,i}\) in Eqs. to can be replaced with constant values for that layer.
 
 % table 29

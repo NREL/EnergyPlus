@@ -2700,6 +2700,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     24999.9597049817,        !- Normalization Reference
+    ,                        !- External File Name
     12.77778,                !- X Value #1
     36,                      !- Y Value #1
     19524.15032,             !- Output Value #1
@@ -2841,6 +2842,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     24999.9597049817,        !- Normalization Reference
+    ,                        !- External File Name
     12.77778,                !- X Value #1
     36,                      !- Y Value #1
     19524.15032,             !- Output Value #1
@@ -3088,6 +3090,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     ,                        !- Normalization Reference
+    ,                        !- External File Name
     12.77778,                !- X Value #1
     18,                      !- Y Value #1
     0.750374374,             !- Output Value #1
@@ -3193,6 +3196,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     ,                        !- Normalization Reference
+    ,                        !- External File Name
     12.77778,                !- X Value #1
     18,                      !- Y Value #1
     0.750374374,             !- Output Value #1

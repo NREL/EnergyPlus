@@ -899,10 +899,9 @@ namespace DXCoils {
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
-		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
+		Real64 const AirVolFlowRate, // the air volume flow rate at the given capacity [m3/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
-		bool const PrintFlag = true, // flag used to print warnings if desired
-		Real64 const BaroPress=StdBaroPress // Barometric pressure [Pa]
+		bool const PrintFlag = true // flag used to print warnings if desired
 	);
 
 	Real64

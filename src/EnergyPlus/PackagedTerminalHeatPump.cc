@@ -3451,9 +3451,9 @@ namespace PackagedTerminalHeatPump {
 
 			//   If the PTUnit has a net cooling capacity (NoCompOutput < 0) and
 			//   the zone temp is above the Tstat heating setpoint (QToHeatSetPt < 0)
-			if ( NoCompOutput < 0.0 && QToHeatSetPt < 0.0 ) {
-				if ( NoCompOutput < QToHeatSetPt ) {
-					//       If the net cooling capacity overshoots the heating setpoint, change mode
+			if ( NoCompOutput < 0.0 && QToHeatSetPt <= 0.0 ) {
+				if ( NoCompOutput - QToHeatSetPt < -SmallLoad ) {
+					//  If the net cooling capacity overshoots the heating setpoint, change mode
 					QZnReq = QToHeatSetPt;
 					CoolingLoad = false;
 					//       Don't set mode TRUE unless mode is allowed. Also check for floating zone.

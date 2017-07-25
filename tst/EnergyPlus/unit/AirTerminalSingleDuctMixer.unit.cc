@@ -75,7 +75,6 @@
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 using namespace EnergyPlus::BranchInputManager;

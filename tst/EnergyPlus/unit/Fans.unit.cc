@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
 using namespace DataGlobals;

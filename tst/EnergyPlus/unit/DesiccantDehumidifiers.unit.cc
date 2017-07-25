@@ -49,7 +49,6 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DesiccantDehumidifiers.hh>

@@ -973,7 +973,7 @@ namespace HVACUnitarySystem {
 	);
 
 	void
-	ControlCoolingSystem(
+	ControlCoolingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -982,7 +982,7 @@ namespace HVACUnitarySystem {
 	);
 
 	void
-	ControlHeatingSystem(
+	ControlHeatingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -994,22 +994,6 @@ namespace HVACUnitarySystem {
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration // First HVAC iteration flag
-	);
-
-	void
-	SimWaterCoils(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
-		Real64 const PartLoadFrac,
-		int const CoilType
-	);
-
-	void
-	SimSteamCoils(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
-		Real64 const PartLoadFrac,
-		int const CoilType
 	);
 
 	void
