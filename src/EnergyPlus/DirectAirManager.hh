@@ -99,6 +99,13 @@ namespace DirectAirManager {
 		int ZoneEqNum;
 		int ZoneNum;
 
+		//TRANE BEG: DCV Direct air
+		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
+		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
+		int AirLoopNum; // air loop index 
+		int CtrlZoneNum;  // control zone index
+		//TRANE END: DCV Direct air
+
 		// Default Constructor
 		DirectAirProps() :
 			ZoneSupplyAirNode( 0 ),
@@ -116,7 +123,11 @@ namespace DirectAirManager {
 			HeatEnergy( 0.0 ),
 			CoolEnergy( 0.0 ),
 			ZoneEqNum( 0 ),
-			ZoneNum( 0 )
+			ZoneNum( 0 ),
+			NoOAFlowInputFromUser( true ), //TRANE
+			OARequirementsPtr( 0 ), //TRANE
+			AirLoopNum( 0 ), //TRANE
+			CtrlZoneNum( 0 ) //TRANE
 		{}
 
 	};
