@@ -119,10 +119,10 @@ namespace HVACUnitarySystem {
 	//    IF(SetPointBased Control)THEN
 	//      ControlUnitarySystemToSP   ---->  SimFan (if exists and blowthru)
 	//                                        UpdateUnitarySystemControl (cooling coil if exists)
-	//                                        ControlCoolingSystem ---> Sim*CoolingCoil
+	//                                        ControlCoolingSystemToSP ---> Sim*CoolingCoil
 	//                                        CalcUnitaryCoolingSystem
 	//                                        UpdateUnitarySystemControl (heating coil if exists)
-	//                                        ControlHeatingSystem ---> Sim*HeatingCoil
+	//                                        ControlHeatingSystemToSP ---> Sim*HeatingCoil
 	//                                        CalcUnitaryHeatingSystem
 	//                                        SimFan (if exists and drawthru)
 	//                                        UpdateUnitarySystemControl (supp heating coil if exists)
@@ -531,6 +531,7 @@ namespace HVACUnitarySystem {
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetSteamCoilCapacity( SteamCoils::GetCoilCapacity );
 		using PlantUtilities::InitComponentNodes;
+		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -819,10 +820,6 @@ namespace HVACUnitarySystem {
 					InitComponentNodes( 0.0, UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow, UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode, UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopSide, UnitarySystem( UnitarySysNum ).SuppCoilBranchNum, UnitarySystem( UnitarySysNum ).SuppCoilCompNum );
 				}
 			}
-			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric ) {
-//				SimulateHeatingCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, 1.0, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, _, UnitarySystem( UnitarySysNum ).FanOpMode, 1.0 );
-//				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetHeatingCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ), UnitarySystem( UnitarySysNum ).HeatingCoilName, InitUnitarySystemsErrFlag );
-			}
 			MyEnvrnFlag( UnitarySysNum ) = false;
 		}
 
@@ -857,67 +854,63 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).iterationMode = 0;
 			}
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
-				//     set air-side and steam-side mass flow rates
-				mdot = min( Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow );
-				Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode ).MassFlowRate = mdot;
+
+				//     set water-side mass flow rates
+				mdot = UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow;
+				SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode, UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopSide, UnitarySystem( UnitarySysNum ).CoolCoilBranchNum, UnitarySystem( UnitarySysNum ).CoolCoilCompNum );
 				//     simulate water coil to find operating capacity
 				SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).CoolingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, InitUnitarySystemsQActual );
 				UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = InitUnitarySystemsQActual;
+
 			} // from IF(UnitarySystem(UnitarySysNum)%CoolingCoilType_Num == Coil_CoolingWater .OR. Coil_CoolingWaterDetailed
 			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWater ) {
-				//     set air-side and steam-side mass flow rates
-				mdot = min( Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow );
-				Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode ).MassFlowRate = mdot;
+
+				//     set water-side mass flow rates
+				mdot = UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow;
+				SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode, UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopSide, UnitarySystem( UnitarySysNum ).HeatCoilBranchNum, UnitarySystem( UnitarySysNum ).HeatCoilCompNum );
 				//     simulate water coil to find operating capacity
-				//      SaveMassFlow = Node(UnitarySystem(UnitarySysNum)%HeatCoilInletNodeNum)%MassFlowRate
-				//      Node(UnitarySystem(UnitarySysNum)%HeatCoilInletNodeNum)%MassFlowRate = UnitarySystem(UnitarySysNum)%MaxHeatAirMassFlow
 				SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, InitUnitarySystemsQActual );
 				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = InitUnitarySystemsQActual;
-				//      Node(UnitarySystem(UnitarySysNum)%HeatCoilInletNodeNum)%MassFlowRate = SaveMassFlow
+
 			} // from IF(UnitarySystem(UnitarySysNum)%HeatingCoilType_Num == Coil_HeatingWater) THEN
 
 			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingSteam ) {
 
-				//     set air-side and steam-side mass flow rates
-				mdot = min( Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow );
-				Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode ).MassFlowRate = mdot;
-
+				//     set water-side mass flow rates
+				mdot = UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow;
+				SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode, UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopSide, UnitarySystem( UnitarySysNum ).HeatCoilBranchNum, UnitarySystem( UnitarySysNum ).HeatCoilCompNum );
 				//     simulate steam coil to find operating capacity
 				SimulateSteamCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, 1.0, InitUnitarySystemsQActual ); //QCoilReq, simulate any load > 0 to get max capacity of steam coil
-
 				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetSteamCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ), UnitarySystem( UnitarySysNum ).HeatingCoilName, InitUnitarySystemsErrorsFound );
+
 			} // from IF(UnitarySystem(UnitarySysNum)%HeatingCoilType_Num == Coil_HeatingSteam) THEN
 			if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingWater ) {
-				//     set air-side and steam-side mass flow rates
-				mdot = min( Node( UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow );
-				Node( UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode ).MassFlowRate = mdot;
-				//      SaveMassFlow = Node(UnitarySystem(UnitarySysNum)%SuppCoilAirInletNode)%MassFlowRate
-				//      Node(UnitarySystem(UnitarySysNum)%SuppCoilAirInletNode)%MassFlowRate = UnitarySystem(UnitarySysNum)%MaxHeatAirMassFlow
+
+				//     set steam-side mass flow rates
+				mdot = UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow;
+				SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode, UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopSide, UnitarySystem( UnitarySysNum ).SuppCoilBranchNum, UnitarySystem( UnitarySysNum ).SuppCoilCompNum );
 				//     simulate water coil to find operating capacity
-				if ( mdot > 0.0 ) {
-					//        Node(UnitarySystem(UnitarySysNum)%SuppCoilAirInletNode)%MassFlowRate = &
-					//          UnitarySystem(UnitarySysNum)%MaxHeatAirMassFlow
+				if ( mdot > 0.0 ) { // not sure why this is here and not used for other coil types, wouldn't capacity be 0 if water flow = 0? Maybe a speed issue where coil doesn't need to be simulation if mdot=0.
 					SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).SuppHeatCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, InitUnitarySystemsQActual );
 					UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = InitUnitarySystemsQActual;
 				} else {
 					UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = 0.0;
 				}
-				//      Node(UnitarySystem(UnitarySysNum)%SuppCoilAirInletNode)%MassFlowRate = SaveMassFlow
 
 			} // from IF(UnitarySystem(UnitarySysNum)%SuppHeatCoilType_Num == Coil_HeatingWater) THEN
 
 			if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingSteam ) {
 
 				//     set air-side and steam-side mass flow rates
-				mdot = min( Node( UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow );
-				Node( UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode ).MassFlowRate = mdot;
-
+				mdot = UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow;
+				SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode, UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopSide, UnitarySystem( UnitarySysNum ).SuppCoilBranchNum, UnitarySystem( UnitarySysNum ).SuppCoilCompNum );
 				//     simulate steam coil to find operating capacity
 				SimulateSteamCoilComponents( UnitarySystem( UnitarySysNum ).SuppHeatCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, 1.0, InitUnitarySystemsQActual ); //QCoilReq, simulate any load > 0 to get max capacity of steam coil
 				UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = GetSteamCoilCapacity( "Coil:Heating:Steam", UnitarySystem( UnitarySysNum ).SuppHeatCoilName, InitUnitarySystemsErrorsFound );
 
 			} // from IF(UnitarySystem(UnitarySysNum)%SuppHeatCoilType_Num == Coil_HeatingSteam) THEN
 		} // from IF( FirstHVACIteration ) THEN
+
 		UnitarySystem( UnitarySysNum ).iterationCounter += 1;
 
 		if ( MySetPointCheckFlag( UnitarySysNum ) ) {
@@ -963,6 +956,20 @@ namespace HVACUnitarySystem {
 		UnitarySystem( UnitarySysNum ).DehumidInducedHeatingDemandRate = 0.0;
 		UnitarySystem( UnitarySysNum ).CoolCoilWaterFlowRatio = 0.0;
 		UnitarySystem( UnitarySysNum ).HeatCoilWaterFlowRatio = 0.0;
+
+		// water/steam coil initialization
+		if( UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode > 0 ) {
+			mdot = 0.0;
+			SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode, UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopSide, UnitarySystem( UnitarySysNum ).CoolCoilBranchNum, UnitarySystem( UnitarySysNum ).CoolCoilCompNum );
+		}
+		if( UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode > 0 ) {
+			mdot = 0.0;
+			SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode, UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopSide, UnitarySystem( UnitarySysNum ).HeatCoilBranchNum, UnitarySystem( UnitarySysNum ).HeatCoilCompNum );
+		}
+		if( UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode > 0 ) {
+			mdot = 0.0;
+			SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode, UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopSide, UnitarySystem( UnitarySysNum ).SuppCoilBranchNum, UnitarySystem( UnitarySysNum ).SuppCoilCompNum );
+		}
 
 		UnitarySystem( UnitarySysNum ).InitHeatPump = true;
 		m_massFlow1 = 0.0;
@@ -6439,7 +6446,7 @@ namespace HVACUnitarySystem {
 
 			if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp );
-				ControlCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn );
+				ControlCoolingSystemToSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac;
 				CompOn = 0;
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
@@ -6447,7 +6454,7 @@ namespace HVACUnitarySystem {
 			}
 			if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
-				ControlHeatingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn );
+				ControlHeatingSystemToSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac;
 				CompOn = 0;
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
@@ -6458,7 +6465,7 @@ namespace HVACUnitarySystem {
 
 			if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp, _, UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
-				ControlHeatingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn );
+				ControlHeatingSystemToSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac;
 				CompOn = 0;
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
@@ -6466,7 +6473,7 @@ namespace HVACUnitarySystem {
 			}
 			if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 				UpdateUnitarySystemControl( UnitarySysNum, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum, UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum, OnOffAirFlowRatio, FirstHVACIteration, OAUCoilOutTemp );
-				ControlCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn );
+				ControlCoolingSystemToSP( UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn );
 				PartLoadRatio = UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac;
 				CompOn = 0;
 				if ( PartLoadRatio > 0.0 ) CompOn = 1;
@@ -8935,7 +8942,7 @@ namespace HVACUnitarySystem {
 	}
 
 	void
-	ControlCoolingSystem(
+	ControlCoolingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -8982,6 +8989,8 @@ namespace HVACUnitarySystem {
 		using PackagedThermalStorageCoil::SimTESCoil;
 		using PackagedThermalStorageCoil::OffMode;
 		using PackagedThermalStorageCoil::ChargeOnlyMode;
+		using PlantUtilities::SetComponentFlowRate;
+		using WaterCoils::SimulateWaterCoilComponents;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -9032,6 +9041,8 @@ namespace HVACUnitarySystem {
 		Real64 NoLoadTempOut; // saves coil off outlet temp
 		bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
 		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
+		Real64 mdot; // water coil water flow rate [kg/s]
+		Real64 maxPartLoadFrac; // calculated maximum water side PLR for RegulaFalsi call (when plant limits flow max PLR != 1)
 
 		// Set local variables
 		// Retrieve the load on the controlled zone
@@ -9080,10 +9091,12 @@ namespace HVACUnitarySystem {
 		}
 
 		// IF DXCoolingSystem is scheduled on and there is flow
-		if ( ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 ) && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr ) > 0.0 && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) && UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac == 0.0 ) {
+		if ( ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 ) && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).CoolingCoilAvailSchPtr ) > 0.0 && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
-			// Determine if there is a sensible load on this system (aren't the first 2 tests redundant?)
-			if ( ( Node( InletNode ).Temp > DesOutTemp ) && ( std::abs( Node( InletNode ).Temp - DesOutTemp ) > TempControlTol ) ) SensibleLoad = true;
+			// Determine if there is a sensible load on this system
+			if ( Node( InletNode ).Temp - DesOutTemp > TempControlTol ) SensibleLoad = true;
+			// if a heat pump and other coil is on, disable this coil
+			if ( UnitarySystem( UnitarySysNum ).HeatPump && UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac > 0.0 ) SensibleLoad = false;
 
 			// Determine if there is a latent load on this system - for future use to serve latent-only loads
 			if ( Node( InletNode ).HumRat > DesOutHumRat ) LatentLoad = true;
@@ -9132,7 +9145,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).CompPartLoadRatio = PartLoadFrac;
 				} else if ( ( CoilType_Num == Coil_CoolingWater ) || ( CoilType_Num == Coil_CoolingWaterDetailed ) ) { // COIL:COOLING:WATER
 
-					SimWaterCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, CoolingCoil );
+					SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
 
 				} else if ( CoilType_Num == Coil_CoolingWaterToAirHPSimple ) {
 
@@ -9234,7 +9247,10 @@ namespace HVACUnitarySystem {
 
 					} else if ( ( CoilType_Num == Coil_CoolingWater ) || ( CoilType_Num == Coil_CoolingWaterDetailed ) ) { // COIL:COOLING:WATER
 
-						SimWaterCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, CoolingCoil );
+						mdot = UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow;
+						SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode, UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopSide, UnitarySystem( UnitarySysNum ).CoolCoilBranchNum, UnitarySystem( UnitarySysNum ).CoolCoilCompNum );
+
+						SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
 
 					} else if ( CoilType_Num == Coil_CoolingWaterToAirHPSimple ) {
 
@@ -9464,7 +9480,9 @@ namespace HVACUnitarySystem {
 								Par( 2 ) = 0.0;
 							}
 							Par( 3 ) = DesOutTemp;
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, CoolWaterTempResidual, 0.0, 1.0, Par );
+							// calculate max waterside PLR from mdot request above in case plant chokes water flow
+							maxPartLoadFrac = min( 1.0, ( ( mdot / UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow ) + 0.001 ) ); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
+							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, CoolWaterTempResidual, 0.0, maxPartLoadFrac, Par );
 
 						} else if ( ( CoilType_Num == Coil_CoolingWaterToAirHPSimple ) || ( CoilType_Num == Coil_CoolingWaterToAirHP ) ) {
 							Par( 1 ) = double( UnitarySysNum );
@@ -9490,7 +9508,7 @@ namespace HVACUnitarySystem {
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
-							ShowFatalError( "ControlCoolingSystem: Invalid cooling coil type = " + cAllCoilTypes( CoilType_Num ) );
+							ShowFatalError( "ControlCoolingSystemToSP: Invalid cooling coil type = " + cAllCoilTypes( CoilType_Num ) );
 
 						}
 
@@ -9804,9 +9822,17 @@ namespace HVACUnitarySystem {
 										Par( 1 ) = double( UnitarySystem( UnitarySysNum ).CoolingCoilIndex );
 										Par( 2 ) = DesOutHumRat;
 										Par( 3 ) = double( UnitarySysNum );
-										SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par );
+										if( SpeedNum == 1 ) {
+											SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, CycRatio, DXCoilCyclingHumRatResidual, 0.0, 1.0, Par );
+										} else {
+											SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par );
+										}
 									} else {
-										SpeedRatio = 1.0;
+										if( SpeedNum == 1 ) {
+											CycRatio = 1.0;
+										} else {
+											SpeedRatio = 1.0;
+										}
 									}
 								} else {
 									SpeedRatio = 0.0;
@@ -9936,10 +9962,15 @@ namespace HVACUnitarySystem {
 
 		LoopDXCoilRTF = max( LoopDXCoilRTF, LoopDXCoilMaxRTFSave );
 
+		if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
+			mdot = PartLoadFrac * UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow;
+			SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode, UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopNum, UnitarySystem( UnitarySysNum ).CoolCoilLoopSide, UnitarySystem( UnitarySysNum ).CoolCoilBranchNum, UnitarySystem( UnitarySysNum ).CoolCoilCompNum );
+		}
+
 	}
 
 	void
-	ControlHeatingSystem(
+	ControlHeatingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -9980,6 +10011,8 @@ namespace HVACUnitarySystem {
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 		using UserDefinedComponents::SimCoilUserDefined;
+		using PlantUtilities::SetComponentFlowRate;
+		using WaterCoils::SimulateWaterCoilComponents;
 
 		// Locals
 		bool const SuppHeatingCoilFlag( false );
@@ -10023,6 +10056,8 @@ namespace HVACUnitarySystem {
 		Real64 OutletTemp;
 		bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil is wrapped by UnitarySystem.
 		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off. Not needed here since coil is wrapped by UnitarySystem.
+		Real64 mdot; // water coil water flow rate [kg/s]
+		Real64 maxPartLoadFrac; // calculated maximum water side PLR for RegulaFalsi call (when plant limits flow max PLR != 1)
 
 		// Set local variables
 		// Retrieve the load on the controlled zone
@@ -10086,11 +10121,12 @@ namespace HVACUnitarySystem {
 		}
 
 		// IF DXHeatingSystem is scheduled on and there is flow
-		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr ) > 0.0 && Node( InletNode ).MassFlowRate > MinAirMassFlow && UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac == 0.0 ) {
+		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr ) > 0.0 && Node( InletNode ).MassFlowRate > MinAirMassFlow ) {
 
 			// Determine if there is a sensible load on this system
-			//    IF((Node(InletNode)%Temp < Node(ControlNode)%TempSetPoint) .AND. &
-			if ( ( Node( InletNode ).Temp < DesOutTemp ) && ( std::abs( Node( InletNode ).Temp - DesOutTemp ) > TempControlTol ) ) SensibleLoad = true;
+			if ( DesOutTemp - Node( InletNode ).Temp > TempControlTol ) SensibleLoad = true;
+			// if a heat pump and other coil is on, disable this coil
+			if ( UnitarySystem( UnitarySysNum ).HeatPump && UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac > 0.0) SensibleLoad = false;
 
 			// IF DXHeatingSystem runs with a heating load then set PartLoadFrac on Heating System
 			if ( SensibleLoad ) {
@@ -10131,12 +10167,11 @@ namespace HVACUnitarySystem {
 
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 
-					SimWaterCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, HeatingCoil );
+					SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
 
 				} else if ( SELECT_CASE_var == Coil_HeatingSteam ) {
 
-					SimSteamCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, HeatingCoil );
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow > 0.0 ) PartLoadFrac = min( 1.0, Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum ).MassFlowRate / UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow );
+					SimulateSteamCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, 1.0, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac ); //QCoilReq, simulate any load > 0 to get max capacity
 
 				} else if ( SELECT_CASE_var == Coil_HeatingWaterToAirHPSimple ) {
 
@@ -10229,12 +10264,17 @@ namespace HVACUnitarySystem {
 
 					} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 
-						SimWaterCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, HeatingCoil );
+						mdot = UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow;
+						SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode, UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopSide, UnitarySystem( UnitarySysNum ).HeatCoilBranchNum, UnitarySystem( UnitarySysNum ).HeatCoilCompNum );
+
+						SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
 
 					} else if ( SELECT_CASE_var == Coil_HeatingSteam ) {
 
-						SimSteamCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, HeatingCoil );
-						if ( UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow > 0.0 ) PartLoadFrac = min( 1.0, Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum ).MassFlowRate / UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow );
+						mdot = UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow;
+						SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode, UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopSide, UnitarySystem( UnitarySysNum ).HeatCoilBranchNum, UnitarySystem( UnitarySysNum ).HeatCoilCompNum );
+
+						SimulateSteamCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, 1.0, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac ); //QCoilReq, simulate any load > 0 to get max capacity
 
 					} else if ( SELECT_CASE_var == Coil_HeatingWaterToAirHPSimple ) {
 
@@ -10336,7 +10376,10 @@ namespace HVACUnitarySystem {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = 0.0;
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HotWaterHeatingCoilResidual, 0.0, 1.0, Par );
+
+							// calculate max waterside PLR from mdot request above in case plant chokes water flow
+							maxPartLoadFrac = min( 1.0, ( ( mdot / UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow ) + 0.001 ) ); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
+							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HotWaterHeatingCoilResidual, 0.0, maxPartLoadFrac, Par );
 
 						} else if ( SELECT_CASE_var == Coil_HeatingSteam ) {
 
@@ -10353,7 +10396,9 @@ namespace HVACUnitarySystem {
 								Par( 4 ) = 0.0;
 							}
 
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, SteamHeatingCoilResidual, 0.0, 1.0, Par );
+							// calculate max waterside PLR from mdot request above in case plant chokes water flow
+							maxPartLoadFrac = min( 1.0, ( ( mdot / UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow ) + 0.001 ) ); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
+							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, SteamHeatingCoilResidual, 0.0, maxPartLoadFrac, Par );
 
 						} else if ( ( SELECT_CASE_var == Coil_HeatingWaterToAirHPSimple ) || ( SELECT_CASE_var == Coil_HeatingWaterToAirHP ) ) {
 
@@ -10375,7 +10420,7 @@ namespace HVACUnitarySystem {
 
 						} else {
 							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
-							ShowFatalError( "ControlHeatingSystem: Invalid heating coil type = " + cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) );
+							ShowFatalError( "ControlHeatingSystemToSP: Invalid heating coil type = " + cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) );
 
 						}}
 					}
@@ -10423,6 +10468,11 @@ namespace HVACUnitarySystem {
 		LoopHeatingCoilMaxRTF = max( LoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave );
 		LoopDXCoilRTF = max( LoopDXCoilRTF, LoopDXCoilMaxRTFSave );
 
+		if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWater || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingSteam ) {
+			mdot = PartLoadFrac * UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow;
+			SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode, UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopNum, UnitarySystem( UnitarySysNum ).HeatCoilLoopSide, UnitarySystem( UnitarySysNum ).HeatCoilBranchNum, UnitarySystem( UnitarySysNum ).HeatCoilCompNum );
+		}
+
 	}
 
 	void
@@ -10458,6 +10508,8 @@ namespace HVACUnitarySystem {
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using UserDefinedComponents::SimCoilUserDefined;
+		using PlantUtilities::SetComponentFlowRate;
+		using WaterCoils::SimulateWaterCoilComponents;
 
 		// Locals
 		const bool SuppHeatingCoilFlag( true );
@@ -10490,6 +10542,8 @@ namespace HVACUnitarySystem {
 		Real64 NoLoadTempOut; // save outlet temp when coil is off (C)
 		bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
 		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
+		Real64 mdot; // water coil water flow rate [kg/s]
+		Real64 maxPartLoadFrac; // calculated maximum water side PLR for RegulaFalsi call (when plant limits flow max PLR != 1)
 
 		// Set local variables
 
@@ -10547,11 +10601,11 @@ namespace HVACUnitarySystem {
 					}
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 
-					SimWaterCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, SuppHeatCoil );
+					SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
 
 				} else if ( SELECT_CASE_var == Coil_HeatingSteam ) {
 
-					SimSteamCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, SuppHeatCoil );
+					SimulateSteamCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, 1.0, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac ); //QCoilReq, simulate any load > 0 to get max capacity
 
 				} else if ( SELECT_CASE_var == Coil_UserDefined ) { // do nothing, user defined coil cannot be controlled
 					HeatingActive = false; // set to arbitrary value on entry to function
@@ -10594,11 +10648,17 @@ namespace HVACUnitarySystem {
 
 					} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 
-						SimWaterCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, SuppHeatCoil );
+						mdot = UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow;
+						SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode, UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopSide, UnitarySystem( UnitarySysNum ).SuppCoilBranchNum, UnitarySystem( UnitarySysNum ).SuppCoilCompNum );
+
+						SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
 
 					} else if ( SELECT_CASE_var == Coil_HeatingSteam ) {
 
-						SimSteamCoils( UnitarySysNum, FirstHVACIteration, PartLoadFrac, SuppHeatCoil );
+						mdot = UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow;
+						SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode, UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopSide, UnitarySystem( UnitarySysNum ).SuppCoilBranchNum, UnitarySystem( UnitarySysNum ).SuppCoilCompNum );
+
+						SimulateSteamCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, 1.0, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac ); //QCoilReq, simulate any load > 0 to get max capacity
 
 					} else if ( SELECT_CASE_var == Coil_UserDefined ) {
 
@@ -10650,7 +10710,10 @@ namespace HVACUnitarySystem {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = 0.0;
-							SolveRegulaFalsi( Acc, SolveMaxIter, SolFla, PartLoadFrac, HotWaterHeatingCoilResidual, 0.0, 1.0, Par );
+
+							// calculate max waterside PLR from mdot request above in case plant chokes water flow
+							maxPartLoadFrac = min( 1.0, ( ( mdot / UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow ) + 0.001 ) ); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
+							SolveRegulaFalsi( Acc, SolveMaxIter, SolFla, PartLoadFrac, HotWaterHeatingCoilResidual, 0.0, maxPartLoadFrac, Par );
 
 						} else if ( SELECT_CASE_var == Coil_HeatingSteam ) {
 
@@ -10667,7 +10730,9 @@ namespace HVACUnitarySystem {
 								Par( 4 ) = 0.0;
 							}
 
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, SteamHeatingCoilResidual, 0.0, 1.0, Par );
+							// calculate max waterside PLR from mdot request above in case plant chokes water flow
+							maxPartLoadFrac = min( 1.0, ( ( mdot / UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow ) + 0.001 ) ); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
+							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, SteamHeatingCoilResidual, 0.0, maxPartLoadFrac, Par );
 
 						} else if ( SELECT_CASE_var == Coil_UserDefined ) {
 
@@ -10716,108 +10781,13 @@ namespace HVACUnitarySystem {
 
 		UnitarySystem( UnitarySysNum ).SuppHeatPartLoadFrac = PartLoadFrac;
 
+		// LoopHeatingCoilMaxRTF used for AirflowNetwork gets set in child components (gas and fuel)
 		LoopHeatingCoilMaxRTF = max( LoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave );
 		LoopDXCoilRTF = max( LoopDXCoilRTF, LoopDXCoilMaxRTFSave );
 
-	}
-
-	void
-	SimWaterCoils(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
-		Real64 const PartLoadFrac,
-		int const CoilType
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Chandan Sharma, FSEC
-		//       DATE WRITTEN   March 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine manages water cooling/heating coil simulation.
-
-		// Using/Aliasing
-		using WaterCoils::SimulateWaterCoilComponents;
-
-		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string CompName; // Name of Unitary System object
-		Real64 mdot;
-
-		if ( CoilType == CoolingCoil ) {
-			CompName = UnitarySystem( UnitarySysNum ).CoolingCoilName;
-
-			mdot = min( Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow * PartLoadFrac );
-			Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode ).MassFlowRate = mdot;
-
-			SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
-
-		} else if ( CoilType == HeatingCoil ) {
-			CompName = UnitarySystem( UnitarySysNum ).HeatingCoilName;
-
-			mdot = min( Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow * PartLoadFrac );
-			Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode ).MassFlowRate = mdot;
-
-			SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
-
-		} else {
-			CompName = UnitarySystem( UnitarySysNum ).SuppHeatCoilName;
-
-			mdot = min( Node( UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow * PartLoadFrac );
-			Node( UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode ).MassFlowRate = mdot;
-
-			SimulateWaterCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac );
-		}
-
-	}
-
-	void
-	SimSteamCoils(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
-		Real64 const PartLoadFrac,
-		int const CoilType
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Chandan Sharma, FSEC
-		//       DATE WRITTEN   March 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine manages steam heating coil simulation.
-
-		// Using/Aliasing
-		using SteamCoils::SimulateSteamCoilComponents;
-
-		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string CompName; // Name of Unitary System object
-		Real64 mdot;
-
-		if ( CoilType == HeatingCoil ) {
-
-			CompName = UnitarySystem( UnitarySysNum ).HeatingCoilName;
-
-			mdot = min( Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow * PartLoadFrac );
-			Node( UnitarySystem( UnitarySysNum ).HeatCoilFluidInletNode ).MassFlowRate = mdot;
-
-			SimulateSteamCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, 1.0, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac ); //QCoilReq, simulate any load > 0 to get max capacity
-
-		} else {
-
-			CompName = UnitarySystem( UnitarySysNum ).SuppHeatCoilName;
-
-			mdot = min( Node( UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow * PartLoadFrac );
-			Node( UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode ).MassFlowRate = mdot;
-
-			SimulateSteamCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, 1.0, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac ); //QCoilReq, simulate any load > 0 to get max capacity
-
+		if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingWater || UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingSteam ) {
+			mdot = PartLoadFrac * UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow;
+			SetComponentFlowRate( mdot, UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode, UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopSide, UnitarySystem( UnitarySysNum ).SuppCoilBranchNum, UnitarySystem( UnitarySysNum ).SuppCoilCompNum );
 		}
 
 	}

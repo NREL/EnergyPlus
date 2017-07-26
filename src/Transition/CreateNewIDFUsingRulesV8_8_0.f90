@@ -356,6 +356,25 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    OutArgs(1) = 'DecayCurvesFromComponentLoadsSummary'
                  ENDIF
 
+             CASE('TABLE:TWOINDEPENDENTVARIABLES')
+                 ObjectName='Table:TwoIndependentVariables'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:13)=InArgs(1:13)  ! No change
+                 OutArgs(14)=''           ! Add 1 New Input Field, blank
+                 OutArgs(15:CurArgs+1)=InArgs(14:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+    !!!   Changes for report variables, meters, tables -- update names
+              CASE('OUTPUT:VARIABLE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                IF (OutArgs(1) == Blank) THEN
+                  OutArgs(1)='*'
+                  nodiff=.false.
+                ENDIF
+
                 CALL ScanOutputVariablesForReplacement(  &
                    2,  &
                    DelThis,  &
