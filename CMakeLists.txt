@@ -167,6 +167,23 @@ option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging onl
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 INCLUDE(third_party/cmake/kiva.cmake)
 
+execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_jdd_schema/generate_jdd.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_jdd)
+if( ${generate_jdd} MATCHES ".*timeout.*" )
+  message(FATAL_ERROR "Generating JDD from IDD failed: ${generate_jdd}")
+endif()
+configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
+configure_file( idd/Energy+.jdd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.jdd" )
+configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
+configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
+
+execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_jdd/embedded_jdd.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.jdd" TIMEOUT 30 RESULT_VARIABLE generate_embedded_jdd OUTPUT_VARIABLE embedded_jdd)
+if( ${generate_embedded_jdd} MATCHES ".*timeout.*" )
+  message(FATAL_ERROR "Generating embedded JDD from JDD failed: ${generate_embedded_jdd}")
+endif()
+if( ${generate_embedded_jdd} MATCHES ".*ImportError.*cbor2.*" )
+    message(FATAL_ERROR "You must \"pip install cbor2\": ${generate_embedded_jdd}")
+endif()
+
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
@@ -189,15 +206,6 @@ if( BUILD_TESTING )
     ADD_SUBDIRECTORY(performance_tests)
   endif()
 endif()
-
-execute_process( COMMAND ${PYTHON_EXECUTABLE} "${EnergyPlus_SOURCE_DIR}/scripts/dev/generate_jdd_schema/generate_jdd.py" "${EnergyPlus_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_jdd)
-if( ${generate_jdd} MATCHES ".*timeout.*" )
-  message(FATAL_ERROR "Generating JDD from IDD failed: ${generate_jdd}")
-endif()
-configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
-configure_file( idd/Energy+.jdd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.jdd" )
-configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
-configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)

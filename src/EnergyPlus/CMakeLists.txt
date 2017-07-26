@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 if(NOT PROFILE_USE)
   configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
   configure_file( ConfiguredFunctions.in.hh "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh" )
+  configure_file( InputProcessing/EmbeddedJDD.in.cc "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedJDD.cc" )
 endif()
 
 SET( SRC
@@ -330,13 +331,15 @@ SET( SRC
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
-  InputProcessing/InputProcessor.cc
-  InputProcessing/InputProcessor.hh
+  InputProcessing/DataStorage.hh
+  InputProcessing/EmbeddedJDD.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedJDD.cc"
   InputProcessing/IdfParser.cc
   InputProcessing/IdfParser.hh
+  InputProcessing/InputProcessor.cc
+  InputProcessing/InputProcessor.hh
   InputProcessing/InputValidation.cc
   InputProcessing/InputValidation.hh
-  InputProcessing/DataStorage.hh
   IntegratedHeatPump.cc
   IntegratedHeatPump.hh
   InternalHeatGains.cc

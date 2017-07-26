@@ -59,6 +59,7 @@
 #include <InputProcessing/IdfParser.hh>
 #include <InputProcessing/InputValidation.hh>
 #include <InputProcessing/DataStorage.hh>
+#include <InputProcessing/EmbeddedJDD.hh>
 // #include <InputProcessing/ObjectTypes.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
@@ -218,12 +219,13 @@ namespace EnergyPlus {
 
 	void
 	InputProcessor::processInput() {
-		std::ifstream jdd_stream( DataStringGlobals::inputJddFileName , std::ifstream::in);
-		if ( !jdd_stream.is_open() ) {
-			ShowFatalError( "JDD file path " + DataStringGlobals::inputJddFileName + " not found" );
-			return;
-		}
-		schema = json::parse(jdd_stream);
+		// std::ifstream jdd_stream( DataStringGlobals::inputJddFileName , std::ifstream::in);
+		// if ( !jdd_stream.is_open() ) {
+		// 	ShowFatalError( "JDD file path " + DataStringGlobals::inputJddFileName + " not found" );
+		// 	return;
+		// }
+		// schema = json::parse(jdd_stream);
+		schema = json::from_cbor(embeddedJDD);
 
 		const json & loc = schema[ "properties" ];
 		caseInsensitiveObjectMap.reserve( loc.size() );

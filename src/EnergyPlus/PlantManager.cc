@@ -86,7 +86,6 @@
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
 #include <InputProcessing/InputProcessor.hh>
-#include <InputProcessing/ObjectTypes.hh>
 
 namespace EnergyPlus {
 
