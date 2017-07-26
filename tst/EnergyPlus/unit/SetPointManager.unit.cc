@@ -1186,7 +1186,9 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
 	EXPECT_EQ( -17.778, SetPointManager::OutAirSetPtMgr( 1 ).OutLow1 );
 	EXPECT_EQ( 40.0, SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 );
 	EXPECT_EQ( 21.11, SetPointManager::OutAirSetPtMgr( 1 ).OutHigh1 );
-
+	// set out door dry bukb temp
+	DataEnvironment::OutDryBulbTemp = -20.0;
+	// do init
 	SetPointManager::InitSetPointManagers();
 	// check OA Reset Set Point Manager initialization
 	SetPointManager::SimSetPointManagers();

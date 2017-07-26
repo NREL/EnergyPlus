@@ -4691,14 +4691,8 @@ namespace SetPointManager {
 		Real64 OutHighTemp;
 		Real64 SetTempAtOutLow;
 		Real64 SetTempAtOutHigh;
-		int SchedPtr;
-		Real64 SetPt;
-		int CtrlType;
 
-		SchedPtr = this->SchedPtr;
-		CtrlType = this->CtrlTypeMode;
-
-		if ( SchedPtr > 0 ) {
+		if ( this->SchedPtr > 0 ) {
 			SchedVal = GetCurrentScheduleValue( SchedPtr );
 		} else {
 			SchedVal = 0.0;
@@ -4716,16 +4710,7 @@ namespace SetPointManager {
 			SetTempAtOutHigh = this->OutHighSetPt1;
 		}
 
-		if ( CtrlType == iCtrlVarType_MaxTemp ) {
-			SetPt = SetTempAtOutLow;
-		} else if ( CtrlType == iCtrlVarType_MinTemp ) {
-			SetPt = SetTempAtOutHigh;
-		} else {
-			SetPt = CalcSetPoint( OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh );
-		}
-
-		this->SetPt = SetPt; //Setpoint for Calc Routine
-
+		this->SetPt = CalcSetPoint( OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh );
 	}
 
 	Real64
