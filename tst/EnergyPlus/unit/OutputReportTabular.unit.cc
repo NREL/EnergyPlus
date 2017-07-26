@@ -2457,7 +2457,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+	//DataGlobals::DDOnlySimulation = true;
 
 	ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -3433,7 +3433,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+	//DataGlobals::DDOnlySimulation = true;
 
 	ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -4706,7 +4706,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+	//DataGlobals::DDOnlySimulation = true;
 
 	ManageSimulation();
 //	compare_err_stream( "" );
@@ -4815,20 +4815,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) ",
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (tau",
 		"    1.00;                    !- Sky Clearness                                             ",
-		"                                                                                          ",
-		"  RunPeriod,                                                                              ",
-		"    ,                        !- Name                                                      ",
-		"    1,                       !- Begin Month                                               ",
-		"    1,                       !- Begin Day of Month                                        ",
-		"    12,                      !- End Month                                                 ",
-		"    31,                      !- End Day of Month                                          ",
-		"    Tuesday,                 !- Day of Week for Start Day                                 ",
-		"    Yes,                     !- Use Weather File Holidays and Special Days                ",
-		"    Yes,                     !- Use Weather File Daylight Saving Period                   ",
-		"    No,                      !- Apply Weekend Holiday Rule                                ",
-		"    Yes,                     !- Use Weather File Rain Indicators                          ",
-		"    Yes;                     !- Use Weather File Snow Indicators                          ",
-		"                                                                                          ",
+			"                                                                                          ",
 		"  SimulationControl,                                                                      ",
 		"    NO,                      !- Do Zone Sizing Calculation                                ",
 		"    NO,                      !- Do System Sizing Calculation                              ",
@@ -5817,7 +5804,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+	//DataGlobals::DDOnlySimulation = true;
 
 	ManageSimulation();
 	//compare_err_stream( "" );
