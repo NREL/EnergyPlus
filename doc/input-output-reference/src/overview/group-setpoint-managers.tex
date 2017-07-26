@@ -181,9 +181,9 @@ SetpointManager:Scheduled:DualSetpoint,
 
 \subsection{SetpointManager:OutdoorAirReset}\label{setpointmanageroutdoorairreset}
 
-The Outdoor Air Reset Setpoint Manager sets the supply air temperature according to the outdoor air temperature using a reset rule. The reset rule is determined by 2 points: the supply air setpoint temperature at the outdoor high temperature (SATOH) and the supply air setpoint temperature at the outdoor low temperature (SATOL). If the outdoor temperature is above the outdoor high temperature, the supply air temperature is set to SATOH. If the outdoor temperature is below the outdoor low temperature, the supply air temperature is set to SATOL. If the outdoor temperature is between the outdoor high and outdoor low temperatures, the supply air temperature is linearly interpolated between SATOH and SATOL.
+The Outdoor Air Reset Setpoint Manager is used to place a setpoint temperature on system node according to the outdoor air temperature using a reset rule. The reset rule is determined by 2 points: the setpoint temperature at the outdoor air high temperature (TSetAtOAHigh) and the setpoint temperature at the outdoor air low temperature (TSetAtOALow). If the outdoor air temperature is above the outdoor air high temperature limit, the setpoint temperature is set to TSetAtOAHigh. If the outdoor air temperature is below the outdoor air low temperature limit, the setpoint temperature is set to TSetAtOALow. If the outdoor air temperature is between the outdoor air high and outdoor air low temperatures limits, the setpoint temperature is linearly interpolated between TSetAtOAHigh and TSetAtOALow. The outdoor air temperature is obtained from the weather information during the simulation. This setpoint manager can be used to place a setopint temperature on Airloop and plant loop system node.
 
-The input consists of the setpoint manager name, the type of control variable, a node list name of the nodes affected by the setpoint, and the data for the reset rule: the supply air setpoint temperature at the outdoor low temperature, the outdoor low temperature, the supply air setpoint temperature at the outdoor high temperature, and the outdoor high temperature.
+The input consists of the setpoint manager name, the type of control variable, a node list name of the nodes affected by the setpoint, and the data for the reset rule: the setpoint temperature at the outdoor air low temperature, the outdoor air low temperature limit, the setpoint temperature at the outdoor air high temperature, and the outdoor air high temperature limit.
 
 There are optional inputs for a second reset rule. First there is the name of a schedule that indicates which rule to use: a schedule value of 1 means use the first rule; a schedule value of 2 means use the second rule. Next, there are the 4 inputs specifying the second reset rule.
 
@@ -205,8 +205,6 @@ The type of variable that will be controlled. There are three key choices for th
 \item
   MinimumTemperature
 \end{itemize}
-
-If the Control Variable input field is set to MaximumTemperature, then the setpoint will be set to a setpoint value specified at Setpoint at Outdoor Low Temperature input field, else if the Control Variable input field is set to MinimumTemperature, then the setpoint will be set to a setpoint value specified in Setpoint at Outdoor High Temperature input field, else if the Control Variable input field is set to Temperature, then the setpoint will be set to a setpoint value determined based on the current time outdoor air temperature, and the setpoint values specified at Setpoint Outdoor Low and High Temperature input fields.
 
 \paragraph{Field: Setpoint at Outdoor Low Temperature}\label{field-setpoint-at-outdoor-low-temperature}
 

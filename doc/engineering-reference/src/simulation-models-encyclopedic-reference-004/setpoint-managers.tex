@@ -36,7 +36,7 @@ where \({T_{set}}\) is the supply air temperature setpoint and \({T_{sched}}\) i
 
 \subsection{Outdoor Air Reset}\label{outdoor-air-reset}
 
-The input object SetpointManager:OutdoorAirReset provides a setpoint manager that implements an outdoor air reset strategy for the supply air temperature. The user defines a reset rule for this strategy by specifying two setpoint temperatures at two outside drybulb temperatures. Generally the lower setpoint temperature is matched with the higher drybulb temperature and the higher setpoint temperature with the lower drybulb temperature. The user can specify two reset rules and schedule their usage. A schedule value of 1 indicates use of the 1st rule; 2 indicates use of the 2nd.
+The input object SetpointManager:OutdoorAirReset provides a setpoint manager that implements an outdoor air reset strategy for system node setpoint temperature. The user defines a reset rule for this strategy by specifying two setpoint temperatures at two outside drybulb temperatures. Generally the lower setpoint temperature is matched with the higher outdoor air drybulb temperature and the higher setpoint temperature is matched with the lower outdoor air drybulb temperature. The user can specify two reset rules and schedule their usage. A schedule value of 1 indicates use of the 1st rule; 2 indicates use of the 2nd.
 
 IF \emph{SchedVal = 2}
 
