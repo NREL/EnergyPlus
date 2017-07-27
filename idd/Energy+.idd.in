@@ -750,22 +750,6 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \minimum> 0.0
        \note Used to alter the capacitance of zone air with respect to zone air generic contaminant concentration
 
-HVACSystemRootFindingAlgorithm,
-       \memo Specifies a HVAC system solver algorithm to find a root
-       \unique-object
-  A1 , \field Algorithm
-       \type choice
-       \key RegulaFalsi
-       \key Bisection
-       \key BisectionThenRegulaFalsi
-       \key RegulaFalsiThenBisection
-       \default RegulaFalsi
-  N1 ; \field Number of Iterations Before Algorithm Switch
-       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is 
-       \note entered. When iteration number is greater than the value, algorithm switches.
-       \type integer
-       \default 5
-
 Timestep,
        \memo Specifies the "basic" timestep for the simulation. The
        \memo value entered here is also known as the Zone Timestep.  This is used in
@@ -815,6 +799,22 @@ ConvergenceLimits,
        \type integer
        \default 8
        \minimum 2
+
+HVACSystemRootFindingAlgorithm,
+       \memo Specifies a HVAC system solver algorithm to find a root
+       \unique-object
+  A1 , \field Algorithm
+       \type choice
+       \key RegulaFalsi
+       \key Bisection
+       \key BisectionThenRegulaFalsi
+       \key RegulaFalsiThenBisection
+       \default RegulaFalsi
+  N1 ; \field Number of Iterations Before Algorithm Switch
+       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is 
+       \note entered. When iteration number is greater than the value, algorithm switches.
+       \type integer
+       \default 5
 
 \group Compliance Objects
 
