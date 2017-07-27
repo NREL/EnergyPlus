@@ -4947,8 +4947,7 @@ namespace SingleDuct {
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; //TRANE DCV
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail = mDotFromOARequirement; //TRANE DCV
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail = 0.0;
-			}
-			else {
+			} else {
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; //TRANE DCV
 																								 // but also apply constraints  //TRANE DCV
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = min( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail );  //TRANE DCV
