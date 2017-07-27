@@ -365,8 +365,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(15:CurArgs+1)=InArgs(14:CurArgs)  !
                  CurArgs = CurArgs + 1
 
-
-
              CASE('UNITARYSYSTEMPERFORMANCE:MULTISPEED')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
@@ -421,6 +419,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1:17)=InArgs(1:17)  ! No change
                  OutArgs(18:CurArgs-1)=InArgs(19:CurArgs)  ! remove redundant field, shifting all fields up
                  CurArgs = CurArgs - 1
+
+             CASE('ZONEHVAC:IDEALLOADSAIRSYSTEM')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:4)=InArgs(1:4)
+                 OutArgs(5) = ''
+                 OutArgs(6:CurArgs+1)=InArgs(5:CurArgs)
+                 CurArgs = CurArgs + 1
+
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
