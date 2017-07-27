@@ -4272,13 +4272,15 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 	SizeUnitarySystem( NumUnitarySystem, true, 0 );
 
-	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
+	EXPECT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
 
-	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity * 0.00005, UnitarySystem( 1 ).MaxHeatAirVolFlow );
-	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity * 0.00005, UnitarySystem( 1 ).MaxCoolAirVolFlow );
-	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, DXCoil( UnitarySystem( 1 ).CoolingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedCooling ) );
-	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity, VarSpeedCoil( UnitarySystem( 1 ).HeatingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedHeating ) );
+	EXPECT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity * 0.00005, UnitarySystem( 1 ).MaxHeatAirVolFlow );
+	EXPECT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity * 0.00005, UnitarySystem( 1 ).MaxCoolAirVolFlow );
+	EXPECT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, DXCoil( UnitarySystem( 1 ).CoolingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedCooling ) );
+	// 64-bit MSVS shows these next variables as identical yet other compilers show diff's, changing ASSERT_EQ to EXPECT_NEAR
+	EXPECT_NEAR( UnitarySystem( 1 ).DesignHeatingCapacity, VarSpeedCoil( UnitarySystem( 1 ).HeatingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedHeating ), 0.001 );
 
+	// 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 1 ), 0.031373, 0.000001 );
 	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 1 ), 0.000001 );
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 2 ), 0.062747, 0.000001 );
@@ -4294,6 +4296,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 2 ), UnitarySystem( 1 ).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 2 ), 0.000001 );
 	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 3 ), UnitarySystem( 1 ).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 3 ), 0.000001 );
 
+	// 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ), 0.007884, 0.000001 );
 	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ) );
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ), 0.015769, 0.000001 );
