@@ -823,7 +823,7 @@ namespace CondenserLoopTowers {
 				ErrorsFound = true;
 			}
 			if ( NumAlphas > 12 ) {
-				SimpleTower( TowerNum ).EndUseSubcategory = cAlphaArgs( 13 );
+				SimpleTower( TowerNum ).EndUseSubcategory = AlphArray( 13 );
 			} else {
 				SimpleTower( TowerNum ).EndUseSubcategory = "General";
 			}
@@ -1166,7 +1166,7 @@ namespace CondenserLoopTowers {
 				ErrorsFound = true;
 			}
 			if ( NumAlphas > 11 ) {
-				SimpleTower( TowerNum ).EndUseSubcategory = cAlphaArgs( 12 );
+				SimpleTower( TowerNum ).EndUseSubcategory = AlphArray( 12 );
 			} else {
 				SimpleTower( TowerNum ).EndUseSubcategory = "General";
 			}
@@ -1772,7 +1772,7 @@ namespace CondenserLoopTowers {
 				}
 			}
 			if ( NumAlphas > 13 ) {
-				SimpleTower( TowerNum ).EndUseSubcategory = cAlphaArgs( 14 );
+				SimpleTower( TowerNum ).EndUseSubcategory = AlphArray( 14 );
 			} else {
 				SimpleTower( TowerNum ).EndUseSubcategory = "General";
 			}
@@ -2040,7 +2040,7 @@ namespace CondenserLoopTowers {
 				}
 			}
 			if ( NumAlphas > 15 ) {
-				SimpleTower( TowerNum ).EndUseSubcategory = cAlphaArgs( 16 );
+				SimpleTower( TowerNum ).EndUseSubcategory = AlphArray( 16 );
 			} else {
 				SimpleTower( TowerNum ).EndUseSubcategory = "General";
 			}
