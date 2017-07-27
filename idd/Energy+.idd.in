@@ -751,7 +751,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \note Used to alter the capacitance of zone air with respect to zone air generic contaminant concentration
 
 HVACSystemRootFindingAlgorithm,
-	   \memo Specifies a HVAC system solver algorithm to find a root
+       \memo Specifies a HVAC system solver algorithm to find a root
        \unique-object
   A1 , \field Algorithm
        \type choice
@@ -760,7 +760,7 @@ HVACSystemRootFindingAlgorithm,
        \key BisectionThenRegulaFalsi
        \key RegulaFalsiThenBisection
        \default RegulaFalsi
-  N1 ; \field Number of Iteration Before Algorithm Switch
+  N1 ; \field Number of Iterations Before Algorithm Switch
        \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is 
        \note entered. When iteration number is greater than the value, algorithm switches.
        \type integer
