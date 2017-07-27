@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
@@ -346,6 +347,7 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
 	GetZoneData( ErrorsFound );
 	Zone( 1 ).SurfaceFirst = 1;
 	Zone( 1 ).SurfaceLast = 1;
+	ScheduleManager::Schedule.allocate(1); 
 	AllocateHeatBalArrays();
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
