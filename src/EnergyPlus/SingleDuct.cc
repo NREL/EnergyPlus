@@ -2747,7 +2747,8 @@ namespace SingleDuct {
 		UpdateSys( SysNum );
 
 		// At the current air mass flow rate, calculate heating coil load
-		QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * ( SysInlet( SysNum ).AirTemp - ZoneTemp ); // reheat needed
+		CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, SysInlet( SysNum ).AirTemp );
+		QActualHeating = QToHeatSetPt - MassFlow * ( CpAirSysIn * SysInlet( SysNum ).AirTemp - CpAirZn * ZoneTemp ); // reheat needed
 
 		// do the reheat calculation if there's some air nass flow (or the damper action is "reverse action"), the flow is <= minimum ,
 		// there's a heating requirement, and there's a thermostat with a heating setpoint
@@ -2780,7 +2781,8 @@ namespace SingleDuct {
 
 				MaxHeatTemp = Sys( SysNum ).MaxReheatTemp;
 				if ( QToHeatSetPt > SmallLoad ) { // zone has a postive load to heating setpoint
-					MassFlowReqToLimitLeavingTemp = QToHeatSetPt / ( CpAirZn * ( MaxHeatTemp - ZoneTemp ) );
+					CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, MaxHeatTemp );
+					MassFlowReqToLimitLeavingTemp = QToHeatSetPt / ( ( CpAirSysIn * MaxHeatTemp - CpAirZn * ZoneTemp ) );
 				} else {
 					MassFlowReqToLimitLeavingTemp = 0.0;
 				}
@@ -2802,7 +2804,8 @@ namespace SingleDuct {
 
 			// now make any corrections to heating coil loads
 			if ( Sys( SysNum ).MaxReheatTempSetByUser ) {
-				QZoneMaxRHTempLimit = CpAirZn * MassFlow * ( MaxHeatTemp - ZoneTemp );
+				CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, MaxHeatTemp );
+				QZoneMaxRHTempLimit = MassFlow * ( CpAirSysIn * MaxHeatTemp - CpAirZn * ZoneTemp );
 				QZoneMax2 = min( QZoneMaxRHTempLimit, QToHeatSetPt );
 			}
 
@@ -2894,21 +2897,24 @@ namespace SingleDuct {
 
 			} else if ( SELECT_CASE_var == HCoilType_SteamAirHeating ) { // ! COIL:STEAM:AIRHEATING
 				// Determine the load required to pass to the Component controller
-				QZnReq = QZoneMax2 - MassFlow * CpAirZn * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
+				CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, SysInlet( SysNum ).AirTemp );
+				QZnReq = QZoneMax2 - MassFlow * (CpAirSysIn * SysInlet( SysNum ).AirTemp - CpAirZn * ZoneTemp );
 
 				// Simulate reheat coil for the VAV system
 				SimulateSteamCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, Sys( SysNum ).ReheatComp_Index, QZnReq );
 
 			} else if ( SELECT_CASE_var == HCoilType_Electric ) { // COIL:ELECTRIC:HEATING
 				// Determine the load required to pass to the Component controller
-				QZnReq = QZoneMax2 - MassFlow * CpAirZn * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
+				CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, SysInlet( SysNum ).AirTemp );
+				QZnReq = QZoneMax2 - MassFlow * ( CpAirSysIn * SysInlet( SysNum ).AirTemp - CpAirZn * ZoneTemp );
 
 				// Simulate reheat coil for the VAV system
 				SimulateHeatingCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, QZnReq, Sys( SysNum ).ReheatComp_Index );
 
 			} else if ( SELECT_CASE_var == HCoilType_Gas ) { // COIL:GAS:HEATING
 				// Determine the load required to pass to the Component controller
-				QZnReq = QZoneMax2 - MassFlow * CpAirZn * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
+				CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, SysInlet( SysNum ).AirTemp );
+				QZnReq = QZoneMax2 - MassFlow * ( CpAirSysIn * SysInlet( SysNum ).AirTemp - CpAirZn * ZoneTemp );
 
 				// Simulate reheat coil for the VAV system
 				SimulateHeatingCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, QZnReq, Sys( SysNum ).ReheatComp_Index, QHeatingDelivered );
