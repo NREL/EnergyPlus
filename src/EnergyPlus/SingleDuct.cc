@@ -4934,7 +4934,6 @@ namespace SingleDuct {
 			Real64 airLoopOAFrac( 0.0 );
 			if ( SysATMixer( ATMixerNum ).AirLoopNum > 0 ) {
 				airLoopOAFrac = DataAirLoop::AirLoopFlow( SysATMixer( ATMixerNum ).AirLoopNum ).OAFrac;
-				airLoopOAFrac = DataAirLoop::AirLoopFlow( 1 ).OAFrac;
 				if ( airLoopOAFrac > 0.0 ) {
 					Real64 vDotOAReq = CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, true, true );
 					Real64 rhoAir = PsyRhoAirFnPbTdbW( Node( SysATMixer( ATMixerNum ).PriInNode ).Press, Node( SysATMixer( ATMixerNum ).PriInNode ).Temp, Node( SysATMixer( ATMixerNum ).PriInNode ).HumRat );
@@ -4953,7 +4952,6 @@ namespace SingleDuct {
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; //TRANE DCV
 																								 // but also apply constraints  //TRANE DCV
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = min( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail );  //TRANE DCV
-//				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = min( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMax );  //TRANE DCV
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail );  //TRANE DCV
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMin );  //TRANE DCV
 			}
