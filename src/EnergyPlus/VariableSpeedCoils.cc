@@ -303,6 +303,7 @@ namespace VariableSpeedCoils {
 		CompanionCoolingCoilNum( 0 ),
 		CompanionHeatingCoilNum( 0 ),
 		FanDelayTime( 0.0 ),
+		MSHPDesignSpecIndex( 0 ),
 		MSErrIndex( MaxSpedLevels, 0 ),
 		MSRatedPercentTotCap( MaxSpedLevels, 0.0 ),
 		MSRatedTotCap( MaxSpedLevels, 0.0 ),
@@ -3544,7 +3545,7 @@ namespace VariableSpeedCoils {
 			rhoA = PsyRhoAirFnPbTdbW( OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 			//HPWH, the mass flow rate will be updated by a revised entering air density
 
-			if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 ) {
+			if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 && allocated( HVACUnitarySystem::DesignSpecMSHP ) ) {
 				if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
 					if ( HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).NumOfSpeedCooling != VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) {
 						ShowFatalError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil( DXCoilNum ).Name + " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object." );
@@ -3558,7 +3559,7 @@ namespace VariableSpeedCoils {
 
 			for ( Mode = VarSpeedCoil( DXCoilNum ).NumOfSpeeds; Mode >= 1; --Mode ) {
 
-				if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 ) {
+				if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 && VarSpeedCoil( DXCoilNum ).CoolHeatType != "WATERHEATING" ) {
 					if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
 						VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).CoolingVolFlowRatio( Mode );
 					} else {
