@@ -114,6 +114,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
   INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
   INTEGER :: AlphaNumI
+  REAL :: SaveNumber
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -806,11 +807,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('WINDOWMATERIAL:BLIND:EQUIVALENTLAYER')
                  ObjectName='WindowMaterial:Blind:EquivalentLayer'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1:24) = InArgs(1:24)
-                 IF (inArgs(6) >= 90) THEN
-                   OutArgs(6) = 90.0 - inArgs(6)
+                 OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                 NoDiff=.true.
+                 SaveNumber=ProcessNumber(OutArgs(6),ErrFlag)
+                 IF (ErrFlag) THEN
+                   CALL ShowSevereError('Invalid Number, WINDOWMATERIAL:BLIND:EQUIVALENTLAYER field 6, Name='//TRIM(OutArgs(1)),Auditf)
+                   WRITE(DifLfn,fmta) '  ! Invalid Number, field 6 {'//TRIM(NwFldNames(6))//'} value='//TRIM(OutArgs(6))
                  ELSE
-                   OutArgs(6) = inArgs(6)
+                   IF (SaveNumber >= 90) THEN
+                     SaveNumber = 90.0 - SaveNumber
+                     OutArgs(6) = TrimTrailZeros(SaveNumber)
+                   ENDIF
                  ENDIF
  
               CASE DEFAULT
