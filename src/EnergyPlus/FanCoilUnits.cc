@@ -140,7 +140,7 @@ namespace FanCoilUnits {
 	using DataHVACGlobals::ContFanCycCoil;
 	using DataHVACGlobals::ATMixer_InletSide;
 	using DataHVACGlobals::ATMixer_SupplySide;
-	using DataHVACGlobals::cATMixerTypes;
+	using DataHVACGlobals::cATMixerConnectionTypes;
 	using DataHVACGlobals::ATMixerExists;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
@@ -405,13 +405,6 @@ namespace FanCoilUnits {
 		int NodeNum; // index to loop counter
 		static bool ZoneExNodeNotFound( false ); // used in error checking
 		static bool ZoneInNodeNotFound( false ); // used in error checking
-		static int ATMixerNum( 0 ); // index of air terminal mixer in the air terminal mixer data array
-		static int ATMixerType( 0 ); // type of air terminal mixer (1=inlet side; 2=supply side)
-		static int ATMixerPriNode( 0 ); // node number of the air terminal mixer primary air inlet
-		static int ATMixerSecNode( 0 ); // node number of the air terminal mixer secondary air inlet
-		static int ATMixerOutNode( 0 ); // node number of the air terminal mixer secondary air inlet
-		std::string ATMixerName;
-
 		// FLOW
 
 		// find the number of each type of fan coil unit
@@ -737,52 +730,41 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).HotControlOffset <= 0.0 ) {
 				FanCoil( FanCoilNum ).HotControlOffset = 0.001;
 			}
-
-			//check for inlet side air mixer
-			GetATMixer( FanCoil( FanCoilNum ).Name, ATMixerName, ATMixerNum, ATMixerType, ATMixerPriNode, ATMixerSecNode, ATMixerOutNode );
-			if ( ATMixerType == ATMixer_InletSide ) {
-				// save the air terminal mixer data in the fan coil data array
+			GetATMixer( FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).ATMixerName, FanCoil( FanCoilNum ).ATMixerIndex, FanCoil( FanCoilNum ).ATMixerType, FanCoil( FanCoilNum ).ATMixerPriNode, FanCoil( FanCoilNum ).ATMixerSecNode, FanCoil( FanCoilNum ).ATMixerOutNode );
+			if ( FanCoil( FanCoilNum ).ATMixerType == ATMixer_InletSide || FanCoil( FanCoilNum ).ATMixerType == ATMixer_SupplySide ) {
 				FanCoil( FanCoilNum ).ATMixerExists = true;
-				FanCoil( FanCoilNum ).ATMixerIndex = ATMixerNum;
-				FanCoil( FanCoilNum ).ATMixerName = ATMixerName;
-				FanCoil( FanCoilNum ).ATMixerType = ATMixer_InletSide;
-				FanCoil( FanCoilNum ).ATMixerPriNode = ATMixerPriNode;
-				FanCoil( FanCoilNum ).ATMixerSecNode = ATMixerSecNode;
-				FanCoil( FanCoilNum ).ATMixerOutNode = ATMixerOutNode;
 				// check that fan coil doesn' have local outside air
-				if ( ! lAlphaBlanks( 8 ) ) {
+				if ( !lAlphaBlanks( 8 ) ) {
 					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit has local as well as central outdoor air specified" );
 				}
-				// check that the air teminal mixer out node is the fan coil inlet node
-				if ( FanCoil( FanCoilNum ).AirInNode != ATMixerOutNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name." );
-					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
-					ShowContinueError( "..Fan coil unit air inlet node name = " + NodeID( FanCoil( FanCoilNum ).AirInNode ) );
-					ErrorsFound = true;
-				}
-				// check for supply side air terminal mixer
-			} else if ( ATMixerType == ATMixer_SupplySide ) {
-				// save the air terminal mixer data in the fan coil data array
-				FanCoil( FanCoilNum ).ATMixerExists = true;
-				FanCoil( FanCoilNum ).ATMixerIndex = ATMixerNum;
-				FanCoil( FanCoilNum ).ATMixerName = ATMixerName;
-				FanCoil( FanCoilNum ).ATMixerType = ATMixer_SupplySide;
-				FanCoil( FanCoilNum ).ATMixerPriNode = ATMixerPriNode;
-				FanCoil( FanCoilNum ).ATMixerSecNode = ATMixerSecNode;
-				FanCoil( FanCoilNum ).ATMixerOutNode = ATMixerOutNode;
-				// check that fan coil doesn' have local outside air
-				if ( ! lAlphaBlanks( 8 ) ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit has local as well as central outdoor air specified" );
-				}
-				// check that the air teminal mixer secondary air inlet node is the fan coil outlet node
-				if ( FanCoil( FanCoilNum ).AirOutNode != ATMixerSecNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name." );
-					ShowContinueError( "..Air terminal mixer secondary inlet node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
-					ShowContinueError( "..Fan coil unit air outlet node name = " + NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
-					ErrorsFound = true;
-				}
-				// no air terminal mixer; do the normal connectivity checks
-			} else {
+			}
+			if ( FanCoil( FanCoilNum ).ATMixerExists ) {
+				if ( FanCoil( FanCoilNum ).OutAirVolFlow == 0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"" + " input value to " + cNumericFields( 4 ) + " = 0.0 " );
+					ShowContinueError( " and connected to DOA via AirTerminal:SingleDuct:Mixer = " + FanCoil( FanCoilNum ).ATMixerName );
+					ShowContinueError( " with the Mixer Connection Type = " + cATMixerConnectionTypes( FanCoil( FanCoilNum ).ATMixerType ) );
+					ShowContinueError( " " + cNumericFields( 4 ) + " must be > 0 or set to autosize when " + CurrentModuleObject + " is connected to DOAS. " );
+				}			
+				//check for inlet side air mixer
+				if ( FanCoil( FanCoilNum ).ATMixerType == ATMixer_InletSide ) {
+					// check that the air teminal mixer out node is the fan coil inlet node
+					if ( FanCoil( FanCoilNum ).AirInNode != FanCoil( FanCoilNum ).ATMixerOutNode ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:SideMixer object." );
+						ShowContinueError( "..Fan coil unit air inlet node name = " + NodeID( FanCoil( FanCoilNum ).AirInNode ) );
+						ErrorsFound = true;
+					}
+					// check for supply side air terminal mixer
+				} else if ( FanCoil( FanCoilNum ).ATMixerType == ATMixer_SupplySide ) {
+					// check that the air teminal mixer secondary air inlet node is the fan coil outlet node
+					if ( FanCoil( FanCoilNum ).AirOutNode != FanCoil( FanCoilNum ).ATMixerSecNode ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name." );
+						ShowContinueError( "..Air terminal mixer secondary inlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+						ShowContinueError( "..Fan coil unit air outlet node name = " + NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
+						ErrorsFound = true;
+					}
+				}				
+			} else { // no air terminal mixer; do the normal connectivity checks
 				// check that the fan coil inlet node is the same as one of the zone exhaust nodes
 				ZoneExNodeNotFound = true;
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
@@ -1055,6 +1037,8 @@ namespace FanCoilUnits {
 			InNode = FanCoil( FanCoilNum ).AirInNode;
 			OutNode = FanCoil( FanCoilNum ).AirOutNode;
 			OutsideAirNode = FanCoil( FanCoilNum ).OutsideAirNode;
+			// set it here for use with ATM
+			if ( FanCoil( FanCoilNum ).ATMixerExists ) { OutsideAirNode = FanCoil( FanCoilNum ).ATMixerPriNode; }
 			RhoAir = StdRhoAir;
 			HotConNode = FanCoil( FanCoilNum ).HotControlNode;
 			ColdConNode = FanCoil( FanCoilNum ).ColdControlNode;
@@ -1083,7 +1067,7 @@ namespace FanCoilUnits {
 			//  Node(ColdConNode)%MassFlowRateMax = FanCoil(FanCoilNum)%MaxColdWaterFlow
 			//  Node(ColdConNode)%MassFlowRateMin = FanCoil(FanCoilNum)%MinColdWaterFlow
 
-			if ( FanCoil( FanCoilNum ).OutsideAirNode > 0 ) {
+			if ( OutsideAirNode > 0 ) {
 				Node( OutsideAirNode ).MassFlowRateMax = FanCoil( FanCoilNum ).OutAirMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMin = 0.0;
 			}
@@ -1101,6 +1085,7 @@ namespace FanCoilUnits {
 		// These initializations are done every iteration
 		InletNode = FanCoil( FanCoilNum ).AirInNode;
 		OutsideAirNode = FanCoil( FanCoilNum ).OutsideAirNode;
+		if ( FanCoil( FanCoilNum ).ATMixerExists ) { OutsideAirNode = FanCoil( FanCoilNum ).ATMixerPriNode; }
 		AirRelNode = FanCoil( FanCoilNum ).AirReliefNode;
 		FanCoil( FanCoilNum ).SpeedRatio = 0.0;
 		if ( FanCoil( FanCoilNum ).FanOpModeSchedPtr > 0 ) {
@@ -1120,9 +1105,11 @@ namespace FanCoilUnits {
 				Node( OutsideAirNode ).MassFlowRate = FanCoil( FanCoilNum ).OutAirMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMaxAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
 				Node( OutsideAirNode ).MassFlowRateMinAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
-				Node( AirRelNode ).MassFlowRate = FanCoil( FanCoilNum ).OutAirMassFlow;
-				Node( AirRelNode ).MassFlowRateMaxAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
-				Node( AirRelNode ).MassFlowRateMinAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
+				if ( AirRelNode > 0 ) {
+					Node( AirRelNode ).MassFlowRate = FanCoil( FanCoilNum ).OutAirMassFlow;
+					Node( AirRelNode ).MassFlowRateMaxAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
+					Node( AirRelNode ).MassFlowRateMinAvail = FanCoil( FanCoilNum ).OutAirMassFlow;
+				}
 			}
 
 		} else {
@@ -1133,9 +1120,11 @@ namespace FanCoilUnits {
 				Node( OutsideAirNode ).MassFlowRate = 0.0;
 				Node( OutsideAirNode ).MassFlowRateMaxAvail = 0.0;
 				Node( OutsideAirNode ).MassFlowRateMinAvail = 0.0;
-				Node( AirRelNode ).MassFlowRate = 0.0;
-				Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
-				Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
+				if ( AirRelNode > 0 ) {
+					Node( AirRelNode ).MassFlowRate = 0.0;
+					Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
+					Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
+				}
 			}
 		}
 

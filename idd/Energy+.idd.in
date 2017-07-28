@@ -33552,8 +33552,6 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-        \note This field is set to zero flow when the PTAC is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
@@ -33561,8 +33559,6 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-        \note This field is set to zero flow when the PTAC is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
@@ -33573,8 +33569,6 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \note This air flow rate is used when no heating or cooling is required and the cooling or
         \note heating coil is off. If this field is left blank or zero, the outdoor air flow rate
         \note from the previous on cycle (either cooling or heating) is used.
-        \note This field is set to zero flow when the PTAC is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    A7 , \field Supply Air Fan Object Type
         \required-field
         \type choice
@@ -33710,8 +33704,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-        \note This field is set to zero flow when the PTHP is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
@@ -33719,8 +33711,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-        \note This field is set to zero flow when the PTHP is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
@@ -33730,8 +33720,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note is used when no heating or cooling is required and the DX coil compressor is off.
         \note If this field is left blank or zero, the outdoor air flow rate from the previous
         \note on cycle (either cooling or heating) is used.
-        \note This field is set to zero flow when the PTHP is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    A7 , \field Supply Air Fan Object Type
         \required-field
         \type choice
@@ -33904,8 +33892,6 @@ ZoneHVAC:WaterToAirHeatPump,
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-        \note This field is set to zero flow when the WSHP is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
@@ -33913,8 +33899,6 @@ ZoneHVAC:WaterToAirHeatPump,
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-        \note This field is set to zero flow when the WSHP is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
@@ -33924,8 +33908,6 @@ ZoneHVAC:WaterToAirHeatPump,
         \note is used when no heating or cooling is required and the DX coil compressor is off.
         \note If this field is left blank or zero, the outdoor air flow rate from the previous
         \note on cycle (either cooling or heating) is used.
-        \note This field is set to zero flow when the PTHP is connected to central
-        \note dedicated outdoor air through air terminal single duct mixer object.
    A7,  \field Supply Air Fan Object Type
         \required-field
         \type choice
@@ -34877,22 +34859,16 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to
-        \note central dedicated outdoor air through air terminal single duct mixer object.
   N6 ,  \field Heating Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to
-        \note central dedicated outdoor air through air terminal single duct mixer object.
   N7 ,  \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to
-        \note central dedicated outdoor air through air terminal single duct mixer object.
   A5 ,  \field Supply Air Fan Operating Mode Schedule Name
         \required-field
         \type object-list

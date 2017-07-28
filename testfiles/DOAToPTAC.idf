@@ -5,7 +5,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-! PTAC_ConnectedToDOAS.idf
+! DOAToPTAC.idf
 !
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum
 !                          Illustrates the use of a dedicated outdoor air system (DOAS) with Packaged Terminal AirConditioner (PTAC)
@@ -22,8 +22,8 @@
 !
 ! Location:                Miami, FL USA
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7�C
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2�C MWB=25.3�C
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7?C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2?C MWB=25.3?C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7.
 !
@@ -158,7 +158,7 @@
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7�C
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7?C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -190,7 +190,7 @@
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2�C MWB=25.3�C
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2?C MWB=25.3?C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -1910,13 +1910,13 @@
   Sizing:Zone,
     SPACE1-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    13.8,                    !- Zone Cooling Design Supply Air Temperature {C}
+    15.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0095,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0080,                  !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     SZ DSOA SPACE1-1,        !- Design Specification Outdoor Air Object Name
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
@@ -1939,13 +1939,13 @@
   Sizing:Zone,
     SPACE2-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    15.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0095,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0080,                  !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
@@ -1968,13 +1968,13 @@
   Sizing:Zone,
     SPACE3-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    15.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0095,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0080,                  !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     SZ DSOA SPACE3-1,        !- Design Specification Outdoor Air Object Name
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
@@ -1997,13 +1997,13 @@
   Sizing:Zone,
     SPACE4-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    15.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0095,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0080,                  !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     SZ DSOA SPACE4-1,        !- Design Specification Outdoor Air Object Name
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
@@ -2026,13 +2026,13 @@
   Sizing:Zone,
     SPACE5-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    15.8,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0095,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0080,                  !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     SZ DSOA SPACE5-1,        !- Design Specification Outdoor Air Object Name
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
@@ -2150,9 +2150,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE1-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
@@ -2267,9 +2267,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE2-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
@@ -2307,9 +2307,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE3-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
@@ -2347,9 +2347,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE4-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
@@ -2387,9 +2387,9 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE5-1 Supply Fan,     !- Supply Air Fan Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
@@ -2936,6 +2936,11 @@
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
 
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DIAGNOSTICS ===========
+
+  Output:Diagnostics,
+    displayallwarnings;      !- Key 1
+
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
@@ -3030,11 +3035,6 @@
 
   Output:Variable,DOAS Relief Air Outlet,System Node Temperature,hourly;
 
-!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DIAGNOSTICS ===========
-
-  Output:Diagnostics,
-    displayallwarnings;      !- Key 1
-
   Output:Variable,DOAS Return Air Outlet,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE1-1 Return Outlet,System Node Mass Flow Rate,hourly;
@@ -3082,4 +3082,3 @@
   Output:Variable,SPACE4-1 Supply Inlet,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE5-1 Supply Inlet,System Node Mass Flow Rate,hourly;
-

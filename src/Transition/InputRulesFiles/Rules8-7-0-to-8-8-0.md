@@ -22,3 +22,4 @@ The only change is for field F1, which is A1.  Logic to apply:
 
 if key = 'DecayCurvesfromZoneComponentLoads', change to = 'DecayCurvesFromComponentLoadsSummary'
 
+>>>>>>> develop

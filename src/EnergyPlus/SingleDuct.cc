@@ -4868,13 +4868,9 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int PriInNode;
-		int MixedAirOutNode;
-
-		InletNode = SysATMixer( ATMixerNum ).SecInNode;
-		PriInNode = SysATMixer( ATMixerNum ).PriInNode;
-		MixedAirOutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+		//int InletNode = SysATMixer( ATMixerNum ).SecInNode;
+		//int PriInNode = SysATMixer( ATMixerNum ).PriInNode;
+		//int MixedAirOutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 
 		if ( FirstHVACIteration ) {
 			//  SysATMixer(ATMixerNum)%ZoneAirMassFlowRate = SysATMixer(ATMixerNum)%MaxAirMassFlowRate
@@ -4989,6 +4985,7 @@ namespace SingleDuct {
 
 		// Using/Aliasing
 		using namespace DataLoopNode;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -5002,16 +4999,31 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int MixedAirOutNode;
-
-		MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;
-
+		int PriInNode = SysATMixer( SysNum ).PriInNode;
+		int SecInNode = SysATMixer( SysNum ).SecInNode;
+		int MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;	
 		// mixed air data
 		Node( MixedAirOutNode ).Temp = SysATMixer( SysNum ).MixedAirTemp;
 		Node( MixedAirOutNode ).HumRat = SysATMixer( SysNum ).MixedAirHumRat;
 		Node( MixedAirOutNode ).Enthalpy = SysATMixer( SysNum ).MixedAirEnthalpy;
 		Node( MixedAirOutNode ).Press = SysATMixer( SysNum ).MixedAirPressure;
 		Node( MixedAirOutNode ).MassFlowRate = SysATMixer( SysNum ).MixedAirMassFlowRate;
+		
+		if ( Contaminant.CO2Simulation ) {
+			if ( SysATMixer( SysNum ).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow ) {
+				Node( MixedAirOutNode ).CO2 = Node( PriInNode ).CO2;
+			} else {
+				Node( MixedAirOutNode ).CO2 = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).CO2 + Node( PriInNode ).MassFlowRate * Node( PriInNode ).CO2 ) / Node( MixedAirOutNode ).MassFlowRate;
+			}
+		}
+
+		if ( Contaminant.GenericContamSimulation ) {
+			if ( SysATMixer( SysNum ).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow ) {
+				Node( MixedAirOutNode ).GenContam = Node( PriInNode ).GenContam;
+			} else {
+				Node( MixedAirOutNode ).GenContam = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).GenContam + Node( PriInNode ).MassFlowRate * Node( PriInNode ).GenContam ) / Node( MixedAirOutNode ).MassFlowRate;
+			}
+		}
 
 	}
 

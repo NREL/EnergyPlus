@@ -2127,7 +2127,7 @@
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     ,                        !- Low Speed Supply Air Flow Ratio
     ,                        !- Medium Speed Supply Air Flow Ratio
-    0,                       !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     ,                        !- Outdoor Air Schedule Name
     SPACE1-1 Fan Coil Inlet, !- Air Inlet Node Name
     SPACE1-1 Supply Inlet,   !- Air Outlet Node Name
@@ -2153,7 +2153,7 @@
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     ,                        !- Low Speed Supply Air Flow Ratio
     ,                        !- Medium Speed Supply Air Flow Ratio
-    0,                       !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     ,                        !- Outdoor Air Schedule Name
     SPACE2-1 Fan Coil Inlet, !- Air Inlet Node Name
     SPACE2-1 Supply Inlet,   !- Air Outlet Node Name
@@ -2179,7 +2179,7 @@
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     ,                        !- Low Speed Supply Air Flow Ratio
     ,                        !- Medium Speed Supply Air Flow Ratio
-    0,                       !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     ,                        !- Outdoor Air Schedule Name
     SPACE3-1 Fan Coil Inlet, !- Air Inlet Node Name
     SPACE3-1 Supply Inlet,   !- Air Outlet Node Name
@@ -2205,7 +2205,7 @@
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     ,                        !- Low Speed Supply Air Flow Ratio
     ,                        !- Medium Speed Supply Air Flow Ratio
-    0,                       !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     ,                        !- Outdoor Air Schedule Name
     SPACE4-1 Fan Coil Inlet, !- Air Inlet Node Name
     SPACE4-1 Supply Inlet,   !- Air Outlet Node Name
@@ -2231,7 +2231,7 @@
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     ,                        !- Low Speed Supply Air Flow Ratio
     ,                        !- Medium Speed Supply Air Flow Ratio
-    0,                       !- Maximum Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     ,                        !- Outdoor Air Schedule Name
     SPACE5-1 Fan Coil Inlet, !- Air Inlet Node Name
     SPACE5-1 Supply Inlet,   !- Air Outlet Node Name

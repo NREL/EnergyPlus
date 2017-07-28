@@ -278,13 +278,13 @@ namespace DataHVACGlobals {
 	extern Array1D_string const cHXTypes;
 
 	// Parameters describing air terminal mixers
-	extern int const NumATMixerTypes;
+	extern int const NumATMixerConnectionTypes;
 
 	extern int const No_ATMixer;
 	extern int const ATMixer_InletSide;
 	extern int const ATMixer_SupplySide;
 
-	extern Array1D_string const cATMixerTypes;
+	extern Array1D_string const cATMixerConnectionTypes;
 	extern bool const ATMixerExists;
 
 	// Parameters describing variable refrigerant flow terminal unit types

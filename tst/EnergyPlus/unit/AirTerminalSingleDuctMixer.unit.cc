@@ -60,19 +60,25 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
@@ -84,18 +90,24 @@ using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::Fans;
+using namespace EnergyPlus::FanCoilUnits;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::PackagedTerminalHeatPump;
+using namespace EnergyPlus::PlantManager;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SingleDuct;
+using namespace EnergyPlus::SizingManager;
+using namespace EnergyPlus::SplitterComponent;
 using namespace EnergyPlus::UnitVentilator;
+using namespace EnergyPlus::WaterCoils;
 using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -174,9 +186,9 @@ namespace EnergyPlus {
 			"    0.300,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.300,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:Fuel,        !- Heating Coil Object Type",
@@ -417,9 +429,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:Fuel,        !- Heating Coil Object Type",
@@ -743,9 +755,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:Fuel,        !- Heating Coil Object Type",
@@ -1071,9 +1083,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type",
@@ -1483,9 +1495,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    Fan:OnOff,               !- Supply Air Fan Object Type",
 			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
 			"    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type",
@@ -1902,9 +1914,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
 			"    drawthrough,             !- Supply Air Fan Placement",
 			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
@@ -2574,9 +2586,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
 			"    drawthrough,             !- Supply Air Fan Placement",
 			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
@@ -3246,9 +3258,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
 			"    drawthrough,             !- Supply Air Fan Placement",
 			"    Fan:VariableVolume,      !- Supply Air Fan Object Type",
@@ -4898,7 +4910,7 @@ namespace EnergyPlus {
 
 		ZoneSysEnergyDemand.allocate( 1 );
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
-		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -10000.0;
 		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP;
 
 		Schedule( VRFTU( VRFTUNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
@@ -4915,8 +4927,8 @@ namespace EnergyPlus {
 		// check the terminal air mixer outlet flow rate must be equal to VRFTU mass flow rate
 		HVACInletMassFlowRate = Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate;
 		ASSERT_EQ( HVACInletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 5.0 Watt of zone cooling load 
-		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 5.0 );
+		// check the cooling output delivered 
+		ASSERT_NEAR( -5389.0, QUnitOutVRFTU, 5.0 );
 
 	}
 
@@ -4997,9 +5009,9 @@ namespace EnergyPlus {
 			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
 			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
 			"    drawthrough,             !- Supply Air Fan Placement",
 			"    Fan:VariableVolume,      !- Supply Air Fan Object Type",
@@ -6615,6 +6627,11 @@ namespace EnergyPlus {
 		VRFTUNum = 1;
 		VRFTU( VRFTUNum ).OpMode = CycFanCycCoil;
 		// initialize mass flow rates
+
+		VRFTU( VRFTUNum ).CoolOutAirMassFlow = PrimaryAirMassFlowRate;
+		VRFTU( VRFTUNum ).HeatOutAirMassFlow = PrimaryAirMassFlowRate;
+		VRFTU( VRFTUNum ).NoCoolHeatOutAirMassFlow = PrimaryAirMassFlowRate;
+
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate = HVACInletMassFlowRate;
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate;
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
@@ -6647,7 +6664,7 @@ namespace EnergyPlus {
 
 		ZoneSysEnergyDemand.allocate( 1 );
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
-		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -6600.0;
 		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP;
 
 		Schedule( VRFTU( VRFTUNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
@@ -6664,8 +6681,8 @@ namespace EnergyPlus {
 		// check the terminal air mixer outlet flow rate must be equal to the mass flow rate of VRFTU + the primary air 
 		ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
 		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
-		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
+		// check the cooling output delivered
+		ASSERT_NEAR( -5927.0, QUnitOutVRFTU, 2.0 );
 
 	}
 
@@ -7134,4 +7151,2456 @@ namespace EnergyPlus {
 		ASSERT_NEAR( QZnReq, QUnitOut, 0.001 );
 
 	}
+
+	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_wDOASplitter ) {
+
+		bool FirstCall( false );
+		bool ErrorsFound( false );		
+		bool FirstHVACIteration( false );
+		bool SplitterInletChanged( false );
+		Real64 HVACInletMassFlowRate1( 0.0 );
+		Real64 HVACInletMassFlowRate2( 0.0 );
+		Real64 PrimaryAirMassFlowRate1( 0.0 );
+		Real64 PrimaryAirMassFlowRate2( 0.0 );
+		Real64 SecondaryAirMassFlowRate1( 0.0 );
+		Real64 SecondaryAirMassFlowRate2( 0.0 );
+		Real64 OnOffAirFlowRatio( 1.0 );
+		Real64 LatOutputProvided( 0.0 );
+		Real64 QUnitOut( 0.0 );
+		Real64 QZnReq( 0.0 );
+		int ZoneNum( 0 );
+		int PTUnitNum( 0 );
+		
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.7;",
+
+			"AirTerminal:SingleDuct:Mixer,",
+			"    SPACE1-1 DOAS Air Terminal,                  !- Name",
+			"    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type",
+			"    SPACE1-1 PTAC,                               !- ZoneHVAC Terminal Unit Name",
+			"    SPACE1-1 Heat Pump Inlet,                    !- Terminal Unit Outlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name",
+			"    InletSide;                                   !- Terminal Unit Connection Type",
+
+			"AirTerminal:SingleDuct:Mixer,",
+			"    SPACE2-1 DOAS Air Terminal,  !- Name",
+			"    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type",
+			"    SPACE2-1 PTAC,                               !- ZoneHVAC Terminal Unit Name",
+			"    SPACE2-1 Heat Pump Inlet,                    !- Terminal Unit Outlet Node Name",
+			"    SPACE2-1 Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
+			"    SPACE2-1 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name",
+			"    InletSide;                                   !- Terminal Unit Connection Type",
+
+			"ZoneHVAC:AirDistributionUnit,",
+			"    SPACE1-1 DOAS ATU,       !- Name",
+			"    SPACE1-1 Heat Pump Inlet,!- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name",
+			
+			"ZoneHVAC:AirDistributionUnit,",
+			"    SPACE2-1 DOAS ATU,       !- Name",
+			"    SPACE2-1 Heat Pump Inlet,!- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE2-1 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"Schedule:Compact,",
+			"    FanAvailSched,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 16",
+			"    1.0;                     !- Field 17",
+
+			"Schedule:Compact,",
+			"    CyclingFanSch,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 3",
+			"    0.0;                     !- Field 4",
+
+			"ZoneHVAC:EquipmentList,",
+			"    SPACE1-1 Equipment,      !- Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+			"    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type",
+			"    SPACE1-1 PTAC,           !- Zone Equipment 2 Name",
+			"    2,                       !- Zone Equipment 2 Cooling Sequence",
+			"    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+			
+			"ZoneHVAC:EquipmentList,",
+			"    SPACE2-1 Equipment,      !- Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+			"    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type",
+			"    SPACE2-1 PTAC,           !- Zone Equipment 2 Name",
+			"    2,                       !- Zone Equipment 2 Cooling Sequence",
+			"    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+			
+			"  ZoneHVAC:PackagedTerminalAirConditioner,",
+			"    SPACE1-1 PTAC,      !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    SPACE1-1 Heat Pump Inlet,!- Air Inlet Node Name",
+			"    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name",
+			"    ,                        !- Outdoor Air Mixer Object Type",
+			"    ,                        !- Outdoor Air Mixer Name",
+			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
+			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    Fan:OnOff,               !- Supply Air Fan Object Type",
+			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
+			"    Coil:Heating:Fuel,        !- Heating Coil Object Type",
+			"    SPACE1-1 Heating Coil,   !- Heating Coil Name",
+			"    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
+			"    SPACE1-1 PTAC CCoil,     !- Cooling Coil Name",
+			"    BlowThrough,             !- Fan Placement",
+			"    CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name",
+			
+			"  ZoneHVAC:PackagedTerminalAirConditioner,",
+			"    SPACE2-1 PTAC,      !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    SPACE2-1 Heat Pump Inlet,!- Air Inlet Node Name",
+			"    SPACE2-1 Supply Inlet,   !- Air Outlet Node Name",
+			"    ,                        !- Outdoor Air Mixer Object Type",
+			"    ,                        !- Outdoor Air Mixer Name",
+			"    0.600,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.600,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
+			"    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    Fan:OnOff,               !- Supply Air Fan Object Type",
+			"    SPACE2-1 Supply Fan,     !- Supply Air Fan Name",
+			"    Coil:Heating:Fuel,        !- Heating Coil Object Type",
+			"    SPACE2-1 Heating Coil,   !- Heating Coil Name",
+			"    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
+			"    SPACE2-1 PTAC CCoil,     !- Cooling Coil Name",
+			"    BlowThrough,             !- Fan Placement",
+			"    CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name",
+
+			"Fan:OnOff,",
+			"    SPACE1-1 Supply Fan,     !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.7,                     !- Fan Total Efficiency",
+			"    75,                      !- Pressure Rise {Pa}",
+			"    0.500,                   !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1,                       !- Motor In Airstream Fraction",
+			"    SPACE1-1 Heat Pump Inlet,!- Air Inlet Node Name",
+			"    SPACE1-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name",
+			
+			"Fan:OnOff,",
+			"    SPACE2-1 Supply Fan,     !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.7,                     !- Fan Total Efficiency",
+			"    75,                      !- Pressure Rise {Pa}",
+			"    0.600,                   !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1,                       !- Motor In Airstream Fraction",
+			"    SPACE2-1 Heat Pump Inlet,!- Air Inlet Node Name",
+			"    SPACE2-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name",
+
+			"Coil:Heating:Fuel,",
+			"    SPACE1-1 Heating Coil,   !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
+			"    0.8,                     !- Gas Burner Efficiency",
+			"    10000.0,                 !- Nominal Capacity {W}",
+			"    SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name",
+			"    SPACE1-1 Supply Inlet;   !- Air Outlet Node Name",
+			
+			"Coil:Heating:Fuel,",
+			"    SPACE2-1 Heating Coil,   !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
+			"    0.8,                     !- Gas Burner Efficiency",
+			"    10000.0,                 !- Nominal Capacity {W}",
+			"    SPACE2-1 Cooling Coil Outlet,  !- Air Inlet Node Name",
+			"    SPACE2-1 Supply Inlet;   !- Air Outlet Node Name",
+			
+			"  Coil:Cooling:DX:SingleSpeed,",
+			"    SPACE1-1 PTAC CCoil,     !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    6680.0,                  !- Gross Rated Total Cooling Capacity {W}",
+			"    0.75,                    !- Gross Rated Sensible Heat Ratio",
+			"    3.0,                     !- Gross Rated Cooling COP {W/W}",
+			"    0.500,                   !- Rated Air Flow Rate {m3/s}",
+			"    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+			"    SPACE1-1 Zone Unit Fan Outlet, !- Air Inlet Node Name",
+			"    SPACE1-1 Cooling Coil Outlet,  !- Air Outlet Node Name",
+			"    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name",
+			"    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"    HPACEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name",
+			"    HPACEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name",
+			"    HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name",
+
+			"  Coil:Cooling:DX:SingleSpeed,",
+			"    SPACE2-1 PTAC CCoil,     !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    8200.0,                  !- Gross Rated Total Cooling Capacity {W}",
+			"    0.75,                    !- Gross Rated Sensible Heat Ratio",
+			"    3.0,                     !- Gross Rated Cooling COP {W/W}",
+			"    0.600,                   !- Rated Air Flow Rate {m3/s}",
+			"    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+			"    SPACE2-1 Zone Unit Fan Outlet, !- Air Inlet Node Name",
+			"    SPACE2-1 Cooling Coil Outlet,  !- Air Outlet Node Name",
+			"    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name",
+			"    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"    HPACEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name",
+			"    HPACEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name",
+			"    HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name",
+
+			"  Curve:Quadratic,",
+			"    HPACCoolCapFFF,          !- Name",
+			"    0.8,                     !- Coefficient1 Constant",
+			"    0.2,                     !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    0.5,                     !- Minimum Value of x",
+			"    1.5;                     !- Maximum Value of x",
+
+			"  Curve:Quadratic,",
+			"    HPACEIRFFF,              !- Name",
+			"    1.1552,                  !- Coefficient1 Constant",
+			"    -0.1808,                 !- Coefficient2 x",
+			"    0.0256,                  !- Coefficient3 x**2",
+			"    0.5,                     !- Minimum Value of x",
+			"    1.5;                     !- Maximum Value of x",
+
+			"  Curve:Quadratic,",
+			"    HPACPLFFPLR,             !- Name",
+			"    0.85,                    !- Coefficient1 Constant",
+			"    0.15,                    !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    0.0,                     !- Minimum Value of x",
+			"    1.0;                     !- Maximum Value of x",
+
+			"  Curve:Cubic,",
+			"    FanEffRatioCurve,        !- Name",
+			"    0.33856828,              !- Coefficient1 Constant",
+			"    1.72644131,              !- Coefficient2 x",
+			"    -1.49280132,             !- Coefficient3 x**2",
+			"    0.42776208,              !- Coefficient4 x**3",
+			"    0.5,                     !- Minimum Value of x",
+			"    1.5,                     !- Maximum Value of x",
+			"    0.3,                     !- Minimum Curve Output",
+			"    1.0;                     !- Maximum Curve Output",
+
+			"  Curve:Exponent,",
+			"    FanPowerRatioCurve,      !- Name",
+			"    0.0,                     !- Coefficient1 Constant",
+			"    1.0,                     !- Coefficient2 Constant",
+			"    3.0,                     !- Coefficient3 Constant",
+			"    0.0,                     !- Minimum Value of x",
+			"    1.5,                     !- Maximum Value of x",
+			"    0.01,                    !- Minimum Curve Output",
+			"    1.5;                     !- Maximum Curve Output",
+
+			"  Curve:Biquadratic,",
+			"    HPACCoolCapFT,           !- Name",
+			"    0.942587793,             !- Coefficient1 Constant",
+			"    0.009543347,             !- Coefficient2 x",
+			"    0.000683770,             !- Coefficient3 x**2",
+			"    -0.011042676,            !- Coefficient4 y",
+			"    0.000005249,             !- Coefficient5 y**2",
+			"    -0.000009720,            !- Coefficient6 x*y",
+			"    12.77778,                !- Minimum Value of x",
+			"    23.88889,                !- Maximum Value of x",
+			"    18.0,                    !- Minimum Value of y",
+			"    46.11111,                !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    HPACEIRFT,               !- Name",
+			"    0.342414409,             !- Coefficient1 Constant",
+			"    0.034885008,             !- Coefficient2 x",
+			"    -0.000623700,            !- Coefficient3 x**2",
+			"    0.004977216,             !- Coefficient4 y",
+			"    0.000437951,             !- Coefficient5 y**2",
+			"    -0.000728028,            !- Coefficient6 x*y",
+			"    12.77778,                !- Minimum Value of x",
+			"    23.88889,                !- Maximum Value of x",
+			"    18.0,                    !- Minimum Value of y",
+			"    46.11111,                !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"Zone,",
+			"    SPACE1-1,                !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    2.438400269,             !- Ceiling Height {m}",
+			"    239.247360229;           !- Volume {m3}",
+
+			"Zone,",
+			"    SPACE2-1,                !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    2.438400269,             !- Ceiling Height {m}",
+			"    319.247360229;           !- Volume {m3}",
+
+			"ZoneHVAC:EquipmentConnections,",
+			"    SPACE1-1,                !- Zone Name",
+			"    SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name",
+			"    SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE1-1 Zone Air Node,  !- Zone Air Node Name",
+			"    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name",
+
+			"ZoneHVAC:EquipmentConnections,",
+			"    SPACE2-1,                !- Zone Name",
+			"    SPACE2-1 Equipment,      !- Zone Conditioning Equipment List Name",
+			"    SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE2-1 Zone Air Node,  !- Zone Air Node Name",
+			"    SPACE2-1 Return Outlet;  !- Zone Return Air Node Name",
+
+			"NodeList,",
+			"    SPACE1-1 Inlets,         !- Name",
+			"    SPACE1-1 Supply Inlet;   !- Node 1 Name",
+
+			"NodeList,",
+			"    SPACE2-1 Inlets,         !- Name",
+			"    SPACE2-1 Supply Inlet;   !- Node 1 Name",
+
+			"AirLoopHVAC:ZoneSplitter,",
+			"	DOAS Zone Splitter,       !- Name",
+			"	DOAS Supply Path Inlet,   !- Inlet Node Name",
+			"	SPACE1-1 Air Terminal Mixer Primary Inlet, !- Outlet 1 Node Name",
+			"	SPACE2-1 Air Terminal Mixer Primary Inlet; !- Outlet 2 Node Name",
+
+			"	AirLoopHVAC:SupplyPath,",
+			"	DOAS Supply Path,         !- Name",
+			"	DOAS Supply Path Inlet,   !- Supply Air Path Inlet Node Name",
+			"	AirLoopHVAC:ZoneSplitter, !- Component 1 Object Type",
+			"	DOAS Zone Splitter;       !- Component 1 Name",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+		ProcessScheduleInput(); // read schedules
+		InitializePsychRoutines();
+		OutputReportPredefined::SetPredefinedTables();
+
+		GetZoneData( ErrorsFound );
+		ASSERT_FALSE( ErrorsFound );
+
+		GetZoneEquipmentData1();
+		GetZoneAirLoopEquipment();
+		GetPTUnit();
+		GetPTUnitInputFlag = false;
+		SplitterComponent::GetSplitterInput();
+
+
+		// get input test for terminal air single duct mixer on inlet side of PTAC
+		ASSERT_EQ( 2, NumATMixers );
+		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
+		EXPECT_EQ( "ZoneHVAC:PackagedTerminalAirConditioner", PTUnit( 1 ).UnitType );  // zoneHVAC equipment type
+
+		BeginEnvrnFlag = false;
+
+		// set input variables
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::OutDryBulbTemp = 35.0;
+		DataEnvironment::OutHumRat = 0.0098;
+		DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW( DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat );
+		DataEnvironment::StdRhoAir = 1.20;
+		ZoneSysEnergyDemand.allocate( 2 );
+
+		// set zoneNode air condition
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp = 24.0;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat = 0.0075;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat );
+
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp = 24.0;
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat = 0.0075;
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat );
+
+		PackagedTerminalHeatPump::HeatingLoad = false;
+		PackagedTerminalHeatPump::CoolingLoad = true;
+		PackagedTerminalHeatPump::CompOnFlowRatio = 1.0; // compressor is on
+		DataHVACGlobals::ZoneCompTurnFansOff = false;
+		DataHVACGlobals::ZoneCompTurnFansOn = true;
+
+		SysSizingRunDone = true;
+		ZoneSizingRunDone = true;
+		SysSizingCalc = true;
+
+		ZoneNum = 1;
+		PTUnitNum = 1;
+		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).OpMode = CycFanCycCoil;
+		// initialize mass flow rates
+		HVACInletMassFlowRate1 = 0.50;
+		PrimaryAirMassFlowRate1 = 0.1;
+		PackagedTerminalHeatPump::CompOnMassFlow = HVACInletMassFlowRate1; // supply air mass flow rate
+		PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate1; // OA mass flow rate
+		Node( PTUnit( 1 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate1;
+		Node( PTUnit( 1 ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate1;
+		Node( PTUnit( 1 ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate1;
+		// set fan parameters
+		Fan( 1 ).MaxAirMassFlowRate = HVACInletMassFlowRate1;
+		Fan( 1 ).InletAirMassFlowRate = HVACInletMassFlowRate1;
+		Fan( 1 ).RhoAirStdInit = DataEnvironment::StdRhoAir;
+		Node( Fan( 1 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate1;
+		Node( Fan( 1 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate1;
+		// set DX coil rated performance parameters
+		DXCoil( 1 ).RatedCBF( 1 ) = 0.05;
+		DXCoil( 1 ).RatedAirMassFlowRate( 1 ) = HVACInletMassFlowRate1;
+		// primary air condition set at outdoor air condition
+		Node( PTUnit( 1 ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
+		Node( PTUnit( 1 ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
+		Node( PTUnit( 1 ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
+		// set secondary air (recirculating air) conditions to zone air node		
+		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
+		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
+		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
+		Schedule( PTUnit( 1 ).SchedPtr ).CurrentValue = 1.0; // unit is always available
+		Schedule( PTUnit( 1 ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
+		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0; // set secondary air mass flow rate to zero 
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
+		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP;
+		// simulate PTAC zoneHVAC equipment 
+		SimPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided );
+		// apply mass conservation to determine secondary air mass flow rate
+		SecondaryAirMassFlowRate1 = HVACInletMassFlowRate1 - PrimaryAirMassFlowRate1;
+		// check the terminal air mixer secondary air mass flow rate 
+		ASSERT_EQ( SecondaryAirMassFlowRate1, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
+		// check the cooling output delivered
+		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
+		
+		ZoneNum = 2;
+		PTUnitNum = 2;
+		PTUnit( 2 ).CtrlZoneNum = 2;
+		PTUnit( 2 ).OpMode = CycFanCycCoil;
+		// initialize mass flow rates
+		HVACInletMassFlowRate2 = 0.80;
+		PrimaryAirMassFlowRate2 = 0.2;
+		PackagedTerminalHeatPump::CompOnMassFlow = HVACInletMassFlowRate2; // supply air mass flow rate
+		PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate2; // OA mass flow rate
+		Node( PTUnit( 2 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate2;
+		Node( PTUnit( 2 ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate2;
+		Node( PTUnit( 2 ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate2;
+		// set fan parameters
+		Fan( 2 ).MaxAirMassFlowRate = HVACInletMassFlowRate2;
+		Fan( 2 ).InletAirMassFlowRate = HVACInletMassFlowRate2;
+		Fan( 2 ).RhoAirStdInit = DataEnvironment::StdRhoAir;
+		Node( Fan( 2 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate2;
+		Node( Fan( 2 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate2;
+		// set DX coil rated performance parameters
+		DXCoil( 2 ).RatedCBF( 1 ) = 0.01;
+		DXCoil( 2 ).RatedAirMassFlowRate( 1 ) = HVACInletMassFlowRate2;
+		// primary air condition set at outdoor air condition
+		Node( PTUnit( 2 ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
+		Node( PTUnit( 2 ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
+		Node( PTUnit( 2 ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
+		// set secondary air (recirculating air) conditions to zone air node		
+		Node( SysATMixer( 2 ).SecInNode ).Temp = Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp;
+		Node( SysATMixer( 2 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat;
+		Node( SysATMixer( 2 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 2 ).ZoneNode ).Enthalpy;
+		Schedule( PTUnit( 2 ).SchedPtr ).CurrentValue = 1.0; // unit is always available
+		Schedule( PTUnit( 2 ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
+		Node( SysATMixer( 2 ).SecInNode ).MassFlowRate = 0.0; // set secondary air mass flow rate to zero 
+		ZoneSysEnergyDemand( 2 ).RemainingOutputReqToHeatSP = 0.0;
+		ZoneSysEnergyDemand( 2 ).RemainingOutputReqToCoolSP = -5520.0;
+		QZnReq = ZoneSysEnergyDemand( 2 ).RemainingOutputReqToCoolSP;
+		// simulate PTAC zoneHVAC equipment 
+		SimPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided );
+		// apply mass conservation to determine secondary air mass flow rate
+		SecondaryAirMassFlowRate2 = HVACInletMassFlowRate2 - PrimaryAirMassFlowRate2;
+		// check the terminal air mixer secondary air mass flow rate 
+		ASSERT_DOUBLE_EQ( SecondaryAirMassFlowRate2, Node( SysATMixer( 2 ).SecInNode ).MassFlowRate );
+		// check the cooling output delivered
+		ASSERT_NEAR( QZnReq, QUnitOut, 5.0 );
+		// simulate the splitter
+		SimAirLoopSplitter( SupplyAirPath( 1 ).ComponentName( 1 ), FirstHVACIteration, FirstCall, SplitterInletChanged, SupplyAirPath( 1 ).ComponentIndex( 1 ) );
+		// check primary air distribution by the splitter 
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate1, 0.1 );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate2, 0.2 );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate1, SplitterCond( 1 ).OutletMassFlowRate( 1 ) );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate2, SplitterCond( 1 ).OutletMassFlowRate( 2 ) );
+		ASSERT_DOUBLE_EQ( SplitterCond( 1 ).InletMassFlowRate, 0.3 );
+
+
+	}
+
+	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_wDOASplitter ) {
+
+		bool FirstCall( false );
+		bool ErrorsFound( false );
+		bool FirstHVACIteration( false );
+		bool SplitterInletChanged( false );
+		Real64 HVACInletMassFlowRate1( 0.0 );
+		Real64 HVACInletMassFlowRate2( 0.0 );
+		Real64 PrimaryAirMassFlowRate1( 0.0 );
+		Real64 PrimaryAirMassFlowRate2( 0.0 );
+		Real64 SecondaryAirMassFlowRate1( 0.0 );
+		Real64 SecondaryAirMassFlowRate2( 0.0 );
+		Real64 OnOffAirFlowRatio( 1.0 );
+		Real64 LatOutputProvided( 0.0 );
+		Real64 QUnitOutVRFTU( 0.0 );
+		Real64 QZnReq( 0.0 );
+		int VRFNum( 1 );
+		int VRFTUNum( 1 );
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.7;",
+
+			"AirTerminal:SingleDuct:Mixer,",
+			"    SPACE1-1 DOAS Air Terminal,  !- Name",
+			"    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Terminal Unit Object Type",
+			"    TU1,                         !- ZoneHVAC Terminal Unit Name",
+			"    TU1 Inlet Node,              !- Terminal Unit Outlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name",
+			"    InletSide;                                    !- Terminal Unit Connection Type",
+
+			"ZoneHVAC:AirDistributionUnit,",
+			"    SPACE1-1 DOAS ATU,       !- Name",
+			"    TU1 Inlet Node,          !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"AirTerminal:SingleDuct:Mixer,",
+			"    SPACE2-1 DOAS Air Terminal,  !- Name",
+			"    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Terminal Unit Object Type",
+			"    TU2,                         !- ZoneHVAC Terminal Unit Name",
+			"    TU2 Inlet Node,              !- Terminal Unit Outlet Node Name",
+			"    SPACE2-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name",
+			"    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name",
+			"    InletSide;                                    !- Terminal Unit Connection Type",
+
+			"ZoneHVAC:AirDistributionUnit,",
+			"    SPACE2-1 DOAS ATU,       !- Name",
+			"    TU2 Inlet Node,          !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE2-1 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"Schedule:Compact,",
+			"    FanAvailSched,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 3",
+			"    1.0;                     !- Field 4",
+
+			"  Schedule:Compact,",
+			"    VRFAvailSched,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 3",
+			"    1.0;                     !- Field 4",
+
+			"Schedule:Compact,",
+			"    CyclingFanSch,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 3",
+			"    0.0;                     !- Field 4",
+
+			"ZoneHVAC:EquipmentList,",
+			"    SPACE1-1 Eq,             !- Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+			"    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type",
+			"    TU1,                     !- Zone Equipment 2 Name",
+			"    2,                       !- Zone Equipment 2 Cooling Sequence",
+			"    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+
+			"ZoneHVAC:EquipmentList,",
+			"    SPACE2-1 Eq,             !- Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+			"    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type",
+			"    TU2,                     !- Zone Equipment 2 Name",
+			"    2,                       !- Zone Equipment 2 Cooling Sequence",
+			"    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+
+			"  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+			"    TU1,                     !- Zone Terminal Unit Name",
+			"    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+			"    TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+			"    TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+			"    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.500,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
+			"    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
+			"    0.500,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.100,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+			"    drawthrough,             !- Supply Air Fan Placement",
+			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+			"    TU1 VRF Supply Fan,      !- Supply Air Fan Object Name",
+			"    ,                        !- Outside Air Mixer Object Type",
+			"    ,                        !- Outside Air Mixer Object Name",
+			"    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+			"    TU1 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+			"    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+			"    TU1 VRF DX Heating Coil, !- Heating Coil Object Name",
+			"    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+			"    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+			
+            "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+			"    TU2,                     !- Zone Terminal Unit Name",
+			"    VRFAvailSched,           !- Terminal Unit Availability Schedule",
+			"    TU2 Inlet Node,          !- Terminal Unit Air Inlet Node Name",
+			"    TU2 Outlet Node,         !- Terminal Unit Air Outlet Node Name",
+			"    0.600,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.600,                   !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
+			"    0.600,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
+			"    0.600,                   !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
+			"    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+			"    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+			"    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name",
+			"    drawthrough,             !- Supply Air Fan Placement",
+			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+			"    TU2 VRF Supply Fan,      !- Supply Air Fan Object Name",
+			"    ,                        !- Outside Air Mixer Object Type",
+			"    ,                        !- Outside Air Mixer Object Name",
+			"    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+			"    TU2 VRF DX Cooling Coil, !- Cooling Coil Object Name",
+			"    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+			"    TU2 VRF DX Heating Coil, !- Heating Coil Object Name",
+			"    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+			"    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+
+			"  Fan:ConstantVolume,",
+			"    TU1 VRF Supply Fan,      !- Name",
+			"    VRFAvailSched,           !- Availability Schedule Name",
+			"    0.7,                     !- Fan Total Efficiency",
+			"    600.0,                   !- Pressure Rise {Pa}",
+			"    0.500,                   !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1.0,                     !- Motor In Airstream Fraction",
+			"    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+			"    TU1 Outlet Node;         !- Air Outlet Node Name",
+
+			"  Fan:ConstantVolume,",
+			"    TU2 VRF Supply Fan,      !- Name",
+			"    VRFAvailSched,           !- Availability Schedule Name",
+			"    0.7,                     !- Fan Total Efficiency",
+			"    600.0,                   !- Pressure Rise {Pa}",
+			"    0.600,                   !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1.0,                     !- Motor In Airstream Fraction",
+			"    TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+			"    TU2 Outlet Node;         !- Air Outlet Node Name",
+			
+			"  COIL:Heating:DX:VariableRefrigerantFlow,",
+			"    TU1 VRF DX Heating Coil, !- Name",
+			"    VRFAvailSched,           !- Availability Schedule",
+			"    7000.0,                  !- Gross Rated Heating Capacity {W}",
+			"    0.500,                   !- Rated Air Flow Rate {m3/s}",
+			"    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+			"    TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+			"    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+			"    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
+			"  COIL:Heating:DX:VariableRefrigerantFlow,",
+			"    TU2 VRF DX Heating Coil, !- Name",
+			"    VRFAvailSched,           !- Availability Schedule",
+			"    7600.0,                  !- Gross Rated Heating Capacity {W}",
+			"    0.600,                   !- Rated Air Flow Rate {m3/s}",
+			"    TU2 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+			"    TU2 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+			"    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+			"    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+			
+			"  Curve:Cubic,",
+			"    VRFTUHeatCapFT,          !- Name",
+			"    -0.390708928227928,      !- Coefficient1 Constant",
+			"    0.261815023760162,       !- Coefficient2 x",
+			"    -0.0130431603151873,     !- Coefficient3 x**2",
+			"    0.000178131745997821,    !- Coefficient4 x**3",
+			"    0.0,                     !- Minimum Value of x",
+			"    50.0,                    !- Maximum Value of x",
+			"    0.5,                     !- Minimum Curve Output",
+			"    1.5,                     !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  COIL:Cooling:DX:VariableRefrigerantFlow,",
+			"    TU1 VRF DX Cooling Coil, !- Name",
+			"    VRFAvailSched,           !- Availability Schedule Name",
+			"    6600.0,                  !- Gross Rated Total Cooling Capacity {W}",
+			"    0.75,                    !- Gross Rated Sensible Heat Ratio",
+			"    0.500,                   !- Rated Air Flow Rate {m3/s}",
+			"    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+			"    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+			"    TU1 Inlet Node,          !- Coil Air Inlet Node",
+			"    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+			"    ;                        !- Name of Water Storage Tank for Condensate Collection",
+
+			"  COIL:Cooling:DX:VariableRefrigerantFlow,",
+			"    TU2 VRF DX Cooling Coil, !- Name",
+			"    VRFAvailSched,           !- Availability Schedule Name",
+			"    8600.0,                  !- Gross Rated Total Cooling Capacity {W}",
+			"    0.75,                    !- Gross Rated Sensible Heat Ratio",
+			"    0.600,                   !- Rated Air Flow Rate {m3/s}",
+			"    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+			"    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+			"    TU2 Inlet Node,          !- Coil Air Inlet Node",
+			"    TU2 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
+			"    ;                        !- Name of Water Storage Tank for Condensate Collection",
+			
+			"  Curve:Cubic,",
+			"    VRFTUCoolCapFT,          !- Name",
+			"    0.504547273506488,       !- Coefficient1 Constant",
+			"    0.0288891279198444,      !- Coefficient2 x",
+			"    -0.000010819418650677,   !- Coefficient3 x**2",
+			"    0.0000101359395177008,   !- Coefficient4 x**3",
+			"    0.0,                     !- Minimum Value of x",
+			"    50.0,                    !- Maximum Value of x",
+			"    0.5,                     !- Minimum Curve Output",
+			"    1.5,                     !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Quadratic,",
+			"    VRFACCoolCapFFF,         !- Name",
+			"    0.8,                     !- Coefficient1 Constant",
+			"    0.2,                     !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    0.5,                     !- Minimum Value of x",
+			"    1.5;                     !- Maximum Value of x",
+
+			"Zone,",
+			"    SPACE1-1,                !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    2.438400269,             !- Ceiling Height {m}",
+			"    239.247360229;           !- Volume {m3}",
+			
+			"Zone,",
+			"    SPACE2-1,                !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    2.438400269,             !- Ceiling Height {m}",
+			"    319.247360229;           !- Volume {m3}",
+			
+			"  ZoneHVAC:EquipmentConnections,",
+			"    SPACE1-1,                !- Zone Name",
+			"    SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+			"    SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE1-1 Node,           !- Zone Air Node Name",
+			"    SPACE1-1 RETURN OUTLET;  !- Zone Return Air Node Name",
+			
+			"  ZoneHVAC:EquipmentConnections,",
+			"    SPACE2-1,                !- Zone Name",
+			"    SPACE2-1 Eq,             !- Zone Conditioning Equipment List Name",
+			"    SPACE2-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE2-1 Air Terminal Mixer Secondary Inlet, !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE2-1 Node,           !- Zone Air Node Name",
+			"    SPACE2-1 RETURN OUTLET;  !- Zone Return Air Node Name",
+
+			"  NodeList,",
+			"    SPACE1-1 In Nodes,       !- Name",
+			"    TU1 Outlet Node;         !- Node 1 Name",
+			
+			"  NodeList,",
+			"    SPACE2-1 In Nodes,       !- Name",
+			"    TU2 Outlet Node;         !- Node 1 Name",
+
+			"  AirConditioner:VariableRefrigerantFlow,",
+			"    VRF Heat Pump,           !- Heat Pump Name",
+			"    VRFAvailSched,           !- Availability Schedule Name",
+			"    15000.0,                 !- Gross Rated Total Cooling Capacity {W}",
+			"    3.2917,                  !- Gross Rated Cooling COP {W/W}",
+			"    -5,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+			"    43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+			"    VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+			"    VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+			"    VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+			"    VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+			"    VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+			"    VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+			"    CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+			"    CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+			"    CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+			"    VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+			"    15000.0,                 !- Gross Rated Heating Capacity {W}",
+			"    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}",
+			"    3.5484,                  !- Gross Rated Heating COP {W/W}",
+			"    -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+			"    20,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+			"    VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+			"    VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+			"    VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+			"    VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+			"    VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+			"    VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+			"    WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+			"    HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+			"    HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+			"    HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+			"    VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+			"    0.25,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+			"    SPACE1-1,                !- Zone Name for Master Thermostat Location",
+			"    LoadPriority,            !- Master Thermostat Priority Control Type",
+			"    ,                        !- Thermostat Priority Schedule Name",
+			"    VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+			"    No,                      !- Heat Pump Waste Heat Recovery",
+			"    30,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+			"    10,                      !- Vertical Height used for Piping Correction Factor {m}",
+			"    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+			"    -0.000386,               !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+			"    30,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+			"    ,                        !- Piping Correction Factor for Length in Heating Mode Curve Name",
+			"    ,                        !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+			"    15,                      !- Crankcase Heater Power per Compressor {W}",
+			"    3,                       !- Number of Compressors {dimensionless}",
+			"    0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+			"    7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+			"    Resistive,               !- Defrost Strategy",
+			"    Timed,                   !- Defrost Control",
+			"    ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+			"    ,                        !- Defrost Time Period Fraction {dimensionless}",
+			"    15000.0,                 !- Resistive Defrost Heater Capacity {W}",
+			"    7,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+			"    AirCooled,               !- Condenser Type",
+			"    MyVRFOANode,             !- Condenser Inlet Node Name",
+			"    ,                        !- Condenser Outlet Node Name",
+			"    ,                        !- Water Condenser Volume Flow Rate {m3/s}",
+			"    ,                        !- Evaporative Condenser Effectiveness {dimensionless}",
+			"    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+			"    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
+			"    ,                        !- Supply Water Storage Tank Name",
+			"    0,                       !- Basin Heater Capacity {W/K}",
+			"    ,                        !- Basin Heater Setpoint Temperature {C}",
+			"    ,                        !- Basin Heater Operating Schedule Name",
+			"    Electricity;             !- Fuel Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFCoolCapFT,            !- Name",
+			"    0.576882692,             !- Coefficient1 Constant",
+			"    0.017447952,             !- Coefficient2 x",
+			"    0.000583269,             !- Coefficient3 x**2",
+			"    -1.76324E-06,            !- Coefficient4 y",
+			"    -7.474E-09,              !- Coefficient5 y**2",
+			"    -1.30413E-07,            !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    -5,                      !- Minimum Value of y",
+			"    23,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFCoolCapFTBoundary,    !- Name",
+			"    25.73473775,             !- Coefficient1 Constant",
+			"    -0.03150043,             !- Coefficient2 x",
+			"    -0.01416595,             !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 x**3",
+			"    11,                      !- Minimum Value of x",
+			"    30,                      !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFCoolCapFTHi,          !- Name",
+			"    0.6867358,               !- Coefficient1 Constant",
+			"    0.0207631,               !- Coefficient2 x",
+			"    0.0005447,               !- Coefficient3 x**2",
+			"    -0.0016218,              !- Coefficient4 y",
+			"    -4.259E-07,              !- Coefficient5 y**2",
+			"    -0.0003392,              !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    16,                      !- Minimum Value of y",
+			"    43,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFCoolEIRFT,            !- Name",
+			"    0.989010541,             !- Coefficient1 Constant",
+			"    -0.02347967,             !- Coefficient2 x",
+			"    0.000199711,             !- Coefficient3 x**2",
+			"    0.005968336,             !- Coefficient4 y",
+			"    -1.0289E-07,             !- Coefficient5 y**2",
+			"    -0.00015686,             !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    -5,                      !- Minimum Value of y",
+			"    23,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFCoolEIRFTBoundary,    !- Name",
+			"    25.73473775,             !- Coefficient1 Constant",
+			"    -0.03150043,             !- Coefficient2 x",
+			"    -0.01416595,             !- Coefficient3 x**2",
+			"    0,                       !- Coefficient4 x**3",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFCoolEIRFTHi,          !- Name",
+			"    0.14351470,              !- Coefficient1 Constant",
+			"    0.01860035,              !- Coefficient2 x",
+			"    -0.0003954,              !- Coefficient3 x**2",
+			"    0.02485219,              !- Coefficient4 y",
+			"    0.00016329,              !- Coefficient5 y**2",
+			"    -0.0006244,              !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    24,                      !- Maximum Value of x",
+			"    16,                      !- Minimum Value of y",
+			"    43,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    CoolingEIRLowPLR,        !- Name",
+			"    0.4628123,               !- Coefficient1 Constant",
+			"    -1.0402406,              !- Coefficient2 x",
+			"    2.17490997,              !- Coefficient3 x**2",
+			"    -0.5974817,              !- Coefficient4 x**3",
+			"    0,                       !- Minimum Value of x",
+			"    1,                       !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Quadratic,",
+			"    CoolingEIRHiPLR,         !- Name",
+			"    1.0,                     !- Coefficient1 Constant",
+			"    0.0,                     !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    1.0,                     !- Minimum Value of x",
+			"    1.5,                     !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Dimensionless,           !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Linear,",
+			"    CoolingCombRatio,        !- Name",
+			"    0.618055,                !- Coefficient1 Constant",
+			"    0.381945,                !- Coefficient2 x",
+			"    1.0,                     !- Minimum Value of x",
+			"    1.5,                     !- Maximum Value of x",
+			"    1.0,                     !- Minimum Curve Output",
+			"    1.2,                     !- Maximum Curve Output",
+			"    Dimensionless,           !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  CURVE:QUADRATIC,",
+			"    VRFCPLFFPLR,             !- Name",
+			"    0.85,                    !- Coefficient1 Constant",
+			"    0.15,                    !- Coefficient2 x",
+			"    0.0,                     !- Coefficient3 x**2",
+			"    0.0,                     !- Minimum Value of x",
+			"    1.0,                     !- Maximum Value of x",
+			"    0.85,                    !- Minimum Curve Output",
+			"    1.0,                     !- Maximum Curve Output",
+			"    Dimensionless,           !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFHeatCapFT,            !- Name",
+			"    1.014599599,             !- Coefficient1 Constant",
+			"    -0.002506703,            !- Coefficient2 x",
+			"    -0.000141599,            !- Coefficient3 x**2",
+			"    0.026931595,             !- Coefficient4 y",
+			"    1.83538E-06,             !- Coefficient5 y**2",
+			"    -0.000358147,            !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -20,                     !- Minimum Value of y",
+			"    15,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFHeatCapFTBoundary,    !- Name",
+			"    -7.6000882,              !- Coefficient1 Constant",
+			"    3.05090016,              !- Coefficient2 x",
+			"    -0.1162844,              !- Coefficient3 x**2",
+			"    0.0,                     !- Coefficient4 x**3",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFHeatCapFTHi,          !- Name",
+			"    1.161134821,             !- Coefficient1 Constant",
+			"    0.027478868,             !- Coefficient2 x",
+			"    -0.00168795,             !- Coefficient3 x**2",
+			"    0.001783378,             !- Coefficient4 y",
+			"    2.03208E-06,             !- Coefficient5 y**2",
+			"    -6.8969E-05,             !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -10,                     !- Minimum Value of y",
+			"    15,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFHeatEIRFT,            !- Name",
+			"    0.87465501,              !- Coefficient1 Constant",
+			"    -0.01319754,             !- Coefficient2 x",
+			"    0.00110307,              !- Coefficient3 x**2",
+			"    -0.0133118,              !- Coefficient4 y",
+			"    0.00089017,              !- Coefficient5 y**2",
+			"    -0.00012766,             !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -20,                     !- Minimum Value of y",
+			"    12,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    VRFHeatEIRFTBoundary,    !- Name",
+			"    -7.6000882,              !- Coefficient1 Constant",
+			"    3.05090016,              !- Coefficient2 x",
+			"    -0.1162844,              !- Coefficient3 x**2",
+			"    0.0,                     !- Coefficient4 x**3",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -20,                     !- Minimum Curve Output",
+			"    15,                      !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature;             !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    VRFHeatEIRFTHi,          !- Name",
+			"    2.504005146,             !- Coefficient1 Constant",
+			"    -0.05736767,             !- Coefficient2 x",
+			"    4.07336E-05,             !- Coefficient3 x**2",
+			"    -0.12959669,             !- Coefficient4 y",
+			"    0.00135839,              !- Coefficient5 y**2",
+			"    0.00317047,              !- Coefficient6 x*y",
+			"    15,                      !- Minimum Value of x",
+			"    27,                      !- Maximum Value of x",
+			"    -10,                     !- Minimum Value of y",
+			"    15,                      !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Cubic,",
+			"    HeatingEIRLowPLR,        !- Name",
+			"    0.1400093,               !- Coefficient1 Constant",
+			"    0.6415002,               !- Coefficient2 x",
+			"    0.1339047,               !- Coefficient3 x**2",
+			"    0.0845859,               !- Coefficient4 x**3",
+			"    0,                       !- Minimum Value of x",
+			"    1,                       !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Dimensionless,           !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Quadratic,",
+			"    HeatingEIRHiPLR,         !- Name",
+			"    2.4294355,               !- Coefficient1 Constant",
+			"    -2.235887,               !- Coefficient2 x",
+			"    0.8064516,               !- Coefficient3 x**2",
+			"    1.0,                     !- Minimum Value of x",
+			"    1.5,                     !- Maximum Value of x",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Dimensionless,           !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Linear,",
+			"    HeatingCombRatio,        !- Name",
+			"    0.96034,                 !- Coefficient1 Constant",
+			"    0.03966,                 !- Coefficient2 x",
+			"    1.0,                     !- Minimum Value of x",
+			"    1.5,                     !- Maximum Value of x",
+			"    1.0,                     !- Minimum Curve Output",
+			"    1.023,                   !- Maximum Curve Output",
+			"    Dimensionless,           !- Input Unit Type for X",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  Curve:Biquadratic,",
+			"    CoolingLengthCorrectionFactor,  !- Name",
+			"    1.0693794,               !- Coefficient1 Constant",
+			"    -0.0014951,              !- Coefficient2 x",
+			"    2.56E-06,                !- Coefficient3 x**2",
+			"    -0.1151104,              !- Coefficient4 y",
+			"    0.0511169,               !- Coefficient5 y**2",
+			"    -0.0004369,              !- Coefficient6 x*y",
+			"    8,                       !- Minimum Value of x",
+			"    175,                     !- Maximum Value of x",
+			"    0.5,                     !- Minimum Value of y",
+			"    1.5,                     !- Maximum Value of y",
+			"    ,                        !- Minimum Curve Output",
+			"    ,                        !- Maximum Curve Output",
+			"    Temperature,             !- Input Unit Type for X",
+			"    Temperature,             !- Input Unit Type for Y",
+			"    Dimensionless;           !- Output Unit Type",
+
+			"  ZoneTerminalUnitList,",
+			"    VRF Heat Pump TU List,   !- Zone Terminal Unit List Name",
+			"    TU1,                     !- Zone Terminal Unit Name 1",
+			"    TU2;                     !- Zone Terminal Unit Name 2",
+
+			"  OutdoorAir:NodeList,",
+			"    OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+			"  NodeList,",
+			"    OutsideAirInletNodes,    !- Name",
+			"    MyVRFOANode;             !- Node 1 Name",
+
+			"AirLoopHVAC:ZoneSplitter,",
+			"	DOAS Zone Splitter,       !- Name",
+			"	DOAS Supply Path Inlet,   !- Inlet Node Name",
+			"	SPACE1-1 Air Terminal Mixer Primary Inlet, !- Outlet 1 Node Name",
+			"	SPACE2-1 Air Terminal Mixer Primary Inlet; !- Outlet 2 Node Name",
+
+			"	AirLoopHVAC:SupplyPath,",
+			"	DOAS Supply Path,         !- Name",
+			"	DOAS Supply Path Inlet,   !- Supply Air Path Inlet Node Name",
+			"	AirLoopHVAC:ZoneSplitter, !- Component 1 Object Type",
+			"	DOAS Zone Splitter;       !- Component 1 Name",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+		ProcessScheduleInput(); // read schedules
+		InitializePsychRoutines();
+		OutputReportPredefined::SetPredefinedTables();
+
+		GetZoneData( ErrorsFound );
+		ASSERT_FALSE( ErrorsFound );
+
+		GetZoneEquipmentData1();
+		GetZoneAirLoopEquipment();
+
+		GetVRFInput();
+		GetVRFInputFlag = false;
+		SplitterComponent::GetSplitterInput();
+
+		// get input test for terminal air single duct mixer on inlet side of VRF terminal unit
+		ASSERT_EQ( 2, NumATMixers );
+		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
+		EXPECT_EQ( "TU1", VRFTU( 1 ).Name ); // zoneHVAC equipment name
+
+		BeginEnvrnFlag = false;
+
+		// set input variables
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::OutDryBulbTemp = 35.0;
+		DataEnvironment::OutHumRat = 0.0098;
+		DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW( DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat );
+		DataEnvironment::StdRhoAir = 1.20;
+
+		HVACVariableRefrigerantFlow::CoolingLoad.allocate( 2 );
+		HVACVariableRefrigerantFlow::HeatingLoad.allocate( 2 );
+		ZoneSysEnergyDemand.allocate( 2 );
+		HVACVariableRefrigerantFlow::CompOnFlowRatio = 1.0; // compressor is on
+		DataHVACGlobals::ZoneCompTurnFansOff = false;
+		DataHVACGlobals::ZoneCompTurnFansOn = true;
+		SysSizingRunDone = true;
+		ZoneSizingRunDone = true;
+		SysSizingCalc = true;
+
+		VRFNum = 1;
+		VRFTUNum = 1;
+		VRFTU( 1 ).ZoneNum = 1;
+		VRFTU( 1 ).OpMode = ContFanCycCoil;	
+		HVACVariableRefrigerantFlow::HeatingLoad( 1 ) = false;
+		HVACVariableRefrigerantFlow::CoolingLoad( 1 ) = true;
+		// set zoneNode air condition
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp = 24.0;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat = 0.0075;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat );
+		// initialize mass flow rates
+		HVACInletMassFlowRate1 = 0.50;
+		PrimaryAirMassFlowRate1 = 0.1;
+		HVACVariableRefrigerantFlow::CompOnMassFlow = HVACInletMassFlowRate1; // supply air mass flow rate
+		HVACVariableRefrigerantFlow::OACompOnMassFlow = PrimaryAirMassFlowRate1; // OA mass flow rate
+		Node( VRFTU( 1 ).VRFTUInletNodeNum ).MassFlowRate = HVACInletMassFlowRate1;
+		Node( VRFTU( 1 ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate1;
+		Node( VRFTU( 1 ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate1;
+		// set fan parameters
+		Fan( 1 ).MaxAirMassFlowRate = HVACInletMassFlowRate1;
+		Fan( 1 ).InletAirMassFlowRate = HVACInletMassFlowRate1;
+		Fan( 1 ).RhoAirStdInit = DataEnvironment::StdRhoAir;
+		Node( Fan( 1 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate1;
+		Node( Fan( 1 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate1;
+		// set DX coil rated performance parameters
+		DXCoil( 1 ).RatedCBF( 1 ) = 0.05;
+		DXCoil( 1 ).RatedAirMassFlowRate( 1 ) = HVACInletMassFlowRate1;
+		// primary air condition set at outdoor air condition
+		Node( VRFTU( 1 ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
+		Node( VRFTU( 1 ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
+		Node( VRFTU( 1 ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
+		// set secondary air (recirculating air) conditions to zone air node		
+		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
+		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
+		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
+
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
+		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP;
+
+		Schedule( VRFTU( 1 ).SchedPtr ).CurrentValue = 1.0; // unit is always available
+		Schedule( VRFTU( 1 ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
+
+		// set secondary air mass flow rate to zero 
+		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
+		// Simulate zoneHVAC equipment (VRF terminal unit)
+		SimVRF( VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq );
+		// seconday air flow is VRFTU flow less primary air flow
+		SecondaryAirMassFlowRate1 = HVACInletMassFlowRate1 - PrimaryAirMassFlowRate1; 
+		// check the terminal air mixer secondary air mass flow rate 
+		ASSERT_EQ( SecondaryAirMassFlowRate1, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
+		// check the terminal air mixer outlet flow rate must be equal to VRFTU mass flow rate
+		ASSERT_EQ( HVACInletMassFlowRate1, SysATMixer( 1 ).MixedAirMassFlowRate );
+		// check the cooling output delivered
+		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
+
+
+		VRFTUNum = 2;
+		VRFTU( 2 ).ZoneNum = 1;
+		VRFTU( 2 ).OpMode = ContFanCycCoil;
+		HVACVariableRefrigerantFlow::HeatingLoad( 2 ) = false;
+		HVACVariableRefrigerantFlow::CoolingLoad( 2 ) = true;
+		// set zoneNode air condition
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp = 24.0;
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat = 0.0075;
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat );
+		// initialize mass flow rates
+		HVACInletMassFlowRate2 = 0.60;
+		PrimaryAirMassFlowRate2 = 0.2;
+		HVACVariableRefrigerantFlow::CompOnMassFlow = HVACInletMassFlowRate2; // supply air mass flow rate
+		HVACVariableRefrigerantFlow::OACompOnMassFlow = PrimaryAirMassFlowRate2; // OA mass flow rate
+		Node( VRFTU( 2 ).VRFTUInletNodeNum ).MassFlowRate = HVACInletMassFlowRate2;
+		Node( VRFTU( 2 ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate2;
+		Node( VRFTU( 2 ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate2;
+		// set fan parameters
+		Fan( 2 ).MaxAirMassFlowRate = HVACInletMassFlowRate2;
+		Fan( 2 ).InletAirMassFlowRate = HVACInletMassFlowRate2;
+		Fan( 2 ).RhoAirStdInit = DataEnvironment::StdRhoAir;
+		Node( Fan( 2 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate2;
+		Node( Fan( 2 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate2;
+		// set DX coil rated performance parameters
+		DXCoil( 2 ).RatedCBF( 1 ) = 0.01;
+		DXCoil( 2 ).RatedAirMassFlowRate( 1 ) = HVACInletMassFlowRate2;
+		// primary air condition set at outdoor air condition
+		Node( VRFTU( 2 ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
+		Node( VRFTU( 2 ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
+		Node( VRFTU( 2 ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
+		// set secondary air (recirculating air) conditions to zone air node		
+		Node( SysATMixer( 2 ).SecInNode ).Temp = Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp;
+		Node( SysATMixer( 2 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat;
+		Node( SysATMixer( 2 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 2 ).ZoneNode ).Enthalpy;
+
+		ZoneSysEnergyDemand( 2 ).RemainingOutputReqToHeatSP = 0.0;
+		ZoneSysEnergyDemand( 2 ).RemainingOutputReqToCoolSP = -5500.0;
+		QZnReq = ZoneSysEnergyDemand( 2 ).RemainingOutputReqToCoolSP;
+
+		Schedule( VRFTU( 2 ).SchedPtr ).CurrentValue = 1.0; // unit is always available
+		Schedule( VRFTU( 2 ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
+
+		// set secondary air mass flow rate to zero 
+		Node( SysATMixer( 2 ).SecInNode ).MassFlowRate = 0.0;
+		// Simulate zoneHVAC equipment (VRF terminal unit)
+		SimVRF( VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq );
+		// seconday air flow is VRFTU flow less primary air flow
+		SecondaryAirMassFlowRate2 = HVACInletMassFlowRate2 - PrimaryAirMassFlowRate2; 
+		// check the terminal air mixer secondary air mass flow rate 
+		ASSERT_EQ( SecondaryAirMassFlowRate2, Node( SysATMixer( 2 ).SecInNode ).MassFlowRate );
+		// check the terminal air mixer outlet flow rate must be equal to VRFTU mass flow rate
+		ASSERT_EQ( HVACInletMassFlowRate2, SysATMixer( 2 ).MixedAirMassFlowRate );
+		// check the cooling output delivered
+		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
+
+		// simulate the splitter
+		SimAirLoopSplitter( SupplyAirPath( 1 ).ComponentName( 1 ), FirstHVACIteration, FirstCall, SplitterInletChanged, SupplyAirPath( 1 ).ComponentIndex( 1 ) );
+		// check primary air distribution by the splitter 
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate1, 0.1 );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate2, 0.2 );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate1, SplitterCond( 1 ).OutletMassFlowRate( 1 ) );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate2, SplitterCond( 1 ).OutletMassFlowRate( 2 ) );
+		ASSERT_DOUBLE_EQ( SplitterCond( 1 ).InletMassFlowRate, 0.3 );
+	}
+
+	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFanCoil_wDOASplitter ) {
+
+		bool FirstCall( false );
+		bool ErrorsFound( false );
+		bool FirstHVACIteration( false );
+		bool SplitterInletChanged( false );
+		Real64 HVACInletMassFlowRate1( 0.0 );
+		Real64 HVACInletMassFlowRate2( 0.0 );
+		Real64 PrimaryAirMassFlowRate1( 0.0 );
+		Real64 PrimaryAirMassFlowRate2( 0.0 );
+		Real64 SecondaryAirMassFlowRate1( 0.0 );
+		Real64 SecondaryAirMassFlowRate2( 0.0 );
+		Real64 ColdWaterMassFlowRate( 0.0 );
+		Real64 HotWaterMassFlowRate( 0.0);
+		Real64 LatOutputProvided( 0.0 );
+		Real64 QUnitOut( 0.0 );
+		Real64 QZnReq( 0.0 );
+		int ZoneNum( 1 );
+		int	FanCoilNum( 1 );
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.7;",
+
+			"  AirTerminal:SingleDuct:Mixer,",
+			"    SPACE1-1 DOAS Air Terminal,  !- Name",
+			"    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Unit Object Type",
+			"    SPACE1-1 Fan Coil,       !- ZoneHVAC Unit Object Name",
+			"    SPACE1-1 Fan Coil Inlet, !- Mixer Outlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name",
+			"    InletSide;               !- Mixer Connection Type",
+
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    SPACE1-1 DOAS ATU,       !- Name",
+			"    SPACE1-1 Fan Coil Inlet, !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"  AirTerminal:SingleDuct:Mixer,",
+			"    SPACE2-1 DOAS Air Terminal,  !- Name",
+			"    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Unit Object Type",
+			"    SPACE2-1 Fan Coil,       !- ZoneHVAC Unit Object Name",
+			"    SPACE2-1 Fan Coil Inlet, !- Mixer Outlet Node Name",
+			"    SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name",
+			"    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name",
+			"    InletSide;               !- Mixer Connection Type",
+
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    SPACE2-1 DOAS ATU,       !- Name",
+			"    SPACE2-1 Fan Coil Inlet, !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE2-1 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"Schedule:Compact,",
+			"    FanAvailSched,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 3",
+			"    1.0;                     !- Field 4",
+
+			"  Schedule:Compact,",
+			"    AvailSched,              !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 3",
+			"    1.0;                     !- Field 4",
+
+			"Schedule:Compact,",
+			"    CyclingFanSch,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 3",
+			"    0.0;                     !- Field 4",
+
+			"  ZoneHVAC:EquipmentList,",
+			"    SPACE1-1 Equipment,      !- Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    2,                       !- Zone Equipment 1 Cooling Sequence",
+			"    2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+			"    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
+			"    SPACE1-1 Fan Coil,       !- Zone Equipment 2 Name",
+			"    1,                       !- Zone Equipment 2 Cooling Sequence",
+			"    1;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+
+			"  ZoneHVAC:EquipmentList,",
+			"    SPACE2-1 Equipment,      !- Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    2,                       !- Zone Equipment 1 Cooling Sequence",
+			"    2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+			"    ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type",
+			"    SPACE2-1 Fan Coil,       !- Zone Equipment 2 Name",
+			"    1,                       !- Zone Equipment 2 Cooling Sequence",
+			"    1;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+
+			"  ZoneHVAC:FourPipeFanCoil,",
+			"    SPACE1-1 Fan Coil,       !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    ConstantFanVariableFlow, !- Capacity Control Method",
+			"    0.50,                    !- Maximum Supply Air Flow Rate {m3/s}",
+			"    0.10,                    !- Low Speed Supply Air Flow Ratio",
+			"    0.30,                    !- Medium Speed Supply Air Flow Ratio",
+			"    0.10,                    !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    ,                        !- Outdoor Air Schedule Name",
+			"    SPACE1-1 Fan Coil Inlet, !- Air Inlet Node Name",
+			"    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name",
+			"    ,                        !- Outdoor Air Mixer Object Type",
+			"    ,                        !- Outdoor Air Mixer Name",
+			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+			"    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
+			"    Coil:Cooling:Water,      !- Cooling Coil Object Type",
+			"    SPACE1-1 Cooling Coil,   !- Cooling Coil Name",
+			"    3.75985E-004,            !- Maximum Cold Water Flow Rate {m3/s}",
+			"    0,                       !- Minimum Cold Water Flow Rate {m3/s}",
+			"    0.001,                   !- Cooling Convergence Tolerance",
+			"    Coil:Heating:Water,      !- Heating Coil Object Type",
+			"    SPACE1-1 Heating Coil,   !- Heating Coil Name",
+			"    3.75985E-004,            !- Maximum Hot Water Flow Rate {m3/s}",
+			"    0,                       !- Minimum Hot Water Flow Rate {m3/s}",
+			"    0.001;                   !- Heating Convergence Tolerance",
+
+			"  ZoneHVAC:FourPipeFanCoil,",
+			"    SPACE2-1 Fan Coil,       !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    ConstantFanVariableFlow, !- Capacity Control Method",
+			"    0.60,                    !- Maximum Supply Air Flow Rate {m3/s}",
+			"    0.20,                    !- Low Speed Supply Air Flow Ratio",
+			"    0.40,                    !- Medium Speed Supply Air Flow Ratio",
+			"    0.20,                    !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    ,                        !- Outdoor Air Schedule Name",
+			"    SPACE2-1 Fan Coil Inlet, !- Air Inlet Node Name",
+			"    SPACE2-1 Supply Inlet,   !- Air Outlet Node Name",
+			"    ,                        !- Outdoor Air Mixer Object Type",
+			"    ,                        !- Outdoor Air Mixer Name",
+			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+			"    SPACE2-1 Supply Fan,     !- Supply Air Fan Name",
+			"    Coil:Cooling:Water,      !- Cooling Coil Object Type",
+			"    SPACE2-1 Cooling Coil,   !- Cooling Coil Name",
+			"    3.75985E-004,            !- Maximum Cold Water Flow Rate {m3/s}",
+			"    0,                       !- Minimum Cold Water Flow Rate {m3/s}",
+			"    0.001,                   !- Cooling Convergence Tolerance",
+			"    Coil:Heating:Water,      !- Heating Coil Object Type",
+			"    SPACE2-1 Heating Coil,   !- Heating Coil Name",
+			"    3.75985E-004,            !- Maximum Hot Water Flow Rate {m3/s}",
+			"    0,                       !- Minimum Hot Water Flow Rate {m3/s}",
+			"    0.001;                   !- Heating Convergence Tolerance",
+
+			"  Fan:ConstantVolume,",
+			"    SPACE1-1 Supply Fan,     !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.7,                     !- Fan Total Efficiency",
+			"    75,                      !- Pressure Rise {Pa}",
+			"    0.50,                    !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1,                       !- Motor In Airstream Fraction",
+			"    SPACE1-1 Fan Coil Inlet, !- Air Inlet Node Name",
+			"    SPACE1-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name",
+
+			"  Fan:ConstantVolume,",
+			"    SPACE2-1 Supply Fan,     !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.7,                     !- Fan Total Efficiency",
+			"    75,                      !- Pressure Rise {Pa}",
+			"    0.60,                    !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1,                       !- Motor In Airstream Fraction",
+			"    SPACE2-1 Fan Coil Inlet, !- Air Inlet Node Name",
+			"    SPACE2-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name",
+
+			" Zone,",
+			"    SPACE1-1,                !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    2.438400269,             !- Ceiling Height {m}",
+			"    239.247360229;           !- Volume {m3}",
+
+			" Zone,",
+			"    SPACE2-1,                !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    2.438400269,             !- Ceiling Height {m}",
+			"    319.247360229;           !- Volume {m3}",
+
+			"  ZoneHVAC:EquipmentConnections,",
+			"    SPACE1-1,                !- Zone Name",
+			"    SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name",
+			"    SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE1-1 Zone Air Node,  !- Zone Air Node Name",
+			"    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name",
+
+			"  ZoneHVAC:EquipmentConnections,",
+			"    SPACE2-1,                !- Zone Name",
+			"    SPACE2-1 Equipment,      !- Zone Conditioning Equipment List Name",
+			"    SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE2-1 Zone Air Node,  !- Zone Air Node Name",
+			"    SPACE2-1 Return Outlet;  !- Zone Return Air Node Name",
+
+			"  NodeList,",
+			"    SPACE1-1 Inlets,         !- Name",
+			"    SPACE1-1 Supply Inlet;   !- Node 1 Name",
+
+			"  NodeList,",
+			"    SPACE2-1 Inlets,         !- Name",
+			"    SPACE2-1 Supply Inlet;   !- Node 1 Name",
+
+			"  OutdoorAir:NodeList,",
+			"    DOAS Outdoor Air Inlet;  !- Node or NodeList Name 1",
+
+			"  AirLoopHVAC:ZoneSplitter,",
+			"    DOAS Zone Splitter,      !- Name",
+			"    DOAS Supply Path Inlet,  !- Inlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Outlet 1 Node Name",
+			"    SPACE2-1 Air Terminal Mixer Primary Inlet;  !- Outlet 2 Node Name",
+
+			" AirLoopHVAC:SupplyPath,",
+			"	DOAS Supply Path,         !- Name",
+			"	DOAS Supply Path Inlet,   !- Supply Air Path Inlet Node Name",
+			"	AirLoopHVAC:ZoneSplitter, !- Component 1 Object Type",
+			"	DOAS Zone Splitter;       !- Component 1 Name",
+
+			"  Coil:Cooling:Water,",
+			"    SPACE1-1 Cooling Coil,   !- Name",
+			"    AvailSched,              !- Availability Schedule Name",
+			"    3.75985E-004,            !- Design Water Flow Rate {m3/s}",
+			"    0.50,                    !- Design Air Flow Rate {m3/s}",
+			"    autosize,                !- Design Inlet Water Temperature {C}",
+			"    autosize,                !- Design Inlet Air Temperature {C}",
+			"    autosize,                !- Design Outlet Air Temperature {C}",
+			"    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+			"    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+			"    SPACE1-1 Cooling Coil ChW Inlet,  !- Water Inlet Node Name",
+			"    SPACE1-1 Cooling Coil ChW Outlet,  !- Water Outlet Node Name",
+			"    SPACE1-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name",
+			"    SPACE1-1 Cooling Coil Outlet,  !- Air Outlet Node Name",
+			"    DetailedAnalysis,        !- Type of Analysis",
+			"    CrossFlow;               !- Heat Exchanger Configuration",
+
+			"  Coil:Cooling:Water,",
+			"    SPACE2-1 Cooling Coil,   !- Name",
+			"    AvailSched,              !- Availability Schedule Name",
+			"    3.75985E-004,            !- Design Water Flow Rate {m3/s}",
+			"    0.60,                    !- Design Air Flow Rate {m3/s}",
+			"    autosize,                !- Design Inlet Water Temperature {C}",
+			"    autosize,                !- Design Inlet Air Temperature {C}",
+			"    autosize,                !- Design Outlet Air Temperature {C}",
+			"    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+			"    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+			"    SPACE2-1 Cooling Coil ChW Inlet,  !- Water Inlet Node Name",
+			"    SPACE2-1 Cooling Coil ChW Outlet,  !- Water Outlet Node Name",
+			"    SPACE2-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name",
+			"    SPACE2-1 Cooling Coil Outlet,  !- Air Outlet Node Name",
+			"    DetailedAnalysis,        !- Type of Analysis",
+			"    CrossFlow;               !- Heat Exchanger Configuration",
+
+			"  Coil:Heating:Water,",
+			"    SPACE1-1 Heating Coil,   !- Name",
+			"    AvailSched,              !- Availability Schedule Name",
+			"    120.0,                   !- U-Factor Times Area Value {W/K}",
+			"    3.75985E-004,            !- Maximum Water Flow Rate {m3/s}",
+			"    SPACE1-1 Heating Coil HW Inlet,  !- Water Inlet Node Name",
+			"    SPACE1-1 Heating Coil HW Outlet,  !- Water Outlet Node Name",
+			"    SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name",
+			"    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name",
+			"    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+			"    autosize,                !- Rated Capacity {W}",
+			"    82.2,                    !- Rated Inlet Water Temperature {C}",
+			"    16.6,                    !- Rated Inlet Air Temperature {C}",
+			"    71.1,                    !- Rated Outlet Water Temperature {C}",
+			"    32.2,                    !- Rated Outlet Air Temperature {C}",
+			"    1.0;                     !- Rated Ratio for Air and Water Convection",
+
+			"  Coil:Heating:Water,",
+			"    SPACE2-1 Heating Coil,   !- Name",
+			"    AvailSched,              !- Availability Schedule Name",
+			"    120.0,                   !- U-Factor Times Area Value {W/K}",
+			"    3.75985E-004,            !- Maximum Water Flow Rate {m3/s}",
+			"    SPACE2-1 Heating Coil HW Inlet,  !- Water Inlet Node Name",
+			"    SPACE2-1 Heating Coil HW Outlet,  !- Water Outlet Node Name",
+			"    SPACE2-1 Cooling Coil Outlet,  !- Air Inlet Node Name",
+			"    SPACE2-1 Supply Inlet,   !- Air Outlet Node Name",
+			"    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+			"    autosize,                !- Rated Capacity {W}",
+			"    82.2,                    !- Rated Inlet Water Temperature {C}",
+			"    16.6,                    !- Rated Inlet Air Temperature {C}",
+			"    71.1,                    !- Rated Outlet Water Temperature {C}",
+			"    32.2,                    !- Rated Outlet Air Temperature {C}",
+			"    1.0;                     !- Rated Ratio for Air and Water Convection",
+
+			"  Branch,",
+			"    SPACE1-1 Cooling Coil ChW Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Coil:Cooling:Water,      !- Component 1 Object Type",
+			"    SPACE1-1 Cooling Coil,   !- Component 1 Name",
+			"    SPACE1-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
+			"    SPACE1-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    SPACE1-1 Heating Coil HW Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Coil:Heating:Water,      !- Component 1 Object Type",
+			"    SPACE1-1 Heating Coil,   !- Component 1 Name",
+			"    SPACE1-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
+			"    SPACE1-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    SPACE2-1 Cooling Coil ChW Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Coil:Cooling:Water,      !- Component 1 Object Type",
+			"    SPACE2-1 Cooling Coil,   !- Component 1 Name",
+			"    SPACE2-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
+			"    SPACE2-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    SPACE2-1 Heating Coil HW Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Coil:Heating:Water,      !- Component 1 Object Type",
+			"    SPACE2-1 Heating Coil,   !- Component 1 Name",
+			"    SPACE2-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
+			"    SPACE2-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Hot Water Loop HW Supply Bypass Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Hot Water Loop HW Supply Side Bypass Pipe,  !- Component 1 Name",
+			"    Hot Water Loop HW Supply Bypass Inlet,  !- Component 1 Inlet Node Name",
+			"    Hot Water Loop HW Supply Bypass Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Hot Water Loop HW Supply Inlet Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pump:ConstantSpeed,      !- Component 1 Object Type",
+			"    Hot Water Loop HW Supply Pump,  !- Component 1 Name",
+			"    Hot Water Loop HW Supply Inlet,  !- Component 1 Inlet Node Name",
+			"    Hot Water Loop HW Pump Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Hot Water Loop HW Supply Outlet Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Hot Water Loop HW Supply Outlet Pipe,  !- Component 1 Name",
+			"    Hot Water Loop HW Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
+			"    Hot Water Loop HW Supply Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Hot Water Loop HW Demand Inlet Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Hot Water Loop HW Demand Inlet Pipe,  !- Component 1 Name",
+			"    Hot Water Loop HW Demand Inlet,  !- Component 1 Inlet Node Name",
+			"    Hot Water Loop HW Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Hot Water Loop HW Demand Bypass Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Hot Water Loop HW Demand Side Bypass Pipe,  !- Component 1 Name",
+			"    Hot Water Loop HW Demand Bypass Inlet,  !- Component 1 Inlet Node Name",
+			"    Hot Water Loop HW Demand Bypass Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Hot Water Loop HW Demand Outlet Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Hot Water Loop HW Demand Outlet Pipe,  !- Component 1 Name",
+			"    Hot Water Loop HW Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
+			"    Hot Water Loop HW Demand Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Main Boiler HW Branch,   !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Boiler:HotWater,         !- Component 1 Object Type",
+			"    Main Boiler,             !- Component 1 Name",
+			"    Main Boiler HW Inlet,    !- Component 1 Inlet Node Name",
+			"    Main Boiler HW Outlet;   !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Main Chiller ChW Branch, !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Chiller:Electric:EIR,    !- Component 1 Object Type",
+			"    Main Chiller,            !- Component 1 Name",
+			"    Main Chiller ChW Inlet,  !- Component 1 Inlet Node Name",
+			"    Main Chiller ChW Outlet; !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Main Chiller CndW Branch,!- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Chiller:Electric:EIR,    !- Component 1 Object Type",
+			"    Main Chiller,            !- Component 1 Name",
+			"    Main Chiller Cnd Inlet,  !- Component 1 Inlet Node Name",
+			"    Main Chiller Cnd Outlet; !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Main Tower CndW Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    CoolingTower:SingleSpeed,!- Component 1 Object Type",
+			"    Main Tower,              !- Component 1 Name",
+			"    Main Tower CndW Inlet,   !- Component 1 Inlet Node Name",
+			"    Main Tower CndW Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Chilled Water Loop ChW Supply Bypass Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Chilled Water Loop ChW Supply Side Bypass Pipe,  !- Component 1 Name",
+			"    Chilled Water Loop ChW Supply Bypass Inlet,  !- Component 1 Inlet Node Name",
+			"    Chilled Water Loop ChW Supply Bypass Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Chilled Water Loop ChW Supply Inlet Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pump:ConstantSpeed,      !- Component 1 Object Type",
+			"    Chilled Water Loop ChW Supply Pump,  !- Component 1 Name",
+			"    Chilled Water Loop ChW Supply Inlet,  !- Component 1 Inlet Node Name",
+			"    Chilled Water Loop ChW Pump Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Chilled Water Loop ChW Supply Outlet Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Chilled Water Loop ChW Supply Outlet Pipe,  !- Component 1 Name",
+			"    Chilled Water Loop ChW Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
+			"    Chilled Water Loop ChW Supply Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Chilled Water Loop ChW Demand Inlet Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Chilled Water Loop ChW Demand Inlet Pipe,  !- Component 1 Name",
+			"    Chilled Water Loop ChW Demand Inlet,  !- Component 1 Inlet Node Name",
+			"    Chilled Water Loop ChW Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Chilled Water Loop ChW Demand Bypass Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Chilled Water Loop ChW Demand Side Bypass Pipe,  !- Component 1 Name",
+			"    Chilled Water Loop ChW Demand Bypass Inlet,  !- Component 1 Inlet Node Name",
+			"    Chilled Water Loop ChW Demand Bypass Outlet;  !- Component 1 Outlet Node Name",
+
+			"  Branch,",
+			"    Chilled Water Loop ChW Demand Outlet Branch,  !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    Pipe:Adiabatic,          !- Component 1 Object Type",
+			"    Chilled Water Loop ChW Demand Outlet Pipe,  !- Component 1 Name",
+			"    Chilled Water Loop ChW Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
+			"    Chilled Water Loop ChW Demand Outlet;  !- Component 1 Outlet Node Name",
+
+			"  BranchList,",
+			"    Hot Water Loop HW Supply Side Branches,  !- Name",
+			"    Hot Water Loop HW Supply Inlet Branch,  !- Branch 1 Name",
+			"    Main Boiler HW Branch,   !- Branch 2 Name",
+			"    Hot Water Loop HW Supply Bypass Branch,  !- Branch 3 Name",
+			"    Hot Water Loop HW Supply Outlet Branch;  !- Branch 4 Name",
+
+			"  BranchList,",
+			"    Hot Water Loop HW Demand Side Branches,  !- Name",
+			"    Hot Water Loop HW Demand Inlet Branch,  !- Branch 1 Name",
+			"    SPACE1-1 Heating Coil HW Branch,  !- Branch 2 Name",
+			"    SPACE2-1 Heating Coil HW Branch,  !- Branch 3 Name",
+			"    Hot Water Loop HW Demand Bypass Branch,  !- Branch 8 Name",
+			"    Hot Water Loop HW Demand Outlet Branch;  !- Branch 9 Name",
+
+			"  BranchList,",
+			"    Chilled Water Loop ChW Supply Side Branches,  !- Name",
+			"    Chilled Water Loop ChW Supply Inlet Branch,  !- Branch 1 Name",
+			"    Main Chiller ChW Branch, !- Branch 2 Name",
+			"    Chilled Water Loop ChW Supply Bypass Branch,  !- Branch 3 Name",
+			"    Chilled Water Loop ChW Supply Outlet Branch;  !- Branch 4 Name",
+
+			"  BranchList,",
+			"    Chilled Water Loop ChW Demand Side Branches,  !- Name",
+			"    Chilled Water Loop ChW Demand Inlet Branch,  !- Branch 1 Name",
+			"    SPACE1-1 Cooling Coil ChW Branch,  !- Branch 2 Name",
+			"    SPACE2-1 Cooling Coil ChW Branch,  !- Branch 3 Name",
+			"    Chilled Water Loop ChW Demand Bypass Branch,  !- Branch 8 Name",
+			"    Chilled Water Loop ChW Demand Outlet Branch;  !- Branch 9 Name",
+
+			"  Connector:Splitter,",
+			"    Hot Water Loop HW Supply Splitter,  !- Name",
+			"    Hot Water Loop HW Supply Inlet Branch,  !- Inlet Branch Name",
+			"    Hot Water Loop HW Supply Bypass Branch,  !- Outlet Branch 1 Name",
+			"    Main Boiler HW Branch;   !- Outlet Branch 2 Name",
+
+			"  Connector:Splitter,",
+			"    Hot Water Loop HW Demand Splitter,  !- Name",
+			"    Hot Water Loop HW Demand Inlet Branch,  !- Inlet Branch Name",
+			"    SPACE1-1 Heating Coil HW Branch,  !- Outlet Branch 1 Name",
+			"    SPACE2-1 Heating Coil HW Branch,  !- Outlet Branch 2 Name",
+			"    Hot Water Loop HW Demand Bypass Branch;  !- Outlet Branch 7 Name",
+
+			"  Connector:Splitter,",
+			"    Chilled Water Loop ChW Supply Splitter,  !- Name",
+			"    Chilled Water Loop ChW Supply Inlet Branch,  !- Inlet Branch Name",
+			"    Main Chiller ChW Branch, !- Outlet Branch 1 Name",
+			"    Chilled Water Loop ChW Supply Bypass Branch;  !- Outlet Branch 2 Name",
+
+			"  Connector:Splitter,",
+			"    Chilled Water Loop ChW Demand Splitter,  !- Name",
+			"    Chilled Water Loop ChW Demand Inlet Branch,  !- Inlet Branch Name",
+			"    SPACE1-1 Cooling Coil ChW Branch,  !- Outlet Branch 1 Name",
+			"    SPACE2-1 Cooling Coil ChW Branch,  !- Outlet Branch 2 Name",
+			"    Chilled Water Loop ChW Demand Bypass Branch;  !- Outlet Branch 7 Name",
+
+			"  Connector:Mixer,",
+			"    Hot Water Loop HW Supply Mixer,  !- Name",
+			"    Hot Water Loop HW Supply Outlet Branch,  !- Outlet Branch Name",
+			"    Hot Water Loop HW Supply Bypass Branch,  !- Inlet Branch 1 Name",
+			"    Main Boiler HW Branch;   !- Inlet Branch 2 Name",
+
+			"  Connector:Mixer,",
+			"    Hot Water Loop HW Demand Mixer,  !- Name",
+			"    Hot Water Loop HW Demand Outlet Branch,  !- Outlet Branch Name",
+			"    SPACE1-1 Heating Coil HW Branch,  !- Inlet Branch 1 Name",
+			"    SPACE2-1 Heating Coil HW Branch,  !- Inlet Branch 2 Name",
+			"    Hot Water Loop HW Demand Bypass Branch;  !- Inlet Branch 7 Name",
+
+			"  Connector:Mixer,",
+			"    Chilled Water Loop ChW Supply Mixer,  !- Name",
+			"    Chilled Water Loop ChW Supply Outlet Branch,  !- Outlet Branch Name",
+			"    Main Chiller ChW Branch, !- Inlet Branch 1 Name",
+			"    Chilled Water Loop ChW Supply Bypass Branch;  !- Inlet Branch 2 Name",
+
+			"  Connector:Mixer,",
+			"    Chilled Water Loop ChW Demand Mixer,  !- Name",
+			"    Chilled Water Loop ChW Demand Outlet Branch,  !- Outlet Branch Name",
+			"    SPACE1-1 Cooling Coil ChW Branch,  !- Inlet Branch 1 Name",
+			"    SPACE2-1 Cooling Coil ChW Branch,  !- Inlet Branch 2 Name",
+			"    Chilled Water Loop ChW Demand Bypass Branch;  !- Inlet Branch 7 Name",
+
+			"  ConnectorList,",
+			"    Hot Water Loop HW Supply Side Connectors,  !- Name",
+			"    Connector:Splitter,      !- Connector 1 Object Type",
+			"    Hot Water Loop HW Supply Splitter,  !- Connector 1 Name",
+			"    Connector:Mixer,         !- Connector 2 Object Type",
+			"    Hot Water Loop HW Supply Mixer;  !- Connector 2 Name",
+
+			"  ConnectorList,",
+			"    Hot Water Loop HW Demand Side Connectors,  !- Name",
+			"    Connector:Splitter,      !- Connector 1 Object Type",
+			"    Hot Water Loop HW Demand Splitter,  !- Connector 1 Name",
+			"    Connector:Mixer,         !- Connector 2 Object Type",
+			"    Hot Water Loop HW Demand Mixer;  !- Connector 2 Name",
+
+			"  ConnectorList,",
+			"    Chilled Water Loop ChW Supply Side Connectors,  !- Name",
+			"    Connector:Splitter,      !- Connector 1 Object Type",
+			"    Chilled Water Loop ChW Supply Splitter,  !- Connector 1 Name",
+			"    Connector:Mixer,         !- Connector 2 Object Type",
+			"    Chilled Water Loop ChW Supply Mixer;  !- Connector 2 Name",
+
+			"  ConnectorList,",
+			"    Chilled Water Loop ChW Demand Side Connectors,  !- Name",
+			"    Connector:Splitter,      !- Connector 1 Object Type",
+			"    Chilled Water Loop ChW Demand Splitter,  !- Connector 1 Name",
+			"    Connector:Mixer,         !- Connector 2 Object Type",
+			"    Chilled Water Loop ChW Demand Mixer;  !- Connector 2 Name",
+
+			"  Pipe:Adiabatic,",
+			"    Hot Water Loop HW Supply Side Bypass Pipe,  !- Name",
+			"    Hot Water Loop HW Supply Bypass Inlet,  !- Inlet Node Name",
+			"    Hot Water Loop HW Supply Bypass Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Hot Water Loop HW Supply Outlet Pipe,  !- Name",
+			"    Hot Water Loop HW Supply Outlet Pipe Inlet,  !- Inlet Node Name",
+			"    Hot Water Loop HW Supply Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Hot Water Loop HW Demand Inlet Pipe,  !- Name",
+			"    Hot Water Loop HW Demand Inlet,  !- Inlet Node Name",
+			"    Hot Water Loop HW Demand Inlet Pipe Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Hot Water Loop HW Demand Side Bypass Pipe,  !- Name",
+			"    Hot Water Loop HW Demand Bypass Inlet,  !- Inlet Node Name",
+			"    Hot Water Loop HW Demand Bypass Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Hot Water Loop HW Demand Outlet Pipe,  !- Name",
+			"    Hot Water Loop HW Demand Outlet Pipe Inlet,  !- Inlet Node Name",
+			"    Hot Water Loop HW Demand Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop ChW Supply Side Bypass Pipe,  !- Name",
+			"    Chilled Water Loop ChW Supply Bypass Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop ChW Supply Bypass Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop ChW Supply Outlet Pipe,  !- Name",
+			"    Chilled Water Loop ChW Supply Outlet Pipe Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop ChW Supply Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop ChW Demand Inlet Pipe,  !- Name",
+			"    Chilled Water Loop ChW Demand Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop ChW Demand Inlet Pipe Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop ChW Demand Side Bypass Pipe,  !- Name",
+			"    Chilled Water Loop ChW Demand Bypass Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop ChW Demand Bypass Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop ChW Demand Outlet Pipe,  !- Name",
+			"    Chilled Water Loop ChW Demand Outlet Pipe Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop ChW Demand Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop CndW Supply Outlet Pipe,  !- Name",
+			"    Chilled Water Loop CndW Supply Outlet Pipe Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop CndW Supply Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop CndW Supply Side Bypass Pipe,  !- Name",
+			"    Chilled Water Loop CndW Supply Bypass Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop CndW Supply Bypass Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop CndW Demand Inlet Pipe,  !- Name",
+			"    Chilled Water Loop CndW Demand Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop CndW Demand Inlet Pipe Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop CndW Demand Side Bypass Pipe,  !- Name",
+			"    Chilled Water Loop CndW Demand Bypass Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop CndW Demand Bypass Outlet;  !- Outlet Node Name",
+
+			"  Pipe:Adiabatic,",
+			"    Chilled Water Loop CndW Demand Outlet Pipe,  !- Name",
+			"    Chilled Water Loop CndW Demand Outlet Pipe Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop CndW Demand Outlet;  !- Outlet Node Name",
+
+			"  Pump:VariableSpeed,",
+			"    Chilled Water Loop CndW Supply Pump,  !- Name",
+			"    Chilled Water Loop CndW Supply Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop CndW Pump Outlet,  !- Outlet Node Name",
+			"    3.77739E-003,            !- Design Maximum Flow Rate {m3/s}",
+			"    179352,                  !- Design Pump Head {Pa}",
+			"    autosize,                !- Design Power Consumption {W}",
+			"    0.9,                     !- Motor Efficiency",
+			"    0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
+			"    0,                       !- Coefficient 1 of the Part Load Performance Curve",
+			"    1,                       !- Coefficient 2 of the Part Load Performance Curve",
+			"    0,                       !- Coefficient 3 of the Part Load Performance Curve",
+			"    0,                       !- Coefficient 4 of the Part Load Performance Curve",
+			"    0,                       !- Design Minimum Flow Rate {m3/s}",
+			"    INTERMITTENT;            !- Pump Control Type",
+
+			"  Pump:ConstantSpeed,",
+			"    Hot Water Loop HW Supply Pump,  !- Name",
+			"    Hot Water Loop HW Supply Inlet,  !- Inlet Node Name",
+			"    Hot Water Loop HW Pump Outlet,  !- Outlet Node Name",
+			"    3.77739E-003,            !- Design Flow Rate {m3/s}",
+			"    179352,                  !- Design Pump Head {Pa}",
+			"    800.0,                   !- Design Power Consumption {W}",
+			"    0.9,                     !- Motor Efficiency",
+			"    0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
+			"    INTERMITTENT;            !- Pump Control Type",
+
+			"  Pump:ConstantSpeed,",
+			"    Chilled Water Loop ChW Supply Pump,  !- Name",
+			"    Chilled Water Loop ChW Supply Inlet,  !- Inlet Node Name",
+			"    Chilled Water Loop ChW Pump Outlet,  !- Outlet Node Name",
+			"    3.77739E-003,            !- Design Flow Rate {m3/s}",
+			"    179352,                  !- Design Pump Head {Pa}",
+			"    800.0,                   !- Design Power Consumption {W}",
+			"    0.9,                     !- Motor Efficiency",
+			"    0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
+			"    INTERMITTENT;            !- Pump Control Type",
+
+			"  Boiler:HotWater,",
+			"    Main Boiler,             !- Name",
+			"    NaturalGas,              !- Fuel Type",
+			"    autosize,                !- Nominal Capacity {W}",
+			"    0.8,                     !- Nominal Thermal Efficiency",
+			"    LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable",
+			"    Main Boiler Efficiency Curve,  !- Normalized Boiler Efficiency Curve Name",
+			"    81,                      !- Design Water Outlet Temperature {C}",
+			"    2.77739E-003,            !- Design Water Flow Rate {m3/s}",
+			"    0,                       !- Minimum Part Load Ratio",
+			"    1.1,                     !- Maximum Part Load Ratio",
+			"    1,                       !- Optimum Part Load Ratio",
+			"    Main Boiler HW Inlet,    !- Boiler Water Inlet Node Name",
+			"    Main Boiler HW Outlet,   !- Boiler Water Outlet Node Name",
+			"    100,                     !- Water Outlet Upper Temperature Limit {C}",
+			"    ConstantFlow,            !- Boiler Flow Mode",
+			"    0,                       !- Parasitic Electric Load {W}",
+			"    1.0;                     !- Sizing Factor",
+
+			"  Chiller:Electric:EIR,",
+			"    Main Chiller,            !- Name",
+			"    600000.0,                !- Reference Capacity {W}",
+			"    3.2,                     !- Reference COP {W/W}",
+			"    6.67,                    !- Reference Leaving Chilled Water Temperature {C}",
+			"    29.4,                    !- Reference Entering Condenser Fluid Temperature {C}",
+			"    3.77739E-003,            !- Reference Chilled Water Flow Rate {m3/s}",
+			"    autosize,                !- Reference Condenser Fluid Flow Rate {m3/s}",
+			"    Main Chiller RecipCapFT, !- Cooling Capacity Function of Temperature Curve Name",
+			"    Main Chiller RecipEIRFT, !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name",
+			"    Main Chiller RecipEIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
+			"    0,                       !- Minimum Part Load Ratio",
+			"    1,                       !- Maximum Part Load Ratio",
+			"    1,                       !- Optimum Part Load Ratio",
+			"    0.25,                    !- Minimum Unloading Ratio",
+			"    Main Chiller ChW Inlet,  !- Chilled Water Inlet Node Name",
+			"    Main Chiller ChW Outlet, !- Chilled Water Outlet Node Name",
+			"    Main Chiller Cnd Inlet,  !- Condenser Inlet Node Name",
+			"    Main Chiller Cnd Outlet, !- Condenser Outlet Node Name",
+			"    AirCooled,               !- Condenser Type",
+			"    ,                        !- Condenser Fan Power Ratio {W/W}",
+			"    1,                       !- Fraction of Compressor Electric Consumption Rejected by Condenser",
+			"    5,                       !- Leaving Chilled Water Lower Temperature Limit {C}",
+			"    ConstantFlow,            !- Chiller Flow Mode",
+			"    0,                       !- Design Heat Recovery Water Flow Rate {m3/s}",
+			"    ,                        !- Heat Recovery Inlet Node Name",
+			"    ,                        !- Heat Recovery Outlet Node Name",
+			"    1.0;                     !- Sizing Factor",
+
+			"  PlantLoop,",
+			"    Hot Water Loop Hot Water Loop,  !- Name",
+			"    Water,                   !- Fluid Type",
+			"    ,                        !- User Defined Fluid Type",
+			"    Hot Water Loop Operation,!- Plant Equipment Operation Scheme Name",
+			"    Hot Water Loop HW Supply Outlet,  !- Loop Temperature Setpoint Node Name",
+			"    100,                     !- Maximum Loop Temperature {C}",
+			"    10,                      !- Minimum Loop Temperature {C}",
+			"    3.77739E-003,            !- Maximum Loop Flow Rate {m3/s}",
+			"    0,                       !- Minimum Loop Flow Rate {m3/s}",
+			"    0.50,                    !- Plant Loop Volume {m3}",
+			"    Hot Water Loop HW Supply Inlet,  !- Plant Side Inlet Node Name",
+			"    Hot Water Loop HW Supply Outlet,  !- Plant Side Outlet Node Name",
+			"    Hot Water Loop HW Supply Side Branches,  !- Plant Side Branch List Name",
+			"    Hot Water Loop HW Supply Side Connectors,  !- Plant Side Connector List Name",
+			"    Hot Water Loop HW Demand Inlet,  !- Demand Side Inlet Node Name",
+			"    Hot Water Loop HW Demand Outlet,  !- Demand Side Outlet Node Name",
+			"    Hot Water Loop HW Demand Side Branches,  !- Demand Side Branch List Name",
+			"    Hot Water Loop HW Demand Side Connectors,  !- Demand Side Connector List Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
+			"    ,                        !- Availability Manager List Name",
+			"    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+
+			"  PlantLoop,",
+			"    Chilled Water Loop Chilled Water Loop,  !- Name",
+			"    Water,                   !- Fluid Type",
+			"    ,                        !- User Defined Fluid Type",
+			"    Chilled Water Loop Chiller Operation,  !- Plant Equipment Operation Scheme Name",
+			"    Chilled Water Loop ChW Supply Outlet,  !- Loop Temperature Setpoint Node Name",
+			"    98,                      !- Maximum Loop Temperature {C}",
+			"    1,                       !- Minimum Loop Temperature {C}",
+			"    3.77739E-003,            !- Maximum Loop Flow Rate {m3/s}",
+			"    0,                       !- Minimum Loop Flow Rate {m3/s}",
+			"    0.50,                    !- Plant Loop Volume {m3}",
+			"    Chilled Water Loop ChW Supply Inlet,  !- Plant Side Inlet Node Name",
+			"    Chilled Water Loop ChW Supply Outlet,  !- Plant Side Outlet Node Name",
+			"    Chilled Water Loop ChW Supply Side Branches,  !- Plant Side Branch List Name",
+			"    Chilled Water Loop ChW Supply Side Connectors,  !- Plant Side Connector List Name",
+			"    Chilled Water Loop ChW Demand Inlet,  !- Demand Side Inlet Node Name",
+			"    Chilled Water Loop ChW Demand Outlet,  !- Demand Side Outlet Node Name",
+			"    Chilled Water Loop ChW Demand Side Branches,  !- Demand Side Branch List Name",
+			"    Chilled Water Loop ChW Demand Side Connectors,  !- Demand Side Connector List Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
+			"    ,                        !- Availability Manager List Name",
+			"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
+			"    None;                    !- Common Pipe Simulation",
+			
+			"  PlantEquipmentList,",
+			"    Hot Water Loop All Equipment,  !- Name",
+			"    Boiler:HotWater,         !- Equipment 1 Object Type",
+			"    Main Boiler;             !- Equipment 1 Name",
+
+			"  PlantEquipmentList,",
+			"    Chilled Water Loop All Chillers,  !- Name",
+			"    Chiller:Electric:EIR,    !- Equipment 1 Object Type",
+			"    Main Chiller;            !- Equipment 1 Name",
+
+			"  Sizing:Plant,",
+			"    Hot Water Loop Hot Water Loop,  !- Plant or Condenser Loop Name",
+			"    Heating,                 !- Loop Type",
+			"    82,                      !- Design Loop Exit Temperature {C}",
+			"    11;                      !- Loop Design Temperature Difference {deltaC}",
+
+			"  Sizing:Plant,",
+			"    Chilled Water Loop Chilled Water Loop,  !- Plant or Condenser Loop Name",
+			"    Cooling,                 !- Loop Type",
+			"    7.22,                    !- Design Loop Exit Temperature {C}",
+			"    6.67;                    !- Loop Design Temperature Difference {deltaC}",
+
+			"  PlantEquipmentOperation:CoolingLoad,",
+			"    Chilled Water Loop Chiller Operation All Hours,  !- Name",
+			"    0,                       !- Load Range 1 Lower Limit {W}",
+			"    1000000000000000,        !- Load Range 1 Upper Limit {W}",
+			"    Chilled Water Loop All Chillers;  !- Range 1 Equipment List Name",
+
+			"  PlantEquipmentOperation:HeatingLoad,",
+			"    Hot Water Loop Operation All Hours,  !- Name",
+			"    0,                       !- Load Range 1 Lower Limit {W}",
+			"    1000000000000000,        !- Load Range 1 Upper Limit {W}",
+			"    Hot Water Loop All Equipment;  !- Range 1 Equipment List Name",
+
+			"  PlantEquipmentOperationSchemes,",
+			"    Hot Water Loop Operation,!- Name",
+			"    PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type",
+			"    Hot Water Loop Operation All Hours,  !- Control Scheme 1 Name",
+			"    AvailSched;   !- Control Scheme 1 Schedule Name",
+
+			"  PlantEquipmentOperationSchemes,",
+			"    Chilled Water Loop Chiller Operation,  !- Name",
+			"    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type",
+			"    Chilled Water Loop Chiller Operation All Hours,  !- Control Scheme 1 Name",
+			"    AvailSched;    !- Control Scheme 1 Schedule Name",
+
+			"  AvailabilityManager:Scheduled,",
+			"    DOAS Availability,       !- Name",
+			"    FanAvailSched;           !- Schedule Name",
+
+			"  AvailabilityManagerAssignmentList,",
+			"    DOAS Availability Managers,  !- Name",
+			"    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type",
+			"    DOAS Availability;       !- Availability Manager 1 Name",
+
+			"  SetpointManager:OutdoorAirReset,",
+			"    Hot Water Loop HW Temp Manager,  !- Name",
+			"    Temperature,             !- Control Variable",
+			"    82.2,                    !- Setpoint at Outdoor Low Temperature {C}",
+			"    -6.7,                    !- Outdoor Low Temperature {C}",
+			"    65.6,                    !- Setpoint at Outdoor High Temperature {C}",
+			"    10,                      !- Outdoor High Temperature {C}",
+			"    Hot Water Loop HW Supply Outlet;  !- Setpoint Node or NodeList Name",
+
+			"  SetpointManager:OutdoorAirReset,",
+			"    Chilled Water Loop ChW Temp Manager,  !- Name",
+			"    Temperature,             !- Control Variable",
+			"    12.2,                    !- Setpoint at Outdoor Low Temperature {C}",
+			"    15.6,                    !- Outdoor Low Temperature {C}",
+			"    6.7,                     !- Setpoint at Outdoor High Temperature {C}",
+			"    26.7,                    !- Outdoor High Temperature {C}",
+			"    Chilled Water Loop ChW Supply Outlet;  !- Setpoint Node or NodeList Name",
+
+			"  Curve:Quadratic,",
+			"    Main Boiler Efficiency Curve,  !- Name",
+			"    0.97,                    !- Coefficient1 Constant",
+			"    0.0633,                  !- Coefficient2 x",
+			"    -0.0333,                 !- Coefficient3 x**2",
+			"    0.0,                     !- Minimum Value of x",
+			"    1.0;                     !- Maximum Value of x",
+
+			"  Curve:Quadratic,",
+			"    Main Chiller RecipEIRFPLR,  !- Name",
+			"    0.088065,                !- Coefficient1 Constant",
+			"    1.137742,                !- Coefficient2 x",
+			"    -0.225806,               !- Coefficient3 x**2",
+			"    0,                       !- Minimum Value of x",
+			"    1;                       !- Maximum Value of x",
+
+			"  Curve:Biquadratic,",
+			"    Main Chiller RecipCapFT, !- Name",
+			"    0.507883,                !- Coefficient1 Constant",
+			"    0.145228,                !- Coefficient2 x",
+			"    -0.00625644,             !- Coefficient3 x**2",
+			"    -0.0011178,              !- Coefficient4 y",
+			"    -0.0001296,              !- Coefficient5 y**2",
+			"    -0.00028188,             !- Coefficient6 x*y",
+			"    5,                       !- Minimum Value of x",
+			"    10,                      !- Maximum Value of x",
+			"    24,                      !- Minimum Value of y",
+			"    35;                      !- Maximum Value of y",
+
+			"  Curve:Biquadratic,",
+			"    Main Chiller RecipEIRFT, !- Name",
+			"    1.03076,                 !- Coefficient1 Constant",
+			"    -0.103536,               !- Coefficient2 x",
+			"    0.00710208,              !- Coefficient3 x**2",
+			"    0.0093186,               !- Coefficient4 y",
+			"    0.00031752,              !- Coefficient5 y**2",
+			"    -0.00104328,             !- Coefficient6 x*y",
+			"    5,                       !- Minimum Value of x",
+			"    10,                      !- Maximum Value of x",
+			"    24,                      !- Minimum Value of y",
+			"    35;                      !- Maximum Value of y",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+		ProcessScheduleInput(); // read schedules
+		ScheduleInputProcessed = true;
+		InitializePsychRoutines();
+		OutputReportPredefined::SetPredefinedTables();
+
+		GetZoneData( ErrorsFound );
+		ASSERT_FALSE( ErrorsFound );
+
+		GetZoneEquipmentData1();
+		GetZoneAirLoopEquipment();
+
+		GetFanInput();
+		GetFanCoilUnits();
+		SplitterComponent::GetSplitterInput();
+		
+		SizingManager::GetPlantSizingInput();
+		GetPlantLoopData();
+		GetPlantInput();
+		SetupInitialPlantCallingOrder();
+		SetupBranchControlTypes();
+
+		BeginEnvrnFlag = false;
+		// set input variables
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::OutDryBulbTemp = 35.0;
+		DataEnvironment::OutHumRat = 0.0098;
+		DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW( DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat );
+		DataEnvironment::StdRhoAir = 1.20;
+		ZoneSysEnergyDemand.allocate( 2 );
+		DataHVACGlobals::ZoneCompTurnFansOff = false;
+		DataHVACGlobals::ZoneCompTurnFansOn = true;
+		SysSizingRunDone = true;
+		ZoneSizingRunDone = true;
+		SysSizingCalc = true;
+		TempControlType.allocate( 2 );
+		TempControlType( 1 ) = 4;
+		TempControlType( 2 ) = 4;
+		ColdWaterMassFlowRate = 0.50;
+		HotWaterMassFlowRate = 0.0;
+
+		ZoneNum = 1;
+		FanCoilNum = 1;
+		InitFanCoilUnits( FanCoilNum, ZoneNum );
+		FanCoil( 1 ).ZonePtr = ZoneNum;
+		FanCoil( 1 ).FanOpMode = ContFanCycCoil;
+		FanCoil( 1 ).FanType_Num = FanType_SimpleOnOff;
+		// initialize mass flow rates
+		HVACInletMassFlowRate1 = 0.50;
+		PrimaryAirMassFlowRate1 = 0.1;
+		FanCoil( 1 ).MaxAirMassFlow = HVACInletMassFlowRate1;
+		FanCoil( 1 ).OutAirMassFlow = PrimaryAirMassFlowRate1;
+		FanCoil( 1 ).FanAirVolFlow = HVACInletMassFlowRate1 / DataEnvironment::StdRhoAir;
+		// set zoneNode air condition
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp = 24.0;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat = 0.0075;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat );
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate1;
+		Node( FanCoil( 1 ).AirInNode ).MassFlowRateMax = HVACInletMassFlowRate1;
+		Node( FanCoil( 1 ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate1;
+		Node( FanCoil( 1 ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate1;
+		// set fan parameters
+		Fan( 1 ).MaxAirMassFlowRate = HVACInletMassFlowRate1;
+		Fan( 1 ).InletAirMassFlowRate = HVACInletMassFlowRate1;
+		Fan( 1 ).RhoAirStdInit = DataEnvironment::StdRhoAir;
+		Node( Fan( 1 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate1;
+		Node( Fan( 1 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate1;
+		// primary air condition set at outdoor air condition
+		Node( FanCoil( 1 ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
+		Node( FanCoil( 1 ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
+		Node( FanCoil( 1 ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
+		// set secondary air (recirculating air) conditions to zone air node		
+		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
+		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
+		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
+		Node( WaterCoil( 1 ).AirInletNodeNum ).MassFlowRate = 0.0;
+		Node( WaterCoil( 1 ).AirInletNodeNum ).MassFlowRateMaxAvail = 0.0;
+		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRate = 0.0;
+		Node( WaterCoil( 1 ).WaterOutletNodeNum ).MassFlowRateMaxAvail = 0.0;
+		Node( WaterCoil( 3 ).AirInletNodeNum ).MassFlowRate = HVACInletMassFlowRate1;
+		Node( WaterCoil( 3 ).AirInletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate1;		
+		Node( WaterCoil( 3 ).AirInletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate1;
+		Node( WaterCoil( 3 ).WaterInletNodeNum ).MassFlowRate = ColdWaterMassFlowRate;
+		Node( WaterCoil( 3 ).WaterInletNodeNum ).MassFlowRateMax = ColdWaterMassFlowRate;
+		Node( WaterCoil( 3 ).WaterInletNodeNum ).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+		// zone 1 fan coil water cooling coil
+		WaterCoil( 3 ).UACoil = 360.0;
+		WaterCoil( 3 ).UACoilTotal = 360.0;
+		WaterCoil( 3 ).UACoilExternal = 600.0;
+		WaterCoil( 3 ).UACoilInternal = 1500.0;
+		WaterCoil( 3 ).TotCoilOutsideSurfArea = 60.0;
+		WaterCoil( 3 ).InletWaterTemp = 6.67;
+		WaterCoil( 3 ).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+		WaterCoil( 3 ).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -6606.0;
+		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP;
+		Schedule( FanCoil( 1 ).SchedPtr ).CurrentValue = 1.0; // unit is always available
+		Schedule( WaterCoil( 3 ).SchedPtr ).CurrentValue = 1.0; // fan is always available
+
+		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0; // set secondary air mass flow rate to zero 
+		// Simulate zoneHVAC equipment (FanCoil unit)
+		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
+		// seconday air flow is fancoil flow less primary air flow
+		SecondaryAirMassFlowRate1 = HVACInletMassFlowRate1 - PrimaryAirMassFlowRate1;
+		// check the terminal air mixer secondary air mass flow rate 
+		ASSERT_EQ( SecondaryAirMassFlowRate1, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
+		// check the terminal air mixer outlet flow rate must be equal to fancoil mass flow rate
+		ASSERT_EQ( HVACInletMassFlowRate1, SysATMixer( 1 ).MixedAirMassFlowRate );
+		// check the cooling output delivered
+		ASSERT_NEAR( QZnReq, QUnitOut, 5.0 );
+
+		ZoneNum = 2;
+		FanCoilNum = 2;
+		InitFanCoilUnits( FanCoilNum, ZoneNum );
+		FanCoil( 2 ).ZonePtr = 1;
+		FanCoil( 2 ).FanOpMode = ContFanCycCoil;
+		FanCoil( 2 ).FanType_Num = FanType_SimpleOnOff;
+		// initialize mass flow rates
+		HVACInletMassFlowRate2 = 0.60;
+		PrimaryAirMassFlowRate2 = 0.2;
+		FanCoil( 2 ).MaxAirMassFlow = HVACInletMassFlowRate2;
+		FanCoil( 2 ).OutAirMassFlow = PrimaryAirMassFlowRate2;
+		FanCoil( 2 ).FanAirVolFlow = HVACInletMassFlowRate2 / DataEnvironment::StdRhoAir;
+		// set zoneNode air condition
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp = 24.0;
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat = 0.0075;
+		Node( ZoneEquipConfig( 2 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat );
+		Node( FanCoil( 2 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate2;
+		Node( FanCoil( 2 ).AirInNode ).MassFlowRateMax = HVACInletMassFlowRate2;
+		Node( FanCoil( 2 ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate2;
+		Node( FanCoil( 2 ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate2;
+		// set fan parameters
+		Fan( 2 ).MaxAirMassFlowRate = HVACInletMassFlowRate2;
+		Fan( 2 ).InletAirMassFlowRate = HVACInletMassFlowRate2;
+		Fan( 2 ).RhoAirStdInit = DataEnvironment::StdRhoAir;
+		Node( Fan( 2 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate2;
+		Node( Fan( 2 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate2;
+		// primary air condition set at outdoor air condition
+		Node( FanCoil( 2 ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
+		Node( FanCoil( 2 ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
+		Node( FanCoil( 2 ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
+		// set secondary air (recirculating air) conditions to zone air node		
+		Node( SysATMixer( 2 ).SecInNode ).Temp = Node( ZoneEquipConfig( 2 ).ZoneNode ).Temp;
+		Node( SysATMixer( 2 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 2 ).ZoneNode ).HumRat;
+		Node( SysATMixer( 2 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 2 ).ZoneNode ).Enthalpy;
+		Node( WaterCoil( 2 ).AirInletNodeNum ).MassFlowRate = 0.0;
+		Node( WaterCoil( 2 ).AirInletNodeNum ).MassFlowRateMaxAvail = 0.0;
+		Node( WaterCoil( 2 ).WaterOutletNodeNum ).MassFlowRate = 0.0;
+		Node( WaterCoil( 2 ).WaterOutletNodeNum ).MassFlowRateMaxAvail = 0.0;
+		Node( WaterCoil( 4 ).AirInletNodeNum ).MassFlowRate = HVACInletMassFlowRate2;
+		Node( WaterCoil( 4 ).AirInletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate2;
+		Node( WaterCoil( 4 ).AirInletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate2;
+		Node( WaterCoil( 4 ).WaterInletNodeNum ).MassFlowRate = ColdWaterMassFlowRate;
+		Node( WaterCoil( 4 ).WaterInletNodeNum ).MassFlowRateMax = ColdWaterMassFlowRate;
+		Node( WaterCoil( 4 ).WaterInletNodeNum ).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
+		// zone 2 fan coil water cooling coil
+		WaterCoil( 4 ).UACoil = 360.0;
+		WaterCoil( 4 ).UACoilTotal = 360.0;
+		WaterCoil( 4 ).UACoilExternal = 600.0;
+		WaterCoil( 4 ).UACoilInternal = 1500.0;
+		WaterCoil( 4 ).TotCoilOutsideSurfArea = 60.0;
+		WaterCoil( 4 ).InletWaterTemp = 6.67;
+		WaterCoil( 4 ).InletWaterMassFlowRate = ColdWaterMassFlowRate;
+		WaterCoil( 4 ).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
+
+		ZoneSysEnergyDemand( 2 ).RemainingOutputReqToHeatSP = 0.0;
+		ZoneSysEnergyDemand( 2 ).RemainingOutputReqToCoolSP = -7366.0;
+		QZnReq = ZoneSysEnergyDemand( 2 ).RemainingOutputReqToCoolSP;
+		Schedule( FanCoil( 2 ).SchedPtr ).CurrentValue = 1.0; // unit is always available
+		Schedule( WaterCoil( 4 ).SchedPtr ).CurrentValue = 1.0; // fan is always available
+
+		Node( SysATMixer( 2 ).SecInNode ).MassFlowRate = 0.0; // set secondary air mass flow rate to zero 
+		// Simulate zoneHVAC equipment (FanCoil unit)
+		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
+		// seconday air flow is FanCoil flow less primary air flow
+		SecondaryAirMassFlowRate2 = HVACInletMassFlowRate2 - PrimaryAirMassFlowRate2;
+		// check the terminal air mixer secondary air mass flow rate 
+		ASSERT_EQ( SecondaryAirMassFlowRate2, Node( SysATMixer( 2 ).SecInNode ).MassFlowRate );
+		// check the terminal air mixer outlet flow rate must be equal to FanCoil mass flow rate
+		ASSERT_EQ( HVACInletMassFlowRate2, SysATMixer( 2 ).MixedAirMassFlowRate );
+		// check the cooling output delivered
+		ASSERT_NEAR( QZnReq, QUnitOut, 5.0 );
+
+		// simulate the splitter
+		SimAirLoopSplitter( SupplyAirPath( 1 ).ComponentName( 1 ), FirstHVACIteration, FirstCall, SplitterInletChanged, SupplyAirPath( 1 ).ComponentIndex( 1 ) );
+		// check primary air distribution by the splitter 
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate1, 0.1 );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate2, 0.2 );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate1, SplitterCond( 1 ).OutletMassFlowRate( 1 ) );
+		ASSERT_DOUBLE_EQ( PrimaryAirMassFlowRate2, SplitterCond( 1 ).OutletMassFlowRate( 2 ) );
+		ASSERT_DOUBLE_EQ( SplitterCond( 1 ).InletMassFlowRate, 0.3 );
+	}
+
+
 }
