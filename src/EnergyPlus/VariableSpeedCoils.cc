@@ -428,7 +428,7 @@ namespace VariableSpeedCoils {
 		using InputProcessor::FindItemInList;
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

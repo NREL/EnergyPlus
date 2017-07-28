@@ -4227,7 +4227,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
@@ -4345,7 +4345,7 @@ namespace PackagedTerminalHeatPump {
 			} else {
 				Par( 8 ) = 0.0;
 			}
-			SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, 0.0, 1.0, Par );
+			SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, 0.0, 1.0, Par );
 			if ( SolFla == -1 ) {
 				//     Very low loads may not converge quickly. Tighten PLR boundary and try again.
 				TempMaxPLR = -0.1;
@@ -4364,7 +4364,7 @@ namespace PackagedTerminalHeatPump {
 					if ( HeatingLoad && TempOutput < QZnReq ) ContinueIter = false;
 					if ( CoolingLoad && TempOutput > QZnReq ) ContinueIter = false;
 				}
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, TempMinPLR, TempMaxPLR, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, TempMinPLR, TempMaxPLR, Par );
 				if ( SolFla == -1 ) {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
@@ -4492,7 +4492,7 @@ namespace PackagedTerminalHeatPump {
 		using DataEnvironment::OutDryBulbTemp;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using SingleDuct::SimATMixer;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -4730,7 +4730,7 @@ namespace PackagedTerminalHeatPump {
 						}
 						Par( 3 ) = SupHeaterLoad;
 						MaxHotWaterFlow = PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow;
-						SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
+						SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
 						if ( SolFlag == -1 ) {
 							if ( PTUnit( PTUnitNum ).HotWaterCoilMaxIterIndex == 0 ) {
 								ShowWarningMessage( "CalcPTUnit: Hot water coil control failed for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name + "\"" );
@@ -5842,7 +5842,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
@@ -6001,7 +6001,7 @@ namespace PackagedTerminalHeatPump {
 					Par( 5 ) = QLatReq;
 				}
 
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
 						if ( ErrCountCyc == 0 ) {
@@ -6052,7 +6052,7 @@ namespace PackagedTerminalHeatPump {
 					Par( 5 ) = QLatReq;
 				}
 
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
 						if ( ErrCountVar == 0 ) {
@@ -6397,7 +6397,7 @@ namespace PackagedTerminalHeatPump {
 		using DataEnvironment::OutDryBulbTemp;
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
@@ -6586,7 +6586,7 @@ namespace PackagedTerminalHeatPump {
 						}
 						Par( 3 ) = SupHeaterLoad;
 						MaxHotWaterFlow = PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow;
-						SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
+						SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
 						if ( SolFlag == -1 ) {
 							if ( PTUnit( PTUnitNum ).HotWaterCoilMaxIterIndex == 0 ) {
 								ShowWarningMessage( "RoutineName//Hot water coil control failed for " + PTUnit( PTUnitNum ).UnitType + "=\"" + PTUnit( PTUnitNum ).Name + "\"" ); //Autodesk:Bug? Meant RoutineName + "Hot water...

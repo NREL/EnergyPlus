@@ -1707,7 +1707,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
 		using General::RoundSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -1752,7 +1752,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				Par( 1 ) = double( CompNum ); // HX index
 				Par( 2 ) = TargetSupplySideLoopLeavingTemp;
 
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, DmdSideMdot, HXDemandSideLoopFlowResidual, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMin, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax, Par );
+				SolveRoot( Acc, MaxIte, SolFla, DmdSideMdot, HXDemandSideLoopFlowResidual, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMin, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax, Par );
 
 				if ( SolFla == -1 ) { // no convergence
 					if ( ! WarmupFlag ) {
@@ -1793,7 +1793,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				Par( 1 ) = double( CompNum ); // HX index
 				Par( 2 ) = TargetSupplySideLoopLeavingTemp;
 
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, DmdSideMdot, HXDemandSideLoopFlowResidual, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMin, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax, Par );
+				SolveRoot( Acc, MaxIte, SolFla, DmdSideMdot, HXDemandSideLoopFlowResidual, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMin, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax, Par );
 
 				if ( SolFla == -1 ) { // no convergence
 					if ( ! WarmupFlag ) {
