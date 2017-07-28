@@ -24144,6 +24144,7 @@ DO iPurchAir = 1, numCompactPurchAir
   CALL AddToObjFld('Availability Schedule Name', base + pazSysAvailSchedNameOff,'')
   CALL AddToObjFld('Zone Supply Air Node Name', base + pazNameOff,' Ideal Loads Supply Inlet')
   CALL AddToObjStr('Zone Exhaust Air Node Name','')
+  CALL AddToObjStr('System Inlet Air Node Name','')
   CALL AddToObjFld('Maximum Heating Supply Air Temperature [C]', base + pazMaxHeatSupplyTempOff,'')
   CALL AddToObjFld('Minimum Cooling Supply Air Temperature [C]', base + pazMinCoolSupplyTempOff,'')
   CALL AddToObjFld('Maximum Heating Supply Air Humidity Ratio [kg-H20/kg-air]', base + pazMaxHeatSupplyHumRatOff,'')
