@@ -800,6 +800,22 @@ ConvergenceLimits,
        \default 8
        \minimum 2
 
+HVACSystemRootFindingAlgorithm,
+       \memo Specifies a HVAC system solver algorithm to find a root
+       \unique-object
+  A1 , \field Algorithm
+       \type choice
+       \key RegulaFalsi
+       \key Bisection
+       \key BisectionThenRegulaFalsi
+       \key RegulaFalsiThenBisection
+       \default RegulaFalsi
+  N1 ; \field Number of Iterations Before Algorithm Switch
+       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is 
+       \note entered. When iteration number is greater than the value, algorithm switches.
+       \type integer
+       \default 5
+
 \group Compliance Objects
 
 Compliance:Building,
