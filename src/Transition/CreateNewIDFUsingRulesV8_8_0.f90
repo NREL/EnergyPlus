@@ -807,7 +807,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ObjectName='WindowMaterial:Blind:EquivalentLayer'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  OutArgs(1:24) = InArgs(1:24)
-                 IF (inArgs(6) >= '90') THEN
+                 IF (inArgs(6) >= 90) THEN
                    OutArgs(6) = 90.0 - inArgs(6)
                  ELSE
                    OutArgs(6) = inArgs(6)
