@@ -367,7 +367,21 @@ namespace ScheduleManager {
 	ReportOrphanSchedules();
 
 	Real64
+	ScheduleAnnualFullLoadHours(
+		int const ScheduleIndex, // Which Schedule being tested
+		int const StartDayOfWeek, // Day of week for start of year
+		bool const isItLeapYear // true if it is a leap year containing February 29
+	);
+
+	Real64
 	ScheduleAverageHoursPerWeek(
+		int const ScheduleIndex, // Which Schedule being tested
+		int const StartDayOfWeek, // Day of week for start of year
+		bool const isItLeapYear // true if it is a leap year containing February 29
+	);
+
+	Real64
+	ScheduleHoursGT1perc(
 		int const ScheduleIndex, // Which Schedule being tested
 		int const StartDayOfWeek, // Day of week for start of year
 		bool const isItLeapYear // true if it is a leap year containing February 29

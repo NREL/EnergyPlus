@@ -2087,7 +2087,7 @@ namespace OutputReportPredefined {
 
 		pdstLeedEqFlLdHrs = newPreDefSubTable( pdrLeed, "Schedules-Equivalent Full Load Hours (Schedule Type=Fraction)" );
 		pdchLeedEflhEflh = newPreDefColumn( pdstLeedEqFlLdHrs, "Equivalent Full Load Hours of Operation Per Year [hr]" );
-		pdchLeedEflhNonZerHrs = newPreDefColumn( pdstLeedEqFlLdHrs, "Hours Greater than Zero Per Year [hr]" );
+		pdchLeedEflhNonZerHrs = newPreDefColumn( pdstLeedEqFlLdHrs, "Hours > 1% [hr]" );
 
 		pdstLeedSchedSetPts = newPreDefSubTable( pdrLeed, "Schedules-SetPoints (Schedule Type=Temperature)" );
 		pdChLeedSchStPtFirstObjUsed = newPreDefColumn( pdstLeedSchedSetPts, "First Object Used" );

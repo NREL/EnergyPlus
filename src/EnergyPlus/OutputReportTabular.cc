@@ -6371,6 +6371,15 @@ namespace OutputReportTabular {
 		} else {
 			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", "-" );
 		}
+		// LEED schedule sub table
+		for ( long iSch = 1; iSch <= ScheduleManager::NumSchedules; ++iSch ) {
+			std::string curSchName = ScheduleManager::Schedule(iSch).Name;
+			std::string curSchType = ScheduleManager::GetScheduleType( iSch );
+			if ( SameString( curSchType, "FRACTION" ) ) {
+				PreDefTableEntry( pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours( iSch, StartOfWeek, CurrentYearIsLeapYear ), 0 );
+				PreDefTableEntry( pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc( iSch, StartOfWeek, CurrentYearIsLeapYear ), 0 );
+			}
+		}
 	}
 
 	void
