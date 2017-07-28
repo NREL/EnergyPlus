@@ -3919,13 +3919,10 @@ namespace SetPointManager {
 					OutAirSetPtMgr( SetPtMgrNum ).calculate();
 					NodeNum = OutAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						// set to oudoor air temp reset value
 						Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
 					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
-						// set to low oudoor air temp reset value
 						Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
 					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
-						// set to high oudoor air temp reset value
 						Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
 					}
 				}
@@ -4693,7 +4690,7 @@ namespace SetPointManager {
 		Real64 SetTempAtOutHigh;
 
 		if ( this->SchedPtr > 0 ) {
-			SchedVal = GetCurrentScheduleValue( SchedPtr );
+			SchedVal = GetCurrentScheduleValue( this->SchedPtr );
 		} else {
 			SchedVal = 0.0;
 		}
