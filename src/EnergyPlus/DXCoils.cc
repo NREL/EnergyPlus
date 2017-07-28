@@ -11592,7 +11592,7 @@ Label50: ;
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataEnvironment::OutBaroPress;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using namespace OutputReportPredefined;
 
@@ -11825,7 +11825,7 @@ Label50: ;
 
 			LowerBoundMassFlowRate = 0.01 * DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
 
-			SolveRegulaFalsi( AccuracyTolerance, MaximumIterations, SolverFlag, PartLoadAirMassFlowRate, CalcTwoSpeedDXCoilIEERResidual, LowerBoundMassFlowRate, DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ), Par );
+			SolveRoot( AccuracyTolerance, MaximumIterations, SolverFlag, PartLoadAirMassFlowRate, CalcTwoSpeedDXCoilIEERResidual, LowerBoundMassFlowRate, DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ), Par );
 
 			if ( SolverFlag == -1 ) {
 
@@ -14404,13 +14404,13 @@ Label50: ;
 		//
 		// USE STATEMENTS:
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using Psychrometrics::PsyHFnTdbW;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Array1D< Real64 > Par( 11 ); // Parameter array for SolveRegulaFalsi
+		Array1D< Real64 > Par( 11 ); // Parameter array for SolveRoot
 		int MaxIter( 500 ); // Max iteration numbers (-)
-		int SolFla; // Solving flag for SolveRegulaFalsi (-)
+		int SolFla; // Solving flag for SolveRoot (-)
 		int const FlagCoolMode( 0 ); // Flag for cooling mode
 		int const FlagHeatMode( 1 ); // Flag for heating mode
 		Real64 BF; // Bypass factor (-)
@@ -14492,7 +14492,7 @@ Label50: ;
 				Par( 5 ) = BF;
 
 				FanSpdRatioMax = 1.0;
-				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par );
+				SolveRoot( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par );
 				if ( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity
 				FanSpdRatio = Ratio1;
 				CoilOnOffRatio = 1.0;
@@ -14593,7 +14593,7 @@ Label50: ;
 				Par( 5 ) = BF;
 
 				FanSpdRatioMax = 1.0;
-				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par );
+				SolveRoot( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par );
 				// this will likely cause problems eventually, -1 and -2 mean different things
 				if ( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity
 				FanSpdRatio = Ratio1;

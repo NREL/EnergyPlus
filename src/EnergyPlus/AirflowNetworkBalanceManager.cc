@@ -4503,7 +4503,7 @@ namespace AirflowNetworkBalanceManager {
 		using DataHVACGlobals::TurnFansOn;
 		using InputProcessor::SameString; // NEEDS TO BE CHANGED after V1.3 release!!!
 		using DataHVACGlobals::VerySmallMassFlow;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using DataAirLoop::LoopFanOperationMode;
 		using DataAirLoop::LoopOnOffFanPartLoadRatio;
 		// Locals
@@ -4710,7 +4710,7 @@ namespace AirflowNetworkBalanceManager {
 				} else {
 					//	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
 					Par( 1 ) = PressureSet;
-					SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par );
+					SolveRoot( ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par );
 					if ( SolFla == -1 ) {
 						if ( !WarmupFlag ) {
 							if ( ErrCountVar == 0 ) {
@@ -4770,7 +4770,7 @@ namespace AirflowNetworkBalanceManager {
 				} else {
 					//	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
 					Par( 1 ) = PressureSet;
-					SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par );
+					SolveRoot( ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par );
 					if ( SolFla == -1 ) {
 						if ( !WarmupFlag ) {
 							if ( ErrCountVar == 0 ) {
