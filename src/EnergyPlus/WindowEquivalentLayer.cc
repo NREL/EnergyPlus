@@ -8248,12 +8248,6 @@ namespace WindowEquivalentLayer {
 		//// Flow
 
 		// TODO handle vert blind cases etc
-
-		// issue #5750, commented out because it does not block the solar beam
-		//RAT = L.S * std::cos( OMEGA_DEG ) / L.W;
-		//// limit upward slat angle to horiz = max visibility
-		//VB_CriticalSlatAngle = max( 0.0, RadiansToDeg * std::asin( RAT ) - OMEGA_DEG );
-
 		// the slat normal points along the profile angle to block the beam solar
 		VB_CriticalSlatAngle = 90.0 - OMEGA_DEG; // 
 
@@ -9267,7 +9261,6 @@ namespace WindowEquivalentLayer {
 		ProfAngVer = 0.0;
 		ConstrNum = Surface( SurfNum ).Construction;
 		EQLNum = Construct( Surface( SurfNum ).Construction ).EQLConsPtr;
-		
 		if ( BeamDIffFlag != isDIFF ) {
 			if ( CosIncAng( TimeStep, HourOfDay, SurfNum ) <= 0.0 ) return;
 
@@ -9313,7 +9306,6 @@ namespace WindowEquivalentLayer {
 				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = CFSAbs( 2, {1,CFSMAXNL} );
 			}
 		}
-
 		if ( CFS( EQLNum ).VBLayerPtr > 0 ) {
 			SurfaceWindow( SurfNum ).SlatAngThisTSDeg = CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).PHI_DEG;
 		}

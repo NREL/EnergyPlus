@@ -11,3 +11,9 @@ The only change is for field F1, which is A1.  Logic to apply:
 
 if key = 'DecayCurvesfromZoneComponentLoads', change to = 'DecayCurvesFromComponentLoadsSummary'
 
+# Object Change: `WindowMaterial:Blind:EquivalentLayer`
+
+The only change is for field F6 value. Th number of fields remains the same:
+
+if SlatAngle < 90, New SlatAngle = SlatAngle
+if SlatAngle >= 90, New SlatAngle =  90.0 - SlatAngle
