@@ -683,6 +683,15 @@ namespace OutputReportPredefined {
 	int pdstLeedEneUsePerc;
 	int pdchLeedEupPerc;
 
+	int pdstLeedEqFlLdHrs;
+	int pdchLeedEflhEflh;
+	int pdchLeedEflhNonZerHrs;
+
+	int pdstLeedSchedSetPts;
+	int pdChLeedSchStPtFirstObjUsed;
+	int pdchLeedSchStPt11amMonday;
+	int pdchLeedSchStPt11pmMonday;
+
 	// Internal data structures to store information provided by calls
 
 	int const sizeIncrement( 100 );
@@ -2075,6 +2084,15 @@ namespace OutputReportPredefined {
 		//    Receptacle Equipment
 		//    Miscellaneous
 		pdchLeedEupPerc = newPreDefColumn( pdstLeedEneUsePerc, "Percent [%]" );
+
+		pdstLeedEqFlLdHrs = newPreDefSubTable( pdrLeed, "Schedules-Equivalent Full Load Hours (Schedule Type=Fraction)" );
+		pdchLeedEflhEflh = newPreDefColumn( pdstLeedEqFlLdHrs, "Equivalent Full Load Hours of Operation Per Year [hr]" );
+		pdchLeedEflhNonZerHrs = newPreDefColumn( pdstLeedEqFlLdHrs, "Hours Greater than Zero Per Year [hr]" );
+
+		pdstLeedSchedSetPts = newPreDefSubTable( pdrLeed, "Schedules-SetPoints (Schedule Type=Temperature)" );
+		pdChLeedSchStPtFirstObjUsed = newPreDefColumn( pdstLeedSchedSetPts, "First Object Used" );
+		pdchLeedSchStPt11amMonday = newPreDefColumn( pdstLeedSchedSetPts, "11am Monday [C]" );
+		pdchLeedSchStPt11pmMonday = newPreDefColumn( pdstLeedSchedSetPts, "11pm Monday [C]" );
 
 	}
 

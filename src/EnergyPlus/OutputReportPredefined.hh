@@ -674,6 +674,15 @@ namespace OutputReportPredefined {
 	extern int pdstLeedEneUsePerc;
 	extern int pdchLeedEupPerc;
 
+	extern int pdstLeedEqFlLdHrs;
+	extern int pdchLeedEflhEflh;
+	extern int pdchLeedEflhNonZerHrs;
+
+	extern int pdstLeedSchedSetPts;
+	extern int pdChLeedSchStPtFirstObjUsed;
+	extern int pdchLeedSchStPt11amMonday;
+	extern int pdchLeedSchStPt11pmMonday;
+
 	// Internal data structures to store information provided by calls
 
 	extern int const sizeIncrement;
