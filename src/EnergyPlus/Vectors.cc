@@ -815,10 +815,9 @@ namespace Vectors {
 
 	}
 
-	void
+	Real64
 	CalcPolyhedronVolume(
-		Polyhedron const & Poly,
-		Real64 & Volume
+		Polyhedron const & Poly
 	)
 	{
 
@@ -860,14 +859,14 @@ namespace Vectors {
 		static Vector p0( 0.0, 0.0, 0.0 );
 		Vector p3FaceOrigin;
 
-		Volume = 0.0;
+		Real64 Volume = 0.0;
 
 		for ( int NFace = 1; NFace <= Poly.NumSurfaceFaces; ++NFace ) {
 			p3FaceOrigin = Poly.SurfaceFace( NFace ).FacePoints( 2 );
 			PyramidVolume = dot( Poly.SurfaceFace( NFace ).NewellAreaVector, ( p3FaceOrigin - p0 ) );
 			Volume += PyramidVolume / 3.0;
 		}
-
+		return Volume;
 	}
 
 } // Vectors
