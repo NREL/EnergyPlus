@@ -210,11 +210,9 @@ We will add an EMS actuator for the surrounding surface temperature to enable ov
 	       \object-list ScheduleNames
 	       \note Schedule values are real numbers, -100.0 to 100.0, units C
 	       \note optional
-	   A2, \field Surrounding Surface 1 Name
-	       
+	   A2, \field Surrounding Surface 1 Name   
 	       \required-field
 	       \type alpha 
-	
 	   N5, \field Surrounding Surface 1 View Factor
 	       \required-field
 	       \minimum 0.0
@@ -225,8 +223,7 @@ We will add an EMS actuator for the surrounding surface temperature to enable ov
 	       \type object-list
 	       \object-list ScheduleNames
 	       \note Schedule values are real numbers, -100.0 to 100.0, units C
-	
-	… 
+		… 
 
 ### (3)	Local Outdoor Air Node for co-simulation with urban micro-climate
 
@@ -306,7 +303,7 @@ The EnergyPlus airflow network consists of a set of nodes linked by airflow comp
 	      \note otherwise this field may be left blank.
 	…
 
-During initialization, the global outdoor wind pressure is either explicitly defined by External Nodes or calculated with a simplified model. To use the local environmental condition in the airflow network simulation at the surface and zone levels for co-simulation with urban micro-climate, the object **AirflowNetwork:MultiZone:ExternalNode** should be defined correspondingly with the local **OutdoorAir:Node** object.
+During initialization, the global outdoor wind pressure is either explicitly defined by External Nodes or calculated with a simplified model. To use the local environmental condition in the airflow network simulation at the surface and zone levels for co-simulation with urban micro-climate, the External Node referrenced by the AirflowNetwork:MultiZone:Surface object points to an **AirflowNetwork:MultiZone:ExternalNode** object or a local **OutdoorAir:Node** object.
 
 Moreover, EMS actuators have already been set for the listed five variables in the current implementation:
 
