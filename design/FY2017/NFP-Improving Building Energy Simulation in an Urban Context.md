@@ -160,19 +160,19 @@ where,
 
 σ=Stefan-Boltzmann constant,
 
-T<sup>surf</sup>=Outside surface temperature of the exterior surface,
+$$T_{surf}$$=Outside surface temperature of the exterior surface,
 
-T<sup>sky</sup>=Sky temperature,
+$$T_{sky}$$=Sky temperature,
 
-F<sup>sky</sup>=View factor of surrounding surface i to the exterior surface.
+$$F_{sky}$$=View factor of surrounding surface i to the exterior surface.
 
-T<sup>si</sup>=View factor of the sky,
+$$T_{si}$$=View factor of the sky,
 
-F<sup>si</sup>=View factor of surrounding surface i to the exterior surface.
+$$F_{si}$$=View factor of surrounding surface i to the exterior surface.
 
-T<sup>g</sup>=Ground temperature,
+$$T_{g}$$=Ground temperature,
 
-F<sup>g</sup>=View factor of the ground,
+$$F_{g}$$=View factor of the ground,
 
 Note that $$F_{sky}+ F_{s1}+⋯+ F_{sn}+ F_{g}=1$$
 
@@ -229,7 +229,7 @@ We will add an EMS actuator for the surrounding surface temperature to enable ov
 
 We propose to modify the current outdoor air node object **OutdoorAir:Node** to EnergyPlus IDD to enable the optional schedule inputs of local ambient air conditions, including dry-bulb temperature, wet-bulb temperature, wind velocity, and wind direction. We also propose to make the schedule variables as new EMS actuators that can be set up for overriding the environmental variables. 
 
-        New IDD object proposed:
+New IDD object proposed:
 
 	OutdoorAir:Node,
 	    \min-fields 2
