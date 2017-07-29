@@ -160,19 +160,19 @@ where,
 
 σ=Stefan-Boltzmann constant,
 
-$$T_{surf}$$=Outside surface temperature of the exterior surface,
+T<sub>surf</sub>=Outside surface temperature of the exterior surface,
 
-$$T_{sky}$$=Sky temperature,
+T<sub>sky</sub>=Sky temperature,
 
-$$F_{sky}$$=View factor of surrounding surface i to the exterior surface.
+F<sub>sky</sub>=View factor of surrounding surface i to the exterior surface.
 
-$$T_{si}$$=View factor of the sky,
+T<sub>si</sub>=View factor of the sky,
 
-$$F_{si}$$=View factor of surrounding surface i to the exterior surface.
+F<sub>si</sub>=View factor of surrounding surface i to the exterior surface.
 
-$$T_{g}$$=Ground temperature,
+T<sub>g</sub>=Ground temperature,
 
-$$F_{g}$$=View factor of the ground,
+F<sub>g</sub>=View factor of the ground,
 
 Note that $$F_{sky}+ F_{s1}+⋯+ F_{sn}+ F_{g}=1$$
 
@@ -286,7 +286,7 @@ The zone infiltration and ventilation are currently calculated within the subrou
 
 The EnergyPlus airflow network consists of a set of nodes linked by airflow components. The node variable is pressure and the linkage variable is airflow rate. The nodes consist of zone node, surface node, equipment component node, and external nodes. In the airflow network calculation, currently, EnergyPlus uses external node data to represent outdoor air conditions, and each surface node links to a specific external node:
 
-	AirflowNetwork:MultiZone:Surface,
+	  AirflowNetwork:MultiZone:Surface,
 	      \min-fields 4
 	      \memo This object specifies the properties of a surface linkage through which air flows.
 	      \memo Airflow Report: Node 1 as an inside face zone;
@@ -301,7 +301,7 @@ The EnergyPlus airflow network consists of a set of nodes linked by airflow comp
 	      \note Used if Wind Pressure Coefficient Type = Input in the AirflowNetwork: SimulationControl object,
 	      \note Or if an outdoor air node is defined for the surface.
 	      \note otherwise this field may be left blank.
-	…
+	  …
 
 During initialization, the global outdoor wind pressure is either explicitly defined by External Nodes or calculated with a simplified model. To use the local environmental condition in the airflow network simulation at the surface and zone levels for co-simulation with urban micro-climate, the External Node referrenced by the AirflowNetwork:MultiZone:Surface object points to an **AirflowNetwork:MultiZone:ExternalNode** object or a local **OutdoorAir:Node** object.
 
