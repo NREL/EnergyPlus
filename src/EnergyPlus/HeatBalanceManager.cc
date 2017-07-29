@@ -1372,6 +1372,9 @@ namespace HeatBalanceManager {
 		using General::RoundSigDigits;
 		using General::ScanForReports;
 		using General::TrimSigDigits;
+		using WindowEquivalentLayer::lscNONE;
+		using WindowEquivalentLayer::lscVBPROF;
+		using WindowEquivalentLayer::lscVBNOBM;
 		using CurveManager::PerfCurve;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveObjectTypeNum;
@@ -3324,11 +3327,11 @@ namespace HeatBalanceManager {
 			//  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 				if ( SameString( MaterialNames( 3 ), "FixedSlatAngle" ) ) {
-					Material( MaterNum ).SlatAngleType = 0;
+					Material( MaterNum ).SlatAngleType = lscNONE;
 				} else if ( SameString( MaterialNames( 3 ), "MaximizeSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 1;
+					Material( MaterNum ).SlatAngleType = lscVBPROF;
 				} else if ( SameString( MaterialNames( 3 ), "BlockBeamSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 2;
+					Material( MaterNum ).SlatAngleType = lscVBNOBM;
 				} else {
 					Material( MaterNum ).SlatAngleType = 0;
 				}
