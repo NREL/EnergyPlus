@@ -74810,13 +74810,16 @@ SetpointManager:Scheduled:DualSetpoint,
        \type node
 
 SetpointManager:OutdoorAirReset,
-     \memo The Outdoor Air Reset Setpoint Manager sets the supply air
-     \memo temperature according to the outdoor air temperature using a reset rule.
+     \memo This Setpoint Manager is used to place a setpoint temperature on system node 
+     \memo according to the outdoor air temperature using a reset rule. The outdoor air
+     \memo temperature is obtained from the weather information during the simulation. 
   A1 , \field Name
        \required-field
   A2 , \field Control Variable
        \type choice
        \key Temperature
+       \key MaximumTemperature
+       \key MinimumTemperature
        \default Temperature
   N1 , \field Setpoint at Outdoor Low Temperature
        \units C
