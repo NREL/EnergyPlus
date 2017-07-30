@@ -7284,7 +7284,7 @@ namespace WaterThermalTanks {
 		using DataGlobals::KickOffSimulation;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::ShortenTimeStepSys;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataEnvironment::OutDryBulbTemp;
 
@@ -7506,7 +7506,7 @@ namespace WaterThermalTanks {
 							Par( 4 ) = 0.0;
 						}
 						Par( 5 ) = MdotWater;
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
+						SolveRoot( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
 						if ( SolFla == -1 ) {
 							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
@@ -7586,7 +7586,7 @@ namespace WaterThermalTanks {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = MdotWater;
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
 							if ( SolFla == -1 ) {
 								gio::write( IterNum, fmtLD ) << MaxIte;
 								strip( IterNum );
@@ -7705,7 +7705,7 @@ namespace WaterThermalTanks {
 		using DXCoils::SimDXCoil;
 		using DXCoils::CalcHPWHDXCoil;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using Psychrometrics::CPHW; // , PsyWFnTdbTwbPb
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -8198,7 +8198,7 @@ namespace WaterThermalTanks {
 				}
 
 				if ( zeroResidual > 0.0 ) { // then iteration
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualHPWH, 0.0, 1.0, Par );
+					SolveRoot( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualHPWH, 0.0, 1.0, Par );
 					if ( SolFla == -1 ) {
 						gio::write( IterNum, fmtLD ) << MaxIte;
 						strip( IterNum );
@@ -8323,7 +8323,7 @@ namespace WaterThermalTanks {
 							ParVS( 9 ) = 0.0;
 						}
 
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS );
+						SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS );
 
 						if ( SolFla == -1 ) {
 							gio::write( IterNum, fmtLD ) << MaxIte;

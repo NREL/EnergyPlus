@@ -871,7 +871,7 @@
 
   Output:Variable,*,Generator Fuel Cell Model Iteration Count,timestep;
 
-  Output:Variable,*,Generator Regula Falsi Iteration Count,timestep;
+  Output:Variable,*,Generator Root Solver Iteration Count,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 

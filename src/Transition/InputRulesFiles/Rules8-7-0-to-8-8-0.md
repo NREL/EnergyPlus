@@ -73,3 +73,11 @@ The only change is for field F18, which was N8.  Logic to apply:
 Fields 1-17 remain the same.  
 After F17, delete one field. This field was removed as redundant: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}. 
 Shift all later fields up by one (old N9 becomes N8).
+
+# Object Change: `WindowMaterial:Blind:EquivalentLayer`
+
+The only change is for field F6 value. Th number of fields remains the same:
+
+if SlatAngle < 90, New SlatAngle = SlatAngle
+if SlatAngle >= 90, New SlatAngle =  90.0 - SlatAngle
+

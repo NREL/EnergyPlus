@@ -323,6 +323,7 @@ ADD_SIMULATION_TEST(IDF_FILE MultiSpeedACFurnace.idf EPW_FILE USA_IL_Chicago-OHa
 ADD_SIMULATION_TEST(IDF_FILE MultiSpeedHP_StagedThermostat.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE MultiStory.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE MultispeedHeatPump.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE MultiSpeedHeatPump_MultiSolvers.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Mundt_System_Always_On.idf EPW_FILE USA_FL_Tampa.Intl.AP.722110_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Mundt_System_On_During_the_Day.idf EPW_FILE USA_FL_Tampa.Intl.AP.722110_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE OptimalStart_RefBldgLargeOfficeNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

@@ -800,6 +800,22 @@ ConvergenceLimits,
        \default 8
        \minimum 2
 
+HVACSystemRootFindingAlgorithm,
+       \memo Specifies a HVAC system solver algorithm to find a root
+       \unique-object
+  A1 , \field Algorithm
+       \type choice
+       \key RegulaFalsi
+       \key Bisection
+       \key BisectionThenRegulaFalsi
+       \key RegulaFalsiThenBisection
+       \default RegulaFalsi
+  N1 ; \field Number of Iterations Before Algorithm Switch
+       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is 
+       \note entered. When iteration number is greater than the value, algorithm switches.
+       \type integer
+       \default 5
+
 \group Compliance Objects
 
 Compliance:Building,
@@ -6252,9 +6268,12 @@ WindowMaterial:Blind:EquivalentLayer,
   N4 , \field Slat Angle
        \type real
        \units deg
-       \minimum 0
-       \maximum 180
+       \minimum -90
+       \maximum 90
        \default 45
+       \note Slat angle is +ve if the tip of the slat front face is tilted upward, else  
+       \note the slat angle is -ve if the tip of the slat front face is tilted downward. 
+       \note The slat angle varies between -90 to +90. The default value is 45 degrees.
   N5 , \field Front Side Slat Beam-Diffuse Solar Transmittance
        \note The front side beam-diffuse solar transmittance of the slat at normal
        \note incidence averaged over the entire spectrum of solar radiation.
@@ -74805,13 +74824,16 @@ SetpointManager:Scheduled:DualSetpoint,
        \type node
 
 SetpointManager:OutdoorAirReset,
-     \memo The Outdoor Air Reset Setpoint Manager sets the supply air
-     \memo temperature according to the outdoor air temperature using a reset rule.
+     \memo This Setpoint Manager is used to place a setpoint temperature on system node 
+     \memo according to the outdoor air temperature using a reset rule. The outdoor air
+     \memo temperature is obtained from the weather information during the simulation. 
   A1 , \field Name
        \required-field
   A2 , \field Control Variable
        \type choice
        \key Temperature
+       \key MaximumTemperature
+       \key MinimumTemperature
        \default Temperature
   N1 , \field Setpoint at Outdoor Low Temperature
        \units C

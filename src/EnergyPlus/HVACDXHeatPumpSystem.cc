@@ -608,7 +608,7 @@ namespace HVACDXHeatPumpSystem {
 		using DXCoils::SimDXCoil;
 		using DXCoils::DXCoilOutletTemp;
 		using FaultsManager::FaultsCoilSATSensor;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
@@ -741,7 +741,7 @@ namespace HVACDXHeatPumpSystem {
 							Par( 2 ) = DesOutTemp;
 							Par( 3 ) = 1.0; //OnOffAirFlowFrac assume = 1.0 for continuous fan dx system
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXHeatPumpSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
@@ -856,7 +856,7 @@ namespace HVACDXHeatPumpSystem {
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
 								Par( 3 ) = double( SpeedNum );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
 
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
@@ -888,7 +888,7 @@ namespace HVACDXHeatPumpSystem {
 								Par( 1 ) = double( VSCoilIndex );
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXHeatPumpSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
