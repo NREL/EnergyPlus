@@ -1041,6 +1041,12 @@ namespace DXCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	Real64
+	GetMinOATCompressorUsingIndex(
+		int const CoilIndex, // index to coil
+		bool & ErrorsFound // set to true if problem
+	);
+
 	int
 	GetCoilInletNode(
 		std::string const & CoilType, // must match coil types in this module

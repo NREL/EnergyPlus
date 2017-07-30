@@ -1917,6 +1917,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name",
 		"  WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"  WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name",
+		"   ,                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 		"  0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 		"  4,                       !- Maximum Cycling Rate {cycles/hr}",
@@ -2248,6 +2249,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 		"  WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name",
 		"  WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"  WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name",
+		"   ,                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 		"  0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 		"  4,                       !- Maximum Cycling Rate {cycles/hr}",
@@ -2622,6 +2624,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  , !- Evaporative Condenser Pump Rated Power Consumption{ W }",
 		"  200.0, !- Crankcase Heater Capacity{ W }",
 		"  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+		"  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  , !- Supply Water Storage Tank Name",
 		"  , !- Condensate Collection Water Storage Tank Name",
 		"  , !- Basin Heater Capacity{ W / K }",
@@ -3048,6 +3051,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  Biquadratic,             !- Energy Input Ratio Function of Temperature Curve Name",
 		"  Quadratic,               !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"  Quadratic,               !- Part Load Fraction Correlation Curve Name",
+		"  ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 		"  0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 		"  4,                       !- Maximum Cycling Rate {cycles/hr}",
@@ -3336,6 +3340,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil Outlet,      !- Air Outlet Node Name",
 		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name",
 		"  AirCooled,                                               !- Condenser Type",
+		"  ,                                                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  ,                                                        !- Supply Water Storage Tank Name",
 		"  ,                                                        !- Condensate Collection Water Storage Tank Name",
 		"  No,                                                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -3742,6 +3747,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
         "  Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "  ,                        !- Condenser Air Inlet Node Name",
         "  AirCooled,               !- Condenser Type",
+        "  ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -4843,6 +4849,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
 		"  Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name",
 		"  AirCooled, !- Condenser Type",
+		"  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  , !- Supply Water Storage Tank Name",
 		"  , !- Condensate Collection Water Storage Tank Name",
 		"  No, !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -5377,6 +5384,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"  Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
 		"  ,                        !- Condenser Air Inlet Node Name",
 		"  AirCooled,               !- Condenser Type",
+		"  ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  ,                        !- Supply Water Storage Tank Name",
 		"  ,                        !- Condensate Collection Water Storage Tank Name",
 		"  No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -6105,6 +6113,13 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 	GetUnitarySystemInput( ); // get UnitarySystem input from object above
 	ASSERT_FALSE( DXCoil( 1 ).MSHPHeatRecActive ); // electricity
 	ASSERT_TRUE( DXCoil( 2 ).MSHPHeatRecActive ); // natural gas
+	// Minimum Outdoor Temperature for Compressor Operation blank field defaults to -25.0 C
+	EXPECT_EQ( DXCoil( 1 ).MinOATCompressor, -25.0 );
+	// Minimum Outdoor Temperature for Compressor read from input field as -8.0 C
+	EXPECT_EQ( DXCoil( 2 ).MinOATCompressor,  -8.0 );
+	// Unitary System mines data from coil objects
+	EXPECT_EQ( DXCoil( 1 ).MinOATCompressor, UnitarySystem( 1 ).MinOATCompressorCooling );
+	EXPECT_EQ( DXCoil( 2 ).MinOATCompressor, UnitarySystem( 1 ).MinOATCompressorHeating );
 
 }
 TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
@@ -6483,6 +6498,11 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 1.0 ); // Watts
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow * UnitarySystem( 1 ).PartLoadFrac  );
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
+
+	// water to air HP coils do not have a Minimum OAT for Compressor Operation input field
+	// Unitary System mines data from coil objects
+	EXPECT_EQ( UnitarySystem( 1 ).MinOATCompressorCooling, -1000.0 );
+	EXPECT_EQ( UnitarySystem( 1 ).MinOATCompressorHeating, -1000.0 );
 
 }
 
