@@ -366,6 +366,61 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(15:CurArgs+1)=InArgs(14:CurArgs)  !
                  CurArgs = CurArgs + 1
 
+             CASE('UNITARYSYSTEMPERFORMANCE:MULTISPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:4)=InArgs(1:4)  ! No change
+                 OutArgs(5)=''           ! Add 1 New Input Field, blank
+                 OutArgs(6:CurArgs+1)=InArgs(5:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:SINGLESPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:14)=InArgs(1:14)  ! No change
+                 OutArgs(15)=''           ! Add 1 New Input Field, blank
+                 OutArgs(16:CurArgs+1)=InArgs(15:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:TWOSPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:22)=InArgs(1:22)  ! No change
+                 OutArgs(23)=''           ! Add 1 New Input Field, blank
+                 OutArgs(24:CurArgs+1)=InArgs(23:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:MULTISPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:6)=InArgs(1:6)  ! No change
+                 OutArgs(7)=''           ! Add 1 New Input Field, blank
+                 OutArgs(8:CurArgs+1)=InArgs(7:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:VARIABLESPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:15)=InArgs(1:15)  ! No change
+                 OutArgs(16)=''           ! Add 1 New Input Field, blank
+                 OutArgs(17:CurArgs+1)=InArgs(16:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:18)=InArgs(1:18)  ! No change
+                 OutArgs(19)=''           ! Add 1 New Input Field, blank
+                 OutArgs(20:CurArgs+1)=InArgs(19:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('ZONEHVAC:PACKAGEDTERMINALHEATPUMP')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:17)=InArgs(1:17)  ! No change
+                 OutArgs(18:CurArgs-1)=InArgs(19:CurArgs)  ! remove redundant field, shifting all fields up
+                 CurArgs = CurArgs - 1
+
              CASE('ZONEHVAC:IDEALLOADSAIRSYSTEM')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
@@ -373,6 +428,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(5) = ''
                  OutArgs(6:CurArgs+1)=InArgs(5:CurArgs)
                  CurArgs = CurArgs + 1
+
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

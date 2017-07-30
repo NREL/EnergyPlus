@@ -301,7 +301,8 @@ namespace HVACUnitarySystem {
 		int HeatingSAFMethod; // Supply air flow method for heating
 		int NoCoolHeatSAFMethod; // Supply air flow method for no cooling or heating
 		// Heat pump related specific data
-		Real64 MinOATCompressor; // Minimum outdoor temperature below which compressor if off
+		Real64 MinOATCompressorHeating; // Minimum outdoor temperature below which compressor if off
+		Real64 MinOATCompressorCooling; // Minimum outdoor temperature below which compressor if off
 		Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of unitary system [cycles/hr]
 		Real64 HPTimeConstant; // Heat pump time constant [s]
 		Real64 OnCyclePowerFraction; // Fraction of on-cycle power use [~]
@@ -592,7 +593,8 @@ namespace HVACUnitarySystem {
 			CoolingSAFMethod( 0 ),
 			HeatingSAFMethod( 0 ),
 			NoCoolHeatSAFMethod( 0 ),
-			MinOATCompressor( 0.0 ),
+			MinOATCompressorHeating( 0.0 ),
+			MinOATCompressorCooling(0.0),
 			MaxONOFFCyclesperHour( 0.0 ),
 			HPTimeConstant( 0.0 ),
 			OnCyclePowerFraction( 0.0 ),
