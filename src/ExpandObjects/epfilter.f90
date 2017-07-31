@@ -10562,6 +10562,7 @@ DO iSys = 1, numCompactSysVAV
   END IF
   CALL AddToObjFld('Control Type', base + vsNightCycleControlOff,'')
   CALL AddToObjStr('Thermostat Tolerance {deltaC}','0.2')
+  CALL AddToObjStr('Cycling Run Time Control Type', 'FixedRunTime')
   CALL AddToObjStr('Cycling run time {s}','3600')
   CALL AddToObjFld('Control Zone Name', base + vsNightCycleCtrlZoneNameOff,'',.TRUE.)
   CALL AddAlwaysSchedule('1')
@@ -11921,6 +11922,7 @@ DO iSys = 1, numCompactSysPVAV
   END IF
   CALL AddToObjFld('Control Type', base + pvavsNightCycleControlOff,'')
   CALL AddToObjStr('Thermostat Tolerance {deltaC}','0.2')
+  CALL AddToObjStr('Cycling Run Time Control Type', 'FixedRunTime')
   CALL AddToObjStr('Cycling run time {s}','3600')
   CALL AddToObjFld('Control Zone Name', base + pvavsNightCycleCtrlZoneNameOff,'',.TRUE.)
   CALL AddAlwaysSchedule('1')
@@ -13796,6 +13798,7 @@ DO iSys = 1, numCompactSysUnit
   END IF
   CALL AddToObjFld('Control Type', base + usNightCycleControlOff,'')
   CALL AddToObjStr('Thermostat Tolerance {deltaC}','0.2')
+  CALL AddToObjStr('Cycling Run Time Control Type', 'FixedRunTime')
   CALL AddToObjStr('Cycling run time {s}','3600')
   CALL AddToObjFld('Control Zone Name', base + usNightCycleCtrlZoneNameOff,'',.TRUE.)
   CALL AddAlwaysSchedule('1')
@@ -14828,6 +14831,7 @@ DO iSys = 1, numCompactSysUnitHP
   END IF
   CALL AddToObjFld('Control Type', base + uhpsNightCycleControlOff,'')
   CALL AddToObjStr('Thermostat Tolerance {deltaC}','0.2')
+  CALL AddToObjStr('Cycling Run Time Control Type', 'FixedRunTime')
   CALL AddToObjStr('Cycling run time {s}','3600')
   CALL AddToObjFld('Control Zone Name', base + uhpsNightCycleCtrlZoneNameOff,'',.TRUE.)
   CALL AddAlwaysSchedule('1')
@@ -19314,6 +19318,7 @@ DO iSys = 1, numCompactSysConstVol
   END IF
   CALL AddToObjFld('Control Type', base + cvsNightCycleControlOff,'')
   CALL AddToObjStr('Thermostat Tolerance {deltaC}','0.2')
+  CALL AddToObjStr('Cycling Run Time Control Type', 'FixedRunTime')
   CALL AddToObjStr('Cycling run time {s}','3600')
   CALL AddToObjFld('Control Zone Name', base + cvsNightCycleCtrlZoneNameOff,'',.TRUE.)
   CALL AddAlwaysSchedule('1')
@@ -21416,6 +21421,7 @@ DO iSys = 1, numCompactSysDualDuct
   END IF
   CALL AddToObjFld('Control Type', base + ddsNightCycleControlOff,'')
   CALL AddToObjStr('Thermostat Tolerance {deltaC}','0.2')
+  CALL AddToObjStr('Cycling Run Time Control Type', 'FixedRunTime')
   CALL AddToObjStr('Cycling run time {s}','3600')
   CALL AddToObjFld('Control Zone Name', base + ddsNightCycleCtrlZoneNameOff,'',.TRUE.)
   CALL AddAlwaysSchedule('1')

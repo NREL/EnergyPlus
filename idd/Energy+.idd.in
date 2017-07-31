@@ -74486,22 +74486,28 @@ AvailabilityManager:NightCycle,
   N1 , \field Thermostat Tolerance
        \default 1.0
        \units deltaC
+  A5 , \field Cycling Run Time Control Type
+       \type choice
+       \key FixedRunTime
+       \key Thermostat
+       \key ThermostatWithMinimumRunTime
+       \default FixedRunTime
   N2 , \field Cycling Run Time
        \default 3600.
        \units s
-  A5 , \field Control Zone or Zone List Name
+  A6 , \field Control Zone or Zone List Name
        \type object-list
        \object-list ZoneAndZoneListNames
        \note When AvailabilityManager:NightCycle is used in the zone component availability
        \note manager assignment list, the Control Zone Name should be the name of the zone in which the
        \note zone component is.
-  A6 , \field Cooling Control Zone or Zone List Name
+  A7 , \field Cooling Control Zone or Zone List Name
        \type object-list
        \object-list ZoneAndZoneListNames
-  A7 , \field Heating Control Zone or Zone List Name
+  A8 , \field Heating Control Zone or Zone List Name
        \type object-list
        \object-list ZoneAndZoneListNames
-  A8 ; \field Heating Zone Fans Only Zone or Zone List Name
+  A9 ; \field Heating Zone Fans Only Zone or Zone List Name
        \type object-list
        \object-list ZoneAndZoneListNames
 
