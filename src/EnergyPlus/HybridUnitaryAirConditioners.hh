@@ -76,11 +76,11 @@ namespace EnergyPlus {
 
 		//using HybridEvapCoolingModel::ZoneHybridUnitaryACSystem;
 		using HybridEvapCoolingModel::Model;
+		using HybridEvapCoolingModel::CSetting;
 		//Array1D< Model > ZoneHybridUnitaryAirConditioner;
 		// Data
 		// MODULE PARAMETER DEFINITIONS
-
-		void
+			void
 			SimZoneHybridUnitaryAirConditioners(
 				std::string const & CompName, // name of the packaged terminal heat pump
 				int const ZoneNum, // number of zone being served
