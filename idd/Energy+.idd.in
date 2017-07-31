@@ -74511,7 +74511,6 @@ AvailabilityManager:NightCycle,
        \type object-list
        \object-list ZoneAndZoneListNames
 
-
 AvailabilityManager:DifferentialThermostat,
        \memo Overrides fan/pump schedules depending on temperature difference between two nodes.
   A1 , \field Name
