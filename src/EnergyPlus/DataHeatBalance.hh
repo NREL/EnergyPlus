@@ -788,6 +788,10 @@ namespace DataHeatBalance {
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
 		HysteresisPhaseChange::HysteresisPhaseChange * phaseChange = nullptr;
+		bool GlassSpectralAndAngle; // if SpectralAndAngle is an entered choice
+		int GlassSpecAngTransDataPtr; // Data set index of transmittance as a function of spectral and angle associated with a window glass material
+		int GlassSpecAngFRefleDataPtr; // Data set index of front reflectance as a function of spectral and angle associated with a window glass material 
+		int GlassSpecAngBRefleDataPtr; // Data set index of back reflectance as a function of spectral and angle associated with a window glass material 
 
 		// Default Constructor
 		MaterialProperties() :
@@ -943,7 +947,11 @@ namespace DataHeatBalance {
 			SlatCrown( 0.0 ),
 			SlatAngle( 0.0 ),
 			SlatAngleType( 0 ),
-			SlatOrientation( 0 )
+			SlatOrientation( 0 ),
+			GlassSpectralAndAngle( false ),
+			GlassSpecAngTransDataPtr( 0 ),
+			GlassSpecAngFRefleDataPtr( 0 ), 
+			GlassSpecAngBRefleDataPtr( 0 )
 		{}
 
 	};
@@ -1293,6 +1301,7 @@ namespace DataHeatBalance {
 		// Calculated after input
 		Real64 FloorArea; // Floor area used for this zone
 		Real64 CalcFloorArea; // Calculated floor area used for this zone
+		Real64 CeilingArea; // Ceiling area for the zone
 		bool HasFloor; // Has "Floor" surface
 		bool HasRoof; // Has "Roof" or "Ceiling" Surface
 		bool HasInterZoneWindow; // Interzone Window(s) present in this zone
@@ -1346,6 +1355,7 @@ namespace DataHeatBalance {
 		bool EnforcedReciprocity; // if zone required forced reciprocity --
 		//   less out of bounds temperature errors allowed
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
+		int ZoneMaxCO2SchedIndex; // Index for the schedule the schedule which determines maximum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
 		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
 		// Hybrid Modeling
@@ -1376,6 +1386,7 @@ namespace DataHeatBalance {
 			UserEnteredFloorArea( AutoCalculate ),
 			FloorArea( 0.0 ),
 			CalcFloorArea( 0.0 ),
+			CeilingArea( 0.0 ), 
 			HasFloor( false ),
 			HasRoof( false ),
 			HasInterZoneWindow( false ),
@@ -1424,6 +1435,7 @@ namespace DataHeatBalance {
 			TempOutOfBoundsReported( false ),
 			EnforcedReciprocity( false ),
 			ZoneMinCO2SchedIndex( 0 ),
+			ZoneMaxCO2SchedIndex( 0 ),
 			ZoneContamControllerSchedIndex( 0 ),
 			FlagCustomizedZoneCap( false ),
 			// Hybrid Modeling

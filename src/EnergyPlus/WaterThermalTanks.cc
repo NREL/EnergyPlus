@@ -5092,7 +5092,7 @@ namespace WaterThermalTanks {
 		static int DummyWaterIndex( 1 );
 		static Real64 TankChangeRateScale( 0.0 ); // local temporary for nominal tank change rate
 		static Real64 MaxSideVolFlow( 0.0 ); // local temporary for largest connection design flow
-		int VSCoilID( 0 );// id of varaible-speed HPWH coil
+		int VSCoilID( 0 );// id of variable-speed HPWH coil
 
 		// FLOW:
 
@@ -5628,7 +5628,7 @@ namespace WaterThermalTanks {
 			HPWHInletDBTemp = HPInletDryBulbTemp;
 			HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, HPInletHumRat, OutBaroPress );
 
-			// initialize flow rates at speed levels for varaible-speed HPWH
+			// initialize flow rates at speed levels for variable-speed HPWH
 			if ( ( HPWaterHeater( HPNum ).bIsIHP ) && ( 0 == HPWaterHeater( HPNum ).NumofSpeed ) )//use SCWH coil represents
 			{
 				SizeIHP( HPWaterHeater( HPNum ).DXCoilNum );//
@@ -7284,7 +7284,7 @@ namespace WaterThermalTanks {
 		using DataGlobals::KickOffSimulation;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::ShortenTimeStepSys;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataEnvironment::OutDryBulbTemp;
 
@@ -7506,7 +7506,7 @@ namespace WaterThermalTanks {
 							Par( 4 ) = 0.0;
 						}
 						Par( 5 ) = MdotWater;
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
+						SolveRoot( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
 						if ( SolFla == -1 ) {
 							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
@@ -7586,7 +7586,7 @@ namespace WaterThermalTanks {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = MdotWater;
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
 							if ( SolFla == -1 ) {
 								gio::write( IterNum, fmtLD ) << MaxIte;
 								strip( IterNum );
@@ -7705,7 +7705,7 @@ namespace WaterThermalTanks {
 		using DXCoils::SimDXCoil;
 		using DXCoils::CalcHPWHDXCoil;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using Psychrometrics::CPHW; // , PsyWFnTdbTwbPb
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -7753,7 +7753,7 @@ namespace WaterThermalTanks {
 		std::string IterNum; // Max number of iterations for warning message
 		int CompOp; // DX compressor operation; 1=on, 0=off
 		Real64 CondenserDeltaT; // HPWH condenser water temperature difference
-		//new varaibles for variable-speed HPWH
+		//new variables for variable-speed HPWH
 		int MaxSpeedNum( 0 ); // speed number of variable speed HPWH coil
 		int SpeedNum( 1 ); // selected speed number
 		Real64 RhoWater; //water density
@@ -8198,7 +8198,7 @@ namespace WaterThermalTanks {
 				}
 
 				if ( zeroResidual > 0.0 ) { // then iteration
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualHPWH, 0.0, 1.0, Par );
+					SolveRoot( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualHPWH, 0.0, 1.0, Par );
 					if ( SolFla == -1 ) {
 						gio::write( IterNum, fmtLD ) << MaxIte;
 						strip( IterNum );
@@ -8323,7 +8323,7 @@ namespace WaterThermalTanks {
 							ParVS( 9 ) = 0.0;
 						}
 
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS );
+						SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS );
 
 						if ( SolFla == -1 ) {
 							gio::write( IterNum, fmtLD ) << MaxIte;

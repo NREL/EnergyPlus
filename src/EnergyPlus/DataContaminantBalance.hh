@@ -189,6 +189,8 @@ namespace DataContaminantBalance {
 		Array1D_int ControlZoneNum; // Controlled zone number
 		std::string ZoneMinCO2SchedName; // Name of the schedule which determines minimum CO2 concentration
 		int ZoneMinCO2SchedIndex; // Index for this schedule
+		std::string ZoneMaxCO2SchedName; // Name of the schedule which determines maximum CO2 concentration
+		int ZoneMaxCO2SchedIndex; // Index for this schedule
 		int ZoneContamControllerSchedIndex; // Index for this schedule
 		std::string GCAvaiSchedule; // Availability Schedule name for generic contamiant
 		int GCAvaiSchedPtr; // Pointer to the correct generic contaminant availability schedule
@@ -206,6 +208,7 @@ namespace DataContaminantBalance {
 			EMSOverrideCO2SetPointValue( 0.0 ),
 			NumOfZones( 0 ),
 			ZoneMinCO2SchedIndex( 0 ),
+			ZoneMaxCO2SchedIndex( 0 ),
 			ZoneContamControllerSchedIndex( 0 ),
 			GCAvaiSchedPtr( 0 ),
 			GCSPSchedIndex( 0 ),
