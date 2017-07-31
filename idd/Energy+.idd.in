@@ -800,6 +800,22 @@ ConvergenceLimits,
        \default 8
        \minimum 2
 
+HVACSystemRootFindingAlgorithm,
+       \memo Specifies a HVAC system solver algorithm to find a root
+       \unique-object
+  A1 , \field Algorithm
+       \type choice
+       \key RegulaFalsi
+       \key Bisection
+       \key BisectionThenRegulaFalsi
+       \key RegulaFalsiThenBisection
+       \default RegulaFalsi
+  N1 ; \field Number of Iterations Before Algorithm Switch
+       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is 
+       \note entered. When iteration number is greater than the value, algorithm switches.
+       \type integer
+       \default 5
+
 \group Compliance Objects
 
 Compliance:Building,
@@ -4785,6 +4801,7 @@ WindowMaterial:Glazing,
        \key SpectralAverage
        \key Spectral
        \key BSDF
+       \key SpectralAndAngle
   A3 , \field Window Glass Spectral Data Set Name
        \note Used only when Optical Data Type = Spectral
        \type object-list
@@ -4864,13 +4881,25 @@ WindowMaterial:Glazing,
        \type real
        \minimum> 0.0
        \default 7.2e10
-  N14; \field Poisson's ratio
+  N14, \field Poisson's ratio
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
        \minimum>  0.0
        \maximum<  1.0
        \default 0.22
+  A5 , \field Window Glass Spectral and Incident Angle Transmittance Data Set Table Name
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
+  A6 , \field Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
+  A7 ; \field Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
+       \note Used only when Optical Data Type = SpectralAndAngle
+       \type object-list
+       \object-list BiVariateTables
 
 WindowMaterial:GlazingGroup:Thermochromic,
     \min-fields 3
@@ -6239,9 +6268,12 @@ WindowMaterial:Blind:EquivalentLayer,
   N4 , \field Slat Angle
        \type real
        \units deg
-       \minimum 0
-       \maximum 180
+       \minimum -90
+       \maximum 90
        \default 45
+       \note Slat angle is +ve if the tip of the slat front face is tilted upward, else  
+       \note the slat angle is -ve if the tip of the slat front face is tilted downward. 
+       \note The slat angle varies between -90 to +90. The default value is 45 degrees.
   N5 , \field Front Side Slat Beam-Diffuse Solar Transmittance
        \note The front side beam-diffuse solar transmittance of the slat at normal
        \note incidence averaged over the entire spectrum of solar radiation.
@@ -6995,6 +7027,80 @@ MaterialProperty:PhaseChange,
        \note for Temperature-enthalpy function corresponding to temperature 16
        \units J/kg
        \type real
+
+MaterialProperty:PhaseChangeHysteresis,
+    \memo Additional properties for temperature dependent thermal conductivity
+    \memo and enthalpy for Phase Change Materials (PCM) with separate melting and freezing curves.
+    \memo HeatBalanceAlgorithm = CondFD (ConductionFiniteDifference) solution algorithm only.
+    \memo Constructions with this should use the detailed CondFD process.
+    \memo Has no effect with other HeatBalanceAlgorithm solution algorithms.
+  A1,  \field Name
+       \required-field
+       \type object-list
+       \object-list MaterialName
+       \note Regular Material Name to which the additional properties will be added.
+       \note this the material name for the basic material properties.
+  N1 , \field Temperature Coefficient for Thermal Conductivity
+       \note The base temperature is 20C.
+       \note This is the thermal conductivity change per degree excursion from 20C.
+       \note This variable conductivity function is overridden by the VariableThermalConductivity object, if present.
+       \units W/m-K2
+       \type real
+       \default 0.0
+  N2 , \field Latent Heat during the Entire Phase Change Process
+       \note The total latent heat absorbed or rejected during the transition from solid to liquid, or back
+       \required-field
+       \units J/kg
+       \type real
+       \minimum> 0
+  N3 , \field Liquid State Specific Heat
+       \note The constant specific heat used for the fully melted (liquid) state
+       \required-field
+       \units J/kg-K
+       \type real
+       \minimum >0
+  N4 , \field High Temperature Difference of Melting Curve
+       \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
+       \required-field
+       \units deltaC
+       \type real
+       \minimum >0
+  N5 , \field Peak Melting Temperature
+       \note The temperature at which the melting curve peaks
+       \required-field
+       \units C
+       \type real
+       \minimum >0
+  N6 , \field Low Temperature Difference of Melting Curve
+       \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
+       \required-field
+       \units deltaC
+       \type real
+       \minimum >0
+  N7 , \field Solid State Specific Heat
+       \note The constant specific heat used for the fully frozen (crystallized) state
+       \required-field
+       \units J/kg-K
+       \type real
+       \minimum >0
+  N8 , \field High Temperature Difference of Freezing Curve
+       \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
+       \required-field
+       \units deltaC
+       \type real
+       \minimum >0
+  N9 , \field Peak Freezing Temperature
+       \note The temperature at which the freezing curve peaks
+       \required-field
+       \units C
+       \type real
+       \minimum >0
+ N10 ; \field Low Temperature Difference of Freezing Curve
+       \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
+       \required-field
+       \units deltaC
+       \type real
+       \minimum >0
 
 MaterialProperty:VariableThermalConductivity,
     \memo Additional properties for temperature dependent thermal conductivity
@@ -24595,8 +24701,6 @@ AirflowNetwork:Distribution:DuctViewFactors,
        \memo calculations.
   A1,  \field Linkage Name
        \required-field
-       \type object-list
-       \object-list AirflowNetworkComponentNames
   N1,  \field Duct Surface Exposure Fraction
        \type real
        \minimum 0.0
@@ -32981,6 +33085,15 @@ ZoneHVAC:IdealLoadsAirSystem,
        \note This field is optional, but is required if this
        \note this object is used with other forced air equipment.
        \type node
+  A5 , \field System Inlet Air Node Name
+       \note This field is only required when the Ideal Loads Air System is connected to an
+       \note AirloopHVAC:ZoneReturnPlenum, otherwise leave this field blank. When connected to a plenum
+       \note the return plenum Outlet Node Name (or Induced Air Outlet Node Name when connecting multiple
+       \note ideal loads air sytems) is entered here. The two ideal loads air system node name fields described above,
+       \note the Zone Supply Air Node Name and the Zone Exhaust Air Node Name must also be entered.
+       \note The Zone Supply Air Node Name must match a zone inlet air node name for the zone where this
+       \note Ideal Loads Air System is connected. The Zone Exhaust Air Node Name must match an inlet air
+       \note node name of an AirloopHVAC:ReturnAirPlenum object.
   N1 , \field Maximum Heating Supply Air Temperature
        \units C
        \minimum> 0
@@ -32999,7 +33112,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \units kgWater/kgDryAir
        \minimum> 0
        \default 0.0077
-  A5 , \field Heating Limit
+  A6 , \field Heating Limit
        \type choice
        \key NoLimit
        \key LimitFlowRate
@@ -33018,7 +33131,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \units W
        \minimum 0.0
        \autosizable
-  A6 , \field Cooling Limit
+  A7 , \field Cooling Limit
        \type choice
        \key NoLimit
        \key LimitFlowRate
@@ -33036,15 +33149,15 @@ ZoneHVAC:IdealLoadsAirSystem,
        \units W
        \minimum 0.0
        \autosizable
-  A7 , \field Heating Availability Schedule Name
+  A8 , \field Heating Availability Schedule Name
        \note If blank, heating is always available.
        \type object-list
        \object-list ScheduleNames
-  A8 , \field Cooling Availability Schedule Name
+  A9 , \field Cooling Availability Schedule Name
        \note If blank, cooling is always available.
        \type object-list
        \object-list ScheduleNames
-  A9 , \field Dehumidification Control Type
+  A10, \field Dehumidification Control Type
        \note ConstantSensibleHeatRatio means that the ideal loads system
        \note will be controlled to meet the sensible cooling load, and the
        \note latent cooling rate will be computed using a constant
@@ -33066,7 +33179,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \minimum> 0.0
        \maximum 1.0
        \default 0.7
-  A10, \field Humidification Control Type
+  A11, \field Humidification Control Type
        \note None means that there is no humidification.
        \note Humidistat means that there is a ZoneControl:Humidistat for this
        \note zone and the ideal loads system will attempt to satisfy the humidistat.
@@ -33077,7 +33190,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \key Humidistat
        \key ConstantSupplyHumidityRatio
        \default None
-  A11, \field Design Specification Outdoor Air Object Name
+  A12, \field Design Specification Outdoor Air Object Name
        \type object-list
        \object-list DesignSpecificationOutdoorAirNames
        \note When the name of a DesignSpecification:OutdoorAir object is entered, the minimum
@@ -33085,12 +33198,12 @@ ZoneHVAC:IdealLoadsAirSystem,
        \note flow rate will also be affected by the next two fields.
        \note If this field is blank, there will be no outdoor air and the remaining fields will
        \note be ignored.
-  A12, \field Outdoor Air Inlet Node Name
+  A13, \field Outdoor Air Inlet Node Name
        \type node
        \note This field is required if the system provides outdoor air
        \note Enter the name of an outdoor air node. This node name is also specified in
        \note an OutdoorAir:Node or OutdoorAir:NodeList object.
-  A13, \field Demand Controlled Ventilation Type
+  A14, \field Demand Controlled Ventilation Type
        \note This field controls how the minimum outdoor air flow rate is calculated.
        \note None means that design occupancy will be used to compute the minimum outdoor air flow rate
        \note OccupancySchedule means that current occupancy level will be used.
@@ -33102,7 +33215,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \key OccupancySchedule
        \key CO2Setpoint
        \default None
-  A14, \field Outdoor Air Economizer Type
+  A15, \field Outdoor Air Economizer Type
        \note DifferentialDryBulb and DifferentialEnthalpy will increase the outdoor air flow rate
        \note when there is a cooling load and the outdoor air temperature or enthalpy
        \note is below the zone exhaust air temperature or enthalpy.
@@ -33111,7 +33224,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \key DifferentialDryBulb
        \key DifferentialEnthalpy
        \default NoEconomizer
-  A15, \field Heat Recovery Type
+  A16, \field Heat Recovery Type
        \type choice
        \key None
        \key Sensible
@@ -33128,7 +33241,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \minimum 0.0
        \maximum 1.0
        \default 0.65
-  A16; \field Design Specification ZoneHVAC Sizing Object Name
+  A17; \field Design Specification ZoneHVAC Sizing Object Name
        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
        \type object-list
        \object-list DesignSpecificationZoneHVACSizingName
@@ -33547,7 +33660,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \memo supply fan, direct expansion (DX) cooling coil, DX heating coil (air-to-air heat
         \memo pump), supplemental heating coil (gas, electric, hot water, or steam), and
         \memo fixed-position outdoor air mixer.
-        \min-fields 27
+        \min-fields 26
    A1,  \field Name
         \required-field
         \type alpha
@@ -33666,13 +33779,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \default 0.001
         \units dimensionless
         \note Defines Heating convergence tolerance as a fraction of Heating load to be met.
-   N8 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
-        \type real
-        \minimum -20.0
-        \default -8.0
-        \units C
-        \note Needs to match the corresponding minimum outdoor temperature defined
-        \note in the DX Heating Coil object.
    A11, \field Cooling Coil Object Type
         \required-field
         \type choice
@@ -33688,7 +33794,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \object-list CoolingCoilsDXSingleSpeed
         \object-list CoolingCoilsDXVariableSpeed
         \note Needs to match in the DX Cooling Coil object.
-   N9 , \field Cooling Convergence Tolerance
+   N8 , \field Cooling Convergence Tolerance
         \type real
         \minimum> 0.0
         \default 0.001
@@ -33707,13 +33813,13 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \type object-list
         \object-list HeatingCoilName
         \note Needs to match in the supplemental heating coil object.
-   N10, \field Maximum Supply Air Temperature from Supplemental Heater
+   N9 , \field Maximum Supply Air Temperature from Supplemental Heater
         \required-field
         \type real
         \units C
         \autosizable
         \note Supply air temperature from the supplemental heater will not exceed this value.
-   N11, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+   N10, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
         \type real
         \maximum 21.0
         \default 21.0
@@ -43317,7 +43423,11 @@ Coil:Cooling:DX:SingleSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (cooling load/steady state capacity)
-   N6, \field Nominal Time for Condensate Removal to Begin
+  N6 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+       \type real
+       \default -25.0
+       \units C
+  N7 , \field Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -43328,7 +43438,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-   N7, \field Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+  N8 , \field Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -43338,7 +43448,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note the compressor first turns off) and the coil's steady state latent capacity
        \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-   N8, \field Maximum Cycling Rate
+  N9 , \field Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -43346,7 +43456,7 @@ Coil:Cooling:DX:SingleSpeed,
        \default 0.0
        \note The maximum on-off cycling Rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation model is disabled.
-   N9, \field Latent Capacity Time Constant
+  N10, \field Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -43363,32 +43473,32 @@ Coil:Cooling:DX:SingleSpeed,
        \key AirCooled
        \key EvaporativelyCooled
        \default AirCooled
-  N10, \field Evaporative Condenser Effectiveness
+  N11, \field Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N11, \field Evaporative Condenser Air Flow Rate
+  N12, \field Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N12, \field Evaporative Condenser Pump Rated Power Consumption
+  N13, \field Evaporative Condenser Pump Rated Power Consumption
        \type real
        \units W
        \minimum 0.0
        \default 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump
-  N13, \field Crankcase Heater Capacity
+  N14, \field Crankcase Heater Capacity
        \type real
        \minimum 0.0
        \default 0.0
        \units W
        \ip-units W
-  N14, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+  N15, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
        \type real
        \minimum 0.0
        \default 10.0
@@ -43399,7 +43509,7 @@ Coil:Cooling:DX:SingleSpeed,
   A13, \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  N15, \field Basin Heater Capacity
+  N16, \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -43409,7 +43519,7 @@ Coil:Cooling:DX:SingleSpeed,
        \note For this situation, the heater maintains the basin water temperature at the basin heater
        \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when the DX coil is off.
-  N16, \field Basin Heater Setpoint Temperature
+  N17, \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -43459,7 +43569,7 @@ Coil:Cooling:DX:TwoSpeed,
        \memo and condenser fan), two-speed (or variable-speed). Requires two sets of performance
        \memo data and will interpolate between speeds. Modeled as a single coil (multi-speed
        \memo compressor or multiple compressors with row split or intertwined coil).
-  \min-fields 19
+  \min-fields 20
   A1 , \field Name
        \required-field
        \type alpha
@@ -43619,37 +43729,41 @@ Coil:Cooling:DX:TwoSpeed,
        \key AirCooled
        \key EvaporativelyCooled
        \default AirCooled
-  N10, \field High Speed Evaporative Condenser Effectiveness
+  N10, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+       \type real
+       \default -25.0
+       \units C
+  N11, \field High Speed Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N11, \field High Speed Evaporative Condenser Air Flow Rate
+  N12, \field High Speed Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N12, \field High Speed Evaporative Condenser Pump Rated Power Consumption
+  N13, \field High Speed Evaporative Condenser Pump Rated Power Consumption
        \type real
        \units W
        \minimum 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump at high speed
-  N13, \field Low Speed Evaporative Condenser Effectiveness
+  N14, \field Low Speed Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N14, \field Low Speed Evaporative Condenser Air Flow Rate
+  N15, \field Low Speed Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N15, \field Low Speed Evaporative Condenser Pump Rated Power Consumption
+  N16, \field Low Speed Evaporative Condenser Pump Rated Power Consumption
        \type real
        \units W
        \minimum 0.0
@@ -43661,7 +43775,7 @@ Coil:Cooling:DX:TwoSpeed,
   A15, \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  N16, \field Basin Heater Capacity
+  N17, \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -43671,7 +43785,7 @@ Coil:Cooling:DX:TwoSpeed,
        \note For this situation, the heater maintains the basin water temperature at the basin heater
        \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when the DX coil is off.
-  N17, \field Basin Heater Setpoint Temperature
+  N18, \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -43731,7 +43845,7 @@ Coil:Cooling:DX:MultiSpeed,
        \memo fan operation. Requires two to four sets of performance data and will interpolate
        \memo between speeds. Modeled as a single coil (multi-speed compressor or multiple
        \memo compressors with row split or intertwined coil).
-  \min-fields 55
+  \min-fields 56
   A1 , \field Name
        \required-field
        \type alpha
@@ -43757,6 +43871,10 @@ Coil:Cooling:DX:MultiSpeed,
        \key AirCooled
        \key EvaporativelyCooled
        \default AirCooled
+  N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+       \type real
+       \default -25.0
+       \units C
   A7 , \field Supply Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
@@ -43773,18 +43891,18 @@ Coil:Cooling:DX:MultiSpeed,
        \key Yes
        \key No
        \default No
-  N1 , \field Crankcase Heater Capacity
+  N2 , \field Crankcase Heater Capacity
        \type real
        \minimum 0.0
        \default 0.0
        \units W
        \ip-units W
-  N2 , \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+  N3 , \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
        \type real
        \minimum 0.0
        \default 10.0
        \units C
-  N3,  \field Basin Heater Capacity
+  N4 , \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -43794,7 +43912,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note For this situation, the heater maintains the basin water temperature at the basin heater
        \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when the DX coil is off.
-  N4,  \field Basin Heater Setpoint Temperature
+  N5 , \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -43821,14 +43939,14 @@ Coil:Cooling:DX:MultiSpeed,
        \key FuelOil#2
        \key OtherFuel1
        \key OtherFuel2
-  N5 , \field Number of Speeds
+  N6 , \field Number of Speeds
        \required-field
        \type integer
        \minimum 2
        \maximum 4
        \note Enter the number of the following sets of data for coil capacity, SHR, COP,
        \note flow rate, and associated curves.
-  N6 , \field Speed 1 Gross Rated Total Cooling Capacity
+  N7 , \field Speed 1 Gross Rated Total Cooling Capacity
        \note Total cooling capacity not accounting for the effect of supply air fan heat
        \required-field
        \type real
@@ -43839,7 +43957,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Rating point: air entering the cooling coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the outdoor condenser coil at 35 C dry-bulb/23.9 C wet-bulb
        \note Speed 1 is defined as low speed
-  N7 , \field Speed 1 Gross Rated Sensible Heat Ratio
+  N8 , \field Speed 1 Gross Rated Sensible Heat Ratio
        \required-field
        \type real
        \minimum 0.5
@@ -43847,14 +43965,14 @@ Coil:Cooling:DX:MultiSpeed,
        \autosizable
        \note Gross Rated Sensible Heat Ratio (gross sensible capacity/gross total capacity)
        \note Sensible and total capacities do not include supply fan heat
-  N8 , \field Speed 1 Gross Rated Cooling COP
+  N9 , \field Speed 1 Gross Rated Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and outdoor fan,
        \note does not include supply fan heat or supply fan electrical energy input
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.0
-  N9 , \field Speed 1 Rated Air Flow Rate
+  N10, \field Speed 1 Rated Air Flow Rate
        \required-field
        \type real
        \units m3/s
@@ -43863,7 +43981,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity
-  N10, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N11, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -43914,7 +44032,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (cooling load/steady state capacity)
-  N11, \field Speed 1 Nominal Time for Condensate Removal to Begin
+  N12, \field Speed 1 Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -43925,7 +44043,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-  N12, \field Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+  N13, \field Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -43935,7 +44053,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note the compressor first turns off) and the Coil's steady state latent capacity
        \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-  N13, \field Speed 1 Maximum Cycling Rate
+  N14, \field Speed 1 Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -43944,7 +44062,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note The maximum on-off cycling rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation
        \note model is disabled.
-  N14, \field Speed 1 Latent Capacity Time Constant
+  N15, \field Speed 1 Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -43953,7 +44071,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Time constant for the cooling coil's latent capacity to reach steady state after
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
-  N15, \field Speed 1 Rated Waste Heat Fraction of Power Input
+  N16, \field Speed 1 Rated Waste Heat Fraction of Power Input
        \type real
        \units dimensionless
        \minimum> 0.0
@@ -43967,25 +44085,25 @@ Coil:Cooling:DX:MultiSpeed,
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-  N16, \field Speed 1 Evaporative Condenser Effectiveness
+  N17, \field Speed 1 Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N17, \field Speed 1 Evaporative Condenser Air Flow Rate
+  N18, \field Speed 1 Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N18, \field Speed 1 Rated Evaporative Condenser Pump Power Consumption
+  N19, \field Speed 1 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump at high speed
-  N19, \field Speed 2 Gross Rated Total Cooling Capacity
+  N20, \field Speed 2 Gross Rated Total Cooling Capacity
        \note Total cooling capacity not accounting for the effect of supply air fan heat
        \required-field
        \type real
@@ -43995,7 +44113,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Gross capacity excluding supply air fan heat
        \note Rating point: air entering the cooling coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the outdoor condenser coil at 35 C dry-bulb/23.9 C wet-bulb
-  N20, \field Speed 2 Gross Rated Sensible Heat Ratio
+  N21, \field Speed 2 Gross Rated Sensible Heat Ratio
        \required-field
        \type real
        \minimum 0.5
@@ -44003,14 +44121,14 @@ Coil:Cooling:DX:MultiSpeed,
        \autosizable
        \note Gross Rated Sensible Heat Ratio (gross sensible capacity/gross total capacity)
        \note Sensible and total capacities do not include supply fan heat
-  N21, \field Speed 2 Gross Rated Cooling COP
+  N22, \field Speed 2 Gross Rated Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and outdoor fan,
        \note does not include supply fan heat or supply fan electrical energy input
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.0
-  N22, \field Speed 2 Rated Air Flow Rate
+  N23, \field Speed 2 Rated Air Flow Rate
        \required-field
        \type real
        \units m3/s
@@ -44019,7 +44137,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 2.
-  N23, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N24, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44070,7 +44188,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (Cooling load/steady state capacity)
-  N24, \field Speed 2 Nominal Time for Condensate Removal to Begin
+  N25, \field Speed 2 Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -44081,7 +44199,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-  N25, \field Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
+  N26, \field Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -44091,7 +44209,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note the compressor first turns off) and the coil's steady state latent capacity
        \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-  N26, \field Speed 2 Maximum Cycling Rate
+  N27, \field Speed 2 Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -44100,7 +44218,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note The maximum on-off cycling rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation
        \note model is disabled.
-  N27, \field Speed 2 Latent Capacity Time Constant
+  N28, \field Speed 2 Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -44109,7 +44227,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Time constant for the cooling coil's latent capacity to reach steady state after
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
-  N28, \field Speed 2 Rated Waste Heat Fraction of Power Input
+  N29, \field Speed 2 Rated Waste Heat Fraction of Power Input
        \type real
        \units dimensionless
        \minimum> 0.0
@@ -44123,25 +44241,25 @@ Coil:Cooling:DX:MultiSpeed,
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-  N29, \field Speed 2 Evaporative Condenser Effectiveness
+  N30, \field Speed 2 Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N30, \field Speed 2 Evaporative Condenser Air Flow Rate
+  N31, \field Speed 2 Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N31, \field Speed 2 Rated Evaporative Condenser Pump Power Consumption
+  N32, \field Speed 2 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump at low speed
-  N32, \field Speed 3 Gross Rated Total Cooling Capacity
+  N33, \field Speed 3 Gross Rated Total Cooling Capacity
        \note Total cooling capacity not accounting for the effect of supply air fan heat
        \type real
        \units W
@@ -44150,21 +44268,21 @@ Coil:Cooling:DX:MultiSpeed,
        \note Gross capacity excluding supply air fan heat
        \note Rating point: air entering the cooling coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the outdoor condenser coil at 35 C dry-bulb/23.9 C wet-bulb
-  N33, \field Speed 3 Gross Rated Sensible Heat Ratio
+  N34, \field Speed 3 Gross Rated Sensible Heat Ratio
        \type real
        \minimum 0.5
        \maximum 1.0
        \autosizable
        \note Gross Rated Sensible Heat Ratio (gross sensible capacity/gross total capacity)
        \note Sensible and total capacities do not include supply fan heat
-  N34, \field Speed 3 Gross Rated Cooling COP
+  N35, \field Speed 3 Gross Rated Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and outdoor fan,
        \note does not include supply fan heat or supply fan electrical energy input
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.0
-  N35, \field Speed 3 Rated Air Flow Rate
+  N36, \field Speed 3 Rated Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -44172,7 +44290,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 3.
-  N36, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N37, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44218,7 +44336,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (Cooling load/steady state capacity)
-  N37, \field Speed 3 Nominal Time for Condensate Removal to Begin
+  N38, \field Speed 3 Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -44229,7 +44347,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-  N38, \field Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
+  N39, \field Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -44239,7 +44357,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note the compressor first turns off) and the coil's steady state latent capacity
        \note at rated air flow and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-  N39, \field Speed 3 Maximum Cycling Rate
+  N40, \field Speed 3 Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -44248,7 +44366,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note The maximum on-off cycling rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation
        \note model is disabled.
-  N40, \field Speed 3 Latent Capacity Time Constant
+  N41, \field Speed 3 Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -44257,7 +44375,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Time constant for the cooling coil's latent capacity to reach steady state after
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
-  N41, \field Speed 3 Rated Waste Heat Fraction of Power Input
+  N42, \field Speed 3 Rated Waste Heat Fraction of Power Input
        \type real
        \units dimensionless
        \minimum> 0.0
@@ -44271,25 +44389,25 @@ Coil:Cooling:DX:MultiSpeed,
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-  N42, \field Speed 3 Evaporative Condenser Effectiveness
+  N43, \field Speed 3 Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N43, \field Speed 3 Evaporative Condenser Air Flow Rate
+  N44, \field Speed 3 Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N44, \field Speed 3 Rated Evaporative Condenser Pump Power Consumption
+  N45, \field Speed 3 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
        \autosizable
        \note Rated power consumed by the evaporative condenser's water pump at Low speed
-  N45, \field Speed 4 Gross Rated Total Cooling Capacity
+  N46, \field Speed 4 Gross Rated Total Cooling Capacity
        \note Total cooling capacity not accounting for the effect of supply air fan heat
        \type real
        \units W
@@ -44298,21 +44416,21 @@ Coil:Cooling:DX:MultiSpeed,
        \note Gross capacity excluding supply air fan heat
        \note Rating point: air entering the cooling coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the outdoor condenser coil at 35 C dry-bulb/23.9 C wet-bulb
-  N46, \field Speed 4 Gross Rated Sensible Heat Ratio
+  N47, \field Speed 4 Gross Rated Sensible Heat Ratio
        \type real
        \minimum 0.5
        \maximum 1.0
        \autosizable
        \note Gross Rated Sensible Heat Ratio (gross sensible capacity/gross total capacity)
        \note Sensible and total capacities do not include supply fan heat
-  N47, \field Speed 4 Gross Rated Cooling COP
+  N48, \field Speed 4 Gross Rated Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and outdoor fan,
        \note does not include supply fan heat or supply fan electrical energy input
        \type real
        \units W/W
        \minimum> 0.0
        \default 3.0
-  N48, \field Speed 4 Rated Air Flow Rate
+  N49, \field Speed 4 Rated Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
@@ -44320,7 +44438,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 4
-  N49, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N50, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44366,7 +44484,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note quadratic curve = a + b*PLR + c*PLR**2
        \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
        \note PLR = part load ratio (cooling load/steady state capacity)
-  N50, \field Speed 4 Nominal Time for Condensate Removal to Begin
+  N51, \field Speed 4 Nominal Time for Condensate Removal to Begin
        \type real
        \units s
        \minimum 0.0
@@ -44377,7 +44495,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Nominal time is equal to the ratio of the energy of the coil's maximum
        \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
        \note Suggested value is 1000; zero value means latent degradation model is disabled.
-  N51, \field Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
+  N52, \field Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity
        \type real
        \units dimensionless
        \minimum 0.0
@@ -44387,7 +44505,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note the compressor first turns off) and the coil's steady state latent capacity
        \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
        \note means latent degradation model is disabled.
-  N52, \field Speed 4 Maximum Cycling Rate
+  N53, \field Speed 4 Maximum Cycling Rate
        \type real
        \units cycles/hr
        \minimum 0.0
@@ -44396,7 +44514,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note The maximum on-off cycling rate for the compressor, which occurs at 50% run time
        \note fraction. Suggested value is 3; zero value means latent degradation
        \note model is disabled.
-  N53, \field Speed 4 Latent Capacity Time Constant
+  N54, \field Speed 4 Latent Capacity Time Constant
        \type real
        \units s
        \minimum 0.0
@@ -44405,7 +44523,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Time constant for the cooling coil's latent capacity to reach steady state after
        \note startup. Suggested value is 45; zero value means latent degradation
        \note model is disabled.
-  N54, \field Speed 4 Rated Waste Heat Fraction of Power Input
+  N55, \field Speed 4 Rated Waste Heat Fraction of Power Input
        \type real
        \units dimensionless
        \minimum> 0.0
@@ -44419,19 +44537,19 @@ Coil:Cooling:DX:MultiSpeed,
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
-  N55, \field Speed 4 Evaporative Condenser Effectiveness
+  N56, \field Speed 4 Evaporative Condenser Effectiveness
        \type real
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.9
-  N56, \field Speed 4 Evaporative Condenser Air Flow Rate
+  N57, \field Speed 4 Evaporative Condenser Air Flow Rate
        \type real
        \units m3/s
        \minimum> 0.0
        \autosizable
        \note Used to calculate evaporative condenser water use
-  N57, \field Speed 4 Rated Evaporative Condenser Pump Power Consumption
+  N58, \field Speed 4 Rated Evaporative Condenser Pump Power Consumption
        \type real
        \units W
        \minimum 0.0
@@ -44451,7 +44569,7 @@ Coil:Cooling:DX:VariableSpeed,
         \memo wet coil when compressor cycles off with continuous fan operation. Requires two to
         \memo ten sets of performance data and will interpolate between speeds. Modeled as a
         \memo single coil with variable-speed compressor.
-        \min-fields 30
+        \min-fields 31
    A1,  \field Name
         \required-field
         \type alpha
@@ -44530,13 +44648,17 @@ Coil:Cooling:DX:VariableSpeed,
         \minimum 0.0
         \default 10.0
         \units C
+   N10, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+        \type real
+        \default -25.0
+        \units C
    A7,  \field Supply Water Storage Tank Name
         \type object-list
         \object-list WaterStorageTankNames
    A8,  \field Condensate Collection Water Storage Tank Name
         \type object-list
         \object-list WaterStorageTankNames
-   N10, \field Basin Heater Capacity
+   N11, \field Basin Heater Capacity
         \type real
         \units W/K
         \minimum 0.0
@@ -44546,7 +44668,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note For this situation, the heater maintains the basin water temperature at the basin heater
         \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
         \note The basin heater only operates when the DX coil is off.
-   N11, \field Basin Heater Setpoint Temperature
+   N12, \field Basin Heater Setpoint Temperature
         \type real
         \units C
         \minimum 2.0
@@ -44561,34 +44683,34 @@ Coil:Cooling:DX:VariableSpeed,
         \note air dry-bulb temperature is below the basin heater setpoint temperature.
         \note If a schedule name is not entered, the basin heater is allowed to operate
         \note throughout the entire simulation.
-   N12, \field Speed 1 Reference Unit Gross Rated Total Cooling Capacity
+   N13, \field Speed 1 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
         \required-field
-   N13, \field Speed 1 Reference Unit Gross Rated Sensible Heat Ratio
+   N14, \field Speed 1 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \maximum 1.0
         \required-field
-   N14, \field Speed 1 Reference Unit Gross Rated Cooling COP
+   N15, \field Speed 1 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
         \required-field
-   N15, \field Speed 1 Reference Unit Rated Air Flow Rate
+   N16, \field Speed 1 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
         \required-field
-   N16, \field Speed 1 Reference Unit Rated Condenser Air Flow Rate
+   N17, \field Speed 1 Reference Unit Rated Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
         \note This field is only used for Condenser Type = EvaporativelyCooled
-   N17, \field Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N18, \field Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -44626,29 +44748,29 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N18, \field Speed 2 Reference Unit Gross Rated Total Cooling Capacity
+   N19, \field Speed 2 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N19, \field Speed 2 Reference Unit Gross Rated Sensible Heat Ratio
+   N20, \field Speed 2 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N20, \field Speed 2 Reference Unit Gross Rated Cooling COP
+   N21, \field Speed 2 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N21, \field Speed 2 Reference Unit Rated Air Flow Rate
+   N22, \field Speed 2 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N22, \field Speed 2 Reference Unit Rated Condenser Air Flow Rate
+   N23, \field Speed 2 Reference Unit Rated Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N23, \field Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N24, \field Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -44681,29 +44803,29 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N24, \field Speed 3 Reference Unit Gross Rated Total Cooling Capacity
+   N25, \field Speed 3 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N25, \field Speed 3 Reference Unit Gross Rated Sensible Heat Ratio
+   N26, \field Speed 3 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N26, \field Speed 3 Reference Unit Gross Rated Cooling COP
+   N27, \field Speed 3 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N27, \field Speed 3 Reference Unit Rated Air Flow Rate
+   N28, \field Speed 3 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N28, \field Speed 3 Reference Unit Rated Condenser Air Flow Rate
+   N29, \field Speed 3 Reference Unit Rated Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N29, \field Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N30, \field Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -44736,29 +44858,29 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N30, \field Speed 4 Reference Unit Gross Rated Total Cooling Capacity
+   N31, \field Speed 4 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N31, \field Speed 4 Reference Unit Gross Rated Sensible Heat Ratio
+   N32, \field Speed 4 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N32, \field Speed 4 Reference Unit Gross Rated Cooling COP
+   N33, \field Speed 4 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N33, \field Speed 4 Reference Unit Rated Air Flow Rate
+   N34, \field Speed 4 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N34, \field Speed 4 Reference Unit Rated Condenser Air Flow Rate
+   N35, \field Speed 4 Reference Unit Rated Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N35, \field Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N36, \field Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -44791,29 +44913,29 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N36, \field Speed 5 Reference Unit Gross Rated Total Cooling Capacity
+   N37, \field Speed 5 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N37, \field Speed 5 Reference Unit Gross Rated Sensible Heat Ratio
+   N38, \field Speed 5 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N38, \field Speed 5 Reference Unit Gross Rated Cooling COP
+   N39, \field Speed 5 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N39, \field Speed 5 Reference Unit Rated Air Flow Rate
+   N40, \field Speed 5 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N40, \field Speed 5 Reference Unit Rated Condenser Air Flow Rate
+   N41, \field Speed 5 Reference Unit Rated Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N41, \field Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N42, \field Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -44846,29 +44968,29 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N42, \field Speed 6 Reference Unit Gross Rated Total Cooling Capacity
+   N43, \field Speed 6 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N43, \field Speed 6 Reference Unit Gross Rated Sensible Heat Ratio
+   N44, \field Speed 6 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N44, \field Speed 6 Reference Unit Gross Rated Cooling COP
+   N45, \field Speed 6 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N45, \field Speed 6 Reference Unit Rated Air Flow Rate
+   N46, \field Speed 6 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N46, \field Speed 6 Reference Unit Condenser Air Flow Rate
+   N47, \field Speed 6 Reference Unit Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N47, \field Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N48, \field Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -44901,29 +45023,29 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N48, \field Speed 7 Reference Unit Gross Rated Total Cooling Capacity
+   N49, \field Speed 7 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N49, \field Speed 7 Reference Unit Gross Rated Sensible Heat Ratio
+   N50, \field Speed 7 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N50, \field Speed 7 Reference Unit Gross Rated Cooling COP
+   N51, \field Speed 7 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N51, \field Speed 7 Reference Unit Rated Air Flow Rate
+   N52, \field Speed 7 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N52, \field Speed 7 Reference Unit Condenser Flow Rate
+   N53, \field Speed 7 Reference Unit Condenser Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N53, \field Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N54, \field Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -44956,29 +45078,29 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N54, \field Speed 8 Reference Unit Gross Rated Total Cooling Capacity
+   N55, \field Speed 8 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N55, \field Speed 8 Reference Unit Gross Rated Sensible Heat Ratio
+   N56, \field Speed 8 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N56, \field Speed 8 Reference Unit Gross Rated Cooling COP
+   N57, \field Speed 8 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N57, \field Speed 8 Reference Unit Rated Air Flow Rate
+   N58, \field Speed 8 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N58, \field Speed 8 Reference Unit Condenser Air Flow Rate
+   N59, \field Speed 8 Reference Unit Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N59, \field Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N60, \field Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -45011,30 +45133,30 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N60, \field Speed 9 Reference Unit Gross Rated Total Cooling Capacity
+   N61, \field Speed 9 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N61, \field Speed 9 Reference Unit Gross Rated Sensible Heat Ratio
+   N62, \field Speed 9 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N62, \field Speed 9 Reference Unit Gross Rated Cooling COP
+   N63, \field Speed 9 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N63, \field Speed 9 Reference Unit Rated Air Flow Rate
+   N64, \field Speed 9 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N64, \field Speed 9 Reference Unit Condenser Air Flow Rate
+   N65, \field Speed 9 Reference Unit Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
         \note optional
-   N65, \field Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N66, \field Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -45068,30 +45190,30 @@ Coil:Cooling:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-   N66, \field Speed 10 Reference Unit Gross Rated Total Cooling Capacity
+   N67, \field Speed 10 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
         \units w
         \type real
         \minimum 0
-   N67, \field Speed 10 Reference Unit Gross Rated Sensible Heat Ratio
+   N68, \field Speed 10 Reference Unit Gross Rated Sensible Heat Ratio
         \units dimensionless
         \type real
         \minimum 0
         \Maximum 1.0
-   N68, \field Speed 10 Reference Unit Gross Rated Cooling COP
+   N69, \field Speed 10 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
         \minimum 0
-   N69, \field Speed 10 Reference Unit Rated Air Flow Rate
+   N70, \field Speed 10 Reference Unit Rated Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
-   N70, \field Speed 10 Reference Unit Condenser Air Flow Rate
+   N71, \field Speed 10 Reference Unit Condenser Air Flow Rate
         \units m3/s
         \type real
         \minimum 0
         \note optional
-   N71, \field Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling
+   N72, \field Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling
         \units dimensionless
         \type real
         \minimum 0
@@ -45205,7 +45327,11 @@ Coil:Cooling:DX:TwoStageWithHumidityControlMode,
   A14, \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  N5,  \field Basin Heater Capacity
+  N5,  \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+       \type real
+       \default -25.0
+       \units C
+  N6,  \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -45215,7 +45341,7 @@ Coil:Cooling:DX:TwoStageWithHumidityControlMode,
        \note For this situation, the heater maintains the basin water temperature at the basin heater
        \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when the DX coil is off.
-  N6,  \field Basin Heater Setpoint Temperature
+  N7,  \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -46225,7 +46351,6 @@ Coil:Heating:DX:SingleSpeed,
        \note only required if ReverseCycle defrost strategy is specified
   N5 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
        \type real
-       \minimum -20.0
        \default -8.0
        \units C
   N6 , \field Outdoor Dry-Bulb Temperature to Turn On Compressor
@@ -47105,7 +47230,6 @@ Coil:Heating:DX:VariableSpeed,
         \note only required if ReverseCycle defrost strategy is specified
    N5,  \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
         \type real
-        \minimum -50.0
         \default -8.0
         \units C
    N6,  \field Outdoor Dry-Bulb Temperature to Turn On Compressor
@@ -54091,8 +54215,11 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \key Coil:UserDefined
-       \note Enter the type of supplemental heating coil if included in the unitary system.
+       \note Enter the type of supplemental heating or reheat coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
+       \note This coil supplements heating mode operation or reheats the supply air during dehumidification
+       \note mode operation. If set point based control is used the coils operate to meet their respective
+       \note supply air temperature set point.
   A19, \field Supplemental Heating Coil Name
        \type object-list
        \object-list HeatingCoilName
@@ -54371,7 +54498,14 @@ UnitarySystemPerformance:Multispeed,
        \note This choice does not apply to speed 1 operation.
        \note Yes = operate at the highest speed possible without exceeding the current load.
        \note No = allow operation at the average of two adjacent speeds to match the current load.
-  N3 , \field Heating Speed 1 Supply Air Flow Ratio
+  N3 , \field No Load Supply Air Flow Rate Ratio
+       \type real
+       \minimum 0
+       \maximum 1
+       \default 1
+       \note Used to define the no load operating air flow rate when the system fan
+       \note is specified to operate continuously.
+  N4 , \field Heating Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
        \autosizable
@@ -54381,7 +54515,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the lowest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N4 , \field Cooling Speed 1 Supply Air Flow Ratio
+  N5 , \field Cooling Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
        \autosizable
@@ -54390,7 +54524,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the lowest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N5 , \field Heating Speed 2 Supply Air Flow Ratio
+  N6 , \field Heating Speed 2 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54398,7 +54532,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N6 , \field Cooling Speed 2 Supply Air Flow Ratio
+  N7 , \field Cooling Speed 2 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54406,7 +54540,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N7 , \field Heating Speed 3 Supply Air Flow Ratio
+  N8 , \field Heating Speed 3 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54414,7 +54548,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N8 , \field Cooling Speed 3 Supply Air Flow Ratio
+  N9 , \field Cooling Speed 3 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54422,7 +54556,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N9 , \field Heating Speed 4 Supply Air Flow Ratio
+  N10, \field Heating Speed 4 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54430,7 +54564,103 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N10; \field Cooling Speed 4 Supply Air Flow Ratio
+  N11, \field Cooling Speed 4 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N12, \field Heating Speed 5 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N13, \field Cooling Speed 5 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N14, \field Heating Speed 6 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N15, \field Cooling Speed 6 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N16, \field Heating Speed 7 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N17, \field Cooling Speed 7 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N18, \field Heating Speed 8 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N19, \field Cooling Speed 8 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N20, \field Heating Speed 9 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N21, \field Cooling Speed 9 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N22, \field Heating Speed 10 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N23; \field Cooling Speed 10 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -74711,13 +74941,16 @@ SetpointManager:Scheduled:DualSetpoint,
        \type node
 
 SetpointManager:OutdoorAirReset,
-     \memo The Outdoor Air Reset Setpoint Manager sets the supply air
-     \memo temperature according to the outdoor air temperature using a reset rule.
+     \memo This Setpoint Manager is used to place a setpoint temperature on system node 
+     \memo according to the outdoor air temperature using a reset rule. The outdoor air
+     \memo temperature is obtained from the weather information during the simulation. 
   A1 , \field Name
        \required-field
   A2 , \field Control Variable
        \type choice
        \key Temperature
+       \key MaximumTemperature
+       \key MinimumTemperature
        \default Temperature
   N1 , \field Setpoint at Outdoor Low Temperature
        \units C
@@ -85188,7 +85421,7 @@ Table:OneIndependentVariable,
 
 Table:TwoIndependentVariables,
        \extensible:3 repeat last three fields
-       \min-fields 22
+       \min-fields 14
        \memo Allows entry of tabular data pairs as alternate input
        \memo for performance curve objects.
        \memo Performance curve objects can be created using these inputs.
@@ -85240,6 +85473,7 @@ Table:TwoIndependentVariables,
        \key MassFlow
        \key Power
        \key Distance
+       \key Angle
        \default Dimensionless
   A5,  \field Input Unit Type for Y
        \type choice
@@ -85249,6 +85483,7 @@ Table:TwoIndependentVariables,
        \key MassFlow
        \key Power
        \key Distance
+       \key Wavelength
        \default Dimensionless
   A6,  \field Output Unit Type
        \type choice
@@ -85261,42 +85496,33 @@ Table:TwoIndependentVariables,
        \note This field is used to normalize the following output data.
        \note The minimum and maximum table output fields are also normalized.
        \note If this field is blank or 1, the table data presented below will be used.
+  A7 , \field External File Name
+       \type alpha
+       \retaincase
   N8 , \field X Value #1
-       \required-field
        \type real
        \begin-extensible
   N9 , \field Y Value #1
-       \required-field
        \type real
   N10, \field Output Value #1
-       \required-field
        \type real
   N11, \field X Value #2
-       \required-field
        \type real
   N12, \field Y Value #2
-       \required-field
        \type real
   N13, \field Output Value #2
-       \required-field
        \type real
   N14, \field X Value #3
-       \required-field
        \type real
   N15, \field Y Value #3
-       \required-field
        \type real
   N16, \field Output Value #3
-       \required-field
        \type real
   N17, \field X Value #4
-       \required-field
        \type real
   N18, \field Y Value #4
-       \required-field
        \type real
   N19, \field Output Value #4
-       \required-field
        \type real
   N20,N21,N22,N23,N24,N25,N26,N27,N28,N29,N30,N31,N32,N33,N34,N35,N36,N37,N38,N39, \note fields as indicated
   N40,N41,N42,N43,N44,N45,N46,N47,N48,N49,N50,N51,N52,N53,N54,N55,N56,N57,N58,N59, \note fields as indicated
@@ -91182,7 +91408,7 @@ Output:Surfaces:List,
    \key ViewFactorInfo
    \key Lines
    \key CostInfo
-   \key DecayCurvesfromZoneComponentLoads
+   \key DecayCurvesFromComponentLoadsSummary
    A2; \field Report Specifications
    \note (IDF, only for Output:Surfaces:List, Lines report --
    \note will print transformed coordinates in IDF style)
@@ -91637,6 +91863,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -91732,6 +91960,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -91827,6 +92057,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -91922,6 +92154,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92017,6 +92251,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92112,6 +92348,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92207,6 +92445,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92302,6 +92542,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92397,6 +92639,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92492,6 +92736,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92587,6 +92833,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92682,6 +92930,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92777,6 +93027,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92872,6 +93124,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -92967,6 +93221,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93063,6 +93319,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93158,6 +93416,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93253,6 +93513,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93348,6 +93610,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93443,6 +93707,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93538,6 +93804,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93633,6 +93901,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93728,6 +93998,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93823,6 +94095,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -93918,6 +94192,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94013,6 +94289,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94108,6 +94386,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94203,6 +94483,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94298,6 +94580,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94393,6 +94677,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94489,6 +94775,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94584,6 +94872,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94679,6 +94969,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94774,6 +95066,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94869,6 +95163,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -94964,6 +95260,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95059,6 +95357,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95154,6 +95454,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95249,6 +95551,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95344,6 +95648,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95439,6 +95745,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95534,6 +95842,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95629,6 +95939,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95724,6 +96036,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95819,6 +96133,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -95915,6 +96231,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96010,6 +96328,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96105,6 +96425,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96200,6 +96522,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96295,6 +96619,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96390,6 +96716,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96485,6 +96813,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96580,6 +96910,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96675,6 +97007,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96770,6 +97104,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96865,6 +97201,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -96960,6 +97298,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97055,6 +97395,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97150,6 +97492,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97245,6 +97589,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97341,6 +97687,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97436,6 +97784,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97531,6 +97881,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97626,6 +97978,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97721,6 +98075,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97816,6 +98172,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -97911,6 +98269,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98006,6 +98366,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98101,6 +98463,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98196,6 +98560,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98291,6 +98657,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98386,6 +98754,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98481,6 +98851,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98576,6 +98948,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98671,6 +99045,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98767,6 +99143,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98862,6 +99240,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -98957,6 +99337,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99052,6 +99434,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99147,6 +99531,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99242,6 +99628,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99337,6 +99725,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary
@@ -99432,6 +99822,8 @@ Output:Table:SummaryReports,
        \key AdaptiveComfortSummary
        \key SensibleHeatGainSummary
        \key ZoneComponentLoadSummary
+       \key AirLoopComponentLoadSummary
+       \key FacilityComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
        \key InitializationSummary

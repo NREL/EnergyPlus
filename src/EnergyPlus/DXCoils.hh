@@ -84,6 +84,7 @@ namespace DXCoils {
 	extern Real64 const RatedOutdoorAirTemp; // 35 C or 95F
 	extern Real64 const RatedInletAirTempHeat; // 21.11C or 70F
 	extern Real64 const RatedOutdoorAirTempHeat; // 8.33 C or 47F
+	extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
 	extern Real64 const RatedInletWetBulbTempHeat; // 15.55 or 60F
 
 	extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
@@ -449,6 +450,7 @@ namespace DXCoils {
 		Real64 FuelUsed; // Energy used, in addition to electricity [W]
 		Real64 FuelConsumed; // Energy consumed, in addition to electricity [J]
 		bool MSHPHeatRecActive; // True when entered Heat Rec Vol Flow Rate > 0
+		int MSHPDesignSpecIndex; // index to MSHPDesignSpecification object used for variable speed coils
 		// End of multispeed DX coil input
 		// VRF system variables used for sizing
 		bool CoolingCoilPresent; // FALSE if coil not present
@@ -697,6 +699,7 @@ namespace DXCoils {
 			PLRImpact( false ),
 			LatentImpact( false ),
 			MSHPHeatRecActive( false ),
+			MSHPDesignSpecIndex( 0 ),
 			CoolingCoilPresent( true ),
 			HeatingCoilPresent( true ),
 			ISHundredPercentDOASDXCoil( false ),
@@ -898,10 +901,9 @@ namespace DXCoils {
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
-		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
+		Real64 const AirVolFlowRate, // the air volume flow rate at the given capacity [m3/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
-		bool const PrintFlag = true, // flag used to print warnings if desired
-		Real64 const BaroPress=StdBaroPress // Barometric pressure [Pa]
+		bool const PrintFlag = true // flag used to print warnings if desired
 	);
 
 	Real64
@@ -1002,6 +1004,14 @@ namespace DXCoils {
 		Optional_bool_const SuppressWarning = _
 	);
 
+	std::string
+	GetDXCoilName(
+		int & DXCoilIndex,
+		bool & ErrorsFound,
+		Optional_string_const ThisObjectType = _,
+		Optional_bool_const SuppressWarning = _
+	);
+
 	Real64
 	GetCoilCapacity(
 		std::string const & CoilType, // must match coil types in this module
@@ -1028,6 +1038,12 @@ namespace DXCoils {
 	GetMinOATCompressor(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
+	Real64
+	GetMinOATCompressorUsingIndex(
+		int const CoilIndex, // index to coil
 		bool & ErrorsFound // set to true if problem
 	);
 

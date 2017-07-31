@@ -1178,7 +1178,7 @@ namespace HeatingCoils {
 
 		// METHODOLOGY EMPLOYED:
 		// Obtains heating capacities from the zone or system sizing arrays or parent object as necessary.
-		// heating coil or other routine sets up any required data varaibles (e.g., DataCoilIsSuppHeater, TermUnitPIU, etc.),
+		// heating coil or other routine sets up any required data variables (e.g., DataCoilIsSuppHeater, TermUnitPIU, etc.),
 		// sizing variable (e.g., HeatingCoil( CoilNum ).NominalCapacity in this routine since it can be multi-staged and new routine
 		// currently only handles single values) and associated string representing that sizing variable.
 		// RequestSizing functions handles the actual sizing and reporting.

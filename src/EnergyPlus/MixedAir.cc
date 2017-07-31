@@ -4127,7 +4127,7 @@ namespace MixedAir {
 		using DataAirLoop::OutsideAirSys;
 		using DataLoopNode::Node;
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using SetPointManager::GetCoilFreezingCheckFlag;
 
 		static std::string const RoutineName("CalcOAEconomizer: ");
@@ -4328,7 +4328,7 @@ namespace MixedAir {
 					Par( 2 ) = this->RetNode;
 					Par( 3 ) = this->InletNode;
 					Par( 4 ) = this->MixMassFlow;
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
+					SolveRoot( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
 					if( SolFla < 0 ) {
 						OASignal = OutAirSignal;
 					}
@@ -4364,7 +4364,7 @@ namespace MixedAir {
 						if( FirstHVACIteration ) Par( 5 ) = 1.0;
 						Par( 6 ) = double( AirLoopNum );
 
-						SolveRegulaFalsi( ( Acc / 10.0 ), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par );
+						SolveRoot( ( Acc / 10.0 ), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par );
 						if( SolFla < 0 ) { // if RegulaFalsi fails to find a solution, returns -1 or -2, set to existing OutAirSignal
 							OASignal = OutAirSignal;
 						}
@@ -4377,7 +4377,7 @@ namespace MixedAir {
 				Par( 2 ) = this->RetNode;
 				Par( 3 ) = this->InletNode;
 				Par( 4 ) = this->MixMassFlow;
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
+				SolveRoot( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
 				if( SolFla < 0 ) {
 					OASignal = OutAirSignal;
 				}

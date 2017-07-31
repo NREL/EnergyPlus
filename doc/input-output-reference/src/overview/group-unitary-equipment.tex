@@ -49,8 +49,6 @@ Links to the fan, cooling coil, heating coil and reheat coil specifications are 
 
 For unitary systems, don't use the night cycle manager. Use a scheduled availability manager and let the system be always on. Then use the Supply Air Fan Operating Mode Schedule Name in the unitary system to switch between continuous fan (for ventilation) during occupied periods and switch to cycling fan for unoccupied. The system will cycle on as the thermostat requests, and this way it will run just enough to meet the load - no need for a minimum cycle time.
 
-\subsubsection{Inputs}\label{inputs-049}
-
 Multi-speed fan chilled and hot water coils Air Handling Unit (AHU) can be modeled using Airloop Unitary System HVAC object (AirloopHVAC:UnitarySystem). AHU with chilled and hot water coils is setup by specifying Fan:OnOff and DesignSpecificationPerformance:MultiSpeed objects in Unitary System. The design specification performance object allows running the chilled and hot water coils capacity control using a multi-speed supply air fan. The multi-speed fan capacity control for chilled and hot water coil AHU is performed by modulating the supply air flow rate while maintaining a constant water flow rate. The chilled or hot water flow rates is set at maximum fixed flow rate when there is cooling or heating load and the water flow rate is set to zero when there is no load. Such control strategy is called two-position cooling or heating coil control. The fan speed selection depends on the current load, at lower load the fan is operated at minimum speed (Speed = 1) and the fan speed level increases progressively as the load increases until it reaches the maximum speed level specified. The multi-speed fan operation is modulated between the speeds to meet the current load. When the supply air fan is cycling between consecutive speeds levels, the speed ratio is calculated that indicates what fraction of the time step that the system run at the higher of the two speeds. At lower load, the fan may cycle on-off or run continuously depending the fan operating schedule specified. When the fan is cycling a part-load ratio is calculated to reflect the proportion of the system timestep the fan and coils were operating. In continuous fan operating mode only the coil cycles on-off and the part-load ratio applies to the coil only. Multi-speed fan capacity control is allowed with load based control type only.
 
 \subsubsection{Inputs}\label{inputs-049}
@@ -61,7 +59,7 @@ This alpha field contains the identifying name for the unitary system.
 
 \paragraph{Field: Control Type}\label{field-control-type-004}
 
-This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{SingleZoneVAV}. Load and SingleZoneVAV control requires a Controlling Zone name and SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. SingleZoneVAV also requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. SingleZoneVAV allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the SingleZoneVAV control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the SingleZoneVAV control type. The cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and Coil:Heating:DX:SingleSpeed. If alternate coil types are used they are modeled using the load based control method. 
+This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{SingleZoneVAV}. Load and SingleZoneVAV control requires a Controlling Zone name. SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. If setpoint control is used and the system represents a heat pump (i.e., cooling and heating coils are both DX coils) then only one of these coils may operate at a time. SingleZoneVAV requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. SingleZoneVAV allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the SingleZoneVAV control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the SingleZoneVAV control type. The cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and Coil:Heating:DX:SingleSpeed. If alternate coil types are used they are modeled using the load based control method. 
 
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{field-controlling-zone-or-thermostat-location}
 
@@ -225,7 +223,7 @@ This alpha field contains the identifying type of supplemental heating coil spec
 
 \paragraph{Field: Supplemental Heating Coil Name}\label{field-supplemental-heating-coil-name}
 
-This alpha field contains the identifying name given to the unitary system reheat coil.
+This alpha field contains the identifying name given to the unitary system supplemental or reheat coil object. This coil provides supplemental heat during heating mode operation, or reheats the supply air during dehumidification mode operation. For set point based control, all coils will control to their respective outlet air temperature set point.
 
 \paragraph{Field: Cooling Supply Air Flow Rate Method}\label{field-cooling-supply-air-flow-rate-method-000}
 
@@ -395,73 +393,74 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 \begin{lstlisting}
 
 AirLoopHVAC:UnitarySystem,
-  DXAC Heat Pump 1,           !- Name
-  Load,                       !- Control Type
-  East Zone,                  !- Controlling Zone or Thermostat Location
-  ,                           !- Dehumidification Control Type
-  FanAndCoilAvailSched,       !- Availability Schedule Name
-  Mixed Air Node,             !- Air Inlet Node Name
-  Air Loop Outlet Node,       !- Air Outlet Node Name
-  Fan:OnOff,                  !- Supply Air Fan Object Type
-  Supply Fan 1,               !- Supply Air Fan Name
-  BlowThrough,                !- Fan Placement
-  FanModeSchedule,            !- Supply Air Fan Operating Mode Schedule Name
+  DXAC Heat Pump 1,            !- Name
+  Load,                        !- Control Type
+  East Zone,                   !- Controlling Zone or Thermostat Location
+  ,                            !- Dehumidification Control Type
+  FanAndCoilAvailSched,        !- Availability Schedule Name
+  Mixed Air Node,              !- Air Inlet Node Name
+  Air Loop Outlet Node,        !- Air Outlet Node Name
+  Fan:OnOff,                   !- Supply Fan Object Type
+  Supply Fan 1,                !- Supply Fan Name
+  BlowThrough,                 !- Fan Placement
+  FanModeSchedule,             !- Supply Air Fan Operating Mode Schedule Name
   Coil:Heating:DX:MultiSpeed,  !- Heating Coil Object Type
   Heat Pump DX Heating Coil 1, !- Heating Coil Name
   ,                            !- DX Heating Coil Sizing Ratio
   Coil:Cooling:DX:MultiSpeed,  !- Cooling Coil Object Type
-  Heat Pump ACDXCoil 1,       !- Cooling Coil Name
-  ,                           !- Use DOAS DX Cooling Coil
-  ,                           !- DOAS DX Cooling Coil Leaving Minimum Air Temperature
-  ,                           !- Latent Load Control
-  Coil:Heating:Fuel,          !- Supplemental Heating Coil Object Type
-  Supp Gas Heating Coil 1,    !- Supplemental Heating Coil Name
-  SupplyAirFlowRate,          !- Cooling Supply Air Flow Rate Method
-  1.7,                        !- Cooling Supply Air Flow Rate {m3/s}
-  ,                           !- Cooling Supply Air Flow Rate Per Floor Area
-  ,                           !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-  ,                           !- Cooling Supply Air Flow Rate Per Unit of Cooling Capacity
-  SupplyAirFlowRate,          !- Heating Supply Air Flow Rate Method
-  1.7,                        !- Heating Supply Air Flow Rate {m3/s}
-  ,                           !- Heating Supply Air Flow Rate Per Floor Area
-  ,                           !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-  ,                           !- Heating Supply Air Flow Rate Per Unit of Heating Capacity
-  SupplyAirFlowRate,          !- No Load Supply Air Flow Rate Method
-  0.2,                        !- No Load Supply Air Flow Rate {m3/s}
-  ,                           !- No Load Supply Air Flow Rate Per Floor Area
-  ,                           !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
-  ,                           !- No Load Fraction of Autosized Heating Supply Air Flow Rate
-  ,                           !- No Load Supply Air Flow Rate Per Unit of Cooling Capacity
-  ,                           !- No Load Supply Air Flow Rate Per Unit of Heating Capacity
-  50,                         !- Maximum Supply Air Temperature {C}
-  21,                         !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
-  ,                           !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                           !- Maximum Cycling Rate
-  ,                           !- Heat Pump Time Constant
-  ,                           !- Fraction of On-Cycle Power Use
-  ,                           !- Heat Pump Fan Delay Time
-  ,                           !- Ancillary On-Cycle Electric Power
-  ,                           !- Ancillary Off-Cycle Electric Power
-  ,                           !- Design Heat Recovery Water Flow Rate
-  ,                           !- Maximum Temperature for Heat Recovery (Maximum Heat Recovery Outlet Temperature?)
-  ,                           !- Heat Recovery Water Inlet Node Name
-  ,                           !- Heat Recovery Water Outlet Node Name
-  UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Heat Pump Object Type
-  MyMultispeedHPSpec;         !- Design Specification Multispeed Heat Pump Object Name
+  Heat Pump ACDXCoil 1,        !- Cooling Coil Name
+  ,                            !- Use DOAS DX Cooling Coil
+  ,                            !- Minimum Supply Air Temperature {C}
+  ,                            !- Latent Load Control
+  Coil:Heating:Fuel,           !- Supplemental Heating Coil Object Type
+  Supp Gas Heating Coil 1,     !- Supplemental Heating Coil Name
+  SupplyAirFlowRate,           !- Cooling Supply Air Flow Rate Method
+  1.7,                         !- Cooling Supply Air Flow Rate {m3/s}
+  ,                            !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+  ,                            !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+  ,                            !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+  SupplyAirFlowRate,           !- Heating Supply Air Flow Rate Method
+  1.7,                         !- Heating Supply Air Flow Rate {m3/s}
+  ,                            !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+  ,                            !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+  ,                            !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+  SupplyAirFlowRate,           !- No Load Supply Air Flow Rate Method
+  0.2,                         !- No Load Supply Air Flow Rate {m3/s}
+  ,                            !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+  ,                            !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
+  ,                            !- No Load Fraction of Autosized Heating Supply Air Flow Rate
+  ,                            !- No Load Supply Air Flow Rate Per Unit of Capacity during Cooling Operation {m3/s-W}
+  ,                            !- No Load Supply Air Flow Rate Per Unit of Capacity during Heating Operation {m3/s-W}
+  50,                          !- Maximum Supply Air Temperature {C}
+  21,                          !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+  ,                            !- Outdoor Dry-Bulb Temperature Sensor Node Name
+  ,                            !- Maximum Cycling Rate {cycles/hr}
+  ,                            !- Heat Pump Time Constant {s}
+  ,                            !- Fraction of On-Cycle Power Use
+  ,                            !- Heat Pump Fan Delay Time {s}
+  ,                            !- Ancillary On-Cycle Electric Power {W}
+  ,                            !- Ancillary Off-Cycle Electric Power {W}
+  ,                            !- Design Heat Recovery Water Flow Rate {m3/s}
+  ,                            !- Maximum Temperature for Heat Recovery {C}
+  ,                            !- Heat Recovery Water Inlet Node Name
+  ,                            !- Heat Recovery Water Outlet Node Name
+  UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Object Type
+  MyMultispeedHPSpec;          !- Design Specification Multispeed Object Name
 
   UnitarySystemPerformance:Multispeed,
-  MyMultispeedHPSpec,         !- Name
-  4,                          !- Number of Speeds for Heating
-  4,                          !- Number of Speeds for Cooling
-  No,                         !- Single Mode Operation
-  0.235294118,                !- Heating Speed 1 Supply Air Flow Rate {m3/s}
-  0.235294118,                !- Cooling Speed 1 Supply Air Flow Rate {m3/s}
-  0.470588235,                !- Heating Speed 2 Supply Air Flow Rate {m3/s}
-  0.470588235,                !- Cooling Speed 2 Supply Air Flow Rate {m3/s}
-  0.705882353,                !- Heating Speed 3 Supply Air Flow Rate {m3/s}
-  0.705882353,                !- Cooling Speed 3 Supply Air Flow Rate {m3/s}
-  1.0,                        !- Heating Speed 4 Supply Air Flow Rate {m3/s}
-  1.0;                        !- Cooling Speed 4 Supply Air Flow Rate {m3/s}
+  MyMultispeedHPSpec,          !- Name
+  4,                           !- Number of Speeds for Heating
+  4,                           !- Number of Speeds for Cooling
+  No,                          !- Single Mode Operation
+  ,                            !- No Load Supply Air Flow Rate Ratio
+  0.235294118,                 !- Heating Speed 1 Supply Air Flow Ratio
+  0.235294118,                 !- Cooling Speed 1 Supply Air Flow Ratio
+  0.470588235,                 !- Heating Speed 2 Supply Air Flow Ratio
+  0.470588235,                 !- Cooling Speed 2 Supply Air Flow Ratio
+  0.705882353,                 !- Heating Speed 3 Supply Air Flow Ratio
+  0.705882353,                 !- Cooling Speed 3 Supply Air Flow Ratio
+  1.0,                         !- Heating Speed 4 Supply Air Flow Ratio
+  1.0;                         !- Cooling Speed 4 Supply Air Flow Ratio
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-038}
@@ -708,37 +707,22 @@ The allowed cooling and heating coil types are restricted to the following combi
 
 Coil:Cooling:DX:MultiSpeed and Coil:Heating:DX:MultiSpeed or Coil:Cooling:DX:MultiSpeed and Coil:Heating:Fuel. 
 
-\paragraph{Field: Heating Speed 1 Supply Air Flow Ratio}\label{field-heating-speed-1-supply-air-flow-ratio}
+\paragraph{Field: No Load Supply Air Flow Rate Ratio}\label{field-no-load-supply-air-flow-rate-ratio}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 1 (lowest speed). Values must be greater than 0.
+This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
 
-\paragraph{Field: Cooling Speed 1 Supply Air Flow Ratio}\label{field-cooling-speed-1-supply-air-flow-ratio}
+\paragraph{Field Group: Heating and Cooling Speeds 1 to 10}\label{field-group-heating-and-cooling-speeds-1-to-10}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 1 (lowest speed). Values must be greater than 0.
+The air flow through a multispeed coil system is specified as a group of two air flow ratio inputs, one each for heating and cooling. If the number of speeds for heating and cooling are different, inputs for both heating and cooling are still required for a given speed yet one input may be blank. The maximum of the inputs for Number of Speeds for Cooling and Number of Speeds for Heating specified above determines how many groups of heating and cooling supply air flow ratio inputs are required. Both inputs for Speed 1 are required and specify the air flow ratio for the lowest speed, followed by the inputs for Speed 2, Speed 3, etc. up to a maximum of 10 speeds. These inputs are applicable only to multispeed or variable speed coils.
 
-\paragraph{Field: Heating Speed 2 Supply Air Flow Ratio}\label{field-heating-speed-2-supply-air-flow-ratio}
+\paragraph{Field: Heating Speed \textless{}x\textgreater{} Supply Air Flow Ratio}\label{field-heating-speed-x-supply-air-flow-ratio}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 2. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating speed 1.
+This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil is operating at Speed \textless{}x\textgreater{}. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for the previous heating speed. If the `Number of Speeds for Heating' is less than \textless{}x\textgreater{}, then this field can be left blank.
 
-\paragraph{Field: Cooling Speed 2 Supply Air Flow Ratio}\label{field-cooling-speed-2-supply-air-flow-ratio}
+\paragraph{Field: Cooling Speed \textless{}x\textgreater{} Supply Air Flow Ratio}\label{field-cooling-speed-x-supply-
+air-flow-ratio}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 2. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling speed 1.
-
-\paragraph{Field: Heating Speed 3 Supply Air Flow Ratio}\label{field-heating-speed-3-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating speed 2.If the `Number of Speeds for Heating' is less than 3, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 3 Supply Air Flow Ratio}\label{field-cooling-speed-3-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling speed 2.If the `Number of Speeds for Cooling' is less than 3, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 4 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 3.If the `Number of Speeds for Heating' is less than 4, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 4 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 4. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 3.If the `Number of Speeds for Cooling' is less than 4, then this field can be left blank.
+This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the cooling coil is operating at Speed \textless{}x\textgreater{}. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for the previous cooling speed. If the `Number of Speeds for Cooling' is less than \textless{}x\textgreater{}, then this field can be left blank.
 
 \subsection{AirLoopHVAC:Unitary:Furnace:HeatCool}\label{airloophvacunitaryfurnaceheatcool}
 
