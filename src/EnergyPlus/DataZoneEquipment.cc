@@ -132,7 +132,7 @@ namespace DataZoneEquipment {
 	// End zone equip objects
 
 	int const NumValidSysAvailZoneComponents( 14 );
-	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit","ZoneHVAC:HybridUnitaryAC" } );
+	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit","ZoneHVAC:HybridUnitaryHVAC" } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -672,7 +672,7 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:EVAPORATIVECOOLERUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneEvaporativeCoolerUnit_Num;
-					} else if (SELECT_CASE_var == "ZONEHVAC:HYBRIDUNITARYAC") {
+					} else if (SELECT_CASE_var == "ZONEHVAC:HYBRIDUNITARYHVAC") {
 						ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneHybridEvaporativeCooler_Num;
 					}else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
@@ -1421,6 +1421,8 @@ namespace DataZoneEquipment {
 		} else if ( ( SELECT_CASE_var == OAFlowSum ) || ( SELECT_CASE_var == OAFlowMax ) ) {
 			// Use sum or max of per person and the following
 			DSOAFlowPerZone = OARequirements( DSOAPtr ).OAFlowPerZone;
+			double FA = Zone(ActualZoneNum).FloorArea;
+			double Requirements = OARequirements(DSOAPtr).OAFlowPerArea;
 			DSOAFlowPerArea = OARequirements( DSOAPtr ).OAFlowPerArea * Zone( ActualZoneNum ).FloorArea;
 			DSOAFlowACH = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.0;
 			if ( OARequirements( DSOAPtr ).OAFlowMethod == OAFlowMax ) {
