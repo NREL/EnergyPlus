@@ -10,6 +10,7 @@ set( test_src
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
   Fixtures/SQLiteFixture.hh
+  PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
@@ -43,6 +44,7 @@ set( test_src
   DOASEffectOnZoneSizing.unit.cc
   DualDuct.unit.cc
   DXCoils.unit.cc
+  EarthTube.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc
   ElectricBaseboardRadiator.unit.cc
@@ -127,6 +129,7 @@ set( test_src
   SiteFCFactorMethodGroundTemperatures.unit.cc
   SiteGroundDomain.unit.cc
   SiteShallowGroundTemperatures.unit.cc
+  SizeWaterHeatingCoil.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
@@ -150,6 +153,7 @@ set( test_src
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
   WindowAC.unit.cc
+  WindowEquivalentLayer.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc

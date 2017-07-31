@@ -14177,6 +14177,7 @@ DO iSys = 1, numCompactSysUnit
        base + usAirHandlerNameOff,' DX Coil EIR-FF')
     CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
        base + usAirHandlerNameOff,' DX Coil PLF')
+    CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
     CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
     CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
     CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -15112,6 +15113,7 @@ DO iSys = 1, numCompactSysUnitHP
      base + uhpsAirHandlerNameOff,' Cool Coil EIR-FF')
   CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
      base + uhpsAirHandlerNameOff,' Cool Coil PLF')
+  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
   CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
   CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
   CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -16067,6 +16069,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
     CALL AddToObjStr('Single Mode Operation', 'No')
+    CALL AddToObjStr('No Load Supply Air Flow Rate Ratio', '')
     CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Cooling Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Heating Speed 2 Supply Air Flow Ratio', 'autosize')
@@ -16074,7 +16077,19 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Heating Speed 3 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Cooling Speed 3 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Heating Speed 4 Supply Air Flow Ratio', 'autosize')
-    CALL AddToObjStr('Cooling Speed 4 Supply Air Flow Ratio', 'autosize',.TRUE.)
+    CALL AddToObjStr('Cooling Speed 4 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 5 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 5 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 6 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 6 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 7 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 7 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 8 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 8 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 9 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 9 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 10 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 10 Supply Air Flow Ratio', 'autosize',.TRUE.)
   END IF
 
   ! add new schedule if needed (from Supply Fan Operating Mode Schedule, above)
@@ -16149,6 +16164,7 @@ DO iSys = 1, numCompactSysUnitarySystem
          base + ussAirHandlerNameOff,' Cool Coil EIR-FF')
       CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
          base + ussAirHandlerNameOff,' Cool Coil PLF')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
       CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
       CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -16712,6 +16728,7 @@ DO iSys = 1, numCompactSysUnitarySystem
          base + ussAirHandlerNameOff,' DX Coil EIR-FF')
       CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
          base + ussAirHandlerNameOff,' DX Coil PLF')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
       CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
       CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -16807,6 +16824,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Air Outlet Node Name',base + ussAirHandlerNameOff, TRIM(coolCoilUnitOutlet))
       CALL AddToObjFld('Condenser Air Inlet Node Name',base + ussAirHandlerNameOff,' Cooling Coil Condenser Inlet')
       CALL AddToObjStr('Condenser Type','AirCooled')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Supply Water Storage Tank Name','')
       CALL AddToObjStr('Condensate Collection Water Storage Tank Name','')
       CALL AddToObjStr('Apply Part Load Fraction to Speeds Greater than 1','No')
@@ -24150,6 +24168,7 @@ DO iPurchAir = 1, numCompactPurchAir
   CALL AddToObjFld('Availability Schedule Name', base + pazSysAvailSchedNameOff,'')
   CALL AddToObjFld('Zone Supply Air Node Name', base + pazNameOff,' Ideal Loads Supply Inlet')
   CALL AddToObjStr('Zone Exhaust Air Node Name','')
+  CALL AddToObjStr('System Inlet Air Node Name','')
   CALL AddToObjFld('Maximum Heating Supply Air Temperature [C]', base + pazMaxHeatSupplyTempOff,'')
   CALL AddToObjFld('Minimum Cooling Supply Air Temperature [C]', base + pazMinCoolSupplyTempOff,'')
   CALL AddToObjFld('Maximum Heating Supply Air Humidity Ratio [kg-H20/kg-air]', base + pazMaxHeatSupplyHumRatOff,'')
@@ -24797,6 +24816,7 @@ DO iZone = 1, numCompactPTAC
      base + ptaczNameOff,' PTAC Cooling Coil EIR-FF')
   CALL AddToObjFld('Part Load Fraction Correlation (function of part load ratio)',   &
      base + ptaczNameOff,' PTAC Cooling Coil Coil PLF')
+  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
   CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
   CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
   CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -25291,8 +25311,6 @@ DO iZone = 1, numCompactPTHP
   CALL AddToObjStr('Heating Coil Object Type','Coil:Heating:DX:SingleSpeed')
   CALL AddToObjFld('Heating Coil Name', base + pthpzNameOff,' PTHP Heating Coil')
   CALL AddToObjStr('Heating Convergence Tolerance {dimensionless}','0.001')
-  CALL AddToObjFld('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}',   &
-     base + pthpzHPHeatMinODBOff,'')
   CALL AddToObjStr('Cooling Coil Object Type','Coil:Cooling:DX:SingleSpeed')
   CALL AddToObjFld('Cooling Coil Name', base + pthpzNameOff,' PTHP Cooling Coil')
   CALL AddToObjStr('Cooling Convergence Tolerance {dimensionless}','0.001')
@@ -25377,6 +25395,7 @@ DO iZone = 1, numCompactPTHP
      base + pthpzNameOff,' PTHP Cooling Coil EIR-FF')
   CALL AddToObjFld('Part Load Fraction Correlation (function of part load ratio)',   &
      base + pthpzNameOff,' PTHP Cooling Coil Coil PLF')
+  CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
   CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
   CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
   CALL AddToObjStr('Maximum Cycling Rate','0')
@@ -31855,6 +31874,7 @@ DO iSys = 1, numCompactDedOutAir
          base + doasNameOff,' DX Coil EIR-FF')
       CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
          base + doasNameOff,' DX Coil PLF')
+      CALL AddToObjStr('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}','')
       CALL AddToObjStr('Nominal Time for Condensate Removal to Begin','0')
       CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity','0')
       CALL AddToObjStr('Maximum Cycling Rate','0')
