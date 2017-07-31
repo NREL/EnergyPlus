@@ -54485,7 +54485,14 @@ UnitarySystemPerformance:Multispeed,
        \note This choice does not apply to speed 1 operation.
        \note Yes = operate at the highest speed possible without exceeding the current load.
        \note No = allow operation at the average of two adjacent speeds to match the current load.
-  N3 , \field Heating Speed 1 Supply Air Flow Ratio
+  N3 , \field No Load Supply Air Flow Rate Ratio
+       \type real
+       \minimum 0
+       \maximum 1
+       \default 1
+       \note Used to define the no load operating air flow rate when the system fan
+       \note is specified to operate continuously.
+  N4 , \field Heating Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
        \autosizable
@@ -54495,7 +54502,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the lowest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N4 , \field Cooling Speed 1 Supply Air Flow Ratio
+  N5 , \field Cooling Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
        \autosizable
@@ -54504,7 +54511,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the lowest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N5 , \field Heating Speed 2 Supply Air Flow Ratio
+  N6 , \field Heating Speed 2 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54512,7 +54519,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N6 , \field Cooling Speed 2 Supply Air Flow Ratio
+  N7 , \field Cooling Speed 2 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54520,7 +54527,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N7 , \field Heating Speed 3 Supply Air Flow Ratio
+  N8 , \field Heating Speed 3 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54528,7 +54535,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N8 , \field Cooling Speed 3 Supply Air Flow Ratio
+  N9 , \field Cooling Speed 3 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54536,7 +54543,7 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N9 , \field Heating Speed 4 Supply Air Flow Ratio
+  N10, \field Heating Speed 4 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -54544,7 +54551,103 @@ UnitarySystemPerformance:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N10; \field Cooling Speed 4 Supply Air Flow Ratio
+  N11, \field Cooling Speed 4 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N12, \field Heating Speed 5 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N13, \field Cooling Speed 5 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N14, \field Heating Speed 6 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N15, \field Cooling Speed 6 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N16, \field Heating Speed 7 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N17, \field Cooling Speed 7 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N18, \field Heating Speed 8 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N19, \field Cooling Speed 8 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N20, \field Heating Speed 9 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N21, \field Cooling Speed 9 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during cooling
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N22, \field Heating Speed 10 Supply Air Flow Ratio
+       \type real
+       \autosizable
+       \minimum> 0
+       \note Used only for Multi speed coils
+       \note Enter the next highest operating supply air flow ratio during heating
+       \note operation or specify autosize. This value is the ratio of air flow
+       \note at this speed to the maximum air flow rate.
+  N23; \field Cooling Speed 10 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0

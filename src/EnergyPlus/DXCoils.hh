@@ -450,6 +450,7 @@ namespace DXCoils {
 		Real64 FuelUsed; // Energy used, in addition to electricity [W]
 		Real64 FuelConsumed; // Energy consumed, in addition to electricity [J]
 		bool MSHPHeatRecActive; // True when entered Heat Rec Vol Flow Rate > 0
+		int MSHPDesignSpecIndex; // index to MSHPDesignSpecification object used for variable speed coils
 		// End of multispeed DX coil input
 		// VRF system variables used for sizing
 		bool CoolingCoilPresent; // FALSE if coil not present
@@ -698,6 +699,7 @@ namespace DXCoils {
 			PLRImpact( false ),
 			LatentImpact( false ),
 			MSHPHeatRecActive( false ),
+			MSHPDesignSpecIndex( 0 ),
 			CoolingCoilPresent( true ),
 			HeatingCoilPresent( true ),
 			ISHundredPercentDOASDXCoil( false ),

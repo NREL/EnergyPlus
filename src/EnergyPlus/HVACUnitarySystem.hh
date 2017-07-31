@@ -165,12 +165,14 @@ namespace HVACUnitarySystem {
 		Array1D< Real64 > CoolingVolFlowRatio; // The ratio of flow to max for this speed
 		Array1D< Real64 > HeatingVolFlowRatio; // The ratio of flow to max for this speed
 		bool SingleModeFlag; // If yes, single mode operation
+		Real64 NoLoadAirFlowRateRatio; // fraction of supply air flow rate multiplier
 
 		// Default Constructor
 		DesignSpecMSHPData() :
 			NumOfSpeedCooling( 0 ),
 			NumOfSpeedHeating( 0 ),
-			SingleModeFlag( false )
+			SingleModeFlag( false ),
+			NoLoadAirFlowRateRatio( 1.0 )
 		{}
 
 	};
@@ -297,6 +299,7 @@ namespace HVACUnitarySystem {
 		Real64 MaxCoolAirMassFlow; // Maximum coil air mass flow for cooling [kg/s]
 		Real64 MaxHeatAirMassFlow; // Maximum coil air mass flow for heating [kg/s]
 		Real64 MaxNoCoolHeatAirMassFlow; // Maximum coil air mass flow for no cooling or heating [kg/s]
+		Real64 NoLoadAirFlowRateRatio; // fraction of supply air flow rate used during no load operation [~]
 		int CoolingSAFMethod; // Supply air flow method for cooling
 		int HeatingSAFMethod; // Supply air flow method for heating
 		int NoCoolHeatSAFMethod; // Supply air flow method for no cooling or heating
@@ -590,6 +593,7 @@ namespace HVACUnitarySystem {
 			MaxCoolAirMassFlow( 0.0 ),
 			MaxHeatAirMassFlow( 0.0 ),
 			MaxNoCoolHeatAirMassFlow( 0.0 ),
+			NoLoadAirFlowRateRatio( 1.0 ),
 			CoolingSAFMethod( 0 ),
 			HeatingSAFMethod( 0 ),
 			NoCoolHeatSAFMethod( 0 ),

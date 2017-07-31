@@ -586,6 +586,7 @@ namespace ReportSizingManager {
 								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 							}
 						}
+						if ( DataFractionUsedForSizing > 0.0 ) AutosizeDes = AutosizeDes * DataFractionUsedForSizing;
 					}
 					}
 				} else if ( SizingType == CoolingAirflowSizing ) {
@@ -1502,6 +1503,7 @@ namespace ReportSizingManager {
 						} else {
 							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						}
+						if ( DataFractionUsedForSizing > 0.0 ) AutosizeDes = AutosizeDes * DataFractionUsedForSizing;
 					}
 				} else if ( SizingType == CoolingWaterflowSizing ) {
 					if ( CurOASysNum > 0 ) {
