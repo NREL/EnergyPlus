@@ -1435,7 +1435,7 @@ Pressure control is achieved by varying either zone exhaust fan flow rate in a c
 
 	In general, the zero flow rate of either exhaust fan or relief node will generate the maximum zone pressure, while the maximum flow rate of either exhaust fan or relief node will produce the minimum zone pressure. 
 
-2. If the setpoint pressure is between the maximum zone pressure caused by zero exhaust fan or relief node flow rate and the minimum zone pressure caused by maximum exhaust fan flow rate or outdoor air flow rate, then the AirflowNetwork model will use Regula Falsi to find a solution with calculated zone exhaust fan flow rate or relief node flow rate. Otherwise, the pressure setpoint will not be met. 
+2. If the setpoint pressure is between the maximum zone pressure caused by zero exhaust fan or relief node flow rate and the minimum zone pressure caused by maximum exhaust fan flow rate or outdoor air flow rate, then the AirflowNetwork model will use root solver to find a solution with calculated zone exhaust fan flow rate or relief node flow rate. Otherwise, the pressure setpoint will not be met. 
 
 3. If both maximum and minimum pressures are higher than the setpoint, the maximum exhaust or outdoor flow rate will be forced. 
 

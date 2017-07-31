@@ -385,6 +385,7 @@
     Liebert Econophase EIR Func T,  !- Energy Input Ratio Function of Temperature Curve Name
     HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Maximum Cycling Rate {cycles/hr}
@@ -419,6 +420,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     ,                        !- Normalization Reference
+    ,                        !- External File Name
     13.0,                    !- X Value #1
     -10.0,                   !- Y Value #1
     1.00,                    !- Output Value #1
@@ -580,6 +582,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless,           !- Output Unit Type
     ,                        !- Normalization Reference
+    ,                        !- External File Name
     12.7,                    !- X Value #1
     -50,                     !- Y Value #1
     0.042,                   !- Output Value #1

@@ -2,7 +2,14 @@
 
 \subsection{Overview}\label{overview-021}
 
-The input object ZoneHVAC:IdealLoadsAirSystem provides a model for an ideal HVAC system. It occupies a place in the program hierarchy corresponding to a zone HVAC unit. It is not connected to a central air system -- instead each ZoneHVAC:IdealLoadsAirSystem object supplies cooling or heating air to a zone in sufficient quantity to meet the zone load or up to its limits, if specified. The supply air conditions are controlled based on specifications in the ZoneHVAC:IdealLoadsAirSystem input. The system has options for humidity control, outdoor air, economizer, demand controlled ventilation, and heat recovery.
+The input object ZoneHVAC:IdealLoadsAirSystem provides a model for an ideal HVAC system. It occupies a place in the program hierarchy corresponding to a zone HVAC unit. It is not connected to a central air system -- instead each ZoneHVAC:IdealLoadsAirSystem object supplies cooling or heating air to a zone in sufficient quantity to meet the zone load or up to its limits, if specified. The ideal loads air system(s) may be optionally connected to a return plenum. The supply air conditions are controlled based on specifications in the ZoneHVAC:IdealLoadsAirSystem input. The system has options for humidity control, outdoor air, economizer, demand controlled ventilation, and heat recovery.
+
+\begin{figure}[hbtp] % fig 267
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/IdealLoadsSchematic.png}
+\caption{Ideal Loads Air System with and without plenum \protect \label{fig:ideal-loads-air-system-with-and-without-plenum}}
+\end{figure}
+
 
 \subsection{Model}\label{model-002}
 
@@ -16,6 +23,7 @@ The user specifies some or all of the following data for each ZoneHVAC:IdealLoad
   \item name of unit availability schedule
   \item name of the zone inlet node;
   \item name of the zone exhaust node;
+  \item name of the system inlet node (if plenum is used);
   \item maximum supply air temperature when in heating mode \emph{T\(_{max,heating}\)} {[}C{]};
   \item minimum supply air temperature when in cooling mode \emph{T\(_{min,cooling}\)} {[}C{]};
   \item maximum supply air humidity ratio when in heating mode \emph{W\(_{max,humid}\)} {[}kg water/kg dry air{]};
@@ -123,6 +131,7 @@ The user specifies some or all of the following data for each ZoneHVAC:IdealLoad
   \item Check the applicable capacity limits (sensible heating and total cooling) and adjust supply air temperature and humidity if needed.
   \item Set the zone inlet node conditions to the supply air mass flow rate, temperature, and humidity ratio.
   \item Calculate the unit output and load components.
+  \item If a zone return plenum is used, after all ideal loads systems that are connected to the plenum are simulated, simulate the return plenum.
 \end{itemize}
 
 \subsection{References}\label{references-029}
