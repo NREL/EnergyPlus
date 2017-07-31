@@ -31757,7 +31757,7 @@ DesignSpecification:OutdoorAir,
       \default 0.0
       \minimum 0
       \note This input is only used if the field Outdoor Air Method is AirChanges/Hour, Sum, or Maximum
-  A3; \field Outdoor Air Schedule Name
+  A3, \field Outdoor Air Schedule Name
       \type object-list
       \object-list ScheduleNames
       \note Schedule values are multiplied by the Outdoor Air Flow rate calculated using
@@ -31767,6 +31767,11 @@ DesignSpecification:OutdoorAir,
       \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:DualDuct:VAV:OutdoorAir,
       \note ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem.
       \note This schedule will also be applied by Controller:MechanicalVentilation for all System Outdoor Air Methods.
+  A4; \field Proportional Control Minimum Outdoor Air Flow Rate Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note This input is only used to calculate the minimum outdoor air flow rate when the field 
+      \note System Outdoor Air Method = ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation.
 
 DesignSpecification:ZoneAirDistribution,
   \min-fields 1
@@ -33029,15 +33034,23 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy
-       \note in Controller:MechanicalVentilation
-  A6 , \field Generic Contaminant Control Availability Schedule Name
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy, 
+       \note or ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation
+  A6 , \field Maximum Carbon Dioxide Concentration Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values should be carbon dioxide concentration in parts per
+       \note million (ppm)
+       \note This field is used when the field System Outdoor Air Method =
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy 
+       \note or ProportionalControlBasedOnDesignOARate.  
+  A7 , \field Generic Contaminant Control Availability Schedule Name
        \note Availability schedule name for generic contaminant controller. Schedule value > 0 means
        \note the generic contaminant controller is enabled. If this field is blank, then generic
        \note contaminant controller is always enabled.
        \type object-list
        \object-list ScheduleNames
-  A7 ; \field Generic Contaminant Setpoint Schedule Name
+  A8 ; \field Generic Contaminant Setpoint Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Schedule values should be generic contaminant concentration in parts per
@@ -57677,6 +57690,7 @@ Controller:MechanicalVentilation,
         \key ProportionalControlBasedonOccupancySchedule
         \key IndoorAirQualityProcedureGenericContaminant
         \key IndoorAirQualityProcedureCombined
+        \key ProportionalControlBasedOnDesignOARate 
         \default VentilationRateProcedure
    N1,  \field Zone Maximum Outdoor Air Fraction
         \type real

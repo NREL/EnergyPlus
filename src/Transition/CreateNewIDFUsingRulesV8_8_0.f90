@@ -429,6 +429,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(6:CurArgs+1)=InArgs(5:CurArgs)
                  CurArgs = CurArgs + 1
 
+             CASE('ZONECONTROL:CONTAMINANTCONTROLLER')                                                                                           
+               CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+               IF(CurArgs .GT. 4) THEN  
+                 nodiff=.false.
+                 OutArgs(1:5)=InArgs(1:5)
+                 OutArgs(6) = ''
+                 OutArgs(7:CurArgs+1)=InArgs(6:CurArgs)
+                 CurArgs = CurArgs + 1
+               ELSE
+                 nodiff=.true.
+                 OutArgs=InArgs
+               END IF
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
