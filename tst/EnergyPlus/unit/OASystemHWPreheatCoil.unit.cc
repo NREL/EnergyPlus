@@ -54,6 +54,7 @@
 
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -65,6 +66,7 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::HVACControllers;
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::Psychrometrics;
@@ -2020,6 +2022,11 @@ namespace EnergyPlus {
 		CpAir = PsyCpAirFnWTdb( Node( AirInletNodeNum ).HumRat, Node( AirInletNodeNum ).Temp );
 		EXPECT_NEAR( WaterCoil( 1 ).TotWaterHeatingCoilRate, WaterCoil( 1 ).InletAirMassFlowRate * CpAir * ( WaterCoil( 1 ).OutletAirTemp - WaterCoil( 1 ).InletAirTemp ), 1.0 ); 
 
+		// test that OA sys water coil bypasses normal controller calls before air loop simulation
+		EXPECT_EQ( "PREHEAT COIL CONTROLLER", HVACControllers::ControllerProps( 1 ).ControllerName );
+		EXPECT_TRUE( HVACControllers::ControllerProps( 1 ).BypassControllerCalc );
+		// test that water coil knows which controller controls the HW coil
+		EXPECT_EQ( WaterCoil( 1 ).ControllerIndex, 1 );
 	}
 
 }
