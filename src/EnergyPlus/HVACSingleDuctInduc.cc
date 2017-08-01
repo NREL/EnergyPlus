@@ -935,7 +935,7 @@ namespace HVACSingleDuctInduc {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataPlant::PlantLoop;
 		using PlantUtilities::SetComponentFlowRate;
@@ -1039,7 +1039,7 @@ namespace HVACSingleDuctInduc {
 					Par( 6 ) = QPriOnly;
 					Par( 7 ) = PowerMet;
 					ErrTolerance = IndUnit( IUNum ).HotControlOffset;
-					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par );
+					SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( IndUnit( IUNum ).HWCoilFailNum1 == 0 ) {
 							ShowWarningMessage( "SimFourPipeIndUnit: Hot water coil control failed for " + IndUnit( IUNum ).UnitType + "=\"" + IndUnit( IUNum ).Name + "\"" );
@@ -1075,7 +1075,7 @@ namespace HVACSingleDuctInduc {
 					Par( 6 ) = QPriOnly;
 					Par( 7 ) = PowerMet;
 					ErrTolerance = IndUnit( IUNum ).ColdControlOffset;
-					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
+					SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( IndUnit( IUNum ).CWCoilFailNum1 == 0 ) {
 							ShowWarningMessage( "SimFourPipeIndUnit: Cold water coil control failed for " + IndUnit( IUNum ).UnitType + "=\"" + IndUnit( IUNum ).Name + "\"" );

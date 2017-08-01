@@ -958,7 +958,7 @@ namespace FluidCoolers {
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -1201,7 +1201,7 @@ namespace FluidCoolers {
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, CalledFrom );
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 						ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1289,7 +1289,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1416,7 +1416,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, CalledFrom );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );

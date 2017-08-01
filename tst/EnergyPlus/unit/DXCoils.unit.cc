@@ -1049,6 +1049,7 @@ namespace EnergyPlus {
 			"	WindACEIRFT,          !- Energy Input Ratio Function of Temperature Curve Name",
 			"	WindACEIRFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name",
 			"	WindACPLFFPLR,        !- Part Load Fraction Correlation Curve Name",
+			"	,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"	0.0,                  !- Nominal Time for Condensate Removal to Begin",
 			"	0.0,                  !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
 			"	0.0,                  !- Maximum Cycling Rate",
@@ -1076,6 +1077,8 @@ namespace EnergyPlus {
 		SizeDXCoil( 1 );
 		EXPECT_EQ( 25000.0, DXCoil( 1 ).RatedTotCap( 1 ) );
 		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ) * 0.004266, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
+		// Minimum Outdoor Temperature for Compressor Operation defaults to -25.0 C
+		EXPECT_EQ( DXCoil( 1 ).MinOATCompressor, -25.0 );
 
 	}
 
@@ -1153,6 +1156,7 @@ namespace EnergyPlus {
 			"  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
 			"  Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name",
 			"  AirCooled, !- Condenser Type",
+			"  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"  , !- Supply Water Storage Tank Name",
 			"  , !- Condensate Collection Water Storage Tank Name",
 			"  No, !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -1431,6 +1435,7 @@ namespace EnergyPlus {
 			"	WindACEIRFT,          !- Energy Input Ratio Function of Temperature Curve Name",
 			"	WindACEIRFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name",
 			"	WindACPLFFPLR,        !- Part Load Fraction Correlation Curve Name",
+			"	,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"	0.0,                  !- Nominal Time for Condensate Removal to Begin",
 			"	0.0,                  !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
 			"	0.0,                  !- Maximum Cycling Rate",
@@ -1522,6 +1527,7 @@ namespace EnergyPlus {
 			"  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
 			"  Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name",
 			"  AirCooled, !- Condenser Type",
+			"  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"  , !- Supply Water Storage Tank Name",
 			"  , !- Condensate Collection Water Storage Tank Name",
 			"  No, !- Apply Part Load Fraction to Speeds Greater than 1",

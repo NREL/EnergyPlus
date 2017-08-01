@@ -1028,6 +1028,10 @@ namespace SetPointManager {
 			OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			if ( UtilityRoutines::SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
+			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
+			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
 			} else {
 				// should not come here if idd type choice and key list is working
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
@@ -3692,11 +3696,14 @@ namespace SetPointManager {
 
 			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumOutAirSetPtMgrs; ++SetPtMgrNum ) {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= OutAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
+					OutAirSetPtMgr( SetPtMgrNum ).calculate();
 					NodeNum = OutAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						// Call the CALC routine, with an optional argument to only set
-						// the initialization NODE(:)% setpoint, and not the OutAirSetPtMgr(:)%SetPt
-						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum, true );
+						Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
+					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
+						Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
+					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
+						Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
 					}
 				}
 			}
@@ -4440,10 +4447,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineOutsideAirSetPointManager::calculate(
-		Optional_int_const NodeNum, // When Init Calls this routine, it passes the cur node number
-		Optional_bool_const InitFlag // When Init Calls this routine, it passes True
-	)
+	DefineOutsideAirSetPointManager::calculate()
 	{
 
 		// SUBROUTINE ARGUMENTS:
@@ -4464,13 +4468,9 @@ namespace SetPointManager {
 		Real64 OutHighTemp;
 		Real64 SetTempAtOutLow;
 		Real64 SetTempAtOutHigh;
-		int SchedPtr;
-		Real64 SetPt;
 
-		SchedPtr = this->SchedPtr;
-
-		if ( SchedPtr > 0 ) {
-			SchedVal = GetCurrentScheduleValue( SchedPtr );
+		if ( this->SchedPtr > 0 ) {
+			SchedVal = GetCurrentScheduleValue( this->SchedPtr );
 		} else {
 			SchedVal = 0.0;
 		}
@@ -4487,14 +4487,7 @@ namespace SetPointManager {
 			SetTempAtOutHigh = this->OutHighSetPt1;
 		}
 
-		SetPt = CalcSetPoint(OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
-
-		if ( present( InitFlag ) ) {
-			Node( NodeNum ).TempSetPoint = SetPt; //Setpoint for Initial Routine
-		} else {
-			this->SetPt = SetPt; //Setpoint for Calc Routine
-		}
-
+		this->SetPt = CalcSetPoint( OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh );
 	}
 
 	Real64
@@ -7198,11 +7191,13 @@ namespace SetPointManager {
 			for ( CtrlNodeIndex = 1; CtrlNodeIndex <= OutAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) { // Loop over the list of nodes wanting
 				// setpoints from this setpoint manager
 				NodeNum = OutAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
-
 				if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
 					Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the setpoint
+				} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
+					Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the high temperature setpoint
+				} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
+					Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the low temperature setpoint
 				}
-
 			}
 
 		}

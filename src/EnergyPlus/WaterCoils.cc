@@ -799,7 +799,7 @@ namespace WaterCoils {
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::Iterate;
 		using General::SafeDivide;
 		using DataSizing::AutoSize;
@@ -1277,7 +1277,7 @@ namespace WaterCoils {
 				// approximate the dry UA as 1.0 times wet UA
 				WaterCoil( CoilNum ).UADryExtPerUnitArea = WaterCoil( CoilNum ).UAWetExtPerUnitArea;
 
-				// Now use SolveRegulaFalsi to "invert" the cooling coil model to obtain the UA given the specified design inlet and outlet conditions
+				// Now use SolveRoot to "invert" the cooling coil model to obtain the UA given the specified design inlet and outlet conditions
 				// Note that the UAs we have obtained so far are rough estimates that are the starting points for the the following iterative
 				//   calulation of the actual UAs.
 				Par( 1 ) = WaterCoil( CoilNum ).DesTotWaterCoilLoad;
@@ -1293,7 +1293,7 @@ namespace WaterCoils {
 				UA0 = 0.1 * WaterCoil( CoilNum ).UACoilExternal;
 				UA1 = 10.0 * WaterCoil( CoilNum ).UACoilExternal;
 				// Invert the simple cooling coil model: given the design inlet conditions and the design load, find the design UA
-				SolveRegulaFalsi( 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, Par );
+				SolveRoot( 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, Par );
 				// if the numerical inversion failed, issue error messages.
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Calculation of cooling coil design UA failed for coil " + WaterCoil( CoilNum ).Name );
@@ -1573,7 +1573,7 @@ namespace WaterCoils {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -5486,7 +5486,7 @@ Label10: ;
 		// none
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 
 		// Return value
@@ -5519,7 +5519,7 @@ Label10: ;
 		Par( 1 ) = H;
 		Par( 2 ) = RH;
 		Par( 3 ) = PB;
-		SolveRegulaFalsi( Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par );
+		SolveRoot( Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par );
 		// if the numerical inversion failed, issue error messages.
 		if ( SolFla == -1 ) {
 			ShowSevereError( "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)" );

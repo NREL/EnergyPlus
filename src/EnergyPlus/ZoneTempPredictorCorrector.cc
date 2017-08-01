@@ -6505,7 +6505,7 @@ namespace ZoneTempPredictorCorrector {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using ThermalComfort::CalcThermalComfortFanger;
 
 		// Locals
@@ -6513,8 +6513,8 @@ namespace ZoneTempPredictorCorrector {
 		// 0 = Solution; 1 = Set to Min; 2 Set to Max
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Acc( 0.001 ); // accuracy control for SolveRegulaFalsi
-		int const MaxIter( 500 ); // iteration control for SolveRegulaFalsi
+		Real64 const Acc( 0.001 ); // accuracy control for SolveRoot
+		int const MaxIter( 500 ); // iteration control for SolveRoot
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -6529,7 +6529,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 PMVMin; // Minimum allowed PMV value
 		Real64 PMVMax; // Calculated PMV value
 		Array1D< Real64 > Par( 2 ); // Passed parameter for RegularFalsi function
-		int SolFla; // feed back flag from SolveRegulaFalsi
+		int SolFla; // feed back flag from SolveRoot
 		static int IterLimitExceededNum1( 0 );
 		static int IterLimitErrIndex1( 0 );
 		static int IterLimitExceededNum2( 0 );
@@ -6545,7 +6545,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( PMVSet > PMVMin && PMVSet < PMVMax ) {
 			Par( 1 ) = PMVSet;
 			Par( 2 ) = double( PeopleNum );
-			SolveRegulaFalsi( Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par );
+			SolveRoot( Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par );
 			if ( SolFla == -1 ) {
 				if ( ! WarmupFlag ) {
 					++IterLimitExceededNum1;

@@ -2372,7 +2372,7 @@ namespace HVACMultiSpeedHeatPump {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
@@ -2502,7 +2502,7 @@ namespace HVACMultiSpeedHeatPump {
 			if ( ( QZnReq > 0.0 && QZnReq <= LowOutput ) || ( QZnReq < 0.0 && QZnReq >= LowOutput ) ) {
 				SpeedRatio = 0.0;
 				SpeedNum = 1;
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
 						if ( ErrCountCyc == 0 ) {
@@ -2539,7 +2539,7 @@ namespace HVACMultiSpeedHeatPump {
 					}
 				}
 				Par( 8 ) = SpeedNum;
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
 						if ( ErrCountVar == 0 ) {
@@ -2576,7 +2576,7 @@ namespace HVACMultiSpeedHeatPump {
 					CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 					SpeedRatio = 0.0;
 					if ( ( QZnReq > 0.0 && QZnReq <= LowOutput ) || ( QZnReq < 0.0 && QZnReq >= LowOutput ) ) {
-						SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
+						SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
 						if ( SolFla == -1 ) {
 							if ( ! WarmupFlag ) {
 								if ( ErrCountCyc == 0 ) {
@@ -2606,7 +2606,7 @@ namespace HVACMultiSpeedHeatPump {
 						CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 1.0, 1.0, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 						if ( ( QZnReq > 0.0 && QZnReq <= FullOutput ) || ( QZnReq < 0.0 && QZnReq >= FullOutput ) ) {
 							Par( 8 ) = SpeedNum;
-							SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
+							SolveRoot( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( ErrCountVar == 0 ) {
@@ -3399,7 +3399,7 @@ namespace HVACMultiSpeedHeatPump {
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::SmallLoad;
 
@@ -3499,7 +3499,7 @@ namespace HVACMultiSpeedHeatPump {
 							Par( 2 ) = 0.0;
 						}
 						Par( 3 ) = HeatingLoad;
-						SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
+						SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
 						if ( SolFlag == -1 ) {
 							if ( MSHeatPump( MSHeatPumpNum ).HotWaterCoilMaxIterIndex == 0 ) {
 								ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed for " + CurrentModuleObject + "=\"" + MSHeatPump( MSHeatPumpNum ).Name + "\"" );

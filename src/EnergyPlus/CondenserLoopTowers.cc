@@ -2308,7 +2308,7 @@ namespace CondenserLoopTowers {
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -2611,7 +2611,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 					//        SimpleTowerInlet(TowerNum)%AirHumRat = PsyWFnTdbTwbPb(35.,25.6,StdBaroPress)
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -2678,7 +2678,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 					//        SimpleTowerInlet(TowerNum)%AirHumRat = PsyWFnTdbTwbPb(35.,25.6,StdBaroPress)
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -2738,7 +2738,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 				//      SimpleTowerInlet(TowerNum)%AirHumRat = PsyWFnTdbTwbPb(35.,25.6,StdBaroPress)
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -2869,7 +2869,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -2940,7 +2940,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -3018,7 +3018,7 @@ namespace CondenserLoopTowers {
 			}
 
 			if ( ModelCalibrated ) {
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, WaterFlowRatio, SimpleTowerApproachResidual, constant_pointfive, MaxWaterFlowRateRatio, Par );
+				SolveRoot( Acc, MaxIte, SolFla, WaterFlowRatio, SimpleTowerApproachResidual, constant_pointfive, MaxWaterFlowRateRatio, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower water flow ratio during calibration" );
 					ShowContinueError( "Inlet air wet-bulb, range, and/or approach temperature does not allow calibration of water flow rate ratio for this variable-speed cooling tower." );
@@ -3154,7 +3154,7 @@ namespace CondenserLoopTowers {
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 
@@ -3391,7 +3391,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6;
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 					ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -3422,7 +3422,7 @@ namespace CondenserLoopTowers {
 				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6;
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower free convection UA" );
 					ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -3628,7 +3628,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 						ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -3658,7 +3658,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower free convection UA" );
 						ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
@@ -4514,7 +4514,7 @@ namespace CondenserLoopTowers {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using FaultsManager::FaultsCondenserSWTSensor;
 		using FaultsManager::FaultsTowerFouling;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -4746,7 +4746,7 @@ namespace CondenserLoopTowers {
 			Par( 7 ) = CpWater;
 			Par( 8 ) = WaterMassFlowRate;
 
-			SolveRegulaFalsi( Acc, MaxIte, SolFla, AirFlowRateRatio, VSMerkelResidual, SimpleTower( TowerNum ).MinimumVSAirFlowFrac, 1.0, Par );
+			SolveRoot( Acc, MaxIte, SolFla, AirFlowRateRatio, VSMerkelResidual, SimpleTower( TowerNum ).MinimumVSAirFlowFrac, 1.0, Par );
 
 			if ( SolFla == -1 ) {
 				if ( ! WarmupFlag ) {
@@ -4926,7 +4926,7 @@ namespace CondenserLoopTowers {
 		// Form 160.00-SG2 (0502). 2002.
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using CurveManager::CurveValue;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
@@ -5159,7 +5159,7 @@ namespace CondenserLoopTowers {
 					Par( 5 ) = Ta; // desired approach temperature [C]
 					Par( 6 ) = 1.0; // calculate the air flow rate ratio required for a balance
 
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, AirFlowRateRatio, SimpleTowerApproachResidual, SimpleTower( TowerNum ).MinimumVSAirFlowFrac, 1.0, Par );
+					SolveRoot( Acc, MaxIte, SolFla, AirFlowRateRatio, SimpleTowerApproachResidual, SimpleTower( TowerNum ).MinimumVSAirFlowFrac, 1.0, Par );
 					if ( SolFla == -1 ) {
 						if ( ! WarmupFlag ) ShowWarningError( "Cooling tower iteration limit exceeded when calculating air flow rate ratio for tower " + SimpleTower( TowerNum ).Name );
 						//           IF RegulaFalsi cannot find a solution then provide detailed output for debugging
@@ -5432,7 +5432,7 @@ namespace CondenserLoopTowers {
 		// Form 160.00-SG2 (0502). 2002.
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 
@@ -5460,7 +5460,7 @@ namespace CondenserLoopTowers {
 		Par( 2 ) = WaterFlowRateRatio; // water flow rate ratio
 		Par( 3 ) = AirFlowRateRatio; // air flow rate ratio
 		Par( 4 ) = Twb; // inlet air wet-bulb temperature [C]
-		SolveRegulaFalsi( Acc, MaxIte, SolFla, Tr, SimpleTowerTrResidual, 0.001, VSTower( SimpleTower( TowerNum ).VSTower ).MaxRangeTemp, Par );
+		SolveRoot( Acc, MaxIte, SolFla, Tr, SimpleTowerTrResidual, 0.001, VSTower( SimpleTower( TowerNum ).VSTower ).MaxRangeTemp, Par );
 
 		OutletWaterTemp = SimpleTowerInlet( TowerNum ).WaterTemp - Tr;
 

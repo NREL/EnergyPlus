@@ -3894,7 +3894,7 @@ namespace PackagedThermalStorageCoil {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 
 		// USE STATEMENTS:
@@ -3964,7 +3964,7 @@ namespace PackagedThermalStorageCoil {
 					Par( 3 ) = TESOpMode;
 					Par( 4 ) = OutletNode;
 					Par( 5 ) = double( FanOpMode );
-					SolveRegulaFalsi( Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par );
+					SolveRoot( Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par );
 					if ( SolFlag == -1 ) {
 						if ( ! WarmupFlag ) {
 							if ( SensPLRIter < 1 ) {
@@ -4017,7 +4017,7 @@ namespace PackagedThermalStorageCoil {
 						Par( 3 ) = TESOpMode;
 						Par( 4 ) = OutletNode;
 						Par( 5 ) = double( FanOpMode );
-						SolveRegulaFalsi( HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par );
+						SolveRoot( HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par );
 						if ( SolFlag == -1 ) {
 							if ( ! WarmupFlag ) {
 								if ( LatPLRIter < 1 ) {

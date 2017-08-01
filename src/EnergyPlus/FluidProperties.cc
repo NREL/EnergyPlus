@@ -4481,7 +4481,7 @@ namespace FluidProperties {
 		// Perform iterations to identify the temperature by calling GetSupHeatEnthalpyRefrig.
 
 		// USE STATEMENTS:
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Return value
 		Real64 ReturnValue;
@@ -4569,8 +4569,13 @@ namespace FluidProperties {
 			Par( 1 ) = RefrigNum;
 			Par( 2 ) = Enthalpy;
 			Par( 3 ) = Pressure;
+<<<<<<< HEAD
 
 			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
+=======
+			
+			SolveRoot( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
+>>>>>>> NREL/develop
 			ReturnValue = Temp;
 		}
 

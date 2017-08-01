@@ -611,7 +611,7 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -823,7 +823,7 @@ namespace BaseboardRadiator {
 						UA1 = DesCoilLoad;
 						// Invert the baseboard model: given the design inlet conditions and the design load,
 						// find the design UA.
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
+						SolveRoot( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
 						// if the numerical inversion failed, issue error messages.
 						if ( SolFla == -1 ) {
 							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );

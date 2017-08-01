@@ -1153,7 +1153,7 @@ namespace EvaporativeFluidCoolers {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -1390,7 +1390,7 @@ namespace EvaporativeFluidCoolers {
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
 						ShowContinueError( "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
@@ -1478,7 +1478,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
@@ -1533,7 +1533,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
@@ -1650,7 +1650,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
@@ -1695,7 +1695,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating EvaporativeFluidCooler UA" );
 					ShowFatalError( "Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );

@@ -848,7 +848,12 @@ namespace WaterToAirHeatPump {
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyTsatFnHPb;
 		using General::RoundSigDigits;
+<<<<<<< HEAD
 		using General::SolveRegulaFalsi;
+=======
+		using General::SolveRoot;
+		using InputProcessor::SameString;
+>>>>>>> NREL/develop
 		using DataPlant::PlantLoop;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -1279,7 +1284,7 @@ namespace WaterToAirHeatPump {
 					Par( 2 ) = double( RefrigIndex );
 					Par( 3 ) = SuperHeatEnth;
 
-					SolveRegulaFalsi( ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par );
+					SolveRoot( ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par );
 					if ( SolFlag == -1 ) {
 						WatertoAirHP( HPNum ).SimFlag = false;
 						return;
@@ -1419,7 +1424,7 @@ namespace WaterToAirHeatPump {
 		// To calculate the compressor suction temperature for water to air HP's
 
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 
 		// REFERENCES:
 		// na
@@ -1498,8 +1503,13 @@ namespace WaterToAirHeatPump {
 		using Psychrometrics::PsyWFnTdbH;
 		//  USE DataZoneEnergyDemands
 		using General::RoundSigDigits;
+<<<<<<< HEAD
 		using General::SolveRegulaFalsi;
 
+=======
+		using General::SolveRoot;
+		using InputProcessor::SameString;
+>>>>>>> NREL/develop
 		using DataPlant::PlantLoop;
 
 		// Locals
@@ -1806,7 +1816,7 @@ namespace WaterToAirHeatPump {
 				Par( 2 ) = double( RefrigIndex );
 				Par( 3 ) = SuperHeatEnth;
 
-				SolveRegulaFalsi( ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par );
+				SolveRoot( ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par );
 				if ( SolFlag == -1 ) {
 					WatertoAirHP( HPNum ).SimFlag = false;
 					return;

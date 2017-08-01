@@ -575,7 +575,7 @@ namespace FourPipeBeam {
 		using DataPlant::MyPlantSizingIndex;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using namespace std::placeholders;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		static std::string const routineName( "HVACFourPipeBeam::set_size " );
 		static int pltSizCoolNum( 0 ); // index of plant sizing object for the cooling loop
@@ -702,7 +702,7 @@ namespace FourPipeBeam {
 				this->airAvailable = true;
 				this->coolingAvailable = true;
 				this->heatingAvailable = false;
-				SolveRegulaFalsi( ErrTolerance, 50, SolFlag, mDotAirSolutionCooling, std::bind( &HVACFourPipeBeam::residualSizing, this, _1 ), minFlow, maxFlowCool );
+				SolveRoot( ErrTolerance, 50, SolFlag, mDotAirSolutionCooling, std::bind( &HVACFourPipeBeam::residualSizing, this, _1 ), minFlow, maxFlowCool );
 				if ( SolFlag == -1 ) {
 					ShowWarningError( "Cooling load sizing search failed in four pipe beam unit called " + this->name );
 					ShowContinueError( "  Iteration limit exceeded in calculating size for design cooling load" );
@@ -743,7 +743,7 @@ namespace FourPipeBeam {
 				this->airAvailable = true;
 				this->heatingAvailable = true;
 				this->coolingAvailable = false;
-				SolveRegulaFalsi( ErrTolerance, 50, SolFlag, mDotAirSolutionHeating, std::bind( &HVACFourPipeBeam::residualSizing, this, _1 ), 0.0, maxFlowHeat );
+				SolveRoot( ErrTolerance, 50, SolFlag, mDotAirSolutionHeating, std::bind( &HVACFourPipeBeam::residualSizing, this, _1 ), 0.0, maxFlowHeat );
 				if ( SolFlag == -1 ) {
 					ShowWarningError( "Heating load sizing search failed in four pipe beam unit called " + this->name );
 					ShowContinueError( "  Iteration limit exceeded in calculating size for design heating load" );
@@ -915,7 +915,7 @@ namespace FourPipeBeam {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::SetComponentFlowRate;
 		using namespace std::placeholders;
 
@@ -997,7 +997,7 @@ namespace FourPipeBeam {
 				// can overcool, modulate chilled water flow rate to meet load
 				this->qDotBeamCoolingMax = this->qDotBeamCooling;
 				ErrTolerance = 0.01;
-				SolveRegulaFalsi( ErrTolerance, 50, SolFlag, this->mDotCW, std::bind( &HVACFourPipeBeam::residualCooling, this, _1 ), 0.0, this->mDotDesignCW );
+				SolveRoot( ErrTolerance, 50, SolFlag, this->mDotCW, std::bind( &HVACFourPipeBeam::residualCooling, this, _1 ), 0.0, this->mDotDesignCW );
 				if ( SolFlag == -1 ) {
 					//ShowWarningError( "Cold water control failed in four pipe beam unit called " + this->name );
 					//ShowContinueError( "  Iteration limit exceeded in calculating cold water mass flow rate" );
@@ -1030,7 +1030,7 @@ namespace FourPipeBeam {
 				this->qDotBeamHeatingMax = this->qDotBeamHeating;
 				// can overheat, modulate hot water flow to meet load
 				ErrTolerance = 0.01;
-				SolveRegulaFalsi( ErrTolerance, 50, SolFlag, this->mDotHW, std::bind( &HVACFourPipeBeam::residualHeating, this , _1 ), 0.0, this->mDotDesignHW );
+				SolveRoot( ErrTolerance, 50, SolFlag, this->mDotHW, std::bind( &HVACFourPipeBeam::residualHeating, this , _1), 0.0, this->mDotDesignHW);
 				if ( SolFlag == -1 ) {
 					//ShowWarningError( "Hot water control failed in four pipe beam unit called " + this->name );
 					//ShowContinueError( "  Iteration limit exceeded in calculating hot water mass flow rate" );
