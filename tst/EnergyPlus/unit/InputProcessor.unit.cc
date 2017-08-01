@@ -77,105 +77,105 @@ std::vector<std::string> getAllLinesInFile( std::string filePath ) {
 
 namespace EnergyPlus {
 
-	TEST_F( InputProcessorFixture, stress_get_number_objects_good ) {
-		auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-		auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-		auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+	// TEST_F( InputProcessorFixture, stress_get_number_objects_good ) {
+	// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
+	// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
+	// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
 
-		compressors.insert( compressors.end(), cases.begin(), cases.end() );
-		compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
+	// 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
+	// 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
 
-		ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
+	// 	ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
 
-		size_t total = 0;
+	// 	size_t total = 0;
 
-		for (int i = 0; i < 10000000; ++i)
-		{
-			total += inputProcessor->getNumObjectsFound( "Refrigeration:Compressor" );
-			total += inputProcessor->getNumObjectsFound( "Curve:Bicubic" );
-			total += inputProcessor->getNumObjectsFound( "Refrigeration:Case" );
-			total += inputProcessor->getNumObjectsFound( "Chiller:Electric:EIR" );
-			total += inputProcessor->getNumObjectsFound( "Curve:Biquadratic" );
-			total += inputProcessor->getNumObjectsFound( "Curve:Quadratic" );
-		}
+	// 	for (int i = 0; i < 10000000; ++i)
+	// 	{
+	// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:Compressor" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:Bicubic" );
+	// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:Case" );
+	// 		total += inputProcessor->getNumObjectsFound( "Chiller:Electric:EIR" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:Biquadratic" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:Quadratic" );
+	// 	}
 
-		EXPECT_EQ( 4038000ul * 10000, total );
-	}
+	// 	EXPECT_EQ( 4038000ul * 10000, total );
+	// }
 
-	TEST_F( InputProcessorFixture, stress_get_number_objects_bad ) {
-		auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-		auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-		auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+	// TEST_F( InputProcessorFixture, stress_get_number_objects_bad ) {
+	// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
+	// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
+	// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
 
-		compressors.insert( compressors.end(), cases.begin(), cases.end() );
-		compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
+	// 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
+	// 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
 
-		ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
+	// 	ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
 
-		size_t total = 0;
+	// 	size_t total = 0;
 
-		for (int i = 0; i < 10000000; ++i)
-		{
-			total += inputProcessor->getNumObjectsFound( "Refrigeration:CompressoR" );
-			total += inputProcessor->getNumObjectsFound( "Curve:BicubiC" );
-			total += inputProcessor->getNumObjectsFound( "Refrigeration:CasE" );
-			total += inputProcessor->getNumObjectsFound( "Chiller:Electric:EIr" );
-			total += inputProcessor->getNumObjectsFound( "Curve:BiquadratiC" );
-			total += inputProcessor->getNumObjectsFound( "Curve:QuadratiC" );
-		}
+	// 	for (int i = 0; i < 10000000; ++i)
+	// 	{
+	// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:CompressoR" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:BicubiC" );
+	// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:CasE" );
+	// 		total += inputProcessor->getNumObjectsFound( "Chiller:Electric:EIr" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:BiquadratiC" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:QuadratiC" );
+	// 	}
 
-		EXPECT_EQ( 4038000ul * 10000, total );
-	}
+	// 	EXPECT_EQ( 4038000ul * 10000, total );
+	// }
 
-	TEST_F( InputProcessorFixture, stress_get_number_objects_worse ) {
-		auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-		auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-		auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+	// TEST_F( InputProcessorFixture, stress_get_number_objects_worse ) {
+	// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
+	// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
+	// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
 
-		compressors.insert( compressors.end(), cases.begin(), cases.end() );
-		compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
+	// 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
+	// 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
 
-		ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
+	// 	ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
 
-		size_t total = 0;
+	// 	size_t total = 0;
 
-		for (int i = 0; i < 10000000; ++i)
-		{
-			total += inputProcessor->getNumObjectsFound( "SurfaceConvectionAlgorithm:Inside" );
-			total += inputProcessor->getNumObjectsFound( "RoomAir:Node:AirflowNetwork:InternalGains" );
-			total += inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:Component:DetailedOpening" );
-			total += inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" );
-			total += inputProcessor->getNumObjectsFound( "HeatPump:WaterToWater:ParameterEstimation:Cooling" );
-			total += inputProcessor->getNumObjectsFound( "WaterHeater:Stratified" );
-		}
+	// 	for (int i = 0; i < 10000000; ++i)
+	// 	{
+	// 		total += inputProcessor->getNumObjectsFound( "SurfaceConvectionAlgorithm:Inside" );
+	// 		total += inputProcessor->getNumObjectsFound( "RoomAir:Node:AirflowNetwork:InternalGains" );
+	// 		total += inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:Component:DetailedOpening" );
+	// 		total += inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" );
+	// 		total += inputProcessor->getNumObjectsFound( "HeatPump:WaterToWater:ParameterEstimation:Cooling" );
+	// 		total += inputProcessor->getNumObjectsFound( "WaterHeater:Stratified" );
+	// 	}
 
-		EXPECT_EQ( 0ul, total );
-	}
+	// 	EXPECT_EQ( 0ul, total );
+	// }
 
-	TEST_F( InputProcessorFixture, stress_get_number_objects_worst ) {
-		auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-		auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-		auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+	// TEST_F( InputProcessorFixture, stress_get_number_objects_worst ) {
+	// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
+	// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
+	// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
 
-		compressors.insert( compressors.end(), cases.begin(), cases.end() );
-		compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
+	// 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
+	// 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
 
-		ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
+	// 	ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
 
-		size_t total = 0;
+	// 	size_t total = 0;
 
-		for (int i = 0; i < 10000000; ++i)
-		{
-			total += inputProcessor->getNumObjectsFound( "SurfaceConvectionAlgorithm:Insides" );
-			total += inputProcessor->getNumObjectsFound( "RoomAir:Node:AirflowNetwork:InternalGainss" );
-			total += inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:Component:DetailedOpenings" );
-			total += inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" );
-			total += inputProcessor->getNumObjectsFound( "HeatPump:WaterToWater:ParameterEstimation:Coolings" );
-			total += inputProcessor->getNumObjectsFound( "WaterHeater:Stratifieds" );
-		}
+	// 	for (int i = 0; i < 10000000; ++i)
+	// 	{
+	// 		total += inputProcessor->getNumObjectsFound( "SurfaceConvectionAlgorithm:Insides" );
+	// 		total += inputProcessor->getNumObjectsFound( "RoomAir:Node:AirflowNetwork:InternalGainss" );
+	// 		total += inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:Component:DetailedOpenings" );
+	// 		total += inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" );
+	// 		total += inputProcessor->getNumObjectsFound( "HeatPump:WaterToWater:ParameterEstimation:Coolings" );
+	// 		total += inputProcessor->getNumObjectsFound( "WaterHeater:Stratifieds" );
+	// 	}
 
-		EXPECT_EQ( 0ul, total );
-	}
+	// 	EXPECT_EQ( 0ul, total );
+	// }
 
 	TEST_F( InputProcessorFixture, decode_encode_1 ) {
 		auto const idf = delimited_string({
