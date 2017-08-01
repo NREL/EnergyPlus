@@ -255,9 +255,9 @@ namespace CoolingPanelSimple {
 		int const CoolingPanelNum
 	);
 
-	void SizeCoolingPanelUA(
-		int const CoolingPanelNum,
-		bool & SizeUASuccess
+	bool
+ 	SizeCoolingPanelUA(
+		int const CoolingPanelNum
 	);
 	
 	void
