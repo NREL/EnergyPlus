@@ -222,27 +222,14 @@ using json = nlohmann::json;
 
 namespace EnergyPlus {
 
-	void EnergyPlusFixture::SetUpTestCase() {
-		EnergyPlus::inputProcessor = InputProcessor::factory();
-
-		bool errors_found = false;
-		process_idd("", errors_found);
-		if ( errors_found ) {
-			std::cout << "JSON Schema not found" << std::endl;
-			return;
-		}
-
-		const json & loc = inputProcessor->schema[ "properties" ];
-		inputProcessor->caseInsensitiveObjectMap.reserve( loc.size() );
-		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
-			inputProcessor->caseInsensitiveObjectMap.emplace( UtilityRoutines::MakeUPPERCase( it.key() ), it.key() );
-		}
-	}
+	void EnergyPlusFixture::SetUpTestCase() {}
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
 
 		show_message();
+
+		EnergyPlus::inputProcessor = InputProcessor::factory();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->eio_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -263,8 +250,6 @@ namespace EnergyPlus {
 		UtilityRoutines::outputErrorHeader = false;
 
 		Psychrometrics::InitializePsychRoutines();
-
-		inputProcessor->state->initialize( & inputProcessor->schema );
 	}
 
 	void EnergyPlusFixture::TearDown() {

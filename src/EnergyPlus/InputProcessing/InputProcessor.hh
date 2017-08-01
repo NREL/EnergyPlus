@@ -257,6 +257,15 @@ namespace EnergyPlus {
 		json const &
 		getFields( std::string const & objectType );
 
+		inline std::string convertToUpper( std::string s ) {
+			size_t len = s.size();
+			for ( size_t i = 0 ; i < len ; ++i ) {
+				char c = s[ i ];
+				s[i] = ( 'a' <= c && c <= 'z' ) ? c ^ 0x20 : c; // ASCII only
+			}
+			return s;
+		}
+
 		using UnorderedObjectTypeMap = std::unordered_map < std::string, std::string >;
 		using UnorderedObjectCacheMap = std::unordered_map< std::string, ObjectCache >;
 		using UnorderedUnusedObjectMap = std::map< const json::object_t * const, ObjectInfo >;

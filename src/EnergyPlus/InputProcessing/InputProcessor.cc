@@ -109,6 +109,16 @@ namespace EnergyPlus {
 		state( std::unique_ptr< State >( new State() ) ),
 		data( std::unique_ptr< DataStorage >( new DataStorage() ) )
 	{
+		schema = json::from_cbor( embeddedJDD );
+
+		const json & loc = schema[ "properties" ];
+		caseInsensitiveObjectMap.reserve( loc.size() );
+		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
+			caseInsensitiveObjectMap.emplace( convertToUpper( it.key() ), it.key() );
+		}
+
+		state->initialize( & schema );
+
 		const auto state_ptr = state.get();
 		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index ) -> bool {
 			state_ptr->traverse( event, parsed, line_num, line_index );
@@ -170,12 +180,8 @@ namespace EnergyPlus {
 // Functions
 
 	void
-	InputProcessor::clear_state() {
-		// state = State();
-		// idf_parser = IdfParser();
-		// jdf.clear();
-		// objectCacheMap.clear();
-	}
+	InputProcessor::clear_state()
+	{}
 
 	std::vector < std::string > const & InputProcessor::validationErrors() {
 		return state->validationErrors();
@@ -187,7 +193,7 @@ namespace EnergyPlus {
 
 	std::pair< bool, std::string >
 	InputProcessor::convertInsensitiveObjectType( std::string const & objectType ) {
-		auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( objectType ) );
+		auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( objectType ) );
 		if ( tmp_umit != caseInsensitiveObjectMap.end() ) {
 			return std::make_pair( true, tmp_umit->second );
 		}
@@ -225,15 +231,15 @@ namespace EnergyPlus {
 		// 	return;
 		// }
 		// schema = json::parse(jdd_stream);
-		schema = json::from_cbor(embeddedJDD);
+		// schema = json::from_cbor( embeddedJDD );
 
-		const json & loc = schema[ "properties" ];
-		caseInsensitiveObjectMap.reserve( loc.size() );
-		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
-			std::string key = it.key();
-			for ( char & c : key ) c = toupper( c );
-			caseInsensitiveObjectMap.emplace( std::move( key ), it.key() );
-		}
+		// const json & loc = schema[ "properties" ];
+		// caseInsensitiveObjectMap.reserve( loc.size() );
+		// for ( auto it = loc.begin(); it != loc.end(); ++it ) {
+		// 	std::string key = it.key();
+		// 	for ( char & c : key ) c = toupper( c );
+		// 	caseInsensitiveObjectMap.emplace( std::move( key ), it.key() );
+		// }
 
 		std::ifstream input_stream( DataStringGlobals::inputFileName , std::ifstream::in | std::ios::ate);
 		if ( !input_stream.is_open() ) {
@@ -270,7 +276,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		state->initialize( & schema );
+		// state->initialize( & schema );
 
 		jdf = json::parse( input_file, callback );
 
@@ -340,7 +346,7 @@ namespace EnergyPlus {
 		auto const & find_obj = jdf.find( ObjectWord );
 
 		if ( find_obj == jdf.end() ) {
-			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
+			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjectWord ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return 0;
 			}
@@ -350,7 +356,7 @@ namespace EnergyPlus {
 		}
 
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
+			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjectWord ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
 			}
@@ -383,7 +389,7 @@ namespace EnergyPlus {
 
 		auto find_iterators = objectCacheMap.find( Object );
 		if ( find_iterators == objectCacheMap.end() ) {
-			auto const tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( Object ) );
+			auto const tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( Object ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
@@ -670,7 +676,7 @@ namespace EnergyPlus {
 		json * obj;
 		auto obj_iter = jdf.find( ObjType );
 		if ( obj_iter == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
-			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjType ) );
+			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjType ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				return -1;
 			}
@@ -710,7 +716,7 @@ namespace EnergyPlus {
 		json * obj;
 		auto obj_iter = jdf.find( ObjType );
 		if ( jdf.find( ObjType ) == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
-			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjType ) );
+			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjType ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				return -1;
 			}
@@ -894,10 +900,9 @@ namespace EnergyPlus {
 		NumNumeric = 0;
 		json * object;
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
+			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjectWord ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
-				ShowSevereError(
-				"getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
+				ShowSevereError( "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;
 			}
 			object = &schema[ "properties" ][ tmp_umit->second ];
@@ -908,10 +913,9 @@ namespace EnergyPlus {
 
 		json * objects;
 		if ( jdf.find( ObjectWord ) == jdf.end() ) {
-			auto tmp_umit = caseInsensitiveObjectMap.find( UtilityRoutines::MakeUPPERCase( ObjectWord ) );
+			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjectWord ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
-				ShowSevereError(
-				"getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
+				ShowSevereError( "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;
 			}
 			objects = &jdf[ tmp_umit->second ];
