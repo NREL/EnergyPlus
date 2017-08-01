@@ -694,7 +694,7 @@ namespace SystemAvailabilityManager {
 
 				// Cycling Run Time Control Type
 				if ( !lAlphaFieldBlanks( 5 ) ) {
-					{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 5 ) ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( cAlphaArgs( 5 ) ) );
 					if ( SELECT_CASE_var == "FIXEDRUNTIME" ) {
 						NCycSysAvailMgrData( SysAvailNum ).CycRunTimeCntrlType = FixedRunTime;
 					} else if ( SELECT_CASE_var == "THERMOSTAT" ) {
@@ -709,26 +709,16 @@ namespace SystemAvailabilityManager {
 				}
 
 				// Control zone or zonelist
-<<<<<<< HEAD
-				if ( !lAlphaFieldBlanks( 5 ) ){
-					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneListName = cAlphaArgs( 5 );
-					int ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Zone );
-=======
 				if ( !lAlphaFieldBlanks( 6 ) ){
 					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneListName = cAlphaArgs( 6 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 6 ), Zone );
->>>>>>> NREL/develop
+					int ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-<<<<<<< HEAD
-						if ( NumOfZoneLists > 0 ) ZoneListNum = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), ZoneList );
-=======
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 6 ), ZoneList );
->>>>>>> NREL/develop
+						if ( NumOfZoneLists > 0 ) ZoneListNum = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones = NumZones;
@@ -744,26 +734,16 @@ namespace SystemAvailabilityManager {
 				}
 
 				// Cooling zone or zonelist
-<<<<<<< HEAD
-				if ( !lAlphaFieldBlanks( 6 ) ){
-					NCycSysAvailMgrData( SysAvailNum ).CoolingZoneListName = cAlphaArgs( 6 );
-					int ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), Zone );
-=======
 				if ( !lAlphaFieldBlanks( 7 ) ){
 					NCycSysAvailMgrData( SysAvailNum ).CoolingZoneListName = cAlphaArgs( 7 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
->>>>>>> NREL/develop
+					int ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-<<<<<<< HEAD
-						if ( NumOfZoneLists > 0 ) ZoneListNum = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), ZoneList );
-=======
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 7 ), ZoneList );
->>>>>>> NREL/develop
+						if ( NumOfZoneLists > 0 ) ZoneListNum = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones = NumZones;
@@ -779,26 +759,16 @@ namespace SystemAvailabilityManager {
 				}
 
 				// Heating zone or zonelist
-<<<<<<< HEAD
-				if ( !lAlphaFieldBlanks( 7 ) ){
-					NCycSysAvailMgrData( SysAvailNum ).HeatingZoneListName = cAlphaArgs( 7 );
-					int ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), Zone );
-=======
 				if ( !lAlphaFieldBlanks( 8 ) ){
 					NCycSysAvailMgrData( SysAvailNum ).HeatingZoneListName = cAlphaArgs( 8 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 8 ), Zone );
->>>>>>> NREL/develop
+					int ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 8 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-<<<<<<< HEAD
-						if ( NumOfZoneLists > 0 ) ZoneListNum = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), ZoneList );
-=======
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 8 ), ZoneList );
->>>>>>> NREL/develop
+						if ( NumOfZoneLists > 0 ) ZoneListNum = UtilityRoutines::FindItemInList( cAlphaArgs( 8 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones = NumZones;
@@ -814,26 +784,16 @@ namespace SystemAvailabilityManager {
 				}
 
 				// HeatZnFan zone or zonelist
-<<<<<<< HEAD
-				if ( !lAlphaFieldBlanks( 8 ) ){
-					NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZoneListName = cAlphaArgs( 8 );
-					int ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 8 ), Zone );
-=======
 				if ( !lAlphaFieldBlanks( 9 ) ){
 					NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZoneListName = cAlphaArgs( 9 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 9 ), Zone );
->>>>>>> NREL/develop
+					int ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 9 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-<<<<<<< HEAD
-						if ( NumOfZoneLists > 0 ) ZoneListNum = UtilityRoutines::FindItemInList( cAlphaArgs( 8 ), ZoneList );
-=======
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 9 ), ZoneList );
->>>>>>> NREL/develop
+						if ( NumOfZoneLists > 0 ) ZoneListNum = UtilityRoutines::FindItemInList( cAlphaArgs( 9 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones = NumZones;
@@ -2027,7 +1987,7 @@ namespace SystemAvailabilityManager {
 		int ZoneNum;
 		Real64 TempTol;
 		static Array1D_bool ZoneCompNCControlType;
-		int CyclingRunTimeControlType; 
+		int CyclingRunTimeControlType;
 
 		if ( present( ZoneEquipType ) ) {
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;

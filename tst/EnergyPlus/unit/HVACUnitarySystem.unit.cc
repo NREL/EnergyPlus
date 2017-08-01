@@ -626,7 +626,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetUnitarySystemInputData( ErrorsFound ); // get UnitarySystem input from object above
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
@@ -935,7 +935,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetUnitarySystemInputData( ErrorsFound ); // get UnitarySystem input from object above
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
@@ -3337,11 +3337,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 		"  1.0,                                                     !- Heating Speed 2 Supply Air Flow Ratio",
 		"  0.666,                                                   !- Cooling Speed 2 Supply Air Flow Ratio",
 		"  1.0,                                                     !- Heating Speed 3 Supply Air Flow Ratio",
-<<<<<<< HEAD
-		"  1.0;                                                    !- Cooling Speed 3 Supply Air Flow Ratio",
-=======
 		"  1.0;                                                     !- Cooling Speed 3 Supply Air Flow Ratio",
->>>>>>> NREL/develop
 
 		"Coil:Cooling:DX:MultiSpeed,",
 		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil,             !- Name",

@@ -848,12 +848,7 @@ namespace WaterToAirHeatPump {
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyTsatFnHPb;
 		using General::RoundSigDigits;
-<<<<<<< HEAD
-		using General::SolveRegulaFalsi;
-=======
 		using General::SolveRoot;
-		using InputProcessor::SameString;
->>>>>>> NREL/develop
 		using DataPlant::PlantLoop;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -1503,13 +1498,7 @@ namespace WaterToAirHeatPump {
 		using Psychrometrics::PsyWFnTdbH;
 		//  USE DataZoneEnergyDemands
 		using General::RoundSigDigits;
-<<<<<<< HEAD
-		using General::SolveRegulaFalsi;
-
-=======
 		using General::SolveRoot;
-		using InputProcessor::SameString;
->>>>>>> NREL/develop
 		using DataPlant::PlantLoop;
 
 		// Locals

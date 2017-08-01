@@ -1192,9 +1192,9 @@ namespace HeatBalanceManager {
 
 		// A new object is added by L. Gu, 4/17
 		CurrentModuleObject = "HVACSystemRootFindingAlgorithm";
-		NumObjects = GetNumObjectsFound( CurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumObjects > 0 ) {
-			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( NumAlpha > 0 ) {
 				HVACSystemRootFinding.Algorithm = AlphaName( 1 );
 				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
@@ -3184,21 +3184,12 @@ namespace HeatBalanceManager {
 			// By default all blinds have fixed slat angle,
 			//  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
-<<<<<<< HEAD
 				if ( UtilityRoutines::SameString( MaterialNames( 3 ), "FixedSlatAngle" ) ) {
-					Material( MaterNum ).SlatAngleType = 0;
-				} else if ( UtilityRoutines::SameString( MaterialNames( 3 ), "MaximizeSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 1;
-				} else if ( UtilityRoutines::SameString( MaterialNames( 3 ), "BlockBeamSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 2;
-=======
-				if ( SameString( MaterialNames( 3 ), "FixedSlatAngle" ) ) {
 					Material( MaterNum ).SlatAngleType = lscNONE;
-				} else if ( SameString( MaterialNames( 3 ), "MaximizeSolar" ) ) {
+				} else if ( UtilityRoutines::SameString( MaterialNames( 3 ), "MaximizeSolar" ) ) {
 					Material( MaterNum ).SlatAngleType = lscVBPROF;
-				} else if ( SameString( MaterialNames( 3 ), "BlockBeamSolar" ) ) {
+				} else if ( UtilityRoutines::SameString( MaterialNames( 3 ), "BlockBeamSolar" ) ) {
 					Material( MaterNum ).SlatAngleType = lscVBNOBM;
->>>>>>> NREL/develop
 				} else {
 					Material( MaterNum ).SlatAngleType = 0;
 				}

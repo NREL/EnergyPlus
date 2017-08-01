@@ -1028,9 +1028,9 @@ namespace SetPointManager {
 			OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			if ( UtilityRoutines::SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
-			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
-			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
 			} else {
 				// should not come here if idd type choice and key list is working

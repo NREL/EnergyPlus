@@ -1175,7 +1175,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
 	SetPointManager::GetSetPointManagerInputs();
@@ -1196,7 +1196,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
 	SetPointManager::UpdateSetPointManagers();
 	// check OA Reset Set Point Manager sim
 	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPointHi );
-	// change the low outdoor air setpoint reset value to 60.0C 
+	// change the low outdoor air setpoint reset value to 60.0C
 	SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 = 60.0;
 	// re simulate OA Reset Set Point Manager
 	SetPointManager::SimSetPointManagers();
@@ -1213,7 +1213,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
 	Real64 SetPt = 60.0 - ( ( 2.0 - -17.778 ) / ( 21.11 - -17.778 ) ) * ( 60.0 - 40.0 );
 	// check OA Reset Set Point Manager sim
 	EXPECT_EQ( SetPt, DataLoopNode::Node( 1 ).TempSetPointHi );
-	
+
 }
 
 TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest )
@@ -1234,7 +1234,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
 	SetPointManager::GetSetPointManagerInputs();
@@ -1255,7 +1255,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest )
 	SetPointManager::UpdateSetPointManagers();
 	// check OA Reset Set Point Manager sim
 	EXPECT_EQ( 40.0, DataLoopNode::Node( 1 ).TempSetPointLo );
-	// change the low outdoor air setpoint reset value to 60.0C 
+	// change the low outdoor air setpoint reset value to 60.0C
 	SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 = 35.0;
 	// re simulate OA Reset Set Point Manager
 	SetPointManager::SimSetPointManagers();

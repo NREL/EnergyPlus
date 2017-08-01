@@ -2329,7 +2329,7 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 		"    0.9;                     !- Divider Thermal Hemispherical Emissivity",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	SimulationManager::GetProjectData( );
 	bool FoundError = false;

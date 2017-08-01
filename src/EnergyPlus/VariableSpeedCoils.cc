@@ -69,12 +69,8 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HVACFan.hh>
-<<<<<<< HEAD
-#include <InputProcessing/InputProcessor.hh>
-=======
 #include <HVACUnitarySystem.hh>
-#include <InputProcessor.hh>
->>>>>>> NREL/develop
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -5733,9 +5729,6 @@ namespace VariableSpeedCoils {
 		// This function looks up the given coil and returns CapFT curve index.  If
 		// incorrect coil index is given, ErrorsFound is returned as true and value is returned
 		// as zero.
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int CapFTIndex; // returned CapFT curve index of matched coil

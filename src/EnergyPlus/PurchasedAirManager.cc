@@ -369,35 +369,21 @@ namespace PurchasedAirManager {
 				PurchAir( PurchAirNum ).MaxHeatSuppAirHumRat = rNumericArgs( 3 );
 				PurchAir( PurchAirNum ).MinCoolSuppAirHumRat = rNumericArgs( 4 );
 
-<<<<<<< HEAD
-				if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "NoLimit" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "NoLimit" ) ) {
 					PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "LimitFlowRate" ) ) {
-=======
-				if ( SameString( cAlphaArgs( 6 ), "NoLimit" ) ) {
-					PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
-				} else if ( SameString( cAlphaArgs( 6 ), "LimitFlowRate" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitFlowRate" ) ) {
 					if ( lNumericFieldBlanks( 5 ) ) {
 						PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
 					} else {
 						PurchAir( PurchAirNum ).HeatingLimit = LimitFlowRate;
 					}
-<<<<<<< HEAD
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "LimitCapacity" ) ) {
-=======
-				} else if ( SameString( cAlphaArgs( 6 ), "LimitCapacity" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitCapacity" ) ) {
 					if ( lNumericFieldBlanks( 6 ) ) {
 						PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
 					} else {
 						PurchAir( PurchAirNum ).HeatingLimit = LimitCapacity;
 					}
-<<<<<<< HEAD
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "LimitFlowRateAndCapacity" ) ) {
-=======
-				} else if ( SameString( cAlphaArgs( 6 ), "LimitFlowRateAndCapacity" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitFlowRateAndCapacity" ) ) {
 					if ( lNumericFieldBlanks( 5 ) && lNumericFieldBlanks( 6 ) ) {
 						PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
 					} else if ( lNumericFieldBlanks( 5 ) ) {
@@ -416,35 +402,21 @@ namespace PurchasedAirManager {
 				PurchAir( PurchAirNum ).MaxHeatVolFlowRate = rNumericArgs( 5 );
 				PurchAir( PurchAirNum ).MaxHeatSensCap = rNumericArgs( 6 );
 
-<<<<<<< HEAD
-				if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "NoLimit" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "NoLimit" ) ) {
 					PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitFlowRate" ) ) {
-=======
-				if ( SameString( cAlphaArgs( 7 ), "NoLimit" ) ) {
-					PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
-				} else if ( SameString( cAlphaArgs( 7 ), "LimitFlowRate" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "LimitFlowRate" ) ) {
 					if ( lNumericFieldBlanks( 7 ) ) {
 						PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
 					} else {
 						PurchAir( PurchAirNum ).CoolingLimit = LimitFlowRate;
 					}
-<<<<<<< HEAD
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitCapacity" ) ) {
-=======
-				} else if ( SameString( cAlphaArgs( 7 ), "LimitCapacity" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "LimitCapacity" ) ) {
 					if ( lNumericFieldBlanks( 8 ) ) {
 						PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
 					} else {
 						PurchAir( PurchAirNum ).CoolingLimit = LimitCapacity;
 					}
-<<<<<<< HEAD
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitFlowRateAndCapacity" ) ) {
-=======
-				} else if ( SameString( cAlphaArgs( 7 ), "LimitFlowRateAndCapacity" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "LimitFlowRateAndCapacity" ) ) {
 					if ( lNumericFieldBlanks( 7 ) && lNumericFieldBlanks( 8 ) ) {
 						PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
 					} else if ( lNumericFieldBlanks( 7 ) ) {
@@ -488,23 +460,13 @@ namespace PurchasedAirManager {
 					}
 				}
 				// get Dehumidification control type
-<<<<<<< HEAD
-				if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "None" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "None" ) ) {
 					PurchAir( PurchAirNum ).DehumidCtrlType = None;
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "ConstantSensibleHeatRatio" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "ConstantSensibleHeatRatio" ) ) {
 					PurchAir( PurchAirNum ).DehumidCtrlType = ConstantSensibleHeatRatio;
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "Humidistat" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "Humidistat" ) ) {
 					PurchAir( PurchAirNum ).DehumidCtrlType = Humidistat;
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "ConstantSupplyHumidityRatio" ) ) {
-=======
-				if ( SameString( cAlphaArgs( 10 ), "None" ) ) {
-					PurchAir( PurchAirNum ).DehumidCtrlType = None;
-				} else if ( SameString( cAlphaArgs( 10 ), "ConstantSensibleHeatRatio" ) ) {
-					PurchAir( PurchAirNum ).DehumidCtrlType = ConstantSensibleHeatRatio;
-				} else if ( SameString( cAlphaArgs( 10 ), "Humidistat" ) ) {
-					PurchAir( PurchAirNum ).DehumidCtrlType = Humidistat;
-				} else if ( SameString( cAlphaArgs( 10 ), "ConstantSupplyHumidityRatio" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "ConstantSupplyHumidityRatio" ) ) {
 					PurchAir( PurchAirNum ).DehumidCtrlType = ConstantSupplyHumidityRatio;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -515,19 +477,11 @@ namespace PurchasedAirManager {
 				PurchAir( PurchAirNum ).CoolSHR = rNumericArgs( 9 );
 
 				// get Humidification control type
-<<<<<<< HEAD
-				if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "None" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 11 ), "None" ) ) {
 					PurchAir( PurchAirNum ).HumidCtrlType = None;
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "Humidistat" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 11 ), "Humidistat" ) ) {
 					PurchAir( PurchAirNum ).HumidCtrlType = Humidistat;
-				} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "ConstantSupplyHumidityRatio" ) ) {
-=======
-				if ( SameString( cAlphaArgs( 11 ), "None" ) ) {
-					PurchAir( PurchAirNum ).HumidCtrlType = None;
-				} else if ( SameString( cAlphaArgs( 11 ), "Humidistat" ) ) {
-					PurchAir( PurchAirNum ).HumidCtrlType = Humidistat;
-				} else if ( SameString( cAlphaArgs( 11 ), "ConstantSupplyHumidityRatio" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 11 ), "ConstantSupplyHumidityRatio" ) ) {
 					PurchAir( PurchAirNum ).HumidCtrlType = ConstantSupplyHumidityRatio;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -537,13 +491,8 @@ namespace PurchasedAirManager {
 				}
 
 				// get Design specification outdoor air object
-<<<<<<< HEAD
-				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					PurchAir( PurchAirNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 11 ), OARequirements );
-=======
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					PurchAir( PurchAirNum ).OARequirementsPtr = FindItemInList( cAlphaArgs( 12 ), OARequirements );
->>>>>>> NREL/develop
+					PurchAir( PurchAirNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 12 ), OARequirements );
 					if ( PurchAir( PurchAirNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
 						ShowContinueError( "Invalid-not found" + cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\"." );
@@ -582,19 +531,11 @@ namespace PurchasedAirManager {
 					if ( UniqueNodeError ) ErrorsFound = true;
 
 					// get Demand controlled ventilation type
-<<<<<<< HEAD
-					if ( UtilityRoutines::SameString( cAlphaArgs( 13 ), "None" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "None" ) ) {
 						PurchAir( PurchAirNum ).DCVType = NoDCV;
-					} else if ( UtilityRoutines::SameString( cAlphaArgs( 13 ), "OccupancySchedule" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "OccupancySchedule" ) ) {
 						PurchAir( PurchAirNum ).DCVType = OccupancySchedule;
-					} else if ( UtilityRoutines::SameString( cAlphaArgs( 13 ), "CO2Setpoint" ) ) {
-=======
-					if ( SameString( cAlphaArgs( 14 ), "None" ) ) {
-						PurchAir( PurchAirNum ).DCVType = NoDCV;
-					} else if ( SameString( cAlphaArgs( 14 ), "OccupancySchedule" ) ) {
-						PurchAir( PurchAirNum ).DCVType = OccupancySchedule;
-					} else if ( SameString( cAlphaArgs( 14 ), "CO2Setpoint" ) ) {
->>>>>>> NREL/develop
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "CO2Setpoint" ) ) {
 						if ( Contaminant.CO2Simulation ) {
 							PurchAir( PurchAirNum ).DCVType = CO2SetPoint;
 						} else {
@@ -611,19 +552,11 @@ namespace PurchasedAirManager {
 						ErrorsFound = true;
 					}
 					// get Outdoor air economizer type
-<<<<<<< HEAD
-					if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "NoEconomizer" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "NoEconomizer" ) ) {
 						PurchAir( PurchAirNum ).EconomizerType = NoEconomizer;
-					} else if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "DifferentialDryBulb" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "DifferentialDryBulb" ) ) {
 						PurchAir( PurchAirNum ).EconomizerType = DifferentialDryBulb;
-					} else if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "DifferentialEnthalpy" ) ) {
-=======
-					if ( SameString( cAlphaArgs( 15 ), "NoEconomizer" ) ) {
-						PurchAir( PurchAirNum ).EconomizerType = NoEconomizer;
-					} else if ( SameString( cAlphaArgs( 15 ), "DifferentialDryBulb" ) ) {
-						PurchAir( PurchAirNum ).EconomizerType = DifferentialDryBulb;
-					} else if ( SameString( cAlphaArgs( 15 ), "DifferentialEnthalpy" ) ) {
->>>>>>> NREL/develop
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "DifferentialEnthalpy" ) ) {
 						PurchAir( PurchAirNum ).EconomizerType = DifferentialEnthalpy;
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -632,19 +565,11 @@ namespace PurchasedAirManager {
 						ErrorsFound = true;
 					}
 					// get Outdoor air heat recovery type and effectiveness
-<<<<<<< HEAD
-					if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "None" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "None" ) ) {
 						PurchAir( PurchAirNum ).HtRecType = NoHeatRecovery;
-					} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "Sensible" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "Sensible" ) ) {
 						PurchAir( PurchAirNum ).HtRecType = Sensible;
-					} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "Enthalpy" ) ) {
-=======
-					if ( SameString( cAlphaArgs( 16 ), "None" ) ) {
-						PurchAir( PurchAirNum ).HtRecType = NoHeatRecovery;
-					} else if ( SameString( cAlphaArgs( 16 ), "Sensible" ) ) {
-						PurchAir( PurchAirNum ).HtRecType = Sensible;
-					} else if ( SameString( cAlphaArgs( 16 ), "Enthalpy" ) ) {
->>>>>>> NREL/develop
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "Enthalpy" ) ) {
 						PurchAir( PurchAirNum ).HtRecType = Enthalpy;
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -671,13 +596,8 @@ namespace PurchasedAirManager {
 				}
 
 				PurchAir( PurchAirNum ).HVACSizingIndex = 0;
-<<<<<<< HEAD
-				if ( ! lAlphaFieldBlanks( 16 ) ) {
-					PurchAir(PurchAirNum).HVACSizingIndex = UtilityRoutines::FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing );
-=======
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					PurchAir(PurchAirNum).HVACSizingIndex = FindItemInList( cAlphaArgs( 17 ), ZoneHVACSizing );
->>>>>>> NREL/develop
+					PurchAir(PurchAirNum).HVACSizingIndex = UtilityRoutines::FindItemInList( cAlphaArgs( 17 ), ZoneHVACSizing );
 					if ( PurchAir(PurchAirNum).HVACSizingIndex == 0 ) {
 						ShowSevereError( cAlphaFieldNames( 17 ) + " = " + cAlphaArgs( 17 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + PurchAir( PurchAirNum ).Name);
@@ -3053,7 +2973,7 @@ namespace PurchasedAirManager {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ReturnPlenumIndex; // index to ZoneHVAC:ReturnPlenum object
 		int ReturnPlenumNum; // loop counter
-		bool PlenumNotFound; // logical to determine if same plenum is used by other ideal loads air systems 
+		bool PlenumNotFound; // logical to determine if same plenum is used by other ideal loads air systems
 		int Loop; // loop counters
 		int Loop2; // loop counters
 		Array1D_int TempPurchArray; // temporary array used for dynamic allocation

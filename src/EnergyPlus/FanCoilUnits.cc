@@ -4833,13 +4833,9 @@ namespace FanCoilUnits {
 				// To calculate the part-load ratio for the FCU with varying water flow rate
 
 				// METHODOLOGY EMPLOYED:
-<<<<<<< HEAD
-				// Use SolveRegulaFalsi to CALL this Function to converge on a solution
 
-=======
 				// Use SolveRoot to CALL this Function to converge on a solution
-			
->>>>>>> NREL/develop
+
 				// REFERENCES:
 				// na
 
@@ -4923,13 +4919,9 @@ namespace FanCoilUnits {
 				// To calculate the part-load ratio for the FCU with varying water flow rate
 
 				// METHODOLOGY EMPLOYED:
-<<<<<<< HEAD
-				// Use SolveRegulaFalsi to CALL this Function to converge on a solution
 
-=======
 				// Use SolveRoot to CALL this Function to converge on a solution
-			
->>>>>>> NREL/develop
+
 				// REFERENCES:
 				// na
 

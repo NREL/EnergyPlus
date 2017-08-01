@@ -5315,7 +5315,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ContaminantControlledZone.allocate( 1 );
 		ContaminantControlledZone( 1 ).AvaiSchedPtr = 4;

@@ -341,13 +341,7 @@ namespace ReportSizingManager {
 		using DXCoils::ValidateADP;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
-<<<<<<< HEAD
-		using General::SolveRegulaFalsi;
-
-=======
 		using General::SolveRoot;
-		using InputProcessor::SameString;
->>>>>>> NREL/develop
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdpPb;

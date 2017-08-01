@@ -1211,7 +1211,7 @@ namespace DXCoils {
 
 			//Set minimum OAT for compressor operation
 			DXCoil( DXCoilNum ).MinOATCompressor = Numbers( 6 );
-			if ( NumNumbers < 6 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included 
+			if ( NumNumbers < 6 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included
 
 			DXCoil( DXCoilNum ).Twet_Rated( 1 ) = Numbers( 7 );
 			DXCoil( DXCoilNum ).Gamma_Rated( 1 ) = Numbers( 8 );
@@ -1835,7 +1835,7 @@ namespace DXCoils {
 
 			//Set minimum OAT for compressor operation
 			DXCoil( DXCoilNum ).MinOATCompressor = Numbers( 5 );
-			if ( NumNumbers < 5 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included 
+			if ( NumNumbers < 5 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included
 
 			//Basin heater power as a function of temperature must be greater than or equal to 0
 			DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = Numbers( 6 );
@@ -12402,23 +12402,18 @@ Label50: ;
 			GetCoilsInputFlag = false;
 		}
 
-<<<<<<< HEAD
-		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:DX:SingleSpeed" ) || UtilityRoutines::SameString( CoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Cooling:DX:SingleSpeed" ) || UtilityRoutines::SameString( CoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
 			WhichCoil = UtilityRoutines::FindItem( CoilName, DXCoil );
-=======
-		if ( SameString( CoilType, "Coil:Cooling:DX:SingleSpeed" ) || SameString( CoilType, "Coil:Cooling:DX:TwoSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				MinOAT = DXCoil( WhichCoil ).MinOATCompressor;
 			}
-		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) || SameString( CoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil );
+		} else if ( UtilityRoutines::SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) || UtilityRoutines::SameString( CoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				MinOAT = DXCoil( WhichCoil ).MinOATCompressor;
 			}
-		} else if ( SameString( CoilType, "Coil:Heating:DX:SingleSpeed" ) || SameString( CoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
-			WhichCoil = FindItem( CoilName, DXCoil );
->>>>>>> NREL/develop
+		} else if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:DX:SingleSpeed" ) || UtilityRoutines::SameString( CoilType, "Coil:Heating:DX:MultiSpeed" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, DXCoil );
 			if ( WhichCoil != 0 ) {
 				MinOAT = DXCoil( WhichCoil ).MinOATCompressor;
 			}
@@ -12452,10 +12447,6 @@ Label50: ;
 		// This function looks up the the min oat for the cooling coil compressor and returns it.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 		// as negative.
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
 
 		// Return value
 		Real64 MinOAT; // returned min oa temperature of matched coil

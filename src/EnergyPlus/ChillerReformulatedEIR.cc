@@ -1364,18 +1364,10 @@ namespace ChillerReformulatedEIR {
 		using CurveManager::GetCurveMinMaxValues;
 		using General::SolveRoot;
 
-<<<<<<< HEAD
-		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRegulaFalsi
-		int const MaxIter( 500 ); // Iteration control for SolveRegulaFalsi
-=======
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRoot
 		int const MaxIter( 500 ); // Iteration control for SolveRoot
->>>>>>> NREL/develop
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		//  na

@@ -4569,13 +4569,8 @@ namespace FluidProperties {
 			Par( 1 ) = RefrigNum;
 			Par( 2 ) = Enthalpy;
 			Par( 3 ) = Pressure;
-<<<<<<< HEAD
 
-			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
-=======
-			
 			SolveRoot( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
->>>>>>> NREL/develop
 			ReturnValue = Temp;
 		}
 

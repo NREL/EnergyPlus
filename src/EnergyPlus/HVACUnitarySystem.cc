@@ -7828,21 +7828,12 @@ namespace HVACUnitarySystem {
 				// To calculate the part-load ratio for the UnitarySystem coil with varying part load ratio
 
 				// METHODOLOGY EMPLOYED:
-<<<<<<< HEAD
-				// Use SolveRegulaFalsi to CALL this Function to converge on a solution
-
-				// USE STATEMENTS:
-		using Psychrometrics::PsyHFnTdbW;
-		using General::SolveRegulaFalsi;
-
-=======
 				// Use SolveRoot to CALL this Function to converge on a solution
-			
+
 				// USE STATEMENTS:
 		using Psychrometrics::PsyHFnTdbW;
 		using General::SolveRoot;
-			
->>>>>>> NREL/develop
+
 				// Return value
 		Real64 Residuum; // Result (forces solution to be within tolerance)
 
