@@ -2027,6 +2027,7 @@ namespace EnergyPlus {
 		EXPECT_TRUE( HVACControllers::ControllerProps( 1 ).BypassControllerCalc );
 		// test that water coil knows which controller controls the HW coil
 		EXPECT_EQ( WaterCoil( 1 ).ControllerIndex, 1 );
+
 	}
 
 }
