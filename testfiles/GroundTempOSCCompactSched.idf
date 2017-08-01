@@ -664,6 +664,7 @@
     ,                        !- Availability Schedule Name
     OSCTest-Inlet,           !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
