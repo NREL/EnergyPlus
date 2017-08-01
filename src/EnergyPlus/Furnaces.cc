@@ -6031,7 +6031,7 @@ namespace Furnaces {
 		using DataHeatBalFanSys::MAT;
 		using namespace ScheduleManager;
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::TrimSigDigits;
 		using DXCoils::DXCoilPartLoadRatio;
 		using DXCoils::DXCoil;
@@ -6271,7 +6271,7 @@ namespace Furnaces {
 							Par( 9 ) = 0.0; // HXUnitOn is always false for HX
 							Par( 10 ) = 0.0;
 							//         HeatErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-							SolveRegulaFalsi( HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
+							SolveRoot( HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
 							//         OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
 							OnOffAirFlowRatio = OnOffAirFlowRatioSave;
 							if ( SolFlag == -1 ) {
@@ -6451,7 +6451,7 @@ namespace Furnaces {
 							Par( 9 ) = 0.0; // HXUnitOn is always false for HX
 							Par( 10 ) = 0.0;
 							//         HeatErrorToler is in fraction load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-							SolveRegulaFalsi( HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
+							SolveRoot( HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
 							//         OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
 							OnOffAirFlowRatio = OnOffAirFlowRatioSave;
 							//         Reset HeatCoilLoad calculated in CalcFurnaceResidual (in case it was reset because output temp > DesignMaxOutletTemp)
@@ -6483,7 +6483,7 @@ namespace Furnaces {
 									CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, 0.0, TempMinPLR, HeatCoilLoad, 0.0, TempHeatOutput, TempLatentOutput, OnOffAirFlowRatio, false );
 								}
 								//           Now solve again with tighter PLR limits
-								SolveRegulaFalsi( HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, TempMinPLR, TempMaxPLR, Par );
+								SolveRoot( HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, TempMinPLR, TempMaxPLR, Par );
 								if ( ModifiedHeatCoilLoad > 0.0 ) {
 									HeatCoilLoad = ModifiedHeatCoilLoad;
 								} else {
@@ -6629,7 +6629,7 @@ namespace Furnaces {
 							//             Par(10) is the heating coil PLR, set this value to 0 for sensible PLR calculations.
 							Par( 10 ) = 0.0;
 							//             CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-							SolveRegulaFalsi( CoolErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
+							SolveRoot( CoolErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
 							//             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
 							OnOffAirFlowRatio = OnOffAirFlowRatioSave;
 							if ( SolFlag == -1 ) {
@@ -6745,7 +6745,7 @@ namespace Furnaces {
 								Par( 10 ) = 0.0;
 							}
 							//           CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-							SolveRegulaFalsi( CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
+							SolveRoot( CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par );
 							//           OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
 							OnOffAirFlowRatio = OnOffAirFlowRatioSave;
 							if ( SolFlag == -1 ) {
@@ -6795,7 +6795,7 @@ namespace Furnaces {
 									CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, TempMinPLR2, 0.0, 0.0, 0.0, TempCoolOutput, TempLatentOutput, OnOffAirFlowRatio, HXUnitOn, CoolingHeatingPLRRatio );
 								}
 								//             tighter boundary of solution has been found, call RegulaFalsi a second time
-								SolveRegulaFalsi( CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, TempMinPLR2, TempMaxPLR, Par );
+								SolveRoot( CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, TempMinPLR2, TempMaxPLR, Par );
 								//             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
 								OnOffAirFlowRatio = OnOffAirFlowRatioSave;
 								if ( SolFlag == -1 ) {
@@ -7029,7 +7029,7 @@ namespace Furnaces {
 		using InputProcessor::FindItemInList;
 		using DataHeatBalFanSys::MAT;
 		using DataAirLoop::AirToOANodeInfo;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::TrimSigDigits;
 
 		// Locals
@@ -7200,7 +7200,7 @@ namespace Furnaces {
 				Par( 8 ) = ZoneSensLoadMetFanONCompOFF; // Output with fan ON compressor OFF
 				Par( 9 ) = 0.0; // HX is off for water-to-air HP
 				//         CoolErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
-				SolveRegulaFalsi( CoolErrorToler, MaxIter, SolFlag, CoolPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par );
+				SolveRoot( CoolErrorToler, MaxIter, SolFlag, CoolPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par );
 				if ( SolFlag == -1 && !WarmupFlag && !FirstHVACIteration ) {
 					OnOffFanPartLoadFraction = OnOffFanPartLoadFractionSave;
 					CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, CoolPartLoadRatio, 0.0, 0.0, 0.0, ZoneSensLoadMet, ZoneLatLoadMet, OnOffAirFlowRatio, false );
@@ -7314,7 +7314,7 @@ namespace Furnaces {
 				Par( 8 ) = ZoneSensLoadMetFanONCompOFF; // Output with fan ON compressor OFF
 				Par( 9 ) = 0.0; // HX is OFF for water-to-air HP
 				//         HeatErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
-				SolveRegulaFalsi( HeatErrorToler, MaxIter, SolFlag, HeatPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par );
+				SolveRoot( HeatErrorToler, MaxIter, SolFlag, HeatPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par );
 				OnOffFanPartLoadFraction = OnOffFanPartLoadFractionSave;
 				CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, OpMode, CompOp, CoolPartLoadRatio, HeatPartLoadRatio, Dummy, Dummy, ZoneSensLoadMet, ZoneLatLoadMet, OnOffAirFlowRatio, false );
 				if ( SolFlag == -1 && !WarmupFlag && !FirstHVACIteration ) {
@@ -7704,7 +7704,7 @@ namespace Furnaces {
 		// To calculate the part-load ratio for cooling and heating coils
 
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 
 		// REFERENCES:
 		// na
@@ -7847,7 +7847,7 @@ namespace Furnaces {
 		// this is used for parameter estimation WAHPs but not equation fit WAHPs
 
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 
 		// REFERENCES:
 		// na
@@ -8273,7 +8273,7 @@ namespace Furnaces {
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::SmallLoad;
 
@@ -8352,7 +8352,7 @@ namespace Furnaces {
 					} else {
 						Par( 4 ) = 0.0;
 					}
-					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
+					SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex == 0 ) {
 							ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name + "\"" );
@@ -8768,7 +8768,7 @@ namespace Furnaces {
 		// Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
@@ -8931,7 +8931,7 @@ namespace Furnaces {
 					Par( 5 ) = QLatReq;
 				}
 
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( !WarmupFlag ) {
 						if ( ErrCountCyc == 0 ) {
@@ -8980,7 +8980,7 @@ namespace Furnaces {
 					Par( 5 ) = QLatReq;
 				}
 
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( !WarmupFlag ) {
 						if ( ErrCountVar == 0 ) {
