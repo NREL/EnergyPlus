@@ -372,6 +372,17 @@ namespace ZoneTempPredictorCorrector {
 		int const ActualZoneNum // controlled zone actual zone number
 	);
 
+	void
+	FillPredefinedTableOnThermostatSetpoints();
+
+	std::tuple< Real64, int >
+	temperatureAndCountInSch(
+		int const & scheduleIndex,
+		bool const & isSummer,
+		int const & dayOfWeek,
+		int const & hourOfDay
+	);
+
 } // ZoneTempPredictorCorrector
 
 } // EnergyPlus

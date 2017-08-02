@@ -103,6 +103,7 @@
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
 #include <ZonePlenum.hh>
+#include <ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -6380,6 +6381,8 @@ namespace OutputReportTabular {
 				PreDefTableEntry( pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc( iSch, StartOfWeek, CurrentYearIsLeapYear ), 0 );
 			}
 		}
+		// fill the LEED setpoint table
+		ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints();
 	}
 
 	void

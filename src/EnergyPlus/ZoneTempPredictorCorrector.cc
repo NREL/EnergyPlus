@@ -6817,6 +6817,114 @@ namespace ZoneTempPredictorCorrector {
 
 	}
 
+	// add values to the LEED tabular report related to schedules used by the thermostat objects
+	void
+	FillPredefinedTableOnThermostatSetpoints()
+	{
+		// J.Glazer - Aug 2017
+		using namespace OutputReportPredefined;
+		std::vector<int> uniqSch;
+		uniqSch.reserve( NumSingleTempHeatingControls + NumSingleTempCoolingControls + NumSingleTempHeatCoolControls + NumDualTempHeatCoolControls * 2 );
+		Real64 setPointAt11;
+		Real64 setPointAt23;
+		int numDays;
+		const int Monday = 2;
+
+		for ( int SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= NumSingleTempHeatingControls; ++SingleTempHeatingControlNum ) {
+			if ( std::find( uniqSch.begin(), uniqSch.end(), SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedIndex ) == uniqSch.end() ) {
+				uniqSch.emplace_back( SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedIndex );
+				PreDefTableEntry( pdChLeedSchStPtFirstObjUsed, SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedName, SetPointSingleHeating( SingleTempHeatingControlNum ).Name );
+
+				std::tie(setPointAt11, numDays) = temperatureAndCountInSch( SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedIndex, false, Monday, 11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonday, SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedName, setPointAt11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonCnt, SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedName, numDays );
+
+				std::tie( setPointAt23, numDays ) = temperatureAndCountInSch( SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedIndex, false, Monday, 23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonday, SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedName, setPointAt23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonCnt, SetPointSingleHeating( SingleTempHeatingControlNum ).TempSchedName, numDays );
+			}
+		}
+		for ( int SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= NumSingleTempCoolingControls; ++SingleTempCoolingControlNum ) {
+			if ( std::find( uniqSch.begin(), uniqSch.end(), SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedIndex ) == uniqSch.end() ) {
+				uniqSch.emplace_back( SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedIndex );
+				PreDefTableEntry( pdChLeedSchStPtFirstObjUsed, SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedName, SetPointSingleCooling( SingleTempCoolingControlNum ).Name );
+
+				std::tie( setPointAt11, numDays ) = temperatureAndCountInSch( SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedIndex, true, Monday, 11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonday, SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedName, setPointAt11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonCnt, SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedName, numDays );
+
+				std::tie( setPointAt23, numDays ) = temperatureAndCountInSch( SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedIndex, true, Monday, 23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonday, SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedName, setPointAt23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonCnt, SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedName, numDays );
+			}
+		}
+		for ( int SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum ) {
+			if ( std::find( uniqSch.begin(), uniqSch.end(), SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex ) == uniqSch.end() ) {
+				uniqSch.emplace_back( SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex );
+				PreDefTableEntry( pdChLeedSchStPtFirstObjUsed, SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedName, SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).Name );
+
+				std::string schNm = SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedName + " (summer)";
+				std::tie( setPointAt11, numDays ) = temperatureAndCountInSch( SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex, true, Monday, 11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonday, schNm, setPointAt11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonCnt, schNm, numDays );
+
+				std::tie( setPointAt23, numDays ) = temperatureAndCountInSch( SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex, true, Monday, 23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonday, schNm, setPointAt23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonCnt, schNm, numDays );
+
+				schNm = SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedName + " (winter)";
+				std::tie( setPointAt11, numDays ) = temperatureAndCountInSch( SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex, false, Monday, 11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonday, schNm, setPointAt11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonCnt, schNm, numDays );
+
+				std::tie( setPointAt23, numDays ) = temperatureAndCountInSch( SetPointSingleHeatCool( SingleTempHeatCoolControlNum ).TempSchedIndex, false, Monday, 23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonday, schNm, setPointAt23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonCnt, schNm, numDays );
+			}
+		}
+		for ( int DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum ) {
+			if ( std::find( uniqSch.begin(), uniqSch.end(), SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSchedIndex ) == uniqSch.end() ) {
+				uniqSch.emplace_back( SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSchedIndex );
+				PreDefTableEntry( pdChLeedSchStPtFirstObjUsed, SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSetptSchedName, SetPointDualHeatCool( DualTempHeatCoolControlNum ).Name );
+
+				std::tie( setPointAt11, numDays ) = temperatureAndCountInSch( SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSchedIndex, false, Monday, 11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonday, SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSetptSchedName, setPointAt11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonCnt, SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSetptSchedName, numDays );
+
+				std::tie( setPointAt23, numDays ) = temperatureAndCountInSch( SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSchedIndex, false, Monday, 23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonday, SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSetptSchedName, setPointAt23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonCnt, SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSetptSchedName, numDays );
+			}
+			if ( std::find( uniqSch.begin(), uniqSch.end(), SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSchedIndex ) == uniqSch.end() ) {
+				uniqSch.emplace_back( SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSchedIndex );
+				PreDefTableEntry( pdChLeedSchStPtFirstObjUsed, SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSetptSchedName, SetPointDualHeatCool( DualTempHeatCoolControlNum ).Name );
+
+				std::tie( setPointAt11, numDays ) = temperatureAndCountInSch( SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSchedIndex, true, Monday, 11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonday, SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSetptSchedName, setPointAt11 );
+				PreDefTableEntry( pdchLeedSchStPt11amMonCnt, SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSetptSchedName, numDays );
+
+				std::tie( setPointAt23, numDays ) = temperatureAndCountInSch( SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSchedIndex, true, Monday, 23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonday, SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSetptSchedName, setPointAt23 );
+				PreDefTableEntry( pdchLeedSchStPt11pmMonCnt, SetPointDualHeatCool( DualTempHeatCoolControlNum ).CoolTempSetptSchedName, numDays );
+			}
+		}
+	}
+
+	// returns the temperature value from a schedule at a certain time for the first day of the week in either January or July
+	std::tuple< Real64, int >
+	temperatureAndCountInSch(
+		int const & scheduleIndex,
+		bool const & isSummer,
+		int const & dayOfWeek,
+		int const & hourOfDay
+	)
+	{
+		// J.Glazer - Aug 2017
+
+		return std::make_tuple( 64., 100 );
+	}
+
+
 } // ZoneTempPredictorCorrector
 
 } // EnergyPlus

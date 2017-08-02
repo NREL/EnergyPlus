@@ -690,7 +690,9 @@ namespace OutputReportPredefined {
 	int pdstLeedSchedSetPts;
 	int pdChLeedSchStPtFirstObjUsed;
 	int pdchLeedSchStPt11amMonday;
+	int pdchLeedSchStPt11amMonCnt;
 	int pdchLeedSchStPt11pmMonday;
+	int pdchLeedSchStPt11pmMonCnt;
 
 	// Internal data structures to store information provided by calls
 
@@ -2092,7 +2094,9 @@ namespace OutputReportPredefined {
 		pdstLeedSchedSetPts = newPreDefSubTable( pdrLeed, "Schedules-SetPoints (Schedule Type=Temperature)" );
 		pdChLeedSchStPtFirstObjUsed = newPreDefColumn( pdstLeedSchedSetPts, "First Object Used" );
 		pdchLeedSchStPt11amMonday = newPreDefColumn( pdstLeedSchedSetPts, "11am Monday [C]" );
+		pdchLeedSchStPt11amMonCnt = newPreDefColumn( pdstLeedSchedSetPts, "Days with Same 11am Value" );
 		pdchLeedSchStPt11pmMonday = newPreDefColumn( pdstLeedSchedSetPts, "11pm Monday [C]" );
+		pdchLeedSchStPt11pmMonCnt = newPreDefColumn( pdstLeedSchedSetPts, "Days with Same 11pm Value" );
 
 	}
 
