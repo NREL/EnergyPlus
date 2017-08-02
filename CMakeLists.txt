@@ -158,7 +158,8 @@ ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
-IF(NOT APPLE )
+ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_jdd)
+IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
 
@@ -175,14 +176,6 @@ configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.id
 configure_file( idd/Energy+.jdd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.jdd" )
 configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
 configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
-
-execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_jdd/embedded_jdd.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.jdd" TIMEOUT 30 RESULT_VARIABLE generate_embedded_jdd OUTPUT_VARIABLE embedded_jdd)
-if( ${generate_embedded_jdd} MATCHES ".*timeout.*" )
-  message(FATAL_ERROR "Generating embedded JDD from JDD failed: ${generate_embedded_jdd}")
-endif()
-if( ${generate_embedded_jdd} MATCHES ".*ImportError.*cbor2.*" )
-    message(FATAL_ERROR "You must \"pip install cbor2\": ${generate_embedded_jdd}")
-endif()
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)

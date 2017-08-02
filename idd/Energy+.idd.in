@@ -811,7 +811,7 @@ HVACSystemRootFindingAlgorithm,
        \key RegulaFalsiThenBisection
        \default RegulaFalsi
   N1 ; \field Number of Iterations Before Algorithm Switch
-       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is 
+       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is
        \note entered. When iteration number is greater than the value, algorithm switches.
        \type integer
        \default 5
@@ -6275,8 +6275,8 @@ WindowMaterial:Blind:EquivalentLayer,
        \minimum -90
        \maximum 90
        \default 45
-       \note Slat angle is +ve if the tip of the slat front face is tilted upward, else  
-       \note the slat angle is -ve if the tip of the slat front face is tilted downward. 
+       \note Slat angle is +ve if the tip of the slat front face is tilted upward, else
+       \note the slat angle is -ve if the tip of the slat front face is tilted downward.
        \note The slat angle varies between -90 to +90. The default value is 45 degrees.
   N5 , \field Front Side Slat Beam-Diffuse Solar Transmittance
        \note The front side beam-diffuse solar transmittance of the slat at normal
@@ -31777,7 +31777,7 @@ DesignSpecification:OutdoorAir,
   A4; \field Proportional Control Minimum Outdoor Air Flow Rate Schedule Name
       \type object-list
       \object-list ScheduleNames
-      \note This input is only used to calculate the minimum outdoor air flow rate when the field 
+      \note This input is only used to calculate the minimum outdoor air flow rate when the field
       \note System Outdoor Air Method = ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation.
 
 DesignSpecification:ZoneAirDistribution,
@@ -33041,7 +33041,7 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy, 
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy,
        \note or ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation
   A6 , \field Maximum Carbon Dioxide Concentration Schedule Name
        \type object-list
@@ -33049,8 +33049,8 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy 
-       \note or ProportionalControlBasedOnDesignOARate.  
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy
+       \note or ProportionalControlBasedOnDesignOARate.
   A7 , \field Generic Contaminant Control Availability Schedule Name
        \note Availability schedule name for generic contaminant controller. Schedule value > 0 means
        \note the generic contaminant controller is enabled. If this field is blank, then generic
@@ -57697,7 +57697,7 @@ Controller:MechanicalVentilation,
         \key ProportionalControlBasedonOccupancySchedule
         \key IndoorAirQualityProcedureGenericContaminant
         \key IndoorAirQualityProcedureCombined
-        \key ProportionalControlBasedOnDesignOARate 
+        \key ProportionalControlBasedOnDesignOARate
         \default VentilationRateProcedure
    N1,  \field Zone Maximum Outdoor Air Fraction
         \type real
@@ -74956,9 +74956,9 @@ SetpointManager:Scheduled:DualSetpoint,
        \type node
 
 SetpointManager:OutdoorAirReset,
-     \memo This Setpoint Manager is used to place a setpoint temperature on system node 
+     \memo This Setpoint Manager is used to place a setpoint temperature on system node
      \memo according to the outdoor air temperature using a reset rule. The outdoor air
-     \memo temperature is obtained from the weather information during the simulation. 
+     \memo temperature is obtained from the weather information during the simulation.
   A1 , \field Name
        \required-field
   A2 , \field Control Variable

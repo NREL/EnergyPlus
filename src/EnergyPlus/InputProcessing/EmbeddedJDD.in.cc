@@ -49,7 +49,7 @@
 namespace EnergyPlus {
 
 const std::vector<uint8_t> embeddedJDD = {
-${embedded_jdd}
+${embedded_schema}
 };
 
 }
