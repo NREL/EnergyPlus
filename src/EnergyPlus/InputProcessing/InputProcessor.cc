@@ -120,8 +120,8 @@ namespace EnergyPlus {
 		state->initialize( & schema );
 
 		const auto state_ptr = state.get();
-		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index ) -> bool {
-			state_ptr->traverse( event, parsed, line_num, line_index );
+		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed ) -> bool {
+			state_ptr->traverse( event, parsed, 999999999, 999999999 );
 			return true;
 		};
 	}
