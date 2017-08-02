@@ -59,8 +59,7 @@
 #include <InputProcessing/IdfParser.hh>
 #include <InputProcessing/InputValidation.hh>
 #include <InputProcessing/DataStorage.hh>
-#include <InputProcessing/EmbeddedJDD.hh>
-// #include <InputProcessing/ObjectTypes.hh>
+#include <InputProcessing/EmbeddedEpJSONSchema.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
 #include <DataPrecisionGlobals.hh>
@@ -109,7 +108,7 @@ namespace EnergyPlus {
 		state( std::unique_ptr< State >( new State() ) ),
 		data( std::unique_ptr< DataStorage >( new DataStorage() ) )
 	{
-		schema = json::from_cbor( embeddedJDD );
+		schema = json::from_cbor( embeddedEpJSONSchema );
 
 		const json & loc = schema[ "properties" ];
 		caseInsensitiveObjectMap.reserve( loc.size() );
@@ -139,8 +138,8 @@ namespace EnergyPlus {
 		// if ( found_type == objectTypeMap.end() ) {
 		// 	ShowFatalError( "ObjectType (" + std::to_string( static_cast< int >( objectType ) ) + ") is not yet implemented" );
 		// }
-		auto const it = jdf.find( objectType );
-		if ( it == jdf.end() ) {
+		auto const it = epJSON.find( objectType );
+		if ( it == epJSON.end() ) {
 			ShowFatalError( "ObjectType (" + objectType + ") requested was not found in input" );
 		}
 		auto const & objs = it.value();
@@ -165,8 +164,8 @@ namespace EnergyPlus {
 		// if ( found_type == objectTypeMap.end() ) {
 		// 	ShowFatalError( "ObjectType (" + std::to_string( static_cast< int >( objectType ) ) + ") is not yet implemented" );
 		// }
-		auto const it = jdf.find( objectType );
-		if ( it == jdf.end() ) {
+		auto const it = epJSON.find( objectType );
+		if ( it == epJSON.end() ) {
 			ShowFatalError( "ObjectType (" + objectType + ") requested was not found in input" );
 		}
 		auto const & objs = it.value();
@@ -204,18 +203,18 @@ namespace EnergyPlus {
 	InputProcessor::initializeMaps() {
 		unusedInputs.clear();
 		objectCacheMap.clear();
-		objectCacheMap.reserve( jdf.size() );
+		objectCacheMap.reserve( epJSON.size() );
 		auto const & schema_properties = schema.at( "properties" );
 
-		for ( auto jdf_iter = jdf.begin(); jdf_iter != jdf.end(); ++jdf_iter ) {
-			auto const & objects = jdf_iter.value();
-			auto const & objectType = jdf_iter.key();
+		for ( auto epJSON_iter = epJSON.begin(); epJSON_iter != epJSON.end(); ++epJSON_iter ) {
+			auto const & objects = epJSON_iter.value();
+			auto const & objectType = epJSON_iter.key();
 			ObjectCache objectCache;
 			objectCache.inputObjectIterators.reserve( objects.size() );
-			for ( auto jdf_obj_iter = objects.begin(); jdf_obj_iter != objects.end(); ++jdf_obj_iter ) {
-				objectCache.inputObjectIterators.emplace_back( jdf_obj_iter );
-				auto const * const obj_ptr = jdf_obj_iter.value().get_ptr< const json::object_t * const >();
-				unusedInputs.emplace( obj_ptr, ObjectInfo( objectType, jdf_obj_iter.key() ) );
+			for ( auto epJSON_obj_iter = objects.begin(); epJSON_obj_iter != objects.end(); ++epJSON_obj_iter ) {
+				objectCache.inputObjectIterators.emplace_back( epJSON_obj_iter );
+				auto const * const obj_ptr = epJSON_obj_iter.value().get_ptr< const json::object_t * const >();
+				unusedInputs.emplace( obj_ptr, ObjectInfo( objectType, epJSON_obj_iter.key() ) );
 			}
 			auto const schema_iter = schema_properties.find( objectType );
 			objectCache.schemaIterator = schema_iter;
@@ -225,13 +224,13 @@ namespace EnergyPlus {
 
 	void
 	InputProcessor::processInput() {
-		// std::ifstream jdd_stream( DataStringGlobals::inputJddFileName , std::ifstream::in);
-		// if ( !jdd_stream.is_open() ) {
-		// 	ShowFatalError( "JDD file path " + DataStringGlobals::inputJddFileName + " not found" );
+		// std::ifstream epJSON_schema_stream( DataStringGlobals::inputEpJSONSchemaFileName , std::ifstream::in);
+		// if ( !epJSON_schema_stream.is_open() ) {
+		// 	ShowFatalError( "epJSON Schema file path " + DataStringGlobals::inputEpJSONSchemaFileName + " not found" );
 		// 	return;
 		// }
-		// schema = json::parse(jdd_stream);
-		// schema = json::from_cbor( embeddedJDD );
+		// schema = json::parse(epJSON_schema_stream);
+		// schema = json::from_cbor( embeddedEpJSON );
 
 		// const json & loc = schema[ "properties" ];
 		// caseInsensitiveObjectMap.reserve( loc.size() );
@@ -263,11 +262,11 @@ namespace EnergyPlus {
 		std::string input_file = memblock;
 		delete[] memblock;
 
-		if ( ! DataGlobals::isJDF ) {
+		if ( ! DataGlobals::isEpJSON ) {
 			json const input_file_json = idf_parser->decode( input_file, schema );
-			if ( DataGlobals::outputJDFConversion ) {
+			if ( DataGlobals::outputEpJSONConversion ) {
 				input_file = input_file_json.dump( 4 );
-				std::string convertedIDF( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".jdf" );
+				std::string convertedIDF( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON" );
 				FileSystem::makeNativePath( convertedIDF );
 				std::ofstream convertedFS( convertedIDF, std::ofstream::out );
 				convertedFS << input_file << std::endl;
@@ -278,13 +277,13 @@ namespace EnergyPlus {
 
 		// state->initialize( & schema );
 
-		jdf = json::parse( input_file, callback );
+		epJSON = json::parse( input_file, callback );
 
-		if ( DataGlobals::isJDF && DataGlobals::outputJDFConversion ) {
-			std::string const encoded = idf_parser->encode( jdf, schema );
-			std::string convertedJDF( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf" );
-			FileSystem::makeNativePath( convertedJDF );
-			std::ofstream convertedFS( convertedJDF, std::ofstream::out );
+		if ( DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion ) {
+			std::string const encoded = idf_parser->encode( epJSON, schema );
+			std::string convertedEpJSON( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf" );
+			FileSystem::makeNativePath( convertedEpJSON );
+			std::ofstream convertedFS( convertedEpJSON, std::ofstream::out );
 			convertedFS << encoded << std::endl;
 		}
 
@@ -319,8 +318,8 @@ namespace EnergyPlus {
 		// METHODOLOGY EMPLOYED:
 		// Look up section in list of sections.  If there, return the
 		// number of sections of that kind found in the current input.  If not, return -1.
-		auto const & SectionWord_iter = jdf.find( SectionWord );
-		if ( SectionWord_iter == jdf.end() ) return -1;
+		auto const & SectionWord_iter = epJSON.find( SectionWord );
+		if ( SectionWord_iter == epJSON.end() ) return -1;
 		return static_cast< int >( SectionWord_iter.value().size() );
 	}
 
@@ -343,14 +342,14 @@ namespace EnergyPlus {
 		// Look up object in list of objects.  If there, return the
 		// number of objects found in the current input.  If not, return 0.
 
-		auto const & find_obj = jdf.find( ObjectWord );
+		auto const & find_obj = epJSON.find( ObjectWord );
 
-		if ( find_obj == jdf.end() ) {
+		if ( find_obj == epJSON.end() ) {
 			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjectWord ) );
-			if ( tmp_umit == caseInsensitiveObjectMap.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
+			if ( tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find( tmp_umit->second ) == epJSON.end() ) {
 				return 0;
 			}
-			return static_cast< int >( jdf[ tmp_umit->second ].size() );
+			return static_cast< int >( epJSON[ tmp_umit->second ].size() );
 		} else {
 			return static_cast< int >( find_obj.value().size() );
 		}
@@ -390,7 +389,7 @@ namespace EnergyPlus {
 		auto find_iterators = objectCacheMap.find( Object );
 		if ( find_iterators == objectCacheMap.end() ) {
 			auto const tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( Object ) );
-			if ( tmp_umit == caseInsensitiveObjectMap.end() || jdf.find( tmp_umit->second ) == jdf.end() ) {
+			if ( tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find( tmp_umit->second ) == epJSON.end() ) {
 				return;
 			}
 			find_iterators = objectCacheMap.find( tmp_umit->second );
@@ -404,24 +403,24 @@ namespace EnergyPlus {
 		auto const & is_NumBlank = present(NumBlank);
 		auto const & is_NumericFieldNames = present(NumericFieldNames);
 
-		auto const & jdf_it = find_iterators->second.inputObjectIterators.at( Number - 1 );
-		auto const & jdd_it = find_iterators->second.schemaIterator;
-		auto const & jdd_it_val = jdd_it.value();
+		auto const & epJSON_it = find_iterators->second.inputObjectIterators.at( Number - 1 );
+		auto const & epJSON_schema_it = find_iterators->second.schemaIterator;
+		auto const & epJSON_schema_it_val = epJSON_schema_it.value();
 
-		auto const * const obj_ptr = jdf_it.value().get_ptr< const json::object_t * const >();
+		auto const * const obj_ptr = epJSON_it.value().get_ptr< const json::object_t * const >();
 		auto const find_unused = unusedInputs.find( obj_ptr );
 		if ( find_unused != unusedInputs.end() ) {
 			unusedInputs.erase( find_unused );
 		}
 
 		// Locations in JSON schema relating to normal fields
-		auto const & schema_obj_props = jdd_it_val[ "patternProperties" ][ ".*" ][ "properties" ];
+		auto const & schema_obj_props = epJSON_schema_it_val[ "patternProperties" ][ ".*" ][ "properties" ];
 
 		// Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
-		auto const & legacy_idd = jdd_it_val[ "legacy_idd" ];
+		auto const & legacy_idd = epJSON_schema_it_val[ "legacy_idd" ];
 		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
 		auto const & legacy_idd_numerics = legacy_idd[ "numerics" ];
-		auto const & schema_name_field = jdd_it_val.find( "name" );
+		auto const & schema_name_field = epJSON_schema_it_val.find( "name" );
 
 		auto key = legacy_idd.find("extension");
 		std::string extension_key;
@@ -432,12 +431,12 @@ namespace EnergyPlus {
 		Alphas = "";
 		Numbers = 0;
 
-		auto const & obj = jdf_it;
+		auto const & obj = epJSON_it;
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
 		for ( size_t i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_alphas_fields[ i ];
-			if ( field == "name" && schema_name_field != jdd_it_val.end() ) {
+			if ( field == "name" && schema_name_field != epJSON_schema_it_val.end() ) {
 				auto const & name_iter = schema_name_field.value();
 				if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
 					Alphas( i + 1 ) = obj.key();
@@ -496,22 +495,22 @@ namespace EnergyPlus {
 		auto const & legacy_idd_alphas_extension_iter = legacy_idd_alphas.find( "extensions" );
 		if ( legacy_idd_alphas_extension_iter != legacy_idd_alphas.end() ) {
 			auto const & legacy_idd_alphas_extensions = legacy_idd_alphas_extension_iter.value();
-			auto const & jdf_extensions_array = obj.value()[ extension_key];
+			auto const & epJSON_extensions_array = obj.value()[ extension_key];
 			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
 			int alphas_index = static_cast <int> ( legacy_idd_alphas_fields.size() );
 
-			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
-				auto const & jdf_extension_obj = it.value();
+			for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
+				auto const & epJSON_extension_obj = it.value();
 
 				for ( size_t i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
 					std::string const & field_name = legacy_idd_alphas_extensions[ i ];
-					auto const & jdf_obj_field_iter = jdf_extension_obj.find( field_name );
+					auto const & epJSON_obj_field_iter = epJSON_extension_obj.find( field_name );
 
-					if ( jdf_obj_field_iter != jdf_extension_obj.end() ) {
-						auto const & jdf_field_val = jdf_obj_field_iter.value();
-						if ( jdf_field_val.is_string() ) {
+					if ( epJSON_obj_field_iter != epJSON_extension_obj.end() ) {
+						auto const & epJSON_field_val = epJSON_obj_field_iter.value();
+						if ( epJSON_field_val.is_string() ) {
 							auto const & schema_field = schema_extension_fields[ field_name ];
-							std::string val = jdf_field_val;
+							std::string val = epJSON_field_val;
 							auto const & tmp_find_default_iter = schema_field.find( "default" );
 							if ( val.empty() and tmp_find_default_iter != schema_field.end() ) {
 								auto const & field_default_val = tmp_find_default_iter.value();
@@ -536,10 +535,10 @@ namespace EnergyPlus {
 								Alphas( alphas_index + 1 ) = UtilityRoutines::MakeUPPERCase( val );
 							}
 						} else {
-							if ( jdf_field_val.is_number_integer() ) {
-								i64toa( jdf_field_val.get < int >(), s );
+							if ( epJSON_field_val.is_number_integer() ) {
+								i64toa( epJSON_field_val.get < int >(), s );
 							} else {
-								dtoa( jdf_field_val.get < double >(), s );
+								dtoa( epJSON_field_val.get < double >(), s );
 							}
 							Alphas( alphas_index + 1 ) = s;
 							if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = false;
@@ -589,23 +588,23 @@ namespace EnergyPlus {
 		}
 
 		auto const legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
-		auto const jdf_extensions_iter = obj.value().find( extension_key );
-		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() && jdf_extensions_iter != obj.value().end() ) {
+		auto const epJSON_extensions_iter = obj.value().find( extension_key );
+		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() && epJSON_extensions_iter != obj.value().end() ) {
 			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
 			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
-			// auto const & jdf_extensions_array = obj.value()[ extension_key ];
-			auto const & jdf_extensions_array = jdf_extensions_iter.value();
+			// auto const & epJSON_extensions_array = obj.value()[ extension_key ];
+			auto const & epJSON_extensions_array = epJSON_extensions_iter.value();
 			int numerics_index = static_cast <int> ( legacy_idd_numerics_fields.size() );
 
-			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
-				auto const & jdf_extension_obj = it.value();
+			for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
+				auto const & epJSON_extension_obj = it.value();
 
 				for ( size_t i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
 					std::string const & field = legacy_idd_numerics_extensions[ i ];
-					auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
+					auto const & epJSON_extension_field_iter = epJSON_extension_obj.find( field );
 
-					if ( jdf_extension_field_iter != jdf_extension_obj.end() ) {
-						auto const & val = jdf_extension_field_iter.value();
+					if ( epJSON_extension_field_iter != epJSON_extension_obj.end() ) {
+						auto const & val = epJSON_extension_field_iter.value();
 						if ( !val.is_string() ) {
 							if ( val.is_number_integer() ) {
 								Numbers( numerics_index + 1 ) = val.get < int >();
@@ -674,13 +673,13 @@ namespace EnergyPlus {
 		// Get the occurrence number of an object of type ObjType and name ObjName
 
 		json * obj;
-		auto obj_iter = jdf.find( ObjType );
-		if ( obj_iter == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
+		auto obj_iter = epJSON.find( ObjType );
+		if ( obj_iter == epJSON.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
 			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjType ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				return -1;
 			}
-			obj = &jdf[ tmp_umit->second ];
+			obj = &epJSON[ tmp_umit->second ];
 		} else {
 			obj = &( obj_iter.value() );
 		}
@@ -714,13 +713,13 @@ namespace EnergyPlus {
 		// Get the occurrence number of an object of type ObjType and name ObjName
 
 		json * obj;
-		auto obj_iter = jdf.find( ObjType );
-		if ( jdf.find( ObjType ) == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
+		auto obj_iter = epJSON.find( ObjType );
+		if ( epJSON.find( ObjType ) == epJSON.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
 			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjType ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				return -1;
 			}
-			obj = &jdf[ tmp_umit->second ];
+			obj = &epJSON[ tmp_umit->second ];
 		} else {
 			obj = &( obj_iter.value() );
 		}
@@ -837,7 +836,7 @@ namespace EnergyPlus {
 		std::string extension_key;
 		auto const & schema_properties = schema.at( "properties" );
 
-		for ( json::iterator object = jdf.begin(); object != jdf.end(); ++object ) {
+		for ( json::iterator object = epJSON.begin(); object != epJSON.end(); ++object ) {
 			int num_alpha = 0;
 			int num_numeric = 0;
 
@@ -912,15 +911,15 @@ namespace EnergyPlus {
 		const json & legacy_idd = object->at( "legacy_idd" );
 
 		json * objects;
-		if ( jdf.find( ObjectWord ) == jdf.end() ) {
+		if ( epJSON.find( ObjectWord ) == epJSON.end() ) {
 			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( ObjectWord ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
 				ShowSevereError( "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;
 			}
-			objects = &jdf[ tmp_umit->second ];
+			objects = &epJSON[ tmp_umit->second ];
 		} else {
-			objects = &jdf[ ObjectWord ];
+			objects = &epJSON[ ObjectWord ];
 		}
 
 		size_t max_size = 0;
@@ -1188,10 +1187,10 @@ namespace EnergyPlus {
 		DataOutputs::MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
-		auto jdf_objects = jdf.find( OutputVariable );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+		auto epJSON_objects = epJSON.find( OutputVariable );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				if ( !fields.at( "key_value" ).empty() ) {
 					addRecordToOutputVariableStructure( fields.at( "key_value" ),
@@ -1202,15 +1201,15 @@ namespace EnergyPlus {
 			}
 		}
 
-		jdf_objects = jdf.find( MeterCustom );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
+		epJSON_objects = epJSON.find( MeterCustom );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
 			auto const & legacy_idd = schema[ "properties" ][ MeterCustom ][ "legacy_idd" ];
 			auto key = legacy_idd.find("extension");
 			if ( key != legacy_idd.end() ) {
 				extension_key = key.value();
 			}
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					if ( !obj.key().empty() ) {
@@ -1225,15 +1224,15 @@ namespace EnergyPlus {
 			}
 		}
 
-		jdf_objects = jdf.find( MeterCustomDecrement );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
+		epJSON_objects = epJSON.find( MeterCustomDecrement );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
 			auto const & legacy_idd = schema[ "properties" ][ MeterCustomDecrement ][ "legacy_idd" ];
 			auto key = legacy_idd.find("extension");
 			if ( key != legacy_idd.end() ) {
 				extension_key = key.value();
 			}
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					if ( !obj.key().empty() ) {
@@ -1248,10 +1247,10 @@ namespace EnergyPlus {
 			}
 		}
 
-		jdf_objects = jdf.find( EMSSensor );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+		epJSON_objects = epJSON.find( EMSSensor );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				if ( !fields.at( "output_variable_or_output_meter_index_key_name" ).empty() ) {
 					addRecordToOutputVariableStructure(
@@ -1264,18 +1263,18 @@ namespace EnergyPlus {
 			}
 		}
 
-		jdf_objects = jdf.find( EMSOutputVariable );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+		epJSON_objects = epJSON.find( EMSOutputVariable );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				addRecordToOutputVariableStructure( "*", obj.key() );
 			}
 		}
 
-		jdf_objects = jdf.find( OutputTableTimeBins );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+		epJSON_objects = epJSON.find( OutputTableTimeBins );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				if ( !obj.key().empty() ) {
 					addRecordToOutputVariableStructure( obj.key(), fields.at( "key_value" ) );
@@ -1285,15 +1284,15 @@ namespace EnergyPlus {
 			}
 		}
 
-		jdf_objects = jdf.find( OutputTableMonthly );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
+		epJSON_objects = epJSON.find( OutputTableMonthly );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
 			auto const & legacy_idd = schema[ "properties" ][ OutputTableMonthly ][ "legacy_idd" ];
 			auto key = legacy_idd.find("extension");
 			if ( key != legacy_idd.end() ) {
 				extension_key = key.value();
 			}
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					addRecordToOutputVariableStructure( "*",
@@ -1302,15 +1301,15 @@ namespace EnergyPlus {
 			}
 		}
 
-		jdf_objects = jdf.find( OutputTableAnnual );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
+		epJSON_objects = epJSON.find( OutputTableAnnual );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
 			auto const & legacy_idd = schema[ "properties" ][ OutputTableAnnual ][ "legacy_idd" ];
 			auto key = legacy_idd.find("extension");
 			if ( key != legacy_idd.end() ) {
 				extension_key = key.value();
 			}
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					addRecordToOutputVariableStructure( "*", extensions.at(
@@ -1319,15 +1318,15 @@ namespace EnergyPlus {
 			}
 		}
 
-		jdf_objects = jdf.find( OutputTableSummaries );
-		if ( jdf_objects != jdf.end() ) {
-			auto const & jdf_object = jdf_objects.value();
+		epJSON_objects = epJSON.find( OutputTableSummaries );
+		if ( epJSON_objects != epJSON.end() ) {
+			auto const & epJSON_object = epJSON_objects.value();
 			auto const & legacy_idd = schema[ "properties" ][ OutputTableSummaries ][ "legacy_idd" ];
 			auto key = legacy_idd.find("extension");
 			if ( key != legacy_idd.end() ) {
 				extension_key = key.value();
 			}
-			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
+			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					auto const report_name = UtilityRoutines::MakeUPPERCase( extensions.at( "report_name" ) );

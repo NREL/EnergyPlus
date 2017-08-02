@@ -87,8 +87,8 @@ namespace DataGlobals {
 	bool runReadVars(false);
 	bool DDOnlySimulation(false);
 	bool AnnualSimulation(false);
-	bool outputJDFConversion(false);
-	bool isJDF(false);
+	bool outputEpJSONConversion(false);
+	bool isEpJSON(false);
 
 	// MODULE PARAMETER DEFINITIONS:
 	int const BeginDay( 1 );
@@ -258,7 +258,7 @@ namespace DataGlobals {
 		runReadVars = false;
 		DDOnlySimulation = false;
 		AnnualSimulation = false;
-		outputJDFConversion = false;
+		outputEpJSONConversion = false;
 		BeginDayFlag = false;
 		BeginEnvrnFlag = false;
 		BeginHourFlag = false;

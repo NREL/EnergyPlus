@@ -247,8 +247,8 @@ namespace EnergyPlus {
 	private:
 		friend class InputProcessorFixture;
 
-		// Function to process the Energy+.jdd, should not normally be called.
-		// This will always grab the Energy+.jdd that is part of the Products folder
+		// Function to process the Energy+.schema.epJSON, should not normally be called.
+		// This will always grab the Energy+.schema.epJSON that is part of the Products folder
 		// This function should be called by process_idf() so unit tests can take advantage of caching
 		// To test this function use InputProcessorFixture
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending

@@ -274,7 +274,7 @@ namespace EnergyPlus {
 		std::unique_ptr< State > state;
 		std::unique_ptr< DataStorage > data;
 		json schema;
-		json jdf;
+		json epJSON;
 		UnorderedObjectTypeMap caseInsensitiveObjectMap;
 		UnorderedObjectCacheMap objectCacheMap;
 		UnorderedUnusedObjectMap unusedInputs;

@@ -140,8 +140,6 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Display help information", "-h", "--help");
 
-	opt.add("Energy+.jdd", 0, 1, 0, "JSON input data dictionary path (default: Energy+.jdd in executable directory)", "-j", "--jdd");
-
 	opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
 
 	opt.add("", 0, 0, 0, "Run EPMacro prior to simulation", "-m", "--epmacro");
@@ -150,7 +148,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Run ReadVarsESO after simulation", "-r", "--readvars");
 
-	opt.add("", 0, 0, 0, "Output IDF->JDF or JDF->IDF, dependent on input file type", "-c", "--convert");
+	opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
 
 	opt.add("L", 0, 1, 0, "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: Dash (e.g., eplus-table.csv)", "-s", "--output-suffix");
 
@@ -180,12 +178,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.get("-w")->getString(inputWeatherFileName);
 
-	opt.get("-j")->getString(inputJddFileName);
-
 	opt.get("-i")->getString(inputIddFileName);
-
-	if (!opt.isSet("-j") && !legacyMode)
-		inputJddFileName = exeDirectory + inputJddFileName;
 
 	if (!opt.isSet("-i") && !legacyMode)
 		inputIddFileName = exeDirectory + inputIddFileName;
@@ -198,7 +191,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	AnnualSimulation = opt.isSet("-a");
 
-	outputJDFConversion = opt.isSet("-c");
+	outputEpJSONConversion = opt.isSet("-c");
 
 	// Process standard arguments
 	if (opt.isSet("-h")) {
@@ -222,7 +215,6 @@ ProcessArgs(int argc, const char * argv[])
 	// Convert all paths to native paths
 	makeNativePath(inputFileName);
 	makeNativePath(inputWeatherFileName);
-	makeNativePath(inputJddFileName);
 	makeNativePath(inputIddFileName);
 	makeNativePath(outDirPathName);
 
@@ -256,12 +248,13 @@ ProcessArgs(int argc, const char * argv[])
 	auto inputFileExt = getFileExtension( inputFileName );
 	std::transform( inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper );
 
-	if ( inputFileExt == "JDF" ) {
-		isJDF = true;
+	// TODO: figure out better logic for determining input file type
+	if ( inputFileExt == "EPJSON" ) {
+		isEpJSON = true;
 	} else if ( inputFileExt == "IDF" ) {
-		isJDF = false;
+		isEpJSON = false;
 	} else {
-		DisplayString("ERROR: Input file must have IDF or JDF extension.");
+		DisplayString("ERROR: Input file must have IDF or epJSON extension.");
 		exit(EXIT_FAILURE);
 	}
 
@@ -492,19 +485,10 @@ ProcessArgs(int argc, const char * argv[])
 
 		gio::close( LFN );
 
-		inputJddFileName = ProgramPath + "Energy+.jdd";
-
 		inputIddFileName = ProgramPath + "Energy+.idd";
 	}
 
 	// Check if specified files exist
-	{ IOFlags flags; gio::inquire( inputJddFileName, flags ); FileExists = flags.exists(); }
-	if ( ! FileExists ) {
-		DisplayString("ERROR: Could not find JSON input data dictionary: " + getAbsolutePath(inputJddFileName) + "." );
-		DisplayString(errorFollowUp);
-		exit(EXIT_FAILURE);
-	}
-
 	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
 		DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
@@ -535,7 +519,7 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	//TODO: might be able to convert JDF->IDF, run preprocessors, then go back IDF->JDF
+	//TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
 	// Preprocessors (These will likely move to a new file)
 	if (runEPMacro) {

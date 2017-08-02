@@ -87,11 +87,11 @@ namespace EnergyPlus {
 		}
 
 		std::string encodeIDF() {
-			return inputProcessor->idf_parser->encode(inputProcessor->jdf, inputProcessor->schema);
+			return inputProcessor->idf_parser->encode(inputProcessor->epJSON, inputProcessor->schema);
 		}
 
-		json & getJDF() {
-			return inputProcessor->jdf;
+		json & getEpJSON() {
+			return inputProcessor->epJSON;
 		}
 
 		void eat_whitespace( std::string const & idf, size_t & index ) {

@@ -532,10 +532,10 @@ namespace EnergyPlus {
 
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
-		inputProcessor->jdf = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema);
+		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema);
 
-		if (inputProcessor->jdf.find("Building") == inputProcessor->jdf.end()) {
-			inputProcessor->jdf["Building"] = {
+		if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
+			inputProcessor->epJSON["Building"] = {
 					{
 							"Bldg",
 							{
@@ -550,8 +550,8 @@ namespace EnergyPlus {
 					}
 			};
 		}
-		if (inputProcessor->jdf.find("GlobalGeometryRules") == inputProcessor->jdf.end()) {
-			inputProcessor->jdf["GlobalGeometryRules"] = {
+		if (inputProcessor->epJSON.find("GlobalGeometryRules") == inputProcessor->epJSON.end()) {
+			inputProcessor->epJSON["GlobalGeometryRules"] = {
 					{
 							"",
 							{
@@ -591,18 +591,18 @@ namespace EnergyPlus {
 			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
 		} else {
 			static auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
-			static auto idd_location = exeDirectory + "Energy+.jdd";
+			static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
 			static auto file_exists = FileSystem::fileExists( idd_location );
 
 			if ( ! file_exists ) {
-				// Energy+.jdd is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "Energy+.jdd";
+				// Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
+				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "Energy+.schema.epJSON";
 				file_exists = FileSystem::fileExists( idd_location );
 			}
 
 			if ( ! file_exists ) {
 				EXPECT_TRUE( file_exists ) <<
-					"Energy+.jdd does not exist at search location." << std::endl << "JDD search location: \"" << idd_location << "\"";
+					"Energy+.schema.epJSON does not exist at search location." << std::endl << "epJSON Schema search location: \"" << idd_location << "\"";
 				errors_found = true;
 				return errors_found;
 			}

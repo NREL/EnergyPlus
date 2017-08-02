@@ -320,14 +320,14 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf(idf) );
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 				}
 			}
@@ -407,14 +407,14 @@ namespace EnergyPlus {
 				};
 
 		ASSERT_TRUE(process_idf(idf));
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 				}
 			}
@@ -524,20 +524,20 @@ namespace EnergyPlus {
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -616,20 +616,20 @@ namespace EnergyPlus {
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -637,7 +637,7 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		json::parse(jdf.dump(2), inputProcessor->callback);
+		json::parse(epJSON.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -797,20 +797,20 @@ namespace EnergyPlus {
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -819,7 +819,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		json::parse(jdf.dump(2), inputProcessor->callback);
+		json::parse(epJSON.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -917,14 +917,14 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 				}
 			}
@@ -988,14 +988,14 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 				}
 			}
@@ -1069,20 +1069,20 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -1212,20 +1212,20 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
-		json & jdf = getJDF();
+		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -1236,7 +1236,7 @@ namespace EnergyPlus {
 	}
 
 
-	TEST_F(InputProcessorFixture, validate_jdf_parametric_template) {
+	TEST_F(InputProcessorFixture, validate_epJSON_parametric_template) {
 		std::string const idf(delimited_string(
 				{
 					"Parametric:Logic,",
@@ -1258,8 +1258,8 @@ namespace EnergyPlus {
 					";                        !- Constant Cooling Setpoint {C}"
 				}));
 		ASSERT_TRUE( process_idf( idf ) );
-		json & jdf = getJDF();
-		json::parse(jdf.dump(2), inputProcessor->callback);
+		json & epJSON = getEpJSON();
+		json::parse(epJSON.dump(2), inputProcessor->callback);
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 2ul);
@@ -3327,8 +3327,8 @@ namespace EnergyPlus {
 		return true;
 	  };
 
-	  IP.jdf = idf_parser.decode(idf, schema);
-	  json::parse(IP.jdf.dump(2), cb);
+	  IP.epJSON = idf_parser.decode(idf, schema);
+	  json::parse(IP.epJSON.dump(2), cb);
 
 	  EXPECT_EQ(2, state.errors + state.warnings);
 
@@ -3337,7 +3337,7 @@ namespace EnergyPlus {
 	  // index = ObjectStartRecord( index );
 	  // EXPECT_EQ( 1, index );
 
-	  json &loc = IP.jdf["properties"]["Version"];
+	  json &loc = IP.epJSON["properties"]["Version"];
 
 	  // EXPECT_EQ( "Version", IDFRecords( index ).Name );
 	  EXPECT_EQ(1, loc['alphas'].size());  // EXPECT_EQ( 1, IDFRecords( index ).NumAlphas )

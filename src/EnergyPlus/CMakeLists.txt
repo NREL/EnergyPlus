@@ -7,7 +7,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 if(NOT PROFILE_USE)
   configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
   configure_file( ConfiguredFunctions.in.hh "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh" )
-  file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedJDD.cc" "Will be filled in later by GenerateEmbeddedSchema" )
+  file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 endif()
 
 SET( SRC
@@ -332,8 +332,8 @@ SET( SRC
   IceThermalStorage.cc
   IceThermalStorage.hh
   InputProcessing/DataStorage.hh
-  InputProcessing/EmbeddedJDD.hh
-  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedJDD.cc"
+  InputProcessing/EmbeddedEpJSONSchema.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
   InputProcessing/IdfParser.cc
   InputProcessing/IdfParser.hh
   InputProcessing/InputProcessor.cc
@@ -586,21 +586,21 @@ if (UNIX)
   ADD_DEFINITIONS("-fPIC")
 endif()
 
-add_custom_target( GenerateEmbeddedSchema
+add_custom_target( GenerateEmbeddedEpJSONSchema
                    COMMAND ${CMAKE_COMMAND} -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
                            -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
                            -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}"
                            -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
-                           -P "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_jdd/generate_embedded_schema.cmake"
+                           -P "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                   DEPENDS generate_embeddedable_schema )
+                   DEPENDS generate_embeddedable_epJSON_schema )
 
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
 target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva )
-add_dependencies( energypluslib GenerateEmbeddedSchema )
+add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries( energypluslib groundplot )
