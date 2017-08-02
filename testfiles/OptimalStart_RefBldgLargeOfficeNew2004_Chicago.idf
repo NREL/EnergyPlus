@@ -6696,6 +6696,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -6704,6 +6705,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -6712,6 +6714,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -6720,6 +6723,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:OptimumStart,

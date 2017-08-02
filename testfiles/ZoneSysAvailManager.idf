@@ -712,6 +712,7 @@
     FanAvailSched,           !- Fan Schedule Name
     CycleOnControlZone,      !- Control Type
     2,                       !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200.,                   !- Cycling Run Time {s}
     SPACE1-1;                !- Control Zone or Zone List Name
 
