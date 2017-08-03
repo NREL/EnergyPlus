@@ -812,12 +812,12 @@ namespace ReportSizingManager {
 //						} else {
 //							DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 //						}
-						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 //						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 //						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 //						DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
-						VentilationLoad = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak ) *  ( StdRhoAir * FinalZoneSizing( CurZoneEqNum ).MinOA ) * ( CoilInTemp - FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak );
-						DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad + max( 0.0, VentilationLoad );
+						VentilationLoad = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak ) *  ( StdRhoAir * FinalZoneSizing( CurZoneEqNum ).MinOA ) * ( FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak - FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak );
+						DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad + max( 0.0, VentilationLoad * FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor );
 						if ( DesCoilLoad >= SmallLoad ) {
 							Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 							rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum ).FluidIndex, CallingRoutine );
@@ -1191,24 +1191,29 @@ namespace ReportSizingManager {
 //						} else {
 //							DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 //						}
-						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 //						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 //						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 //						NominalCapacityDes = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
-						VentilationLoad = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak ) *  ( StdRhoAir * FinalZoneSizing( CurZoneEqNum ).MinOA ) * ( CoilInTemp - FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak );
-						NominalCapacityDes = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad + max( 0.0, VentilationLoad );
+						VentilationLoad = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak ) *  ( StdRhoAir * FinalZoneSizing( CurZoneEqNum ).MinOA ) * ( FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak - FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak );
+						NominalCapacityDes = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad + max( 0.0, VentilationLoad * FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor );
 					}
 					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
 					if ( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
 						ShowWarningMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
 						ShowContinueError( "...Rated Total Heating Capacity = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
-						ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesMassFlow / StdRhoAir, 5 ) + " [m3/s]" );
+//						ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesMassFlow / StdRhoAir, 5 ) + " [m3/s]" );
 						if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
-							ShowContinueError( "...Plant loop temperature difference = " + TrimSigDigits( DataWaterCoilSizHeatDeltaT, 2 ) + " [C]" );							
+							ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesMassFlow / StdRhoAir, 5 ) + " [m3/s]" );
+							ShowContinueError( "...Plant loop temperature difference = " + TrimSigDigits( DataWaterCoilSizHeatDeltaT, 2 ) + " [C]" );
 						} else {
-							ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
-							ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
-							ShowContinueError( "...Coil outlet air humidity ratio used for sizing = " + TrimSigDigits( CoilOutHumRat, 2 ) + " [kgWater/kgDryAir]" );
+//							ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
+//							ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
+//							ShowContinueError( "...Coil outlet air humidity ratio used for sizing = " + TrimSigDigits( CoilOutHumRat, 2 ) + " [kgWater/kgDryAir]" );
+							ShowContinueError( "...Coil zone load used for sizing = " + TrimSigDigits( FinalZoneSizing( CurZoneEqNum ).DesHeatLoad, 2 ) + " [W]" );
+							ShowContinueError( "...Coil ventilation load used for sizing = " + TrimSigDigits( VentilationLoad, 2 ) + " [W]" );
+							ShowContinueError( "...Coil global sizing factor used for sizing = " + TrimSigDigits( FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor, 2 ) + " []" );
+							ShowContinueError( "...Coil heating sizing factor used for sizing = " + TrimSigDigits( DataHeatSizeRatio, 2 ) + " []" );
 						}
 					}
 				} else if ( SizingType == HeatingWaterDesCoilLoadUsedForUASizing ) {
@@ -1232,13 +1237,13 @@ namespace ReportSizingManager {
 //						} else {
 //							DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 //						}
-						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 //						CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
 //						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 //						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 //						AutosizeDes = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
-						VentilationLoad = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak ) *  ( StdRhoAir * FinalZoneSizing( CurZoneEqNum ).MinOA ) * ( CoilInTemp - FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak );
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad + max( 0.0, VentilationLoad );
+						VentilationLoad = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak ) *  ( StdRhoAir * FinalZoneSizing( CurZoneEqNum ).MinOA ) * ( FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak - FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak );
+						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad + max( 0.0, VentilationLoad * FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor );
 					}
 				} else if ( SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing ) {
 					if ( TermUnitSingDuct ) {
