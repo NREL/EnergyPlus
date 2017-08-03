@@ -175,7 +175,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 		"  Sealed;                    !- Gap Vent Type ",
 	});
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	HeatBalanceManager::GetMaterialData( ErrorsFound );
 	HeatBalanceManager::GetConstructData( ErrorsFound );

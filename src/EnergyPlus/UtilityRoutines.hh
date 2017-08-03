@@ -629,6 +629,8 @@ namespace UtilityRoutines {
 		return equali( s, t );
 	}
 
+	typedef char const * c_cstring;
+
 	inline
 	bool
 	SameString( std::string const & s, c_cstring const & t ) {

@@ -230,7 +230,7 @@ namespace EnergyPlus {
 		// 	return;
 		// }
 		// schema = json::parse(epJSON_schema_stream);
-		// schema = json::from_cbor( embeddedEpJSON );
+		// schema = json::from_cbor( embeddedEpJSONSchema );
 
 		// const json & loc = schema[ "properties" ];
 		// caseInsensitiveObjectMap.reserve( loc.size() );
