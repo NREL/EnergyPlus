@@ -69,6 +69,7 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HVACFan.hh>
+#include <HVACUnitarySystem.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -302,6 +303,7 @@ namespace VariableSpeedCoils {
 		CompanionCoolingCoilNum( 0 ),
 		CompanionHeatingCoilNum( 0 ),
 		FanDelayTime( 0.0 ),
+		MSHPDesignSpecIndex( 0 ),
 		MSErrIndex( MaxSpedLevels, 0 ),
 		MSRatedPercentTotCap( MaxSpedLevels, 0.0 ),
 		MSRatedTotCap( MaxSpedLevels, 0.0 ),
@@ -428,7 +430,7 @@ namespace VariableSpeedCoils {
 		using InputProcessor::FindItemInList;
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1119,6 +1121,9 @@ namespace VariableSpeedCoils {
 			//Set crankcase heater cutout temperature
 			VarSpeedCoil( DXCoilNum ).MaxOATCrankcaseHeater = NumArray( 9 );
 
+			//Set crankcase heater cutout temperature
+			VarSpeedCoil( DXCoilNum ).MinOATCompressor = NumArray( 10 );
+
 			// Get Water System tank connections
 			//  A7, \field Name of Water Storage Tank for Supply
 			VarSpeedCoil( DXCoilNum ).EvapWaterSupplyName = AlphArray( 7 );
@@ -1139,20 +1144,20 @@ namespace VariableSpeedCoils {
 			}
 
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
-			VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = NumArray( 10 );
-			if ( NumArray( 10 ) < 0.0 ) {
+			VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = NumArray( 11 );
+			if ( NumArray( 11 ) < 0.0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
-				ShowContinueError( "..." + cNumericFields( 10 ) + " must be >= 0.0." );
-				ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 10 ), 2 ) + "]." );
+				ShowContinueError( "..." + cNumericFields( 11 ) + " must be >= 0.0." );
+				ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 11 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
-			VarSpeedCoil( DXCoilNum ).BasinHeaterSetPointTemp = NumArray( 11 );
+			VarSpeedCoil( DXCoilNum ).BasinHeaterSetPointTemp = NumArray( 12 );
 			if ( VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 				if ( VarSpeedCoil( DXCoilNum ).BasinHeaterSetPointTemp < 2.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", freeze possible" );
-					ShowContinueError( "..." + cNumericFields( 11 ) + " is < 2 {C}. Freezing could occur." );
-					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 11 ), 2 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 12 ) + " is < 2 {C}. Freezing could occur." );
+					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 12 ), 2 ) + "]." );
 				}
 			}
 
@@ -1166,17 +1171,17 @@ namespace VariableSpeedCoils {
 			}
 
 			for ( I = 1; I <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds; ++I ) {
-				VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I ) = NumArray( 12 + ( I - 1 ) * 6 );
-				VarSpeedCoil( DXCoilNum ).MSRatedSHR( I ) = NumArray( 13 + ( I - 1 ) * 6 );
-				VarSpeedCoil( DXCoilNum ).MSRatedCOP( I ) = NumArray( 14 + ( I - 1 ) * 6 );
-				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( I ) = NumArray( 15 + ( I - 1 ) * 6 );
-				VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( I ) = NumArray( 16 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I ) = NumArray( 13 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).MSRatedSHR( I ) = NumArray( 14 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).MSRatedCOP( I ) = NumArray( 15 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( I ) = NumArray( 16 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( I ) = NumArray( 17 + ( I - 1 ) * 6 );
 
-				VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) = NumArray( 17 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) = NumArray( 18 + ( I - 1 ) * 6 );
 				if ( VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) < 0.0 || VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) > 1.0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 17 + ( I - 1 ) * 6 ) + " cannot be < 0.0 or > 1.0." );
-					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 17 + ( I - 1 ) * 6 ), 2 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 18 + ( I - 1 ) * 6 ) + " cannot be < 0.0 or > 1.0." );
+					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 18 + ( I - 1 ) * 6 ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 
@@ -3065,6 +3070,7 @@ namespace VariableSpeedCoils {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using CurveManager::CurveValue;
+		using HVACUnitarySystem::DesignSpecMSHP;
 
 		// Locals
 		Real64 QLoadTotal; // placeholder for calculating SHR
@@ -3541,9 +3547,33 @@ namespace VariableSpeedCoils {
 		} else {
 			rhoA = PsyRhoAirFnPbTdbW( OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 			//HPWH, the mass flow rate will be updated by a revised entering air density
+
+			if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 && allocated( HVACUnitarySystem::DesignSpecMSHP ) ) {
+				if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
+					if ( HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).NumOfSpeedCooling != VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) {
+						ShowFatalError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil( DXCoilNum ).Name + " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object." );
+					}
+				} else {
+					if ( HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).NumOfSpeedHeating != VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) {
+						ShowFatalError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil( DXCoilNum ).Name + " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object." );
+					}
+				}
+			}
+
 			for ( Mode = VarSpeedCoil( DXCoilNum ).NumOfSpeeds; Mode >= 1; --Mode ) {
-				VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( UpperSpeed ) * VarSpeedCoil( DXCoilNum ).MSRatedPercentTotCap( Mode );
-				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+
+				if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 && VarSpeedCoil( DXCoilNum ).CoolHeatType != "WATERHEATING" ) {
+					if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
+						VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).CoolingVolFlowRatio( Mode );
+					} else {
+						VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).HeatingVolFlowRatio( Mode );
+					}
+					VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) / VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+				} else {
+					VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( UpperSpeed ) * VarSpeedCoil( DXCoilNum ).MSRatedPercentTotCap( Mode );
+					VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+				}
+
 				VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) * rhoA;
 				// EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
 				VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedEvapCondVolFlowPerRatedTotCap( Mode );
@@ -4189,6 +4219,11 @@ namespace VariableSpeedCoils {
 		}
 
 		if ( CompOp == 0 ) {
+			VarSpeedCoil( DXCoilNum ).SimFlag = false;
+			return;
+		}
+
+		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) && ( CondInletTemp < VarSpeedCoil( DXCoilNum ).MinOATCompressor ) ) {
 			VarSpeedCoil( DXCoilNum ).SimFlag = false;
 			return;
 		}
@@ -5769,6 +5804,46 @@ namespace VariableSpeedCoils {
 	}
 
 	int
+	GetVSCoilCapFTCurveIndex(
+		int const & CoilIndex, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   7/2017
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given coil and returns CapFT curve index.  If
+		// incorrect coil index is given, ErrorsFound is returned as true and value is returned
+		// as zero.
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		int CapFTIndex; // returned CapFT curve index of matched coil
+
+		// Obtains and Allocates WatertoAirHP related parameters from input file
+		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
+			GetVarSpeedCoilInput();
+			GetCoilsInputFlag = false;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( "GetVSCoilCapFTCurveIndex: Could not find Coil" );
+			ErrorsFound = true;
+			CapFTIndex = 0;
+		} else {
+			CapFTIndex = VarSpeedCoil( CoilIndex ).MSCCapFTemp( VarSpeedCoil( CoilIndex ).NumOfSpeeds );
+		}
+
+		return CapFTIndex;
+
+	}
+
+	int
 	GetCoilInletNodeVariableSpeed(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
@@ -5948,7 +6023,7 @@ namespace VariableSpeedCoils {
 		if ( WhichCoil != 0 ) {
 			MinOAT = VarSpeedCoil( WhichCoil ).MinOATCompressor;
 		} else {
-			ShowSevereError( "GetVSCoilMinOATCompressor: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + CoilName + "\"" );
+			ShowSevereError( "GetVSCoilMinOATCompressor: Invalid VS DX Coil, Type= VS DX Coil Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			MinOAT = -1000.0;
 		}
@@ -5993,7 +6068,7 @@ namespace VariableSpeedCoils {
 		if ( WhichCoil != 0 ) {
 			Speeds = VarSpeedCoil( WhichCoil ).NumOfSpeeds;
 		} else {
-			ShowSevereError( "GetVSCoilNumOfSpeeds: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + CoilName + "\"" );
+			ShowSevereError( "GetVSCoilNumOfSpeeds: Invalid VS DX Coil, Type= VS DX Coil Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			Speeds = 0;
 		}
@@ -6006,7 +6081,8 @@ namespace VariableSpeedCoils {
 		int const WSHPNum, // Number of OA Controller
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
-		Optional_int CompanionHeatingCoilNum // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int CompanionHeatingCoilNum, // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int MSHPDesignSpecIndex // index to UnitarySystemPerformance:Multispeed object
 	) {
 
 		// SUBROUTINE INFORMATION:
@@ -6048,6 +6124,10 @@ namespace VariableSpeedCoils {
 		if ( present( CompanionHeatingCoilNum ) ) {
 			VarSpeedCoil( WSHPNum ).CompanionHeatingCoilNum = CompanionHeatingCoilNum;
 			VarSpeedCoil( CompanionHeatingCoilNum ).CompanionCoolingCoilNum = WSHPNum;
+		}
+
+		if ( present( MSHPDesignSpecIndex ) ) {
+			VarSpeedCoil( WSHPNum ).MSHPDesignSpecIndex = MSHPDesignSpecIndex;
 		}
 
 	}
