@@ -277,7 +277,7 @@ namespace EnergyPlus {
 
 		// state->initialize( & schema );
 
-		epJSON = json::parse( input_file, callback );
+		epJSON = json::parse( input_file );
 
 		if ( DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion ) {
 			std::string const encoded = idf_parser->encode( epJSON, schema );

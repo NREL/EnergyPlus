@@ -637,7 +637,7 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		json::parse(epJSON.dump(2), inputProcessor->callback);
+		json::parse(ep JSON.dump(2) );
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -819,7 +819,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		json::parse(epJSON.dump(2), inputProcessor->callback);
+		json::parse(ep JSON.dump(2) );
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -1259,7 +1259,7 @@ namespace EnergyPlus {
 				}));
 		ASSERT_TRUE( process_idf( idf ) );
 		json & epJSON = getEpJSON();
-		json::parse(epJSON.dump(2), inputProcessor->callback);
+		json::parse(ep JSON.dump(2) );
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size() + warnings.size(), 2ul);
@@ -1334,7 +1334,7 @@ namespace EnergyPlus {
 
 		};
 
-		json::parse(root.dump(2), inputProcessor->callback);
+		json::parse( root.dump(2) );
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 2ul);
@@ -1413,7 +1413,7 @@ namespace EnergyPlus {
 			}
 		};
 
-		json::parse(root.dump(2), inputProcessor->callback);
+		json::parse( root.dump(2) );
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 4ul);
@@ -1491,7 +1491,7 @@ namespace EnergyPlus {
 				}
 			},
 		};
-		json::parse(root.dump(2), inputProcessor->callback);
+		json::parse( root.dump(2) );
 		auto const & errors = validationErrors();
 		auto const & warnings = validationWarnings();
 		EXPECT_EQ(errors.size(), 5ul);
