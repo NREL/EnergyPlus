@@ -315,6 +315,14 @@ namespace General {
 	std::string
 	CreateSysTimeIntervalString();
 
+	int
+	nthDayOfWeekOfMonth(
+		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
+		int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
+		int const & monthNumber, // January = 1
+		bool const & isLeapYear
+	);
+
 	Real64
 	SafeDivide(
 		Real64 const a,

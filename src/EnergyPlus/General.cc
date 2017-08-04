@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <General.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -2567,6 +2568,26 @@ namespace General {
 
 		return OutputString;
 
+	}
+
+	// returns the Julian date for the first, second, etc. day of week for a given month 
+	int
+	nthDayOfWeekOfMonth(
+		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
+		int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
+		int const & monthNumber, // January = 1
+		bool const & isLeapYear 
+	)
+	{
+		int firstDayOfMonth = JulianDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear );
+		int dayOfWeekForFirstDay = (DataEnvironment::RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7 ;
+		int jdatForNth;
+		if ( dayOfWeek >= dayOfWeekForFirstDay ) {
+			jdatForNth = firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay ) + 7 * ( nthTime - 1 );
+		} else {
+			jdatForNth = firstDayOfMonth + ( (dayOfWeek + 7) - dayOfWeekForFirstDay ) + 7 * ( nthTime - 1 );
+		}
+		return jdatForNth;
 	}
 
 	Real64
