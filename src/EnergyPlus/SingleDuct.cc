@@ -4755,18 +4755,18 @@ namespace SingleDuct {
 			SysATMixer( ATMixerNum ).PriInNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 5 ) );
 			SysATMixer( ATMixerNum ).SecInNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
 
-			if ( lAlphaFieldBlanks( 8 ) ) { //TRANE
-				SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = true; //TRANE
-			} else { //TRANE
-				SysATMixer( ATMixerNum ).OARequirementsPtr = InputProcessor::FindItemInList( cAlphaArgs( 8 ), DataSizing::OARequirements ); //TRANE
-				if ( SysATMixer( ATMixerNum ).OARequirementsPtr == 0 ) { //TRANE
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." ); //TRANE
-					ShowContinueError( "..invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." ); //TRANE
-					ErrorsFound = true; //TRANE
-				} else { //TRANE
-					SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false; //TRANE
-				} //TRANE
-			} //TRANE
+			if ( lAlphaFieldBlanks( 8 ) ) { 
+				SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = true; 
+			} else { 
+				SysATMixer( ATMixerNum ).OARequirementsPtr = InputProcessor::FindItemInList( cAlphaArgs( 8 ), DataSizing::OARequirements ); 
+				if ( SysATMixer( ATMixerNum ).OARequirementsPtr == 0 ) { 
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." ); 
+					ShowContinueError( "..invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." ); 
+					ErrorsFound = true; 
+				} else { 
+					SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false; 
+				} 
+			} 
 
 			  // Check for dupes in the three nodes.
 			if ( SysATMixer( ATMixerNum ).SecInNode == SysATMixer( ATMixerNum ).PriInNode ) {
@@ -4792,20 +4792,19 @@ namespace SingleDuct {
 							ZoneNodeNotFound = false;
 							for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
 								if ( SysATMixer( ATMixerNum ).SecInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( SupAirIn ) ) {
-									SysATMixer( ATMixerNum ).ZoneEqNum = CtrlZone; //TRANE
-									SysATMixer( ATMixerNum ).ZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum; //TRANE
+									SysATMixer( ATMixerNum ).ZoneEqNum = CtrlZone; 
+									SysATMixer( ATMixerNum ).ZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum; 
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-									SysATMixer( ATMixerNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( CtrlZone ).AirLoopNum; //TRANE
+									SysATMixer( ATMixerNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( CtrlZone ).AirLoopNum; 
 
-									if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) { //TRANE
-																							 // Calculate the design OA flow rate for this zone
-										bool UseOccSchFlag = false; //TRANE
-										bool UseMinOASchFlag = false; //TRANE
-										SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, UseOccSchFlag, UseMinOASchFlag ); //TRANE
-									} //TRANE
+									if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) { 																						 
+										bool UseOccSchFlag = false; 
+										bool UseMinOASchFlag = false; 
+										SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, UseOccSchFlag, UseMinOASchFlag ); 
+									} 
 								}
 							}
 							goto ControlledZoneLoop_exit;
@@ -4830,12 +4829,17 @@ namespace SingleDuct {
 							ZoneNodeNotFound = false;
 							for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
 								if ( SysATMixer( ATMixerNum ).MixedAirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-									SysATMixer( ATMixerNum ).ZoneEqNum = CtrlZone; //TRANE
-									SysATMixer( ATMixerNum ).ZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum; //TRANE
+									SysATMixer( ATMixerNum ).ZoneEqNum = CtrlZone; 
+									SysATMixer( ATMixerNum ).ZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum; 
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+								}
+								if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) {
+									bool UseOccSchFlag = false;
+									bool UseMinOASchFlag = false;
+									SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, UseOccSchFlag, UseMinOASchFlag );
 								}
 							}
 							goto ControlZoneLoop_exit;
@@ -4928,7 +4932,6 @@ namespace SingleDuct {
 			}
 		}
 
-		//TRANE BEG: DCV
 		Real64 mDotFromOARequirement( 0.0 );
 		if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) {
 			Real64 airLoopOAFrac( 0.0 );
@@ -4936,26 +4939,24 @@ namespace SingleDuct {
 				airLoopOAFrac = DataAirLoop::AirLoopFlow( SysATMixer( ATMixerNum ).AirLoopNum ).OAFrac;
 				if ( airLoopOAFrac > 0.0 ) {
 					Real64 vDotOAReq = CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, true, true );
-					Real64 rhoAir = PsyRhoAirFnPbTdbW( Node( SysATMixer( ATMixerNum ).PriInNode ).Press, Node( SysATMixer( ATMixerNum ).PriInNode ).Temp, Node( SysATMixer( ATMixerNum ).PriInNode ).HumRat );
-					mDotFromOARequirement = vDotOAReq * rhoAir / airLoopOAFrac;
+					mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
 				} else {
 					mDotFromOARequirement = Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate;
 				}
 			}
 
 			if ( FirstHVACIteration ) {
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; //TRANE DCV
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail = mDotFromOARequirement; //TRANE DCV
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; 
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail = SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate * DataEnvironment::StdRhoAir;
 				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail = 0.0;
 			} else {
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; //TRANE DCV
-																								 // but also apply constraints  //TRANE DCV
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = min( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail );  //TRANE DCV
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail );  //TRANE DCV
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMin );  //TRANE DCV
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; 
+																								 
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = min( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail );  
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail );  
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMin );  
 			}
 		}
-		//TRANE END DCV
 
 	}
 
@@ -5060,6 +5061,7 @@ namespace SingleDuct {
 
 		// Using/Aliasing
 		using namespace DataLoopNode;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -5073,9 +5075,9 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int MixedAirOutNode;
-
-		MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;
+		int PriInNode = SysATMixer( SysNum ).PriInNode;
+		int SecInNode = SysATMixer( SysNum ).SecInNode;
+		int MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;
 
 		// mixed air data
 		Node( MixedAirOutNode ).Temp = SysATMixer( SysNum ).MixedAirTemp;
@@ -5084,6 +5086,21 @@ namespace SingleDuct {
 		Node( MixedAirOutNode ).Press = SysATMixer( SysNum ).MixedAirPressure;
 		Node( MixedAirOutNode ).MassFlowRate = SysATMixer( SysNum ).MixedAirMassFlowRate;
 
+		if ( Contaminant.CO2Simulation ) {
+			if ( SysATMixer( SysNum ).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow ) {
+				Node( MixedAirOutNode ).CO2 = Node( PriInNode ).CO2;
+			} else {
+				Node( MixedAirOutNode ).CO2 = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).CO2 + Node( PriInNode ).MassFlowRate * Node( PriInNode ).CO2 ) / Node( MixedAirOutNode ).MassFlowRate;
+			}
+		}
+
+		if ( Contaminant.GenericContamSimulation ) {
+			if ( SysATMixer( SysNum ).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow ) {
+				Node( MixedAirOutNode ).GenContam = Node( PriInNode ).GenContam;
+			} else {
+				Node( MixedAirOutNode ).GenContam = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).GenContam + Node( PriInNode ).MassFlowRate * Node( PriInNode ).GenContam ) / Node( MixedAirOutNode ).MassFlowRate;
+			}
+		}
 	}
 
 	void
