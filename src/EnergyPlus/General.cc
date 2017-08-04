@@ -2575,10 +2575,10 @@ namespace General {
 	nthDayOfWeekOfMonth(
 		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
 		int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
-		int const & monthNumber, // January = 1
-		bool const & isLeapYear 
+		int const & monthNumber // January = 1
 	)
 	{
+		// J. Glazer - August 2017
 		int firstDayOfMonth = JulianDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear );
 		int dayOfWeekForFirstDay = (DataEnvironment::RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7 ;
 		int jdatForNth;

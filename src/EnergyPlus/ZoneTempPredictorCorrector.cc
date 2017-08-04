@@ -6921,6 +6921,28 @@ namespace ZoneTempPredictorCorrector {
 	{
 		// J.Glazer - Aug 2017
 
+		// determine month to use based on hemiphere and season
+		int monthToUse;
+		if ( isSummer ) {
+			if ( DataEnvironment::Latitude > 0. ) {
+				monthToUse = 7; //July - summer in northern hemisphere
+			} else {
+				monthToUse = 1; //January - summer in southern hemisphere
+			}
+		} else {
+			if ( DataEnvironment::Latitude > 0. ) {
+				monthToUse = 1; //January - winter in northern hemisphere
+			} else {
+				monthToUse = 7; //July - winter in southern hemisphere
+			}
+		}
+		int const monday = 2;
+		int jdateSelect = General::nthDayOfWeekOfMonth( monday, 1 ,monthToUse); 
+
+		// adjust date if lands on a holiday
+
+		// adjust time of day for daylight savings time
+
 		return std::make_tuple( 64., 100 );
 	}
 
