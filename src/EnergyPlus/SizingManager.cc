@@ -481,6 +481,19 @@ namespace SizingManager {
 		Month = LastMonth;
 		DayOfMonth = LastDayOfMonth;
 
+		// Get system input then move data from FinalZoneSizing to TermUnitFinalZoneSizing
+		SimAir = true;
+		SimZoneEquip = true;
+		SysSizingCalc = true; // Don't want any equipment to size itself yet, so set this true
+		DoSizeAirLoops = false; // Don't want the airloops to size yet, so set this false
+		ManageZoneEquipment( true, SimZoneEquip, SimAir );
+		ManageAirLoops( true, SimAir, SimZoneEquip );
+		if ( GetNumRangeCheckErrorsFound() > 0 ) {
+			ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
+		}
+		UpdateTermUnitFinalZoneSizing();
+		SysSizingCalc = false; // Set back to false in case there is no actual system sizing calculation
+
 		if ( ( DoSystemSizing ) && ( NumSysSizInput == 0 ) && ( NumAirLoops > 0 ) ) {
 			ShowWarningError( RoutineName + "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored." );
 		}
@@ -510,6 +523,7 @@ namespace SizingManager {
 			}
 			SimAir = true;
 			SimZoneEquip = true;
+			DoSizeAirLoops = true; // Now we want the airloops to size
 
 			ManageZoneEquipment( true, SimZoneEquip, SimAir );
 			ManageAirLoops( true, SimAir, SimZoneEquip );
@@ -3677,7 +3691,62 @@ namespace SizingManager {
 		}
 	}
 
+	void
+	UpdateTermUnitFinalZoneSizing()
+	{
+		// Move data from FinalZoneSizing to TermUnitFinalZoneSizing and apply terminal unit sizing adjustments
+		// Called once to initialize before system sizing, then called again to update after system sizing
+		// M.J. Witte, July 2017
 
+		for ( int termUnitSizingIndex = 1; termUnitSizingIndex <= DataSizing::NumAirTerminalUnits; ++termUnitSizingIndex ) {
+			auto & thisTUFZSizing( TermUnitFinalZoneSizing( termUnitSizingIndex ) );
+			auto const & thisTUSizing( TermUnitSizing( termUnitSizingIndex ) );
+			int ctrlZoneNum = thisTUSizing.CtrlZoneNum;
+			auto const & thisFZSizing( FinalZoneSizing( ctrlZoneNum ) );
+
+			// Copy everything from FinalZoneSizing to TermUnitFinalZoneSizing
+			thisTUFZSizing = thisFZSizing;
+
+			if( DataSizing::NumAirTerminalSizingSpec > 0 ) {
+				// Apply DesignSpecification:AirTerminal:Sizing adjustments - default ratios are 1.0
+				// Cooling
+				Real64 coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
+				Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
+				thisTUFZSizing.DesCoolMinAirFlow = thisFZSizing.DesCoolMinAirFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
+				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolVolFlowMin = thisFZSizing.DesCoolVolFlowMin * coolFlowRatio;
+				thisTUFZSizing.DesCoolMassFlow = thisFZSizing.DesCoolMassFlow * coolFlowRatio;
+				thisTUFZSizing.CoolMassFlow = thisFZSizing.CoolMassFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolMinAirFlow2 = thisFZSizing.DesCoolMinAirFlow2 * coolFlowRatio;
+				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlow * coolFlowRatio;
+				thisTUFZSizing.CoolFlowSeq = thisFZSizing.CoolFlowSeq * coolFlowRatio;
+				thisTUFZSizing.CoolLoadSeq = thisFZSizing.CoolLoadSeq * coolLoadRatio;
+				thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
+				thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
+				// Heating
+				Real64 heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
+				Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
+				thisTUFZSizing.DesHeatMaxAirFlow = thisFZSizing.DesHeatMaxAirFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
+				thisTUFZSizing.DesHeatVolFlow = thisFZSizing.DesHeatVolFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatVolFlowMax = thisFZSizing.DesHeatVolFlowMax * heatFlowRatio;
+				thisTUFZSizing.DesHeatMassFlow = thisFZSizing.DesHeatMassFlow * heatFlowRatio;
+				thisTUFZSizing.HeatMassFlow = thisFZSizing.HeatMassFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatMaxAirFlow2 = thisFZSizing.DesHeatMaxAirFlow2 * heatFlowRatio;
+				thisTUFZSizing.HeatFlowSeq = thisFZSizing.HeatFlowSeq * heatFlowRatio;
+				thisTUFZSizing.HeatLoadSeq = thisFZSizing.HeatLoadSeq * heatLoadRatio;
+				thisTUFZSizing.NonAirSysDesHeatLoad = thisFZSizing.NonAirSysDesHeatLoad * heatLoadRatio;
+				thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
+				// Outdoor air
+				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
+				thisTUFZSizing.DesCoolOAFlowFrac = min(thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0);
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+				thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+			}
+		}
+	}
 } // SizingManager
 
 } // EnergyPlus

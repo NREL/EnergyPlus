@@ -201,6 +201,7 @@ namespace DataGlobals {
 	std::ostream * delightin_stream( nullptr ); // Internal stream used for DElight In file
 	bool ZoneSizingCalc( false ); // TRUE if zone sizing calculation
 	bool SysSizingCalc( false ); // TRUE if system sizing calculation
+	bool DoSizeAirLoops( false ); // TRUE if SizeAirLoops should be called
 	bool DoZoneSizing( false ); // User input in SimulationControl object
 	bool DoSystemSizing( false ); // User input in SimulationControl object
 	bool DoPlantSizing( false ); // User input in SimulationControl object

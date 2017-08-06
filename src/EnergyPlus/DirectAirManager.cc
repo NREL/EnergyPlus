@@ -324,7 +324,8 @@ namespace DirectAirManager {
 
 				// Increment and store pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
 				++DataSizing::NumAirTerminalUnits;
-				DirectAir( DirectAirNum ).TermUnitSizingIndex = DataSizing::NumAirTerminalUnits;
+				int locTermUnitSizingIndex = DataSizing::NumAirTerminalUnits;
+				DirectAir( DirectAirNum ).TermUnitSizingIndex = locTermUnitSizingIndex;
 
 				// DesignSpecification:AirTerminal:Sizing name
 				DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = 0;
@@ -336,7 +337,7 @@ namespace DirectAirManager {
 						ErrorsFound = true;
 					} else {
 						// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
-						auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( DirectAir( DirectAirNum ).TermUnitSizingIndex ) );
+						auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( locTermUnitSizingIndex) );
 						auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex ) );
 						thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
 						thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
@@ -345,7 +346,6 @@ namespace DirectAirManager {
 						thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
 					}
 				}
-
 				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
@@ -353,7 +353,8 @@ namespace DirectAirManager {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = DirectAir( DirectAirNum ).TermUnitSizingIndex;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = locTermUnitSizingIndex;
+							DataSizing::TermUnitSizing( locTermUnitSizingIndex ).CtrlZoneNum = CtrlZone;
 							ZoneEquipConfig( CtrlZone ).SDUNum = DirectAirNum;
 						}
 					}

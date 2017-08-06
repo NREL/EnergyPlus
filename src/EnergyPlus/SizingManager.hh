@@ -186,6 +186,9 @@ namespace SizingManager {
 		int const CallIndicator
 	);
 
+	void
+	UpdateTermUnitFinalZoneSizing();
+
 } // SizingManager
 
 } // EnergyPlus

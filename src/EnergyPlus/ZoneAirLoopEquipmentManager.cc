@@ -363,7 +363,8 @@ namespace ZoneAirLoopEquipmentManager {
 
 				// Increment and store pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
 				++DataSizing::NumAirTerminalUnits;
-				AirDistUnit( AirDistUnitNum ).TermUnitSizingIndex = DataSizing::NumAirTerminalUnits;
+				int locTermUnitSizingIndex = DataSizing::NumAirTerminalUnits;
+				AirDistUnit( AirDistUnitNum ).TermUnitSizingIndex = locTermUnitSizingIndex;
 
 				// DesignSpecification:AirTerminal:Sizing name
 				AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex = 0;
@@ -375,7 +376,7 @@ namespace ZoneAirLoopEquipmentManager {
 						ErrorsFound = true;
 					} else {
 						// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
-						auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( AirDistUnit( AirDistUnitNum ).TermUnitSizingIndex ) );
+						auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( locTermUnitSizingIndex ) );
 						auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex ) );
 						thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
 						thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
@@ -514,6 +515,7 @@ namespace ZoneAirLoopEquipmentManager {
 						if ( ZoneEquipConfig( ZoneEqNum ).InletNode( InletNum ) == AirDistUnit( AirDistUnitNum ).OutletNodeNum ) {
 							AirDistUnit( AirDistUnitNum ).ZoneEqNum = ZoneEqNum;
 							ZoneEquipConfig( ZoneEqNum ).ADUNum = AirDistUnitNum;
+							DataSizing::TermUnitSizing( locTermUnitSizingIndex ).CtrlZoneNum = ZoneEqNum;
 						}
 					}
 				}

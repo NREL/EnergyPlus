@@ -394,7 +394,6 @@ namespace ZoneEquipmentManager {
 		int ZoneInNode;
 		int ZoneExhNode;
 		int ControlledZoneNum;
-		int ZoneReturnAirNode;
 		/////////// hoisted into namespace ////////////
 		// static bool MyOneTimeFlag( true ); // InitZoneEquipmentOneTimeFlag
 		// static bool MyEnvrnFlag( true ); // InitZoneEquipmentEnvrnFlag
@@ -2958,58 +2957,6 @@ namespace ZoneEquipmentManager {
 
 		}}
 
-		// Move data from FinalZoneSizing to TermUnitFinalZoneSizing
-		for ( int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum ) {
-			int NumZonesCooled = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
-			int NumZonesHeated = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
-			for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-				CtrlZoneNum = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
-				int TermUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ) = FinalZoneSizing( CtrlZoneNum );
-				// DesignSpecification:AirTerminal:Sizing adjustments
-				{ auto const & thisTUSizing( TermUnitSizing( TermUnitSizingIndex ) );
-				Real64 coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
-				Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMinAirFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow * coolFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolLoad = FinalZoneSizing( CtrlZoneNum ).DesCoolLoad * coolLoadRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * coolFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin * coolFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow * coolFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolMassFlow = FinalZoneSizing( CtrlZoneNum ).CoolMassFlow * coolFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMinAirFlow2 = FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2 * coolFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * coolFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolFlowSeq = FinalZoneSizing( CtrlZoneNum ).CoolFlowSeq * coolFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolLoadSeq = FinalZoneSizing( CtrlZoneNum ).CoolLoadSeq * coolLoadRatio;
-				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac ;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolOAFlowFrac = min( FinalZoneSizing( CtrlZoneNum ).DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0 );
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = FinalZoneSizing( CtrlZoneNum ).MinOA * minOAFrac;
-				}
-			}
-			for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-				CtrlZoneNum = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
-				int TermUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ) = FinalZoneSizing( CtrlZoneNum );
-				// DesignSpecification:AirTerminal:Sizing adjustments
-				{ auto const & thisTUSizing( TermUnitSizing( TermUnitSizingIndex ) );
-				Real64 heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
-				Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMaxAirFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow * heatFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = FinalZoneSizing( CtrlZoneNum ).DesHeatLoad * heatLoadRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow * heatFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlowMax = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax * heatFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * heatFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatMassFlow = FinalZoneSizing( CtrlZoneNum ).HeatMassFlow * heatFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMaxAirFlow2 = FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2 * heatFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = FinalZoneSizing( CtrlZoneNum ).HeatFlowSeq * heatFlowRatio;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = FinalZoneSizing( CtrlZoneNum ).HeatLoadSeq * heatLoadRatio;
-				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac ;
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatOAFlowFrac = min( FinalZoneSizing( CtrlZoneNum ).DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
-				TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = FinalZoneSizing( CtrlZoneNum ).MinOA * minOAFrac;
-				}
-			}
-		}
-
-
 	}
 
 	void
@@ -3984,7 +3931,7 @@ namespace ZoneEquipmentManager {
 							}
 							UserReturnNode1MassFlow = max( 0.0, ( UserReturnNode1MassFlow * GetCurrentScheduleValue( ZoneEquipConfig( ZoneNum ).ReturnFlowSchedPtrNum ) ) );
 						} else {
-							if( NumRetNodes = 1) {
+							if( NumRetNodes == 1) {
 								UserReturnNode1MassFlow = max( 0.0, ( StdTotalReturnMassFlow * GetCurrentScheduleValue( ZoneEquipConfig( ZoneNum ).ReturnFlowSchedPtrNum ) ) );
 							} else {
 								UserReturnNode1MassFlow = max( 0.0, ( StdTotalReturnMassFlow * GetCurrentScheduleValue( ZoneEquipConfig( ZoneNum ).ReturnFlowSchedPtrNum ) ) );
@@ -3999,7 +3946,7 @@ namespace ZoneEquipmentManager {
 					Node( RetNode1 ).MassFlowRateMinAvail = 0.0;
 
 					// Calculate flow for remaining return nodes, if any
-					int RemainingStdReturnMassFlow = StdTotalReturnMassFlow - UserReturnNode1MassFlow;
+					//int RemainingStdReturnMassFlow = StdTotalReturnMassFlow - UserReturnNode1MassFlow;
 					if ( NumRetNodes > 1) {
 						for (int NodeNumHere = 1; NodeNumHere <= NumRetNodes; ++NodeNumHere) {
 							int RetNode = ZoneEquipConfig(ZoneNum).ReturnNode( NodeNumHere );

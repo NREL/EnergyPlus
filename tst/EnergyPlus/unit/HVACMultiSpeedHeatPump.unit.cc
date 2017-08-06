@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -1232,6 +1233,7 @@ namespace EnergyPlus {
 			EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
 			// Get Zone Equipment Configuration ata
+            DataSizing::TermUnitSizing.allocate( 2 );
 			DataZoneEquipment::GetZoneEquipmentData();
 			MixedAir::GetOutsideAirSysInputs();
 			MixedAir::GetOAControllerInputs();

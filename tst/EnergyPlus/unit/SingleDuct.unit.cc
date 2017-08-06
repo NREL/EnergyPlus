@@ -139,6 +139,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData(ErrorsFound);
 	ASSERT_FALSE(ErrorsFound);
+	DataSizing::TermUnitSizing.allocate( 1 );
 	DataZoneEquipment::GetZoneEquipmentData1();
 	ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 	SingleDuct::GetSysInput();
@@ -310,6 +311,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData(ErrorsFound);
 	ASSERT_FALSE(ErrorsFound);
+	DataSizing::TermUnitSizing.allocate( 1 );
 	DataZoneEquipment::GetZoneEquipmentData1();
 	ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 	SingleDuct::GetSysInput();

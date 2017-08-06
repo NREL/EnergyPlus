@@ -450,11 +450,12 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 
 	// test single zone VAV reheat coil sizing
 	CurZoneEqNum = 1;
+	CurTermUnitSizingNum = 1;
 	CurSysNum = 0;
 	TermUnitSizing.allocate( 1 );
-	TermUnitSizing( CurZoneEqNum ).AirVolFlow = WaterCoil( CoilNum ).DesAirVolFlowRate / 3.0; // DesAirVolFlowRate = 1.0
-	TermUnitSizing( CurZoneEqNum ).MaxHWVolFlow = WaterCoil( CoilNum ).MaxWaterVolFlowRate / 3.0;
-	TermUnitSizing( CurZoneEqNum ).MinFlowFrac = 0.5;
+	TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = WaterCoil( CoilNum ).DesAirVolFlowRate / 3.0; // DesAirVolFlowRate = 1.0
+	TermUnitSizing( CurTermUnitSizingNum ).MaxHWVolFlow = WaterCoil( CoilNum ).MaxWaterVolFlowRate / 3.0;
+	TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac = 0.5;
 	DataSizing::TermUnitSingDuct = true;
 
 	WaterCoil( CoilNum ).DesAirVolFlowRate = AutoSize;
@@ -602,10 +603,11 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	// test single zone VAV reheat coil sizing
 	CurZoneEqNum = 1;
 	CurSysNum = 0;
+	CurTermUnitSizingNum = 1;
 	TermUnitSizing.allocate( 1 );
-	TermUnitSizing( CurZoneEqNum ).AirVolFlow = WaterCoil( CoilNum ).DesAirVolFlowRate / 1500.0; // DesAirVolFlowRate = 1.0 so TU air flow = 0.00067 (lower than 0.001)
-	TermUnitSizing( CurZoneEqNum ).MaxHWVolFlow = WaterCoil( CoilNum ).MaxWaterVolFlowRate / 1500.0;
-	TermUnitSizing( CurZoneEqNum ).MinFlowFrac = 0.5;
+	TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = WaterCoil( CoilNum ).DesAirVolFlowRate / 1500.0; // DesAirVolFlowRate = 1.0 so TU air flow = 0.00067 (lower than 0.001)
+	TermUnitSizing( CurTermUnitSizingNum ).MaxHWVolFlow = WaterCoil( CoilNum ).MaxWaterVolFlowRate / 1500.0;
+	TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac = 0.5;
 	DataSizing::TermUnitSingDuct = true;
 
 	WaterCoil( CoilNum ).DesAirVolFlowRate = AutoSize;

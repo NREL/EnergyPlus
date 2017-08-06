@@ -714,6 +714,7 @@ namespace DataSizing {
 	struct TermUnitSizingData
 	{
 		// Members
+		int CtrlZoneNum; // Controlled zone number (index to FinalZoneSizing, etc.)
 		Real64 AirVolFlow; // design air vol flow rate for single duct terminal unit [m3/s]
 		Real64 MaxHWVolFlow; // design Hot Water vol flow for single duct terminal unit [m3/s]
 		Real64 MaxSTVolFlow; // design Steam vol flow rate for single duct terminal unit [m3/s]
@@ -733,6 +734,7 @@ namespace DataSizing {
 
 		// Default Constructor
 		TermUnitSizingData() :
+			CtrlZoneNum( 0 ),
 			AirVolFlow( 0.0 ),
 			MaxHWVolFlow( 0.0 ),
 			MaxSTVolFlow( 0.0 ),
