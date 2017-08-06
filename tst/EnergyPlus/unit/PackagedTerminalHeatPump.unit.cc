@@ -528,6 +528,7 @@ namespace EnergyPlus {
 		// #6028 child components not sizing correctly on air flow rate
 		// VS coils set SystemAirFlow to true and AirVolFlow to a value, all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and HeatingAirVolFlow
 		EXPECT_TRUE( ZoneEqSizing( 1 ).SystemAirFlow );
+		EXPECT_EQ( ZoneEqSizing( 1 ).AirVolFlow, VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate );
 		EXPECT_TRUE( ZoneEqSizing( 1 ).CoolingAirFlow );
 		EXPECT_TRUE( ZoneEqSizing( 1 ).HeatingAirFlow );
 		EXPECT_EQ( ZoneEqSizing( 1 ).CoolingAirVolFlow, PTUnit( 1 ).MaxCoolAirVolFlow );

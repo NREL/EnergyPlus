@@ -110,6 +110,7 @@ public:
 		UnitarySysEqSizing.allocate( 1 );
 		OASysEqSizing.allocate( 1 );
 		SysSizInput.allocate( 1 );
+		ZoneSizingInput.allocate( 1 );
 		SysSizPeakDDNum.allocate( 1 );
 		SysSizPeakDDNum( 1 ).TimeStepAtSensCoolPk.allocate( 1 );
 		SysSizPeakDDNum( 1 ).TimeStepAtCoolFlowPk.allocate( 1 );
@@ -118,6 +119,7 @@ public:
 		SysSizPeakDDNum( 1 ).CoolFlowPeakDD = 1;
 		SysSizPeakDDNum( 1 ).TotCoolPeakDD = 1;
 		FinalSysSizing.allocate( 1 );
+		FinalZoneSizing.allocate( 1 );
 		PrimaryAirSystem.allocate( 1 );
 		AirLoopControlInfo.allocate( 1 );
 		InitializePsychRoutines();
@@ -326,6 +328,46 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 	EXPECT_DOUBLE_EQ( 0.0, DataDesOutletAirHumRat );
 	EXPECT_DOUBLE_EQ( 0.0, DataDesInletAirHumRat );
 	EXPECT_DOUBLE_EQ( 0.0, DataDesInletWaterTemp );
+
+	// size zone water heating coil
+	CurZoneEqNum = 1;
+	CurSysNum = 0;
+	PlantSizData( 1 ).ExitTemp = 60.0;
+	DataSizing::NumZoneSizingInput = 1;
+	DataSizing::ZoneSizingRunDone = true;
+	ZoneSizingInput( 1 ).ZoneNum = CurZoneEqNum;
+	ZoneEqSizing( 1 ).SizingMethod.allocate( 25 );
+	ZoneEqSizing( 1 ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
+	FinalZoneSizing( 1 ).ZoneTempAtHeatPeak = 20.0;
+	FinalZoneSizing( 1 ).OutTempAtHeatPeak = -20.0;
+	FinalZoneSizing( 1 ).DesHeatCoilInTemp = -20.0; // simulates zone heating air flow rate <= zone OA flow rate
+	FinalZoneSizing( 1 ).DesHeatCoilInHumRat = 0.005;
+	FinalZoneSizing( 1 ).HeatDesTemp = 30.0;
+	FinalZoneSizing( 1 ).HeatDesHumRat = 0.005;
+	ZoneEqSizing( 1 ).OAVolFlow = 0.01;
+	ZoneEqSizing( 1 ).HeatingAirFlow = true;
+	ZoneEqSizing( 1 ).HeatingAirVolFlow = 0.1;
+	FinalZoneSizing( 1 ).DesHeatMassFlow = StdRhoAir * ZoneEqSizing( 1 ).HeatingAirVolFlow;
+	MySizeFlag.allocate( 1 );
+	MySizeFlag( CoilNum ) = true;
+	MyUAAndFlowCalcFlag.allocate( 1 );
+	MyUAAndFlowCalcFlag( CoilNum ) = true;
+
+	WaterCoil( CoilNum ).UACoil = AutoSize;
+	WaterCoil( CoilNum ).DesTotWaterCoilLoad = AutoSize;
+	WaterCoil( CoilNum ).DesAirVolFlowRate = AutoSize;
+	WaterCoil( CoilNum ).DesInletAirTemp = AutoSize;
+	WaterCoil( CoilNum ).DesOutletAirTemp = AutoSize;
+	WaterCoil( CoilNum ).DesInletWaterTemp = AutoSize;
+	WaterCoil( CoilNum ).DesInletAirHumRat = AutoSize;
+	WaterCoil( CoilNum ).DesOutletAirHumRat = AutoSize;
+	WaterCoil( CoilNum ).MaxWaterVolFlowRate = AutoSize;
+
+	SizeWaterCoil( CoilNum );
+	EXPECT_NEAR( WaterCoil( CoilNum ).InletAirTemp, 16.0, 0.0001 ); // a mixture of zone air (20 C) and 10% OA (-20 C) = 16 C
+	EXPECT_NEAR( WaterCoil( CoilNum ).DesTotWaterCoilLoad, 1709.8638, 0.0001 );
+	EXPECT_NEAR( WaterCoil( CoilNum ).UACoil, 51.3278, 0.0001 );
+	EXPECT_NEAR( WaterCoil( CoilNum ).OutletAirTemp, 30.1302, 0.0001 ); // reasonable delta T above inlet air temp
 
 }
 
