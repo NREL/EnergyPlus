@@ -840,8 +840,15 @@ namespace ReportSizingManager {
 					} else if ( TermUnitSingDuct ) {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 					} else {
-						if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow > 0.0 ) {
-							OutAirFrac = min( StdRhoAir * ZoneEqSizing( CurZoneEqNum ).OAVolFlow / FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow, 1.0 );
+						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
+						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow * StdRhoAir;
+						} else {
+							DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
+						}
+						if ( DesMassFlow > 0.0 ) {
+							OutAirFrac = min( StdRhoAir * ZoneEqSizing( CurZoneEqNum ).OAVolFlow / DesMassFlow, 1.0 );
 						} else {
 							OutAirFrac = 0.0;
 						}
@@ -857,8 +864,15 @@ namespace ReportSizingManager {
 					} else if ( TermUnitSingDuct ) {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU;
 					} else {
-						if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow > 0.0 ) {
-							OutAirFrac = min( StdRhoAir * ZoneEqSizing( CurZoneEqNum ).OAVolFlow / FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow, 1.0 );
+						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
+						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
+							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow * StdRhoAir;
+						} else {
+							DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
+						}
+						if ( DesMassFlow > 0.0 ) {
+							OutAirFrac = min( StdRhoAir * ZoneEqSizing( CurZoneEqNum ).OAVolFlow / DesMassFlow, 1.0 );
 						} else {
 							OutAirFrac = 0.0;
 						}
