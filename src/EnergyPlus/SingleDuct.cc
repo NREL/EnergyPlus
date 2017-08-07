@@ -220,6 +220,10 @@ namespace SingleDuct {
 		GetInputFlag = true;
 		GetATMixerFlag = true;
 		InitSysFlag = true;
+		SysATMixer.deallocate();
+		Sys.deallocate();
+		SysInlet.deallocate();
+		SysOutlet.deallocate();
 	}
 
 	void
