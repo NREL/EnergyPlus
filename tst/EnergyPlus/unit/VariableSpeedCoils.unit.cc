@@ -72,6 +72,7 @@ namespace EnergyPlus {
 		"    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
 		"    ,                        !- Crankcase Heater Capacity {W}",
 		"    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+		"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"    ,                        !- Supply Water Storage Tank Name",
 		"    ,                        !- Condensate Collection Water Storage Tank Name",
 		"    ,                        !- Basin Heater Capacity {W/K}",

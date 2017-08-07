@@ -2552,6 +2552,7 @@
     ,                        !- Availability Schedule Name
     SouthZone-Inlet,         !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     48.88889,                !- Maximum Heating Supply Air Temperature {C}
     48.88889,                !- Minimum Cooling Supply Air Temperature {C}
     7.202976E-02,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

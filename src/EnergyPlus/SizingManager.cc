@@ -1012,6 +1012,25 @@ namespace SizingManager {
 			}
 		}
 
+		if ( NumAlphas > 3 ) {
+			if ( !lAlphaBlanks( 4 ) ) {
+				OARequirements( OAIndex ).OAPropCtlMinRateSchPtr = GetScheduleIndex( Alphas( 4 ) );
+				if ( OARequirements( OAIndex ).OAPropCtlMinRateSchPtr > 0 ) {
+					if ( !CheckScheduleValueMinMax( OARequirements( OAIndex ).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0 ) ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+						ShowContinueError( "Error found in " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+						ShowContinueError( "Schedule values must be (>=0., <=1.)" );
+						ErrorsFound = true;
+					}
+				}
+				else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+					ShowContinueError( "...Not Found " + cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\"." );
+					ErrorsFound = true;
+				}
+			}
+		}
+
 	}
 
 

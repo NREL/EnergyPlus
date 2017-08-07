@@ -342,7 +342,7 @@ namespace ReportSizingManager {
 		using DXCoils::ValidateADP;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using InputProcessor::SameString;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyHFnTdbW;
@@ -586,6 +586,7 @@ namespace ReportSizingManager {
 								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 							}
 						}
+						if ( DataFractionUsedForSizing > 0.0 ) AutosizeDes = AutosizeDes * DataFractionUsedForSizing;
 					}
 					}
 				} else if ( SizingType == CoolingAirflowSizing ) {
@@ -1247,7 +1248,7 @@ namespace ReportSizingManager {
 						UA1 = DataCapacityUsedForSizing;
 						// Invert the simple heating coil model: given the design inlet conditions and the design load,
 						// find the design UA.
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
+						SolveRoot( Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
 						if ( SolFla == -1 ) {
 							ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"" );
 							ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
@@ -1502,6 +1503,7 @@ namespace ReportSizingManager {
 						} else {
 							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						}
+						if ( DataFractionUsedForSizing > 0.0 ) AutosizeDes = AutosizeDes * DataFractionUsedForSizing;
 					}
 				} else if ( SizingType == CoolingWaterflowSizing ) {
 					if ( CurOASysNum > 0 ) {
@@ -2057,7 +2059,7 @@ namespace ReportSizingManager {
 						UA1 = DataCapacityUsedForSizing;
 						// Invert the simple heating coil model: given the design inlet conditions and the design load,
 						// find the design UA.
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
+						SolveRoot( Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
 						if ( SolFla == -1 ) {
 							ShowSevereError( "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"" );
 							ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );

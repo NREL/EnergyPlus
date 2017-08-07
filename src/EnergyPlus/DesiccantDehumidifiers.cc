@@ -2835,7 +2835,7 @@ namespace DesiccantDehumidifiers {
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::SmallLoad;
 
@@ -2844,7 +2844,7 @@ namespace DesiccantDehumidifiers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
-		int const SolveMaxIter( 50 ); // Max iteration for SolveRegulaFalsi
+		int const SolveMaxIter( 50 ); // Max iteration for SolveRoot
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2885,7 +2885,7 @@ namespace DesiccantDehumidifiers {
 						Par( 2 ) = 0.0;
 					}
 					Par( 3 ) = RegenCoilLoad;
-					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
+					SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( DesicDehum( DesicDehumNum ).HotWaterCoilMaxIterIndex == 0 ) {
 							ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed for " + DesicDehum( DesicDehumNum ).DehumType + "=\"" + DesicDehum( DesicDehumNum ).Name + "\"" );
