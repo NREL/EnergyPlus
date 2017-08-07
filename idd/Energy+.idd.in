@@ -33042,7 +33042,7 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy 
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy
        \note or ProportionalControlBasedOnDesignOARate.  
   A7 , \field Generic Contaminant Control Availability Schedule Name
        \note Availability schedule name for generic contaminant controller. Schedule value > 0 means
@@ -69973,7 +69973,6 @@ WaterHeater:HeatPump:PumpedCondenser,
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
@@ -70225,7 +70224,6 @@ WaterHeater:HeatPump:WrappedCondenser,
   N5 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
