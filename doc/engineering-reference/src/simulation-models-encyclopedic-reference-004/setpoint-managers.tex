@@ -36,7 +36,7 @@ where \({T_{set}}\) is the supply air temperature setpoint and \({T_{sched}}\) i
 
 \subsection{Outdoor Air Reset}\label{outdoor-air-reset}
 
-The input object SetpointManager:OutdoorAirReset provides a setpoint manager that implements an outdoor air reset strategy for the supply air temperature. The user defines a reset rule for this strategy by specifying two setpoint temperatures at two outside drybulb temperatures. Generally the lower setpoint temperature is matched with the higher drybulb temperature and the higher setpoint temperature with the lower drybulb temperature. The user can specify two reset rules and schedule their usage. A schedule value of 1 indicates use of the 1st rule; 2 indicates use of the 2nd.
+The input object SetpointManager:OutdoorAirReset provides a setpoint manager that implements an outdoor air reset strategy for system node setpoint temperature. The user defines a reset rule for this strategy by specifying two setpoint temperatures at two outside drybulb temperatures. Generally the lower setpoint temperature is matched with the higher outdoor air drybulb temperature and the higher setpoint temperature is matched with the lower outdoor air drybulb temperature. The user can specify two reset rules and schedule their usage. A schedule value of 1 indicates use of the 1st rule; 2 indicates use of the 2nd.
 
 IF \emph{SchedVal = 2}
 
@@ -56,7 +56,7 @@ IF \emph{SchedVal = 2}
 {T_{set,atOAhigh}} = {T_{2,set,atOAhigh}}
 \end{equation}
 
-otherwise
+Otherwise
 
 \begin{equation}
 {T_{out,low}} = {T_{1,out,low}}
@@ -70,25 +70,32 @@ otherwise
 {T_{set,atOAlow}} = {T_{1,set,atOAlow}}
 \end{equation}
 
-\({T_{set,atOAhigh}} = {T_{1,set,atOAhigh}}\) .
+\begin{equation}
+{T_{set,atOAhigh}} = {T_{1,set,atOAhigh}}
+\end{equation}
 
-If \({T_{out,low}} < {T_{out,high}}\) and \({T_{set,atOAlow}} > {T_{set,atOAhigh}}\) ~then
+ 
+If \({T_{out,low}} < {T_{out,high}}\) ~then
 
-~~~~~ If \({T_{out}} \le {T_{out,low}}\) ~then
+~~~ If \({T_{out}} \le {T_{out,low}}\) ~then
 
-~~~~~ \({T_{set}} = {T_{out,low}}\)
+~~~~~ \({T_{set}} = {T_{set,atOAlow}}\)
 
-~~~~~ if \({T_{out}} \ge {T_{out,high}}\) ~then
+~~~ If \({T_{out}} \ge {T_{out,high}}\) ~then
 
-~~~~~ \({T_{set}} = {T_{out,high}}\)
+~~~~~ \({T_{set}} = {T_{set,atOAhigh}}\)
 
-~~~~~ otherwise
+~~~ Otherwise
 
 ~~~~~ \({T_{set}} = {T_{set,atOAlow}} - (({T_{out}} - {T_{out,low}})/({T_{out,high}} - {T_{out,low}}))\cdot ({T_{set,atOAlow}} - {T_{set,atOAhigh}})\)
 
-otherwise
+~~~ End If
 
-~~~~~ \({T_{set}} = 0.5({T_{set,atOAlow}} + {T_{set,atOAhigh)}}\) .
+Otherwise
+
+~~~ \({T_{set}} = 0.5({T_{set,atOAlow}} + {T_{set,atOAhigh)}}\)
+
+End IF
 
 \emph{\({T_{set}}\)}will be applied to the node or nodes specified in the \emph{SetpointManager:OutdoorAirReset} object input.
 

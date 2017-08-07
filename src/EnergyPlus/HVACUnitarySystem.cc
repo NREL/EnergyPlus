@@ -1770,6 +1770,7 @@ namespace HVACUnitarySystem {
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 		using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
+		using VariableSpeedCoils::GetVSCoilCapFTCurveIndex;
 		using WaterToAirHeatPump::SimWatertoAirHP;
 		auto & GetWAHPCoilCapacity( WaterToAirHeatPump::GetCoilCapacity );
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
@@ -1794,7 +1795,7 @@ namespace HVACUnitarySystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Iter; // iteration count
-		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
+//		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		int MSHPIndex; // Index to design Specification object
 		int BranchNum; // Index to branch on air loop
 		Real64 SystemFlow; // AirloopHVAC flow rate [m3/s]
@@ -1962,6 +1963,10 @@ namespace HVACUnitarySystem {
 				TempSize = AutoSize;
 				if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 					DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+					DataIsDXCoil = true;
+				}
+				if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+					DataTotCapCurveIndex = GetVSCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
 					DataIsDXCoil = true;
 				}
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
@@ -2150,10 +2155,14 @@ namespace HVACUnitarySystem {
 				SizingMethod = AutoCalculateSizing;
 				if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
 					DataConstantUsedForSizing = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
-					if( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+					if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 						minNoLoadFlow = 0.6667;
 					} else {
-						minNoLoadFlow = 0.5;
+						if ( UnitarySystem( UnitarySysNum ).NoLoadAirFlowRateRatio < 1.0 ) {
+							minNoLoadFlow = UnitarySystem( UnitarySysNum ).NoLoadAirFlowRateRatio;
+						} else {
+							minNoLoadFlow = 0.5;
+						}
 					}
 					if( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow >= UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow ) {
 						DataFractionUsedForSizing = min( minNoLoadFlow, ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow ) - 0.01 ) ;
@@ -2188,6 +2197,8 @@ namespace HVACUnitarySystem {
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
 				UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
+			} else {
+				DataFractionUsedForSizing = UnitarySystem( UnitarySysNum ).NoLoadAirFlowRateRatio;
 			}
 
 			FieldNum = 11;	// N11 , \field No Load Supply Air Flow Rate
@@ -2216,13 +2227,22 @@ namespace HVACUnitarySystem {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
 			}
 
+			MSHPIndex = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
+			if ( MSHPIndex > 0 ) {
+				for ( Iter = DesignSpecMSHP( MSHPIndex ).NumOfSpeedCooling; Iter >= 1; --Iter ) { // use reverse order since we divide by HeatVolumeFlowRate(max)
+					if ( DesignSpecMSHP( MSHPIndex ).CoolingVolFlowRatio( Iter ) == AutoSize ) {
+						DesignSpecMSHP( MSHPIndex ).CoolingVolFlowRatio( Iter ) = double( Iter ) / double( DesignSpecMSHP( MSHPIndex ).NumOfSpeedCooling );
+					}
+				}
+			}
+
 			SimVariableSpeedCoils( BlankString, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, 0, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 			UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NumOfSpeeds;
 			DXCoolCap = GetCoilCapacityVariableSpeed( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
 			EqSizing.DesCoolingLoad = DXCoolCap;
-			MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NormSpedLevel );
+
 			for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedCooling; ++Iter ) {
-				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
+				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( Iter );
 				UnitarySystem( UnitarySysNum ).CoolMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) * StdRhoAir;
 				// it seems the ratio should reference the actual flow rates, not the fan flow ???
 				if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate > 0.0 && UnitarySystem( UnitarySysNum ).FanExists ) {
@@ -2305,6 +2325,16 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).IdleSpeedRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 );
 			}
 		} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
+
+			MSHPIndex = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
+			if ( MSHPIndex > 0 ) {
+				for ( Iter = DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating; Iter >= 1; --Iter ) { // use reverse order since we divide by HeatVolumeFlowRate(max)
+					if ( DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) == AutoSize ) {
+						DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) = double( Iter ) / double( DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating );
+					}
+				}
+			}
+
 			SimVariableSpeedCoils( BlankString, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, 0, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 
 			UnitarySystem( UnitarySysNum ).NumOfSpeedHeating = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NumOfSpeeds;
@@ -2315,9 +2345,8 @@ namespace HVACUnitarySystem {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
 			}
 
-			MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).NormSpedLevel );
 			for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedHeating; ++Iter ) {
-				UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
+				UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).HeatingCoilIndex ).MSRatedAirVolFlowRate( Iter );
 				UnitarySystem( UnitarySysNum ).HeatMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) * StdRhoAir;
 				if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate > 0.0 && UnitarySystem( UnitarySysNum ).FanExists ) {
 					UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( Iter ) = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) / UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate;
@@ -3023,30 +3052,31 @@ namespace HVACUnitarySystem {
 					ErrorsFound = true;
 				}
 			}
+			DesignSpecMSHP( DesignSpecNum ).NoLoadAirFlowRateRatio = Numbers( 3 );
 
 			// initialize number of speeds (MIN = 4 or greater of cooling and heating speeds x 2)
 			MaxSpeedNum = 0; // set to 0 so we know if the inputs are valid
 
-			if ( mod( double( NumNumbers - 2 ), 2.0 ) > 0.0 ) {
+			if ( mod( double( NumNumbers - 3 ), 2.0 ) > 0.0 ) {
 				// check that the number of numeric speed input fields match the number of speeds
 				ShowSevereError( CurrentModuleObject + " = " + DesignSpecMSHP( DesignSpecNum ).Name );
 				ShowContinueError( "Illegal number of entries in Supply Air Flow Rate fields." );
 				ShowContinueError( "..number of required Supply Air Flow Rate fields = " + TrimSigDigits( 2 * max( NumOfSpeedCooling, NumOfSpeedHeating ) ) );
-				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 2 ) );
+				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 3 ) );
 				ErrorsFound = true;
 			} else {
-				MaxSpeedNum = ( NumNumbers - 2 ) / 2; // Extensible fields included (>4) for cooling and heating
+				MaxSpeedNum = ( NumNumbers - 3 ) / 2; // Extensible fields included (>4) for cooling and heating
 			}
 
 			if ( MaxSpeedNum < max( NumOfSpeedHeating, NumOfSpeedCooling ) ) {
 				ShowSevereError( CurrentModuleObject + " = " + DesignSpecMSHP( DesignSpecNum ).Name );
 				ShowContinueError( "Illegal number of entries in Supply Air Flow Rate fields." );
 				ShowContinueError( "..number of required Supply Air Flow Rate fields = " + TrimSigDigits( 2 * max( NumOfSpeedCooling, NumOfSpeedHeating ) ) );
-				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 2 ) );
+				ShowContinueError( "..number of actual Supply Air Flow Rate fields   = " + TrimSigDigits( NumNumbers - 3 ) );
 				ErrorsFound = true;
 			}
 
-			StartingSpeedRatioInput = 3; // start the index counter at the first input for heating (e.g. 3+0*2)
+			StartingSpeedRatioInput = 4; // start the index counter at the first input for heating (e.g. 4+0*2)
 			if ( NumOfSpeedHeating > 0 && MaxSpeedNum > 0 ) {
 				DesignSpecMSHP( DesignSpecNum ).HeatingVolFlowRatio.allocate( MaxSpeedNum );
 				for ( SpeedNum = 1; SpeedNum <= NumOfSpeedHeating; ++SpeedNum ) {
@@ -3054,7 +3084,7 @@ namespace HVACUnitarySystem {
 				}
 			}
 
-			StartingSpeedRatioInput = 4; // start the index counter at the first input for heating (e.g. 4+0*2)
+			StartingSpeedRatioInput = 5; // start the index counter at the first input for cooling (e.g. 5+0*2)
 			if ( NumOfSpeedCooling > 0 && MaxSpeedNum > 0 ) {
 				DesignSpecMSHP( DesignSpecNum ).CoolingVolFlowRatio.allocate( MaxSpeedNum );
 				for ( SpeedNum = 1; SpeedNum <= NumOfSpeedCooling; ++SpeedNum ) {
@@ -6018,19 +6048,40 @@ namespace HVACUnitarySystem {
 				}
 			}
 
-			//Set minimum OAT for heat pump compressor operation
+			//Set minimum OAT for heat pump compressor operation in cooling mode
 			// get from coil module
 			errFlag = false;
-			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
-				UnitarySystem( UnitarySysNum ).MinOATCompressor = GetVSCoilMinOATCompressor( HeatingCoilName, errFlag );
-			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ) {
-				UnitarySystem( UnitarySysNum ).MinOATCompressor = GetMinOATDXCoilCompressor( HeatingCoilType, HeatingCoilName, errFlag );
-				//       ELSEIF  ***... make sure we catch all possbile coil types here ...***
+			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
+				UnitarySystem( UnitarySysNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
+			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+				UnitarySystem( UnitarySysNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
+			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) {
+				UnitarySystem( UnitarySysNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
+			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+				UnitarySystem( UnitarySysNum ).MinOATCompressorCooling = GetMinOATDXCoilCompressor( CoolingCoilType, CoolingCoilName, errFlag );
+			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+				UnitarySystem( UnitarySysNum ).MinOATCompressorCooling = GetVSCoilMinOATCompressor( CoolingCoilName, errFlag );
 			} else {
-				UnitarySystem( UnitarySysNum ).MinOATCompressor = -1000.0;
+				UnitarySystem( UnitarySysNum ).MinOATCompressorCooling = -1000.0;
 			}
 			if ( errFlag ) {
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ErrorsFound = true;
+			}
+
+			//Set minimum OAT for heat pump compressor operation in heating mode
+			// get from coil module
+			errFlag = false;
+			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
+				UnitarySystem( UnitarySysNum ).MinOATCompressorHeating = GetVSCoilMinOATCompressor( HeatingCoilName, errFlag );
+			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ) {
+				UnitarySystem( UnitarySysNum ).MinOATCompressorHeating = GetMinOATDXCoilCompressor( HeatingCoilType, HeatingCoilName, errFlag );
+				//       ELSEIF  ***... make sure we catch all possbile coil types here ...***
+			} else {
+				UnitarySystem( UnitarySysNum ).MinOATCompressorHeating = -1000.0;
+			}
+			if ( errFlag ) {
+				ShowContinueError("Occurs in " + CurrentModuleObject + " = " + UnitarySystem(UnitarySysNum).Name);
 				ErrorsFound = true;
 			}
 
@@ -6124,6 +6175,8 @@ namespace HVACUnitarySystem {
 
 				if ( DesignSpecNum > 0 ) {
 
+					UnitarySystem( UnitarySysNum ).NoLoadAirFlowRateRatio = DesignSpecMSHP( DesignSpecNum ).NoLoadAirFlowRateRatio;
+
 					if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
 						UnitarySystem( UnitarySysNum ).NumOfSpeedHeating = DesignSpecMSHP( DesignSpecNum ).NumOfSpeedHeating;
 						UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( DesignSpecMSHP( DesignSpecNum ).NumOfSpeedHeating );
@@ -6152,7 +6205,7 @@ namespace HVACUnitarySystem {
 				ShowContinueError( "Field " + cAlphaFields( iDesignSpecMSHPTypeAlphaNum ) + " = " + Alphas( iDesignSpecMSHPTypeAlphaNum ) );
 				ShowContinueError( "Field " + cAlphaFields( iDesignSpecMSHPNameAlphaNum ) + " = " + Alphas( iDesignSpecMSHPNameAlphaNum ) );
 				ErrorsFound = true;
-			} else if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
+			} else if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) { // how do these last 2 get called?
 				NumOfSpeedHeating = UnitarySystem( UnitarySysNum ).NumOfSpeedHeating;
 
 				UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( NumOfSpeedHeating );
@@ -6210,6 +6263,14 @@ namespace HVACUnitarySystem {
 					}
 				}
 
+			}
+
+			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+				SetVarSpeedCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound, _, _, UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex );
+			}
+
+			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
+				SetVarSpeedCoilData( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrorsFound, _, _, UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex );
 			}
 
 			// set global logicals that denote coil type
@@ -8538,7 +8599,7 @@ namespace HVACUnitarySystem {
 
 		} else if ( SELECT_CASE_var == CoilDX_MultiSpeedCooling ) { // Coil:Cooling:DX:Multispeed
 
-			if ( OutsideDryBulbTemp > UnitarySystem( UnitarySysNum ).MinOATCompressor ) {
+			if ( OutsideDryBulbTemp > UnitarySystem( UnitarySysNum ).MinOATCompressorCooling ) {
 				SimDXCoilMultiSpeed( CompName, UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).CoolingCycRatio, CompIndex, UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).FanOpMode, CompOn, UnitarySystem( UnitarySysNum ).SingleMode );
 				if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 ) {
 					if ( UnitarySystem( UnitarySysNum ).SingleMode == 0 ) {
@@ -8719,7 +8780,7 @@ namespace HVACUnitarySystem {
 
 		} else if ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) {
 
-			if ( OutsideDryBulbTemp > UnitarySystem( UnitarySysNum ).MinOATCompressor ) {
+			if ( OutsideDryBulbTemp > UnitarySystem( UnitarySysNum ).MinOATCompressorHeating ) {
 				SimDXCoilMultiSpeed( CompName, UnitarySystem( UnitarySysNum ).HeatingSpeedRatio, UnitarySystem( UnitarySysNum ).HeatingCycRatio, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, UnitarySystem( UnitarySysNum ).HeatingSpeedNum, UnitarySystem( UnitarySysNum ).FanOpMode, CompOn, UnitarySystem( UnitarySysNum ).SingleMode );
 				UnitarySystem( UnitarySysNum ).HeatCompPartLoadRatio = PartLoadRatio * double( CompOn );
 			} else {
@@ -9041,6 +9102,7 @@ namespace HVACUnitarySystem {
 		Real64 NoLoadTempOut; // saves coil off outlet temp
 		bool HeatingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
 		bool CoolingActive; // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
+		Real64 OutdoorDryBulb; // local variable for OutDryBulbTemp
 		Real64 mdot; // water coil water flow rate [kg/s]
 		Real64 maxPartLoadFrac; // calculated maximum water side PLR for RegulaFalsi call (when plant limits flow max PLR != 1)
 
@@ -9073,6 +9135,13 @@ namespace HVACUnitarySystem {
 		NoLoadHumRatOut = 0.0;
 		OnOffAirFlowRatio = 0.0; //Autodesk:Init Patch to prevent use uninitialized in calls to SimVariableSpeedCoils
 
+		if ( UnitarySystem( UnitarySysNum ).CondenserNodeNum != 0 ) {
+			OutdoorDryBulb = Node( UnitarySystem( UnitarySysNum ).CondenserNodeNum ).Temp;
+		} else {
+			OutdoorDryBulb = OutDryBulbTemp;
+		}
+
+
 		// Check the dehumidification control type. IF it's multimode, turn off the HX to find the sensible PLR. Then check to
 		// see if the humidity load is met without the use of the HX. Always run the HX for the other modes.
 		if ( UnitarySystem( UnitarySysNum ).DehumidControlType_Num != DehumidControl_Multimode ) {
@@ -9103,6 +9172,12 @@ namespace HVACUnitarySystem {
 
 			// disable latent dehumidification if there is no sensible load and latent only is not allowed
 			if ( UnitarySystem( UnitarySysNum ).RunOnLatentOnlyWithSensible && ! SensibleLoad ) LatentLoad = false;
+
+			// disable compressor if OAT is below minimum outdoor temperature
+			if ( OutdoorDryBulb < UnitarySystem( UnitarySysNum ).MinOATCompressorCooling ) {
+				SensibleLoad = false;
+				LatentLoad = false;
+			}
 
 			// IF DXCoolingSystem runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
 			// Multimode coil will switch to enhanced dehumidification IF available and needed, but it
@@ -9829,7 +9904,7 @@ namespace HVACUnitarySystem {
 											SolveRoot( HumRatAcc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par );
 										}
 									} else {
-										if( SpeedNum == 1 ) {
+										if ( SpeedNum == 1 ) {
 											CycRatio = 1.0;
 										} else {
 											SpeedRatio = 1.0;
@@ -10128,6 +10203,11 @@ namespace HVACUnitarySystem {
 			if ( DesOutTemp - Node( InletNode ).Temp > TempControlTol ) SensibleLoad = true;
 			// if a heat pump and other coil is on, disable this coil
 			if ( UnitarySystem( UnitarySysNum ).HeatPump && UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac > 0.0) SensibleLoad = false;
+
+			// disable compressor if OAT is below minimum outdoor temperature
+			if ( OutdoorDryBulb < UnitarySystem( UnitarySysNum ).MinOATCompressorHeating ) {
+				SensibleLoad = false;
+			}
 
 			// IF DXHeatingSystem runs with a heating load then set PartLoadFrac on Heating System
 			if ( SensibleLoad ) {
@@ -10436,28 +10516,30 @@ namespace HVACUnitarySystem {
 			PartLoadFrac = 0.0;
 		}
 
-		if ( SolFla == -1 ) {
-			if ( ! WarmupFlag ) {
-				if ( UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIter < 1 ) {
-					++UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIter;
-					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
-					ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
-				} else {
-					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+		if ( SolFla < 0 ) {
+			if ( SolFla == -1 ) {
+				if ( !WarmupFlag ) {
+					if ( UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIter < 1 ) {
+						++UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIter;
+						ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
+						ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
+						ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
+					} else {
+						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+					}
 				}
-			}
-		} else if ( SolFla == -2 ) {
-			PartLoadFrac = ReqOutput / FullOutput;
-			if ( ! WarmupFlag ) {
-				if ( UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFail < 1 ) {
-					++UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFail;
-					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
-				} else {
-					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+			} else if ( SolFla == -2 ) {
+				PartLoadFrac = ReqOutput / FullOutput;
+				if ( !WarmupFlag ) {
+					if ( UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFail < 1 ) {
+						++UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFail;
+						ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
+						ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
+					} else {
+						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+					}
 				}
 			}
 		}
