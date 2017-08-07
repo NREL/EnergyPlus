@@ -893,6 +893,10 @@ This field is the name of schedule that defines how outdoor air requirements cha
 
 If this DesignSpecification:OutdoorAir object is referenced by a Controller:MechanicalVentilation object (either directly or indirectly through Sizing:Zone), the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calcaulations.
 
+\paragraph{Field: Proportional Control Minimum Outdoor Air Flow Rate Schedule Name }\label{field-proportional-control-minimum-outdoor-air-flow-rate-schedule-name}
+
+This field is the name of schedule that defines how minimum outdoor air requirements change over time. The field is optional. If left blank, the schedule defaults to 1.0. If used when the field System Outdoor Air Method = ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation, then the schedule values are multiplied by the outdoor air flow rate.
+
 An IDF example:
 
 \begin{lstlisting}
@@ -915,6 +919,7 @@ DesignSpecification:OutdoorAir
       Until: 24:00, 1.0,       !- Field 4
       For: AllOtherDays,       !- Field 5
       Until: 24:00, 0.5;       !- Field 7
+      
 \end{lstlisting}
 
 \subsection{DesignSpecification:ZoneAirDistribution}\label{designspecificationzoneairdistribution}

@@ -114,6 +114,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
   INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
   INTEGER :: AlphaNumI
+  REAL :: SaveNumber
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -363,6 +364,90 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1:13)=InArgs(1:13)  ! No change
                  OutArgs(14)=''           ! Add 1 New Input Field, blank
                  OutArgs(15:CurArgs+1)=InArgs(14:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('UNITARYSYSTEMPERFORMANCE:MULTISPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:4)=InArgs(1:4)  ! No change
+                 OutArgs(5)=''           ! Add 1 New Input Field, blank
+                 OutArgs(6:CurArgs+1)=InArgs(5:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:SINGLESPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:14)=InArgs(1:14)  ! No change
+                 OutArgs(15)=''           ! Add 1 New Input Field, blank
+                 OutArgs(16:CurArgs+1)=InArgs(15:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:TWOSPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:22)=InArgs(1:22)  ! No change
+                 OutArgs(23)=''           ! Add 1 New Input Field, blank
+                 OutArgs(24:CurArgs+1)=InArgs(23:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:MULTISPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:6)=InArgs(1:6)  ! No change
+                 OutArgs(7)=''           ! Add 1 New Input Field, blank
+                 OutArgs(8:CurArgs+1)=InArgs(7:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:VARIABLESPEED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:15)=InArgs(1:15)  ! No change
+                 OutArgs(16)=''           ! Add 1 New Input Field, blank
+                 OutArgs(17:CurArgs+1)=InArgs(16:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:18)=InArgs(1:18)  ! No change
+                 OutArgs(19)=''           ! Add 1 New Input Field, blank
+                 OutArgs(20:CurArgs+1)=InArgs(19:CurArgs)  !
+                 CurArgs = CurArgs + 1
+
+             CASE('ZONEHVAC:PACKAGEDTERMINALHEATPUMP')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:17)=InArgs(1:17)  ! No change
+                 OutArgs(18:CurArgs-1)=InArgs(19:CurArgs)  ! remove redundant field, shifting all fields up
+                 CurArgs = CurArgs - 1
+
+             CASE('ZONEHVAC:IDEALLOADSAIRSYSTEM')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:4)=InArgs(1:4)
+                 OutArgs(5) = ''
+                 OutArgs(6:CurArgs+1)=InArgs(5:CurArgs)
+                 CurArgs = CurArgs + 1
+
+             CASE('ZONECONTROL:CONTAMINANTCONTROLLER')
+               CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+               IF(CurArgs .GT. 4) THEN  
+                 nodiff=.false.
+                 OutArgs(1:5)=InArgs(1:5)
+                 OutArgs(6) = ''
+                 OutArgs(7:CurArgs+1)=InArgs(6:CurArgs)
+                 CurArgs = CurArgs + 1
+               ELSE
+                 nodiff=.true.
+                 OutArgs=InArgs
+               END IF
+
+             CASE('AVAILABILITYMANAGER:NIGHTCYCLE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:5)=InArgs(1:5)
+                 OutArgs(6) = 'FixedRunTime'
+                 OutArgs(7:CurArgs+1)=InArgs(6:CurArgs)
                  CurArgs = CurArgs + 1
 
     !!!   Changes for report variables, meters, tables -- update names
@@ -795,6 +880,22 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
                 ENDDO
 
+              CASE('WINDOWMATERIAL:BLIND:EQUIVALENTLAYER')
+                 ObjectName='WindowMaterial:Blind:EquivalentLayer'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                 NoDiff=.true.
+                 SaveNumber=ProcessNumber(OutArgs(6),ErrFlag)
+                 IF (ErrFlag) THEN
+                   CALL ShowSevereError('Invalid Number, WINDOWMATERIAL:BLIND:EQUIVALENTLAYER field 6, Name='//TRIM(OutArgs(1)),Auditf)
+                   WRITE(DifLfn,fmta) '  ! Invalid Number, field 6 {'//TRIM(NwFldNames(6))//'} value='//TRIM(OutArgs(6))
+                 ELSE
+                   IF (SaveNumber >= 90) THEN
+                     SaveNumber = 90.0 - SaveNumber
+                     OutArgs(6) = TrimTrailZeros(SaveNumber)
+                   ENDIF
+                 ENDIF
+ 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
                     WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'
