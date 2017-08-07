@@ -20,7 +20,7 @@ using namespace std;
 using namespace std;
 
 const int MODE_BLOCK_OFFSET_Alpha = 9;
-const int BLOCK_HEADER_OFFSET_Alpha =  18;
+const int BLOCK_HEADER_OFFSET_Alpha =  19;
 
 const int MODE1_BLOCK_OFFSET_Number = 2;
 const int MODE_BLOCK_OFFSET_Number = 16;
@@ -207,6 +207,12 @@ namespace EnergyPlus {
 			Real64 SystemLatentHeatingRate;
 			Real64 SystemLatentHeatingEnergy;
 			Real64 RequestedLoadToCoolingSetpoint;
+			Real64  RequestedHumdificationMass;
+			Real64  RequestedHumdificationLoad;
+			Real64  RequestedHumdificationEnergy;
+			Real64  RequestedDeHumdificationMass;
+			Real64  RequestedDeHumdificationLoad;
+			Real64  RequestedDeHumdificationEnergy;
 			int TsaMin_schedule_pointer;
 			int TsaMax_schedule_pointer;
 			int RHsaMin_schedule_pointer;
@@ -269,10 +275,11 @@ namespace EnergyPlus {
 
 			int Model::GetID();            // accessor function
 			void Model::SetID(int vID) { ID = vID; };    // accessor function
-			void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double ZoneHeatingLoad, double ZoneMoistureLoad, double ZoneDehumidificationLoad, double DesignMinVR);
+			void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double ZoneHeatingLoad, double OutputRequiredToHumidify, double OutputRequiredToDehumidify, double DesignMinVR);
 			void Model::Initialize(int ZoneNumber);//, ConfigFile* pConfig);
 			CMode* Model::AddNewOperatingMode(double correction);
 			void Model::InitializeModelParams();
+			void Model::ResetOutputs();
 			void Model::ModelLog(std::string fmuLocation);
 			double Model::CalcHum_ratio_W(double Tdb, double RH, double P);
 			bool Model::MeetsSupplyAirTOC(double Tosa);
@@ -306,12 +313,13 @@ namespace EnergyPlus {
 			double Model::Part_press(double P, double W);
 			double ResolutionMsa;
 			double ResolutionOSA;
-
+			int count_EnvironmentConditionsNotMet;
 			int count_EnvironmentConditionsMetOnce;
 			int count_SAHR_OC_MetOnce;
 			int count_SAT_OC_MetOnce;
 			int count_DidWeMeetLoad;
-			
+			int count_DidWeNotMeetLoad;
+
 			double MsaRated;
 			double RatedH;
 		
