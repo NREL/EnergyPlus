@@ -148,7 +148,13 @@ namespace PoweredInductionUnits {
 
 	// MODULE VARIABLE DECLARATIONS:
 	Array1D_bool CheckEquipName;
-	bool GetPIUInputFlag( true ); // First time, input is "gotten"
+
+	namespace {
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetPIUInputFlag( true ); // First time, input is "gotten"
+	}
 
 	int NumPIUs( 0 );
 	int NumSeriesPIUs( 0 );
@@ -160,6 +166,10 @@ namespace PoweredInductionUnits {
 	void
 	clear_state()
 	{
+		NumPIUs = 0;
+		NumSeriesPIUs = 0;
+		NumParallelPIUs = 0;
+		GetPIUInputFlag = true;
 		PIU.deallocate();
 	}
 
