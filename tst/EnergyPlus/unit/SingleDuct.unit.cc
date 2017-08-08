@@ -2517,6 +2517,7 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 	DataHeatBalance::ZoneIntGain( 1 ).NOFOCC = 5.0;
 
 	DataEnvironment::StdRhoAir = 1.20;
+	SysATMixer( 1 ).MassFlowRateMaxAvail = 1.0;
 	SingleDuct::InitATMixer( 1, true );
 	EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 0.72, 0.0001 );
 

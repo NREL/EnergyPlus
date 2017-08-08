@@ -295,16 +295,14 @@ namespace SingleDuct {
 		Real64 MixedAirEnthalpy; // mixed air in enthalpy
 		Real64 MixedAirPressure; // mixed air in pressure
 		Real64 MixedAirMassFlowRate; // mixed air in mass flow rate
-		Real64 MaxAirMassFlowRate; // maximum air mass flow rate allowed through component
+		Real64 MassFlowRateMaxAvail; // maximum air mass flow rate allowed through component
 
-		//TRANE BEG: DCV into ZoneHVAC
 		int ZoneEqNum;
 		int ZoneNum;
 		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
 		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
-		//TRANE END: DCV into ZoneHVAC
-		int AirLoopNum; //TRANE for system sizing adjustments
-		Real64 DesignPrimaryAirVolRate; //TRANE for system sizing adjustments, filled from design OA spec using sizing mode flags.
+		int AirLoopNum; //System sizing adjustments
+		Real64 DesignPrimaryAirVolRate; //System sizing adjustments, filled from design OA spec using sizing mode flags.
 		// Default Constructor
 		AirTerminalMixerData() :
 			MixerType( 0 ),
@@ -327,13 +325,13 @@ namespace SingleDuct {
 			MixedAirEnthalpy( 0.0 ),
 			MixedAirPressure( 0.0 ),
 			MixedAirMassFlowRate( 0.0 ),
-			MaxAirMassFlowRate( 0.0 ),
-			ZoneEqNum( 0 ), //TRANE
-			ZoneNum( 0 ), //TRANE
-			NoOAFlowInputFromUser( true ), //TRANE
-			OARequirementsPtr( 0 ), //TRANE
-			AirLoopNum( 0 ), //TRANE
-			DesignPrimaryAirVolRate( 0.0 ) //TRANE
+			MassFlowRateMaxAvail( 0.0 ),
+			ZoneEqNum( 0 ), 
+			ZoneNum( 0 ), 
+			NoOAFlowInputFromUser( true ), 
+			OARequirementsPtr( 0 ), 
+			AirLoopNum( 0 ), 
+			DesignPrimaryAirVolRate( 0.0 ) 
 		{}
 
 	};

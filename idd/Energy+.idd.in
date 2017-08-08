@@ -31704,6 +31704,9 @@ DesignSpecification:OutdoorAir,
       \key AirChanges/Hour
       \key Sum
       \key Maximum
+      \key IndoorAirQualityProcedure
+      \key ProportionalControlBasedOnDesignOccupancy
+      \key ProportionalControlBasedonOccupancySchedule
       \default Flow/Person
       \note Flow/Person => Outdoor Air Flow per Person * Occupancy = Design Flow Rate,
       \note Flow/Area => Outdoor Air Flow per Zone Floor Area * Zone Floor Area = Design Flow Rate,

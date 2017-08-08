@@ -4686,6 +4686,8 @@ namespace SingleDuct {
 		using DataGlobals::NumOfZones;
 		using DataHVACGlobals::ATMixer_InletSide;
 		using DataHVACGlobals::ATMixer_SupplySide;
+		using DataSizing::ZoneSizingInput;
+
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -4756,7 +4758,7 @@ namespace SingleDuct {
 			SysATMixer( ATMixerNum ).SecInNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
 
 			if ( lAlphaFieldBlanks( 8 ) ) { 
-				SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = true; 
+				SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = true;
 			} else { 
 				SysATMixer( ATMixerNum ).OARequirementsPtr = InputProcessor::FindItemInList( cAlphaArgs( 8 ), DataSizing::OARequirements ); 
 				if ( SysATMixer( ATMixerNum ).OARequirementsPtr == 0 ) { 
@@ -4798,7 +4800,6 @@ namespace SingleDuct {
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-									SysATMixer( ATMixerNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( CtrlZone ).AirLoopNum; 
 
 									if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) { 																						 
 										bool UseOccSchFlag = false; 
@@ -4857,6 +4858,16 @@ namespace SingleDuct {
 			}
 			TestCompSet( cCurrentModuleObject, SysATMixer( ATMixerNum ).Name, cAlphaArgs( 5 ), cAlphaArgs( 4 ), "Air Nodes" );
 
+			if ( SysATMixer( ATMixerNum ).OARequirementsPtr == 0 ) {
+				if ( ZoneSizingInput( SysATMixer( ATMixerNum ).ZoneNum ).ZoneDesignSpecOAIndex == 0 ) {
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+					ShowContinueError( "If " + cAlphaFieldNames( 8 ) + "is blank, the input of Design Specification Outdoor Air Object Name in Sizing:Zone is needed. Otherwise the mixer outdoor airflow rate is zero." );
+					SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = 0.0;
+				} else {
+					SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( ZoneSizingInput( SysATMixer( ATMixerNum ).ZoneNum ).ZoneDesignSpecOAIndex, SysATMixer( ATMixerNum ).ZoneNum, false, false );
+				}
+			}
+			SysATMixer( ATMixerNum ).MassFlowRateMaxAvail = SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate * DataEnvironment::StdRhoAir;
 		}
 
 		if ( ErrorsFound ) {
@@ -4933,29 +4944,34 @@ namespace SingleDuct {
 		}
 
 		Real64 mDotFromOARequirement( 0.0 );
-		if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) {
+		Real64 vDotOAReq( 0.0 );
+		if ( SysATMixer( ATMixerNum ).MassFlowRateMaxAvail  > 0.0 ) {
 			Real64 airLoopOAFrac( 0.0 );
 			if ( SysATMixer( ATMixerNum ).AirLoopNum > 0 ) {
 				airLoopOAFrac = DataAirLoop::AirLoopFlow( SysATMixer( ATMixerNum ).AirLoopNum ).OAFrac;
 				if ( airLoopOAFrac > 0.0 ) {
-					Real64 vDotOAReq = CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, true, true );
+					if ( SysATMixer( ATMixerNum ).OARequirementsPtr > 0 ) {
+						vDotOAReq = CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, true, true );
+					} else {
+						vDotOAReq = CalcDesignSpecificationOutdoorAir( ZoneSizingInput( SysATMixer( ATMixerNum ).ZoneNum ).ZoneDesignSpecOAIndex, SysATMixer( ATMixerNum ).ZoneNum, true, true );
+					}
 					mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
 				} else {
 					mDotFromOARequirement = Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate;
 				}
 			}
+		}
 
-			if ( FirstHVACIteration ) {
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; 
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail = SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate * DataEnvironment::StdRhoAir;
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail = 0.0;
-			} else {
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; 
+		if ( FirstHVACIteration ) {
+			Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; 
+			Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail = SysATMixer( ATMixerNum ).MassFlowRateMaxAvail;
+			Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail = 0.0;
+		} else {
+			Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement; 
 																								 
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = min( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail );  
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail );  
-				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMin );  
-			}
+			Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = min( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail );  
+			Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail );  
+			Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMin );  
 		}
 
 	}

@@ -57,6 +57,7 @@
 #include <SizingManager.hh>
 #include <CostEstimateManager.hh>
 #include <DataAirLoop.hh>
+#include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -919,6 +920,7 @@ namespace SizingManager {
 		using ScheduleManager::GetScheduleMaxValue;
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -948,10 +950,16 @@ namespace SizingManager {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowSum;
 			} else if ( SameString( Alphas( 2 ), "Maximum" ) ) {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowMax;
+			} else if ( SameString( Alphas( 2 ), "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_IAQP;
+			} else if ( SameString( Alphas( 2 ), "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE" ) ) { // Proportional Control based on ASHRAE Standard 62.1-2004
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_ProportionalControlSchOcc;
+			} else if ( SameString( Alphas( 2 ), "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY" ) ) { // Proportional Control based on ASHRAE Standard 62.1-2004
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_ProportionalControlDesOcc;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
 				ShowContinueError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"," );
-				ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum." );
+				ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, IndoorAirQualityProcedure, ProportionalControlBasedOnDesignOccupancy, and ProportionalControlBasedonOccupancySchedule." );
 				ErrorsFound = true;
 			}
 		} else {
@@ -966,26 +974,30 @@ namespace SizingManager {
 		}
 		// if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it
 		// being counted later #4378
-		if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax ) {
+		if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax &&
+			OARequirements( OAIndex ).OAFlowMethod != ZOAM_ProportionalControlSchOcc && OARequirements( OAIndex ).OAFlowMethod != ZOAM_ProportionalControlDesOcc && OARequirements( OAIndex ).OAFlowMethod != ZOAM_IAQP ) {
 			OARequirements( OAIndex ).OAFlowPerPerson = 0.0;
 		}
 		// remaining fields default to 0
 		if ( NumNumbers > 1 ) {
 			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowPerArea || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
 				OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
+			} else if ( OARequirements( OAIndex ).OAFlowMethod == ZOAM_ProportionalControlSchOcc || OARequirements( OAIndex ).OAFlowMethod == ZOAM_ProportionalControlDesOcc || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
+				OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
 			} else {
 				OARequirements( OAIndex ).OAFlowPerArea = 0.0;
 			}
 		}
 		if ( NumNumbers > 2 ) {
-			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlow || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlow || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
 				OARequirements( OAIndex ).OAFlowPerZone = Numbers( 3 );
 			} else {
 				OARequirements( OAIndex ).OAFlowPerZone = 0.0;
 			}
 		}
+
 		if ( NumNumbers > 3 ) {
-			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowACH || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowACH || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
 				OARequirements( OAIndex ).OAFlowACH = Numbers( 4 );
 			} else {
 				OARequirements( OAIndex ).OAFlowACH = 0.0;

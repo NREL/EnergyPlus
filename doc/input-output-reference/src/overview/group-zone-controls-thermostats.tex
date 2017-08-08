@@ -1052,6 +1052,17 @@ The ZoneControl:ContaminantController object is used for any of the following tw
 
 For the first purpose above, when multiple zones are served by an AirLoop, those zones that do not have a contaminant controller object specified in the input data file are automatically assigned a carbon dioxide setpoint. Zone objects entered in the input data file are internally assigned an index number from 1 to n (first defined Zone object = 1, next Zone object defined in the input file = 2, etc.). For zones served by an AirLoop that do not have a contaminant controller specified, the zone s carbon dioxide setpoint will be the same as the zone with the next highest zone index number that has a contaminant controller specified. If a zone with a higher index number and contaminant controller specified does not exist, then the zone with the next lowest zone index number that has a contaminant controller specified will be used. For example, assume an AirLoop serves zones 1 through 5, but one ZoneControl:ContaminantController object is specified for zone 2, a second ZoneControl:ContaminantController object is specified for zone 4, and no ZoneControl:ContaminantController objects are specified for zones 1, 3 and 5. In this case, zone 1 will be assigned the carbon dioxide setpoint schedule that was specified for zone 2, and zones 3 and 5 will be assigned the carbon dioxide setpoint schedule that was specified for zone 4.
 
+The ZoneControl:ContaminantController object is also used for any of the following two purposes based on the outdoor air method specified in the DesignSpecification:OutdoorAir.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  To control a zone to a specified indoor level of contaminants. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = IndoorAirQualityProcedure, so that the required outdoor airflow rate to reach the zone air setpoint can be assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC can reach the zone air CO2 setpoint precisely.
+\item
+  To specify minimum CO2 concentration schedule name for a zone. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy. The outdoor airflow rate is determined by one of proportional control procedures. Then, the calculated outdoor airflow rate is assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC will receive the outdoor airflow rate based on terminal unit request. 
+
+\end{enumerate}
+
 \subsubsection{Inputs}\label{inputs-14-017}
 
 \paragraph{Field: Name}\label{field-name-12-013}
@@ -1072,7 +1083,7 @@ This field contains the name of a schedule that contains the zone carbon dioxide
 
 \paragraph{Field:Minimum Carbon Dioxide Concentration Schedule Name}\label{fieldminimum-carbon-dioxide-concentration-schedule-name}
 
-This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the Controller:MechanicalVentilation object.
+This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the Controller:MechanicalVentilation object. This field is also used when the field Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the DesignSpecification:OutdoorAir object.
 
 \paragraph{Field: Generic Contaminant Control Availability Schedule Name}\label{field-generic-contaminant-control-availability-schedule-name}
 
