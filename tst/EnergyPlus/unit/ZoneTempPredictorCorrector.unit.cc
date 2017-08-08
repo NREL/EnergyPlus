@@ -176,6 +176,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	Node( 3 ).MassFlowRate = 0.00; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.03; // Zone return node
 	Node( 4 ).HumRat = 0.000;
@@ -201,6 +202,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.01; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -226,6 +228,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.02;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.03; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -251,6 +254,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.02;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.01; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -266,7 +270,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MDotOA( 1 ) = 0.0;
 
 	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
-	EXPECT_FALSE( (0.008 == Node( 5 ).HumRat) );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
+
+	// Add a section to check #6119 by L. Gu on 5/16/17
+	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Deallocate everything
 	ZoneEquipConfig( 1 ).InletNode.deallocate();

@@ -1355,6 +1355,7 @@ namespace DataHeatBalance {
 		bool EnforcedReciprocity; // if zone required forced reciprocity --
 		//   less out of bounds temperature errors allowed
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
+		int ZoneMaxCO2SchedIndex; // Index for the schedule the schedule which determines maximum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
 		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
 		// Hybrid Modeling
@@ -1434,6 +1435,7 @@ namespace DataHeatBalance {
 			TempOutOfBoundsReported( false ),
 			EnforcedReciprocity( false ),
 			ZoneMinCO2SchedIndex( 0 ),
+			ZoneMaxCO2SchedIndex( 0 ),
 			ZoneContamControllerSchedIndex( 0 ),
 			FlagCustomizedZoneCap( false ),
 			// Hybrid Modeling

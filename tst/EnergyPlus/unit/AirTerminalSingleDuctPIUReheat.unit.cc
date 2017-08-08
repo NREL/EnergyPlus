@@ -193,5 +193,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( "COIL:HEATING:WATER", PIU( 1 ).HCoilType ); // hot water heating coil
 		EXPECT_GT( PIU( 1 ).HotControlNode, 0 );  // none zero integer node index is expected
 
+		//PIU.deallocate();
+
 	}
 }
