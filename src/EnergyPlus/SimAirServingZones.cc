@@ -603,44 +603,47 @@ namespace SimAirServingZones {
 			if ( !lNumericBlanks( 2 ) ) {
 				PrimaryAirSystem( AirSysNum ).DesignReturnFlowFraction = Numbers( 2 );
 			}
-			//Only allow one return air node (at the loop level)
-			AirToZoneNodeInfo( AirSysNum ).NumReturnNodes = 1;
-			// Allocate the return air node arrays
-			AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
-			AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
-			// fill the return air node arrays with node numbers
-			AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 			if ( lAlphaBlanks( 7 ) ){
-				AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) = 0;
+				AirToZoneNodeInfo( AirSysNum ).NumReturnNodes = 0;
 			} else {
+				//Only allow one return air node (at the loop level)
+				AirToZoneNodeInfo( AirSysNum ).NumReturnNodes = 1;
+				// Allocate the return air node arrays
+				AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
+				AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
+				// fill the return air node arrays with node numbers
+				AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 				AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 			}
+
+			if( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes > 0){
 				// work on unique nodes
 			test = FindItemInList( Alphas( 6 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
-			if ( test == 0 ) {
-				++TestUniqueNodesNum;
-				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 6 );
-				TestUniqueNodes( TestUniqueNodesNum ).AirLoopName = Alphas( 1 );
-				TestUniqueNodes( TestUniqueNodesNum ).FieldName = cAlphaFields( 6 );
-				TestUniqueNodes( TestUniqueNodesNum ).NodeNameUsed = true;
-			} else {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate node name." );
-				ShowContinueError( "...used for " + cAlphaFields( 6 ) + "=\"" + Alphas( 6 ) + "\"" );
-				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
-				ErrorsFound = true;
-			}
-			test = FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
-			if ( test == 0 ) {
-				++TestUniqueNodesNum;
-				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 7 );
-				TestUniqueNodes( TestUniqueNodesNum ).AirLoopName = Alphas( 1 );
-				TestUniqueNodes( TestUniqueNodesNum ).FieldName = cAlphaFields( 7 );
-				TestUniqueNodes( TestUniqueNodesNum ).NodeNameUsed = true;
-			} else {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate node name." );
-				ShowContinueError( "...used for " + cAlphaFields( 7 ) + "=\"" + Alphas( 7 ) + "\"" );
-				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
-				ErrorsFound = true;
+				if ( test == 0 ) {
+					++TestUniqueNodesNum;
+					TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 6 );
+					TestUniqueNodes( TestUniqueNodesNum ).AirLoopName = Alphas( 1 );
+					TestUniqueNodes( TestUniqueNodesNum ).FieldName = cAlphaFields( 6 );
+					TestUniqueNodes( TestUniqueNodesNum ).NodeNameUsed = true;
+				} else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate node name." );
+					ShowContinueError( "...used for " + cAlphaFields( 6 ) + "=\"" + Alphas( 6 ) + "\"" );
+					ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
+					ErrorsFound = true;
+				}
+				test = FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
+				if ( test == 0 ) {
+					++TestUniqueNodesNum;
+					TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 7 );
+					TestUniqueNodes( TestUniqueNodesNum ).AirLoopName = Alphas( 1 );
+					TestUniqueNodes( TestUniqueNodesNum ).FieldName = cAlphaFields( 7 );
+					TestUniqueNodes( TestUniqueNodesNum ).NodeNameUsed = true;
+				} else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate node name." );
+					ShowContinueError( "...used for " + cAlphaFields( 7 ) + "=\"" + Alphas( 7 ) + "\"" );
+					ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
+					ErrorsFound = true;
+				}
 			}
 			test = FindItemInList( Alphas( 8 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
@@ -676,14 +679,14 @@ namespace SimAirServingZones {
 					break;
 				}
 			}
-			if ( test == 0 ) { // there, see if it's in the controlled zone info
+			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) ) { // there, see if it's in the controlled zone info
 				for ( count = 1; count <= NumOfZones; ++count ) {
 					if ( ZoneEquipConfig( count ).ReturnAirNode != AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) ) continue;
 					test = count;
 					break;
 				}
 			}
-			if ( test == 0 ) {
+			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid." );
 				ShowContinueError( cAlphaFields( 7 ) + " (Return Air Path or ZoneHVAC:EquipmentConnections) not valid = \"" + Alphas( 7 ) + "\"." );
 				ErrorsFound = true;

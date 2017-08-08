@@ -585,7 +585,7 @@ Searching on `.ReturnAirNode` and `.AirLoopNum` shows relevant hits in:
 ### 8. Allow an airloop with no return path *(if budget allows)*
 
 #### SimAirServingZones::GetAirPathData ####
-- *Done* Modify input processing for `AirLoopHVAC` to allow the Demand Side Outlet Node Name to be blank
+- *Done again 2017-08-06* Modify input processing for `AirLoopHVAC` to allow the Demand Side Outlet Node Name to be blank
 - ** No change needed?** Skip the check for proper return connection if the Demand Side Outlet Node Name is blank
 
 #### ReturnAirPathManager::InitReturnAirPath  ####

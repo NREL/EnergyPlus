@@ -58216,12 +58216,12 @@ AirLoopHVAC,
        \type object-list
        \object-list ConnectorLists
    A6, \field Supply Side Inlet Node Name
-       \note Name of inlet node where return air enters the supply side of the air loop
-       \required-field
+       \note Name of inlet node where return air or outdoor air enters the supply side of the air loop
+       \note Required if this air loop has a return path. Leave this field blank if there is no return.
        \type node
    A7, \field Demand Side Outlet Node Name
        \note Name of outlet node where return air leaves the demand side and enters the supply side.
-       \required-field
+       \note Required if this air loop has a return path. Leave this field blank if there is no return.
        \type node
    A8, \field Demand Side Inlet Node Names
        \note Name of a Node or NodeList containing the inlet node(s) supplying air to zone equipment.
