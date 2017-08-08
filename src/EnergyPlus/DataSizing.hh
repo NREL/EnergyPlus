@@ -159,6 +159,7 @@ namespace DataSizing {
 	// based on the generic contaminant setpoint
 	extern int const SOAM_IAQPCOM; // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	// based on the generic contaminant setpoint
+	extern int const SOAM_ProportionalControlDesOARate; // Calculate the system level outdoor air flow rates based on design OA rate
 
 	// Zone HVAC Equipment Supply Air Sizing Option
 	extern int const None;
@@ -1271,6 +1272,7 @@ namespace DataSizing {
 		Real64 OAFlowPerZone; // - OA requirement per zone
 		Real64 OAFlowACH; // - OA requirement per zone per hour
 		int OAFlowFracSchPtr; // - Fraction schedule applied to total OA requirement
+		int OAPropCtlMinRateSchPtr; // - Fraction schedule applied to Proportional Control Minimum Outdoor Air Flow Rate 
 		int CO2MaxMinLimitErrorCount; // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
 		int CO2MaxMinLimitErrorIndex; // Index for max CO2 concentration < min CO2 concentration recurring error message for SOAM_ProportionalControlSchOcc
 		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
@@ -1284,6 +1286,8 @@ namespace DataSizing {
 			OAFlowPerZone( 0.0 ),
 			OAFlowACH( 0.0 ),
 			OAFlowFracSchPtr( DataGlobals::ScheduleAlwaysOn ),
+			OAPropCtlMinRateSchPtr( DataGlobals::ScheduleAlwaysOn )
+
 			CO2MaxMinLimitErrorCount( 0 ),
 			CO2MaxMinLimitErrorIndex( 0 ),
 			CO2GainErrorCount( 0 ),

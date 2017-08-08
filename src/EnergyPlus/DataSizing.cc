@@ -168,6 +168,7 @@ namespace DataSizing {
 	// based on the generic contaminant setpoint
 	int const SOAM_ProportionalControlDesOcc( 7 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
 	// to calculate the system level outdoor air flow rates based on design occupancy
+	int const SOAM_ProportionalControlDesOARate( 8 ); // Calculate the system level outdoor air flow rates based on design OA rate
 
 	// Zone HVAC Equipment Supply Air Sizing Option
 	int const None( 1 );

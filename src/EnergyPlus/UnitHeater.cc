@@ -1289,7 +1289,7 @@ namespace UnitHeater {
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using DataZoneEquipment::UnitHeater_Num;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -1462,7 +1462,7 @@ namespace UnitHeater {
 						if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 						Par( 3 ) = double( UnitHeat( UnitHeatNum ).OpMode );
 						// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-						SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitHeaterResidual, 0.0, 1.0, Par );
+						SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitHeaterResidual, 0.0, 1.0, Par );
 					}
 				}
 
@@ -1742,7 +1742,7 @@ namespace UnitHeater {
 		// To calculate the part-load ratio for the unit heater
 
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 
 		// REFERENCES:
 		// na

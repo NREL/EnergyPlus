@@ -69,6 +69,7 @@
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
+#include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
@@ -702,6 +703,7 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::lMinimalShadowing;
+		using DataHVACGlobals::HVACSystemRootFinding;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1227,6 +1229,43 @@ namespace HeatBalanceManager {
 			gio::write( OutputFileInits, Format_733 ) << "No" << "N/A" << "N/A" << "N/A";
 		}
 
+		// A new object is added by L. Gu, 4/17
+		CurrentModuleObject = "HVACSystemRootFindingAlgorithm";
+		NumObjects = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumObjects > 0 ) {
+			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( NumAlpha > 0 ) {
+				HVACSystemRootFinding.Algorithm = AlphaName( 1 );
+				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
+				if ( ( SELECT_CASE_var == "REGULAFALSI" ) ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+				} else if ( SELECT_CASE_var == "BiSECTION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
+				} else if ( SELECT_CASE_var == "BISECTIONTHENREGULAFALSI" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
+				} else if ( SELECT_CASE_var == "REGULAFALSITHENBISECTION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
+				} else if ( SELECT_CASE_var == "ALTERNATION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation;
+				} else {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames( 1 ) + ". The default choice is assigned = " + AlphaName( 1 ) );
+					ShowContinueError( "Valid choices are: RegulaFalsi, Bisection, BisectionThenRegulaFalsi, RegulaFalsiThenBisection, or Alternation." );
+				}}
+			}
+			if ( NumNumber > 0 ) {
+				HVACSystemRootFinding.NumOfIter = BuildingNumbers( 1 );
+			}
+		}
+		else {
+			HVACSystemRootFinding.Algorithm = "RegulaFalsi";
+			HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+		}
+
+		// Write Solution Algorithm to the initialization output file for User Verification
+		gio::write( OutputFileInits, Format_726 );
+		gio::write( OutputFileInits, Format_727 ) << AlphaName( 1 );
+
 	}
 
 	void
@@ -1333,6 +1372,9 @@ namespace HeatBalanceManager {
 		using General::RoundSigDigits;
 		using General::ScanForReports;
 		using General::TrimSigDigits;
+		using WindowEquivalentLayer::lscNONE;
+		using WindowEquivalentLayer::lscVBPROF;
+		using WindowEquivalentLayer::lscVBNOBM;
 		using CurveManager::PerfCurve;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveObjectTypeNum;
@@ -3285,11 +3327,11 @@ namespace HeatBalanceManager {
 			//  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 				if ( SameString( MaterialNames( 3 ), "FixedSlatAngle" ) ) {
-					Material( MaterNum ).SlatAngleType = 0;
+					Material( MaterNum ).SlatAngleType = lscNONE;
 				} else if ( SameString( MaterialNames( 3 ), "MaximizeSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 1;
+					Material( MaterNum ).SlatAngleType = lscVBPROF;
 				} else if ( SameString( MaterialNames( 3 ), "BlockBeamSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 2;
+					Material( MaterNum ).SlatAngleType = lscVBNOBM;
 				} else {
 					Material( MaterNum ).SlatAngleType = 0;
 				}
