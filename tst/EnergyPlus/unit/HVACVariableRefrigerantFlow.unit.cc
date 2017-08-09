@@ -127,9 +127,7 @@ namespace EnergyPlus {
 		int const FlagCondMode( 0 ); // Flag for running as condenser [-]
 		int const FlagEvapMode( 1 ); // Flag for running as evaporator [-]
 		bool ErrorsFound( false );        // function returns true on error
-		int NumTUList( 1 ); // number of TU List
 		int VRFCond( 1 ); // index to VRF condenser
-		int TUListNum ( 1 ); // index to VRF TU list
 
 		std::string const idf_objects = delimited_string( {
 		"Version,8.5;",
