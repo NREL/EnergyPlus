@@ -7838,6 +7838,8 @@ namespace SolarShading {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataDaylighting::ZoneDaylight;
 		using General::POLYF;
+		using DataWindowEquivalentLayer::CFS;
+		using WindowEquivalentLayer::lscNONE;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -7894,7 +7896,16 @@ namespace SolarShading {
 			SurfaceWindow( ISurf ).ExtIntShadePrevTS = SurfaceWindow( ISurf ).ShadingFlag;
 			// SurfaceWindow( ISurf ).ShadingFlag = NoShade;
 			SurfaceWindow( ISurf ).FracTimeShadingDeviceOn = 0.0;
-
+			if ( SurfaceWindow( ISurf ).WindowModelType == WindowEQLModel ) {
+				int EQLNum = Construct( Surface( ISurf ).Construction ).EQLConsPtr;
+				if ( CFS( EQLNum ).VBLayerPtr > 0 ) {
+					if ( CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).CNTRL == lscNONE ) {
+						SurfaceWindow( ISurf ).SlatAngThisTSDeg = CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).PHI_DEG;
+					} else {
+						SurfaceWindow( ISurf ).SlatAngThisTSDeg = 0.0;
+					}
+				}				
+			}
 			if ( Surface( ISurf ).Class != SurfaceClass_Window ) continue;
 			if ( Surface( ISurf ).ExtBoundCond != ExternalEnvironment ) continue;
 			if ( Surface( ISurf ).WindowShadingControlPtr == 0 ) continue;
