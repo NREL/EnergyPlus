@@ -920,7 +920,6 @@ namespace SizingManager {
 		using ScheduleManager::GetScheduleMaxValue;
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
-		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
