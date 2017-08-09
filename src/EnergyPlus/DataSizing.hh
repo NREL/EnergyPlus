@@ -1286,8 +1286,7 @@ namespace DataSizing {
 			OAFlowPerZone( 0.0 ),
 			OAFlowACH( 0.0 ),
 			OAFlowFracSchPtr( DataGlobals::ScheduleAlwaysOn ),
-			OAPropCtlMinRateSchPtr( DataGlobals::ScheduleAlwaysOn )
-
+			OAPropCtlMinRateSchPtr( DataGlobals::ScheduleAlwaysOn ),
 			CO2MaxMinLimitErrorCount( 0 ),
 			CO2MaxMinLimitErrorIndex( 0 ),
 			CO2GainErrorCount( 0 ),

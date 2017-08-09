@@ -1533,7 +1533,7 @@ namespace DataZoneEquipment {
 							}
 
 							if ( ZoneMaxCO2 <= ZoneMinCO2 ) {
-								OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount;
+								++OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount;
 								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlSchOcc ) {
 									if ( OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount < 2 ) {
 										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
