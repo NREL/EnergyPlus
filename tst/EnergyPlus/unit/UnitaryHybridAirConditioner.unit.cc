@@ -26,7 +26,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-
+#include <ConfiguredFunctions.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -105,7 +105,7 @@ namespace EnergyPlus {
 
 
 		using namespace InputProcessor;
-		std::vector<std::string> snippet = getAllLinesInFile2("Z:/Dropbox/EnergyPlus/datasets/Example_1Zone_1Hybrid_MuntersEPX5000_rev0728.idf");
+		std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/datasets/Example_1Zone_1Hybrid_MuntersEPX5000_rev0806_nolimits.idf");
 		std::string string = delimited_string(snippet);
 		ASSERT_FALSE(process_idf(string));
 
@@ -173,20 +173,15 @@ namespace EnergyPlus {
 		double MsaRatio, OSAF;
 		MsaRatio = OSAF = 1;
 		int lineN = 0;
-		// CalcDesignSpecificationOutdoorAir(pZoneHybridUnitaryAirConditioner->OARequirementsPtr, 1, UseOccSchFlag, UseMinOASchFlag);  //double OAVolumeFlowRate = ;
-
 
 		Requestedheating = Requested_Humidification = Requested_Dehumidification = 0;
 
-
-		//timestamp	Outside Air Temperature (C)	Outside Air Relative Humidity (1-100%)	Outside Air Humidity Ratio (-)	Zone Thermostat Requested Sensible Heat Transfer Rate (kW)	Supply Air Temperature (C)	Supply Air Relative Humidity (0-100%)	Supply Air Humidity Ratio	Water Use (Liters/min)	System Electric Power (kW)	Operating Mode	Supply Air Mass Flow Rate (kg/s)	Supply Air Volume Flow Rate (m3/s)	Sensible System Cooling Capacity (kW)	Latent System Cooling Capacity (kW)	Total System Cooling Capacity (kW)
-
-		std::vector<std::string> lines = getAllLinesInFile2("Z:/Dropbox/EnergyPlus/datasets/InputData_cool.csv"); // configured_source_directory()																									 //line input format: time, Outside Air Temperature(C),	Outside Air Relative Humidity(1 - 100 % ),	Outside Air Humidity Ratio(-)
+		std::vector<std::string> lines = getAllLinesInFile2(configured_source_directory() + "/datasets/InputData_cool.csv"); // configured_source_directory()																									 //line input format: time, Outside Air Temperature(C),	Outside Air Relative Humidity(1 - 100 % ),	Outside Air Humidity Ratio(-)
 		double NormalizationReference = 3.0176;
 		int Msa = NormalizationReference* MsaRatio;
 		int scaler = pZoneHybridUnitaryAirConditioner->ScalingFactor;
 		ofstream myfile;
-		myfile.open("Z:/Dropbox/EnergyPlus/datasets/OutputData.csv");
+		myfile.open(configured_source_directory() + "/datasets/OutputData.csv");
 
 		std::list<CMode*>::const_iterator iterator_mode;
 		std::vector<std::string>::const_iterator iterator_line;
@@ -258,7 +253,7 @@ namespace EnergyPlus {
 			s << "Expected Outputs: ," << ExpectedSupplyAirTemperature << "," << ExpectedSupplyAirHumidityRatio << "," << ExpectedTotalElectricPower << "," << ModeName << "," << ExpectedSupplyAirMassFlowRate << "," << ExpectedSupplyAirVolumeFlowRate << "," << ExpectedSensibleSystemCoolingCapacity << "," << ExpectedLatentSystemCoolingCapacity << "," << ExpectedTotalSystemCoolingCapacity;
 
 			s << "\n";
-			myfile << s.str();// .rdbuf();"\n"
+			myfile << s.str();
 		}
 		myfile.close();
 
