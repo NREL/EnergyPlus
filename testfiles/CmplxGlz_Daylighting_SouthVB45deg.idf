@@ -86310,6 +86310,7 @@
     FAN-SCHED,               !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     4.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200.;                   !- Cycling Run Time {s}
 
   SetpointManager:SingleZone:Reheat,

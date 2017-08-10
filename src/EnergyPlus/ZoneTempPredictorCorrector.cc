@@ -4749,7 +4749,6 @@ namespace ZoneTempPredictorCorrector {
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
 				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
-			ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
 
 			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
 				TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;
@@ -4819,11 +4818,11 @@ namespace ZoneTempPredictorCorrector {
 		// Check for the flow and NO flow condition
 		if ( ZoneMassFlowRate > 0.0 ) {
 			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
-			A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+			A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 				// Multizone airflow calculated in AirflowNetwork
 				B = ( LatentGain / H2OHtOfVap ) + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum );
-				A = TotExitMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
+				A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
 			}
 			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 		} else if ( ZoneMassFlowRate <= 0.0 ) {
@@ -6234,7 +6233,7 @@ namespace ZoneTempPredictorCorrector {
 
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using ThermalComfort::CalcThermalComfortFanger;
 
 		// Locals
@@ -6242,8 +6241,8 @@ namespace ZoneTempPredictorCorrector {
 		// 0 = Solution; 1 = Set to Min; 2 Set to Max
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Acc( 0.001 ); // accuracy control for SolveRegulaFalsi
-		int const MaxIter( 500 ); // iteration control for SolveRegulaFalsi
+		Real64 const Acc( 0.001 ); // accuracy control for SolveRoot
+		int const MaxIter( 500 ); // iteration control for SolveRoot
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tmin; // Minimun drybulb setpoint temperature
@@ -6252,7 +6251,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 PMVMin; // Minimum allowed PMV value
 		Real64 PMVMax; // Calculated PMV value
 		Array1D< Real64 > Par( 2 ); // Passed parameter for RegularFalsi function
-		int SolFla; // feed back flag from SolveRegulaFalsi
+		int SolFla; // feed back flag from SolveRoot
 		static int IterLimitExceededNum1( 0 );
 		static int IterLimitErrIndex1( 0 );
 		static int IterLimitExceededNum2( 0 );
@@ -6268,7 +6267,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( PMVSet > PMVMin && PMVSet < PMVMax ) {
 			Par( 1 ) = PMVSet;
 			Par( 2 ) = double( PeopleNum );
-			SolveRegulaFalsi( Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par );
+			SolveRoot( Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par );
 			if ( SolFla == -1 ) {
 				if ( ! WarmupFlag ) {
 					++IterLimitExceededNum1;
