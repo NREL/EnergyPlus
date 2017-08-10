@@ -480,10 +480,7 @@ namespace EnergyPlus {//***************
 
 			return ErrorsFound;
 		}
-		// Alpha items for object
-		 // Numeric items for object
-		  // Alpha field names
-		// Numeric field names
+
 
 		bool CMode::MeetsOAEnvConstraints(double Tosa, double Wosa, double RHosa)
 		{
@@ -696,44 +693,29 @@ namespace EnergyPlus {//***************
 
 		void Model::InitializeModelParams()
 		{
-			//should reset most of these?
+			
 			ResetOutputs();
 			optimal_EnvCondMet = false;
 
 			Tsa = 0;
-			//Wsa = 0;
+			
 			pOptimal->ElectricalPower = IMPLAUSIBLE_POWER;
 			pSubOptimal->ElectricalPower = IMPLAUSIBLE_POWER;
 			RunningPeakCapacity_EnvCondMet = false;
 	
-		/*	list<CSetting*>::iterator iterOperatingSettings;
-			for (iterOperatingSettings = CurrentOperatingSettings.begin(); iterOperatingSettings != CurrentOperatingSettings.end(); ++iterOperatingSettings) {
-				CSetting* po = (*iterOperatingSettings);
-				delete po;
-			}
-			list<CSetting*>::iterator iterSettings;
-			for (iterSettings = Settings.begin(); iterSettings != Settings.end(); ++iterSettings) {
-				CSetting* ps = (*iterSettings);
-				delete ps;
-			}*/
 			Settings.clear();
 			
 		}
 
-		Model::~Model()                 // destructor, just an example
+		Model::~Model()                 
 		{
-			//delete pStandBy; dont delete it twice if it is an oiperating setting
+			
 			list<CModeSolutionSpace*>::iterator iter;
 			for (iter = SolutionSpaces.begin(); iter != SolutionSpaces.end(); ++iter) {
 				CModeSolutionSpace* p = (*iter);
 				delete p;
 			}
 			
-			/*list<CSetting*>::iterator iterOperatingSettings;
-			for (iterOperatingSettings = CurrentOperatingSettings.begin(); iterOperatingSettings != CurrentOperatingSettings.end(); ++iterOperatingSettings) {
-				CSetting* po = (*iterOperatingSettings);
-				delete po;
-			}*/
 			list<CSetting*>::iterator iterSettings;
 			for (iterSettings = Settings.begin(); iterSettings != Settings.end(); ++iterSettings) {
 				CSetting* ps = (*iterSettings);
@@ -744,11 +726,7 @@ namespace EnergyPlus {//***************
 		}
 		CMode::~CMode()                 // destructor, just an example
 		{
-			/*list<CModeSolutionSpace*>::iterator iter;
-			for (iter = sol.begin(); iter != sol.end(); ++iter) {
-				CModeSolutionSpace* p = (*iter);
-				delete p;
-			}*/
+	
 		}
 
 		// GetAge, Public accessor function
@@ -758,24 +736,6 @@ namespace EnergyPlus {//***************
 			return ID;
 		}
 
-
-	/*	double Model::EstimateQRemaining(double TroomTemp, Real64 communicationStepSize) {
-			double Q;
-			double volume = 800; //m3
-			double mass = volume*1.2;
-			double TheatingSetpoint = 18;
-			double TcoolingSetpoint = 24;
-
-			Q = 0;
-			if (TroomTemp > TcoolingSetpoint) {
-				Q = -((TroomTemp - TcoolingSetpoint)*mass * 1006) / (2 * communicationStepSize);
-			}
-
-			if (TroomTemp < TheatingSetpoint) {
-				Q = ((TheatingSetpoint - TroomTemp)*mass * 1006) / (2 * communicationStepSize);
-			}
-			return -Q;
-		}*/
 
 		CMode* Model::AddNewOperatingMode(double scaledCorrection)
 		{
@@ -927,7 +887,7 @@ namespace EnergyPlus {//***************
 				pStandBy->Supply_Air_Mass_Flow_Rate = Msa;
 				pStandBy->Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
 				pStandBy->Outside_Air_Fraction = OSAF;
-				// for now just use return air but should use look up table!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				// for now just use return air but should use look up table
 				pStandBy->SupplyAirTemperature = Tra;
 				pStandBy->SupplyAirW = Wra;
 				pStandBy->Mode = 0;
@@ -995,7 +955,7 @@ namespace EnergyPlus {//***************
 			}
 			return averagedVal;
 		}
-		double CalculatePartRuntimeFraction(double Mvent, double MinOA_Msa, double RequestedConditioningLoad,double SensibleRoomORZone, double LatentRoomORZone, double ZoneDehumidificationLoad)
+		double Model::CalculatePartRuntimeFraction(double Mvent, double MinOA_Msa, double RequestedConditioningLoad,double SensibleRoomORZone, double RequestedLatentRoomORZone, double ZoneDehumidificationLoad, double requestedhumidificationload, double humidification)
 		{
 			double PLLatetRatio, PLVentRatio, PLSensibleRatio, PartRuntimeFraction;
 			PLLatetRatio = PLVentRatio = PLSensibleRatio = 0;
@@ -1004,7 +964,7 @@ namespace EnergyPlus {//***************
 			PartRuntimeFraction = PLVentRatio;
 			if (SensibleRoomORZone != 0)   PLSensibleRatio = abs(RequestedConditioningLoad) / abs(SensibleRoomORZone);
 			if (PLSensibleRatio > PartRuntimeFraction) PartRuntimeFraction = PLSensibleRatio;
-			if (ZoneDehumidificationLoad > 0)  PLLatetRatio = LatentRoomORZone / ZoneDehumidificationLoad;
+			if (ZoneDehumidificationLoad > 0)  PLLatetRatio = RequestedLatentRoomORZone / ZoneDehumidificationLoad;
 			if (PLLatetRatio > PartRuntimeFraction) PartRuntimeFraction = PLLatetRatio;
 
 			return PartRuntimeFraction;
@@ -1016,6 +976,7 @@ namespace EnergyPlus {//***************
 
 			double Requestedlatent = 0; //needs to come from EP
 			bool DidWeMeetLoad = false;
+			bool DidWeMeetHumidificaiton = false;
 			bool DidWePartlyMeetLoad = false;
 			using General::RoundSigDigits;
 			int modenumber = 0;
@@ -1027,7 +988,10 @@ namespace EnergyPlus {//***************
 			double pOptimal_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
 			double EIR, ElectricalPower, SHR, Tma, Wma, Hsa, Hma, TotalSystem,RequestedConditioningLoad;
 			//mode_optimal_power = 0;
-			double PreviousMaxiumOutput = 0;
+			double PreviousMaxiumConditioningOutput = 0;
+			double PreviousMaxiumHumidOrDehumidOutput = 0;
+			
+			
 			if (StepIns.RHosa > 1) { ShowSevereError("Unitary hybrid system error, required RH 0-1"); } //should be fractional 
 			if (StepIns.RHra > 1) { ShowSevereError("Unitary hybrid system error, required RH 0-1"); } //should be fractional 
 
@@ -1097,7 +1061,7 @@ namespace EnergyPlus {//***************
 						Mvent = Msa * OSAF;
 
 						if (StdRhoAir>1) 	pCandidateSetting->Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
-						else pCandidateSetting->Supply_Air_Ventilation_Volume = Mvent / 1.225;
+						else pCandidateSetting->Supply_Air_Ventilation_Volume = Mvent / 1.225;  //Why store it as a volume
 
 						
 						if (Mvent > MinOA_Msa) MinVRMet = MinVRMetOnce = true;
@@ -1143,15 +1107,11 @@ namespace EnergyPlus {//***************
 
 					if (SAT_OC_MetinMode == false)
 					{
-						SAT_OC_MetinMode_v[pMode->ModeID] = SAT_OC_MetinMode_v[pMode->ModeID] + 1;
-						//SAT_OC_MetinMode_str << "," << pMode->ModeID;
-						//ShowWarningError("Failed to meet supply air T requirements in mode: " + RoundSigDigits(double(pMode->ModeID), 1));
+						SAT_OC_MetinMode_v[pMode->ModeID] = SAT_OC_MetinMode_v[pMode->ModeID] + 1;	
 					}
 					if (SAHR_OC_MetinMode == false)
 					{
 						SAHR_OC_MetinMode_v[pMode->ModeID] = SAHR_OC_MetinMode_v[pMode->ModeID] + 1;
-
-						//ShowWarningError("Failed to meet supply air HR requirements in mode: " + RoundSigDigits(double(pMode->ModeID), 1));
 					}
 				}
 				modenumber++;
@@ -1214,10 +1174,10 @@ namespace EnergyPlus {//***************
 
 				pSetting->Dehumidification = 0; //add
 
-
 				bool Conditioning_load_met = false;
 				if (CoolingRequested && SensibleRoomORZone > RequestedConditioningLoad) Conditioning_load_met = true;
 				if (HeatingRequested && SensibleRoomORZone < RequestedConditioningLoad) Conditioning_load_met = true;
+				if (!(HeatingRequested || CoolingRequested))  Conditioning_load_met = true;
 
 				bool Humidification_load_met = false;
 				//bool Humidification_load_met = false;
@@ -1225,86 +1185,85 @@ namespace EnergyPlus {//***************
 				if (DehumidificationRequested && LatentRoomORZone > RequestedHumdificationLoad_kw) Humidification_load_met = true;
 				if (HumidificationRequested && LatentRoomORZone < RequestedHumdificationLoad_kw) Humidification_load_met = true;
 
-				if (Conditioning_load_met && (Humidification_load_met&&(HumidificationRequested|| DehumidificationRequested)))
+				if (!(HumidificationRequested || DehumidificationRequested)) Humidification_load_met = true;
+
+	
+				double Y_val = pSetting->pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, modenumber, POWER_CURVE); //fix modenumber not set
+				ElectricalPower = Y_val;  //kW
+				pSetting->ElectricalPower = ElectricalPower;
+
+				//Calculate EIR and SHR
+				EIR = ElectricalPower / TotalSystem; // maybe store and output this?
+				SHR = SupplyAirCp * (Tma - Tsa) / (Hma - Hsa);
+
+				// Calculate partload fraction required to meet all requirements
+				double PartRuntimeFraction = CalculatePartRuntimeFraction(pSetting->Supply_Air_Ventilation_Volume*StdRhoAir, MinOA_Msa, RequestedConditioningLoad, SensibleRoomORZone, LatentRoomORZone, StepIns.ZoneDehumidificationLoad, LatentRoomORZone, StepIns.ZoneMoistureLoad);//
+				double RunFractionTotalFuel = ElectricalPower*PartRuntimeFraction; // fraction can be above 1 meaning its not able to do it completely in a time step.
+				pSetting->Runtime_Fraction=PartRuntimeFraction;
+				if (Conditioning_load_met && Humidification_load_met)
 				{
-
-					//calculate the electrical power usage
-					double Y_val = pSetting->pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, modenumber, POWER_CURVE); //fix modenumber not set
-					ElectricalPower = Y_val;  //kW
-					pSetting->ElectricalPower = ElectricalPower;
-
-					//Calculate EIR and SHR
-					EIR = ElectricalPower / TotalSystem; // maybe store and output this?
-					SHR = SupplyAirCp * (Tma - Tsa) / (Hma - Hsa);
-
-					// Calculate partload fraction required to meet all requirements
-					double PartRuntimeFraction = CalculatePartRuntimeFraction(Mvent, MinOA_Msa, RequestedConditioningLoad, SensibleRoomORZone, LatentRoomORZone, StepIns.ZoneDehumidificationLoad);//
-
-					pSetting->Runtime_Fraction = PartRuntimeFraction;
-					double RunFractionTotalFuel = ElectricalPower*PartRuntimeFraction;
-					//PartloadElectricalPower=
-					//NCD Additions------------------------------------
-					/*if (RunFractionTotalFuel < mode_optimal_power)
-					{
-						mode_optimal_power = ElectricalPower;
-						mode_optimal_point = point_number;
-					}*/
-					//-------------------------------------------------
-					//store a copy of the acceptable (meets load points for debug reaons can remove from final version
+					//store best performing mode
 					if (RunFractionTotalFuel < pOptimal_RunFractionTotalFuel)
 					{
 						pOptimal_RunFractionTotalFuel = RunFractionTotalFuel;
 						pOptimal = pSetting;
 						DidWeMeetLoad = true;
-						DidWePartlyMeetLoad = true;
+						DidWeMeetHumidificaiton = true;
 					}
 				}
 				else
 				{
-					//the system might never actually be able to meet the load so we need a method of remembering the best attempt at satisfying load
-					bool store_best_attempt = false;
-					if (CoolingRequested && SensibleRoomORZone > PreviousMaxiumOutput) store_best_attempt = true;
-					if (HeatingRequested && SensibleRoomORZone < PreviousMaxiumOutput) store_best_attempt = true;
-
-					if (store_best_attempt)
+					if (!(DidWeMeetLoad&&DidWeMeetHumidificaiton))
 					{
-						DidWePartlyMeetLoad = true;
-						PreviousMaxiumOutput = SensibleRoomORZone;
-						double Y_val = pSetting->pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, modenumber, POWER_CURVE);
-						ElectricalPower = Y_val;  //kW
-												  //Calculate EIR and SHR
-						pSetting->ElectricalPower = ElectricalPower;
-						pSetting->Runtime_Fraction = 1;
-						EIR = ElectricalPower / TotalSystem;
-						SHR = SupplyAirCp * (Tma - Tsa) / (Hma - Hsa);
+						bool store_best_attempt = false;
 
-						pSubOptimal = pSetting;
+						if (Conditioning_load_met)
+						{
+							DidWeMeetLoad = true; 
+							if (HumidificationRequested && (LatentRoomORZone < PreviousMaxiumHumidOrDehumidOutput)) store_best_attempt = true; //these may be backwards
+							if (DehumidificationRequested && (LatentRoomORZone > PreviousMaxiumHumidOrDehumidOutput)) store_best_attempt = true;
+							if (store_best_attempt) PreviousMaxiumHumidOrDehumidOutput = LatentRoomORZone;
+						}
+						else
+						{
+							if (!DidWeMeetLoad)
+							{
+								if (CoolingRequested && (SensibleRoomORZone > PreviousMaxiumConditioningOutput)) store_best_attempt = true;
+								if (HeatingRequested && (SensibleRoomORZone < PreviousMaxiumConditioningOutput)) store_best_attempt = true;
+								if (store_best_attempt) PreviousMaxiumConditioningOutput = SensibleRoomORZone;
+							}
+						}
+						if (store_best_attempt)
+						{
+							pOptimal_RunFractionTotalFuel = RunFractionTotalFuel;
+							pOptimal = pSetting;
+							//DidWeMeetLoad = true;
+							//DidWeMeetHumidificaiton = true;
+							DidWePartlyMeetLoad = true;
+						}
 					}
 				}
+				
 			}
-
+			
 
 			if (EnvironmentConditionsMetOnce == false)
 			{
 
 				ErrorCode = 1;
 				count_EnvironmentConditionsNotMet++;
-				//error 
+			
 			}
 			if (SAHR_OC_MetOnce == false)
 			{
 
-				//ShowWarningError("Failed to meet supply air HR requirements in any mode");
 				count_SAHR_OC_MetOnce++;
 				ErrorCode = 2;
-				//error 
 			}
 			if (SAT_OC_MetOnce == false)
 			{
-				//ShowWarningError("Failed to meet supply air T requirements in any mode");
 				count_SAT_OC_MetOnce++;
 				ErrorCode = 3;
-				//error 
 			}
 
 			if (DidWeMeetLoad == true)
@@ -1312,9 +1271,7 @@ namespace EnergyPlus {//***************
 				//add first operating mode
 				ErrorCode = 0;
 				list<CSetting*>::iterator iterOperatingSettings2 = CurrentOperatingSettings.begin();
-				//std::advance(iterOperatingSettings2, 1);
-
-				//CurrentOperatingSettings.push_back(pOptimal);
+		
 				CSetting* pSetting = *iterOperatingSettings2;
 				*pSetting = *pOptimal;
 				pStandBy->Runtime_Fraction = (1 - pOptimal->Runtime_Fraction);
@@ -1323,7 +1280,7 @@ namespace EnergyPlus {//***************
 				iterOperatingSettings2++;
 				pSetting = *iterOperatingSettings2;
 				*pSetting = *pStandBy;
-				//CurrentOperatingSettings.push_back(pStandBy);
+		
 			}
 			else if (DidWeMeetLoad == false && DidWePartlyMeetLoad == true)
 			{
@@ -1331,17 +1288,17 @@ namespace EnergyPlus {//***************
 
 				count_DidWeNotMeetLoad++;
 
-				if (pSubOptimal->ElectricalPower == IMPLAUSIBLE_POWER)
+				if (pOptimal->ElectricalPower == IMPLAUSIBLE_POWER)
 				{
 					ShowWarningError("Model was not able to provide cooling for a time step, called in HybridEvapCooling:dostep");
 					//cout << "Model was not able to provide cooling.";
-					pSubOptimal->ElectricalPower = 0;
+					pOptimal->ElectricalPower = 0;
 				}
 
 				//CurrentOperatingSettings.push_back(pSubOptimal);
 				list<CSetting*>::iterator iterOperatingSettings2 = CurrentOperatingSettings.begin();
 				CSetting* pSetting = *iterOperatingSettings2;
-				*pSetting = *pSubOptimal;
+				*pSetting = *pOptimal;
 				PrimaryModeRuntimeFraction = 1;
 				PrimaryMode = pSetting->Mode;
 
@@ -1356,11 +1313,11 @@ namespace EnergyPlus {//***************
 			}
 			if (EnvironmentConditionsMetOnce == false)
 			{
-				if (!WarmupFlag)
+				if (!WarmupFlag) // dto do  
 				{
 				//	ShowWarningError("In day " + RoundSigDigits((double)DayOfSim, 1) + " of simulation, system " + Name.c_str() + " was unable to operate for a timestep because environment conditions were beyond the allowable operating range for any mode.");
 				}
-				//cout << "Environmental conditions exceeded model limits./n";
+				
 			}
 
 			bool foundwarnings = false;
@@ -1385,42 +1342,6 @@ namespace EnergyPlus {//***************
 				count_EnvironmentConditionsMetOnce = 0;
 				count_EnvironmentConditionsNotMet = 0;
 				WarnOnceFlag = false;
-				/*std::vector<int>::iterator it;
-				int index = 0;
-				stringstream SAT_OC_MetinMode_str;
-				for (it = SAT_OC_MetinMode_v.begin(); it != SAT_OC_MetinMode_v.end(); ++it) {
-
-					int countofwarnings = *it;
-					
-					if (countofwarnings > 0)
-					{
-						SAT_OC_MetinMode_str << "Mode:" << index << "," << countofwarnings << " times,";
-						foundwarnings = true;
-					}
-					*it = 0;
-					index++;
-				}
-				if (foundwarnings) ShowWarningError("In day " + RoundSigDigits((double)DayOfSim, 1) + " of simulation, " + Name.c_str() + " failed to meet supply air T requirements in " + SAT_OC_MetinMode_str.str());
-				//SAT_OC_MetinMode_v.clear();
-				//SAT_OC_MetinMode_v
-				//SAHR_OC_MetinMode_v
-				foundwarnings = false;
-			    SAT_OC_MetinMode_str.str(""); 
-				for (it = SAHR_OC_MetinMode_v.begin(); it != SAHR_OC_MetinMode_v.end(); ++it) {
-
-					int countofwarnings = *it;
-
-					if (countofwarnings > 0)
-					{
-						SAT_OC_MetinMode_str << "Mode:" << index << "," << countofwarnings << " times,";
-						foundwarnings = true;
-					}
-					*it = 0;
-					index++;
-				}
-				if (foundwarnings) ShowWarningError("In day " + RoundSigDigits((double)DayOfSim, 1) + " of simulation, " + Name.c_str() + " failed to meet supply air HR requirements in " + SAT_OC_MetinMode_str.str());
-				//SAHR_OC_MetinMode_v.clear();
-				 */
 				
 			}
 			if (HourOfDay == 1 && WarnOnceFlag==false && !WarmupFlag)
@@ -1458,8 +1379,8 @@ namespace EnergyPlus {//***************
 		//doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful in unit testing
 		void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double ZoneHeatingLoad, double OutputRequiredToHumidify, double OutputRequiredToDehumidify, double DesignMinVR) {
 
-			if (StdRhoAir>1) 	MinOA_Msa = DesignMinVR * StdRhoAir;
-			else MinOA_Msa = DesignMinVR *  1.225;
+		
+			MinOA_Msa = DesignMinVR;// as mass flow kg/s
 			CStepInputs StepIns;
 		
 			RequestedHumdificationMass= OutputRequiredToHumidify;
@@ -1528,11 +1449,11 @@ namespace EnergyPlus {//***************
 					OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
 					OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR));
 					
-					OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, 101325); //dont use a fixed pressure !!!!!!!!!!!!!!!!!!!
+					OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, 101325); //dont use a fixed pressure !
 					double OperatingAverageMixedAirTemperature = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_TEMP);
 					double OperatingMixedAirW= CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_HR);
 					double MixedAirEnthalpy= PsyHFnTdbW(OperatingAverageMixedAirTemperature, OperatingMixedAirW);
-					OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // is the outlet presure going to be different? //InletEnthalpy - (ZoneCoolingLoad / AirMassFlow);
+					OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // is the outlet presure going to be different? 
 					OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
 
 					if (StdRhoAir>1) 	OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
@@ -1659,13 +1580,3 @@ namespace EnergyPlus {//***************
 
 	}
 }
-/*	int t1 = NumOfDayInEnvrn; // Number of days in the simulation for a particular environment
-int t2 = NumOfTimeStepInHour; // Number of time steps in each hour of the simulation
-int t3 = NumOfZones; // Total number of Zones for simulation
-int t4 = TimeStep; // Counter for time steps (fractional hours)
-
-int test1 = NumOfSysTimeSteps; // for current zone time step, number of system timesteps inside  it
-int	test2 = NumOfSysTimeStepsLastZoneTimeStep; // previous zone time step, num of system timesteps inside
-int	test3 = LimitNumSysSteps;
-int t5 = DayOfSim;
-int t6 = HourOfDay;*/

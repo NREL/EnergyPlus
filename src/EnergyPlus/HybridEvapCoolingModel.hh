@@ -222,7 +222,8 @@ namespace EnergyPlus {
 			double averageOSAF;
 			int CurrentPrimaryMode();
 			double CurrentPrimaryRuntimeFraction();
-			
+
+			double Model::CalculatePartRuntimeFraction(double Mvent, double MinOA_Msa, double RequestedConditioningLoad, double SensibleRoomORZone, double RequestedLatentRoomORZone, double ZoneDehumidificationLoad, double requestedhumidificationload, double humidification);
 			int ErrorCode;
 			int InletNode;
 			int OutletNode;
