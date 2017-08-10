@@ -236,6 +236,14 @@
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
+  Material:NoMass,
+    R13LAYER,                !- Name
+    Rough,                   !- Roughness
+    2.290965,                !- Thermal Resistance {m2-K/W}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
   Construction,
     PVRoofPaverUnderlayment, !- Name
     IN35,                    !- Outside Layer
@@ -246,6 +254,10 @@
   Construction,
     FLOOR SLAB 8 IN,         !- Name
     C10 - 8 IN HW CONCRETE;  !- Outside Layer
+
+  Construction,
+    R13WALL,                 !- Name
+    R13LAYER;                !- Outside Layer
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
@@ -320,11 +332,11 @@
     0,                       !- Direction of Relative North {deg}
     0,                       !- X Origin {m}
     0,                       !- Y Origin {m}
-    -10.00,                  !- Z Origin {m}
+    0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.45,                    !- Ceiling Height {m}
-    60.00;                   !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   BuildingSurface:Detailed,
     Zn001:Floor001,          !- Name
@@ -389,6 +401,54 @@
     14.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
     20.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
     20.0,0.0,5.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    20.0,0.0,5.0,  !- X,Y,Z ==> Vertex 1 {m}
+    20.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    20.0,15.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    20.0,15.0,5.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    20.0,15.0,5.0,  !- X,Y,Z ==> Vertex 1 {m}
+    20.0,15.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,15.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,15.0,5.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.0,15.0,5.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,15.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,0.0,5.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn001:Roof001,           !- Name
@@ -529,6 +589,7 @@
     ,                        !- Availability Schedule Name
     Zone 1 inlet,            !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.009,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
