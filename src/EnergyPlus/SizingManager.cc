@@ -481,19 +481,6 @@ namespace SizingManager {
 		Month = LastMonth;
 		DayOfMonth = LastDayOfMonth;
 
-		// Get system input then move data from FinalZoneSizing to TermUnitFinalZoneSizing
-		SimAir = true;
-		SimZoneEquip = true;
-		SysSizingCalc = true; // Don't want any equipment to size itself yet, so set this true
-		DoSizeAirLoops = false; // Don't want the airloops to size yet, so set this false
-		ManageZoneEquipment( true, SimZoneEquip, SimAir );
-		ManageAirLoops( true, SimAir, SimZoneEquip );
-		if ( GetNumRangeCheckErrorsFound() > 0 ) {
-			ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
-		}
-		UpdateTermUnitFinalZoneSizing();
-		SysSizingCalc = false; // Set back to false in case there is no actual system sizing calculation
-
 		if ( ( DoSystemSizing ) && ( NumSysSizInput == 0 ) && ( NumAirLoops > 0 ) ) {
 			ShowWarningError( RoutineName + "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored." );
 		}

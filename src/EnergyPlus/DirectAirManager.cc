@@ -340,6 +340,19 @@ namespace DirectAirManager {
 						ErrorsFound = true;
 					}
 				}
+
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+							ZoneEquipConfig( CtrlZone ).SDUNum = DirectAirNum;
+						}
+					}
+				}
+
 				// Find the Zone Equipment Inlet Node from the Supply Air Path Splitter
 				for ( SplitNum = 1; SplitNum <= NumSplitters; ++SplitNum ) {
 					for ( NodeNum = 1; NodeNum <= SplitterCond( SplitNum ).NumOutletNodes; ++NodeNum ) {
@@ -425,14 +438,11 @@ namespace DirectAirManager {
 
 		// need to associate zone equip config AirDistUnits with this terminal unit
 		if ( MyAirDistInitFlag( DirectAirNum ) ) {
-			// Match Zone Equipment data inlet node with the supply air inlet node number of this unit and fill in data
+			// Match Zone Equipment data inlet node (again) with the supply air inlet node number of this unit and fill in TermUnitSizingIndex
 			{ auto & thisZoneEqConfig( ZoneEquipConfig( ControlledZoneNum ) );
 			for ( int SupAirIn = 1; SupAirIn <= thisZoneEqConfig.NumInletNodes; ++SupAirIn ) {
 				if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == thisZoneEqConfig.InletNode( SupAirIn ) ) {
-					thisZoneEqConfig.AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
-					thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 					thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
-					thisZoneEqConfig.SDUNum = DirectAirNum;
 					break;
 				}
 			}}

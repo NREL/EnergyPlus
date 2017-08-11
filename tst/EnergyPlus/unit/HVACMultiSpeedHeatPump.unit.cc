@@ -1243,10 +1243,7 @@ namespace EnergyPlus {
 			SplitterComponent::GetSplitterInput();
 			BranchInputManager::GetMixerInput();
 			BranchInputManager::ManageBranchInput();
-			bool SimAir = true;
-			bool SimZoneEquip = true;
-			ZoneEquipmentManager::ManageZoneEquipment( true, SimZoneEquip, SimAir );
-			//DirectAirManager::GetDirectAirInput();
+			DirectAirManager::GetDirectAirInput();
 			// Get Air Loop HVAC Data
 			SimAirServingZones::GetAirPathData();
 			SimAirServingZones::InitAirLoops( FirstHVACIteration );
