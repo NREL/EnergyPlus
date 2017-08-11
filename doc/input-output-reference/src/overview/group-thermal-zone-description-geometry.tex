@@ -2729,6 +2729,14 @@ As of Version 2.1, the previous variable plus absorbed shortwave radiation from 
 \subsubsection{Surface Construction Index {[]}}\label{surface-construction-index}
 
 The variable reports an index that points to specific Construction. The variable is an additional output variable when Output:Diagnostics, DisplayAdvancedReportVariables; is given in an input file.
+
+In order to find a corresponding construction using the index, following steps are suggested:
+
+1. Fins a surface name from Surface Construction Index in the .csv file
+
+2. Search the surface name in lines starting with HeatTransfer Surface in the .eio file
+
+3. The seventh item is the construction name with matched surface name. 
  
 \subsection{Surface Output Variables (exterior heat transfer surfaces)}\label{surface-output-variables-exterior-heat-transfer-surfaces}
 
