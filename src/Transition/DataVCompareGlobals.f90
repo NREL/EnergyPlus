@@ -109,7 +109,7 @@ LOGICAL, DIMENSION(:), ALLOCATABLE :: CMtrVarCaution
 LOGICAL, DIMENSION(:), ALLOCATABLE :: CMtrDVarCaution
 INTEGER NumRepVarNames
 
-LOGICAL :: MakingPretty=.true.
+LOGICAL :: MakingPretty=.false.
 INTEGER, ALLOCATABLE, DIMENSION(:) :: ObjectFoundCounts
 CHARACTER(len=120), ALLOCATABLE, DIMENSION(:) :: ObjectFoundFile
 CHARACTER(len=120), DIMENSION(:), ALLOCATABLE :: ReportNames
