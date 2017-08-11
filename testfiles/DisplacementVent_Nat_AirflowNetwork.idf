@@ -686,12 +686,12 @@
   AirflowNetwork:MultiZone:ExternalNode,
     No1,                     !- Name
     1.524,                   !- External Node Height {m}
-    No1_WPCValue;            !- Wind Pressure Coefficient Values Object Name
+    No1_WPCValue;            !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     No2,                     !- Name
     1.524,                   !- External Node Height {m}
-    No2_WPCValue;            !- Wind Pressure Coefficient Values Object Name
+    No2_WPCValue;            !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:WindPressureCoefficientArray,
     CPNAME,                  !- Name

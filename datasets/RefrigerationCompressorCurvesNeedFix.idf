@@ -12,6 +12,9 @@
 ! Capacity Curve for Carlyle_R-22_Low_06DR109,   !nominal MBtu/h = 8192.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Curve:Bicubic,
     06DR109_R-22_Low_qcurv,  !- Name
     1.497e+004,              !- Coefficient1 Constant

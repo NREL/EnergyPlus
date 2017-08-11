@@ -52,7 +52,7 @@
     Denver Stapleton Intl Arpt CO USA WMO=724690,  !- Name
     39.77,                   !- Latitude {deg}
     -104.87,                 !- Longitude {deg}
-    -7.0,                   !- Time Zone {hr}
+    -7.0,                    !- Time Zone {hr}
     1611.00;                 !- Elevation {m}
 
  ! Denver Stapleton Intl Arpt CO USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
@@ -415,7 +415,7 @@
     24INCHHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
     0.0000000E+00,           !- X Origin {m}
-    30.0000000E+00,           !- Y Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -426,7 +426,7 @@
     28INCHHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
     0.0000000E+00,           !- X Origin {m}
-    60.0000000E+00,           !- Y Origin {m}
+    60.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -436,7 +436,7 @@
   Zone,
     30INCHHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    30.0000000E+00,           !- X Origin {m}
+    30.0000000E+00,          !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -447,8 +447,8 @@
   Zone,
     32INCHHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    30.0000000E+00,           !- X Origin {m}
-    30.0000000E+00,           !- Y Origin {m}
+    30.0000000E+00,          !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -458,8 +458,8 @@
   Zone,
     36INCHHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    30.0000000E+00,           !- X Origin {m}
-    60.0000000E+00,           !- Y Origin {m}
+    30.0000000E+00,          !- X Origin {m}
+    60.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -469,7 +469,7 @@
   Zone,
     XW11 WALLS,              !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    60.0000000E+00,           !- X Origin {m}
+    60.0000000E+00,          !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -480,8 +480,8 @@
   Zone,
     XW17 WALLS,              !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    60.0000000E+00,           !- X Origin {m}
-    30.0000000E+00,           !- Y Origin {m}
+    60.0000000E+00,          !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -491,8 +491,8 @@
   Zone,
     EXTERIOR WALLS,          !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    60.0000000E+00,           !- X Origin {m}
-    60.0000000E+00,           !- Y Origin {m}
+    60.0000000E+00,          !- X Origin {m}
+    60.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -508,7 +508,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    Relative;                   !- Coordinate System
+    Relative;                !- Coordinate System
 
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
@@ -520,7 +520,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -536,7 +536,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -552,7 +552,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -568,7 +568,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -584,7 +584,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -600,7 +600,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -616,7 +616,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -632,7 +632,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -648,7 +648,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -664,7 +664,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -680,7 +680,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -696,7 +696,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -712,7 +712,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -728,7 +728,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -744,7 +744,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -760,7 +760,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -776,7 +776,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -792,7 +792,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -808,7 +808,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -824,7 +824,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -840,7 +840,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -856,7 +856,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -872,7 +872,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -888,7 +888,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -904,7 +904,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -920,7 +920,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -936,7 +936,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -952,7 +952,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -968,7 +968,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -984,7 +984,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1000,7 +1000,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1016,7 +1016,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1032,7 +1032,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1048,7 +1048,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1064,7 +1064,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1080,7 +1080,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1096,7 +1096,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1112,7 +1112,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1128,7 +1128,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1144,7 +1144,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1160,7 +1160,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1176,7 +1176,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1192,7 +1192,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1208,7 +1208,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1224,7 +1224,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1240,7 +1240,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1256,7 +1256,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1272,7 +1272,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1288,7 +1288,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1304,7 +1304,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1320,7 +1320,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1336,7 +1336,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1352,7 +1352,7 @@
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     15.240000000000,15.240000000000,0.000000000000,  !- X,Y,Z ==> Vertex 1 {m}
     15.240000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1368,7 +1368,7 @@
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
-    4,           !- Number of Vertices
+    4,                       !- Number of Vertices
     0.000000000000,15.240000000000,4.572000000000,  !- X,Y,Z ==> Vertex 1 {m}
     0.000000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 2 {m}
     15.240000000000,0.000000000000,4.572000000000,  !- X,Y,Z ==> Vertex 3 {m}
@@ -1407,3 +1407,4 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+

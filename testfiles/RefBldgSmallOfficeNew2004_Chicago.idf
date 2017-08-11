@@ -86,7 +86,7 @@
     6;                       !- Minimum Number of Warmup Days
 
   RunPeriod,
-    Annual,                        !- Name
+    Annual,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -2198,28 +2198,28 @@
 
 ! ***HVAC EQUIPMENT***
 
-Fan:SystemModel,
-  PSZ-AC:1_Fan , !- Name
-  HVACOperationSchd , !- Availability Schedule Name
-  PSZ-AC:1_HeatC-PSZ-AC:1_FanNode,  !- Air Inlet Node Name
-  PSZ-AC:1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  622.0, !- Design Pressure Rise
-  0.825 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.53625,  !- Fan Total Efficiency 
-  , !- Electric Power Function of Flow Fraction Curve Name
-  , !- Night Ventilation Mode Pressure Rise
-  , !- Night Ventilation Mode Flow Fraction
-  , !- Motor Loss Zone Name
-  , !- Motor Loss Radiative Fraction 
-  Fan Energy; !- End-Use Subcategory
+  Fan:SystemModel,
+    PSZ-AC:1_Fan,            !- Name
+    HVACOperationSchd,       !- Availability Schedule Name
+    PSZ-AC:1_HeatC-PSZ-AC:1_FanNode,  !- Air Inlet Node Name
+    PSZ-AC:1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    622.0,                   !- Design Pressure Rise {Pa}
+    0.825,                   !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.53625,                 !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    Fan Energy;              !- End-Use Subcategory
 
   Fan:ConstantVolume,
     PSZ-AC:2_Fan,            !- Name
@@ -3375,7 +3375,7 @@ Fan:SystemModel,
     PSZ-AC:1_HeatC,          !- Component 3 Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:1_HeatC-PSZ-AC:1_FanNode,  !- Component 3 Outlet Node Name
-    Fan:SystemModel,      !- Component 4 Object Type
+    Fan:SystemModel,         !- Component 4 Object Type
     PSZ-AC:1_Fan,            !- Component 4 Name
     PSZ-AC:1_HeatC-PSZ-AC:1_FanNode,  !- Component 4 Inlet Node Name
     PSZ-AC:1 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name

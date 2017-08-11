@@ -144,7 +144,7 @@
     0.028,                   !- Cooling Outdoor Air Flow Rate {m3/s}
     0.028,                   !- Heating Outdoor Air Flow Rate {m3/s}
     0.0186,                  !- No Load Outdoor Air Flow Rate {m3/s}
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone1PTACFan,            !- Supply Air Fan Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Zone1PTACHeater,         !- Heating Coil Name
@@ -166,7 +166,7 @@
     autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
     autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
     autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
-    Fan:SystemModel,               !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone2PTACFan,            !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Zone2PTACHeater,         !- Heating Coil Name
@@ -188,7 +188,7 @@
     autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
     autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
     autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
-    Fan:SystemModel,               !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone3PTACFan,            !- Supply Air Fan Name
     Coil:Heating:Steam,      !- Heating Coil Object Type
     Zone3PTACHeater,         !- Heating Coil Name
@@ -1932,59 +1932,58 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:CONSTANTVOLUME ===========
 
-
-Fan:SystemModel,
-  Zone1PTACFan , !- Name
-  FanAndCoilAvailSched , !- Availability Schedule Name
-  Zone1PTACOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone1PTACFanOutletNode,  !- Air Outlet Node Name
-  0.4 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.5; !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone1PTACFan,            !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone1PTACOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone1PTACFanOutletNode,  !- Air Outlet Node Name
+    0.4,                     !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5;                     !- Fan Total Efficiency
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
-Fan:SystemModel,
-  Zone2PTACFan , !- Name
-  FanAndCoilAvailSched , !- Availability Schedule Name
-  Zone2PTACOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone2PTACFanOutletNode,  !- Air Outlet Node Name
-  Autosize , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.5; !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone2PTACFan,            !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone2PTACOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone2PTACFanOutletNode,  !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5;                     !- Fan Total Efficiency
 
-Fan:SystemModel,
-  Zone3PTACFan , !- Name
-  FanAndCoilAvailSched , !- Availability Schedule Name
-  Zone3PTACDXHeatCoilOutletNode,  !- Air Inlet Node Name
-  Zone3PTACAirOutletNode,  !- Air Outlet Node Name
-  Autosize , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.5; !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone3PTACFan,            !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone3PTACDXHeatCoilOutletNode,  !- Air Inlet Node Name
+    Zone3PTACAirOutletNode,  !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5;                     !- Fan Total Efficiency
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:STEAM ===========
 

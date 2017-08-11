@@ -364,19 +364,19 @@
     CP02 CARPET PAD;         !- Layer 2
 
   Foundation:Kiva,
-    Slab Foundation,      !- Name
-    ,                     !- Interior Horizonatl Insulation Material Name
-    ,                     !- Interior Horizontal Insulation Depth
-    ,                     !- Interior Horizontal Insulation Width
-    ,                     !- Interior Vertical Insulation Material Name
-    ,                     !- Interior Vertical Insulation Depth
-    ,                     !- Exterior Horizontal Insulation Material Name
-    ,                     !- Exterior Horizontal Insulation Depth
-    ,                     !- Exterior Horizontal Insulation Width
-    ,                     !- Exterior Vertical Insulation Material Name
-    ,                     !- Exterior Vertical Insulation Depth
-    0.127,                !- Wall Height Above Grade
-    0.127;                !- Wall Depth Below Slab
+    Slab Foundation,         !- Name
+    ,                        !- Interior Horizontal Insulation Material Name
+    ,                        !- Interior Horizontal Insulation Depth {m}
+    ,                        !- Interior Horizontal Insulation Width {m}
+    ,                        !- Interior Vertical Insulation Material Name
+    ,                        !- Interior Vertical Insulation Depth {m}
+    ,                        !- Exterior Horizontal Insulation Material Name
+    ,                        !- Exterior Horizontal Insulation Depth {m}
+    ,                        !- Exterior Horizontal Insulation Width {m}
+    ,                        !- Exterior Vertical Insulation Material Name
+    ,                        !- Exterior Vertical Insulation Depth {m}
+    0.127,                   !- Wall Height Above Grade {m}
+    0.127;                   !- Wall Depth Below Slab {m}
 
 ! Interior Walls
 
@@ -902,8 +902,8 @@
 
   SurfaceProperty:ExposedFoundationPerimeter,
     Core_bot_ZN_5_Floor,     !- Surface Name
-    ,                        !- Total Exposed Perimeter
-    ,                        !- Exposed Perimeter Fraction
+    ,                        !- Total Exposed Perimeter {m}
+    ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
     No,                      !- Surface Segment 2 Exposed
     No,                      !- Surface Segment 3 Exposed
@@ -1598,9 +1598,9 @@
     49.9110,0.0000,0.0000;  !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:ExposedFoundationPerimeter,
-    Perimeter_bot_ZN_1_Floor,  !- Surface Name
-    ,                        !- Total Exposed Perimeter
-    ,                        !- Exposed Perimeter Fraction
+    Perimeter_bot_ZN_1_Floor,!- Surface Name
+    ,                        !- Total Exposed Perimeter {m}
+    ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
     No,                      !- Surface Segment 2 Exposed
     No,                      !- Surface Segment 3 Exposed
@@ -1703,9 +1703,9 @@
     49.9110,33.2738,0.0000;  !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:ExposedFoundationPerimeter,
-    Perimeter_bot_ZN_2_Floor,  !- Surface Name
-    ,                        !- Total Exposed Perimeter
-    ,                        !- Exposed Perimeter Fraction
+    Perimeter_bot_ZN_2_Floor,!- Surface Name
+    ,                        !- Total Exposed Perimeter {m}
+    ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
     No,                      !- Surface Segment 2 Exposed
     No,                      !- Surface Segment 3 Exposed
@@ -1808,9 +1808,9 @@
     0.0000,33.2738,0.0000;  !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:ExposedFoundationPerimeter,
-    Perimeter_bot_ZN_3_Floor,  !- Surface Name
-    ,                        !- Total Exposed Perimeter
-    ,                        !- Exposed Perimeter Fraction
+    Perimeter_bot_ZN_3_Floor,!- Surface Name
+    ,                        !- Total Exposed Perimeter {m}
+    ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
     No,                      !- Surface Segment 2 Exposed
     No,                      !- Surface Segment 3 Exposed
@@ -1913,9 +1913,9 @@
     0.0000,0.0000,0.0000;  !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:ExposedFoundationPerimeter,
-    Perimeter_bot_ZN_4_Floor,  !- Surface Name
-    ,                        !- Total Exposed Perimeter
-    ,                        !- Exposed Perimeter Fraction
+    Perimeter_bot_ZN_4_Floor,!- Surface Name
+    ,                        !- Total Exposed Perimeter {m}
+    ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
     No,                      !- Surface Segment 2 Exposed
     No,                      !- Surface Segment 3 Exposed
@@ -7941,3 +7941,4 @@
     0,                       !- Nuclear High Level Emission Factor {g/MJ}
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+

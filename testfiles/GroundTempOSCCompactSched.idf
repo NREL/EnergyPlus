@@ -337,10 +337,10 @@
     NoWind,                  !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,4.572,               !- X,Y,Z ==> Vertex 1 {m}
-    0,0,0,                   !- X,Y,Z ==> Vertex 2 {m}
-    6.096,0,0,               !- X,Y,Z ==> Vertex 3 {m}
-    6.096,0,4.572;           !- X,Y,Z ==> Vertex 4 {m}
+    0,0,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.096,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096,0,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     OSCTest:East Wall,       !- Name
@@ -353,10 +353,10 @@
     NoWind,                  !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,6.096,4.572,           !- X,Y,Z ==> Vertex 1 {m}
-    0,6.096,0,               !- X,Y,Z ==> Vertex 2 {m}
-    0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}
-    0,0,4.572;               !- X,Y,Z ==> Vertex 4 {m}
+    0,6.096,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    0,6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     OSCTest:North Wall,      !- Name
@@ -369,10 +369,10 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096,6.096,4.572,       !- X,Y,Z ==> Vertex 1 {m}
-    6.096,6.096,0,           !- X,Y,Z ==> Vertex 2 {m}
-    0,6.096,0,               !- X,Y,Z ==> Vertex 3 {m}
-    0,6.096,4.572;           !- X,Y,Z ==> Vertex 4 {m}
+    6.096,6.096,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,6.096,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     OSCTest:West Wall,       !- Name
@@ -385,10 +385,10 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096,0,4.572,           !- X,Y,Z ==> Vertex 1 {m}
-    6.096,0,0,               !- X,Y,Z ==> Vertex 2 {m}
-    6.096,6.096,0,           !- X,Y,Z ==> Vertex 3 {m}
-    6.096,6.096,4.572;       !- X,Y,Z ==> Vertex 4 {m}
+    6.096,0,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.096,6.096,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096,6.096,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     OSCTest:Ceiling,         !- Name

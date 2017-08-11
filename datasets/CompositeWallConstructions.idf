@@ -19,6 +19,9 @@
 ! Material layer names follow:
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Construction,
     Composite 2x4 Wood Stud R11,  !- Name
     Composite 2x4 Wood Stud R11 #3,  !- Outside Layer

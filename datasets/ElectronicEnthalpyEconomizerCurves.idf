@@ -128,6 +128,9 @@
 !
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Curve:Cubic,
     ElectronicEnthalpyCurveA,!- Name
     0.01342704,              !- Coefficient1 Constant

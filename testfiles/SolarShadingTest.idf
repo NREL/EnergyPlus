@@ -85,7 +85,7 @@
   Version,8.7;
 
   Timestep,4;
-  
+
   Building,
     BUILDING WITH MANY SHADING EFFECTS,  !- Name
     0.0000000E+00,           !- North Axis {deg}

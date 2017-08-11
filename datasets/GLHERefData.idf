@@ -22,6 +22,9 @@
 !************ LINE CONFIGURATION: 1 x 2, line, Standard Grout *****************
 ! The G-function is defined by the following data pairs
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   GroundHeatExchanger:Vertical,
     Vertical GHE 1x2 Std,    !- Name
     GHE Inlet Node 1x2 Std,  !- Inlet Node Name

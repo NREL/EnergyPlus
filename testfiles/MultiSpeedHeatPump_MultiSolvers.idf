@@ -119,8 +119,8 @@
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
   HVACSystemRootFindingAlgorithm,
-    RegulaFalsiThenBisection, !- Algorithm
-    5;                       !- Number of Iteration Before Bisection
+    RegulaFalsiThenBisection,!- Algorithm
+    5;                       !- Number of Iterations Before Algorithm Switch
 
   RunPeriod,
     ,                        !- Name
@@ -1676,7 +1676,7 @@
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Outdoor Condenser Air Node,  !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
@@ -2227,5 +2227,4 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-
 

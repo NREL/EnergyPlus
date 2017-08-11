@@ -10,6 +10,9 @@
 ! Air
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   WindowMaterial:Gas,
     AIR 3MM,                 !- Name
     Air,                     !- Gas Type

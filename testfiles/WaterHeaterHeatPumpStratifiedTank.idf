@@ -290,7 +290,7 @@
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:SystemModel,                    !- Fan Type
+    Fan:SystemModel,         !- Fan Object Type
     HPWHPlantFan,            !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -438,22 +438,21 @@
     1.0;                     !- Maximum Value of x
 
   Fan:SystemModel,
-    HPWHPlantFan ,          !- Name
-    PlantHPWHSch ,      !- Availability Schedule Name
-    HPPlantAirInletNode,  !- Air Inlet Node Name
-    HPPlantFanAirOutletNode,  !- Air Outlet Node Name
-    2.6852,                   !- Design Maximum Air Flow Rate
-    Discrete ,                   !- Speed Control Method
-    0.0,                         !- Electric Power Minimum Flow Rate Fraction
-    100.0,                        !- Design Pressure Rise
-    0.9 ,                        !- Motor Efficiency
-    1.0 ,                        !- Motor In Air Stream Fraction
-    AUTOSIZE,                    !- Design Electric Power Consumption
+    HPWHPlantFan,            !- Name
+    PlantHPWHSch,            !- Availability Schedule Name
+    HPPlantAirInletNode,     !- Air Inlet Node Name
+    HPPlantFanAirOutletNode, !- Air Outlet Node Name
+    2.6852,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    100.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
     TotalEfficiencyAndPressure,  !- Design Power Sizing Method
-    ,                            !- Electric Power Per Unit Flow Rate
-    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.7;                        !- Fan Total Efficiency
-
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7;                     !- Fan Total Efficiency
 
   OutdoorAir:Node,
     HPPlantAirInletNode;     !- Name

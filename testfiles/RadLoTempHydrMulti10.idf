@@ -865,7 +865,6 @@
     6,11,10,  !- X,Y,Z ==> Vertex 3 {m}
     11,11,10;  !- X,Y,Z ==> Vertex 4 {m}
 
-
   Sizing:Zone,
     ZONE 1,                  !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method

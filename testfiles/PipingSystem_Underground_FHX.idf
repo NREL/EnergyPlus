@@ -409,7 +409,6 @@
     0,0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
-
   BuildingSurface:Detailed,
     Basement Floor,          !- Name
     Floor,                   !- Surface Type

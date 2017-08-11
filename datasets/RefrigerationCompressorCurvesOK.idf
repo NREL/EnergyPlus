@@ -9,6 +9,9 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 !
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Curve:Bicubic,
     06CC016_R-22_Low_qcurv,  !- Name
     2.350e+004,              !- Coefficient1 Constant
