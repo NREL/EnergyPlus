@@ -326,11 +326,9 @@ namespace FourPipeBeam {
 					thisBeam->zoneNodeIndex = ZoneEquipConfig( ctrlZone ).ZoneNode;
 					ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).InNode = thisBeam->airInNodeNum;
 					ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).OutNode = thisBeam->airOutNodeNum;
-					if ( thisBeam->aDUNum > 0 )ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).TermUnitSizingIndex = AirDistUnit(thisBeam->aDUNum ).TermUnitSizingIndex;
 					if ( thisBeam->beamHeatingPresent ) {
 						ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).InNode = thisBeam->airInNodeNum;
 						ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).OutNode =thisBeam->airOutNodeNum;
-						if ( thisBeam->aDUNum > 0 )ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).TermUnitSizingIndex = AirDistUnit(thisBeam->aDUNum ).TermUnitSizingIndex;
 					}
 					airNodeFound = true;
 					break;

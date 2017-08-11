@@ -135,6 +135,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACManager.hh>
+#include <EnergYPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -343,6 +344,7 @@ namespace EnergyPlus {
 		HVACDXSystem::clear_state();
 		HVACFan::clearHVACFanObjects();
 		HVACManager::clear_state();
+		HVACSingleDuctInduc::clear_state();
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();

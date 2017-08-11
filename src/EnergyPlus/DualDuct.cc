@@ -421,8 +421,6 @@ namespace DualDuct {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = Damper( DamperNum ).HotAirInletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
-								if ( Damper( DamperIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingIndex;
-								if ( Damper( DamperIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingIndex;
 							}
 						}
 					}
@@ -506,8 +504,6 @@ namespace DualDuct {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = Damper( DamperNum ).HotAirInletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
-							if ( Damper( DamperIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingIndex;
-							if ( Damper( DamperIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingIndex;
 
 							Damper( DamperNum ).CtrlZoneNum = CtrlZone;
 							Damper( DamperNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
@@ -626,8 +622,6 @@ namespace DualDuct {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = Damper( DamperNum ).OAInletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
-							if ( Damper( DamperIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingIndex;
-							if ( Damper( DamperIndex ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingIndex;
 
 							Damper( DamperNum ).CtrlZoneNum = CtrlZone;
 							Damper( DamperNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;

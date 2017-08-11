@@ -406,8 +406,6 @@ namespace ZoneEquipmentManager {
 
 		if ( InitZoneEquipmentOneTimeFlag ) {
 			InitZoneEquipmentOneTimeFlag = false;
-			int numTerminalUnits = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" ) + InputProcessor::GetNumObjectsFound( "ZoneHVAC:AirDistributionUnit" );
-			TermUnitSizing.allocate( numTerminalUnits );
 			ZoneEqSizing.allocate( NumOfZones );
 			// setup zone equipment sequenced demand storage
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
@@ -1037,8 +1035,8 @@ namespace ZoneEquipmentManager {
 		FinalZoneSizing.allocate( NumOfZones );
 		CalcZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
 		CalcFinalZoneSizing.allocate( NumOfZones );
-		int numTerminalUnits = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" ) + InputProcessor::GetNumObjectsFound( "ZoneHVAC:AirDistributionUnit" );
-		TermUnitFinalZoneSizing.allocate( numTerminalUnits );
+		DataSizing::NumAirTerminalUnits = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" ) + InputProcessor::GetNumObjectsFound( "ZoneHVAC:AirDistributionUnit" );
+		TermUnitFinalZoneSizing.allocate( DataSizing::NumAirTerminalUnits );
 		DesDayWeath.allocate( TotDesDays + TotRunDesPersDays );
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		AvgData.allocate( NumOfTimeStepInDay );
@@ -3154,6 +3152,7 @@ namespace ZoneEquipmentManager {
 				SysOutputProvided = 0.0;
 				LatOutputProvided = 0.0;
 				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
+				CurTermUnitSizingNum = ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex( EquipTypeNum );
 
 				// Reset ZoneEqSizing data (because these may change from one equipment type to the next)
 				if ( FirstPassZoneEquipFlag ) {
@@ -3365,7 +3364,7 @@ namespace ZoneEquipmentManager {
 				ZoneEquipConfig( ControlledZoneNum ).PlenumMassFlow += PlenumInducedMassFlow;
 
 				UpdateSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided, EquipTypeNum );
-
+				CurTermUnitSizingNum = 0;
 			} // zone loop
 
 			AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;

@@ -111,7 +111,6 @@ namespace DirectAirManager {
 			AirMassFlowFraction( 0.0 ),
 			ZoneEquipAirInletNode( 0 ),
 			AirTerminalSizingSpecIndex( 0 ),
-			TermUnitSizingIndex( 0 ),
 			SensOutputProvided( 0.0 ),
 			EMSOverrideAirFlow( false ),
 			EMSMassFlowRateValue( 0.0 ),

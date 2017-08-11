@@ -348,8 +348,7 @@ namespace DataZoneEquipment {
 		// AirDistUnitCool/AirDistUnitHeat, may represent a DIRECT AIR object,
 		// or the cold/hot side of AIR DISTRIBUTION
 		// UNIT object.  That is both AirDistUnitHeat and AirDistUnitCool are required to describe a dual
-		// duct AIR DISTRIBUTION object in the ZoneEquipList.  Although only one AIR DISTRIBUTION UNIT is
-		// allowed in ZoneEquipList, two instances of that object may exist in this data structure
+		// duct AIR DISTRIBUTION object in the ZoneEquipList.
 		Array1D< AirIn > AirDistUnitHeat; // dimensioned to number of zone inlet nodes
 		Array1D< AirIn > AirDistUnitCool; // dimensioned to number of zone inlet nodes.
 		bool SupLeakToRetPlen; // True if there is supply duct leak to the
@@ -463,6 +462,7 @@ namespace DataZoneEquipment {
 		Array1D_int EquipType_Num;
 		Array1D_string EquipName;
 		Array1D_int EquipIndex;
+		Array1D_int EquipAirTermSizingIndex; // index to TermUnitSizing and TermUnitFinalZoneSizing (only applies to air distribution units and direct air)
 		Array1D_int CoolingPriority;
 		Array1D_int HeatingPriority;
 		Array1D< EquipmentData > EquipData; // Index of energy output report data

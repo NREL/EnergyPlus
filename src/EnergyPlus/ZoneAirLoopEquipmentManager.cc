@@ -220,8 +220,7 @@ namespace ZoneAirLoopEquipmentManager {
 			}
 		}
 
-		DataSizing::CurTermUnitSizingNum = AirDistUnit( AirDistUnitNum ).TermUnitSizingIndex;
-		InitZoneAirLoopEquipment( FirstHVACIteration, AirDistUnitNum, ActualZoneNum );
+		InitZoneAirLoopEquipment( AirDistUnitNum, ControlledZoneNum, ActualZoneNum );
 
 		SimZoneAirLoopEquipment( AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum );
 
@@ -229,7 +228,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// ReportZoneAirLoopEquipment( AirDistUnitNum );
 
-		DataSizing::CurTermUnitSizingNum = 0;
 		SimZone = false;
 
 	}
@@ -283,8 +281,6 @@ namespace ZoneAirLoopEquipmentManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirDistUnitNum;
 		int AirDistCompUnitNum;
-		int ZoneEqNum; // zone equip config index
-		int InletNum; // zone equip config inlet node index
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
@@ -361,11 +357,6 @@ namespace ZoneAirLoopEquipmentManager {
 					AirDistUnit( AirDistUnitNum ).DownStreamLeak = false;
 				}
 
-				// Increment and store pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
-				++DataSizing::NumAirTerminalUnits;
-				int locTermUnitSizingIndex = DataSizing::NumAirTerminalUnits;
-				AirDistUnit( AirDistUnitNum ).TermUnitSizingIndex = locTermUnitSizingIndex;
-
 				// DesignSpecification:AirTerminal:Sizing name
 				AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex = 0;
 				if ( !lAlphaBlanks( 5 )) {
@@ -374,15 +365,6 @@ namespace ZoneAirLoopEquipmentManager {
 						ShowSevereError( cAlphaFields( 5 ) + " = " + AlphArray( 5 ) + " not found." );
 						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
 						ErrorsFound = true;
-					} else {
-						// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
-						auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( locTermUnitSizingIndex ) );
-						auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex ) );
-						thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
-						thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
-						thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
-						thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
-						thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
 					}
 				}
 				// Validate EquipType for Air Distribution Unit
@@ -508,22 +490,6 @@ namespace ZoneAirLoopEquipmentManager {
 					SetUpCompSets( CurrentModuleObject, AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
 				}
 
-				// find and save corresponding zone equip config
-				for ( ZoneEqNum = 1; ZoneEqNum <= NumOfZones; ++ZoneEqNum ) {
-					if ( !ZoneEquipConfig( ZoneEqNum ).IsControlled ) continue;
-					for ( InletNum = 1; InletNum <= ZoneEquipConfig( ZoneEqNum ).NumInletNodes; ++InletNum ) {
-						if ( ZoneEquipConfig( ZoneEqNum ).InletNode( InletNum ) == AirDistUnit( AirDistUnitNum ).OutletNodeNum ) {
-							AirDistUnit( AirDistUnitNum ).ZoneEqNum = ZoneEqNum;
-							ZoneEquipConfig( ZoneEqNum ).ADUNum = AirDistUnitNum;
-							DataSizing::TermUnitSizing( locTermUnitSizingIndex ).CtrlZoneNum = ZoneEqNum;
-						}
-					}
-				}
-
-				if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-					ZoneEquipConfig( AirDistUnit( AirDistUnitNum ).ZoneEqNum ).SupLeakToRetPlen = true;
-				}
-
 			} //End of Air Dist Do Loop
 			for ( AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum ) {
 				SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy [J]", AirDistUnit( AirDistUnitNum ).HeatGain, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
@@ -540,43 +506,17 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	InitZoneAirLoopEquipment(
-		bool const EP_UNUSED( FirstHVACIteration ), // unused1208
 		int const AirDistUnitNum,
-		int const ZoneNum
+		int const ControlledZoneNum,
+		int const ActualZoneNum
 	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Russ Taylor
 		//       DATE WRITTEN   Nov 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is left for Module format consistency -- not needed in this module.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// using DataSizing::FinalZoneSizing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Do the Begin Simulation initializations
 		if ( InitAirDistUnitsFlag ) {
@@ -585,11 +525,34 @@ namespace ZoneAirLoopEquipmentManager {
 			InitAirDistUnitsFlag = false;
 		}
 		if ( EachOnceFlag( AirDistUnitNum )) {
-			AirDistUnit( AirDistUnitNum ).ZoneNum = ZoneNum;
-			// ZoneEqNum = AirDistUnit( AirDistUnitNum ).ZoneEqNum;
-			// if ( allocated( FinalZoneSizing ) ) {
-				// AirDistUnit( AirDistUnitNum ).AccountForDOAS = FinalZoneSizing( ZoneEqNum ).AccountForDOAS;
-			// }
+			AirDistUnit( AirDistUnitNum ).ZoneNum = ActualZoneNum;
+
+			// find and save corresponding zone equip config
+			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ) );
+			for ( int InletNum = 1; InletNum <= thisZoneEqConfig.NumInletNodes; ++InletNum ) {
+				if ( thisZoneEqConfig.InletNode( InletNum ) == AirDistUnit( AirDistUnitNum ).OutletNodeNum ) {
+					AirDistUnit( AirDistUnitNum ).ZoneEqNum = ControlledZoneNum;
+					thisZoneEqConfig.AirDistUnitCool( InletNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
+					thisZoneEqConfig.AirDistUnitHeat( InletNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
+					thisZoneEqConfig.ADUNum = AirDistUnitNum;
+					break;
+				}
+			}
+
+			if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
+				thisZoneEqConfig.SupLeakToRetPlen = true;
+			}}
+
+			// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
+			if ( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex > 0 ) {
+				auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex ) );
+				auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( DataSizing::CurTermUnitSizingNum ) );
+				thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
+				thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
+				thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
+				thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
+				thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
+			}
 			EachOnceFlag( AirDistUnitNum ) = false;
 		}
 
@@ -734,7 +697,7 @@ namespace ZoneAirLoopEquipmentManager {
 				SimPIU( AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompNum ), FirstHVACIteration, ActualZoneNum, ZoneEquipConfig( ControlledZoneNum ).ZoneNode, AirDistUnit( AirDistUnitNum ).EquipIndex( AirDistCompNum ) );
 
 			} else if ( SELECT_CASE_var == SingleDuct_ConstVol_4PipeInduc ) {
-				SimIndUnit( AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompNum ), FirstHVACIteration, ActualZoneNum, ZoneEquipConfig( ControlledZoneNum ).ZoneNode, AirDistUnit( AirDistUnitNum ).EquipIndex( AirDistCompNum ) );
+				SimIndUnit( AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompNum ), FirstHVACIteration, ActualZoneNum, ZoneEquipConfig( ControlledZoneNum ).ZoneNode, AirDistUnit( AirDistUnitNum ).EquipIndex( AirDistCompNum ), ControlledZoneNum );
 
 			} else if ( SELECT_CASE_var == SingleDuctVAVReheatVSFan ) {
 				SimulateSingleDuct( AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompNum ), FirstHVACIteration, ActualZoneNum, ZoneEquipConfig( ControlledZoneNum ).ZoneNode, AirDistUnit( AirDistUnitNum ).EquipIndex( AirDistCompNum ) );

@@ -66,6 +66,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus::BranchInputManager;
@@ -1242,7 +1243,10 @@ namespace EnergyPlus {
 			SplitterComponent::GetSplitterInput();
 			BranchInputManager::GetMixerInput();
 			BranchInputManager::ManageBranchInput();
-			DirectAirManager::GetDirectAirInput();
+			bool SimAir = true;
+			bool SimZoneEquip = true;
+			ZoneEquipmentManager::ManageZoneEquipment( true, SimZoneEquip, SimAir );
+			//DirectAirManager::GetDirectAirInput();
 			// Get Air Loop HVAC Data
 			SimAirServingZones::GetAirPathData();
 			SimAirServingZones::InitAirLoops( FirstHVACIteration );

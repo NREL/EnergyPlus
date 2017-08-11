@@ -418,6 +418,9 @@ namespace DataZoneEquipment {
 		InitUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
 
 		overallEquipCount = 0;
+		DataSizing::NumAirTerminalUnits = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" ) + InputProcessor::GetNumObjectsFound( "ZoneHVAC:AirDistributionUnit" );
+		DataSizing::TermUnitSizing.allocate( DataSizing::NumAirTerminalUnits );
+		int locTermUnitSizingIndex = 0; // will increment for every air distribution unit and direct air  unit
 
 		for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop ) {
 
@@ -526,6 +529,7 @@ namespace DataZoneEquipment {
 				ZoneEquipList( ControlledZoneNum ).EquipType_Num.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).EquipName.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).EquipIndex.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+				ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).EquipData.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).CoolingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
@@ -533,6 +537,7 @@ namespace DataZoneEquipment {
 				ZoneEquipList( ControlledZoneNum ).EquipType_Num = 0;
 				ZoneEquipList( ControlledZoneNum ).EquipName = "";
 				ZoneEquipList( ControlledZoneNum ).EquipIndex = 0;
+				ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex = 0;
 				ZoneEquipList( ControlledZoneNum ).CoolingPriority = 0;
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority = 0;
 
@@ -568,9 +573,17 @@ namespace DataZoneEquipment {
 
 					if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
+						// Increment terminal unit sizing index and cross-reference
+						++locTermUnitSizingIndex;
+						ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex( ZoneEquipTypeNum ) = locTermUnitSizingIndex;
+						DataSizing::TermUnitSizing( locTermUnitSizingIndex ).CtrlZoneNum = ControlledZoneNum;
 
 					} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = DirectAir_Num;
+						// Increment terminal unit sizing index and cross-reference
+						++locTermUnitSizingIndex;
+						ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex( ZoneEquipTypeNum ) = locTermUnitSizingIndex;
+						DataSizing::TermUnitSizing( locTermUnitSizingIndex ).CtrlZoneNum = ControlledZoneNum;
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER" ) { // Window Air Conditioner
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = WindowAC_Num;

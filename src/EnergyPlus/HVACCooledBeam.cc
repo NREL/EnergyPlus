@@ -422,7 +422,6 @@ namespace HVACCooledBeam {
 					if ( CoolBeam( CBNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = CoolBeam( CBNum ).AirInNode;
 						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = CoolBeam( CBNum ).AirOutNode;
-						if ( CoolBeam( CBNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( CoolBeam( CBNum ).ADUNum ).TermUnitSizingIndex;
 						AirNodeFound = true;
 						break;
 					}

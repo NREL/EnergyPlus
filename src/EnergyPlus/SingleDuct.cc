@@ -669,7 +669,6 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 
 						Sys( SysNum ).CtrlZoneNum = CtrlZone;
@@ -885,7 +884,6 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 					}
 				}
@@ -1058,7 +1056,6 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).OutletNodeNum;
-							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 					}
 				}
@@ -1209,7 +1206,6 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 
 						Sys( SysNum ).CtrlZoneNum = CtrlZone;
@@ -1323,7 +1319,6 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 					}
 				}
@@ -1564,7 +1559,6 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-							if ( Sys( SysNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingIndex;
 						}
 					}
 				}
@@ -4885,8 +4879,6 @@ namespace SingleDuct {
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-									if ( SysATMixer( ATMixerNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).TermUnitSizingIndex;
-									if ( SysATMixer( ATMixerNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).TermUnitSizingIndex;
 								}
 							}
 							goto ControlledZoneLoop_exit;
@@ -4915,8 +4907,6 @@ namespace SingleDuct {
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-									if ( SysATMixer( ATMixerNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).TermUnitSizingIndex;
-									if ( SysATMixer( ATMixerNum ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).TermUnitSizingIndex;
 								}
 							}
 							goto ControlZoneLoop_exit;

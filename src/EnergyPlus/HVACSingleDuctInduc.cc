@@ -136,13 +136,36 @@ namespace HVACSingleDuctInduc {
 	Array1D_bool CheckEquipName;
 	bool GetIUInputFlag( true ); // First time, input is "gotten"
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		static bool MyOneTimeFlag( true );
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyAirDistInitFlag;
+	}
 
-	// PRIVATE UpdateIndUnit
-	// PRIVATE ReportIndUnit
+	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
 
 	// Object Data
 	Array1D< IndUnitData > IndUnit;
+
+	void
+	clear_state()
+	{
+		NumIndUnits = 0;
+		IndUnit.deallocate();
+		GetIUInputFlag = true;
+		MyOneTimeFlag = true;
+		MyEnvrnFlag.deallocate();
+		MySizeFlag.deallocate();
+		MyPlantScanFlag.deallocate();
+		MyAirDistInitFlag.deallocate();
+	}
 
 	// Functions
 
@@ -152,7 +175,8 @@ namespace HVACSingleDuctInduc {
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
 		int const ZoneNum, // index of zone served by the terminal unit
 		int const ZoneNodeNum, // zone node number of zone served by the terminal unit
-		int & CompIndex // which terminal unit in data structure
+		int & CompIndex, // which terminal unit in data structure
+		int const ControlledZoneNum // controlled zone equip number
 	)
 	{
 
@@ -219,7 +243,7 @@ namespace HVACSingleDuctInduc {
 		}
 
 		// initialize the unit
-		InitIndUnit( IUNum, FirstHVACIteration );
+		InitIndUnit( IUNum, FirstHVACIteration, ControlledZoneNum );
 
 		TermUnitIU = true;
 
@@ -449,42 +473,6 @@ namespace HVACSingleDuctInduc {
 				ShowContinueError( "...should have outlet node=" + NodeID( IndUnit( IUNum ).OutAirNode ) );
 				//          ErrorsFound=.TRUE.
 			}
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				int SizingIndex = 0;
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( IndUnit( IUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
-							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( NodeID( IndUnit( IUNum ).OutAirNode ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + IndUnit( IUNum ).UnitType + " = " + IndUnit( IUNum ).Name );
-							ShowContinueError( "Check terminal unit node names for errors" );
-							ErrorsFound = true;
-						} else {
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = IndUnit( IUNum ).PriAirInNode;
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = IndUnit( IUNum ).OutAirNode;
-							if ( IndUnit( IUNum ).ADUNum > 0 ) {
-								SizingIndex = AirDistUnit( IndUnit( IUNum ).ADUNum ).TermUnitSizingIndex;
-								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = SizingIndex;
-							}
-						}
-						AirNodeFound = true;
-						// save the induction ratio in the term unit sizing array for use in the system sizing calculation
-						if ( ( ZoneSizingRunDone ) && ( SizingIndex > 0 ) ){
-							TermUnitSizing( SizingIndex ).InducRat = IndUnit( IUNum ).InducRatio;
-						}
-						break;
-					}
-				}
-			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 3 ) );
-				ErrorsFound = true;
-			}
-
 		}
 
 		Alphas.deallocate();
@@ -502,7 +490,8 @@ namespace HVACSingleDuctInduc {
 	void
 	InitIndUnit(
 		int const IUNum, // number of the current induction unit being simulated
-		bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
+		bool const FirstHVACIteration, // TRUE if first air loop solution this HVAC step
+		int const ControlledZoneNum // controlled zone equip number
 	)
 	{
 
@@ -544,10 +533,6 @@ namespace HVACSingleDuctInduc {
 		int ColdConNode; // cold water control node  number
 		Real64 IndRat; // unit induction ratio
 		Real64 RhoAir; // air density at outside pressure and standard temperature and humidity
-		static bool MyOneTimeFlag( true );
-		static Array1D_bool MyEnvrnFlag;
-		static Array1D_bool MySizeFlag;
-		static Array1D_bool MyPlantScanFlag;
 
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
@@ -562,9 +547,11 @@ namespace HVACSingleDuctInduc {
 			MyEnvrnFlag.allocate( NumIndUnits );
 			MySizeFlag.allocate( NumIndUnits );
 			MyPlantScanFlag.allocate( NumIndUnits );
+			MyAirDistInitFlag.allocate( NumIndUnits );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
+			MyAirDistInitFlag = true;
 			MyOneTimeFlag = false;
 		}
 
@@ -589,6 +576,40 @@ namespace HVACSingleDuctInduc {
 			MyPlantScanFlag( IUNum ) = false;
 		}
 
+		// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+		if ( MyAirDistInitFlag( IUNum ) ) {
+			bool ErrorsFound = false;
+			bool AirNodeFound = false;
+			int SizingIndex = 0;
+			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ) );
+			for ( int SupAirIn = 1; SupAirIn <= thisZoneEqConfig.NumInletNodes; ++SupAirIn ) {
+				if ( IndUnit( IUNum ).OutAirNode == thisZoneEqConfig.InletNode( SupAirIn ) ) {
+					if ( thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
+						ShowSevereError( "Error in connecting a terminal unit to a zone" );
+						ShowContinueError( NodeID( IndUnit( IUNum ).OutAirNode ) + " already connects to another zone" );
+						ShowContinueError( "Occurs for terminal unit " + IndUnit( IUNum ).UnitType + " = " + IndUnit( IUNum ).Name );
+						ShowContinueError( "Check terminal unit node names for errors" );
+						ErrorsFound = true;
+					} else {
+						thisZoneEqConfig.AirDistUnitCool( SupAirIn ).InNode = IndUnit( IUNum ).PriAirInNode;
+						thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode = IndUnit( IUNum ).OutAirNode;
+					}
+					AirNodeFound = true;
+					// save the induction ratio in the term unit sizing array for use in the system sizing calculation
+					if ( DataSizing::CurTermUnitSizingNum > 0 ){
+						DataSizing::TermUnitSizing( DataSizing::CurTermUnitSizingNum ).InducRat = IndUnit( IUNum ).InducRatio;
+					}
+					break;
+				}
+			}}
+			if ( ! AirNodeFound ) {
+				ShowSevereError( "The outlet air node from the " + IndUnit( IUNum ).UnitType + " = " + IndUnit( IUNum ).Name );
+				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + IndUnit( IUNum ).PriAirInNode );
+				ErrorsFound = true;
+			}
+			if ( ErrorsFound ) ShowFatalError( "InitIndUnit: Errors found during intialization. Preceding conditions cause termination." );
+			MyAirDistInitFlag( IUNum ) = false;
+		}
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
 			ZoneEquipmentListChecked = true;
 			// Check to see if there is a Air Distribution Unit on the Zone Equipment List

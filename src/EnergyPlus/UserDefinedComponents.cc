@@ -1286,7 +1286,6 @@ namespace UserDefinedComponents {
 							} else {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = UserAirTerminal( CompLoop ).AirLoop.InletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = UserAirTerminal( CompLoop ).AirLoop.OutletNodeNum;
-								if ( UserAirTerminal( CompLoop ).ADUNum > 0 ) ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = DataDefineEquip::AirDistUnit( UserAirTerminal( CompLoop ).ADUNum ).TermUnitSizingIndex;
 							}
 
 							UserAirTerminal( CompLoop ).ActualCtrlZoneNum = CtrlZone;

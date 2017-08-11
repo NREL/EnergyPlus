@@ -110,7 +110,6 @@ namespace DataDefineEquip {
 		Array1D_string EquipName; // name of subcomponent
 		Array1D_int EquipIndex;
 		int AirTerminalSizingSpecIndex; // Pointer to DesignSpecification:AirTerminal:Sizing obect
-		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
 		Real64 UpStreamLeakFrac; // upstream nominal leakage fraction
 		Real64 DownStreamLeakFrac; // downstream constant leakage fraction
 		Real64 MassFlowRateUpStrLk; // current air mass flow rate of the upstream leak [kg/s]
@@ -143,7 +142,6 @@ namespace DataDefineEquip {
 			EquipName( MaxZoneAirComponents ),
 			EquipIndex( MaxZoneAirComponents, 0 ),
 			AirTerminalSizingSpecIndex( 0 ),
-			TermUnitSizingIndex( 0 ),
 			UpStreamLeakFrac( 0.0 ),
 			DownStreamLeakFrac( 0.0 ),
 			MassFlowRateUpStrLk( 0.0 ),
