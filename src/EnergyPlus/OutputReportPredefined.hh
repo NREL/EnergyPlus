@@ -680,10 +680,11 @@ namespace OutputReportPredefined {
 
 	extern int pdstLeedSchedSetPts;
 	extern int pdChLeedSchStPtFirstObjUsed;
-	extern int pdchLeedSchStPt11amMonday;
-	extern int pdchLeedSchStPt11amMonCnt;
-	extern int pdchLeedSchStPt11pmMonday;
-	extern int pdchLeedSchStPt11pmMonCnt;
+	extern int pdChLeedSchStPtMonthUsed;
+	extern int pdchLeedSchStPt11amWednesday;
+	extern int pdchLeedSchStPt11amWedCnt;
+	extern int pdchLeedSchStPt11pmWednesday;
+	extern int pdchLeedSchStPt11pmWedCnt;
 
 	// Internal data structures to store information provided by calls
 

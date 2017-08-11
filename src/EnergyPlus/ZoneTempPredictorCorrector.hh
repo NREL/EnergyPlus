@@ -375,7 +375,7 @@ namespace ZoneTempPredictorCorrector {
 	void
 	FillPredefinedTableOnThermostatSetpoints();
 
-	std::tuple< Real64, int >
+	std::tuple< Real64, int, std::string >
 	temperatureAndCountInSch(
 		int const & scheduleIndex,
 		bool const & isSummer,
