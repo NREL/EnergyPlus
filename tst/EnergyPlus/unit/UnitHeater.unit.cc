@@ -1997,6 +1997,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 		"    FanAvailSched,           !- Fan Schedule Name",
 		"    CycleOnAny,              !- Control Type",
 		"    0.2,                     !- Thermostat Tolerance {deltaC}",
+		"    FixedRunTime,            !- Cycling Run Time Control Type",
 		"    3600;                    !- Cycling Run Time {s}",
 
 		"SetpointManager:Warmest,",
