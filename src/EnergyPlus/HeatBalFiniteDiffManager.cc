@@ -764,7 +764,7 @@ namespace HeatBalFiniteDiffManager {
 					mAlpha = 0.0;
 
 					//check for Material layers that are too thin and highly conductivity (not appropriate for surface models)
-					if ( Alpha > HighDiffusivityThreshold && ! Material( CurrentLayer ).WarnedForHighDiffusivity ) {
+					if ( Alpha > HighDiffusivityThreshold ) {
 						DeltaTimestep = TimeStepZoneSec;
 						ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 						if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
@@ -776,7 +776,7 @@ namespace HeatBalFiniteDiffManager {
 								ShowContinueError( "Material may be too thin to be modeled well, thickness = " + RoundSigDigits( Material( CurrentLayer ).Thickness, 5 ) + " [m]" );
 								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThinMaterialLayerThreshold, 5 ) + " [m]" );
 							}
-							Material( CurrentLayer ).WarnedForHighDiffusivity = true;
+							ShowFatalError( "Preceding conditions cause termination." );
 						}
 					}
 
