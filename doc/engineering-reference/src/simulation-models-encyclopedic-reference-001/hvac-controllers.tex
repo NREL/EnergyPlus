@@ -264,7 +264,7 @@ The economizer schedule is then checked to determine if a ``push-button'' type e
 
 If \emph{S\(_{oa,init}\)} is greater than \({f_{oa,\min }}\) and less than 1 and the mixed air mass flow rate is greater than \({\dot m_{verysmall}}\) (\({10^{ - 30}}\) ) and night venting is not occuring and \emph{HighHumidityOperationFlag} is false then
 
-·~~~~~~~~we calculate a final outside air signal \emph{S\(_{oa}\)} by using the regula falsi method routine \emph{SolveRegulaFalsi} to zero the residual \({T_{mix,set}} - {T_{mix}}\) by varying the outside air mass flow rate \({S_{oa}}\cdot {\dot m_{mix}}\) . Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function \emph{PsyTdbFnHW} is used to obtain \emph{T\(_{mix}\)} from the mixed air enthalpy and humidity ratio.
+·~~~~~~~~we calculate a final outside air signal \emph{S\(_{oa}\)} by using the root solver method routine \emph{SolveRegulaFalsi} to zero the residual \({T_{mix,set}} - {T_{mix}}\) by varying the outside air mass flow rate \({S_{oa}}\cdot {\dot m_{mix}}\) . Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function \emph{PsyTdbFnHW} is used to obtain \emph{T\(_{mix}\)} from the mixed air enthalpy and humidity ratio.
 
 Otherwise
 
