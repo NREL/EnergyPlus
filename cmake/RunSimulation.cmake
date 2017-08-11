@@ -16,7 +16,7 @@ get_filename_component(IDF_EXT "${IDF_FILE}" EXT)
 get_filename_component(EXE_PATH "${ENERGYPLUS_EXE}" PATH)
 
 # Create path variables
-set (OUTPUT_DIR_PATH "${BINARY_DIR}/${TEST_FILE_FOLDER}/${IDF_NAME}")
+set (OUTPUT_DIR_PATH "${BINARY_DIR}/${TEST_FILE_FOLDER}/${IDF_NAME}/")
 set (IDF_PATH "${SOURCE_DIR}/${TEST_FILE_FOLDER}/${IDF_FILE}")
 set (PRODUCT_PATH "${BINARY_DIR}/Products/")
 set (EXE_PATH "${EXE_PATH}/")
