@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -2524,6 +2524,7 @@
     FanAvailSched,           !- Fan Schedule Name
     CycleOnAnyZoneFansOnly,  !- Control Type
     1,                       !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   Schedule:Compact,

@@ -183,6 +183,39 @@ namespace EnergyPlus {
 		EXPECT_EQ(3ul, result.size());
 	}
 
+
+	TEST_F( SQLiteFixture, SQLiteProcedures_sqliteWithinTransaction ) {
+		EXPECT_FALSE( sqlite_test->sqliteWithinTransaction() );
+		sqlite_test->sqliteBegin();
+		EXPECT_TRUE( sqlite_test->sqliteWithinTransaction() );
+		sqlite_test->sqliteCommit();
+		EXPECT_FALSE( sqlite_test->sqliteWithinTransaction() );
+	}
+
+	TEST_F( SQLiteFixture, SQLiteProcedures_informationalErrorRecords ) {
+		sqlite_test->sqliteBegin();
+		// There needs to be a simulation record otherwise the foreign key constraint will fail
+		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+
+		EnergyPlus::sqlite = std::move( sqlite_test );
+		ShowMessage( "This is an informational message" );
+		sqlite_test = std::move( EnergyPlus::sqlite );
+
+		auto result = queryResult("SELECT * FROM Errors;", "Errors");
+		sqlite_test->sqliteCommit();
+
+		ASSERT_EQ(1ul, result.size());
+		std::vector<std::string> testResult0 {"1", "1", "-1", "This is an informational message", "0"};
+		EXPECT_EQ(testResult0, result[0]);
+
+		std::string const errMsg = delimited_string ({
+			"   ************* This is an informational message"
+		});
+
+		compare_err_stream(errMsg);
+
+	}
+
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord )
 	{
 		sqlite_test->sqliteBegin();
@@ -348,16 +381,13 @@ namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord ) {
 		sqlite_test->sqliteBegin();
-		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Calculated Cooling Design Air Flow Rate [m3/s]", 6.37 );
-		sqlite_test->addSQLiteSystemSizingRecord( "VAV_2", "User Cooling Design Air Flow Rate", 5.1 );
+		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Cooling", "Sensible",23.3, 6.3, 6.03, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00" );
 		auto result = queryResult("SELECT * FROM SystemSizes;", "SystemSizes");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(2ul, result.size());
-		std::vector<std::string> testResult0 {"1", "VAV_1", "Calculated Cooling Design Air Flow Rate", "6.37", "m3/s"};
-		std::vector<std::string> testResult1 {"2", "VAV_2", "User Cooling Design Air Flow Rate", "5.1", ""};
+		ASSERT_EQ(1ul, result.size());
+		std::vector<std::string> testResult0 {"1", "VAV_1", "Cooling", "Sensible","23.3", "6.3", "6.03", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00" };
 		EXPECT_EQ(testResult0, result[0]);
-		EXPECT_EQ(testResult1, result[1]);
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteComponentSizingRecord ) {

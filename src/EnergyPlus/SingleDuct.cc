@@ -220,6 +220,10 @@ namespace SingleDuct {
 		GetInputFlag = true;
 		GetATMixerFlag = true;
 		InitSysFlag = true;
+		SysATMixer.deallocate();
+		Sys.deallocate();
+		SysInlet.deallocate();
+		SysOutlet.deallocate();
 	}
 
 	void
@@ -2288,9 +2292,9 @@ namespace SingleDuct {
 			TermUnitSizing( CurZoneEqNum ).ReheatLoadMult = 1.0;
 			if ( ZoneSizingRunDone ) {
 				if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheatVSFan ) {
-					TermUnitSizing( CurZoneEqNum ).AirVolFlow = max( UserInputMaxHeatAirVolFlowRate, CalcFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
+					TermUnitSizing( CurZoneEqNum ).AirVolFlow = max( UserInputMaxHeatAirVolFlowRate, FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
 				} else {
-					TermUnitSizing( CurZoneEqNum ).AirVolFlow = max( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
+					TermUnitSizing( CurZoneEqNum ).AirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
 				}
 			} else {
 				if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheatVSFan ) {
@@ -2358,9 +2362,9 @@ namespace SingleDuct {
 						if ( PltSizHeatNum > 0 ) {
 							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
-							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
-							ZoneDesHumRat = CalcFinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
+							DesZoneHeatLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
+							ZoneDesTemp = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
+							ZoneDesHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
 							// the coil load is the zone design heating load plus (or minus!) the reheat load
 							DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb( ZoneDesHumRat, 0.5 * ( CoilInTemp + ZoneDesTemp ) ) * DesMassFlow * ( ZoneDesTemp - CoilInTemp );
 							if ( DesCoilLoad >= SmallLoad ) {
@@ -2430,9 +2434,9 @@ namespace SingleDuct {
 						if ( PltSizHeatNum > 0 ) {
 							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
-							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
-							ZoneDesHumRat = CalcFinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
+							DesZoneHeatLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
+							ZoneDesTemp = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
+							ZoneDesHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
 							// the coil load is the zone design heating load plus (or minus!) the reheat load
 							DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb( ZoneDesHumRat, 0.5 * ( CoilInTemp + ZoneDesTemp ) ) * DesMassFlow * ( ZoneDesTemp - CoilInTemp );
 							if ( DesCoilLoad >= SmallLoad ) {
@@ -3396,7 +3400,7 @@ namespace SingleDuct {
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
 		using DataConvergParams::HVACFlowRateToler;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using SteamCoils::GetCoilCapacity;
 
 		// Locals
@@ -3552,7 +3556,7 @@ namespace SingleDuct {
 				Par( 6 ) = double( FanType );
 				Par( 7 ) = double( FanOp );
 				Par( 8 ) = QTotLoad;
-				SolveRegulaFalsi( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSCoolingResidual, MinMassFlow, MaxCoolMassFlow, Par );
+				SolveRoot( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSCoolingResidual, MinMassFlow, MaxCoolMassFlow, Par );
 				if ( SolFlag == -1 ) {
 					if ( Sys( SysNum ).IterationLimit == 0 ) {
 						ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
@@ -3610,7 +3614,7 @@ namespace SingleDuct {
 					Par( 7 ) = double( FanOp );
 					Par( 8 ) = QTotLoad;
 					ErrTolerance = Sys( SysNum ).ControllerOffset;
-					SolveRegulaFalsi( ErrTolerance, 500, SolFlag, HWFlow, VAVVSHWNoFanResidual, MinFlowWater, MaxFlowWater, Par );
+					SolveRoot( ErrTolerance, 500, SolFlag, HWFlow, VAVVSHWNoFanResidual, MinFlowWater, MaxFlowWater, Par );
 					if ( SolFlag == -1 ) {
 						ShowRecurringWarningErrorAtEnd( "Hot Water flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).ErrCount1 );
 						ShowRecurringContinueErrorAtEnd( "...Iteration limit (500) exceeded in calculating the hot water flow rate", Sys( SysNum ).ErrCount1c );
@@ -3637,7 +3641,7 @@ namespace SingleDuct {
 					Par( 6 ) = double( FanType );
 					Par( 7 ) = double( FanOp );
 					Par( 8 ) = QTotLoad;
-					SolveRegulaFalsi( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par );
+					SolveRoot( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( Sys( SysNum ).IterationLimit == 0 ) {
 							ShowWarningError( "Supply air flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
@@ -3678,7 +3682,7 @@ namespace SingleDuct {
 					Par( 10 ) = MaxFlowSteam;
 					Par( 11 ) = MaxSteamCap;
 					ErrTolerance = Sys( SysNum ).ControllerOffset;
-					SolveRegulaFalsi( ErrTolerance, 500, SolFlag, HWFlow, VAVVSHWNoFanResidual, MinFlowSteam, MaxFlowSteam, Par );
+					SolveRoot( ErrTolerance, 500, SolFlag, HWFlow, VAVVSHWNoFanResidual, MinFlowSteam, MaxFlowSteam, Par );
 					if ( SolFlag == -1 ) {
 						ShowRecurringWarningErrorAtEnd( "Steam flow control failed in VS VAV terminal unit " + Sys( SysNum ).SysName, Sys( SysNum ).ErrCount1 );
 						ShowRecurringContinueErrorAtEnd( "...Iteration limit (500) exceeded in calculating the hot water flow rate", Sys( SysNum ).ErrCount1c );
@@ -3704,7 +3708,7 @@ namespace SingleDuct {
 					Par( 6 ) = double( FanType );
 					Par( 7 ) = double( FanOp );
 					Par( 8 ) = QTotLoad;
-					SolveRegulaFalsi( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par );
+					SolveRoot( UnitFlowToler, 50, SolFlag, MassFlow, VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( Sys( SysNum ).IterationLimit == 0 ) {
 							ShowWarningError( "Steam heating coil control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );
@@ -3743,7 +3747,7 @@ namespace SingleDuct {
 					Par( 6 ) = double( FanType );
 					Par( 7 ) = double( FanOp );
 					Par( 8 ) = QTotLoad;
-					SolveRegulaFalsi( UnitFlowToler, 50, SolFlag, FracDelivered, VAVVSHCFanOnResidual, 0.0, 1.0, Par );
+					SolveRoot( UnitFlowToler, 50, SolFlag, FracDelivered, VAVVSHCFanOnResidual, 0.0, 1.0, Par );
 					if ( SolFlag == -1 ) {
 						if ( Sys( SysNum ).IterationLimit == 0 ) {
 							ShowWarningError( "Heating coil control failed in VS VAV terminal unit " + Sys( SysNum ).SysName );

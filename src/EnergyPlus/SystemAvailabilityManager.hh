@@ -69,6 +69,11 @@ namespace SystemAvailabilityManager {
 	extern int const CycleOnControlZone;
 	extern int const ZoneFansOnly;
 
+	// Cycling Run Time Control Type
+	extern int const FixedRunTime;
+	extern int const Thermostat;
+	extern int const ThermostatWithMinimumRunTime;
+
 	// Optimum start parameter definations
 	extern int const ControlZone;
 	extern int const MaximumOfZoneList;
@@ -195,6 +200,7 @@ namespace SystemAvailabilityManager {
 		int FanSchedPtr; // Fan schedule pointer
 		int CtrlType; // type of control: Stay Off, Cycle On Any,
 		//   Cycle On Control Zone, or Cycle On Any - Zone Fans Only
+		int CycRunTimeCntrlType; // Cycling Run Time Control Type
 		Real64 TempTolRange; // range in degrees C of thermostat tolerance
 		int CyclingTimeSteps; // period (in Loads time steps) system will cycle on.
 		int AvailStatus; // reports status of availability manager
@@ -218,6 +224,7 @@ namespace SystemAvailabilityManager {
 			SchedPtr( 0 ),
 			FanSchedPtr( 0 ),
 			CtrlType( 0 ),
+			CycRunTimeCntrlType( 0 ),
 			TempTolRange( 1.0 ),
 			CyclingTimeSteps( 1 ),
 			AvailStatus( 0 ),

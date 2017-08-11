@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
   Building,
     NONE,                    !- Name
@@ -1528,6 +1528,7 @@
     4,                       !- Number of Speeds for Heating
     4,                       !- Number of Speeds for Cooling
     Yes,                     !- Single Mode Operation
+    ,                        !- No Load Supply Air Flow Rate Ratio
     0.24,                    !- Heating Speed 1 Supply Air Flow Ratio
     0.24,                    !- Cooling Speed 1 Supply Air Flow Ratio
     0.47,                    !- Heating Speed 2 Supply Air Flow Ratio
@@ -1631,7 +1632,7 @@ Fan:SystemModel,
    FanAndCoilAvailSched , !- Availability Schedule Name
   Mixed Air Node,  !- Air Inlet Node Name
   DX Cooling Coil Air Inlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
+  1.7 , !- Design Maximum Air Flow Rate
   Continuous , !- Speed Control Method
   0.0, !- Electric Power Minimum Flow Rate Fraction
   300.0, !- Design Pressure Rise
@@ -2028,6 +2029,7 @@ Fan:SystemModel,
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Outdoor Condenser Air Node,  !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1

@@ -217,7 +217,7 @@ The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of hea
 
 \subsubsection{Zone Air Heat Balance System Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-system-air-transfer-rate-w}
 
-The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers. The Zone Air Heat Balance System Air Transfer Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time. 
 
 \subsubsection{Zone Air Heat Balance System Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-system-convective-heat-gain-rate-w}
 
@@ -3170,7 +3170,7 @@ For an exterior window of arbitrary tilt, it is defined as the angle between the
 
 If the sun is behind the window, the horizontal profile angle is not defined and is reported as 0.0.
 
-Note that in most texts what we call ``horizontal profile angle'' is called ``vertical profile angle.''
+Note that in most texts and in window equivalent layer model what we call ``horizontal profile angle'' is called ``vertical profile angle.''
 
 \subsubsection{Surface Window Solar Vertical Profile Angle {[}deg{]}}\label{surface-window-solar-vertical-profile-angle-deg}
 
@@ -3180,7 +3180,7 @@ For an exterior window of arbitrary tilt, it is defined as the angle between the
 
 If the sun is behind the window, the vertical profile angle is not defined and is reported as 0.0.
 
-Note that in most texts what we call ``vertical profile angle'' is called ``horizontal profile angle.''
+Note that in most texts and in window equivalent layer model what we call ``vertical profile angle'' is called ``horizontal profile angle.''
 
 \begin{figure}[hbtp] % fig 32
 \centering
@@ -3248,6 +3248,9 @@ For a time interval longer a timestep, this is the fraction of the time interval
 \subsubsection{Surface Window Blind Slat Angle {[}deg{]}}\label{surface-window-blind-slat-angle-deg}
 
 For an exterior window with a blind, this is the angle in degrees between the glazing outward normal and the blind slat angle outward normal, where the outward normal points away from the front face of the slat. The slat angle varies from 0 to 180 deg. If the slat angle is 0 deg or 180 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 90 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. See illustrations under WindowMaterial:Blind. For blinds with a fixed slat angle, the value reported here will be constant.
+
+For WindowMaterial:Blind:EquivalentLayer blinds the slat angle varies from -90 to 90 deg. If the slat angle is -90 deg or 90 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 0 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. For blinds with a fixed slat angle, the value reported here will be constant.
+
 
 \subsubsection{Surface Window Blind Beam to Beam Solar Transmittance {[]}}\label{surface-window-blind-beam-to-beam-solar-transmittance}
 
@@ -4853,11 +4856,11 @@ This field represents the sensible cooling energy in Joules that is actually sup
 
 \subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w-1}
 
-This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. The Zone Air System Sensible Heating Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
 
 \subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w-1}
 
-This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. The Zone Air System Sensible Cooling Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
 
 \subsubsection{Zone Air Humidity Ratio{[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratiokgwaterkgdryair}
 

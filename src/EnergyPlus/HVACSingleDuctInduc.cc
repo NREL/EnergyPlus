@@ -815,7 +815,7 @@ namespace HVACSingleDuctInduc {
 								// the design heating coil load is the zone load minus whatever the central system does. Note that
 								// DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
 								if ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak > 0.0 ) {
-									DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak );
+									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak );
 								} else {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
 								}
@@ -887,7 +887,7 @@ namespace HVACSingleDuctInduc {
 								// the design cooling coil load is the zone load minus whatever the central system does. Note that
 								// DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
 								if ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak > 0.0 ) {
-									DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU );
+									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU );
 								} else {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU - ZoneSizThermSetPtHi( CurZoneEqNum ) );
 								}
@@ -984,7 +984,7 @@ namespace HVACSingleDuctInduc {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataPlant::PlantLoop;
 		using PlantUtilities::SetComponentFlowRate;
@@ -1088,7 +1088,7 @@ namespace HVACSingleDuctInduc {
 					Par( 6 ) = QPriOnly;
 					Par( 7 ) = PowerMet;
 					ErrTolerance = IndUnit( IUNum ).HotControlOffset;
-					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par );
+					SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( IndUnit( IUNum ).HWCoilFailNum1 == 0 ) {
 							ShowWarningMessage( "SimFourPipeIndUnit: Hot water coil control failed for " + IndUnit( IUNum ).UnitType + "=\"" + IndUnit( IUNum ).Name + "\"" );
@@ -1124,7 +1124,7 @@ namespace HVACSingleDuctInduc {
 					Par( 6 ) = QPriOnly;
 					Par( 7 ) = PowerMet;
 					ErrTolerance = IndUnit( IUNum ).ColdControlOffset;
-					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
+					SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( IndUnit( IUNum ).CWCoilFailNum1 == 0 ) {
 							ShowWarningMessage( "SimFourPipeIndUnit: Cold water coil control failed for " + IndUnit( IUNum ).UnitType + "=\"" + IndUnit( IUNum ).Name + "\"" );

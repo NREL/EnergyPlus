@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
   Timestep,6;
 
@@ -1341,6 +1341,7 @@
     FanAndCoilAvailSched,    !- Fan Schedule Name
     CycleOnAnyCoolingOrHeatingZone,  !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800,                    !- Cycling Run Time {s}
     ,                        !- Control Zone or Zone List Name
     Reheat System 1 Cooling Zones,  !- Cooling Control Zone or Zone List Name

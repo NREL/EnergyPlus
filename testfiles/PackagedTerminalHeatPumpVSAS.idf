@@ -122,7 +122,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:PACKAGEDTERMINALHEATPUMP ===========
 
@@ -144,7 +144,6 @@
     Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type
     Zone1PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Zone1PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -173,7 +172,6 @@
     Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type
     Zone2PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -202,7 +200,6 @@
     Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type
     Zone3PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Zone3PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -503,6 +500,7 @@
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     200.0,                   !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
@@ -625,6 +623,7 @@
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     200.0,                   !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
@@ -747,6 +746,7 @@
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     200.0,                   !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}

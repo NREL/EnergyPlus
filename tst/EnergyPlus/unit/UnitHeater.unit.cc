@@ -1144,13 +1144,13 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		EXPECT_FALSE( ErrorsFound );
 
 		HWMaxVolFlowRate = WaterCoils::WaterCoil( CoilNum ).MaxWaterVolFlowRate;
-		HWDensity = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "xxx" );
-		CpHW = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "xxx" );
+		HWDensity = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "xxx" );
+		CpHW = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "xxx" );
 		HWPlantDeltaTDesign = PlantSizData( PltSizHeatNum ).DeltaT;
 		// calculate hot water coil design capacity
 		HWCoilDesignCapacity = HWMaxVolFlowRate * HWDensity * CpHW * HWPlantDeltaTDesign;
 		EXPECT_NEAR( HWCoilDesignCapacity, WaterCoils::WaterCoil( CoilNum ).DesWaterHeatingCoilRate, 1.0 );
-		EXPECT_NEAR( 111.02, WaterCoils::WaterCoil( CoilNum ).UACoil, 0.02 );
+		EXPECT_NEAR( 108.95, WaterCoils::WaterCoil( CoilNum ).UACoil, 0.02 );
 
 }
 

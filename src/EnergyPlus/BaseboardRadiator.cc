@@ -622,7 +622,7 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -705,7 +705,7 @@ namespace BaseboardRadiator {
 						if ( CapSizingMethod == HeatingDesignCapacity ) {
 							if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 								CheckZoneSizing(CompType, CompName);
-								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							} else {
 								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
 							}
@@ -720,7 +720,7 @@ namespace BaseboardRadiator {
 							CheckZoneSizing(CompType, CompName);
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							DataFracOfAutosizedHeatingCapacity = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							TempSize = AutoSize;
 							DataScalableCapSizingON = true;
 						} else {
@@ -796,7 +796,7 @@ namespace BaseboardRadiator {
 						if ( CapSizingMethod == HeatingDesignCapacity ) {
 							if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 								CheckZoneSizing(CompType, CompName);
-								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							} else {
 								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity;;
 							}
@@ -811,7 +811,7 @@ namespace BaseboardRadiator {
 							CheckZoneSizing(CompType, CompName);
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							DataFracOfAutosizedHeatingCapacity = Baseboard(BaseboardNum).ScaledHeatingCapacity;
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							TempSize = AutoSize;
 							DataScalableCapSizingON = true;
 						} else {
@@ -821,7 +821,7 @@ namespace BaseboardRadiator {
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
 					} else {
-						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+						DesCoilLoad = 0.0; // FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
 					}
 					if ( DesCoilLoad >= SmallLoad ) {
 						// pick an air  mass flow rate that is twice the water mass flow rate (CR8842)
@@ -834,7 +834,7 @@ namespace BaseboardRadiator {
 						UA1 = DesCoilLoad;
 						// Invert the baseboard model: given the design inlet conditions and the design load,
 						// find the design UA.
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
+						SolveRoot( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
 						// if the numerical inversion failed, issue error messages.
 						if ( SolFla == -1 ) {
 							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
@@ -969,7 +969,7 @@ namespace BaseboardRadiator {
 
 		ZoneNum = Baseboard( BaseboardNum ).ZonePtr;
 		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP;
-		if ( MySizeFlag( BaseboardNum ) ) QZnReq = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor; // If in sizing, assign design condition
+		if ( MySizeFlag( BaseboardNum ) ) QZnReq = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad; // If in sizing, assign design condition
 
 		WaterInletTemp = Baseboard( BaseboardNum ).WaterInletTemp;
 		WaterOutletTemp = WaterInletTemp;

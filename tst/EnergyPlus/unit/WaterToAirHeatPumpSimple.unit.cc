@@ -52,7 +52,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -142,12 +141,6 @@ TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir )
 		ShowMessage( "SizeHVACWaterToAir: Rated Sensible Heat Ratio = " + RoundSigDigits( SimpleWatertoAirHP( HPNum ).RatedCapCoolSens / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal, 2 ) + " [-]" );
 	} 
 
-	// clean up
-	SimpleWatertoAirHP.deallocate();
-	FinalZoneSizing.deallocate();
-	ZoneEqSizing.deallocate();
-	DesDayWeath( 1 ).Temp.deallocate();
-	DesDayWeath.deallocate();
 }
 
 TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl )
@@ -290,6 +283,19 @@ TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl )
 	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 5.0 );
 	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 5.221888, 0.00001 );
 
+	// test reduced flow at coil water inlet node
+	PartLoadRatio = 0.25;
+	Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate = 3.75;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPCoolingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 3.75 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 5.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 5.221888, 0.00001 );
+	UpdateSimpleWatertoAirHP( HPNum );
+	EXPECT_EQ( Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate, 3.75 );
+	EXPECT_EQ( Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).MassFlowRate, 3.75 );
+	EXPECT_NEAR( Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Temp, 5.221888, 0.00001 );
+
 	HPNum = 2;
 	SimpleWatertoAirHP( HPNum ).LoopNum = 2;
 	PlantLoop( 2 ).Name = "HotWaterLoop";
@@ -346,7 +352,17 @@ TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl )
 	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 35.0 );
 	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 34.514131, 0.00001 );
 
-	// clean up
-	SimpleWatertoAirHP.deallocate();
+	// test reduced flow at coil water inlet node
+	PartLoadRatio = 0.25;
+	Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate = 3.75;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPHeatingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 3.75 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 35.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 34.514131, 0.00001 );
+	UpdateSimpleWatertoAirHP( HPNum );
+	EXPECT_EQ( Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate, 3.75 );
+	EXPECT_EQ( Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).MassFlowRate, 3.75 );
+	EXPECT_NEAR( Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Temp, 34.514131, 0.00001 );
 
 }

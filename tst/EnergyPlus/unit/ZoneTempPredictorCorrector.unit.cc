@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -172,6 +173,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	Node( 3 ).MassFlowRate = 0.00; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.03; // Zone return node
 	Node( 4 ).HumRat = 0.000;
@@ -197,6 +199,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.01; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -222,6 +225,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.02;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.03; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -247,6 +251,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.02;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.01; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -262,7 +267,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MDotOA( 1 ) = 0.0;
 
 	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
-	EXPECT_FALSE( (0.008 == Node( 5 ).HumRat) );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
+
+	// Add a section to check #6119 by L. Gu on 5/16/17
+	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Deallocate everything
 	ZoneEquipConfig( 1 ).InletNode.deallocate();
@@ -923,3 +932,164 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempControlledZone.deallocate();
 
 	}
+
+TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectionTest )
+{
+	// AUTHOR: L. Gu, FSEC
+	// DATE WRITTEN: Jan 2017
+	// #5906 Adaptive convection resulting in extremely low zone temperature which causes fatal error
+
+	int ZoneNum = 1; // Zone number
+	Real64 SumIntGain = 0.0; // Zone sum of convective internal gains
+	Real64 SumHA = 0.0; // Zone sum of Hc*Area
+	Real64 SumHATsurf = 0.0; // Zone sum of Hc*Area*Tsurf
+	Real64 SumHATref = 0.0; // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
+	Real64 SumMCp = 0.0; // Zone sum of MassFlowRate*Cp
+	Real64 SumMCpT = 0.0; // Zone sum of MassFlowRate*Cp*T
+	Real64 SumSysMCp = 0.0; // Zone sum of air system MassFlowRate*Cp
+	Real64 SumSysMCpT = 0.0; // Zone sum of air system MassFlowRate*Cp*T
+
+	DataHeatBalance::ZoneIntGain.allocate( ZoneNum );
+	DataHeatBalFanSys::SumConvHTRadSys.allocate( ZoneNum );
+	DataHeatBalFanSys::SumConvPool.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPI.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPV.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPM.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPE.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPC.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPTI.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPTV.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPTM.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPTE.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPTC.allocate( ZoneNum );
+	DataHeatBalFanSys::MDotCPOA.allocate( ZoneNum );
+	DataHeatBalFanSys::MCPI( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPV( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPM( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPE( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPC( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPTI( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPTV( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPTM( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPTE( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MCPTC( ZoneNum ) = 0.0;
+	DataHeatBalFanSys::MDotCPOA( ZoneNum ) = 0.0;
+
+
+	DataHeatBalance::ZoneIntGain( 1 ).NumberOfDevices = 0;
+	DataHeatBalFanSys::SumConvHTRadSys( 1 ) = 0.0;
+	DataHeatBalFanSys::SumConvPool( 1 ) = 0.0;
+
+	ZoneEquipConfig.allocate( 1 );
+	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
+	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+	std::vector< int > controlledZoneEquipConfigNums;
+	controlledZoneEquipConfigNums.push_back( 1 );
+
+	ZoneEquipConfig( 1 ).NumInletNodes = 2;
+	ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
+	ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;
+	ZoneEquipConfig( 1 ).InletNode( 2 ) = 2;
+	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
+	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
+	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+
+	Zone.allocate( 1 );
+	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+	ZoneEqSizing.allocate( 1 );
+	CurZoneEqNum = 1;
+	Zone( 1 ).Multiplier = 1.0;
+	Zone( 1 ).Volume = 1000.0;
+	Zone( 1 ).SystemZoneNodeNumber = 5;
+	Zone( 1 ).ZoneVolCapMultpMoist = 1.0;
+	ZoneLatentGain.allocate( 1 );
+	ZoneLatentGain( 1 ) = 0.0;
+	SumLatentHTRadSys.allocate( 1 );
+	SumLatentHTRadSys( 1 ) = 0.0;
+	SumLatentPool.allocate( 1 );
+	SumLatentPool( 1 ) = 0.0;
+	OutBaroPress = 101325.0;
+	MAT.allocate( 1 ); // Zone temperature C
+	MAT( 1 ) = 24.0;
+	ZoneAirHumRat.allocate( 1 );
+	ZoneAirHumRat( 1 ) = 0.001;
+
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 3;
+	Surface.allocate( 3 );
+	HConvIn.allocate( 3 );
+	Node.allocate( 4 );
+	TempEffBulkAir.allocate( 3 );
+	DataHeatBalSurface::TempSurfInTmp.allocate( 3 );
+
+	Surface( 1 ).HeatTransSurf = true;
+	Surface( 2 ).HeatTransSurf = true;
+	Surface( 3 ).HeatTransSurf = true;
+	Surface( 1 ).Area = 10.0;
+	Surface( 2 ).Area = 10.0;
+	Surface( 3 ).Area = 10.0;
+	Surface( 1 ).TAirRef = ZoneMeanAirTemp;
+	Surface( 2 ).TAirRef = AdjacentAirTemp;
+	Surface( 3 ).TAirRef = ZoneSupplyAirTemp;
+	DataHeatBalSurface::TempSurfInTmp( 1 ) = 15.0;
+	DataHeatBalSurface::TempSurfInTmp( 2 ) = 20.0;
+	DataHeatBalSurface::TempSurfInTmp( 3 ) = 25.0;
+	TempEffBulkAir( 1 ) = 10.0;
+	TempEffBulkAir( 2 ) = 10.0;
+	TempEffBulkAir( 3 ) = 10.0;
+
+	Node( 1 ).Temp = 20.0;
+	Node( 2 ).Temp = 20.0;
+	Node( 3 ).Temp = 20.0;
+	Node( 4 ).Temp = 20.0;
+	Node( 1 ).MassFlowRate = 0.1;
+	Node( 2 ).MassFlowRate = 0.1;
+	Node( 3 ).MassFlowRate = 0.1;
+	Node( 4 ).MassFlowRate = 0.1;
+
+	HConvIn( 1 ) = 0.5;
+	HConvIn( 2 ) = 0.5;
+	HConvIn( 3 ) = 0.5;
+
+	NumZoneReturnPlenums = 0;
+	NumZoneSupplyPlenums = 0;
+
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	EXPECT_EQ( 5.0, SumHA );
+	EXPECT_EQ( 300.0, SumHATsurf );
+	EXPECT_EQ( 150.0, SumHATref );
+
+	Node( 1 ).MassFlowRate = 0.0;
+	Node( 2 ).MassFlowRate = 0.0;
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	EXPECT_EQ( 10.0, SumHA );
+	EXPECT_EQ( 300.0, SumHATsurf );
+	EXPECT_EQ( 50.0, SumHATref );
+
+	DataHeatBalance::ZoneIntGain.deallocate( );
+	DataHeatBalFanSys::SumConvHTRadSys.deallocate( );
+	DataHeatBalFanSys::SumConvPool.deallocate( );
+	DataHeatBalFanSys::MCPI.deallocate( );
+	DataHeatBalFanSys::MCPV.deallocate( );
+	DataHeatBalFanSys::MCPM.deallocate( );
+	DataHeatBalFanSys::MCPE.deallocate( );
+	DataHeatBalFanSys::MCPC.deallocate( );
+	DataHeatBalFanSys::MCPTI.deallocate( );
+	DataHeatBalFanSys::MCPTV.deallocate( );
+	DataHeatBalFanSys::MCPTM.deallocate( );
+	DataHeatBalFanSys::MCPTE.deallocate( );
+	DataHeatBalFanSys::MCPTC.deallocate( );
+	DataHeatBalFanSys::MDotCPOA.deallocate( );
+	ZoneEquipConfig.deallocate( );
+	Zone.deallocate( );
+	Surface.deallocate( );
+	MAT.deallocate( );
+	ZoneAirHumRat.deallocate( );
+	HConvIn.deallocate( );
+	TempEffBulkAir.deallocate( );
+	Node.deallocate( );
+	DataHeatBalSurface::TempSurfInTmp.deallocate( );
+
+}
+

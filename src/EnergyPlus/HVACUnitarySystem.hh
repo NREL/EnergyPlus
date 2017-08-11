@@ -165,12 +165,14 @@ namespace HVACUnitarySystem {
 		Array1D< Real64 > CoolingVolFlowRatio; // The ratio of flow to max for this speed
 		Array1D< Real64 > HeatingVolFlowRatio; // The ratio of flow to max for this speed
 		bool SingleModeFlag; // If yes, single mode operation
+		Real64 NoLoadAirFlowRateRatio; // fraction of supply air flow rate multiplier
 
 		// Default Constructor
 		DesignSpecMSHPData() :
 			NumOfSpeedCooling( 0 ),
 			NumOfSpeedHeating( 0 ),
-			SingleModeFlag( false )
+			SingleModeFlag( false ),
+			NoLoadAirFlowRateRatio( 1.0 )
 		{}
 
 	};
@@ -297,11 +299,13 @@ namespace HVACUnitarySystem {
 		Real64 MaxCoolAirMassFlow; // Maximum coil air mass flow for cooling [kg/s]
 		Real64 MaxHeatAirMassFlow; // Maximum coil air mass flow for heating [kg/s]
 		Real64 MaxNoCoolHeatAirMassFlow; // Maximum coil air mass flow for no cooling or heating [kg/s]
+		Real64 NoLoadAirFlowRateRatio; // fraction of supply air flow rate used during no load operation [~]
 		int CoolingSAFMethod; // Supply air flow method for cooling
 		int HeatingSAFMethod; // Supply air flow method for heating
 		int NoCoolHeatSAFMethod; // Supply air flow method for no cooling or heating
 		// Heat pump related specific data
-		Real64 MinOATCompressor; // Minimum outdoor temperature below which compressor if off
+		Real64 MinOATCompressorHeating; // Minimum outdoor temperature below which compressor if off
+		Real64 MinOATCompressorCooling; // Minimum outdoor temperature below which compressor if off
 		Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of unitary system [cycles/hr]
 		Real64 HPTimeConstant; // Heat pump time constant [s]
 		Real64 OnCyclePowerFraction; // Fraction of on-cycle power use [~]
@@ -589,10 +593,12 @@ namespace HVACUnitarySystem {
 			MaxCoolAirMassFlow( 0.0 ),
 			MaxHeatAirMassFlow( 0.0 ),
 			MaxNoCoolHeatAirMassFlow( 0.0 ),
+			NoLoadAirFlowRateRatio( 1.0 ),
 			CoolingSAFMethod( 0 ),
 			HeatingSAFMethod( 0 ),
 			NoCoolHeatSAFMethod( 0 ),
-			MinOATCompressor( 0.0 ),
+			MinOATCompressorHeating( 0.0 ),
+			MinOATCompressorCooling(0.0),
 			MaxONOFFCyclesperHour( 0.0 ),
 			HPTimeConstant( 0.0 ),
 			OnCyclePowerFraction( 0.0 ),
@@ -971,7 +977,7 @@ namespace HVACUnitarySystem {
 	);
 
 	void
-	ControlCoolingSystem(
+	ControlCoolingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -980,7 +986,7 @@ namespace HVACUnitarySystem {
 	);
 
 	void
-	ControlHeatingSystem(
+	ControlHeatingSystemToSP(
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration, // First HVAC iteration flag
@@ -992,22 +998,6 @@ namespace HVACUnitarySystem {
 		int const UnitarySysNum, // index to Unitary System
 		int const AirLoopNum, // index to air loop
 		bool const FirstHVACIteration // First HVAC iteration flag
-	);
-
-	void
-	SimWaterCoils(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
-		Real64 const PartLoadFrac,
-		int const CoilType
-	);
-
-	void
-	SimSteamCoils(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool const FirstHVACIteration, // True when first HVAC iteration
-		Real64 const PartLoadFrac,
-		int const CoilType
 	);
 
 	void

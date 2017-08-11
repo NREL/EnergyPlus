@@ -5,6 +5,7 @@
 #define GEOMETRY_CPP_
 
 #include "Geometry.hpp"
+#include "Errors.hpp"
 
 namespace Kiva {
 
@@ -61,7 +62,7 @@ geom::Direction getDirectionIn(Polygon poly, std::size_t vertex)
 {
   if (!isRectilinear(poly))
   {
-    // Throw exception
+    showMessage(MSG_ERR, "Cannot get direction of vertex for non-rectilinear polygon.");
   }
 
   double xPrev;
@@ -108,7 +109,7 @@ geom::Direction getDirectionOut(Polygon poly, std::size_t vertex)
 {
   if (!isRectilinear(poly))
   {
-    // TODO Error
+    showMessage(MSG_ERR, "Cannot get direction of vertex for non-rectilinear polygon.");
   }
 
   double xNext;

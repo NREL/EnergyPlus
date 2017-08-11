@@ -20,7 +20,7 @@
 ! File developed for Interprogram Comparative Test Case 301
 !
 
-  Version,8.6;
+  Version,8.7;
 
   Building,
     Test Harness for MicroCogen,  !- Name
@@ -215,6 +215,7 @@
     ,                        !- Availability Schedule Name
     Garage inlet,            !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.0085,                  !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

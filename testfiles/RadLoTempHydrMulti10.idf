@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
   Timestep,4;
 
@@ -780,10 +780,42 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    23.30000,6.000000,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
-    6.000000,6.000000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    6.000000,23.30000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    23.30000,23.30000,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+    21,26,0,  !- X,Y,Z ==> Vertex 1 {m}
+    21,6,0,  !- X,Y,Z ==> Vertex 2 {m}
+    11,6,0,  !- X,Y,Z ==> Vertex 3 {m}
+    11,26,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr002,            !- Name
+    Floor,                   !- Surface Type
+    SLAB FLOOR,              !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    26,21,0,  !- X,Y,Z ==> Vertex 1 {m}
+    26,11,0,  !- X,Y,Z ==> Vertex 2 {m}
+    21,11,0,  !- X,Y,Z ==> Vertex 3 {m}
+    21,21,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr003,            !- Name
+    Floor,                   !- Surface Type
+    SLAB FLOOR,              !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    11,21,0,  !- X,Y,Z ==> Vertex 1 {m}
+    11,11,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6,11,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6,21,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn001:Roof001,           !- Name
@@ -796,10 +828,43 @@
     WindExposed,             !- Wind Exposure
     0.0000000E+00,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.000000,23.30000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.000000,6.000000,10.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    23.30000,6.000000,10.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    23.30000,23.30000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+    21,26,10,  !- X,Y,Z ==> Vertex 1 {m}
+    11,26,10,  !- X,Y,Z ==> Vertex 2 {m}
+    11,6,10,  !- X,Y,Z ==> Vertex 3 {m}
+    21,6,10;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof002,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000000E+00,           !- View Factor to Ground
+    4,                       !- Number of Vertices
+    26,21,10,  !- X,Y,Z ==> Vertex 1 {m}
+    21,21,10,  !- X,Y,Z ==> Vertex 2 {m}
+    21,11,10,  !- X,Y,Z ==> Vertex 3 {m}
+    26,11,10;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof003,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000000E+00,           !- View Factor to Ground
+    4,                       !- Number of Vertices
+    11,21,10,  !- X,Y,Z ==> Vertex 1 {m}
+    6,21,10,  !- X,Y,Z ==> Vertex 2 {m}
+    6,11,10,  !- X,Y,Z ==> Vertex 3 {m}
+    11,11,10;  !- X,Y,Z ==> Vertex 4 {m}
+
 
   Sizing:Zone,
     ZONE 1,                  !- Zone or ZoneList Name

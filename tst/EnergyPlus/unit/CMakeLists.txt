@@ -10,15 +10,19 @@ set( test_src
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
   Fixtures/SQLiteFixture.hh
+  PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BoilerHotWater.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerConstantCOP.unit.cc
+  ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
@@ -40,6 +44,7 @@ set( test_src
   DOASEffectOnZoneSizing.unit.cc
   DualDuct.unit.cc
   DXCoils.unit.cc
+  EarthTube.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc
   ElectricBaseboardRadiator.unit.cc
@@ -56,6 +61,7 @@ set( test_src
   Furnaces.unit.cc
   General.unit.cc
   GroundHeatExchangers.unit.cc
+  HeatBalanceAirManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
@@ -67,6 +73,7 @@ set( test_src
   HighTempRadiantSystem.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
+  HVACDXSystem.unit.cc
   HVACFan.unit.cc
   HVACFourPipeBeam.unit.cc
   HVACManager.unit.cc
@@ -105,6 +112,7 @@ set( test_src
   PlantPipingSystemsManager.unit.cc
   PlantChillers.unit.cc
   PlantUtilities.unit.cc
+  PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   ReportSizingManager.unit.cc
@@ -121,6 +129,7 @@ set( test_src
   SiteFCFactorMethodGroundTemperatures.unit.cc
   SiteGroundDomain.unit.cc
   SiteShallowGroundTemperatures.unit.cc
+  SizeWaterHeatingCoil.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
@@ -131,6 +140,7 @@ set( test_src
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
+  TranspiredCollector.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
@@ -143,6 +153,7 @@ set( test_src
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
   WindowAC.unit.cc
+  WindowEquivalentLayer.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc

@@ -1020,488 +1020,463 @@ namespace EnergyPlus {
 			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" );
 
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 1 ).Key );
-			EXPECT_EQ( "ZONE AIR SYSTEM SENSIBLE COOLING RATE", OutputVariablesForSimulation( 1 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 1 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 1 ).Next );
-
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 2 ).Key );
-			EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", OutputVariablesForSimulation( 2 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 2 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 2 ).Next );
-
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 3 ).Key );
-			EXPECT_EQ( "SITE OUTDOOR AIR WETBULB TEMPERATURE", OutputVariablesForSimulation( 3 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 3 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 3 ).Next );
-
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 4 ).Key );
-			EXPECT_EQ( "ZONE TOTAL INTERNAL LATENT GAIN ENERGY", OutputVariablesForSimulation( 4 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 4 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 4 ).Next );
-
-			EXPECT_EQ( "*", OutputVariablesForSimulation( 5 ).Key );
-			EXPECT_EQ( "ZONE TOTAL INTERNAL LATENT GAIN RATE", OutputVariablesForSimulation( 5 ).VarName );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 5 ).Previous );
-			EXPECT_EQ( 0, OutputVariablesForSimulation( 5 ).Next );
+			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" ) );
+			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ) );
+			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ) );
+			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" ) );
+			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" ) );
 
 		}
 
 		TEST_F( InputProcessorFixture, addVariablesForMonthlyReport )
 		{
-			auto const results_map = std::map< std::string, std::vector< std::tuple< std::string, std::string, int, int > > >({
+			auto const results_map = std::map< std::string, std::vector< std::tuple< std::string, std::string > > >({
 				{
 					"ZONECOOLINGSUMMARYMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 0, 0 ),
+						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
+						std::make_tuple( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" ),
+						std::make_tuple( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" ),
 					}
 				},
 				{
 					"ZONEHEATINGSUMMARYMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE HEATING RATE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE", 0, 0 ),
+						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE HEATING RATE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
 					}
 				},
 				{
 					"ZONEELECTRICSUMMARYMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE LIGHTS ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY", 0, 0 ),
+						std::make_tuple( "*", "ZONE LIGHTS ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY" ),
 					}
 				},
 				{
 					"SPACEGAINSMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY", 0, 0 ),
+						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" ),
+						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" ),
 					}
 				},
 				{
 					"PEAKSPACEGAINSMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY", 0, 0 ),
+						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" ),
+						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" ),
 					}
 				},
 				{
 					"SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY", 0, 0 ),
+						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" ),
+						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" ),
+						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" ),
 					}
 				},
 				{
 					"SETPOINTSNOTMETWITHTEMPERATURESMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE HEATING SETPOINT NOT MET TIME", 0, 0 ),
-						std::make_tuple( "*", "ZONE MEAN AIR TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "ZONE HEATING SETPOINT NOT MET WHILE OCCUPIED TIME", 0, 0 ),
-						std::make_tuple( "*", "ZONE COOLING SETPOINT NOT MET TIME", 0, 0 ),
-						std::make_tuple( "*", "ZONE COOLING SETPOINT NOT MET WHILE OCCUPIED TIME", 0, 0 ),
+						std::make_tuple( "*", "ZONE HEATING SETPOINT NOT MET TIME" ),
+						std::make_tuple( "*", "ZONE MEAN AIR TEMPERATURE" ),
+						std::make_tuple( "*", "ZONE HEATING SETPOINT NOT MET WHILE OCCUPIED TIME" ),
+						std::make_tuple( "*", "ZONE COOLING SETPOINT NOT MET TIME" ),
+						std::make_tuple( "*", "ZONE COOLING SETPOINT NOT MET WHILE OCCUPIED TIME" ),
 					}
 				},
 				{
 					"COMFORTREPORTSIMPLE55MONTHLY",
 					{
-						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME", 0, 0 ),
-						std::make_tuple( "*", "ZONE MEAN AIR TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME", 0, 0 ),
-						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME", 0, 0 ),
+						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" ),
+						std::make_tuple( "*", "ZONE MEAN AIR TEMPERATURE" ),
+						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" ),
+						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" ),
 					}
 				},
 				{
 					"UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY",
 					{
-						std::make_tuple( "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY", 0, 0 ),
-						std::make_tuple( "*", "SOLAR COLLECTOR OUTSIDE FACE SUCTION VELOCITY", 0, 0 ),
-						std::make_tuple( "*", "SOLAR COLLECTOR SENSIBLE HEATING RATE", 0, 0 ),
+						std::make_tuple( "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY" ),
+						std::make_tuple( "*", "SOLAR COLLECTOR OUTSIDE FACE SUCTION VELOCITY" ),
+						std::make_tuple( "*", "SOLAR COLLECTOR SENSIBLE HEATING RATE" ),
 					}
 				},
 				{
 					"OCCUPANTCOMFORTDATASUMMARYMONTHLY",
 					{
-						std::make_tuple( "*", "PEOPLE OCCUPANT COUNT", 0, 0 ),
-						std::make_tuple( "*", "PEOPLE AIR TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "PEOPLE AIR RELATIVE HUMIDITY", 0, 0 ),
-						std::make_tuple( "*", "ZONE THERMAL COMFORT FANGER MODEL PMV", 0, 0 ),
-						std::make_tuple( "*", "ZONE THERMAL COMFORT FANGER MODEL PPD", 0, 0 ),
+						std::make_tuple( "*", "PEOPLE OCCUPANT COUNT" ),
+						std::make_tuple( "*", "PEOPLE AIR TEMPERATURE" ),
+						std::make_tuple( "*", "PEOPLE AIR RELATIVE HUMIDITY" ),
+						std::make_tuple( "*", "ZONE THERMAL COMFORT FANGER MODEL PMV" ),
+						std::make_tuple( "*", "ZONE THERMAL COMFORT FANGER MODEL PPD" ),
 					}
 				},
 				{
 					"CHILLERREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "CHILLER ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "CHILLER ELECTRIC POWER", 0, 0 ),
-						std::make_tuple( "*", "CHILLER EVAPORATOR COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "CHILLER CONDENSER HEAT TRANSFER ENERGY", 0, 0 ),
-						std::make_tuple( "*", "CHILLER COP", 0, 0 ),
+						std::make_tuple( "*", "CHILLER ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "CHILLER ELECTRIC POWER" ),
+						std::make_tuple( "*", "CHILLER EVAPORATOR COOLING ENERGY" ),
+						std::make_tuple( "*", "CHILLER CONDENSER HEAT TRANSFER ENERGY" ),
+						std::make_tuple( "*", "CHILLER COP" ),
 					}
 				},
 				{
 					"TOWERREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "COOLING TOWER FAN ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "COOLING TOWER FAN ELECTRIC POWER", 0, 0 ),
-						std::make_tuple( "*", "COOLING TOWER HEAT TRANSFER RATE", 0, 0 ),
-						std::make_tuple( "*", "COOLING TOWER INLET TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "COOLING TOWER OUTLET TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "COOLING TOWER MASS FLOW RATE", 0, 0 ),
+						std::make_tuple( "*", "COOLING TOWER FAN ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "COOLING TOWER FAN ELECTRIC POWER" ),
+						std::make_tuple( "*", "COOLING TOWER HEAT TRANSFER RATE" ),
+						std::make_tuple( "*", "COOLING TOWER INLET TEMPERATURE" ),
+						std::make_tuple( "*", "COOLING TOWER OUTLET TEMPERATURE" ),
+						std::make_tuple( "*", "COOLING TOWER MASS FLOW RATE" ),
 					}
 				},
 				{
 					"BOILERREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "BOILER HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "BOILER GAS CONSUMPTION", 0, 0 ),
-						std::make_tuple( "*", "BOILER HEATING RATE", 0, 0 ),
-						std::make_tuple( "*", "BOILER GAS CONSUMPTION RATE", 0, 0 ),
-						std::make_tuple( "*", "BOILER INLET TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "BOILER OUTLET TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "BOILER MASS FLOW RATE", 0, 0 ),
-						std::make_tuple( "*", "BOILER ANCILLARY ELECTRIC POWER", 0, 0 ),
+						std::make_tuple( "*", "BOILER HEATING ENERGY" ),
+						std::make_tuple( "*", "BOILER GAS CONSUMPTION" ),
+						std::make_tuple( "*", "BOILER HEATING RATE" ),
+						std::make_tuple( "*", "BOILER GAS CONSUMPTION RATE" ),
+						std::make_tuple( "*", "BOILER INLET TEMPERATURE" ),
+						std::make_tuple( "*", "BOILER OUTLET TEMPERATURE" ),
+						std::make_tuple( "*", "BOILER MASS FLOW RATE" ),
+						std::make_tuple( "*", "BOILER ANCILLARY ELECTRIC POWER" ),
 					}
 				},
 				{
 					"DXREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "COOLING COIL TOTAL COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL LATENT COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL CRANKCASE HEATER ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL RUNTIME FRACTION", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL TOTAL COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL LATENT COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL ELECTRIC POWER", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL CRANKCASE HEATER ELECTRIC POWER", 0, 0 ),
+						std::make_tuple( "*", "COOLING COIL TOTAL COOLING ENERGY" ),
+						std::make_tuple( "*", "COOLING COIL ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING ENERGY" ),
+						std::make_tuple( "*", "COOLING COIL LATENT COOLING ENERGY" ),
+						std::make_tuple( "*", "COOLING COIL CRANKCASE HEATER ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "COOLING COIL RUNTIME FRACTION" ),
+						std::make_tuple( "*", "COOLING COIL TOTAL COOLING RATE" ),
+						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING RATE" ),
+						std::make_tuple( "*", "COOLING COIL LATENT COOLING RATE" ),
+						std::make_tuple( "*", "COOLING COIL ELECTRIC POWER" ),
+						std::make_tuple( "*", "COOLING COIL CRANKCASE HEATER ELECTRIC POWER" ),
 					}
 				},
 				{
 					"WINDOWREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION RATE", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION RATE", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW HEAT GAIN RATE", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW HEAT LOSS RATE", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW INSIDE FACE GLAZING CONDENSATION STATUS", 0, 0 ),
-						std::make_tuple( "*", "SURFACE SHADING DEVICE IS ON TIME FRACTION", 0, 0 ),
-						std::make_tuple( "*", "SURFACE STORM WINDOW ON OFF STATUS", 0, 0 ),
+						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE" ),
+						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION RATE" ),
+						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION RATE" ),
+						std::make_tuple( "*", "SURFACE WINDOW HEAT GAIN RATE" ),
+						std::make_tuple( "*", "SURFACE WINDOW HEAT LOSS RATE" ),
+						std::make_tuple( "*", "SURFACE WINDOW INSIDE FACE GLAZING CONDENSATION STATUS" ),
+						std::make_tuple( "*", "SURFACE SHADING DEVICE IS ON TIME FRACTION" ),
+						std::make_tuple( "*", "SURFACE STORM WINDOW ON OFF STATUS" ),
 					}
 				},
 				{
 					"WINDOWENERGYREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION ENERGY", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION ENERGY", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW HEAT GAIN ENERGY", 0, 0 ),
-						std::make_tuple( "*", "SURFACE WINDOW HEAT LOSS ENERGY", 0, 0 ),
+						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION ENERGY" ),
+						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION ENERGY" ),
+						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" ),
+						std::make_tuple( "*", "SURFACE WINDOW HEAT GAIN ENERGY" ),
+						std::make_tuple( "*", "SURFACE WINDOW HEAT LOSS ENERGY" ),
 					}
 				},
 				{
 					"WINDOWZONESUMMARYMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE", 0, 0 ),
+						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE" ),
+						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE" ),
+						std::make_tuple( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE" ),
+						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" ),
+						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" ),
+						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" ),
+						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" ),
 					}
 				},
 				{
 					"WINDOWENERGYZONESUMMARYMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY", 0, 0 ),
+						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY" ),
+						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY" ),
+						std::make_tuple( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY" ),
+						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" ),
+						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" ),
+						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" ),
+						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" ),
 					}
 				},
 				{
 					"AVERAGEOUTDOORCONDITIONSMONTHLY",
 					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE WIND SPEED", 0, 0 ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA", 0, 0 ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA", 0, 0 ),
-						std::make_tuple( "*", "SITE RAIN STATUS", 0, 0 ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
+						std::make_tuple( "*", "SITE WIND SPEED" ),
+						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
+						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
+						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
+						std::make_tuple( "*", "SITE RAIN STATUS" ),
 					}
 				},
 				{
 					"OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY",
 					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE WIND SPEED", 0, 0 ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA", 0, 0 ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA", 0, 0 ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
+						std::make_tuple( "*", "SITE WIND SPEED" ),
+						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
+						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
+						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
 					}
 				},
 				{
 					"OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY",
 					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE WIND SPEED", 0, 0 ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA", 0, 0 ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA", 0, 0 ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
+						std::make_tuple( "*", "SITE WIND SPEED" ),
+						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
+						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
+						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
 					}
 				},
 				{
 					"OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY",
 					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE WIND SPEED", 0, 0 ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA", 0, 0 ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA", 0, 0 ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
+						std::make_tuple( "*", "SITE WIND SPEED" ),
+						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
+						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
+						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
 					}
 				},
 				{
 					"OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY",
 					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE WIND SPEED", 0, 0 ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA", 0, 0 ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA", 0, 0 ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
+						std::make_tuple( "*", "SITE WIND SPEED" ),
+						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
+						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
+						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
 					}
 				},
 				{
 					"OUTDOORGROUNDCONDITIONSMONTHLY",
 					{
-						std::make_tuple( "*", "SITE GROUND TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE SURFACE GROUND TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE DEEP GROUND TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE MAINS WATER TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "SITE GROUND REFLECTED SOLAR RADIATION RATE PER AREA", 0, 0 ),
-						std::make_tuple( "*", "SITE SNOW ON GROUND STATUS", 0, 0 ),
+						std::make_tuple( "*", "SITE GROUND TEMPERATURE" ),
+						std::make_tuple( "*", "SITE SURFACE GROUND TEMPERATURE" ),
+						std::make_tuple( "*", "SITE DEEP GROUND TEMPERATURE" ),
+						std::make_tuple( "*", "SITE MAINS WATER TEMPERATURE" ),
+						std::make_tuple( "*", "SITE GROUND REFLECTED SOLAR RADIATION RATE PER AREA" ),
+						std::make_tuple( "*", "SITE SNOW ON GROUND STATUS" ),
 					}
 				},
 				{
 					"WINDOWACREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC POWER", 0, 0 ),
+						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY" ),
+						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING ENERGY" ),
+						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING ENERGY" ),
+						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING RATE" ),
+						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING RATE" ),
+						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE" ),
+						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC POWER" ),
 					}
 				},
 				{
 					"WATERHEATERREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY", 0, 0 ),
-						std::make_tuple( "*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY", 0, 0 ),
-						std::make_tuple( "*", "WATER HEATER BURNER HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "WATER HEATER GAS CONSUMPTION", 0, 0 ),
-						std::make_tuple( "*", "WATER HEATER LOSS DEMAND ENERGY", 0, 0 ),
-						std::make_tuple( "*", "WATER HEATER HEAT LOSS ENERGY", 0, 0 ),
-						std::make_tuple( "*", "WATER HEATER TANK TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY", 0, 0 ),
-						std::make_tuple( "*", "WATER HEATER SOURCE ENERGY", 0, 0 ),
+						std::make_tuple( "*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY" ),
+						std::make_tuple( "*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY" ),
+						std::make_tuple( "*", "WATER HEATER BURNER HEATING ENERGY" ),
+						std::make_tuple( "*", "WATER HEATER GAS CONSUMPTION" ),
+						std::make_tuple( "*", "WATER HEATER LOSS DEMAND ENERGY" ),
+						std::make_tuple( "*", "WATER HEATER HEAT LOSS ENERGY" ),
+						std::make_tuple( "*", "WATER HEATER TANK TEMPERATURE" ),
+						std::make_tuple( "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY" ),
+						std::make_tuple( "*", "WATER HEATER SOURCE ENERGY" ),
 					}
 				},
 				{
 					"GENERATORREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "GENERATOR PRODUCED ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "GENERATOR DIESEL CONSUMPTION", 0, 0 ),
-						std::make_tuple( "*", "GENERATOR GAS CONSUMPTION", 0, 0 ),
-						std::make_tuple( "*", "GENERATOR TOTAL HEAT RECOVERY", 0, 0 ),
-						std::make_tuple( "*", "GENERATOR JACKET HEAT RECOVERY ENERGY", 0, 0 ),
-						std::make_tuple( "*", "GENERATOR LUBE HEAT RECOVERY", 0, 0 ),
-						std::make_tuple( "*", "GENERATOR EXHAUST HEAT RECOVERY ENERGY", 0, 0 ),
-						std::make_tuple( "*", "GENERATOR EXHAUST AIR TEMPERATURE", 0, 0 ),
+						std::make_tuple( "*", "GENERATOR PRODUCED ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "GENERATOR DIESEL CONSUMPTION" ),
+						std::make_tuple( "*", "GENERATOR GAS CONSUMPTION" ),
+						std::make_tuple( "*", "GENERATOR TOTAL HEAT RECOVERY" ),
+						std::make_tuple( "*", "GENERATOR JACKET HEAT RECOVERY ENERGY" ),
+						std::make_tuple( "*", "GENERATOR LUBE HEAT RECOVERY" ),
+						std::make_tuple( "*", "GENERATOR EXHAUST HEAT RECOVERY ENERGY" ),
+						std::make_tuple( "*", "GENERATOR EXHAUST AIR TEMPERATURE" ),
 					}
 				},
 				{
 					"DAYLIGHTINGREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "SITE EXTERIOR BEAM NORMAL ILLUMINANCE", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 ILLUMINANCE", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 ILLUMINANCE", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME", 0, 0 ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME", 0, 0 ),
+						std::make_tuple( "*", "SITE EXTERIOR BEAM NORMAL ILLUMINANCE" ),
+						std::make_tuple( "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER" ),
+						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 ILLUMINANCE" ),
+						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX" ),
+						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME" ),
+						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" ),
+						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 ILLUMINANCE" ),
+						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX" ),
+						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" ),
+						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" ),
 					}
 				},
 				{
 					"COILREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "HEATING COIL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "HEATING COIL HEATING RATE", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL TOTAL COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL TOTAL COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING RATE", 0, 0 ),
-						std::make_tuple( "*", "COOLING COIL WETTED AREA FRACTION", 0, 0 ),
+						std::make_tuple( "*", "HEATING COIL HEATING ENERGY" ),
+						std::make_tuple( "*", "HEATING COIL HEATING RATE" ),
+						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING ENERGY" ),
+						std::make_tuple( "*", "COOLING COIL TOTAL COOLING ENERGY" ),
+						std::make_tuple( "*", "COOLING COIL TOTAL COOLING RATE" ),
+						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING RATE" ),
+						std::make_tuple( "*", "COOLING COIL WETTED AREA FRACTION" ),
 					}
 				},
 				{
 					"PLANTLOOPDEMANDREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE", 0, 0 ),
-						std::make_tuple( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE", 0, 0 ),
+						std::make_tuple( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE" ),
+						std::make_tuple( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE" ),
 					}
 				},
 				{
 					"FANREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "FAN ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "FAN RISE IN AIR TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "FAN ELECTRIC POWER", 0, 0 ),
+						std::make_tuple( "*", "FAN ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "FAN RISE IN AIR TEMPERATURE" ),
+						std::make_tuple( "*", "FAN ELECTRIC POWER" ),
 					}
 				},
 				{
 					"PUMPREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "PUMP ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "PUMP FLUID HEAT GAIN ENERGY", 0, 0 ),
-						std::make_tuple( "*", "PUMP ELECTRIC POWER", 0, 0 ),
-						std::make_tuple( "*", "PUMP SHAFT POWER", 0, 0 ),
-						std::make_tuple( "*", "PUMP FLUID HEAT GAIN RATE", 0, 0 ),
-						std::make_tuple( "*", "PUMP OUTLET TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "PUMP MASS FLOW RATE", 0, 0 ),
+						std::make_tuple( "*", "PUMP ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "PUMP FLUID HEAT GAIN ENERGY" ),
+						std::make_tuple( "*", "PUMP ELECTRIC POWER" ),
+						std::make_tuple( "*", "PUMP SHAFT POWER" ),
+						std::make_tuple( "*", "PUMP FLUID HEAT GAIN RATE" ),
+						std::make_tuple( "*", "PUMP OUTLET TEMPERATURE" ),
+						std::make_tuple( "*", "PUMP MASS FLOW RATE" ),
 					}
 				},
 				{
 					"CONDLOOPDEMANDREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE", 0, 0 ),
-						std::make_tuple( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE", 0, 0 ),
-						std::make_tuple( "*", "PLANT SUPPLY SIDE INLET TEMPERATURE", 0, 0 ),
-						std::make_tuple( "*", "PLANT SUPPLY SIDE OUTLET TEMPERATURE", 0, 0 ),
+						std::make_tuple( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE" ),
+						std::make_tuple( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE" ),
+						std::make_tuple( "*", "PLANT SUPPLY SIDE INLET TEMPERATURE" ),
+						std::make_tuple( "*", "PLANT SUPPLY SIDE OUTLET TEMPERATURE" ),
 					}
 				},
 				{
 					"ZONETEMPERATUREOSCILLATIONREPORTMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE OSCILLATING TEMPERATURES TIME", 0, 0 ),
-						std::make_tuple( "*", "ZONE PEOPLE OCCUPANT COUNT", 0, 0 ),
+						std::make_tuple( "*", "ZONE OSCILLATING TEMPERATURES TIME" ),
+						std::make_tuple( "*", "ZONE PEOPLE OCCUPANT COUNT" ),
 					}
 				},
 				{
 					"AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY",
 					{
-						std::make_tuple( "*", "AIR SYSTEM HOT WATER ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM STEAM ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM CHILLED WATER ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM GAS ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM WATER VOLUME", 0, 0 ),
+						std::make_tuple( "*", "AIR SYSTEM HOT WATER ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM STEAM ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM CHILLED WATER ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM GAS ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM WATER VOLUME" ),
 					}
 				},
 				{
 					"AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY",
 					{
-						std::make_tuple( "*", "AIR SYSTEM FAN AIR HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM COOLING COIL TOTAL COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HEAT EXCHANGER TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HEAT EXCHANGER TOTAL COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HUMIDIFIER TOTAL HEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM EVAPORATIVE COOLER TOTAL COOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY", 0, 0 ),
+						std::make_tuple( "*", "AIR SYSTEM FAN AIR HEATING ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM COOLING COIL TOTAL COOLING ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HEATING COIL TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HEAT EXCHANGER TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HEAT EXCHANGER TOTAL COOLING ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HUMIDIFIER TOTAL HEATING ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM EVAPORATIVE COOLER TOTAL COOLING ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY" ),
 					}
 				},
 				{
 					"AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY",
 					{
-						std::make_tuple( "*", "AIR SYSTEM FAN ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM DX HEATING COIL ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM DX COOLING COIL ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL GAS ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL STEAM ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM HUMIDIFIER ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRIC ENERGY", 0, 0 ),
-						std::make_tuple( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRIC ENERGY", 0, 0 ),
+						std::make_tuple( "*", "AIR SYSTEM FAN ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM DX HEATING COIL ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM DX COOLING COIL ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HEATING COIL ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HEATING COIL GAS ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HEATING COIL STEAM ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM HUMIDIFIER ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRIC ENERGY" ),
+						std::make_tuple( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRIC ENERGY" ),
 					}
 				},
 				{
 					"MECHANICALVENTILATIONLOADSMONTHLY",
 					{
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD DECREASE ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT ADDITION ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY", 0, 0 ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR", 0, 0 ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY" ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY" ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD DECREASE ENERGY" ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT ADDITION ENERGY" ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE ENERGY" ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY" ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY" ),
+						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR" ),
 					}
 				}
 			});
 
 			for ( auto const result : results_map ) {
-				int index = 1;
-				DataOutputs::OutputVariablesForSimulation.allocate( 10000 );
 				AddVariablesForMonthlyReport( result.first );
 				for ( auto const result_tuple : result.second ) {
-					EXPECT_EQ( std::get<0>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Key );
-					EXPECT_EQ( std::get<1>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).VarName );
-					EXPECT_EQ( std::get<2>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Previous );
-					EXPECT_EQ( std::get<3>( result_tuple ), DataOutputs::OutputVariablesForSimulation( index ).Next );
-					++index;
+					EXPECT_TRUE( DataOutputs::FindItemInVariableList( std::get<0>( result_tuple ), std::get<1>( result_tuple ) ) );
 				}
-				DataOutputs::OutputVariablesForSimulation.deallocate();
+				DataOutputs::OutputVariablesForSimulation.clear();
 				DataOutputs::NumConsideredOutputVariables = 0;
 			}
 
@@ -1524,10 +1499,7 @@ namespace EnergyPlus {
 			EXPECT_FALSE( has_cout_output() );
 			EXPECT_FALSE( has_cerr_output() );
 
-			EXPECT_EQ( "*", DataOutputs::OutputVariablesForSimulation( 1 ).Key );
-			EXPECT_EQ( "SITE OUTDOOR AIR DRYBULB TEMPERATURE", DataOutputs::OutputVariablesForSimulation( 1 ).VarName );
-			EXPECT_EQ( 0, DataOutputs::OutputVariablesForSimulation( 1 ).Previous );
-			EXPECT_EQ( 0, DataOutputs::OutputVariablesForSimulation( 1 ).Next );
+			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ) );
 
 		}
 
