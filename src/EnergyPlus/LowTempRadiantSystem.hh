@@ -547,6 +547,12 @@ namespace LowTempRadiantSystem {
 		int const SystemType // Type of radiant system: hydronic, constant flow, or electric
 	);
 
+	Real64
+	SizeRadSysTubeLength(
+		int const RadSysType, // type of system (hydronic or constant flow)
+		int const RadSysNum   // index number for radiant system
+	);
+	
 	void
 	CalcLowTempHydrRadiantSystem(
 		int const RadSysNum, // name of the low temperature radiant system

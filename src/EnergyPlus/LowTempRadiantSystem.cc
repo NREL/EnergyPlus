@@ -2382,9 +2382,8 @@ namespace LowTempRadiantSystem {
 						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "User-Specified Hydronic Tubing Length [m]", HydrRadSys( RadSysNum ).TubeLength );
 					}
 				} else { // Autosize or hard-size with sizing run
-					// assume tube spacing of 15 cm
 					// CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-					TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+					TubeLengthDes = SizeRadSysTubeLength( SystemType, RadSysNum );
 					if ( IsAutoSize ) {
 						HydrRadSys( RadSysNum ).TubeLength = TubeLengthDes;
 						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes );
@@ -2544,9 +2543,8 @@ namespace LowTempRadiantSystem {
 							"User-Specified Hydronic Tubing Length [m]", CFloRadSys( RadSysNum ).TubeLength );
 					}
 				} else {	// Autosize or hard-size with sizing run
-					// assume tube spacing of 15 cm
 					// CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-					TubeLengthDes = CFloRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+					TubeLengthDes = SizeRadSysTubeLength( SystemType, RadSysNum );
 					if (IsAutoSize ) {
 						CFloRadSys( RadSysNum ).TubeLength = TubeLengthDes;
 						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
@@ -2593,6 +2591,68 @@ namespace LowTempRadiantSystem {
 
 	}
 
+	Real64
+	SizeRadSysTubeLength(
+		int const RadSysType, // type of system (hydronic or constant flow)
+		int const RadSysNum   // index number for radiant system
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   August 2017
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine figures out the tube length based on the spacing of tubes.
+		// For single surface systems, this is fairly easy as there is only one spacing
+		// to deal with.  For multi-surface systems, more work is necessary because each
+		// surface could use a different spacing.
+
+		// Return value
+		Real64 SizeRadSysTubeLength;
+		
+		int SurfNum; // index for counting through the surfaces that are part of this radiant system
+		Real64 TubeLength; // temporary holding place for the function calculation
+		
+		// HydrRadSys( RadNum ).TotalSurfaceArea = 0.0;
+		// for ( SurfNum = 1; SurfNum <= HydrRadSys( RadNum ).NumOfSurfaces; ++SurfNum ) {
+		// 	HydrRadSys( RadNum ).TotalSurfaceArea += Surface( HydrRadSys( RadNum ).SurfacePtr( SurfNum ) ).Area;
+		// }
+
+		TubeLength = 0.0;
+		if ( RadSysType == HydronicSystem ) {
+			auto & thisHydrSys( HydrRadSys( RadSysNum ) );
+			for ( SurfNum = 1; SurfNum <= thisHydrSys.NumOfSurfaces; ++ SurfNum ) {
+				auto & thisHydrSysSurf( Surface( thisHydrSys.SurfacePtr( SurfNum ) ) );
+				auto & thisHydrSpacing( Construct( thisHydrSysSurf.Construction ).ThicknessPerpend );
+				if ( ( thisHydrSpacing > 0.005) && ( thisHydrSpacing < 0.5 ) ) { // limit allowable spacing to between 1cm and 1m
+					TubeLength += thisHydrSysSurf.Area / ( 2.0 * thisHydrSpacing );
+				} else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
+					TubeLength += thisHydrSysSurf.Area / 0.15;
+				}
+			}
+		} else if ( RadSysType == ConstantFlowSystem ) {
+			auto & thisCFloSys( CFloRadSys( RadSysNum ) );
+			for ( SurfNum = 1; SurfNum <= thisCFloSys.NumOfSurfaces; ++ SurfNum ) {
+				auto & thisCFloSysSurf( Surface( thisCFloSys.SurfacePtr( SurfNum ) ) );
+				auto & thisCFloSpacing( Construct( thisCFloSysSurf.Construction ).ThicknessPerpend );
+				if ( ( thisCFloSpacing > 0.005) && ( thisCFloSpacing < 0.5 ) ) { // limit allowable spacing to between 1cm and 1m
+					TubeLength += thisCFloSysSurf.Area / ( 2.0 * thisCFloSpacing );
+				} else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
+					TubeLength += thisCFloSysSurf.Area / 0.15;
+				}
+			}
+		} else {
+			// Return value
+			ShowWarningError( "SizeRadSysTubeLength: Illegal system type passed into this routine.  This should never happen." );
+			TubeLength = 60.0; // Assign a length to avoid any divide by zero errors. This length is a 3m by 3m room with 0.15m spacing.
+		}
+			
+		SizeRadSysTubeLength = TubeLength;
+		return SizeRadSysTubeLength;
+		
+	}
+	
 	void
 	CalcLowTempHydrRadiantSystem(
 		int const RadSysNum, // name of the low temperature radiant system
