@@ -472,6 +472,7 @@ namespace EMSManager {
 			SetupSurfaceConvectionActuators();
 			SetupSurfaceConstructionActuators();
 			SetupSurfaceOutdoorBoundaryConditionActuators();
+			SetupZoneOutdoorBoundaryConditionActuators();
 			GetEMSInput();
 			GetEMSUserInput = false;
 		}
@@ -1575,6 +1576,8 @@ namespace EMSManager {
 				NodeNum = OutsideAirNodeList( OutsideAirNodeNum );
 				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Drybulb Temperature", "[C]", Node( NodeNum ).EMSOverrideOutAirDryBulb, Node( NodeNum ).EMSValueForOutAirDryBulb );
 				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wetbulb Temperature", "[C]", Node( NodeNum ).EMSOverrideOutAirWetBulb, Node( NodeNum ).EMSValueForOutAirWetBulb );
+				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wind Speed", "[m/s]", Node( NodeNum ).EMSOverrideOutAirWindSpeed, Node( NodeNum ).EMSValueForOutAirWindSpeed);
+				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wind Direction", "[degree]", Node( NodeNum ).EMSOverrideOutAirWindDir, Node( NodeNum ).EMSValueForOutAirWindDir );
 			}
 		}
 
@@ -2065,6 +2068,7 @@ namespace EMSManager {
 			SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wetbulb Temperature", "[C]", Surface( SurfNum ).OutWetBulbTempEMSOverrideOn, Surface( SurfNum ).OutWetBulbTempEMSOverrideValue );
 			if ( Surface( SurfNum ).ExtWind ) {
 				SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wind Speed", "[m/s]", Surface( SurfNum ).WindSpeedEMSOverrideOn, Surface( SurfNum ).WindSpeedEMSOverrideValue );
+				SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wind Direction", "[degree]", Surface( SurfNum ).WindDirEMSOverrideOn, Surface( SurfNum ).WindDirEMSOverrideValue );
 			}
 		}
 
@@ -2122,6 +2126,58 @@ namespace EMSManager {
 		}
 
 	}
+
+	void
+	SetupZoneOutdoorBoundaryConditionActuators()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X Luo
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// setup EMS actuators for outside boundary conditions by surface
+
+		// METHODOLOGY EMPLOYED:
+		// loop through all surfaces, cycle if not heat transfer or outdoors BC
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataHeatBalance::Zone;
+		using DataGlobals::NumOfZones;
+
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int ZoneNum; // local loop index.
+
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Drybulb Temperature", "[C]", Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn, Zone( ZoneNum ).OutDryBulbTempEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wetbulb Temperature", "[C]", Zone( ZoneNum ).OutWetBulbTempEMSOverrideOn, Zone( ZoneNum ).OutWetBulbTempEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wind Speed", "[m/s]", Zone( ZoneNum ).WindSpeedEMSOverrideOn, Zone( ZoneNum ).WindSpeedEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wind Direction", "[degree]", Zone( ZoneNum ).WindDirEMSOverrideOn, Zone( ZoneNum ).WindDirEMSOverrideValue );
+
+		}
+
+	}
+
 
 	void
 	checkForUnusedActuatorsAtEnd()

@@ -192,6 +192,9 @@ namespace HeatBalanceManager {
 	GetZoneData( bool & ErrorsFound ); // If errors found in input
 
 	void
+	GetZoneLocalEnvData( bool & ErrorsFound ); // If errors found in input
+
+	void
 	ProcessZoneData(
 		std::string const & cCurrentModuleObject,
 		int const ZoneLoop,

@@ -4414,6 +4414,7 @@ namespace ZoneEquipmentManager {
 		using namespace DataHeatBalFanSys;
 		using namespace DataHeatBalance;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
+		using Psychrometrics::PsyWFnTdbTwbPb;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyTdbFnHW;
 		using DataRoomAirModel::ZTJET;
@@ -4479,7 +4480,10 @@ namespace ZoneEquipmentManager {
 		Real64 CpAir; // Heat capacity of air (J/kg-C)
 		Real64 OutletAirEnthalpy; // Enthlapy of outlet air (VENTILATION objects)
 		Real64 TempExt;
-		Real64 WindExt;
+		Real64 WindSpeedExt;
+		Real64 WindDirExt;
+		Real64 HumRatExt;
+		Real64 EnthalpyExt;
 		bool MixingLimitFlag;
 		Real64 MixingTmin;
 		Real64 MixingTmax;
@@ -4602,12 +4606,23 @@ namespace ZoneEquipmentManager {
 		}
 
 		for ( j = 1; j <= TotVentilation; ++j ) {
+			// X Luo Modified 08/02/2017
+			// Use air node information linked to the zone if defined
 			NZ = Ventilation( j ).ZonePtr;
 			Ventilation( j ).FanPower = 0.0;
 			TempExt = Zone( NZ ).OutDryBulbTemp;
-			WindExt = Zone( NZ ).WindSpeed;
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, OutHumRat );
-			CpAir = PsyCpAirFnWTdb( OutHumRat, TempExt );
+			WindSpeedExt = Zone( NZ ).WindSpeed;
+			WindDirExt = Zone( NZ ).WindDir;
+			if ( Zone( NZ ).HasLinkedOutAirNode ) {
+				HumRatExt = Node( Zone( NZ ).LinkedOutAirNode ).HumRat;
+				EnthalpyExt = Node( Zone( NZ ).LinkedOutAirNode ).Enthalpy;
+			}
+			else {
+				HumRatExt = OutHumRat;
+				EnthalpyExt = OutEnthalpy;					
+			}
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, HumRatExt );
+			CpAir = PsyCpAirFnWTdb( HumRatExt, TempExt );
 			//CR7751 should maybe use code below, indoor conditions instead of outdoor conditions
 			//   AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZMAT(NZ), ZHumRat(NZ))
 			//   CpAir = PsyCpAirFnWTdb(ZHumRat(NZ),ZMAT(NZ))
@@ -4675,7 +4690,7 @@ namespace ZoneEquipmentManager {
 			// Skip this if the outdoor temperature is above the maximum outdoor temperature limit
 			if ( ( TempExt > Ventilation( I ).MaxOutdoorTemperature ) && ( ! Ventilation( j ).EMSSimpleVentOn ) ) continue;
 			// Skip this if the outdoor wind speed is above the maximum windspeed limit
-			if ( ( WindExt > Ventilation( I ).MaxWindSpeed ) && ( ! Ventilation( j ).EMSSimpleVentOn ) ) continue;
+			if ( ( WindSpeedExt > Ventilation( I ).MaxWindSpeed ) && ( ! Ventilation( j ).EMSSimpleVentOn ) ) continue;
 
 			// Hybrid ventilation controls
 			if ( ( Ventilation( j ).HybridControlType == HybridControlTypeClose ) && ( ! Ventilation( j ).EMSSimpleVentOn ) ) continue;
@@ -4690,7 +4705,7 @@ namespace ZoneEquipmentManager {
 				if ( Ventilation( j ).EMSSimpleVentOn ) VVF = Ventilation( j ).EMSimpleVentFlowRate;
 
 				if ( VVF < 0.0 ) VVF = 0.0;
-				VentMCP( j ) = VVF * AirDensity * CpAir * ( Ventilation( j ).ConstantTermCoef + std::abs( TempExt - ZMAT( NZ ) ) * Ventilation( j ).TemperatureTermCoef + WindExt * ( Ventilation( j ).VelocityTermCoef + WindExt * Ventilation( j ).VelocitySQTermCoef ) );
+				VentMCP( j ) = VVF * AirDensity * CpAir * ( Ventilation( j ).ConstantTermCoef + std::abs( TempExt - ZMAT( NZ ) ) * Ventilation( j ).TemperatureTermCoef + WindSpeedExt * ( Ventilation( j ).VelocityTermCoef + WindSpeedExt * Ventilation( j ).VelocitySQTermCoef ) );
 				if ( VentMCP( j ) < 0.0 ) VentMCP( j ) = 0.0;
 				VAMFL_temp = VentMCP( j ) / CpAir;
 				if ( Ventilation( j ).QuadratureSum ) {
@@ -4726,19 +4741,19 @@ namespace ZoneEquipmentManager {
 				// Intake fans will add some heat to the air, raising the temperature for an intake fan...
 				if ( Ventilation( j ).FanType == IntakeVentilation || Ventilation( j ).FanType == BalancedVentilation ) {
 					if ( VAMFL_temp == 0.0 ) {
-						OutletAirEnthalpy = OutEnthalpy;
+						OutletAirEnthalpy = EnthalpyExt;
 					} else {
 						if ( Ventilation( j ).FanPower > 0.0 ) {
 							if ( Ventilation( j ).FanType == BalancedVentilation ) {
-								OutletAirEnthalpy = OutEnthalpy + Ventilation( j ).FanPower / VAMFL_temp / 2.0; // Half fan power to calculate inlet T
+								OutletAirEnthalpy = EnthalpyExt + Ventilation( j ).FanPower / VAMFL_temp / 2.0; // Half fan power to calculate inlet T
 							} else {
-								OutletAirEnthalpy = OutEnthalpy + Ventilation( j ).FanPower / VAMFL_temp;
+								OutletAirEnthalpy = EnthalpyExt + Ventilation( j ).FanPower / VAMFL_temp;
 							}
 						} else {
-							OutletAirEnthalpy = OutEnthalpy;
+							OutletAirEnthalpy = EnthalpyExt;
 						}
 					}
-					Ventilation( j ).AirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutHumRat );
+					Ventilation( j ).AirTemp = PsyTdbFnHW( OutletAirEnthalpy, HumRatExt );
 				} else {
 					Ventilation( j ).AirTemp = TempExt;
 				}
@@ -4750,7 +4765,7 @@ namespace ZoneEquipmentManager {
 					Cw = Ventilation( j ).OpenEff;
 				} else {
 					// linear interpolation between effective angle and wind direction
-					angle = std::abs( WindDir - Ventilation( j ).EffAngle );
+					angle = std::abs( WindDirExt - Ventilation( j ).EffAngle );
 					if ( angle > 180.0 ) angle -= 180.0;
 					Cw = 0.55 + angle / 180.0 * ( 0.3 - 0.55 );
 				}
@@ -4759,7 +4774,7 @@ namespace ZoneEquipmentManager {
 				} else {
 					Cd = 0.40 + 0.0045 * std::abs( TempExt - ZMAT( NZ ) );
 				}
-				Qw = Cw * Ventilation( j ).OpenArea * GetCurrentScheduleValue( Ventilation( j ).OpenAreaSchedPtr ) * WindExt;
+				Qw = Cw * Ventilation( j ).OpenArea * GetCurrentScheduleValue( Ventilation( j ).OpenAreaSchedPtr ) * WindSpeedExt;
 				Qst = Cd * Ventilation( j ).OpenArea * GetCurrentScheduleValue( Ventilation( j ).OpenAreaSchedPtr ) * std::sqrt( 2.0 * 9.81 * Ventilation( j ).DH * std::abs( TempExt - ZMAT( NZ ) ) / ( ZMAT( NZ ) + 273.15 ) );
 				VVF = std::sqrt( Qw * Qw + Qst * Qst );
 				if ( Ventilation( j ).EMSSimpleVentOn ) VVF = Ventilation( j ).EMSimpleVentFlowRate;
@@ -5170,15 +5185,24 @@ namespace ZoneEquipmentManager {
 			} //ZoneA=1,(NumOfZones - 1)
 		} //(TotRefrigerationDoorMixing > 0) THEN
 
+		int t = TotInfiltration;
 		// Process the scheduled Infiltration for air heat balance depending on model type
 		for ( j = 1; j <= TotInfiltration; ++j ) {
 
 			NZ = Infiltration( j ).ZonePtr;
 
 			TempExt = Zone( NZ ).OutDryBulbTemp;
-			WindExt = Zone( NZ ).WindSpeed;
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, OutHumRat, RoutineNameInfiltration );
-			CpAir = PsyCpAirFnWTdb( OutHumRat, TempExt );
+			WindSpeedExt = Zone( NZ ).WindSpeed;
+
+			// X Luo Modified 08/02/2017
+			// Use air node information linked to the zone if defined
+			
+			if ( Zone( NZ ).HasLinkedOutAirNode ) HumRatExt = Node( Zone( NZ ).LinkedOutAirNode ).HumRat;
+			else HumRatExt = OutHumRat;
+
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, HumRatExt, RoutineNameInfiltration );
+			CpAir = PsyCpAirFnWTdb( HumRatExt, TempExt );
+
 			//CR7751  should maybe use code below, indoor conditions instead of outdoor conditions
 			//   AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZMAT(NZ), ZHumRat(NZ))
 			//   CpAir = PsyCpAirFnWTdb(ZHumRat(NZ),ZMAT(NZ))
@@ -5189,7 +5213,7 @@ namespace ZoneEquipmentManager {
 				IVF = Infiltration( j ).DesignLevel * GetCurrentScheduleValue( Infiltration( j ).SchedPtr );
 				// CR6845 if calculated < 0.0, don't propagate
 				if ( IVF < 0.0 ) IVF = 0.0;
-				MCpI_temp = IVF * AirDensity * CpAir * ( Infiltration( j ).ConstantTermCoef + std::abs( TempExt - ZMAT( NZ ) ) * Infiltration( j ).TemperatureTermCoef + WindExt * ( Infiltration( j ).VelocityTermCoef + WindExt * Infiltration( j ).VelocitySQTermCoef ) );
+				MCpI_temp = IVF * AirDensity * CpAir * ( Infiltration( j ).ConstantTermCoef + std::abs( TempExt - ZMAT( NZ ) ) * Infiltration( j ).TemperatureTermCoef + WindSpeedExt * ( Infiltration( j ).VelocityTermCoef + WindSpeedExt * Infiltration( j ).VelocitySQTermCoef ) );
 
 				if ( MCpI_temp < 0.0 ) MCpI_temp = 0.0;
 				Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
@@ -5208,8 +5232,8 @@ namespace ZoneEquipmentManager {
 				Infiltration(j).MassFlowRate = Infiltration(j).VolumeFlowRate * AirDensity;
 			} else if ( SELECT_CASE_var == InfiltrationShermanGrimsrud ) {
 				// Sherman Grimsrud model as formulated in ASHRAE HoF
-				WindExt = WindSpeed; // formulated to use wind at Meterological Station rather than local
-				IVF = GetCurrentScheduleValue( Infiltration( j ).SchedPtr ) * Infiltration( j ).LeakageArea / 1000.0 * std::sqrt( Infiltration( j ).BasicStackCoefficient * std::abs( TempExt - ZMAT( NZ ) ) + Infiltration( j ).BasicWindCoefficient * pow_2( WindExt ) );
+				WindSpeedExt = WindSpeed; // formulated to use wind at Meterological Station rather than local
+				IVF = GetCurrentScheduleValue( Infiltration( j ).SchedPtr ) * Infiltration( j ).LeakageArea / 1000.0 * std::sqrt( Infiltration( j ).BasicStackCoefficient * std::abs( TempExt - ZMAT( NZ ) ) + Infiltration( j ).BasicWindCoefficient * pow_2( WindSpeedExt ) );
 				if ( IVF < 0.0 ) IVF = 0.0;
 				MCpI_temp = IVF * AirDensity * CpAir;
 				if ( MCpI_temp < 0.0 ) MCpI_temp = 0.0;
@@ -5229,7 +5253,7 @@ namespace ZoneEquipmentManager {
 				Infiltration(j).MassFlowRate = Infiltration(j).VolumeFlowRate * AirDensity;
 			} else if ( SELECT_CASE_var == InfiltrationAIM2 ) {
 				// Walker Wilson model as formulated in ASHRAE HoF
-				IVF = GetCurrentScheduleValue( Infiltration( j ).SchedPtr ) * std::sqrt( pow_2( Infiltration( j ).FlowCoefficient * Infiltration( j ).AIM2StackCoefficient * std::pow( std::abs( TempExt - ZMAT( NZ ) ), Infiltration( j ).PressureExponent ) ) + pow_2( Infiltration( j ).FlowCoefficient * Infiltration( j ).AIM2WindCoefficient * std::pow( Infiltration( j ).ShelterFactor * WindExt, 2.0 * Infiltration( j ).PressureExponent ) ) );
+				IVF = GetCurrentScheduleValue( Infiltration( j ).SchedPtr ) * std::sqrt( pow_2( Infiltration( j ).FlowCoefficient * Infiltration( j ).AIM2StackCoefficient * std::pow( std::abs( TempExt - ZMAT( NZ ) ), Infiltration( j ).PressureExponent ) ) + pow_2( Infiltration( j ).FlowCoefficient * Infiltration( j ).AIM2WindCoefficient * std::pow( Infiltration( j ).ShelterFactor * WindSpeedExt, 2.0 * Infiltration( j ).PressureExponent ) ) );
 				if ( IVF < 0.0 ) IVF = 0.0;
 				MCpI_temp = IVF * AirDensity * CpAir;
 				if ( MCpI_temp < 0.0 ) MCpI_temp = 0.0;
@@ -5285,8 +5309,8 @@ namespace ZoneEquipmentManager {
 					}
 				}
 				NZ = ZoneAirBalance( j ).ZonePtr;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Zone( NZ ).OutDryBulbTemp, OutHumRat, RoutineNameZoneAirBalance );
-				CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( NZ ).OutDryBulbTemp );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Zone( NZ ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance );
+				CpAir = PsyCpAirFnWTdb( HumRatExt, Zone( NZ ).OutDryBulbTemp );
 				ZoneAirBalance( j ).ERVMassFlowRate *= AirDensity;
 				MDotOA( NZ ) = std::sqrt( pow_2( ZoneAirBalance( j ).NatMassFlowRate ) + pow_2( ZoneAirBalance( j ).IntMassFlowRate ) + pow_2( ZoneAirBalance( j ).ExhMassFlowRate ) + pow_2( ZoneAirBalance( j ).ERVMassFlowRate ) + pow_2( ZoneAirBalance( j ).InfMassFlowRate ) + pow_2( AirDensity * ZoneAirBalance( j ).InducedAirRate * GetCurrentScheduleValue( ZoneAirBalance( j ).InducedAirSchedPtr ) ) ) + ZoneAirBalance( j ).BalMassFlowRate;
 				MDotCPOA( NZ ) = MDotOA( NZ ) * CpAir;

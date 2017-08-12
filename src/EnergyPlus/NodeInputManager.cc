@@ -448,6 +448,8 @@ namespace NodeInputManager {
 					SetupOutputVariable( "System Node Enthalpy [J/kg]", MoreNodeInfo( NumNode ).ReportEnthalpy, "System", "Average", NodeID( NumNode ) );
 					SetupOutputVariable( "System Node Wetbulb Temperature [C]", MoreNodeInfo( NumNode ).WetBulbTemp, "System", "Average", NodeID( NumNode ) );
 					SetupOutputVariable( "System Node Dewpoint Temperature [C]", MoreNodeInfo( NumNode ).AirDewPointTemp, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable(" System Node Wind Speed [m/s]", Node( NumNode ).OutAirWindSpeed, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable(" System Node Wind Direction [degree]", Node( NumNode ).OutAirWindDir, "System", "Average", NodeID( NumNode ) );
 					SetupOutputVariable( "System Node Quality []", Node( NumNode ).Quality, "System", "Average", NodeID( NumNode ) );
 					SetupOutputVariable( "System Node Height [m]", Node( NumNode ).Height, "System", "Average", NodeID( NumNode ) );
 					if ( DisplayAdvancedReportVariables ) {

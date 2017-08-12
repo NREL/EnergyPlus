@@ -17788,6 +17788,94 @@ SurfaceProperty:SolarIncidentInside,
        \required-field
        \type object-list
        \object-list ScheduleNames
+	   
+SurfaceProperty:LocalEnvironment,
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference SurfaceLocalEnvironmentNames
+   A2, \field Exterior Surface Name
+       \type object-list
+       \object-list SurfaceNames
+       \note Enter the name of an exterior surface object
+   A3, \field External Shading Fraction Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Enter the name of a Schedule object
+   A4, \field Surrounding Surfaces Object Name
+       \type object-list
+       \object-list SurroundingSurfacesNames
+       \note Enter the name of a SurfaceProperty:SurroundingSurfaces object
+   A5; \field Outdoor Air Node Name
+       \type object-list
+       \object-list OutdoorAirNodeNames
+       \note Enter the name of an OutdoorAir:Node object
+
+ZoneProperty:LocalEnvironment,
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference ZoneLocalEnvironmentNames
+   A2, \field Zone Name
+       \type object-list
+       \object-list ZoneNames
+       \note Enter the name of a zone object
+   A3; \field Outdoor Air Node Name
+       \type object-list
+       \object-list OutdoorAirNodeNames
+       \note Enter the name of an OutdoorAir:Node object
+
+SurfaceProperty:SurroundingSurfaces,
+       \min-fields 8
+       \memo This object defines a list of surrounding surfaces for an exterior surface.
+       \extensible: -- duplicate last set of surrounding surface properties (the last three fields), remembering to remove ; from "inner" fields.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference SurroundingSurfacesNames
+   N1, \field Sky View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.5
+       \note optional
+   A2, \field Sky Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+   N2, \field Ground View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.5
+       \note optional
+   A3, \field Ground Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+   A4, \field Surrounding Surface 1 Name       
+       \required-field
+       \type alpha 
+   N3, \field Surrounding Surface 1 View Factor
+       \required-field
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A5, \field Surrounding Surface 1 Temperature Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A6, \field Surrounding Surface 2 Name       
+       \type alpha 
+   N4, \field Surrounding Surface 2 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A7; \field Surrounding Surface 2 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
 
 ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Used to provide solar radiation absorbed in fenestration layers. References surface-construction pair
@@ -61186,19 +61274,37 @@ NodeList,
   A492,A493,A494,A495,A496,A497,A498,A499,A500,A501; \note fields as indicated
 
 OutdoorAir:Node,
-       \memo This object sets the temperature and humidity conditions
-       \memo for an outdoor air node.  It allows the height above ground to be
-       \memo specified.  This object may be used more than once.
-       \memo The same node name may not appear in both an OutdoorAir:Node object and
-       \memo an OutdoorAir:NodeList object.
+      \memo This object sets the temperature and humidity conditions
+	  \memo for an outdoor air node.  It allows the height above ground to be
+	  \memo specified.  This object may be used more than once.
+	  \memo The same node name may not appear in both an OutdoorAir:Node object and
+	  \memo an OutdoorAir:NodeList object.
+	  \memo This object defines local outdoor air environmental conditions.
   A1,  \field Name
        \required-field
        \type node
-  N1 ; \field Height Above Ground
+  N1,  \field Height Above Ground
        \note A value less than zero indicates that the height will be ignored and the weather file conditions will be used.
        \type real
        \units m
        \default -1.0
+  A2 , \field Drybulb Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C 
+  A3 , \field Wetbulb Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+  A4 , \field Wind Speed Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, 0.0 to 40.0, units m/s
+  A5 ; \field Wind Direction Schedule Name 
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, 0.0 to 360.0, units degree
+
 
 OutdoorAir:NodeList,
        \extensible:1 Just duplicate last field and comments (changing numbering, please)

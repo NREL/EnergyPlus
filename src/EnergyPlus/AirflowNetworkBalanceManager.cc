@@ -5470,7 +5470,7 @@ namespace AirflowNetworkBalanceManager {
 				Real64 Vol = Zone( ZoneNum ).Volume; // Zone volume [m3]
 				V = pow( Vol, 0.333 ) * ACH / 3600; // Average air speed in zone [m/s]
 			} else {
-				V = WindSpeed;
+				V = Zone( ZoneNum ).WindSpeed;
 			}
 
 			Real64 Re = V * Dh / KinVisc; // Reynolds number

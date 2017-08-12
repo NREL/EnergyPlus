@@ -72,7 +72,7 @@ using namespace EnergyPlus::HeatBalanceSurfaceManager;
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp )
 	{
 
 		int SurfNum; // Surface number DO loop counter
@@ -115,8 +115,10 @@ namespace EnergyPlus {
 		DataHeatBalSurface::TempSurfIn( SurfNum ) = 1.0;
 		DataHeatBalSurface::QRadSWOutMvIns.allocate( SurfNum );
 		DataHeatBalSurface::QRadSWOutMvIns( SurfNum ) = 1.0;
+		DataHeatBalSurface::QRadLWOutSrdSurfs.allocate( SurfNum );
+		DataHeatBalSurface::QRadLWOutSrdSurfs( SurfNum ) = 1.0;
 		
-		DataHeatBalSurface::TH.allocate(2,2,1);
+		DataHeatBalSurface::TH.allocate( 2,2,1 );
 		DataSurfaces::Surface.allocate( SurfNum );
 		DataSurfaces::Surface( SurfNum ).Class = 1;
 		DataSurfaces::Surface( SurfNum ).Area = 10.0;

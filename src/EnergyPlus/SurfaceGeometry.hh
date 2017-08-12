@@ -54,8 +54,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
+#include <DataLoopNode.hh>
 #include <DataVectorTypes.hh>
 #include <HeatBalanceKivaManager.hh>
+#include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 
 // C++ Headers
 #include <map>
@@ -279,6 +282,12 @@ namespace SurfaceGeometry {
 
 	void
 	GetShadingSurfReflectanceData( bool & ErrorsFound ); // If errors found in input
+
+	void
+	GetSurfaceSrdSurfsData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
+
+	void
+	GetSurfaceLocalEnvData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
 
 	void
 	GetHTSurfExtVentedCavityData( bool & ErrorsFound ); // Error flag indicator (true if errors found)

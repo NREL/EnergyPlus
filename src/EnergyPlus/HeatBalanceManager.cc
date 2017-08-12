@@ -4291,6 +4291,8 @@ namespace HeatBalanceManager {
 
 		GetZoneData( ErrorsFound ); // Read Zone data from input file
 
+		GetZoneLocalEnvData( ErrorsFound );
+
 		SetupZoneGeometry( ErrorsFound );
 
 	}
@@ -4515,10 +4517,137 @@ namespace HeatBalanceManager {
 			} // GroupNum
 		}
 
+		// GetZoneLocalEnvData( ErrorsFound );
+
 		//allocate the array the holds the predefined report data
 		ZonePreDefRep.allocate( NumOfZones );
 
 	}
+
+	void
+	GetZoneLocalEnvData( bool & ErrorsFound ) // Error flag indicator (true if errors found)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X LUO
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// load input data for Outdoor Air Node for zones
+
+		// METHODOLOGY EMPLOYED:
+		// usual E+ input processes
+
+
+		// Using/Aliasing
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::VerifyName;
+
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
+
+		using DataHeatBalance::ZoneLocalEnvironment;
+		using DataLoopNode::Node;
+		using DataLoopNode::NodeType_Air;
+		using DataLoopNode::NodeConnectionType_Inlet;
+		using DataLoopNode::ObjectIsParent;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetZoneLocalEnvData: " );
+
+		// INTERFACE BLOCK SPECIFICATIONS:na
+		// DERIVED TYPE DEFINITIONS:na
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumArgs;
+		int NumAlpha;
+		int NumNumeric;
+
+		int Loop;
+		int ZoneLoop;
+		int ZoneNum; // DO loop counter for zones
+		int TotZoneEnv;
+		bool ErrorInName;
+		bool IsBlank;
+		int IOStat;
+		int NodeNum;
+		int OutdoorAirNodeNum;
+
+		//-----------------------------------------------------------------------
+		//               ZoneProperty:LocalEnvironment
+		//-----------------------------------------------------------------------
+
+		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";		
+		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
+		if ( TotZoneEnv > 0 ) {
+			// Check if IDD definition is correct
+			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
+			if ( NumAlpha != 3 ) {
+				ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates wroung number of Alpha Objects (requires 3)." );
+				ErrorsFound = true;
+			}
+
+			if ( !allocated( ZoneLocalEnvironment ) ) {
+				ZoneLocalEnvironment.allocate( TotZoneEnv );
+			}
+
+			for ( Loop = 1; Loop <= TotZoneEnv; ++Loop ) {
+				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				ErrorInName = false;
+				IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), ZoneLocalEnvironment, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				if ( ErrorInName ) {
+					ShowContinueError( "...each ZoneProperty:LocalEnvironment name must not duplicate other SurfaceProperty:LocalEnvironment name" );
+					ErrorsFound = true;
+					continue;
+				}
+
+				ZoneLocalEnvironment( Loop ).Name = cAlphaArgs( 1 );
+
+				// Assign zone number
+				ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+				if ( ZoneNum == 0 ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
+					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding zone has been found in the input file." );
+					ErrorsFound = true;
+				}
+				else {
+					ZoneLocalEnvironment( Loop ).ZonePtr = ZoneNum;
+				}
+
+				//Assign outdoor air node number;
+				NodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+				if ( NodeNum == 0 && CheckOutAirNodeNumber( NodeNum ) ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 3 ) + " has been found." );
+					ShowContinueError( cAlphaFieldNames( 3 ) + " entered value = \"" + cAlphaArgs( 3 ) + "\" no corresponding schedule has been found in the input file." );
+					ErrorsFound = true;
+				}
+				else {
+					ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr = NodeNum;
+				}
+			}
+		}
+		// Link zone properties to zone object
+		for ( ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) {
+			for ( Loop = 1; Loop <= TotZoneEnv; ++Loop ) {
+				if ( ZoneLocalEnvironment( Loop ).ZonePtr == ZoneLoop ) {
+					if ( ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
+						Zone( ZoneLoop ).HasLinkedOutAirNode = true;
+						Zone( ZoneLoop ).LinkedOutAirNode = ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr;
+					}
+				}
+			}
+		}
+	}
+
 
 	void
 	ProcessZoneData(
@@ -4666,6 +4795,8 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wind Direction [degree]", Zone( ZoneLoop ).WindDir, "Zone", "Average", Zone( ZoneLoop ).Name );
+
 
 		if ( FlagHybridModel ){
 			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
@@ -4705,6 +4836,8 @@ namespace HeatBalanceManager {
 		using namespace ConductionTransferFunctionCalc;
 		using namespace WindowManager;
 		using namespace SolarShading;
+		using DataLoopNode::Node;
+		using OutAirNodeManager::GetOutAirNodesInput;
 		using DaylightingDevices::InitDaylightingDevices;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		//  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -4726,6 +4859,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StormWinNum; // Number of StormWindow object
 		int SurfNum; // Surface number
+		int ZoneNum;
 		static bool ChangeSet( true ); // Toggle for checking storm windows
 
 		// FLOW:
@@ -4807,6 +4941,57 @@ namespace HeatBalanceManager {
 		if ( DetailedSolarTimestepIntegration ) { // always redo solar calcs
 			PerformSolarCalculations();
 		}
+
+		// Initialize zone outdoor environmental variables
+		// Bulk Initialization for Temperatures & WindSpeed
+		// using the zone, modify the zone  Dry/Wet BulbTemps
+		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
+
+		// X Luo Added 07/19/2017
+		// set zone level wind dir to global value
+		SetZoneWindSpeedAt();
+		SetZoneWindDirAt();
+
+		// X Luo Added 07/30/2017
+		// Set zone data to linked air node value if defined.
+		GetOutAirNodesInput();
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
+				if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
+					Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+				}
+				if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWetBulb ) {
+					Zone( ZoneNum ).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
+				}
+				if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWindSpeed ) {
+					Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
+				}
+				if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWindDir ) {
+					Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
+				}
+			}
+		}
+
+		// X Luo Added 07/19/2017
+		// Overwriting surface and zone level environmental data with EMS override value 
+		if ( AnyEnergyManagementSystemInModel ) {
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				if ( Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn ) {
+					Zone( ZoneNum ).OutDryBulbTemp = Zone( ZoneNum ).OutDryBulbTempEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).OutWetBulbTempEMSOverrideOn ) {
+					Zone( ZoneNum ).OutWetBulbTemp = Zone( ZoneNum ).OutWetBulbTempEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).WindSpeedEMSOverrideOn ) {
+					Zone( ZoneNum ).WindSpeed = Zone( ZoneNum ).WindSpeedEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).WindDirEMSOverrideOn ) {
+					Zone( ZoneNum ).WindDir = Zone( ZoneNum ).WindDirEMSOverrideValue;
+				}
+			}
+		}
+
 
 	}
 

@@ -8389,6 +8389,7 @@ namespace SolarShading {
 		int SurfNum; // Surface counter
 		int IPhi; // Altitude step counter
 		int ITheta; // Azimuth step counter
+		int SrdSurfsNum; // Srd surface counter
 		Real64 DPhi; // Altitude step size
 		Real64 DTheta; // Azimuth step size
 		Real64 DThetaDPhi; // Product of DTheta and DPhi
@@ -8535,7 +8536,19 @@ namespace SolarShading {
 				Surface( SurfNum ).ViewFactorSkyIR *= DifShdgRatioIsoSkyHRTS( 1, 1, SurfNum );
 			}
 			Surface( SurfNum ).ViewFactorGroundIR = 1.0 - Surface( SurfNum ).ViewFactorSkyIR;
+
+			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+				SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+				if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+					Surface( SurfNum ).ViewFactorSkyIR *= SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+				}
+				if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor != -1 ) {
+					Surface( SurfNum ).ViewFactorGroundIR *= SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+				}
+			}
 		}
+
+		// TODO: overwrite here
 
 		//  DEALLOCATE(WithShdgIsoSky)
 		//  DEALLOCATE(WoShdgIsoSky)

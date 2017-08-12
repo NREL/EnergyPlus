@@ -335,7 +335,7 @@ namespace HeatBalanceSurfaceManager {
 		// heat balance.
 
 		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger record keeping events.
+		// Uses the status flags to trigger record keeping events. 
 
 		// REFERENCES:
 		// na
@@ -357,6 +357,7 @@ namespace HeatBalanceSurfaceManager {
 		using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
 		using DataSystemVariables::GoodIOStatValue;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
+		using DataLoopNode::Node;
 		// RJH DElight Modification Begin
 		using namespace DElightManagerF;
 		// RJH DElight Modification End
@@ -378,6 +379,8 @@ namespace HeatBalanceSurfaceManager {
 		Real64 QIC; // Intermediate calculation variable
 		Real64 QOC; // Intermediate calculation variable
 		int SurfNum; // DO loop counter for surfaces
+		int ZoneNum; // DO loop counter for zones
+		int SrdSurfsNum; // DO loop counter for srd surfaces
 		int Term; // DO loop counter for conduction equation terms
 		Real64 TSC; // Intermediate calculation variable (temperature at source location)
 		Real64 TUC; // Intermediate calculation variable (temperature at user specified location)
@@ -412,13 +415,20 @@ namespace HeatBalanceSurfaceManager {
 		assert( equal_dimensions( TH, QH ) );
 
 		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Outdoor environment for Surfaces" );
+
+		// X Luo Deleted 08/01/2017
+		// Zone levelset up were moved to subroutine InitHeatBalance() in HeatBalanceManager.cc
+		// This subroutine - InitSurfaceHeatBalance() is executed right after InitHeatBalance() and is suggest to handle surface level input only as the name suggested
+		// The test shows identical results with the original implementation
+
+		// set zone level wind dir to global value
 		// Initialize zone outdoor environmental variables
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the zone, modify the zone  Dry/Wet BulbTemps
-		SetZoneOutBulbTempAt();
-		CheckZoneOutBulbTempAt();
+		//SetZoneOutBulbTempAt();
+		//CheckZoneOutBulbTempAt();		
+		//SetZoneWindSpeedAt();
 
-		SetZoneWindSpeedAt();
 		//  DO ZoneNum = 1, NumOfZones
 		//    Zone(ZoneNum)%WindSpeed = WindSpeedAt(Zone(ZoneNum)%Centroid%z)
 		//  END DO
@@ -429,11 +439,35 @@ namespace HeatBalanceSurfaceManager {
 		SetSurfaceOutBulbTempAt();
 		CheckSurfaceOutBulbTempAt();
 
+		// X Luo Added 07/19/2017
+		// set surface level wind dir to global value
 		SetSurfaceWindSpeedAt();
+		SetSurfaceWindDirAt();
 		//  DO SurfNum = 1, TotSurfaces
 		//    IF (Surface(SurfNum)%ExtWind) Surface(SurfNum)%WindSpeed = WindSpeedAt(Surface(SurfNum)%Centroid%z)
 		//  END DO
 
+		// X Luo Added 07/30/2017
+		// Set surface data to linked air node value 
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			if ( Surface( SurfNum ).HasLinkedOutAirNode ) {
+				if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
+					Surface( SurfNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+				}
+				if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWetBulb ) {
+					Surface( SurfNum ).OutWetBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
+				}
+				if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWindSpeed ) {
+					Surface( SurfNum ).WindSpeed = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
+				}
+				if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWindDir ) {
+					Surface( SurfNum ).WindDir = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
+				}
+			}
+		}
+
+		// X Luo Added 07/19/2017
+		// Overwriting surface and zone level environmental data with EMS override value 
 		if ( AnyEnergyManagementSystemInModel ) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).OutDryBulbTempEMSOverrideOn ) {
@@ -444,6 +478,21 @@ namespace HeatBalanceSurfaceManager {
 				}
 				if ( Surface( SurfNum ).WindSpeedEMSOverrideOn ) {
 					Surface( SurfNum ).WindSpeed = Surface( SurfNum ).WindSpeedEMSOverrideValue;
+				} 
+				if ( Surface( SurfNum ).WindDirEMSOverrideOn ) {
+					Surface( SurfNum ).WindDir = Surface( SurfNum ).WindDirEMSOverrideValue;
+				}
+			}
+		}
+
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+				int SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+				if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+					Surface( SurfNum ).ViewFactorSkyIR *= SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+				}
+				if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor != -1 ) {
+					Surface( SurfNum ).ViewFactorGroundIR *= SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
 				}
 			}
 		}
@@ -1305,6 +1354,7 @@ namespace HeatBalanceSurfaceManager {
 		HAirExtSurf.dimension( TotSurfaces, 0.0 );
 		HSkyExtSurf.dimension( TotSurfaces, 0.0 );
 		HGrdExtSurf.dimension( TotSurfaces, 0.0 );
+		QRadLWOutSrdSurfs.dimension(TotSurfaces, 0.0);
 		TempSurfIn.dimension( TotSurfaces, 0.0 );
 		TempSurfInTmp.dimension( TotSurfaces, 0.0 );
 		QRadSWOutAbs.dimension( TotSurfaces, 0.0 );
@@ -1475,11 +1525,13 @@ namespace HeatBalanceSurfaceManager {
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Drybulb Temperature [C]", Surface( loop ).OutDryBulbTemp, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Wetbulb Temperature [C]", Surface( loop ).OutWetBulbTemp, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Speed [m/s]", Surface( loop ).WindSpeed, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Direction [degree]", Surface( loop ).WindDir, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate [W]", QdotConvOutRep( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate per Area [W/m2]", QdotConvOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Energy [J]", QConvOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Transfer Coefficient [W/m2-K]", HcExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Rate [W]", QdotRadOutRep( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Net Long Wave Radiation Heat Gain Rate [W]", QRadLWOutSrdSurfs( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area [W/m2]", QdotRadOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]", QRadOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]", HAirExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
@@ -4608,11 +4660,17 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 	Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave  COP mod
 	int RoughSurf; // Roughness index of the exterior surface
 	int SurfNum; // Surface number DO loop counter
+	int SrdSurfsNum; // Surrounding surfaces list number
+	int SrdSurfNum; // Surrounding surface number DO loop counter
+	Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
+	Real64 SrdSurfViewFac; // View factor of a surrounding surface
 	Real64 TempExt; // Exterior temperature boundary condition
 	int ZoneNum; // Zone number the current surface is attached to
 	int OPtr;
 	Real64 RhoVaporSat; // Local temporary saturated vapor density for checking
 	bool MovInsulErrorFlag; // Movable Insulation error flag
+	Real64 TSurf; // Absolute temperature of the outside surface of an exterior surface
+	
 
 	// FUNCTION DEFINITIONS:
 	// na
@@ -4665,6 +4723,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 		HAirExtSurf( SurfNum ) = 0.0;
 		HSkyExtSurf( SurfNum ) = 0.0;
 		HGrdExtSurf( SurfNum ) = 0.0;
+		QRadLWOutSrdSurfs( SurfNum ) = 0.0;
 
 		// Calculate the current outside surface temperature TH(SurfNum,1,1) for the
 		// various different boundary conditions
@@ -4971,12 +5030,23 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				}
 
 			}
+			// Calculate LWR from surrounding surfaces if defined for an exterior surface
+			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+				SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+				for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+					SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+					SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+					TSurf = TempExt + KelvinConv;
+					QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) - pow_4( TSurf ) );
+				}
+			}
 
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
 				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
 			}
+			
 
 		} else if ( SELECT_CASE_var == KivaFoundation ) {
 			// Do nothing
@@ -6140,10 +6210,12 @@ CalcOutsideSurfTemp(
 	int PipeNum; // TDD pipe object number
 	int SurfNum2; // TDD:DIFFUSER object number
 	int ZoneNum2; // TDD:DIFFUSER zone number
+	int SrdSurfsNum; // Counter
 	Real64 Ueff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
 	Real64 RadTemp; // local value for Effective radiation temperature for OtherSideConditions model
 	Real64 HRad; // local value for effective (linearized) radiation coefficient
-
+	Real64 TSky;
+	Real64 TGround;
 	// FLOW:
 
 	// Determine whether or not movable insulation is present
@@ -6161,6 +6233,21 @@ CalcOutsideSurfTemp(
 	} else {
 		QuickConductionSurf = false;
 	}
+
+
+	TSky = SkyTemp;
+	TGround = OutDryBulbTemp;
+
+	if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+		SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+		if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum != 0 ) {
+			TSky = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum );
+		}
+		if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum != 0 ) {
+			TGround = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum );
+		}
+	}
+
 
 	// Now, calculate the outside surface temperature using the proper heat balance equation.
 	// Each case has been separated out into its own IF-THEN block for clarity.  Additional
@@ -6186,19 +6273,22 @@ CalcOutsideSurfTemp(
 		// *QsrcHist(1,SurfNum)                     &
 		//+Construct(ConstrNum)%CTFSourceIn(0) &   TDDs cannot be radiant systems
 		// *QsrcHist(1,SurfNum)                &
-		TH11 = ( QRadSWwinAbs( 1, SurfNum ) / 2.0 + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + F1 * ( QRadSWwinAbs( 1, SurfNum2 ) / 2.0 + QRadThermInAbs( SurfNum2 ) + HConvIn( SurfNum2 ) * MAT( ZoneNum2 ) + NetLWRadToSurf( SurfNum2 ) ) ) / ( Ueff + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * Ueff ); // Instead of QRadSWOutAbs(SurfNum) | ODB used to approx ground surface temp | Use TDD:DIFFUSER surface | Use TDD:DIFFUSER surface | Use TDD:DIFFUSER surface and zone | Use TDD:DIFFUSER surface
+		TH11 = ( QRadSWwinAbs( 1, SurfNum ) / 2.0 + QRadLWOutSrdSurfs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * TSky + HGrdExtSurf( SurfNum ) * TGround + F1 * ( QRadSWwinAbs( 1, SurfNum2 ) / 2.0 + QRadThermInAbs( SurfNum2 ) + HConvIn( SurfNum2 ) * MAT( ZoneNum2 ) + NetLWRadToSurf( SurfNum2 ) ) ) / ( Ueff + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * Ueff ); // Instead of QRadSWOutAbs(SurfNum) | ODB used to approx ground surface temp | Use TDD:DIFFUSER surface | Use TDD:DIFFUSER surface | Use TDD:DIFFUSER surface and zone | Use TDD:DIFFUSER surface
 
 		// Outside heat balance case: No movable insulation, slow conduction
 	} else if ( ( ! MovInsulPresent ) && ( ! QuickConductionSurf ) ) {
+		// X Luo Modified Aug 2017
+		// Add LWR from surrounding surfaces
 		if ( Surface( SurfNum ).OSCMPtr == 0 ) {
 			if ( construct.SourceSinkPresent ) {
-				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) + construct.CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ); // ODB used to approx ground surface temp
+				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + QRadLWOutSrdSurfs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * TSky + HGrdExtSurf( SurfNum ) * TGround + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) + construct.CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ); // ODB used to approx ground surface temp
 			} else {
-				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ); // ODB used to approx ground surface temp
+				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + QRadLWOutSrdSurfs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * TSky + HGrdExtSurf( SurfNum ) * TGround + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ); // ODB used to approx ground surface temp
 			}
 			// Outside Heat Balance case: Other Side Conditions Model
 		} else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
 			// local copies of variables for clarity in radiation terms
+			// TODO: - int OSCMPtr; // "Pointer" to OSCM data structure (other side conditions from a model)
 			RadTemp = OSCM( Surface( SurfNum ).OSCMPtr ).TRad;
 			HRad = OSCM( Surface( SurfNum ).OSCMPtr ).HRad;
 
@@ -6213,9 +6303,9 @@ CalcOutsideSurfTemp(
 	} else if ( ( ! MovInsulPresent ) && ( QuickConductionSurf ) ) {
 		if ( Surface( SurfNum ).OSCMPtr == 0 ) {
 			if ( construct.SourceSinkPresent ) {
-				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
+				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + QRadLWOutSrdSurfs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * TSky + HGrdExtSurf( SurfNum ) * TGround + construct.CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
 			} else {
-				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
+				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + QRadLWOutSrdSurfs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * TSky + HGrdExtSurf( SurfNum ) * TGround + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
 			}
 			// Outside Heat Balance case: Other Side Conditions Model
 		} else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
@@ -6234,21 +6324,25 @@ CalcOutsideSurfTemp(
 
 		F2 = HMovInsul / ( HMovInsul + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) );
 
-		TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) + F2 * ( QRadSWOutMvIns( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) ) / ( construct.CTFOutside( 0 ) + HMovInsul - F2 * HMovInsul ); // ODB used to approx ground surface temp
+		TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + QRadLWOutSrdSurfs( SurfNum ) + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) + F2 * ( QRadSWOutMvIns( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * TSky + HGrdExtSurf( SurfNum ) * TGround ) ) / ( construct.CTFOutside( 0 ) + HMovInsul - F2 * HMovInsul ); // ODB used to approx ground surface temp
 
 		// Outside heat balance case: Movable insulation, quick conduction
 	} else if ( ( MovInsulPresent ) && ( QuickConductionSurf ) ) {
 
 		F2 = HMovInsul / ( HMovInsul + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) );
 
-		TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) + F2 * ( QRadSWOutMvIns( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) ) / ( construct.CTFOutside( 0 ) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp
+		TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + QRadLWOutSrdSurfs( SurfNum ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) + F2 * ( QRadSWOutMvIns( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * TSky + HGrdExtSurf( SurfNum ) * TGround ) ) / ( construct.CTFOutside( 0 ) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp
 
 	} // ...end of outside heat balance cases IF-THEN block
 
 	// multiply out linearized radiation coeffs for reporting
-	Real64 const HExtSurf_fac( -( HSkyExtSurf( SurfNum ) * ( TH11 - SkyTemp ) + HAirExtSurf( SurfNum ) * ( TH11 - TempExt ) + HGrdExtSurf( SurfNum ) * ( TH11 - OutDryBulbTemp ) ) );
+	Real64 const HExtSurf_fac( -( HSkyExtSurf( SurfNum ) * ( TH11 - TSky ) + HAirExtSurf( SurfNum ) * ( TH11 - TempExt ) + HGrdExtSurf( SurfNum ) * ( TH11 - TGround ) ) );
 	QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac;
 	QdotRadOutRepPerArea( SurfNum ) = HExtSurf_fac;
+
+	//QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac + QRadLWOutSrdSurfs( SurfNum );	
+	//QdotRadOutRepPerArea( SurfNum ) = QdotRadOutRep( SurfNum ) / Surface( SurfNum ).Area;
+
 	QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * TimeStepZoneSec;
 	// Set the radiant system heat balance coefficients if this surface is also a radiant system
 	if ( construct.SourceSinkPresent ) {
@@ -6265,7 +6359,7 @@ CalcOutsideSurfTemp(
 		} else {
 			Real64 const RadSysDiv( 1.0 / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ) );
 
-			RadSysToHBConstCoef( SurfNum ) = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) * RadSysDiv; // ODB used to approx ground surface temp
+			RadSysToHBConstCoef( SurfNum ) = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + QRadLWOutSrdSurfs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * TSky + HGrdExtSurf( SurfNum ) * TGround ) * RadSysDiv; // ODB used to approx ground surface temp
 
 			RadSysToHBTinCoef( SurfNum ) = construct.CTFCross( 0 ) * RadSysDiv;
 
