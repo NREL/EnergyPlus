@@ -51,7 +51,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Piping System Example,   !- Name
@@ -232,18 +232,18 @@
     2405,                    !- Pipe Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Percent {percent}
     50,                      !- Soil Moisture Content Percent at Saturation {percent}
-    Site:GroundTemperature:Undisturbed:KusudaAchenbach,    !- Type of Undisturbed Ground Temperature Model
-    KATemps,                 !- Name of Undisturbed Ground Temperature Model
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    KATemps,                 !- Undisturbed Ground Temperature Model Name
     0.408;                   !- Evapotranspiration Ground Cover Parameter
-    
-Site:GroundTemperature:Undisturbed:KusudaAchenbach,
-    KATemps,         !- Name of object
-    1.08,            !- Soil Thermal Conductivity {W/m-K}
-    962,             !- Soil Density {kg/m3}
-    2576,            !- Soil Specific Heat {J/kg-K}
-    15.5,            !- Annual average surface temperature {C}
-    12.8,            !- Annual amplitude of surface temperature {delta C}
-    17.3;            !- Phase shift of minimum surface temperature {days}
+
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,                 !- Name
+    1.08,                    !- Soil Thermal Conductivity {W/m-K}
+    962,                     !- Soil Density {kg/m3}
+    2576,                    !- Soil Specific Heat {J/kg-K}
+    15.5,                    !- Average Soil Surface Temperature {C}
+    12.8,                    !- Average Amplitude of Surface Temperature {deltaC}
+    17.3;                    !- Phase Shift of Minimum Surface Temperature {days}
 
 !***********************************************************
 !****** Plant LOOP *************************************
@@ -293,18 +293,15 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
 
   Branch,
     Plant Supply Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
     Plant Supply Inlet Node, !- Component 1 Inlet Node Name
     Plant Supply Intermediate Node,  !- Component 1 Outlet Node Name
-    SERIESACTIVE,            !- Component 1 Branch Control Type
     GroundHeatExchanger:HorizontalTrench,  !- Component 2 Object Type
     My Pipe Circuit,         !- Component 2 Name
     Plant Supply Intermediate Node,  !- Component 2 Inlet Node Name
-    Plant Supply Outlet Node,!- Component 2 Outlet Node Name
-    SERIESACTIVE;            !- Component 2 Branch Control Type
+    Plant Supply Outlet Node;!- Component 2 Outlet Node Name
 
   BranchList,
     Plant Demand Side Branches,  !- Name
@@ -312,13 +309,11 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
 
   Branch,
     Plant Demand Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile,            !- Component 1 Name
     Plant Demand Inlet Node, !- Component 1 Inlet Node Name
-    Plant Demand Outlet Node,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Plant Demand Outlet Node;!- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile,            !- Name
@@ -347,16 +342,16 @@ Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     Cond Circ Pump,          !- Name
     Plant Supply Inlet Node, !- Inlet Node Name
     Plant Supply Intermediate Node,  !- Outlet Node Name
-    .004,                    !- Rated Flow Rate {m3/s}
-    5000,                    !- Rated Pump Head {Pa}
-    25,                      !- Rated Power Consumption {W}
+    .004,                    !- Design Maximum Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    25,                      !- Design Power Consumption {W}
     .87,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
 !***********************************************************

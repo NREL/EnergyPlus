@@ -89,7 +89,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            Yes
-! Coils:                          Coil:Heating:Gas, Coil:Heating:Electric
+! Coils:                          Coil:Heating:Fuel, Coil:Heating:Electric
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
 ! Chillers:                       None
@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -958,7 +958,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone1UnitHeatFan,        !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Zone1UnitHeatHeatingCoil,!- Heating Coil Name
     ,                        !- Supply Air Fan Operating Mode Schedule Name
     Yes;                     !- Supply Air Fan Operation During No Heating
@@ -974,10 +974,11 @@
     Zone1UnitHeatAirInletNode,  !- Air Inlet Node Name
     Zone1UnitHeatFanOutletNode;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Zone1UnitHeatHeatingCoil,!- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.76,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.76,                    !- Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Zone1UnitHeatFanOutletNode,  !- Air Inlet Node Name
     Zone1UnitHeatAirOutletNode;  !- Air Outlet Node Name

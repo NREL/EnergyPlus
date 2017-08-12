@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  VERSION,8.4;
+  VERSION,8.6;
 
   Timestep,4;
 
@@ -1764,25 +1764,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_1_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    7.500,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    7.500,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_1,  !- Name
@@ -2137,25 +2141,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_2_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    5.215,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    5.215,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_2,  !- Name
@@ -2510,25 +2518,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_3_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    5.000,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    5.000,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_3,  !- Name
@@ -2883,25 +2895,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_4_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    9.785,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    9.785,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_4,  !- Name
@@ -3256,25 +3272,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_5_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    7.500,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_5,        !- Zone Name
+    7.500,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_5,  !- Name
@@ -3629,25 +3649,29 @@
     0.0000,30.8600,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_6_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_6,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    15.430,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_6,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    15.430,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_6,  !- Name
@@ -4002,25 +4026,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_7_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_7,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.930,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_7,        !- Zone Name
+    2.930,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_7,  !- Name
@@ -4375,25 +4403,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_8_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_8,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    5.215,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_8,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    5.215,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_8,  !- Name
@@ -4748,25 +4780,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_9_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_9,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    9.570,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_9,        !- Zone Name
+    9.570,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_9,  !- Name
@@ -5121,25 +5157,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_10_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_10,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    9.785,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_10,       !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    9.785,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_10,  !- Name
@@ -5494,25 +5534,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_11_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_11,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.930,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_11,       !- Zone Name
+    2.930,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_11,  !- Name
@@ -5867,25 +5911,29 @@
     0.0000,40.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_12_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_12,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    20.000,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_12,       !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    20.000,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_12,  !- Name
@@ -7219,6 +7267,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -7227,28 +7276,23 @@
 
   Branch,
     PSZ-AC:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:1_OA,             !- Component 1 Name
     PSZ-AC:1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:1_CoolC,          !- Component 2 Name
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:1_HeatC,          !- Component 3 Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:1_HeatC-PSZ-AC:1 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:1 Fan,            !- Component 4 Name
     PSZ-AC:1_HeatC-PSZ-AC:1 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:1 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:1 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:1_OA_Controllers, !- Name
@@ -7385,10 +7429,11 @@
   OutdoorAir:Node,
     PSZ-AC:1_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:1_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:1_HeatC-PSZ-AC:1 FanNode,  !- Air Outlet Node Name
@@ -7507,6 +7552,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -7515,28 +7561,23 @@
 
   Branch,
     PSZ-AC:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:2_OA,             !- Component 1 Name
     PSZ-AC:2 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:2_CoolC,          !- Component 2 Name
     PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:2_HeatC,          !- Component 3 Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:2_HeatC-PSZ-AC:2 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:2 Fan,            !- Component 4 Name
     PSZ-AC:2_HeatC-PSZ-AC:2 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:2 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:2 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:2_OA_Controllers, !- Name
@@ -7673,10 +7714,11 @@
   OutdoorAir:Node,
     PSZ-AC:2_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:2_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:2_HeatC-PSZ-AC:2 FanNode,  !- Air Outlet Node Name
@@ -7795,6 +7837,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -7803,28 +7846,23 @@
 
   Branch,
     PSZ-AC:3 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:3_OA,             !- Component 1 Name
     PSZ-AC:3 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:3_CoolC,          !- Component 2 Name
     PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:3_HeatC,          !- Component 3 Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:3_HeatC-PSZ-AC:3 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:3 Fan,            !- Component 4 Name
     PSZ-AC:3_HeatC-PSZ-AC:3 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:3 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:3 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:3_OA_Controllers, !- Name
@@ -7961,10 +7999,11 @@
   OutdoorAir:Node,
     PSZ-AC:3_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:3_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:3_HeatC-PSZ-AC:3 FanNode,  !- Air Outlet Node Name
@@ -8083,6 +8122,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -8091,28 +8131,23 @@
 
   Branch,
     PSZ-AC:4 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:4_OA,             !- Component 1 Name
     PSZ-AC:4 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:4_CoolC,          !- Component 2 Name
     PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:4_HeatC,          !- Component 3 Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:4_HeatC-PSZ-AC:4 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:4 Fan,            !- Component 4 Name
     PSZ-AC:4_HeatC-PSZ-AC:4 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:4 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:4 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:4_OA_Controllers, !- Name
@@ -8249,10 +8284,11 @@
   OutdoorAir:Node,
     PSZ-AC:4_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:4_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:4_HeatC-PSZ-AC:4 FanNode,  !- Air Outlet Node Name
@@ -8371,6 +8407,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -8379,28 +8416,23 @@
 
   Branch,
     PSZ-AC:5 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:5_OA,             !- Component 1 Name
     PSZ-AC:5 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:5_OA-PSZ-AC:5_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:5_CoolC,          !- Component 2 Name
     PSZ-AC:5_OA-PSZ-AC:5_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:5_HeatC,          !- Component 3 Name
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:5_HeatC-PSZ-AC:5 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:5 Fan,            !- Component 4 Name
     PSZ-AC:5_HeatC-PSZ-AC:5 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:5 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:5 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:5_OA_Controllers, !- Name
@@ -8537,10 +8569,11 @@
   OutdoorAir:Node,
     PSZ-AC:5_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:5_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:5_HeatC-PSZ-AC:5 FanNode,  !- Air Outlet Node Name
@@ -8659,6 +8692,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -8667,28 +8701,23 @@
 
   Branch,
     PSZ-AC:6 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:6_OA,             !- Component 1 Name
     PSZ-AC:6 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:6_OA-PSZ-AC:6_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:6_CoolC,          !- Component 2 Name
     PSZ-AC:6_OA-PSZ-AC:6_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:6_CoolC-PSZ-AC:6_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:6_HeatC,          !- Component 3 Name
     PSZ-AC:6_CoolC-PSZ-AC:6_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:6_HeatC-PSZ-AC:6 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:6 Fan,            !- Component 4 Name
     PSZ-AC:6_HeatC-PSZ-AC:6 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:6 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:6 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:6_OA_Controllers, !- Name
@@ -8825,10 +8854,11 @@
   OutdoorAir:Node,
     PSZ-AC:6_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:6_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:6_CoolC-PSZ-AC:6_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:6_HeatC-PSZ-AC:6 FanNode,  !- Air Outlet Node Name
@@ -8947,6 +8977,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -8955,28 +8986,23 @@
 
   Branch,
     PSZ-AC:7 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:7_OA,             !- Component 1 Name
     PSZ-AC:7 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:7_OA-PSZ-AC:7_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:7_CoolC,          !- Component 2 Name
     PSZ-AC:7_OA-PSZ-AC:7_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:7_CoolC-PSZ-AC:7_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:7_HeatC,          !- Component 3 Name
     PSZ-AC:7_CoolC-PSZ-AC:7_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:7_HeatC-PSZ-AC:7 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:7 Fan,            !- Component 4 Name
     PSZ-AC:7_HeatC-PSZ-AC:7 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:7 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:7 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:7_OA_Controllers, !- Name
@@ -9113,10 +9139,11 @@
   OutdoorAir:Node,
     PSZ-AC:7_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:7_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:7_CoolC-PSZ-AC:7_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:7_HeatC-PSZ-AC:7 FanNode,  !- Air Outlet Node Name
@@ -9235,6 +9262,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -9243,28 +9271,23 @@
 
   Branch,
     PSZ-AC:8 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:8_OA,             !- Component 1 Name
     PSZ-AC:8 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:8_OA-PSZ-AC:8_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:8_CoolC,          !- Component 2 Name
     PSZ-AC:8_OA-PSZ-AC:8_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:8_CoolC-PSZ-AC:8_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:8_HeatC,          !- Component 3 Name
     PSZ-AC:8_CoolC-PSZ-AC:8_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:8_HeatC-PSZ-AC:8 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:8 Fan,            !- Component 4 Name
     PSZ-AC:8_HeatC-PSZ-AC:8 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:8 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:8 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:8_OA_Controllers, !- Name
@@ -9401,10 +9424,11 @@
   OutdoorAir:Node,
     PSZ-AC:8_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:8_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:8_CoolC-PSZ-AC:8_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:8_HeatC-PSZ-AC:8 FanNode,  !- Air Outlet Node Name
@@ -9523,6 +9547,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -9531,28 +9556,23 @@
 
   Branch,
     PSZ-AC:9 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:9_OA,             !- Component 1 Name
     PSZ-AC:9 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:9_OA-PSZ-AC:9_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:9_CoolC,          !- Component 2 Name
     PSZ-AC:9_OA-PSZ-AC:9_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:9_CoolC-PSZ-AC:9_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:9_HeatC,          !- Component 3 Name
     PSZ-AC:9_CoolC-PSZ-AC:9_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:9_HeatC-PSZ-AC:9 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:9 Fan,            !- Component 4 Name
     PSZ-AC:9_HeatC-PSZ-AC:9 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:9 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:9 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:9_OA_Controllers, !- Name
@@ -9689,10 +9709,11 @@
   OutdoorAir:Node,
     PSZ-AC:9_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:9_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:9_CoolC-PSZ-AC:9_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:9_HeatC-PSZ-AC:9 FanNode,  !- Air Outlet Node Name
@@ -9811,6 +9832,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -9819,28 +9841,23 @@
 
   Branch,
     PSZ-AC:10 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:10_OA,            !- Component 1 Name
     PSZ-AC:10 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:10_OA-PSZ-AC:10_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:10_CoolC,         !- Component 2 Name
     PSZ-AC:10_OA-PSZ-AC:10_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:10_CoolC-PSZ-AC:10_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:10_HeatC,         !- Component 3 Name
     PSZ-AC:10_CoolC-PSZ-AC:10_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:10_HeatC-PSZ-AC:10 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:10 Fan,           !- Component 4 Name
     PSZ-AC:10_HeatC-PSZ-AC:10 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:10 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:10 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:10_OA_Controllers,!- Name
@@ -9977,10 +9994,11 @@
   OutdoorAir:Node,
     PSZ-AC:10_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:10_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:10_CoolC-PSZ-AC:10_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:10_HeatC-PSZ-AC:10 FanNode,  !- Air Outlet Node Name
@@ -10099,6 +10117,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -10107,28 +10126,23 @@
 
   Branch,
     PSZ-AC:11 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:11_OA,            !- Component 1 Name
     PSZ-AC:11 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:11_OA-PSZ-AC:11_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:11_CoolC,         !- Component 2 Name
     PSZ-AC:11_OA-PSZ-AC:11_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:11_CoolC-PSZ-AC:11_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:11_HeatC,         !- Component 3 Name
     PSZ-AC:11_CoolC-PSZ-AC:11_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:11_HeatC-PSZ-AC:11 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:11 Fan,           !- Component 4 Name
     PSZ-AC:11_HeatC-PSZ-AC:11 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:11 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:11 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:11_OA_Controllers,!- Name
@@ -10265,10 +10279,11 @@
   OutdoorAir:Node,
     PSZ-AC:11_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:11_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:11_CoolC-PSZ-AC:11_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:11_HeatC-PSZ-AC:11 FanNode,  !- Air Outlet Node Name
@@ -10387,6 +10402,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -10395,28 +10411,23 @@
 
   Branch,
     PSZ-AC:12 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:12_OA,            !- Component 1 Name
     PSZ-AC:12 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:12_OA-PSZ-AC:12_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:12_CoolC,         !- Component 2 Name
     PSZ-AC:12_OA-PSZ-AC:12_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:12_CoolC-PSZ-AC:12_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:12_HeatC,         !- Component 3 Name
     PSZ-AC:12_CoolC-PSZ-AC:12_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:12_HeatC-PSZ-AC:12 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:12 Fan,           !- Component 4 Name
     PSZ-AC:12_HeatC-PSZ-AC:12 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:12 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:12 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:12_OA_Controllers,!- Name
@@ -10553,10 +10564,11 @@
   OutdoorAir:Node,
     PSZ-AC:12_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:12_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:12_CoolC-PSZ-AC:12_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:12_HeatC-PSZ-AC:12 FanNode,  !- Air Outlet Node Name
@@ -10675,6 +10687,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -10683,28 +10696,23 @@
 
   Branch,
     PSZ-AC:13 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:13_OA,            !- Component 1 Name
     PSZ-AC:13 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:13_OA-PSZ-AC:13_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:13_CoolC,         !- Component 2 Name
     PSZ-AC:13_OA-PSZ-AC:13_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:13_CoolC-PSZ-AC:13_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:13_HeatC,         !- Component 3 Name
     PSZ-AC:13_CoolC-PSZ-AC:13_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:13_HeatC-PSZ-AC:13 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:13 Fan,           !- Component 4 Name
     PSZ-AC:13_HeatC-PSZ-AC:13 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:13 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:13 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:13_OA_Controllers,!- Name
@@ -10841,10 +10849,11 @@
   OutdoorAir:Node,
     PSZ-AC:13_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:13_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:13_CoolC-PSZ-AC:13_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:13_HeatC-PSZ-AC:13 FanNode,  !- Air Outlet Node Name
@@ -10963,6 +10972,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -10971,28 +10981,23 @@
 
   Branch,
     PSZ-AC:14 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:14_OA,            !- Component 1 Name
     PSZ-AC:14 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:14_OA-PSZ-AC:14_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:14_CoolC,         !- Component 2 Name
     PSZ-AC:14_OA-PSZ-AC:14_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:14_CoolC-PSZ-AC:14_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:14_HeatC,         !- Component 3 Name
     PSZ-AC:14_CoolC-PSZ-AC:14_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:14_HeatC-PSZ-AC:14 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:14 Fan,           !- Component 4 Name
     PSZ-AC:14_HeatC-PSZ-AC:14 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:14 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:14 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:14_OA_Controllers,!- Name
@@ -11129,10 +11134,11 @@
   OutdoorAir:Node,
     PSZ-AC:14_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:14_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:14_CoolC-PSZ-AC:14_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:14_HeatC-PSZ-AC:14 FanNode,  !- Air Outlet Node Name
@@ -11251,6 +11257,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -11259,28 +11266,23 @@
 
   Branch,
     PSZ-AC:15 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:15_OA,            !- Component 1 Name
     PSZ-AC:15 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:15_OA-PSZ-AC:15_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-AC:15_CoolC,         !- Component 2 Name
     PSZ-AC:15_OA-PSZ-AC:15_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:15_CoolC-PSZ-AC:15_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:15_HeatC,         !- Component 3 Name
     PSZ-AC:15_CoolC-PSZ-AC:15_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:15_HeatC-PSZ-AC:15 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-AC:15 Fan,           !- Component 4 Name
     PSZ-AC:15_HeatC-PSZ-AC:15 FanNode,  !- Component 4 Inlet Node Name
-    PSZ-AC:15 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-AC:15 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:15_OA_Controllers,!- Name
@@ -11417,10 +11419,11 @@
   OutdoorAir:Node,
     PSZ-AC:15_CoolCOA Ref node;  !- Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:15_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:15_CoolC-PSZ-AC:15_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:15_HeatC-PSZ-AC:15 FanNode,  !- Air Outlet Node Name

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <DataAirflowNetwork.hh>
@@ -102,8 +90,8 @@ namespace DataAirflowNetwork {
 	int const CompTypeNum_HEX( 16 ); // Distribution system heat exchanger
 	int const CompTypeNum_HOP( 17 ); // Horizontal opening component
 	int const CompTypeNum_RVD( 18 ); // Reheat VAV terminal damper
-	int const CompTypeNum_OAF( 19 ); // Distribution system OA 
-	int const CompTypeNum_REL( 20 ); // Distribution system relief air 
+	int const CompTypeNum_OAF( 19 ); // Distribution system OA
+	int const CompTypeNum_REL( 20 ); // Distribution system relief air
 
 	// EPlus component Type
 	int const EPlusTypeNum_SCN( 1 ); // Supply connection
@@ -111,7 +99,7 @@ namespace DataAirflowNetwork {
 	int const EPlusTypeNum_RHT( 3 ); // Reheat terminal
 	int const EPlusTypeNum_FAN( 4 ); // Fan
 	int const EPlusTypeNum_COI( 5 ); // Heating or cooling coil
-	int const EPlusTypeNum_HEX( 6 ); // Heat ecxchanger
+	int const EPlusTypeNum_HEX( 6 ); // Heat exchanger
 	int const EPlusTypeNum_RVD( 7 ); // Reheat VAV terminal damper
 
 	// EPlus node type
@@ -148,15 +136,15 @@ namespace DataAirflowNetwork {
 	//  NONE           NONE           0      No AirflowNetwork and SIMPLE
 	//  SIMPLE         NONE           1      Simple calculations only
 	//  MULTIZONE      NONE           2      Perform multizone calculations only
-	//  NONE           DISTSYS        3      Perform distribution system durin system on time only
-	//  SIMPLE         DISTSYS        4      Perform distribution system durin system on time and simple calculations during off time
-	//  MULTIZONE      DISTSYS        5      Perform distribution system durin system on time and multizone calculations during off time
+	//  NONE           DISTSYS        3      Perform distribution system during system on time only
+	//  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
+	//  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
 
 	int const AirflowNetworkControlSimple( 1 ); // Simple calculations only
 	int const AirflowNetworkControlMultizone( 2 ); // Perform multizone calculations only
-	int const AirflowNetworkControlSimpleADS( 4 ); // Perform distribution system durin system
+	int const AirflowNetworkControlSimpleADS( 4 ); // Perform distribution system during system
 	// on time and simple calculations during off time
-	int const AirflowNetworkControlMultiADS( 5 ); // Perform distribution system durin system on time
+	int const AirflowNetworkControlMultiADS( 5 ); // Perform distribution system during system on time
 	// and multizone calculations during off time
 
 	Array1D_bool AirflowNetworkZoneFlag;
@@ -177,7 +165,7 @@ namespace DataAirflowNetwork {
 	int AirflowNetworkNumOfSurfaces( 0 ); // The number of surfaces for multizone calculation
 	int AirflowNetworkNumOfZones( 0 ); // The number of zones for multizone calculation
 
-	bool RollBackFlag( false ); // Roll back flag when system time steo down shifting
+	bool RollBackFlag( false ); // Roll back flag when system time step down shifting
 	Array1D< Real64 > ANZT; // Local zone air temperature for roll back use
 	Array1D< Real64 > ANZW; // Local zone air humidity ratio for roll back use
 	Array1D< Real64 > ANCO; // Local zone air CO2 for roll back use
@@ -188,7 +176,7 @@ namespace DataAirflowNetwork {
 	bool AirflowNetworkUnitarySystem( false ); // set to TRUE for unitary systems (to make answers equal, will remove eventually)
 	// Multispeed HP only
 	int MultiSpeedHPIndicator( 0 ); // Indicator for multispeed heat pump use
-	// Addiitonal airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
+	// Additional airflow needed for an VAV fan to compensate the leakage losses and supply pathway pressure losses [kg/s]
 	Real64 VAVTerminalRatio( 0.0 ); // The terminal flow ratio when a supply VAV fan reach its max flow rate
 	bool VAVSystem( false ); // This flag is used to represent a VAV system
 	Real64 ExhaustFanMassFlowRate( 0.0 ); // Exhaust fan flow rate used in PressureStat
@@ -203,7 +191,7 @@ namespace DataAirflowNetwork {
 	Array1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
 	Array1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
 	Array1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
-	AirflowNetworkSimuProp AirflowNetworkSimu( "", "NoMultizoneOrDistribution", "Input", 0, "", "", "", 500, 0, 1.0e-5, 1.0e-5, -0.5, 500.0, 0.0, 1.0, 0, 1.0e-4, 0, 0, 0, 0, "ZeroNodePressures", false ); // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration | Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit | Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag type
+	AirflowNetworkSimuProp AirflowNetworkSimu;
 	Array1D< AirflowNetworkNodeProp > AirflowNetworkNodeData;
 	Array1D< AirflowNetworkCompProp > AirflowNetworkCompData;
 	Array1D< AirflowNetworkLinkageProp > AirflowNetworkLinkageData;
@@ -216,11 +204,6 @@ namespace DataAirflowNetwork {
 	Array1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
 	Array1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
 	Array1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
-	Array1D< MultizoneCPArrayProp > MultizoneCPArrayData;
-	Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
-	Array1D< MultizoneCPValueProp > MultizoneCPValueData;
-	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modifcation factor
 	Array1D< DeltaCpProp > DeltaCp;
 	Array1D< DeltaCpProp > EPDeltaCP;
 	Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
@@ -241,6 +224,7 @@ namespace DataAirflowNetwork {
 	Array1D< PressureControllerProp > PressureControllerData;
 	Array1D< DisSysCompAirflowProp > DisSysCompOutdoorAirData;
 	Array1D< DisSysCompAirflowProp > DisSysCompReliefAirData;
+	Array1D< AirflowNetworkLinkageViewFactorProp > AirflowNetworkLinkageViewFactorData;
 
 	void
 	clear_state()
@@ -277,7 +261,7 @@ namespace DataAirflowNetwork {
 		AirflowNetworkLinkReport.deallocate();
 		AirflowNetworkNodeReport.deallocate();
 		AirflowNetworkLinkReport1.deallocate();
-		AirflowNetworkSimu = AirflowNetworkSimuProp( "", "NoMultizoneOrDistribution", "Input", 0, "", "", "", 500, 0, 1.0e-5, 1.0e-5, -0.5, 500.0, 0.0, 1.0, 0, 1.0e-4, 0, 0, 0, 0, "ZeroNodePressures", false );
+		AirflowNetworkSimu = AirflowNetworkSimuProp();
 		AirflowNetworkNodeData.deallocate();
 		AirflowNetworkCompData.deallocate();
 		AirflowNetworkLinkageData.deallocate();
@@ -290,11 +274,6 @@ namespace DataAirflowNetwork {
 		MultizoneSurfaceCrackData.deallocate();
 		MultizoneSurfaceELAData.deallocate();
 		MultizoneExternalNodeData.deallocate();
-		MultizoneCPArrayData.deallocate();
-		MultizoneCPArrayDataSingleSided.deallocate();
-		MultizoneCPValueData.deallocate();
-		MultizoneCPValueDataTemp.deallocate();
-		MultizoneCPValueDataTempUnMod.deallocate();
 		DeltaCp.deallocate();
 		EPDeltaCP.deallocate();
 		MultizoneCompExhaustFanData.deallocate();
@@ -312,6 +291,7 @@ namespace DataAirflowNetwork {
 		DisSysCompTermUnitData.deallocate();
 		DisSysCompCPDData.deallocate();
 		AirflowNetworkReportData.deallocate();
+		AirflowNetworkLinkageViewFactorData.deallocate();
 	}
 
 } // DataAirflowNetwork

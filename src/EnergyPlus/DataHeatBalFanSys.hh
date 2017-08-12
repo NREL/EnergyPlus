@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataHeatBalFanSys_hh_INCLUDED
 #define DataHeatBalFanSys_hh_INCLUDED
@@ -96,6 +84,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > QHWBaseboardToPerson; // Sum of radiant gains to people from hot water baseboard heaters
 	extern Array1D< Real64 > QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
 	extern Array1D< Real64 > QElecBaseboardToPerson; // Sum of radiant gains to people from electric baseboard heaters
+	extern Array1D< Real64 > QCoolingPanelToPerson; // Sum of radiant losses to people from cooling panels
 	//Zone air drybulb conditions variables
 	extern Array1D< Real64 > ZTAV; // Zone Air Temperature Averaged over the Zone Time step
 	extern Array1D< Real64 > MAT; // MEAN AIR TEMPARATURE (C)
@@ -176,11 +165,13 @@ namespace DataHeatBalFanSys {
 	//REAL Variables for the Heat Balance Simulation
 
 	extern Array1D< Real64 > QRadSysSource; // Current source/sink for a particular surface (radiant sys)
-	extern Array1D< Real64 > TCondFDSourceNode; // Temperature of sourc/sink location in surface from CondFD algo
+	extern Array1D< Real64 > TCondFDSourceNode; // Temperature of source/sink location in surface from CondFD algo
 	extern Array1D< Real64 > QPVSysSource; // Current source/sink for a surface (integrated PV sys)
 
 	extern Array1D< Real64 > CTFTsrcConstPart; // Constant Outside Portion of the CTF calculation of
 	// temperature at source
+	extern Array1D< Real64 > CTFTuserConstPart; // Constant Outside Portion of the CTF calculation of
+	// temperature at the user specified location
 	extern Array1D< Real64 > QHTRadSysSurf; // Current radiant heat flux at a surface due to the presence
 	// of high temperature radiant heaters
 	extern Array1D< Real64 > QHWBaseboardSurf; // Current radiant heat flux at a surface due to the presence
@@ -189,6 +180,9 @@ namespace DataHeatBalFanSys {
 	// of steam baseboard heaters
 	extern Array1D< Real64 > QElecBaseboardSurf; // Current radiant heat flux at a surface due to the presence
 	// of electric baseboard heaters
+	extern Array1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
+	// of simple cooling panels
+	extern Array1D< Real64 > QRadSurfAFNDuct; // Current radiant heat flux at a surface due to radiation from AFN ducts
 	extern Array1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
 	extern Array1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	extern Array1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
@@ -202,19 +196,23 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > SumHmAW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
 	extern Array1D< Real64 > SumHmARa; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
 	extern Array1D< Real64 > SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
+	extern Array1D< Real64 > SumHmARaZ;
 
 	extern Array1D< Real64 > TempZoneThermostatSetPoint;
+	extern Array1D< Real64 > AdapComfortCoolingSetPoint;
 	extern Array1D< Real64 > ZoneThermostatSetPointHi;
 	extern Array1D< Real64 > ZoneThermostatSetPointLo;
 
 	extern Array1D< Real64 > LoadCorrectionFactor; // PH 3/3/04
 
-	extern Array1D_bool CrossMixingFlag; // TRUE when a zone is mixing
-
 	extern Array1D< Real64 > AIRRAT; // "air power capacity"  PH 3/5/04
 	extern Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	extern Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
 	extern Array1D< Real64 > ZTM3; // zone air temperature at previous T-3
+	// Hybrid Modeling
+	extern Array1D< Real64 > PreviousMeasuredZT1; // Measured zone air temperature at previous timestep1
+	extern Array1D< Real64 > PreviousMeasuredZT2; // Measured zone air temperature at previous timestep2
+	extern Array1D< Real64 > PreviousMeasuredZT3; // Measured zone air temperature at previous timestep3
 	// Exact and Euler solutions
 	extern Array1D< Real64 > ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	extern Array1D< Real64 > ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
@@ -222,17 +220,6 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	extern Array1D< Real64 > ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
 	extern Array1D< Real64 > ZoneW1; // Zone temperature at the previous time step used in Exact and Euler method
-
-	extern Real64 ZoneVolCapMultpSens; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone temp in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpMoist; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone humidity ratio in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpCO2; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone CO2 concentration in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpGenContam; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone generic contaminant concentration in the predictor
-	// and corrector step
-
 	extern Array1D_int TempControlType;
 	extern Array1D_int ComfortControlType;
 

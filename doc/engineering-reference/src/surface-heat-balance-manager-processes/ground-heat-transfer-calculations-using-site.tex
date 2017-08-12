@@ -1,4 +1,5 @@
-\section{Ground Heat Transfer Calculations using Site:GroundDomain:Slab}\label{ground-heat-transfer-calculations-using-sitegrounddomainslab}
+\section{Ground Heat Transfer Calculations using \\
+		Site:GroundDomain:Slab}\label{ground-heat-transfer-calculations-using-sitegrounddomainslab}
 
 In order to simulate heat transfer with horizontal building surfaces in contact with the ground, a general finite difference ground model has been implemented. The model simulates heat transfer with the horizontal building surfaces through the ground domain. The domain can simulate heat transfer for slab-in-grade or slab-on-grade scenarios. In all scenarios, the ground domain must interact with the zone through an OthersideConditionsModel as the horizontal surface's outside boundary condition.
 
@@ -10,7 +11,15 @@ Multiple horizontal surfaces can be coupled to each ground domain object. The mo
 
 \subsubsection{Boudary Conditions}\label{boudary-conditions}
 
-At the interface surface, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a GroundDomain boundary condition at the Surface/GroundDomain interface cells. Far-field temperatures are applied as boundary temperature at the GroundDomain sides and lower surface. The ground temperature profile at the domain sides and lower surface are taken from Kusuda \& Achenbach 1965. The correlation requires annual ground surface temperature data.
+At the interface surface, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a GroundDomain boundary condition at the Surface/GroundDomain interface cells. Heat flux to each cell is weighted as was recommended by Pinel \& Beausoleil-Morrison 2012 which is shown in Equation \ref{eq:Pinel-Beausoleil-Morrison}.
+
+\begin{equation}
+	q_{out,i} = q_{out,\mbox{1-D}} \frac{T_{zone} - T_{out,i}}{T_{zone} - T_{out,avg}}
+	\label{eq:Pinel-Beausoleil-Morrison}
+\end{equation}
+
+
+Far-field temperatures are applied as boundary temperature at the GroundDomain sides and lower surface. The ground temperature profile at the domain sides and lower surface are taken from Kusuda \& Achenbach 1965. The correlation requires annual ground surface temperature data.
 
 Ground surface cells are treated as a heat balance, where long and short wave radiation, conduction, and convection are considered. Evapotranspiration is also considered. The evapotranspiration rate is calculated as a moisture loss by using the Allen et al. (2005) model, and translated into a heat loss by multiplication with the density and latent heat of evaporation of water. The evapotranspiration rate is dependent on the type of vegetation at the surface; the user can vary the surface vegetation from anywhere between a concrete surface and a fairly tall grass (about 7'').
 
@@ -32,20 +41,20 @@ Situations & Vert. Ins. & Horiz Ins. (Full) & Horiz Ins. (Perim) \tabularnewline
 
 \caption[]{Possible insulation/slab configurations for Site:GroundDomain model.} \tabularnewline
 \toprule 
-Situations & Vert. Ins. & Horiz Ins. (Full) & Horiz Ins. (Perim) \tabularnewline
+Type & Situations & Vert. Ins. & Horiz Ins. (Full) & Horiz Ins. (Perim) \tabularnewline
 \midrule
 \endhead
 
-In-Grade & 1 & X &  &  \tabularnewline
-2 & X & X &  \tabularnewline
-3 & X &  & X \tabularnewline
-4 &  &  &  \tabularnewline
-5 &  & X &  \tabularnewline
-6 &  &  & X \tabularnewline
-On-Grade & 7 & X &  &  \tabularnewline
-8* & X & X &  \tabularnewline
-9 &  &  &  \tabularnewline
-10* &  & X &  \tabularnewline
+In-Grade & 1   & X &   &   \tabularnewline
+In-Grade & 2   & X & X &   \tabularnewline
+In-Grade & 3   & X &   & X \tabularnewline
+In-Grade & 4   &   &   &   \tabularnewline
+In-Grade & 5   &   & X &   \tabularnewline
+In-Grade & 6   &   &   & X \tabularnewline
+On-Grade & 7   & X &   &   \tabularnewline
+On-Grade & 8*  & X & X &   \tabularnewline
+On-Grade & 9   &   &   &   \tabularnewline
+On-Grade & 10* &   & X &   \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -55,6 +64,8 @@ For the slab-in-grade scenarios, a thin surface layer must be included in the fl
 
 \subsubsection{References}\label{references-026}
 
+Allen, R.G., Walter, I.A., Elliott, R.L., Howell, T.A., Itenfisu, D., Jensen, M.E., Snyder, R.L. 2005. The ASCE Standardized Reference Evapotranspiration Equation. Reston, VA: American Society of Civil Engineers.
+
 Kusuda, T. \& Achenbach, P. 1965. Earth Temperature and Thermal Diffusivity at Selected Stations in the United States, ASHRAE Transactions 71(1): 61--75.
 
-Allen, R.G., Walter, I.A., Elliott, R.L., Howell, T.A., Itenfisu, D., Jensen, M.E., Snyder, R.L. 2005. The ASCE Standardized Reference Evapotranspiration Equation. Reston, VA: American Society of Civil Engineers.
+Pinel, P \& Beausoleil-Morrison, I. 2012. Coupling soil heat and mass transfer models to foundation models in whole-building simulation packages. In Proceedings of eSim 2012, Halifax, Canada.

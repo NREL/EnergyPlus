@@ -33,7 +33,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -67,7 +67,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 3
 
-  Version,8.5;
+  Version,8.7;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -405,14 +405,6 @@
     0.7;                     !- Visible Absorptance
 
 ! ***COMMON CONSTRUCTIONS AND MATERIALS***
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -803,10 +795,10 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     FineStorage,             !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
+    Zone,                    !- Outside Boundary Condition
+    BulkStorage,             !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     45.7178,30.4785,8.5340,  !- X,Y,Z ==> Vertex 1 {m}
@@ -883,10 +875,10 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     Office,                  !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
+    Zone,                    !- Outside Boundary Condition
+    FineStorage,             !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     25.9067,0.0000,4.2670,  !- X,Y,Z ==> Vertex 1 {m}
@@ -899,10 +891,10 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     Office,                  !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
+    Zone,                    !- Outside Boundary Condition
+    FineStorage,             !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     25.9067,9.1435,4.2670,  !- X,Y,Z ==> Vertex 1 {m}
@@ -1565,26 +1557,29 @@
     BulkStorage Unit Heater Post Fan Node,  !- Air Outlet Node Name
     Unit Heater Fans;        !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     BulkStorage Unit Heater Coil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.78,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.78,                    !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     BulkStorage Unit Heater Post Fan Node,  !- Air Inlet Node Name
     BulkStorage Unit Heater Inlet Node Name;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV_1:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV_1:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV_1:1 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV_2:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.78,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.78,                    !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV_2:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV_2:2 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -1629,7 +1624,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     BulkStorage Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     BulkStorage Unit Heater Coil,  !- Heating Coil Name
     ,                        !- Supply Air Fan Operating Mode Schedule Name
     No,                      !- Supply Air Fan Operation During No Heating
@@ -1853,17 +1848,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -1892,17 +1887,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2145,14 +2140,14 @@
     FURNACE_PACU_CAV_1:1 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
     HVACOperationSchd,       !- Supply Air Fan Operating Mode Schedule Name
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
     Office,                  !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV_1:1_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV_1:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV_1:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -2167,14 +2162,14 @@
     FURNACE_PACU_CAV_2:2 Supply Equipment Outlet Node,  !- Unitary System Air Outlet Node Name
     HVACOperationSchd,       !- Supply Air Fan Operating Mode Schedule Name
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
     FineStorage,             !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV_2:2_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV_2:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV_2:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -2260,6 +2255,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -2268,6 +2264,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -2280,33 +2277,27 @@
 
   Branch,
     FURNACE_PACU_CAV_1:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     FURNACE_PACU_CAV_1:1_OA, !- Component 1 Name
     FURNACE_PACU_CAV_1:1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     FURNACE_PACU_CAV_1:1_OA-FURNACE_PACU_CAV_1:1_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     FURNACE_PACU_CAV_1:1_Unitary_Package,  !- Component 2 Name
     FURNACE_PACU_CAV_1:1_OA-FURNACE_PACU_CAV_1:1_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    FURNACE_PACU_CAV_1:1 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    FURNACE_PACU_CAV_1:1 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     FURNACE_PACU_CAV_2:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     FURNACE_PACU_CAV_2:2_OA, !- Component 1 Name
     FURNACE_PACU_CAV_2:2 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     FURNACE_PACU_CAV_2:2_OA-FURNACE_PACU_CAV_2:2_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     FURNACE_PACU_CAV_2:2_Unitary_Package,  !- Component 2 Name
     FURNACE_PACU_CAV_2:2_OA-FURNACE_PACU_CAV_2:2_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    FURNACE_PACU_CAV_2:2 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    FURNACE_PACU_CAV_2:2 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     FURNACE_PACU_CAV_1:1_OA_Controllers,  !- Name

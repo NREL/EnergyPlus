@@ -46,7 +46,7 @@ Zone floor area is used in many places within EnergyPlus. EnergyPlus automatical
 
 \paragraph{Field: Zone Inside Convection Algorithm}\label{field-zone-inside-convection-algorithm}
 
-The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{Detailed} (variable natural convection based on temperature difference - ASHRAE), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized) and \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
+The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{TARP} (combines natural and wind-driven convection correlations from laboratory measurements on flat plates), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized) and \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
 
 If omitted or blank, the algorithm specified in the SurfaceConvectionAlgorithm:Inside object is the default.
 
@@ -217,7 +217,7 @@ The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of hea
 
 \subsubsection{Zone Air Heat Balance System Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-system-air-transfer-rate-w}
 
-The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers. The Zone Air Heat Balance System Air Transfer Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time. 
 
 \subsubsection{Zone Air Heat Balance System Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-system-convective-heat-gain-rate-w}
 
@@ -1617,7 +1617,9 @@ This value can be one of several things depending on the actual kind of surface.
   \item
     \textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
   \item
-    \textbf{Ground} -- if this surface is exposed to the ground, then this is the usual choice. The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month. For more information on ground contact surfaces, reference the Auxiliary Programs document section on ``Ground Heat Transfer in EnergyPlus''.
+    \textbf{Foundation} - uses an alternative model (currently only the Kiva\textsuperscript{TM} model) to account for the multi-dimensional heat transfer of foundation surfaces. The Outside Boundary Condition Object will refer to the name of a Foundation:Kiva object (or be left blank to use the default foundation without extra insulation).
+  \item
+    \textbf{Ground} - The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month.
   \item
     \textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:CfactorUndergroundWall}, then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
   \item
@@ -1642,7 +1644,7 @@ This value can be one of several things depending on the actual kind of surface.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-6}
 
-If neither Surface, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
+If neither Surface, Zone, Foundation, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
 
 As stated above, if the Outside Boundary Condition is ``Surface'', then this field's value must be the surface name whose inside face temperature will be forced on the outside face of the base surface. This permits heat exchange between adjacent zones (interzone heat transfer) when multiple zones are simulated, but can also be used to simulate middle zone behavior without modeling the adjacent zones. This is done by specifying a surface within the zone. For example, a middle floor zone can be modeled by making the floor the Outside Boundary Condition Object for the ceiling, and the ceiling the Outside Boundary Condition Object for the floor.
 
@@ -1728,7 +1730,7 @@ This value can be one of several things depending on the actual kind of surface.
   \item
     \textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
   \item
-    \textbf{Ground} -- if this surface is exposed to the ground, then this is the choice. The temperature on the outside of this surface will be the Ground Temperature.
+    \textbf{Ground} -- The temperature on the outside of this surface will be the Ground Temperature.
   \item
     \textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
   \item
@@ -1751,7 +1753,7 @@ This value can be one of several things depending on the actual kind of surface.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-7}
 
-If neither Surface, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
+If neither Surface, Zone, Foundation, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
 
 As stated above, if the Outside Boundary Condition is ``Surface'', then this field's value must be the surface name whose inside face temperature will be forced on the outside face of the base surface. This permits heat exchange between adjacent zones (interzone heat transfer) when multiple zones are simulated, but can also be used to simulate middle zone behavior without modeling the adjacent zones. This is done by specifying a surface within the zone. For example, a middle floor zone can be modeled by making the floor the Outside Boundary Condition Object for the ceiling, and the ceiling the Outside Boundary Condition Object for the floor.
 
@@ -1827,39 +1829,44 @@ This is the zone name to which the surface belongs.
 
 This value can be one of several things depending on the actual kind of surface.
 
-1)~~~\textbf{Surface} -- if this surface is an internal surface, then this is the choice. The value will either be a surface in the base zone or a surface in another zone. The heat balance between two zones can be accurately simulated by specifying a surface in an adjacent zone. EnergyPlus will simulate a group of zones simultaneously and will include the heat transfer between zones. However, as this increases the complexity of the calculations, it is not necessary to specify the other zone unless the two zones will have a significant temperature difference. If the two zones will not be very different (temperature wise), then the surface should use itself as the outside environment or specify this field as \textbf{Adiabatic}. The surface name on the ``outside'' of this surface (adjacent to) is placed in the next field.
-
-2)~~~\textbf{Adiabatic} -- an internal surface in the same Zone. This surface will not transfer heat out of the zone, but will still store heat in thermal mass. Only the inside face of the surface will exchange heat with the zone (i.e.~two adiabatic surfaces are required to model internal partitions where both sides of the surface are exchanging heat with the zone). The Outside Boundary Condition Object can be left blank.
-
-3)~~~\textbf{Zone} -- this is similar to Surface but EnergyPlus will automatically create the required surface in the adjacent zone when this is entered for the surface. If there are windows or doors on the surface, EnergyPlus automatically creates appropriate sub-surfaces as well.
-
-4)~~~\textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
-
-5)~~~\textbf{Ground} -- if this surface is exposed to the ground, then this is the usual choice. The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month. For more information on ground contact surfaces, reference the Auxiliary Programs document section on ``Ground Heat Transfer in EnergyPlus''.
-
-6)~~~\textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:FfactorGroundFloor}, then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
-
-7)~~~\textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
-
-8)~~~\textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
-
-9)~~~\textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
-
-10)\textbf{GroundSlabPreprocessorCore} -- uses the core results from the Slab preprocessor calculations.
-
-11)\textbf{GroundSlabPreprocessorPerimeter} -- uses the perimeter results from the Slab preprocessor calculations.
-
-12)\textbf{GroundBasementPreprocessorAverageWall} -- uses the average wall results from the Basement preprocessor calculations.
-
-13)\textbf{GroundBasementPreprocessorAverageFloor} -- uses the average floor results from the Basement preprocessor calculations.
-
-14)\textbf{GroundBasementPreprocessorUpperWall} -- uses the upper wall results from the Basement preprocessor calculations.
-
-15)\textbf{GroundBasementPreprocessorLowerWall} -- uses the lower wall results from the Basement preprocessor calculations.
+\begin{enumerate}
+  \item
+    \textbf{Surface} -- if this surface is an internal surface, then this is the choice. The value will either be a surface in the base zone or a surface in another zone. The heat balance between two zones can be accurately simulated by specifying a surface in an adjacent zone. EnergyPlus will simulate a group of zones simultaneously and will include the heat transfer between zones. However, as this increases the complexity of the calculations, it is not necessary to specify the other zone unless the two zones will have a significant temperature difference. If the two zones will not be very different (temperature wise), then the surface should use itself as the outside environment or specify this field as \textbf{Adiabatic}. The surface name on the ``outside'' of this surface (adjacent to) is placed in the next field.
+  \item
+    \textbf{Adiabatic} -- an internal surface in the same Zone. This surface will not transfer heat out of the zone, but will still store heat in thermal mass. Only the inside face of the surface will exchange heat with the zone (i.e.~two adiabatic surfaces are required to model internal partitions where both sides of the surface are exchanging heat with the zone). The Outside Boundary Condition Object can be left blank.
+  \item
+    \textbf{Zone} -- this is similar to Surface but EnergyPlus will automatically create the required surface in the adjacent zone when this is entered for the surface. If there are windows or doors on the surface, EnergyPlus automatically creates appropriate sub-surfaces as well.
+  \item
+    \textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
+  \item
+    \textbf{Foundation} - uses an alternative model (currently only the Kiva\textsuperscript{TM} model) to account for the multi-dimensional heat transfer of foundation surfaces. The Outside Boundary Condition Object will refer to the name of a Foundation:Kiva object (or be left blank to use the default foundation without extra insulation).
+  \item
+    \textbf{Ground} - The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month..
+  \item
+    \textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:CfactorUndergroundWall}, then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
+  \item
+    \textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
+  \item
+    \textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
+  \item
+    \textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundSlabPreprocessorCore} -- uses the core results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundSlabPreprocessorPerimeter} -- uses the perimeter results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorAverageWall} -- uses the average wall results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorAverageFloor} -- uses the average floor results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorUpperWall} -- uses the upper wall results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorLowerWall} -- uses the lower wall results from the Basement preprocessor calculations.
+\end{enumerate}
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-8}
 
-If neither Surface, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
+If neither Surface, Zone, Foundation, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
 
 As stated above, if the Outside Boundary Condition is ``Surface'', then this field's value must be the surface name whose inside face temperature will be forced on the outside face of the base surface. This permits heat exchange between adjacent zones (interzone heat transfer) when multiple zones are simulated, but can also be used to simulate middle zone behavior without modeling the adjacent zones. This is done by specifying a surface within the zone. For example, a middle floor zone can be modeled by making the floor the Outside Boundary Condition Object for the ceiling, and the ceiling the Outside Boundary Condition Object for the floor.
 
@@ -1991,39 +1998,44 @@ This is the zone name to which the surface belongs.
 
 This value can be one of several things depending on the actual kind of surface.
 
-1)~~~\textbf{Surface} -- if this surface is an internal surface, then this is the choice. The value will either be a surface in the base zone or a surface in another zone. The heat balance between two zones can be accurately simulated by specifying a surface in an adjacent zone. EnergyPlus will simulate a group of zones simultaneously and will include the heat transfer between zones. However, as this increases the complexity of the calculations, it is not necessary to specify the other zone unless the two zones will have a significant temperature difference. If the two zones will not be very different (temperature wise), then the surface should use itself as the outside environment or specify this field as \textbf{Adiabatic}. In either case, the surface name on the ``outside'' of this surface (adjacent to) is placed in the next field.
-
-2)~~~\textbf{Adiabatic} -- an internal surface in the same Zone. This surface will not transfer heat out of the zone, but will still store heat in thermal mass. Only the inside face of the surface will exchange heat with the zone (i.e.~two adiabatic surfaces are required to model internal partitions where both sides of the surface are exchanging heat with the zone). The Outside Boundary Condition Object can be left blank.
-
-3)~~~\textbf{Zone} -- this is similar to Surface but EnergyPlus will automatically create the required surface in the adjacent zone when this is entered for the surface. If there are windows or doors on the surface, EnergyPlus automatically creates appropriate sub-surfaces as well.
-
-4)~~~\textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
-
-5)~~~\textbf{Ground} -- if this surface is exposed to the ground, then this is the usual choice. The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month. For more information on ground contact surfaces, reference the Auxiliary Programs document section on ``Ground Heat Transfer in EnergyPlus''.
-
-6)~~~\textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:CfactorUndergroundWall} or \textbf{Construction:FfactorGroundFloor} (depending on surface type), then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
-
-7)~~~\textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
-
-8)~~~\textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
-
-9)~~~\textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
-
-10)\textbf{GroundSlabPreprocessorCore} -- uses the core results from the Slab preprocessor calculations.
-
-11)\textbf{GroundSlabPreprocessorPerimeter} -- uses the perimeter results from the Slab preprocessor calculations.
-
-12)\textbf{GroundBasementPreprocessorAverageWall} -- uses the average wall results from the Basement preprocessor calculations.
-
-13)\textbf{GroundBasementPreprocessorAverageFloor} -- uses the average floor results from the Basement preprocessor calculations.
-
-14)\textbf{GroundBasementPreprocessorUpperWall} -- uses the upper wall results from the Basement preprocessor calculations.
-
-15)\textbf{GroundBasementPreprocessorLowerWall} -- uses the lower wall results from the Basement preprocessor calculations.
+\begin{enumerate}
+  \item
+    \textbf{Surface} -- if this surface is an internal surface, then this is the choice. The value will either be a surface in the base zone or a surface in another zone. The heat balance between two zones can be accurately simulated by specifying a surface in an adjacent zone. EnergyPlus will simulate a group of zones simultaneously and will include the heat transfer between zones. However, as this increases the complexity of the calculations, it is not necessary to specify the other zone unless the two zones will have a significant temperature difference. If the two zones will not be very different (temperature wise), then the surface should use itself as the outside environment or specify this field as \textbf{Adiabatic}. The surface name on the ``outside'' of this surface (adjacent to) is placed in the next field.
+  \item
+    \textbf{Adiabatic} -- an internal surface in the same Zone. This surface will not transfer heat out of the zone, but will still store heat in thermal mass. Only the inside face of the surface will exchange heat with the zone (i.e.~two adiabatic surfaces are required to model internal partitions where both sides of the surface are exchanging heat with the zone). The Outside Boundary Condition Object can be left blank.
+  \item
+    \textbf{Zone} -- this is similar to Surface but EnergyPlus will automatically create the required surface in the adjacent zone when this is entered for the surface. If there are windows or doors on the surface, EnergyPlus automatically creates appropriate sub-surfaces as well.
+  \item
+    \textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
+  \item
+    \textbf{Foundation} - uses an alternative model (currently only the Kiva\textsuperscript{TM} model) to account for the multi-dimensional heat transfer of foundation surfaces. The Outside Boundary Condition Object will refer to the name of a Foundation:Kiva object (or be left blank to use the default foundation without extra insulation).
+  \item
+    \textbf{Ground} - The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month.
+  \item
+    \textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:CfactorUndergroundWall}, then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
+  \item
+    \textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
+  \item
+    \textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
+  \item
+    \textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundSlabPreprocessorCore} -- uses the core results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundSlabPreprocessorPerimeter} -- uses the perimeter results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorAverageWall} -- uses the average wall results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorAverageFloor} -- uses the average floor results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorUpperWall} -- uses the upper wall results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorLowerWall} -- uses the lower wall results from the Basement preprocessor calculations.
+\end{enumerate}
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-9}
 
-If neither Surface, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
+If neither Surface, Zone, Foundation, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
 
 As stated above, if the Outside Boundary Condition is ``Surface'', then this field's value must be the surface name whose inside face temperature will be forced on the outside face of the base surface. This permits heat exchange between adjacent zones (interzone heat transfer) when multiple zones are simulated, but can also be used to simulate middle zone behavior without modeling the adjacent zones. This is done by specifying a surface within the zone. For example, a middle floor zone can be modeled by making the floor the Outside Boundary Condition Object for the ceiling, and the ceiling the Outside Boundary Condition Object for the floor.
 
@@ -2125,13 +2137,15 @@ BuildingSurface:Detailed,Zn001:Wall001,  !- Base Surface Name
 
 This surface class is used for subsurfaces, which can be of five different types: Windows, Doors, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers. A subsurface (such as a window) of a base surface (such as a wall) inherits several of the properties (such as Outside Boundary Condition, Sun Exposure, etc.) of the base surface. Windows, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers are considered to have one or more glass layers and so transmit solar radiation. Doors are considered to be opaque.
 
+The surface can be of 3 sides or 4 sides. A 4-sided but non-rectangular fenestration surface is allowed and will be transferred to an equivalent rectangular surface with the same area and aspect ratio for the convection calculations at window air gaps.
+
 \subsubsection{Inputs}\label{inputs-24-004}
 
 \paragraph{Field: Name}\label{field-name-20-004}
 
 This is a unique name associated with the heat transfer subsurface. It may be used in other places as a reference (e.g.~as the opposing subsurface of an interzone window or door).
 
-\paragraph{Field: Surface Type}\label{field-surface-type-1}
+\paragraph{Field: Surface Type}\label{field-surface-type-2016-06-16}
 
 The choices for Surface Type are Window, Door, GlassDoor, TubularDaylightDome, and TubularDaylightDiffuser. Doors are assumed to be opaque (do not transmit solar radiation) whereas the other surface types do transmit solar radiation. Windows and Glass Doors are treated identically in the calculation of conduction heat transfer, solar gain, daylighting, etc. A Window or GlassDoor, but not a Door, can have a movable interior, exterior or between-glass shading device, such as blinds (ref: WindowMaterial:Blind object), and can have a frame and/or a divider (ref: WindowProperty:FrameAndDivider object). TubularDaylightDomes and TubularDaylightDomes are specialized subsurfaces for use with the DaylightingDevice:Tubular object to simulate Tubular Daylighting Devices (TDDs). TubularDaylightDomes and TubularDaylightDomes cannot have shades, screens or blinds. In the following, the term ``window'' applies to Window, GlassDoor, TubularDaylightDome, and TubularDaylightDome, if not otherwise explicitly mentioned.
 
@@ -2258,7 +2272,7 @@ Determine when a shading device is on in a particular timestep & Print the varia
 Control the \textbf{slat angle} of a blind & Window\-Property:\-Shading\-Control & Purch\-Air\-Window\-Blind.idf \tabularnewline
 Add a \textbf{frame} & Window\-Property:\-FrameAndDivider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Add a \textbf{divider} & Window\-Property:\-Frame\-And\-Divider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
-Allow window to \textbf{daylight} a zone & Day\-lighting:Controls, Day\-lighting:\-DELight:\-Controls & Purch\-Air\-With\-Day\-lighting.idf, DElight-\-Detailed-\-Comparison.idf \tabularnewline
+Allow window to \textbf{daylight} a zone & Day\-lighting:Controls & Purch\-Air\-With\-Day\-lighting.idf, DElight-\-Detailed-\-Comparison.idf \tabularnewline
 Find \textbf{solar reflected} onto window from neighboring buildings & Building/\-Solar\-Distribution field – uses ``WithReflections'' & Reflective\-Adjacent\-Building.idf \tabularnewline
 Model \textbf{switchable glazing} (e.g., electrochromic glass) & Window\-Property:\-Shading\-Control & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Add an \textbf{interior window} & Define two Fenestration\-Surface:\-Detailed's, one for each associated interior wall & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
@@ -2445,7 +2459,6 @@ Zone,Average,Surface Heat Storage Gain Rate [W]
 Zone,Average,Surface Heat Storage Loss Rate [W]
 Zone,Average,Surface Heat Storage Rate per Area [W/m2]
 Zone,Sum,Surface Heat Storage Energy [J]
-Zone,Average,Surface Internal Source Location Temperature [C]
 Zone,Average,Zone Opaque Surface Inside Face Conduction [W]
 Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate [W]
 Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate [W]
@@ -2588,7 +2601,7 @@ This will output a temperature for the back face of the layer. The layer back fa
 
 The various output variables related to surface heat transfer are organized around the inside and outside face of each surface. The zone heat balance model draws energy balances at each side, or face, of a surface and so each surface essentially has two sets of results. The inside face is the side of a heat transfer surface that faces toward the thermal zone. The outside face is the side of a heat transfer surface that faces away from the thermal zone, typically facing outdoors. The Key Value for these is generally the user-defined name of the surface.
 
-\subsubsection{\texorpdfstring{Surface Inside Face Heat Balance Calculation Iteration Count {[]}}{Surface Inside Face Heat Balance Calculation Iteration Count }}\label{surface-inside-face-heat-balance-calculation-iteration-count}
+\subsubsection{Surface Inside Face Heat Balance Calculation Iteration Count {[]}}\label{surface-inside-face-heat-balance-calculation-iteration-count}
 
 This output is the number of iterations used in a part of the solution for surface heat transfer that accounts for thermal radiation heat transfer between zone surfaces. This is simply a counter on the iteration loop for inside face surface modeling. There is only one instance of this output in a given run and the Key Value is ``Simulation.''
 
@@ -2730,7 +2743,7 @@ The outdoor wind speed calculated at the height above ground of the surface cent
 
 The outside area of an exterior surface that is illuminated by (unreflected) beam solar radiation.
 
-\subsubsection{\texorpdfstring{Surface Outside Face Sunlit Fraction {[]}}{Surface Outside Face Sunlit Fraction }}\label{surface-outside-face-sunlit-fraction}
+\subsubsection{Surface Outside Face Sunlit Fraction {[]}}\label{surface-outside-face-sunlit-fraction}
 
 The fraction of the outside area of an exterior surface that is illuminated by (unreflected) beam solar radiation. Equals Surface Outside Face Sunlit Area divided by total surface area.
 
@@ -2807,15 +2820,15 @@ The solar beam radiation incident on the outside of an exterior surface that ari
 
 The solar diffuse radiation incident on the outside of an exterior surface that arises from beam-to-diffuse reflection from building shades or building surfaces. This value will be non-zero only if ``Reflections'' option is chosen in the BUILDING object.
 
-\subsubsection{\texorpdfstring{Surface Outside Face Beam Solar Incident Angle Cosine Value {[]}}{Surface Outside Face Beam Solar Incident Angle Cosine Value }}\label{surface-outside-face-beam-solar-incident-angle-cosine-value}
+\subsubsection{Surface Outside Face Beam Solar Incident Angle Cosine Value {[]}}\label{surface-outside-face-beam-solar-incident-angle-cosine-value}
 
 The cosine of the angle of incidence of (unreflected) beam solar radiation on the outside of an exterior surface. The value varies from 0.0 for beam parallel to the surface (incidence angle = 90\(^{O}\)) to 1.0 for beam perpendicular to the surface (incidence angle = 0\(^{O}\)). Negative values indicate the sun is behind the surface, i.e the surface does not see the sun.
 
-\subsubsection{\texorpdfstring{Surface Anisotropic Sky Multiplier {[]}}{Surface Anisotropic Sky Multiplier }}\label{surface-anisotropic-sky-multiplier}
+\subsubsection{Surface Anisotropic Sky Multiplier {[]}}\label{surface-anisotropic-sky-multiplier}
 
 This is the view factor multiplier for diffuse sky irradiance on exterior surfaces taking into account the anisotropic radiance of the sky. The diffuse sky irradiance on a surface is given by Anisotropic Sky Multiplier * Diffuse Solar Irradiance.
 
-\subsubsection{\texorpdfstring{Surface Window BSDF Beam Direction Number {[]}}{Surface Window BSDF Beam Direction Number }}\label{surface-window-bsdf-beam-direction-number}
+\subsubsection{Surface Window BSDF Beam Direction Number {[]}}\label{surface-window-bsdf-beam-direction-number}
 
 \subsubsection{Surface Window BSDF Beam Phi Angle {[}rad{]}}\label{surface-window-bsdf-beam-phi-angle-rad}
 
@@ -2886,10 +2899,6 @@ Different versions of the reports are available. The basic heat conduction rate 
 These ``heat storage'' output variables combine the inside face conduction and outside face conduction reports together to describe the thermal storage situation in a heat transfer surface in a nominal way. This is simply the difference between the inside and outside face conduction, but with the sign convention arranged so that positive values indicate heat being added to the core of the surface.
 
 Different versions of the reports are available. The basic heat storage rate (W) and a per unit area flux (W/m\(^{2}\)) can have positive or negative values with the sign convention that positive indicates heat being added to the surface's mass. There are also directed ``gain'' and ``loss'' versions that have only positive values or zero when the heat storage direction opposes (W). Finally there is a version for total energy stored (J).
-
-\subsubsection{Surface Internal Source Location Temperature {[}C{]}}\label{surface-internal-source-location-temperature-c}
-
-When a surface has an internal source or sink (defined using Construction:InternalSource) then this output is available for the temperature within the surface at the location of the source/sink.
 
 \subsubsection{Zone Opaque Surface Inside Face Conduction {[}W{]}}\label{zone-opaque-surface-inside-face-conduction-w}
 
@@ -3023,15 +3032,15 @@ The combined beam and diffuse solar that first entered adjacent zones through ex
 
 The sum of the Surface Window Transmitted Diffuse Solar Radiation Rate (see definition above) from all interior windows in a zone.
 
-\subsubsection{\texorpdfstring{Surface Window System Solar Transmittance {[]}}{Surface Window System Solar Transmittance }}\label{surface-window-system-solar-transmittance}
+\subsubsection{Surface Window System Solar Transmittance {[]}}\label{surface-window-system-solar-transmittance}
 
 Effective solar transmittance of an exterior window, including effect of shading device, if present. Equal to ``Surface Window Transmitted Solar Radiation Rate'' divided by total exterior beam plus diffuse solar radiation incident on the window (excluding frame, if present).
 
-\subsubsection{\texorpdfstring{Surface Window System Solar Absorptance {[]}}{Surface Window System Solar Absorptance }}\label{surface-window-system-solar-absorptance}
+\subsubsection{Surface Window System Solar Absorptance {[]}}\label{surface-window-system-solar-absorptance}
 
 Effective solar absorptance of an exterior window, including effect of shading device, if present. Equal to ``Window Solar Absorbed: All Glass Layers'' plus ``Window Solar Absorbed: Shading Device'' divided by total exterior beam plus diffuse solar radiation incident on window (excluding frame, if present)
 
-\subsubsection{\texorpdfstring{Surface Window System Solar Reflectance {[]}}{Surface Window System Solar Reflectance }}\label{surface-window-system-solar-reflectance}
+\subsubsection{Surface Window System Solar Reflectance {[]}}\label{surface-window-system-solar-reflectance}
 
 Effective solar reflectance of an exterior window, including effect of shading device, if present. Equal to: {[}1.0 -- ``Surface Window System Solar Transmittance'' -- ``Surface Window System Solar Absorptance''{]}.
 
@@ -3137,19 +3146,19 @@ For a window \emph{with an interior shading device}, this heat flow is equal to:
   {[}Conduction through the window frame and divider, if present{]}
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Surface Window Glazing Beam to Beam Solar Transmittance {[]}}{Surface Window Glazing Beam to Beam Solar Transmittance }}\label{surface-window-glazing-beam-to-beam-solar-transmittance}
+\subsubsection{Surface Window Glazing Beam to Beam Solar Transmittance {[]}}\label{surface-window-glazing-beam-to-beam-solar-transmittance}
 
 The fraction of exterior beam solar radiation incident on the glass of an exterior window that is transmitted through the glazing as beam radiation. This is for the base window without shading. Takes into account the angle of incidence of beam solar radiation on the glass.
 
-\subsubsection{\texorpdfstring{Surface Window Glazing Beam to Diffuse Solar Transmittance {[]}}{Surface Window Glazing Beam to Diffuse Solar Transmittance }}\label{surface-window-glazing-beam-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Glazing Beam to Diffuse Solar Transmittance {[]}}\label{surface-window-glazing-beam-to-diffuse-solar-transmittance}
 
 The fraction of exterior beam solar radiation incident on the glazing of an exterior window that is transmitted through the glazing as diffuse radiation.
 
-\subsubsection{\texorpdfstring{Surface Window Glazing Diffuse to Diffuse Solar Transmittance {[]}}{Surface Window Glazing Diffuse to Diffuse Solar Transmittance }}\label{surface-window-glazing-diffuse-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Glazing Diffuse to Diffuse Solar Transmittance {[]}}\label{surface-window-glazing-diffuse-to-diffuse-solar-transmittance}
 
 The fraction of exterior diffuse solar radiation incident on the glass of an exterior window that is transmitted through the glass assuming that the window has no shading device. It is assumed that incident diffuse solar is transmitted only as diffuse with no beam component.
 
-\subsubsection{\texorpdfstring{Surface Window Model Solver Iteration Count {[]}}{Surface Window Model Solver Iteration Count }}\label{surface-window-model-solver-iteration-count}
+\subsubsection{Surface Window Model Solver Iteration Count {[]}}\label{surface-window-model-solver-iteration-count}
 
 The number of iterations needed by the window-layer heat balance solution to converge.
 
@@ -3161,7 +3170,7 @@ For an exterior window of arbitrary tilt, it is defined as the angle between the
 
 If the sun is behind the window, the horizontal profile angle is not defined and is reported as 0.0.
 
-Note that in most texts what we call ``horizontal profile angle'' is called ``vertical profile angle.''
+Note that in most texts and in window equivalent layer model what we call ``horizontal profile angle'' is called ``vertical profile angle.''
 
 \subsubsection{Surface Window Solar Vertical Profile Angle {[}deg{]}}\label{surface-window-solar-vertical-profile-angle-deg}
 
@@ -3171,7 +3180,7 @@ For an exterior window of arbitrary tilt, it is defined as the angle between the
 
 If the sun is behind the window, the vertical profile angle is not defined and is reported as 0.0.
 
-Note that in most texts what we call ``vertical profile angle'' is called ``horizontal profile angle.''
+Note that in most texts and in window equivalent layer model what we call ``vertical profile angle'' is called ``horizontal profile angle.''
 
 \begin{figure}[hbtp] % fig 32
 \centering
@@ -3207,7 +3216,7 @@ Diffuse solar radiation reflected from inside reveal surfaces onto the frame sur
 
 Diffuse solar radiation reflected from inside reveal surfaces onto the glazing surfaces of a window, in Watts.
 
-\subsubsection{\texorpdfstring{Surface Window Inside Face Glazing Condensation Status {[]}}{Surface Window Inside Face Glazing Condensation Status }}\label{surface-window-inside-face-glazing-condensation-status}
+\subsubsection{Surface Window Inside Face Glazing Condensation Status {[]}}\label{surface-window-inside-face-glazing-condensation-status}
 
 A value of 1 means that moisture condensation will occur on the innermost glass face of an exterior window (i.e., on the glass face in contact with the zone air). Otherwise the value is 0. The condition for condensation is glass inside face temperature \textless{} zone air dewpoint temperature.
 
@@ -3222,15 +3231,15 @@ For airflow exterior windows, in which forced air passes between adjacent glass 
 
 As for regular windows, the value will also be 1 if condensation occurs on the innermost glass face.
 
-\subsubsection{\texorpdfstring{Surface Window Inside Face Frame Condensation Status {[]}}{Surface Window Inside Face Frame Condensation Status }}\label{surface-window-inside-face-frame-condensation-status}
+\subsubsection{Surface Window Inside Face Frame Condensation Status {[]}}\label{surface-window-inside-face-frame-condensation-status}
 
 If an exterior window has a frame and the value of this flag is 1, condensation will occur on the inside surface of the frame. The condition for condensation is frame inside surface temperature \textless{} zone air dewpoint temperature.
 
-\subsubsection{\texorpdfstring{Surface Window Inside Face Divider Condensation Status {[]}}{Surface Window Inside Face Divider Condensation Status }}\label{surface-window-inside-face-divider-condensation-status}
+\subsubsection{Surface Window Inside Face Divider Condensation Status {[]}}\label{surface-window-inside-face-divider-condensation-status}
 
 If an exterior window has a divider and the value of this flag is 1, condensation will occur on the inside surface of the divider. The condition for condensation is divider inside surface temperature \textless{} zone air dewpoint temperature.
 
-\subsubsection{\texorpdfstring{Surface Shading Device Is On Time Fraction {[]}}{Surface Shading Device Is On Time Fraction }}\label{surface-shading-device-is-on-time-fraction}
+\subsubsection{Surface Shading Device Is On Time Fraction {[]}}\label{surface-shading-device-is-on-time-fraction}
 
 The fraction of time that a shading device is on an exterior window. For a particular simulation timestep, the value is 0.0 if the shading device is off (or there is no shading device) and the value is 1.0 if the shading device is on. (It is assumed that the shading device, if present, is either on or off for the entire timestep.) If the shading device is switchable glazing, a value of 0.0 means that the glazing is in the unswitched (light colored) state, and a value of 1.0 means that the glazing is in the switched (dark colored) state.
 
@@ -3240,43 +3249,46 @@ For a time interval longer a timestep, this is the fraction of the time interval
 
 For an exterior window with a blind, this is the angle in degrees between the glazing outward normal and the blind slat angle outward normal, where the outward normal points away from the front face of the slat. The slat angle varies from 0 to 180 deg. If the slat angle is 0 deg or 180 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 90 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. See illustrations under WindowMaterial:Blind. For blinds with a fixed slat angle, the value reported here will be constant.
 
-\subsubsection{\texorpdfstring{Surface Window Blind Beam to Beam Solar Transmittance {[]}}{Surface Window Blind Beam to Beam Solar Transmittance }}\label{surface-window-blind-beam-to-beam-solar-transmittance}
+For WindowMaterial:Blind:EquivalentLayer blinds the slat angle varies from -90 to 90 deg. If the slat angle is -90 deg or 90 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 0 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. For blinds with a fixed slat angle, the value reported here will be constant.
+
+
+\subsubsection{Surface Window Blind Beam to Beam Solar Transmittance {[]}}\label{surface-window-blind-beam-to-beam-solar-transmittance}
 
 For an exterior window with a blind, this is the fraction of exterior beam solar radiation incident on the blind that is transmitted through the blind as beam solar radiation when the blind is isolated (i.e., as though the window glass were not present). Depends on various factors, including slat angle, width, separation, and thickness, and horizontal solar profile angle (for blinds with horizontal slats) or vertical solar profile angle (for blinds with vertical slats). The transmittance value reported here will be non-zero only when some beam solar can pass through the blind without hitting the slats.
 
-\subsubsection{\texorpdfstring{Surface Window Blind Beam to Diffuse Solar Transmittance {[]}}{Surface Window Blind Beam to Diffuse Solar Transmittance }}\label{surface-window-blind-beam-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Blind Beam to Diffuse Solar Transmittance {[]}}\label{surface-window-blind-beam-to-diffuse-solar-transmittance}
 
 For an exterior window with a blind, the fraction of exterior beam solar radiation incident on the blind that is transmitted through the blind as diffuse solar radiation when the blind is isolated (i.e., as though the window glass were not present). Depends on various factors, including slat angle, width, separation, thickness and reflectance, and horizontal solar profile angle (for blinds with horizontal slats) or vertical solar profile angle (for blinds with vertical slats).
 
-\subsubsection{\texorpdfstring{Surface Window Blind Diffuse to Diffuse Solar Transmittance {[]}}{Surface Window Blind Diffuse to Diffuse Solar Transmittance }}\label{surface-window-blind-diffuse-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Blind Diffuse to Diffuse Solar Transmittance {[]}}\label{surface-window-blind-diffuse-to-diffuse-solar-transmittance}
 
 For an exterior window with a blind, the fraction of exterior diffuse solar radiation incident on the blind that is transmitted through the blind as diffuse solar radiation when the blind is isolated (i.e., as though the window glass were not present). Depends on various factors, including slat angle, width, separation, thickness and reflectance. For blinds with a fixed slat angle the transmittance value reported here will be constant.
 
-\subsubsection{\texorpdfstring{Surface Window Blind and Glazing System Beam Solar Transmittance {[]}}{Surface Window Blind and Glazing System Beam Solar Transmittance }}\label{surface-window-blind-and-glazing-system-beam-solar-transmittance}
+\subsubsection{Surface Window Blind and Glazing System Beam Solar Transmittance {[]}}\label{surface-window-blind-and-glazing-system-beam-solar-transmittance}
 
 The fraction of exterior beam solar radiation incident on an exterior window with a blind (excluding window frame, if present) that is transmitted through the blind/glass system as beam solar radiation. Depends on various factors, including type of glass; solar incidence angle; slat angle, width, separation, and thickness; and horizontal solar profile angle (for blinds with horizontal slats) or vertical solar profile angle (for blinds with vertical slats).
 
-\subsubsection{\texorpdfstring{Surface Window Blind and Glazing System Diffuse Solar Transmittance {[]}}{Surface Window Blind and Glazing System Diffuse Solar Transmittance }}\label{surface-window-blind-and-glazing-system-diffuse-solar-transmittance}
+\subsubsection{Surface Window Blind and Glazing System Diffuse Solar Transmittance {[]}}\label{surface-window-blind-and-glazing-system-diffuse-solar-transmittance}
 
 The fraction of exterior diffuse solar radiation incident on an exterior window with a blind (excluding window frame, if present) that is transmitted through the blind/glass system as diffuse solar radiation. Depends on various factors, including type of glass and slat angle, width, separation, thickness and reflectance. For blinds with a fixed slat angle the transmittance value reported here will be constant.
 
-\subsubsection{\texorpdfstring{Surface Window Screen Beam to Beam Solar Transmittance {[]}}{Surface Window Screen Beam to Beam Solar Transmittance }}\label{surface-window-screen-beam-to-beam-solar-transmittance}
+\subsubsection{Surface Window Screen Beam to Beam Solar Transmittance {[]}}\label{surface-window-screen-beam-to-beam-solar-transmittance}
 
 For an exterior window with a screen, this is the fraction of exterior beam solar radiation incident on the screen that is transmitted through the screen as beam solar radiation when the screen is isolated (i.e., as though the window glass were not present). Depends on various factors, including the screen reflectance and the relative angle of the incident beam with respect to the screen. This value will include the amount of inward reflection of solar beam off the screen material surface if the user specifies this modeling option (i.e., Material: WindowScreen, field Reflected Beam Transmittance Accounting Method = Model as Direct Beam).
 
-\subsubsection{\texorpdfstring{Surface Window Screen Beam to Diffuse Solar Transmittance{[]}}{Surface Window Screen Beam to Diffuse Solar Transmittance}}\label{surface-window-screen-beam-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Screen Beam to Diffuse Solar Transmittance{[]}}\label{surface-window-screen-beam-to-diffuse-solar-transmittance}
 
 For an exterior window with a screen, the fraction of exterior beam solar radiation incident on the screen that is transmitted through the screen as diffuse solar radiation when the screen is isolated (i.e., as though the window glass were not present). Depends on various factors, including the screen reflectance and the relative angle of the incident beam with respect to the screen. This value is the amount of inward reflection of solar beam off the screen material surface if the user specifies this modeling option (i.e., Material: WindowScreen, field Reflected Beam Transmittance Accounting Method = Model as Diffuse); otherwise, this value will be zero.
 
-\subsubsection{\texorpdfstring{Surface Window Screen Diffuse to Diffuse Solar Transmittance{[]}}{Surface Window Screen Diffuse to Diffuse Solar Transmittance}}\label{surface-window-screen-diffuse-to-diffuse-solar-transmittance}
+\subsubsection{Surface Window Screen Diffuse to Diffuse Solar Transmittance{[]}}\label{surface-window-screen-diffuse-to-diffuse-solar-transmittance}
 
 For an exterior window with a screen, the fraction of exterior diffuse solar radiation incident on the screen that is transmitted through the screen as diffuse solar radiation when the screen is isolated (i.e., as though the window glass were not present). Depends on various factors including screen material geometry and reflectance. This value is calculated as an average, constant For a window with a screen, this value consists of diffuse radiation transmitted through the screen (gaps between the screen material) and diffuse radiation from diffuse-to-diffuse reflection from the screen material. For a window with a screen, this value consists of diffuse radiation transmitted through the screen (gaps between the screen material) and diffuse radiation from diffuse-to-diffuse reflection from the screen material.
 
-\subsubsection{\texorpdfstring{Surface Window Screen and Glazing System Beam Solar Transmittance{[]}}{Surface Window Screen and Glazing System Beam Solar Transmittance}}\label{surface-window-screen-and-glazing-system-beam-solar-transmittance}
+\subsubsection{Surface Window Screen and Glazing System Beam Solar Transmittance{[]}}\label{surface-window-screen-and-glazing-system-beam-solar-transmittance}
 
 The fraction of exterior beam solar radiation incident on an exterior window with a screen (excluding window frame, if present) that is transmitted through the screen/glass system as beam solar radiation. Depends on various factors, including the screen reflectance and the relative angle of the incident beam with respect to the screen. This value will include the amount of inward reflection of solar beam off the screen material surface if the user specifies this modeling option (i.e., Material: WindowScreen, field Reflected Beam Transmittance Accounting Method = Model as Direct Beam).
 
-\subsubsection{\texorpdfstring{Surface Window Screen and Glazing System Diffuse Solar Transmittance {[]}}{Surface Window Screen and Glazing System Diffuse Solar Transmittance }}\label{surface-window-screen-and-glazing-system-diffuse-solar-transmittance}
+\subsubsection{Surface Window Screen and Glazing System Diffuse Solar Transmittance {[]}}\label{surface-window-screen-and-glazing-system-diffuse-solar-transmittance}
 
 The fraction of exterior diffuse solar radiation incident on an exterior window with a screen (excluding window frame, if present) that is transmitted through the screen/glass system as diffuse solar radiation. Depends on various factors including screen material geometry and reflectance.
 
@@ -3286,7 +3298,7 @@ The fraction of exterior diffuse solar radiation incident on an exterior window 
 
 The beam solar radiation transmitted through an interior window. Calculated only if Solar Distribution = FullInteriorAndExterior in your Building input. The origin of this radiation is beam solar that enters through an exterior window in a zone and then passes through an interior window into the adjacent zone. The amount of this radiation depends on several factors, including sun position, intensity of beam solar incident on the exterior window (including effects of shadowing, if present), relative position of the exterior and interior window, and the size and transmittance of the windows. Note that if there are two or more exterior windows in a zone, then beam solar from one or more of them may pass through the same interior window. Likewise, if there are more than two or more interior windows in a zone then beam solar from a single exterior window may pass through one or more of the interior windows. There are both rate and energy versions of the output.
 
-\subsubsection{\texorpdfstring{Surface Storm Window On Off Status {[]}}{Surface Storm Window On Off Status }}\label{surface-storm-window-on-off-status}
+\subsubsection{Surface Storm Window On Off Status {[]}}\label{surface-storm-window-on-off-status}
 
 Indicates whether a storm window glass layer is present (ref: StormWindow object). The value is \textbf{0} if the storm window glass layer is off, \textbf{1} if it is on, and \textbf{--1} if the window does not have an associated storm window. Applicable only to exterior windows and glass doors.
 
@@ -3376,11 +3388,11 @@ The overall properties (U-factor/SHGC/VT) of the thermochromic windows at differ
 
 \subsubsection{Switchable Window Outputs}\label{switchable-window-outputs}
 
-\subsubsection{\texorpdfstring{Surface Window Switchable Glazing Switching Factor{[]}}{Surface Window Switchable Glazing Switching Factor}}\label{surface-window-switchable-glazing-switching-factor}
+\subsubsection{Surface Window Switchable Glazing Switching Factor{[]}}\label{surface-window-switchable-glazing-switching-factor}
 
 The switching factor (tint level) of the switchable window: 0 means no switching -- clear state; 1 means fully switched -- dark state.
 
-\subsubsection{\texorpdfstring{Surface Window Switchable Glazing Visible Transmittance{[]}}{Surface Window Switchable Glazing Visible Transmittance}}\label{surface-window-switchable-glazing-visible-transmittance}
+\subsubsection{Surface Window Switchable Glazing Visible Transmittance{[]}}\label{surface-window-switchable-glazing-visible-transmittance}
 
 The visible transmittance of the switchable window.
 
@@ -3390,7 +3402,7 @@ Several reports can be selected for Surfaces. (See Group -- Report for details o
 
 \subsubsection{DXF}\label{dxf}
 
-This report produces a special file (\textbf{eplusout.dxf}) in the industry standard DXF (Drawing Interchange Format) for drawings. It is produced and accepted by many popular, commercial CAD programs. Detailed reference can be found on the AutoCAD™ website at: http://www.autodesk.com/techpubs/autocad/acadr14/dxf/index.htm
+This report produces a special file (\textbf{eplusout.dxf}) in the industry standard DXF (Drawing Interchange Format) for drawings. It is produced and accepted by many popular, commercial CAD programs. Detailed reference can be found on the AutoCAD™ website at: \url{http://www.autodesk.com/techpubs/autocad/acadr14/dxf/index.htm}.
 
 EnergyPlus produces this file from the Report command:
 
@@ -4742,7 +4754,7 @@ The WINDOW program calculates the U-value, Solar Heat Gain Coefficient, solar tr
 
 WINDOW can write a data file containing a description of the window that was analyzed. An example of this file (which is no longer the preferred method) is shown in the Tips document under WINDOW generated files. is shown below. This file, which can be named by the user, can be read by EnergyPlus. For more complete description and examples, see the object description -- Construction:WindowDataFile.
 
-In this way, the same window that was created in WINDOW can be imported into EnergyPlus for annual energy analysis without having to re-input the window data. To obtain WINDOW, THERM, or OPTICS go to http://windows.lbl.gov and choose the software link. A major advantage of using WINDOW to create window input for EnergyPlus is that you will have direct access to WINDOW's expanding database of over 1000 different glass types; and you will be able to browse through this database according to different criteria (color, transmittance, solar heat gain coefficient, etc.) to help you select the best glass type for your application.
+In this way, the same window that was created in WINDOW can be imported into EnergyPlus for annual energy analysis without having to re-input the window data. To obtain WINDOW, THERM, or OPTICS go to \url{http://windows.lbl.gov} and choose the software link. A major advantage of using WINDOW to create window input for EnergyPlus is that you will have direct access to WINDOW's expanding database of over 1000 different glass types; and you will be able to browse through this database according to different criteria (color, transmittance, solar heat gain coefficient, etc.) to help you select the best glass type for your application.
 
 Although WINDOW writes only one window entry on the WINDOW data file, EnergyPlus users can combine two or more of these files to end up with a single data file with multiple window entries of different types. In this way a library of windows from WINDOW can be built up if so desired. If you combine files like this you should be sure not to leave out or change any of lines from the original files.
 
@@ -4844,11 +4856,11 @@ This field represents the sensible cooling energy in Joules that is actually sup
 
 \subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w-1}
 
-This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. The Zone Air System Sensible Heating Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
 
 \subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w-1}
 
-This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. The Zone Air System Sensible Cooling Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
 
 \subsubsection{Zone Air Humidity Ratio{[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratiokgwaterkgdryair}
 

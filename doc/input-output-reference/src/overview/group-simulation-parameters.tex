@@ -36,12 +36,12 @@ The choice made for this field has important implications for modeling accuracy 
 \end{itemize}
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
 \midrule
 \endhead
@@ -133,13 +133,13 @@ The site's terrain affects how the wind hits the building -- as does the buildin
 % table 1
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Values for ``Terrain'' \label{table:values-for-terrain}} \tabularnewline
-\toprule 
+\toprule
 Terrain Type Value & Terrain Description \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Values for ``Terrain''} \tabularnewline
-\toprule 
+\toprule
 Terrain Type Value & Terrain Description \tabularnewline
 \midrule
 \endhead
@@ -341,28 +341,36 @@ Four values are allowed to select which solution will be used.
   The \textbf{ConductionTransferFunction} selection is a sensible heat only solution and does not take into account moisture storage or diffusion in the construction elements.
 \item
   The \textbf{MoisturePenetrationDepthConductionTransferFunction} selection is a sensible heat diffusion and an inside surface moisture storage algorithm that also needs additional moisture material property information. Sometimes, this is referred to as the Effective Moisture Penetration Depth or EMPD. See the moisture material property object for additional information and description of outputs:
-\item
-  MaterialProperty:MoisturePenetrationDepth:Settings
+  \begin{itemize}
+  \item
+    MaterialProperty:MoisturePenetrationDepth:Settings
+  \end{itemize}
 \item
   \textbf{Advanced/Research usage:}The \textbf{ConductionFiniteDifference} selection is a sensible heat only solution and does not take into account moisture storage or diffusion in the construction elements. This solution technique uses a 1-D finite difference solution in the construction elements. Outputs for the surfaces are described with the material property objects. The Conduction Finite Difference (aka CondFD) property objects are:
-\item
-  MaterialProperty:PhaseChange
-\item
-  MaterialProperty:VariableThermalConductivity
+  \begin{itemize}
+  \item
+    MaterialProperty:PhaseChange
+  \item
+    MaterialProperty:VariableThermalConductivity
+  \item
+    MaterialProperty:PhaseChangeHysteresis
+  \end{itemize}
 \item
   \textbf{Advanced/Research usage:} The \textbf{CombinedHeatAndMoistureFiniteElement} is a coupled heat and moisture transfer and storage solution. The solution technique uses a one dimensional finite difference solution in the construction elements and requires further material properties described in the Heat and Moisture Transfer material properties objects. Outputs from the algorithm are described with these objects. The Heat and Moisture Transfer property objects are:
-\item
-  MaterialProperty:HeatAndMoistureTransfer:Settings
-\item
-  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
-\item
-  MaterialProperty:HeatAndMoistureTransfer:Suction
-\item
-  MaterialProperty:HeatAndMoistureTransfer:Redistribution
-\item
-  MaterialProperty:HeatAndMoistureTransfer:Diffusion
-\item
-  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+  \begin{itemize}
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:Settings
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:Suction
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:Redistribution
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:Diffusion
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+  \end{itemize}
 \end{itemize}
 
 \paragraph{Field: Surface Temperature Upper Limit}\label{field-surface-temperature-upper-limit}
@@ -470,7 +478,7 @@ Input is Yes or No. The default is No. If Yes, simulation of carbon dioxide conc
 
 \paragraph{Field: Outdoor Carbon Dioxide Schedule Name}\label{field-outdoor-carbon-dioxide-schedule-name}
 
-This field specifies the name of a schedule that contains outdoor air carbon dioxide level values in units of ppm. One source of monthly average CO\(_{2}\) levels in the atmosphere is available at [NOAA's website](http://www.esrl.noaa.gov/gmd/ccgg/trends/) or via [ftp](ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_mm_mlo.txt).
+This field specifies the name of a schedule that contains outdoor air carbon dioxide level values in units of ppm. One source of monthly average CO\(_{2}\) levels in the atmosphere is available at \href{http://www.esrl.noaa.gov/gmd/ccgg/trends/}{NOAA's website} or via \href{ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_mm_mlo.txt}{ftp}.
 
 \paragraph{Field: Generic Contaminant Concentration}\label{field-generic-contaminant-concentration}
 
@@ -531,7 +539,7 @@ This object is used to control some details of EnergyPlus's solar, shadowing and
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method-000}
 
-This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword DetailedTimestepIntegration. The later method is useful modeling dynamic fenestration and shading surfaces.
+This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword TimestepFrequency. The TimestepFrequency method must be used for modeling dynamic fenestration and shading surfaces.
 
 \paragraph{Field: Calculation Frequency}\label{field-calculation-frequency}
 
@@ -587,7 +595,9 @@ Allowable choices are:
 
 \textbf{DisplayZoneAirHeatBalanceOffBalance} -- this is a developer diagnostic which you can turn on, if you desire.
 
-\textbf{DoNotMirrorDetachedShading} -- use this to turn off the automatic mirroring of detached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate. Note that Shading:Zone:Detailed surfaces are also mirrored and there is no way to turn that ``off''.
+\textbf{DoNotMirrorDetachedShading} -- use this to turn off the automatic mirroring of detached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate. 
+
+\textbf{DoNotMirrorAttachedShading} -- use this to turn off the automatic mirroring of attached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate. Attached shading surfaces include Shading:Overhang, Shading:Overhang:Projection, Shading:Fin, Shading:Fin:Projection, and Shading:Zone:Detailed.
 
 \textbf{DisplayWeatherMissingDataWarnings} -- use this to turn on the missing data warnings from the read of the weather file.
 
@@ -688,6 +698,14 @@ This field is used to alter the effective carbon dioxide capacitance of the zone
 
 This field is used to alter the effective generic contaminant capacitance of the zone air volume. This affects the transient calculations of zone air generic contaminantconcentration. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminantlevel of zone air from timestep to timestep.
 
+\paragraph{Field: Name}\label{field-name-hybrid-model}
+
+The name of the ZoneCapacitanceMultiplier:ResearchSpecial object.
+
+\paragraph{Field: Zone or ZoneList Name}\label{field-Zone-or-zonelist-name-hybrid-model}
+
+This field is the name of the thermal zone (ref: Zone) and attaches a particular zone capacitance multiplier to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then capacity multiplier is applied to each of the zones in the zone list.
+
 \subsection{SimulationControl}\label{simulationcontrol}
 
 The input for SimulationControl allows the user to specify what kind of calculations a given EnergyPlus simulation will perform. For instance the user may want to perform one or more of the sizing calculations but not proceed to an annual weather file simulation. Or the user might have all flow rates and equipment sizes already specified and desire an annual weather without any preceding sizing calculations. Sizing runs, even for large projects, are quickly run -- they do not add much to the overall simulation time. The SimulationControl input allows all permutations of run selection by means of 5 yes/no inputs.
@@ -739,26 +757,35 @@ SimulationControl,
   2;                       !- Maximum Number of HVAC Sizing Simulation Passes
 \end{lstlisting}
 
-\subsection{ProgramControl}\label{programcontrol}
+\subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
 
-This object is currently disabled. The ProgramControl object can be used to control how the EnergyPlus program executes on the computer. Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation. This multithreading may not be desirable when running more than one simulation at a time on the same computer (because it can actually run more slowly). This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed. When this object is used, its input for the number of threads will take precedent over the value of the environment variable \textbf{``EP\_OMP\_NUM\_THREADS''} which is an alternate method of controlling the program's threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is \textless{} = 30.
+The HVACSystemRootFindingAlgorithm object provides a way to select what type of solution
+algorithm will be used to find a part load ratio or mass flow rate at given equipment/system load in HVAC system simulations. This object is an optional object. If the default algorithm is used, this object is not required in an input file.
 
-\subsubsection{Inputs}\label{inputs-16-010}
 
-\paragraph{Field: Number of Threads Allowed}\label{field-number-of-threads-allowed}
+\subsubsection{Inputs}\label{inputs-hvacystemrootfindingalgorithm}
 
-This field is used to specify a limit on the number of threads EnergyPlus will use. If a zero is entered then the program will set the number of threads to the maximum available on the computer. If the number entered is larger than the number of processors or cores, then the hardware limits will take precedent over this limit.
+\paragraph{Field: Algorithm}\label{field-algorithm}
 
-An example IDF object that sets the program to use only one thread follows.
+Five choices are allowed to select which solution algorithm will be used: RegulaFalsi, Bisection,  BisectionThenRegulaFalsi, RegulaFalsiThenBisection, and Alternation. The RegulaFalsi
+selection is the default selection. Bisection selction will allow the program to use the bisection method to get a solution. The BisectionThenRegulaFalsi selection requires the program to apply the bisection method first. After the number of iteration is above the value defined in the next field, the RegulaFalsi algorithm will be applied. The RegulaFalsiThenBisection selection requires the program to apply the RegulaFalsi method first. After the number of iteration is above the value defined in the next field, the bisection algorithm will be applied. The Alternation selection forces number of iteration (defined in the next field) using RegulaFalsi first. Then Bisection and RegulaFalsi algorithm will be alternated after the number of iteration is above the value defined in the next field.  
+
+
+\paragraph{Field: Number of Iterations Before Algorithm Switch}\label{field-number-of-iteration-before-algorithm-switch}
+
+This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi or Alternation is entered. When the iteration number is greater than the value, algorithm switches either from RegulaFalsi to Bisection or from Bisection to RegulaFalsi with choices of RegulaFalsiThenBisection or BisectionThenRegulaFalsi. 
+
+An IDF example:
 
 \begin{lstlisting}
-ProgramControl,
-  1; !- Number of Threads Allowed
+HVACSystemRootFindingAlgorithm,
+  RegulaFalsiThenBisection, !- Algorithm
+  20;                      !- Number of Iteration Before Algorithm Switch
 \end{lstlisting}
 
 \subsection{Meter:Custom}\label{metercustom}
 
-A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar.
+A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar. A Meter:Custom cannot reference another Meter:Custom.
 
 \subsubsection{Inputs}\label{inputs-17-008}
 
@@ -809,7 +836,7 @@ A key name field is used when the following field specifies an output variable. 
 
 \paragraph{Field: Output Variable or Meter Name \#}\label{field-output-variable-or-meter-name}
 
-This field must be a valid output variable name or a valid meter name.
+This field must be a valid output variable name or a valid meter name. If a Meter:Custom references another Meter:Custom it will generate a warning and not product any output.
 
 \subsection{Meter:CustomDecrement}\label{metercustomdecrement}
 

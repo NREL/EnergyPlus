@@ -84,7 +84,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:MultiSpeed, Coil:Heating:DX:MultiSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:MultiSpeed, Coil:Heating:DX:MultiSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -1079,18 +1079,15 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.7,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,  !- Component 2 Object Type
     DXAC Heat Pump 1,        !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node;    !- Component 2 Outlet Node Name
 
   AvailabilityManagerAssignmentList,
     Heat Pump 1 Avail List,  !- Name
@@ -1278,7 +1275,7 @@
     -8.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:MultiSpeed,  !- Cooling Coil Object Type
     Heat Pump ACDXCoil 1,    !- Cooling Coil Name
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supp Gas Heating Coil 1, !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -1288,17 +1285,17 @@
     80.0,                    !- Maximum Temperature for Heat Recovery {C}
     ,                        !- Heat Recovery Water Inlet Node Name
     ,                        !- Heat Recovery Water Outlet Node Name
-    0.2,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0.2,                     !- No Load Supply Air Flow Rate {m3/s}
     4,                       !- Number of Speeds for Heating
     4,                       !- Number of Speeds for Cooling
-    0.4,                     !- Speed 1 Supply Air Flow Rate During Heating Operation {m3/s}
-    0.8,                     !- Speed 2 Supply Air Flow Rate During Heating Operation {m3/s}
-    1.2,                     !- Speed 3 Supply Air Flow Rate During Heating Operation {m3/s}
-    1.7,                     !- Speed 4 Supply Air Flow Rate During Heating Operation {m3/s}
-    0.4,                     !- Speed 1 Supply Air Flow Rate During Cooling Operation {m3/s}
-    0.8,                     !- Speed 2 Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.2,                     !- Speed 3 Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.7;                     !- Speed 4 Supply Air Flow Rate During Cooling Operation {m3/s}
+    0.4,                     !- Heating Speed 1 Supply Air Flow Rate {m3/s}
+    0.8,                     !- Heating Speed 2 Supply Air Flow Rate {m3/s}
+    1.2,                     !- Heating Speed 3 Supply Air Flow Rate {m3/s}
+    1.7,                     !- Heating Speed 4 Supply Air Flow Rate {m3/s}
+    0.4,                     !- Cooling Speed 1 Supply Air Flow Rate {m3/s}
+    0.8,                     !- Cooling Speed 2 Supply Air Flow Rate {m3/s}
+    1.2,                     !- Cooling Speed 3 Supply Air Flow Rate {m3/s}
+    1.7;                     !- Cooling Speed 4 Supply Air Flow Rate {m3/s}
 
   Coil:Heating:DX:MultiSpeed,
     Heat Pump DX Heating Coil 1,  !- Name
@@ -1675,6 +1672,7 @@
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Outdoor Condenser Air Node,  !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
@@ -2103,10 +2101,11 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Supp Gas Heating Coil 1, !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     45000,                   !- Nominal Capacity {W}
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name

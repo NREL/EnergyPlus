@@ -8,7 +8,7 @@ The rules for selecting names of EMS variables are:
 \item
   No spaces are allowed in user-defined variable names.
 \item
-  Underscore (``\_'') is the only special character allowed in variable names.
+  Underscore (``\_'') is the only special character allowed in variable names.  This means variable names cannot contain ''+'', ''-'', ''/'', etc.
 \item
   Variable names are \textbf{not} case sensitive.
 \item
@@ -23,7 +23,9 @@ The rules for using EMS variables are:
 
 \begin{itemize}
 \item
-  All numeric variables are treated as floating point numbers. You use the underlying Fortran language features to handle these as double precision real numbers.
+  All numeric variables are treated as floating point numbers. You use the underlying C++ language features to handle these as double precision real numbers.
+\item
+  Variables need to be initialized before being used in an expression.  Beginning with version 8.6, EnergyPlus detects when un-initialized variables are used and when they are it issues a fatal warning.  Warnings are sent to both the ERR file and the EDD file.  Before a variable can be used it must first be given a value using SET statement, unless it is a Sensor, Built-in, or Internal variable (see below).
 \item
   You can use the SET statement to reassign sensor variables and built-in variables.
 \item

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::MultiSpeedAirToAirHeatPump Unit Tests
 
@@ -63,6 +51,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -221,6 +210,7 @@ namespace EnergyPlus {
 			"    AC-24 HC inlet node,     !- Air Outlet Node Name",
 			"    ,                        !- Condenser Air Inlet Node Name",
 			"    AirCooled,               !- Condenser Type",
+			"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    ,                        !- Supply Water Storage Tank Name",
 			"    ,                        !- Condensate Collection Water Storage Tank Name",
 			"    No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -313,6 +303,7 @@ namespace EnergyPlus {
 			"    AC-25 HC inlet node,     !- Air Outlet Node Name",
 			"    ,                        !- Condenser Air Inlet Node Name",
 			"    AirCooled,               !- Condenser Type",
+			"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    ,                        !- Supply Water Storage Tank Name",
 			"    ,                        !- Condensate Collection Water Storage Tank Name",
 			"    No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -569,9 +560,9 @@ namespace EnergyPlus {
 			"    ,                        !- Heating Speed 4 Supply Air Flow Rate {m3/s}",
 			"    3.209,                   !- Cooling Speed 1 Supply Air Flow Rate {m3/s}",
 			"    3.209;                   !- Cooling Speed 2 Supply Air Flow Rate {m3/s}",
-			
+
 			"  Timestep,6;",
-			
+
 			"  Zone,",
 			"    402,                     !- Name",
 			"    48.33,                   !- Direction of Relative North {deg}",
@@ -881,33 +872,27 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Z401 main branch,        !- Name",
-			"    3.209,                   !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Z401 OA Sys,             !- Component 1 Name",
 			"    AC-24 airloop inlet node,!- Component 1 Inlet Node Name",
 			"    AC-24 SF inlet air node, !- Component 1 Outlet Node Name",
-			"    Passive,                 !- Component 1 Branch Control Type",
 			"    AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,  !- Component 2 Object Type",
 			"    AC-24 heat pump,         !- Component 2 Name",
 			"    AC-24 SF inlet air node, !- Component 2 Inlet Node Name",
-			"    AC-24 airloop outlet node,  !- Component 2 Outlet Node Name",
-			"    Active;                  !- Component 2 Branch Control Type",
+			"    AC-24 airloop outlet node;  !- Component 2 Outlet Node Name",
 
 			"  Branch,",
 			"    Z402 main branch,        !- Name",
-			"    3.209,                   !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Z402 OA Sys,             !- Component 1 Name",
 			"    AC-25 airloop inlet node,!- Component 1 Inlet Node Name",
 			"    AC-25 SF inlet air node, !- Component 1 Outlet Node Name",
-			"    Passive,                 !- Component 1 Branch Control Type",
 			"    AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,  !- Component 2 Object Type",
 			"    AC-25 heat pump,         !- Component 2 Name",
 			"    AC-25 SF inlet air node, !- Component 2 Inlet Node Name",
-			"    AC-25 airloop outlet node,  !- Component 2 Outlet Node Name",
-			"    Active;                  !- Component 2 Branch Control Type",
+			"    AC-25 airloop outlet node;  !- Component 2 Outlet Node Name",
 
 			"!-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========",
 
@@ -1238,7 +1223,7 @@ namespace EnergyPlus {
 			});
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
-			
+
 			NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 			MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 			ProcessScheduleInput();
@@ -1247,7 +1232,7 @@ namespace EnergyPlus {
 			EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
 			// Get Zone Equipment Configuration ata
-			DataZoneEquipment::GetZoneEquipmentData();			
+			DataZoneEquipment::GetZoneEquipmentData();
 			MixedAir::GetOutsideAirSysInputs();
 			MixedAir::GetOAControllerInputs();
 			SplitterComponent::GetSplitterInput();
@@ -1293,9 +1278,9 @@ namespace EnergyPlus {
 			MSHeatPump( 2 ).TotHeatEnergyRate = 1000.0;
 			MSHeatPump( 2 ).TotCoolEnergyRate = 1000.0;
 
-			// InitMSHeatPump resets the current MSHeatPumpNum only 
+			// InitMSHeatPump resets the current MSHeatPumpNum only
 			HVACMultiSpeedHeatPump::InitMSHeatPump(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnReq, OnOffAirFlowRatio );
-	
+
 			EXPECT_DOUBLE_EQ( 1000.0, MSHeatPump( 1 ).TotHeatEnergyRate );
 			EXPECT_DOUBLE_EQ( 1000.0, MSHeatPump( 1 ).TotCoolEnergyRate );
 			EXPECT_DOUBLE_EQ( 0.0, MSHeatPump( 2 ).TotHeatEnergyRate );
@@ -1303,5 +1288,57 @@ namespace EnergyPlus {
 
 			ZoneSysEnergyDemand.deallocate();
 			CurDeadBandOrSetback.deallocate();
+	}
+
+	TEST_F( EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest ) {
+
+			DataLoopNode::Node.allocate( 2 );
+			MSHeatPump.allocate( 1 );
+			int HeatRecInNode( 1 );
+			int HeatRecOutNode( 2 );
+			MSHeatPump( 1 ).HeatRecInletNodeNum = HeatRecInNode;
+			MSHeatPump( 1 ).HeatRecOutletNodeNum = HeatRecOutNode;
+			MSHeatPump( 1 ).MaxHeatRecOutletTemp = 80;
+			MSHeatPump( 1 ).HRLoopNum = 1; // index to plant
+			DataLoopNode::Node( HeatRecInNode ).Temp = 50.0;
+			DataHVACGlobals::MSHPWasteHeat = 1000.0;
+
+			DataPlant::PlantLoop.allocate( 1 );
+			DataPlant::PlantLoop( 1 ).FluidName = "WATER";
+			DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+
+			DataLoopNode::Node( HeatRecInNode ).MassFlowRate = 0.0; // test heat recovery result with 0 water flow rate
+			HVACMultiSpeedHeatPump::MSHPHeatRecovery( 1 );
+
+			// outlet temp should equal inlet temp since mass flow rate = 0
+			Real64 calculatedOutletTemp = DataLoopNode::Node( HeatRecInNode ).Temp + DataHVACGlobals::MSHPWasteHeat / ( DataLoopNode::Node( HeatRecInNode ).MassFlowRate * 4181.0 );
+			EXPECT_DOUBLE_EQ( 0.0, MSHeatPump( 1 ).HeatRecoveryRate );
+			EXPECT_DOUBLE_EQ( 50.0, MSHeatPump( 1 ).HeatRecoveryInletTemp );
+			EXPECT_DOUBLE_EQ( 50.0, MSHeatPump( 1 ).HeatRecoveryOutletTemp );
+			EXPECT_DOUBLE_EQ( 0.0, MSHeatPump( 1 ).HeatRecoveryMassFlowRate );
+
+			DataLoopNode::Node( HeatRecInNode ).MassFlowRate = 0.1; // initialize flow rate and test heat recovery result using 1 kW heat transfer to fluid
+			HVACMultiSpeedHeatPump::MSHPHeatRecovery( 1 );
+
+			// outlet temp should equal temperature rise due to 1 kW of heat input at 0.1 kg/s
+			calculatedOutletTemp = DataLoopNode::Node( HeatRecInNode ).Temp + DataHVACGlobals::MSHPWasteHeat / ( DataLoopNode::Node( HeatRecInNode ).MassFlowRate * 4181.0 );
+			EXPECT_DOUBLE_EQ( 1000.0, MSHeatPump( 1 ).HeatRecoveryRate );
+			EXPECT_DOUBLE_EQ( 50.0, MSHeatPump( 1 ).HeatRecoveryInletTemp );
+			EXPECT_DOUBLE_EQ( calculatedOutletTemp, MSHeatPump( 1 ).HeatRecoveryOutletTemp );
+			EXPECT_DOUBLE_EQ( 52.391772303276724, calculatedOutletTemp );
+			EXPECT_DOUBLE_EQ( 0.1, MSHeatPump( 1 ).HeatRecoveryMassFlowRate );
+
+			DataHVACGlobals::MSHPWasteHeat = 100000.0; // test very high heat transfer that would limit outlet water temperature
+			DataLoopNode::Node( HeatRecInNode ).MassFlowRate = 0.1;
+			HVACMultiSpeedHeatPump::MSHPHeatRecovery( 1 );
+
+			// outlet temp should equal max limit of 80 C since 100 kW would cause outlet water temperature to exceed 80 C
+			EXPECT_DOUBLE_EQ( 50.0, MSHeatPump( 1 ).HeatRecoveryInletTemp );
+			EXPECT_DOUBLE_EQ( 80.0, MSHeatPump( 1 ).HeatRecoveryOutletTemp );
+			EXPECT_DOUBLE_EQ( 0.1, MSHeatPump( 1 ).HeatRecoveryMassFlowRate );
+			Real64 QHeatRecovery = DataLoopNode::Node( HeatRecInNode ).MassFlowRate * 4181.0 * ( MSHeatPump( 1 ).HeatRecoveryOutletTemp - MSHeatPump( 1 ).HeatRecoveryInletTemp );
+			EXPECT_DOUBLE_EQ( QHeatRecovery, MSHeatPump( 1 ).HeatRecoveryRate );
+			EXPECT_DOUBLE_EQ( 12543.0, QHeatRecovery );
+
 	}
 }

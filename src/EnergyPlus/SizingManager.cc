@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -68,6 +56,7 @@
 #include <CommandLineInterface.hh>
 #include <SizingManager.hh>
 #include <CostEstimateManager.hh>
+#include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -371,6 +360,7 @@ namespace SizingManager {
 								}
 							}
 							UpdateZoneSizing( BeginDay );
+							UpdateFacilitySizing( BeginDay );
 						}
 
 						for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
@@ -445,7 +435,10 @@ namespace SizingManager {
 
 						} // ... End hour loop.
 
-						if ( EndDayFlag ) UpdateZoneSizing( EndDay );
+						if ( EndDayFlag ) {
+							UpdateZoneSizing( EndDay );
+							UpdateFacilitySizing( EndDay );
+						}
 
 						if ( ! WarmupFlag && ( DayOfSim > 0 ) && ( DayOfSim < NumOfDayInEnvrn ) ) {
 							++CurOverallSimDay;
@@ -460,6 +453,7 @@ namespace SizingManager {
 
 				if ( NumSizingPeriodsPerformed > 0 ) {
 					UpdateZoneSizing( EndZoneSizingCalc );
+					UpdateFacilitySizing( EndZoneSizingCalc );
 					ZoneSizingRunDone = true;
 				} else {
 					ShowSevereError( RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved." );
@@ -714,21 +708,43 @@ namespace SizingManager {
 		if ( SysSizingRunDone ) {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				curName = FinalSysSizing( AirLoopNum ).AirPriLoopName;
-				ReportSysSizing( curName, "Calculated Cooling Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
 				PreDefTableEntry( pdchSysSizCalcClAir, curName, CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
 				if ( std::abs( CalcSysSizing( AirLoopNum ).DesCoolVolFlow ) <= 1.e-8 ) {
 					ShowWarningError( RoutineName + "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing( AirLoopNum ).AirPriLoopName + " is zero." );
 					ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 				}
-				ReportSysSizing( curName, "User Cooling Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesCoolVolFlow );
 				PreDefTableEntry( pdchSysSizUserClAir, curName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow );
-				ReportSysSizing( curName, "Calculated Heating Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 				PreDefTableEntry( pdchSysSizCalcHtAir, curName, CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 				if ( std::abs( CalcSysSizing( AirLoopNum ).DesHeatVolFlow ) <= 1.e-8 ) {
 					ShowWarningError( RoutineName + "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing( AirLoopNum ).AirPriLoopName + " is zero." );
 					ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 				}
-				ReportSysSizing( curName, "User Heating Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
+				std::string coolPeakLoadKind = "";
+				std::string coolPeakDDDate = "";
+				int coolPeakDD = 0;
+				Real64 coolCap = 0.;
+				if ( FinalSysSizing ( AirLoopNum ).CoolingPeakLoadType == SensibleCoolingLoad ) {
+					coolPeakLoadKind = "Sensible";
+					coolPeakDDDate = SysSizPeakDDNum( AirLoopNum ).cSensCoolPeakDDDate;
+					coolPeakDD = SysSizPeakDDNum( AirLoopNum ).SensCoolPeakDD;
+					coolCap = FinalSysSizing( AirLoopNum ).SensCoolCap;
+				} else if ( FinalSysSizing( AirLoopNum ).CoolingPeakLoadType == TotalCoolingLoad ) {
+					coolPeakLoadKind = "Total";
+					coolPeakDDDate = SysSizPeakDDNum( AirLoopNum ).cTotCoolPeakDDDate;
+					coolPeakDD = SysSizPeakDDNum( AirLoopNum ).TotCoolPeakDD;
+					coolCap = FinalSysSizing( AirLoopNum ).TotCoolCap;
+				}
+				if ( coolPeakDD > 0 ) {
+					ReportSysSizing( curName, "Cooling", coolPeakLoadKind, coolCap, CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).CoolDesDay, coolPeakDDDate, SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( coolPeakDD ));
+				} else {
+					ReportSysSizing( curName, "Cooling", coolPeakLoadKind, coolCap, CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).CoolDesDay, coolPeakDDDate, 0 );
+				}
+				int heatPeakDD = SysSizPeakDDNum( AirLoopNum ).HeatPeakDD;
+				if ( heatPeakDD > 0 ) {
+					ReportSysSizing( curName, "Heating", "Sensible", FinalSysSizing( AirLoopNum ).HeatCap, CalcSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).HeatDesDay, SysSizPeakDDNum( AirLoopNum ).cHeatPeakDDDate, SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( heatPeakDD ) );
+				} else {
+					ReportSysSizing( curName, "Heating", "Sensible", FinalSysSizing( AirLoopNum ).HeatCap, CalcSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).HeatDesDay, SysSizPeakDDNum( AirLoopNum ).cHeatPeakDDDate, 0 );
+				}
 				PreDefTableEntry( pdchSysSizUserHtAir, curName, FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
 			}
 			// Deallocate arrays no longer needed
@@ -975,6 +991,9 @@ namespace SizingManager {
 				OARequirements( OAIndex ).OAFlowACH = 0.0;
 			}
 		}
+
+		// Set default schedule
+		OARequirements( OAIndex ).OAFlowFracSchPtr = DataGlobals::ScheduleAlwaysOn;
 		if ( NumAlphas > 2 ) {
 			if ( !lAlphaBlanks( 3 ) ) {
 				OARequirements( OAIndex ).OAFlowFracSchPtr = GetScheduleIndex( Alphas( 3 ) );
@@ -984,12 +1003,29 @@ namespace SizingManager {
 						ShowContinueError( "Error found in " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 						ShowContinueError( "Schedule values must be (>=0., <=1.)" );
 						ErrorsFound = true;
-					} else {
-						OARequirements( OAIndex ).MaxOAFractionSchValue = GetScheduleMaxValue( OARequirements( OAIndex ).OAFlowFracSchPtr );
 					}
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
 					ShowContinueError( "...Not Found " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
+					ErrorsFound = true;
+				}
+			}
+		}
+
+		if ( NumAlphas > 3 ) {
+			if ( !lAlphaBlanks( 4 ) ) {
+				OARequirements( OAIndex ).OAPropCtlMinRateSchPtr = GetScheduleIndex( Alphas( 4 ) );
+				if ( OARequirements( OAIndex ).OAPropCtlMinRateSchPtr > 0 ) {
+					if ( !CheckScheduleValueMinMax( OARequirements( OAIndex ).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0 ) ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+						ShowContinueError( "Error found in " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+						ShowContinueError( "Schedule values must be (>=0., <=1.)" );
+						ErrorsFound = true;
+					}
+				}
+				else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+					ShowContinueError( "...Not Found " + cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
@@ -1110,6 +1146,15 @@ namespace SizingManager {
 				} else {
 					// default value
 					ZoneAirDistribution( ZADIndex ).ZoneSecondaryRecirculation = 0.0;
+				}
+
+				// Zone Ventilation Efficiency
+				if ( NumNumbers > 3 ) {
+					ZoneAirDistribution( ZADIndex ).ZoneVentilationEff = Numbers( 4 );
+				}
+				else {
+					// default value
+					ZoneAirDistribution( ZADIndex ).ZoneVentilationEff = 0.0;
 				}
 
 				if ( NumAlphas > 1 ) {
@@ -1315,6 +1360,9 @@ namespace SizingManager {
 		int NumZoneLists;
 		int OAIndex; // Index of design specification object
 		int ObjIndex; // Index of zone air distribution effectiveness object name
+		bool DesHeatMaxAirFlowPerAreaUsrInp;
+		bool DesHeatMaxAirFlowUsrInp;
+		bool DesHeatMaxAirFlowFracUsrInp;
 
 		struct GlobalMiscObject
 		{
@@ -1664,14 +1712,18 @@ namespace SizingManager {
 					//      \note This input is currently used in sizing the Fan minimum Flow Rate.
 					//      \note It does not currently affect other component autosizing.
 					if ( lNumericFieldBlanks( 12 ) ) {
-						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFrac = 0.0;
-					} else if ( rNumericArgs( 12 ) < 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = false;
+					} else {
+						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = true;
+					}
+					if ( rNumericArgs( 12 ) < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 						ShowContinueError( "... incorrect " + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( rNumericArgs( 12 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFrac = rNumericArgs( 12 );
 					}
+
 					//  N13,\field Heating Design Air Flow Rate
 					//      \type real
 					//      \units m3/s
@@ -1696,6 +1748,7 @@ namespace SizingManager {
 					//      \default .002032
 					//      \note default is .40 cfm/ft2
 					//      \note This input is not currently used for autosizing any of the components.
+					DesHeatMaxAirFlowPerAreaUsrInp = false;
 					if ( lNumericFieldBlanks( 14 ) ) {
 						if ( rNumericArgs( 14 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = 0.002032;
@@ -1708,6 +1761,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = rNumericArgs( 14 );
+						DesHeatMaxAirFlowPerAreaUsrInp = true;
 					}
 					//  N15,\field Heating Maximum Air Flow
 					//      \type real
@@ -1716,6 +1770,7 @@ namespace SizingManager {
 					//      \default .1415762
 					//      \note default is 300 cfm
 					//      \note This input is not currently used for autosizing any of the components.
+					DesHeatMaxAirFlowUsrInp = false;
 					if ( lNumericFieldBlanks( 15 ) ) {
 						if ( rNumericArgs( 15 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = 0.1415762;
@@ -1728,6 +1783,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = rNumericArgs( 15 );
+						DesHeatMaxAirFlowUsrInp = true;
 					}
 					//  N16;\field Heating Maximum Air Flow Fraction
 					//      \note fraction of the Heating Design Air Flow Rate
@@ -1735,6 +1791,7 @@ namespace SizingManager {
 					//      \type real
 					//      \minimum 0
 					//      \default 0.3
+					DesHeatMaxAirFlowFracUsrInp = false;
 					if ( lNumericFieldBlanks( 16 ) ) {
 						if ( rNumericArgs( 16 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = 0.3;
@@ -1747,9 +1804,22 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = rNumericArgs( 16 );
+						DesHeatMaxAirFlowFracUsrInp = true;
+					}
+					// make sure the user specified inputs of the previous 3 inputs override the defaults
+					if ( DesHeatMaxAirFlowPerAreaUsrInp || DesHeatMaxAirFlowUsrInp || DesHeatMaxAirFlowFracUsrInp ) {
+						if ( !DesHeatMaxAirFlowPerAreaUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = 0.0;
+						}
+						if ( !DesHeatMaxAirFlowUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = 0.0;
+						}
+						if ( !DesHeatMaxAirFlowFracUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = 0.0;
+						}
 					}
 
-					//  A7, \field Zone Air Distribution Object Name
+					//  A7, \field Zone Air Distribution Object Name and add its inputs
 					if ( ! lAlphaFieldBlanks( 7 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName = cAlphaArgs( 7 );
 						ObjIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName, ZoneAirDistribution );
@@ -1758,6 +1828,7 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).ZoneADEffHeating = ZoneAirDistribution( ObjIndex ).ZoneADEffHeating;
 							ZoneSizingInput( ZoneSizIndex ).ZoneSecondaryRecirculation = ZoneAirDistribution( ObjIndex ).ZoneSecondaryRecirculation;
 							ZoneSizingInput( ZoneSizIndex ).ZoneAirDistributionIndex = ObjIndex;
+							ZoneSizingInput( ZoneSizIndex ).ZoneVentilationEff = ZoneAirDistribution( ObjIndex ).ZoneVentilationEff;
 						} else {
 							// generate a warning message
 							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -2762,64 +2833,51 @@ namespace SizingManager {
 
 	}
 
+	// Writes system sizing data to EIO file using one row per system
 	void
 	ReportSysSizing(
 		std::string const & SysName, // the name of the zone
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
+		std::string const & LoadType, // either "Cooling" or "Heating"
+		std::string const & PeakLoadKind, // either "Sensible" or "Total"
+		Real64 const & UserDesCap, // User  Design Capacity
+		Real64 const & CalcDesVolFlow, // Calculated  Design Air Flow Rate
+		Real64 const & UserDesVolFlow, // User Design Air Flow Rate
+		std::string const & DesDayName, // the name of the design day that produced the peak
+		std::string const & DesDayDate, // the date that produced the peak
+		int const & TimeStepIndex // time step of the peak
 	)
 	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   January 2003
-		//       MODIFIED       August 2008, Greg Stark
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine writes one item of system sizing data to the "eio" file..
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::OutputFileInits;
-		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
-
-		// Formats
-		static gio::Fmt Format_990( "('! <System Sizing Information>, System Name, ','Field Description, Value')" );
-		static gio::Fmt Format_991( "(' System Sizing Information',3(', ',A))" );
+		static bool MyOneTimeFlag ( true );
 
 		if ( MyOneTimeFlag ) {
-			gio::write( OutputFileInits, Format_990 );
-			MyOneTimeFlag = false;
+			gio::write( OutputFileInits, "('! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak')");
+			MyOneTimeFlag=false;
 		}
-
-		gio::write( OutputFileInits, Format_991 ) << SysName << VarDesc << RoundSigDigits( VarValue, 5 );
+		std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString( TimeStepIndex );
+		gio::write( OutputFileInits, "(' System Sizing Information, ',A, 7(', ',A))" ) << SysName << LoadType << PeakLoadKind << RoundSigDigits( UserDesCap, 2 ) << RoundSigDigits( CalcDesVolFlow, 5 ) << RoundSigDigits( UserDesVolFlow, 5 ) << DesDayName << dateHrMin;
 
 		// BSLLC Start
-		if ( sqlite ) sqlite->addSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );
+		if ( sqlite ) sqlite->addSQLiteSystemSizingRecord( SysName, LoadType, PeakLoadKind, UserDesCap, CalcDesVolFlow, UserDesVolFlow, DesDayName, dateHrMin );
 		// BSLLC Finish
 
+
+	}
+
+	// convert an index for the timestep of the day into a hour minute string in the format 00:00
+	std::string TimeIndexToHrMinString (
+		int timeIndex
+	)
+	{
+		std::string hrMinString = "";
+		int tMinOfDay = timeIndex * MinutesPerTimeStep;
+		int tHr = int ( tMinOfDay / 60. );
+		int tMin = tMinOfDay - tHr * 60;
+		gio::write ( hrMinString, PeakHrMinFmt ) << tHr << tMin;
+		return hrMinString;
 	}
 
 
@@ -3427,6 +3485,153 @@ namespace SizingManager {
 		}
 
 	}
+
+
+
+	// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
+	void
+	UpdateFacilitySizing( 
+		int const CallIndicator
+	)
+	{
+		int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+
+		//  test if allocated here
+		if ( !CalcFacilitySizing.allocated( ) ) {
+			CalcFacilitySizing.allocate( DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays );
+			for ( int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum ) {
+				CalcFacilitySizing( DDNum ).DOASHeatAddSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).DOASLatAddSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).CoolOutHumRatSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).CoolOutTempSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).CoolZoneTempSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).CoolLoadSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).HeatOutHumRatSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).HeatOutTempSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
+				CalcFacilitySizing( DDNum ).HeatLoadSeq.allocate( NumOfTimeStepInDay );
+
+				CalcFacilitySizing( DDNum ).DOASHeatAddSeq = 0.;
+				CalcFacilitySizing( DDNum ).DOASLatAddSeq = 0.;
+				CalcFacilitySizing( DDNum ).CoolOutHumRatSeq = 0.;
+				CalcFacilitySizing( DDNum ).CoolOutTempSeq = 0.;
+				CalcFacilitySizing( DDNum ).CoolZoneTempSeq = 0.;
+				CalcFacilitySizing( DDNum ).CoolLoadSeq = 0.;
+				CalcFacilitySizing( DDNum ).HeatOutHumRatSeq = 0.;
+				CalcFacilitySizing( DDNum ).HeatOutTempSeq = 0.;
+				CalcFacilitySizing( DDNum ).HeatZoneTempSeq = 0.;
+				CalcFacilitySizing( DDNum ).HeatLoadSeq = 0.;
+			}
+		}
+		if ( !CalcFinalFacilitySizing.DOASHeatAddSeq.allocated( ) ) {
+			CalcFinalFacilitySizing.DOASHeatAddSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.DOASLatAddSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.CoolOutHumRatSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.CoolOutTempSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.CoolZoneTempSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.CoolLoadSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.HeatOutHumRatSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.HeatOutTempSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
+			CalcFinalFacilitySizing.HeatLoadSeq.allocate( NumOfTimeStepInDay );
+
+			CalcFinalFacilitySizing.DOASHeatAddSeq = 0.;
+			CalcFinalFacilitySizing.DOASLatAddSeq = 0.;
+			CalcFinalFacilitySizing.CoolOutHumRatSeq = 0.;
+			CalcFinalFacilitySizing.CoolOutTempSeq = 0.;
+			CalcFinalFacilitySizing.CoolZoneTempSeq = 0.;
+			CalcFinalFacilitySizing.CoolLoadSeq = 0.;
+			CalcFinalFacilitySizing.HeatOutHumRatSeq = 0.;
+			CalcFinalFacilitySizing.HeatOutTempSeq = 0.;
+			CalcFinalFacilitySizing.HeatZoneTempSeq = 0.;
+			CalcFinalFacilitySizing.HeatLoadSeq = 0.;
+		}
+		if ( CallIndicator == BeginDay ) {
+			CalcFacilitySizing( CurOverallSimDay ).HeatDDNum = CurOverallSimDay;
+			CalcFacilitySizing( CurOverallSimDay ).CoolDDNum = CurOverallSimDay;
+		} else if ( CallIndicator == DuringDay ) {
+			int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+			// save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
+			Real64 sumCoolLoad = 0.;
+			Real64 sumHeatLoad = 0.;
+			Real64 wghtdCoolZoneTemp = 0.;
+			Real64 wghtdHeatZoneTemp = 0.;
+			Real64 wghtdCoolHumRat = 0.;
+			Real64 wghtdHeatHumRat = 0.;
+			Real64 wghtdCoolDOASHeatAdd = 0.;
+			Real64 wghtdCoolDOASLatAdd = 0.;
+			for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+				if ( !ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+				Real64 curCoolLoad = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq( TimeStepInDay );
+				if ( curCoolLoad > 0.0 ) {
+					sumCoolLoad += curCoolLoad;
+					wghtdCoolZoneTemp += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTempSeq( TimeStepInDay ) * curCoolLoad;
+					wghtdCoolHumRat += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepInDay ) * curCoolLoad;
+					wghtdCoolDOASHeatAdd += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAddSeq( TimeStepInDay ) * curCoolLoad;
+					wghtdCoolDOASLatAdd += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAddSeq( TimeStepInDay ) * curCoolLoad;
+				}
+				Real64 curHeatLoad = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq( TimeStepInDay );
+				if ( curHeatLoad > 0.0 ) {
+					sumHeatLoad += curHeatLoad;
+					wghtdHeatZoneTemp += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneTempSeq( TimeStepInDay ) * curCoolLoad;
+					wghtdHeatHumRat += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepInDay ) * curHeatLoad;
+				}
+			}
+
+			CalcFacilitySizing( CurOverallSimDay ).CoolLoadSeq( TimeStepInDay ) = sumCoolLoad;
+			CalcFacilitySizing( CurOverallSimDay ).HeatLoadSeq( TimeStepInDay ) = sumHeatLoad;
+
+			if ( sumCoolLoad != 0. ) {
+				CalcFacilitySizing( CurOverallSimDay ).CoolZoneTempSeq( TimeStepInDay ) = wghtdCoolZoneTemp / sumCoolLoad;
+				CalcFacilitySizing( CurOverallSimDay ).CoolOutHumRatSeq( TimeStepInDay ) = wghtdCoolHumRat / sumCoolLoad;
+				CalcFacilitySizing( CurOverallSimDay ).DOASHeatAddSeq( TimeStepInDay ) = wghtdCoolDOASHeatAdd / sumCoolLoad;
+				CalcFacilitySizing( CurOverallSimDay ).DOASLatAddSeq( TimeStepInDay ) = wghtdCoolDOASLatAdd / sumCoolLoad;
+			}
+			if ( sumHeatLoad != 0. ) {
+				CalcFacilitySizing( CurOverallSimDay ).HeatZoneTempSeq( TimeStepInDay ) = wghtdHeatZoneTemp / sumHeatLoad;
+				CalcFacilitySizing( CurOverallSimDay ).HeatOutHumRatSeq( TimeStepInDay ) = wghtdHeatHumRat / sumHeatLoad;
+			}
+
+		} else if ( CallIndicator == EndDay ) {
+			for ( int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
+				if ( CalcFacilitySizing( CurOverallSimDay ).CoolLoadSeq( TimeStepIndex ) > CalcFacilitySizing( CurOverallSimDay ).DesCoolLoad ) {
+					CalcFacilitySizing( CurOverallSimDay ).DesCoolLoad = CalcFacilitySizing( CurOverallSimDay ).CoolLoadSeq( TimeStepIndex );
+					CalcFacilitySizing( CurOverallSimDay ).TimeStepNumAtCoolMax = TimeStepIndex;
+				}
+				if ( CalcFacilitySizing( CurOverallSimDay ).HeatLoadSeq( TimeStepIndex ) > CalcFacilitySizing( CurOverallSimDay ).DesHeatLoad ) {
+					CalcFacilitySizing( CurOverallSimDay ).DesHeatLoad = CalcFacilitySizing( CurOverallSimDay ).HeatLoadSeq( TimeStepIndex );
+					CalcFacilitySizing( CurOverallSimDay ).TimeStepNumAtHeatMax = TimeStepIndex;
+				}
+			}
+
+		} else if ( CallIndicator == EndZoneSizingCalc ) {
+			for ( int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum ) {
+				if ( CalcFacilitySizing( DDNum ).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad ) {
+					CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing( DDNum ).DesCoolLoad;
+					CalcFinalFacilitySizing.TimeStepNumAtCoolMax = CalcFacilitySizing( DDNum ).TimeStepNumAtCoolMax;
+					CalcFinalFacilitySizing.CoolDDNum = CalcFacilitySizing( DDNum ).CoolDDNum;
+					for ( int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
+						CalcFinalFacilitySizing.CoolOutHumRatSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).CoolOutHumRatSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.CoolOutTempSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).CoolOutTempSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.CoolZoneTempSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).CoolZoneTempSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.DOASHeatAddSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).DOASHeatAddSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.DOASLatAddSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).DOASLatAddSeq( TimeStepIndex );
+					}
+				}
+				if ( CalcFacilitySizing( DDNum ).DesHeatLoad > CalcFinalFacilitySizing.DesHeatLoad ) {
+					CalcFinalFacilitySizing.DesHeatLoad = CalcFacilitySizing( DDNum ).DesHeatLoad;
+					CalcFinalFacilitySizing.TimeStepNumAtHeatMax = CalcFacilitySizing( DDNum ).TimeStepNumAtHeatMax;
+					CalcFinalFacilitySizing.HeatDDNum = CalcFacilitySizing( DDNum ).HeatDDNum;
+					for ( int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
+						CalcFinalFacilitySizing.HeatOutHumRatSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).HeatOutHumRatSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.HeatOutTempSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).HeatOutTempSeq( TimeStepIndex );
+						CalcFinalFacilitySizing.HeatZoneTempSeq( TimeStepIndex ) = CalcFacilitySizing( DDNum ).HeatZoneTempSeq( TimeStepIndex );
+					}
+				}
+			}
+		}
+	}
+
 
 } // SizingManager
 

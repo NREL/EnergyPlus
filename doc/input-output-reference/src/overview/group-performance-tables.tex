@@ -125,11 +125,11 @@ Table:OneIndependentVariable,
 
 \subsubsection{Outputs}\label{outputs-022}
 
-\paragraph{\texorpdfstring{Performance Curve Output Value {[]}}{Performance Curve Output Value }}\label{performance-curve-output-value-000}
+\paragraph{Performance Curve Output Value {[]}}\label{performance-curve-output-value-000}
 
 The current value of the performance table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
 
-\paragraph{\texorpdfstring{Performance Curve Input Variable 1 Value {[]}}{Performance Curve Input Variable 1 Value }}\label{performance-curve-input-variable-1-value}
+\paragraph{Performance Curve Input Variable 1 Value {[]}}\label{performance-curve-input-variable-1-value}
 
 The current value of the independent variable passed to the performance curve. This value is averaged over the time step being reported.
 
@@ -162,6 +162,8 @@ The form of the polynomial equation represented by the entered data. The only va
 \paragraph{Field: Interpolation Method}\label{field-interpolation-method-1}
 
 The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation,} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When Lagrange\emph{InterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid equations above, the polynomial order is fixed at 2 which infers that 3 data points will be used for interpolation. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If the following fields are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
+
+When the input data are optical properties, the LinearInterpolationOfTable choice is forced.
 
 \paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-1-000}
 
@@ -204,6 +206,8 @@ This field is used to indicate the kind of units that may be associated with the
   Distance
 \item
   Power
+\item
+  Angle
 \end{itemize}
 
 \paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-000}
@@ -223,6 +227,8 @@ This field is used to indicate the kind of units that may be associated with the
   Distance
 \item
   Power
+\item
+  Wavelength
 \end{itemize}
 
 \paragraph{Field: Output Unit Type}\label{field-output-unit-type-1-000}
@@ -241,6 +247,12 @@ This field is used to indicate the kind of units that may be associated with the
 \paragraph{Field: Normalization Reference}\label{field-normalization-reference-1}
 
 The normalization point for the data set. This field provides a method for automatically normalizing a set of data. Equipment performance data is typically normalized based on a specific operating condition. Both the output values and minimum/maximum curve limits are normalized as applicable. This normalization can be performed simply by entering the data at the reference point. If this field is left blank or a 1 is entered, the data set is assumed to be in the correct format.
+
+\paragraph{Field: External File Name}\label{field-external-file-name}
+
+The name of an external file that represents the tabular data. This file would include all data after the Output Unit Type field below starting with the same format as idf: X1, Y1, Z1, X2, Y2, Z2, ..., Xn, Yn, Zn, and continuing until all input and output values have been entered. The tabular data may use either comma, space or tab delimited format. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+When the External File Name is entered, the following input fields are ignored. 
 
 \paragraph{Data Pairs}\label{data-pairs-1}
 
@@ -298,13 +310,13 @@ Table:TwoIndependentVariables,
 
 \subsubsection{Outputs}\label{outputs-1-017}
 
-\paragraph{\texorpdfstring{Performance Curve Output Value {[]}}{Performance Curve Output Value }}\label{performance-curve-output-value-1}
+\paragraph{Performance Curve Output Value {[]}}\label{performance-curve-output-value-1}
 
 The current value of the performance table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
 
-\paragraph{\texorpdfstring{Performance Curve Input Variable 1 Value {[]}}{Performance Curve Input Variable 1 Value }}\label{performance-curve-input-variable-1-value-1}
+\paragraph{Performance Curve Input Variable 1 Value {[]}}\label{performance-curve-input-variable-1-value-1}
 
-\paragraph{\texorpdfstring{Performance Curve Input Variable 2 Value {[]}}{Performance Curve Input Variable 2 Value }}\label{performance-curve-input-variable-2-value}
+\paragraph{Performance Curve Input Variable 2 Value {[]}}\label{performance-curve-input-variable-2-value}
 
 The current value of the first and second independent variable passed to the performance curve. The order of the independent variables is in the same order as the model equation represented by this performance curve object. This value is averaged over the time step being reported.
 
@@ -786,11 +798,11 @@ Table:MultiVariableLookup,
 
 \subsection{Lookup Table Outputs}\label{lookup-table-outputs}
 
-\subsubsection{\texorpdfstring{Performance Curve Output Value {[]}}{Performance Curve Output Value }}\label{performance-curve-output-value-2}
+\subsubsection{Performance Curve Output Value {[]}}\label{performance-curve-output-value-2}
 
 The current value of the lookup table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detailed reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
 
-\subsubsection{\texorpdfstring{Performance Curve Input Variable 1(-N) Value {[]}}{Performance Curve Input Variable 1(-N) Value }}\label{performance-curve-input-variable-1-n-value-000}
+\subsubsection{Performance Curve Input Variable 1(-N) Value {[]}}\label{performance-curve-input-variable-1-n-value-000}
 
 The current value of the nth independent variable passed to the performance curve. The order of the independent variables is in the same order as the model equation represented by this performance curve object. This value is averaged over the time step being reported.
 

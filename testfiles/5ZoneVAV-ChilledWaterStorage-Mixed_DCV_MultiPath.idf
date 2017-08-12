@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes, PSI Indiana year 2004.
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,4;
 
@@ -1382,25 +1382,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_1_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    20.000,                  !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    400.0000,                !- Illuminance Setpoint at First Reference Point {lux}
-    400.0000,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    20.000,                  !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_1,  !- Name
@@ -1873,25 +1877,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_2_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    -2.285,                  !- X-Coordinate of First Reference Point {m}
-    10.000,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    400.0000,                !- Illuminance Setpoint at First Reference Point {lux}
-    400.0000,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    -2.285,                  !- X-Coordinate of Reference Point {m}
+    10.000,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_2,  !- Name
@@ -2120,7 +2128,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -2324,25 +2332,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_3_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    15.430,                  !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    400.0000,                !- Illuminance Setpoint at First Reference Point {lux}
-    400.0000,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    15.430,                  !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_3,  !- Name
@@ -2571,7 +2583,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -2794,25 +2806,29 @@
     0.0000,20.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_4_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    10.000,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    400.0000,                !- Illuminance Setpoint at First Reference Point {lux}
-    400.0000,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    10.000,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_4,  !- Name
@@ -3041,7 +3057,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -3357,25 +3373,29 @@
     26.3929,8.7546,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_5_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    15.430,                  !- X-Coordinate of First Reference Point {m}
-    5.430,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    400.0000,                !- Illuminance Setpoint at First Reference Point {lux}
-    400.0000,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_5,        !- Zone Name
+    15.430,                  !- X-Coordinate of Reference Point {m}
+    5.430,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_5,  !- Name
@@ -3604,7 +3624,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -3764,17 +3784,17 @@
     NO,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -3798,6 +3818,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -3806,28 +3827,23 @@
 
   Branch,
     VAV WITH REHEAT Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     VAV WITH REHEAT_OA,      !- Component 1 Name
     VAV WITH REHEAT Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     VAV WITH REHEAT_OA-VAV WITH REHEAT_CoolCNode,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water,      !- Component 2 Object Type
     VAV WITH REHEAT_CoolC,   !- Component 2 Name
     VAV WITH REHEAT_OA-VAV WITH REHEAT_CoolCNode,  !- Component 2 Inlet Node Name
     VAV WITH REHEAT_CoolC-VAV WITH REHEAT_HeatCNode,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Water,      !- Component 3 Object Type
     VAV WITH REHEAT_HeatC,   !- Component 3 Name
     VAV WITH REHEAT_CoolC-VAV WITH REHEAT_HeatCNode,  !- Component 3 Inlet Node Name
     VAV WITH REHEAT_HeatC-VAV WITH REHEAT FanNode,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     VAV WITH REHEAT Fan,     !- Component 4 Name
     VAV WITH REHEAT_HeatC-VAV WITH REHEAT FanNode,  !- Component 4 Inlet Node Name
-    VAV WITH REHEAT Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    VAV WITH REHEAT Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     VAV WITH REHEAT_OA_Controllers,  !- Name
@@ -4118,38 +4134,34 @@
 
   Branch,
     SHWSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SHWSys1 Pump,            !- Component 1 Name
     SHWSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SHWSys1 Water Heater,    !- Component 1 Name
     SHWSys1 Pump-SHWSys1 Water HeaterNode,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SHWSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     SHWSys1 Pump,            !- Name
     SHWSys1 Supply Inlet Node,  !- Inlet Node Name
     SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    0,                       !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    0,                       !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     1,                       !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   WaterHeater:Mixed,
@@ -4209,13 +4221,11 @@
 
   Branch,
     SHWSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     SHWSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    SHWSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -4224,13 +4234,11 @@
 
   Branch,
     SHWSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Outlet Pipe,  !- Component 1 Name
     SHWSys1 Supply Mixer-SHWSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Supply Outlet Pipe,  !- Name
@@ -4277,13 +4285,11 @@
 
   Branch,
     SHWSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Inlet Pipe,  !- Component 1 Name
     SHWSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Inlet Pipe,  !- Name
@@ -4292,63 +4298,51 @@
 
   Branch,
     SHWSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Bypass Pipe,  !- Component 1 Name
     SHWSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    SHWSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Bypass Pipe,  !- Name
@@ -4357,13 +4351,11 @@
 
   Branch,
     SHWSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Outlet Pipe,  !- Component 1 Name
     SHWSys1 Demand Mixer-SHWSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Outlet Pipe,  !- Name
@@ -4450,38 +4442,34 @@
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
     HeatSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
     HeatSys1 Pump-HeatSys1 BoilerNode,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
     HeatSys1 Supply Inlet Node,  !- Inlet Node Name
     HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    15000,                   !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    15000,                   !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Boiler:HotWater,
@@ -4519,13 +4507,11 @@
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -4534,13 +4520,11 @@
 
   Branch,
     HeatSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
     HeatSys1 Supply Mixer-HeatSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HeatSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Outlet Pipe,  !- Name
@@ -4590,13 +4574,11 @@
 
   Branch,
     HeatSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Inlet Pipe,  !- Name
@@ -4605,73 +4587,59 @@
 
   Branch,
     HeatSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     VAV WITH REHEAT_HeatC,   !- Component 1 Name
     VAV WITH REHEAT_HeatCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    VAV WITH REHEAT_HeatCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    VAV WITH REHEAT_HeatCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
     HeatSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    HeatSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Bypass Pipe,  !- Name
@@ -4680,13 +4648,11 @@
 
   Branch,
     HeatSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Mixer-HeatSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Outlet Pipe,  !- Name
@@ -4773,38 +4739,34 @@
 
   Branch,
     CoolSysPrimary Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CoolSysPrimary Pump,     !- Component 1 Name
     CoolSysPrimary Supply Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysPrimary Pump-CoolSysPrimary ChillerNodeviaConnector,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CoolSysPrimary Pump-CoolSysPrimary ChillerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSysPrimary Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     CoolSysPrimary Chiller,  !- Component 1 Name
     CoolSysPrimary Pump-CoolSysPrimary ChillerNode,  !- Component 1 Inlet Node Name
-    CoolSysPrimary Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CoolSysPrimary Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     CoolSysPrimary Pump,     !- Name
     CoolSysPrimary Supply Inlet Node,  !- Inlet Node Name
     CoolSysPrimary Pump-CoolSysPrimary ChillerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    15000,                   !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    15000,                   !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Chiller:Electric:EIR,
@@ -4888,13 +4850,11 @@
 
   Branch,
     CoolSysPrimary Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysPrimary Supply Equipment Bypass Pipe,  !- Component 1 Name
     CoolSysPrimary Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysPrimary Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CoolSysPrimary Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysPrimary Supply Equipment Bypass Pipe,  !- Name
@@ -4903,13 +4863,11 @@
 
   Branch,
     CoolSysPrimary Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysPrimary Supply Outlet Pipe,  !- Component 1 Name
     CoolSysPrimary Supply Mixer-CoolSysPrimary Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSysPrimary Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CoolSysPrimary Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysPrimary Supply Outlet Pipe,  !- Name
@@ -4944,13 +4902,11 @@
 
   Branch,
     CoolSysPrimary Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysPrimary Demand Inlet Pipe,  !- Component 1 Name
     CoolSysPrimary Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysPrimary Demand Inlet Pipe-CoolSysPrimary Demand Mixer,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CoolSysPrimary Demand Inlet Pipe-CoolSysPrimary Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysPrimary Demand Inlet Pipe,  !- Name
@@ -4959,23 +4915,19 @@
 
   Branch,
     CoolSysPrimary CW Storage Charge Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ThermalStorage:ChilledWater:Mixed,  !- Component 1 Object Type
     Chilled Water Storage Tank 1,  !- Component 1 Name
     CW Tank Charge Inlet Node,  !- Component 1 Inlet Node Name
-    CW Tank Charge Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CW Tank Charge Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSysPrimary Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysPrimary Demand Bypass Pipe,  !- Component 1 Name
     CoolSysPrimary Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysPrimary Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CoolSysPrimary Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysPrimary Demand Bypass Pipe,  !- Name
@@ -4984,13 +4936,11 @@
 
   Branch,
     CoolSysPrimary Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysPrimary Demand Outlet Pipe,  !- Component 1 Name
     CoolSysPrimary Demand Mixer-CoolSysPrimary Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSysPrimary Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CoolSysPrimary Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysPrimary Demand Outlet Pipe,  !- Name
@@ -5088,33 +5038,27 @@
 
   Branch,
     CoolSysSecondary Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CoolSysSecondary Pump,   !- Component 1 Name
     CoolSysSecondary Supply Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysSecondary Pump-CoolSysSecondary ChillerNodeviaConnector,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CoolSysSecondary Pump-CoolSysSecondary ChillerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSysSecondary Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     CoolSysSecondary Chiller,!- Component 1 Name
     CoolSysSecondary Pump-CoolSysSecondary ChillerNode,  !- Component 1 Inlet Node Name
-    CoolSysSecondary Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CoolSysSecondary Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSysSecondary Supply CW Storage Discharge Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ThermalStorage:ChilledWater:Mixed,  !- Component 1 Object Type
     Chilled Water Storage Tank 1,  !- Component 1 Name
     CW Tank Discharge Inlet node,  !- Component 1 Inlet Node Name
-    CW Tank Discharge Outlet node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CW Tank Discharge Outlet node;  !- Component 1 Outlet Node Name
 
   ThermalStorage:ChilledWater:Mixed,
     Chilled Water Storage Tank 1,  !- Name
@@ -5144,16 +5088,16 @@
     CoolSysSecondary Pump,   !- Name
     CoolSysSecondary Supply Inlet Node,  !- Inlet Node Name
     CoolSysSecondary Pump-CoolSysSecondary ChillerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    15000,                   !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    15000,                   !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Chiller:Electric:EIR,
@@ -5184,13 +5128,11 @@
 
   Branch,
     CoolSysSecondary Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysSecondary Supply Equipment Bypass Pipe,  !- Component 1 Name
     CoolSysSecondary Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysSecondary Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CoolSysSecondary Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysSecondary Supply Equipment Bypass Pipe,  !- Name
@@ -5199,13 +5141,11 @@
 
   Branch,
     CoolSysSecondary Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysSecondary Supply Outlet Pipe,  !- Component 1 Name
     CoolSysSecondary Supply Mixer-CoolSysSecondary Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSysSecondary Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CoolSysSecondary Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysSecondary Supply Outlet Pipe,  !- Name
@@ -5240,13 +5180,11 @@
 
   Branch,
     CoolSysSecondary Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysSecondary Demand Inlet Pipe,  !- Component 1 Name
     CoolSysSecondary Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysSecondary Demand Inlet Pipe-CoolSysSecondary Demand Mixer,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CoolSysSecondary Demand Inlet Pipe-CoolSysSecondary Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysSecondary Demand Inlet Pipe,  !- Name
@@ -5255,23 +5193,19 @@
 
   Branch,
     CoolSysSecondary Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     VAV WITH REHEAT_CoolC,   !- Component 1 Name
     VAV WITH REHEAT_CoolCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    VAV WITH REHEAT_CoolCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    VAV WITH REHEAT_CoolCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSysSecondary Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysSecondary Demand Bypass Pipe,  !- Component 1 Name
     CoolSysSecondary Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysSecondary Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CoolSysSecondary Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysSecondary Demand Bypass Pipe,  !- Name
@@ -5280,13 +5214,11 @@
 
   Branch,
     CoolSysSecondary Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSysSecondary Demand Outlet Pipe,  !- Component 1 Name
     CoolSysSecondary Demand Mixer-CoolSysSecondary Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSysSecondary Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CoolSysSecondary Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSysSecondary Demand Outlet Pipe,  !- Name
@@ -5376,31 +5308,27 @@
 
   Branch,
     TowerWaterSys Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     TowerWaterSys Pump,      !- Component 1 Name
     TowerWaterSys Supply Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     TowerWaterSys Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     TowerWaterSys CoolTower, !- Component 1 Name
     TowerWaterSys Pump-TowerWaterSys CoolTowerNode,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    TowerWaterSys Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:ConstantSpeed,
     TowerWaterSys Pump,      !- Name
     TowerWaterSys Supply Inlet Node,  !- Inlet Node Name
     TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type
@@ -5425,13 +5353,11 @@
 
   Branch,
     TowerWaterSys Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Supply Equipment Bypass Pipe,  !- Component 1 Name
     TowerWaterSys Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    TowerWaterSys Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Supply Equipment Bypass Pipe,  !- Name
@@ -5440,13 +5366,11 @@
 
   Branch,
     TowerWaterSys Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Supply Outlet Pipe,  !- Component 1 Name
     TowerWaterSys Supply Mixer-TowerWaterSys Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    TowerWaterSys Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Supply Outlet Pipe,  !- Name
@@ -5484,13 +5408,11 @@
 
   Branch,
     TowerWaterSys Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Inlet Pipe,  !- Component 1 Name
     TowerWaterSys Demand Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Inlet Pipe-TowerWaterSys Demand Mixer,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    TowerWaterSys Demand Inlet Pipe-TowerWaterSys Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Inlet Pipe,  !- Name
@@ -5499,33 +5421,27 @@
 
   Branch,
     TowerWaterSys Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     CoolSysSecondary Chiller,!- Component 1 Name
     CoolSysSecondary Chiller Water Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysSecondary Chiller Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CoolSysSecondary Chiller Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     TowerWaterSys Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     CoolSysPrimary Chiller,  !- Component 1 Name
     CoolSysPrimary Chiller Water Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSysPrimary Chiller Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CoolSysPrimary Chiller Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     TowerWaterSys Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Bypass Pipe,  !- Component 1 Name
     TowerWaterSys Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    TowerWaterSys Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Bypass Pipe,  !- Name
@@ -5534,13 +5450,11 @@
 
   Branch,
     TowerWaterSys Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Outlet Pipe,  !- Component 1 Name
     TowerWaterSys Demand Mixer-TowerWaterSys Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    TowerWaterSys Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Outlet Pipe,  !- Name

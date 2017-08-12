@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Output:DebuggingData,0,0;
 
@@ -1097,23 +1097,19 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.3,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan 1,            !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
     Cooling Coil Air Inlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                  !- Component 2 Branch Control Type
     Coil:Cooling:Water:DetailedGeometry,  !- Component 3 Object Type
     Detailed Cooling Coil,   !- Component 3 Name
     Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 3 Outlet Node Name
-    PASSIVE;                 !- Component 3 Branch Control Type
+    Air Loop Outlet Node;    !- Component 3 Outlet Node Name
 
   AvailabilityManagerAssignmentList,
     Reheat System 1 Avail List,  !- Name
@@ -1180,43 +1176,35 @@
 
   Branch,
     CW Sec Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CW Sec Circ Pump,        !- Component 1 Name
     CW Sec Supply Inlet Node,!- Component 1 Inlet Node Name
-    CW Sec Circ Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    CW Sec Circ Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Sec Supply Heat Exchanger Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     Plate Heat Exchanger,    !- Component 1 Name
     PHE Supply Inlet Node,   !- Component 1 Inlet Node Name
-    PHE Supply Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    PHE Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Sec Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Sec Supply Bypass Pipe,  !- Component 1 Name
     CW Sec Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Sec Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Sec Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Sec Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Sec Supply Outlet Pipe,  !- Component 1 Name
     CW Sec Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Sec Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Sec Supply Outlet Node;  !- Component 1 Outlet Node Name
 
 !---------------------------------------------------------------------------------------------
 !---------------------LISTING AND MODELING ALL THE SUPPLY SIDE CONNECTORS---------------------
@@ -1247,16 +1235,16 @@
     CW Sec Circ Pump,        !- Name
     CW Sec Supply Inlet Node,!- Inlet Node Name
     CW Sec Circ Pump Outlet Node,  !- Outlet Node Name
-    .0011,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    500,                     !- Rated Power Consumption {W}
+    .0011,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    500,                     !- Design Power Consumption {W}
     .87,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   HeatExchanger:FluidToFluid,
@@ -1299,43 +1287,35 @@
 
   Branch,
     CW Sec Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Sec Demand Inlet Pipe,!- Component 1 Name
     CW Sec Demand Inlet Node,!- Component 1 Inlet Node Name
-    CW Sec Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Sec Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Sec Demand Load Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water:DetailedGeometry,  !- Component 1 Object Type
     Detailed Cooling Coil,   !- Component 1 Name
     Cooling Coil Water Inlet Node,  !- Component 1 Inlet Node Name
-    Cooling Coil Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Cooling Coil Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Sec Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Sec Demand Bypass Pipe,  !- Component 1 Name
     CW Sec Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Sec Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Sec Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Sec Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Sec Demand Outlet Pipe,  !- Component 1 Name
     CW Sec Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Sec Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Sec Demand Outlet Node;  !- Component 1 Outlet Node Name
 
 !---------------------LISTING AND MODELING ALL THE DEMAND SIDE CONNECTORS--------------------
 
@@ -1489,63 +1469,51 @@
 
   Branch,
     CW Primary Pump Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     CW Primary Circ Pump,    !- Component 1 Name
     CW Primary Supply Inlet Node,  !- Component 1 Inlet Node Name
-    CW Primary Pump Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CW Primary Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Little Chiller Branch,   !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:ConstantCOP,     !- Component 1 Object Type
     Little Chiller,          !- Component 1 Name
     Little Chiller Inlet Node,  !- Component 1 Inlet Node Name
-    Little Chiller Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Little Chiller Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Big Chiller Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     Big Chiller,             !- Component 1 Name
     Big Chiller Inlet Node,  !- Component 1 Inlet Node Name
-    Big Chiller Outlet Node, !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Big Chiller Outlet Node; !- Component 1 Outlet Node Name
 
   Branch,
     Purchased Cooling Branch,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictCooling,         !- Component 1 Object Type
     Purchased Cooling,       !- Component 1 Name
     Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Cooling Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Purchased Cooling Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Primary Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Primary Supply Side Bypass Pipe,  !- Component 1 Name
     CW Primary Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Primary Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Primary Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Primary Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Primary Supply Side Outlet Pipe,  !- Component 1 Name
     CW Primary Supply Side Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Primary Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Primary Supply Outlet Node;  !- Component 1 Outlet Node Name
 
 !---------------------------------------------------------------------------------------------
 !---------------------LISTING AND MODELING ALL THE SUPPLY SIDE CONNECTORS---------------------
@@ -1651,9 +1619,9 @@
     CW Primary Circ Pump,    !- Name
     CW Primary Supply Inlet Node,  !- Inlet Node Name
     CW Primary Pump Outlet Node,  !- Outlet Node Name
-    .0011,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    500,                     !- Rated Power Consumption {W}
+    .0011,                   !- Design Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    500,                     !- Design Power Consumption {W}
     .87,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type
@@ -1672,43 +1640,35 @@
 
   Branch,
     CW Primary Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Primary Demand Inlet Pipe,  !- Component 1 Name
     CW Primary Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CW Primary Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CW Primary Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Primary Demand Load Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     Plate Heat Exchanger,    !- Component 1 Name
     PHE Demand Inlet Node,   !- Component 1 Inlet Node Name
-    PHE Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PHE Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Primary Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Primary Demand Side Bypass Pipe,  !- Component 1 Name
     CW Primary Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Primary Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Primary Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Primary Demand Outlet,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Primary Demand Side Outlet Pipe,  !- Component 1 Name
     CW Primary Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Primary Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Primary Demand Outlet Node;  !- Component 1 Outlet Node Name
 
 !---------------------LISTING AND MODELING ALL THE DEMAND SIDE CONNECTORS--------------------
 
@@ -1891,33 +1851,27 @@
 
   Branch,
     Condenser Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
     Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Tower Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     Big Tower,               !- Component 1 Name
     Condenser Tower Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Tower Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Tower Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Side Bypass Pipe,  !- Component 1 Name
     Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Supply Side Bypass Pipe,  !- Name
@@ -1926,13 +1880,11 @@
 
   Branch,
     Condenser Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Outlet Pipe,  !- Component 1 Name
     Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Supply Outlet Pipe,  !- Name
@@ -1956,13 +1908,11 @@
 
   Branch,
     Condenser Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Inlet Pipe,  !- Component 1 Name
     Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Demand Inlet Pipe,  !- Name
@@ -1971,33 +1921,27 @@
 
   Branch,
     Little Chiller Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:ConstantCOP,     !- Component 1 Object Type
     Little Chiller,          !- Component 1 Name
     Little Chiller Condenser Inlet Node,  !- Component 1 Inlet Node Name
-    Little Chiller Condenser Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Little Chiller Condenser Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Big Chiller Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     Big Chiller,             !- Component 1 Name
     Big Chiller Condenser Inlet Node,  !- Component 1 Inlet Node Name
-    Big Chiller Condenser Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Big Chiller Condenser Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser CW Primary Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Side Bypass Pipe,  !- Component 1 Name
     Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Demand Side Bypass Pipe,  !- Name
@@ -2006,13 +1950,11 @@
 
   Branch,
     Condenser Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Outlet Pipe,  !- Component 1 Name
     Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Demand Outlet Pipe,  !- Name
@@ -2084,16 +2026,16 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    .0011,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    500,                     !- Rated Power Consumption {W}
+    .0011,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    500,                     !- Design Power Consumption {W}
     .87,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -2139,33 +2081,27 @@
 
   Branch,
     Heating Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HW Circ Pump,            !- Component 1 Name
     HW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    HW Pump Outlet Node,     !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     Purchased Heating Branch,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictHeating,         !- Component 1 Object Type
     Purchased Heating,       !- Component 1 Name
     Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Heating Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Bypass Pipe,  !- Component 1 Name
     Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Heating Supply Bypass Pipe,  !- Name
@@ -2174,13 +2110,11 @@
 
   Branch,
     Heating Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Outlet Pipe,  !- Component 1 Name
     Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Heating Supply Outlet Pipe,  !- Name
@@ -2205,13 +2139,11 @@
 
   Branch,
     Reheat Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Inlet Pipe,       !- Component 1 Name
     HW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Reheat Inlet Pipe,       !- Name
@@ -2220,13 +2152,11 @@
 
   Branch,
     Reheat Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Outlet Pipe,      !- Component 1 Name
     HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Reheat Outlet Pipe,      !- Name
@@ -2235,43 +2165,35 @@
 
   Branch,
     Zone 1 Reheat Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Reheat Coil Zone 1,      !- Component 1 Name
     Zone 1 Reheat Water Inlet Node,  !- Component 1 Inlet Node Name
-    Zone 1 Reheat Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone 1 Reheat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone 2 Reheat Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Reheat Coil Zone 2,      !- Component 1 Name
     Zone 2 Reheat Water Inlet Node,  !- Component 1 Inlet Node Name
-    Zone 2 Reheat Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone 2 Reheat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone 3 Reheat Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Reheat Coil Zone 3,      !- Component 1 Name
     Zone 3 Reheat Water Inlet Node,  !- Component 1 Inlet Node Name
-    Zone 3 Reheat Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone 3 Reheat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Reheat Bypass Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Bypass,           !- Component 1 Name
     Reheat Bypass Inlet Node,!- Component 1 Inlet Node Name
-    Reheat Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Reheat Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Reheat Bypass,           !- Name
@@ -2327,16 +2249,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    .0043,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    2000,                    !- Rated Power Consumption {W}
+    .0043,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    2000,                    !- Design Power Consumption {W}
     .87,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictHeating,

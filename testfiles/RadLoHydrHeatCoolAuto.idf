@@ -54,15 +54,15 @@
 !
 !      (0,0,0)             (6.069,0,0)               (12.192,0,0)
 !
-! Internal gains description:     ZONE West      - lighting is 0 watts, equip is 2928.751 watts, 3 occupants
-! Internal gains description:     ZONE North     - lighting is 878.6252 watts, equip is 2928.751 watts, 4 occupants
-! Internal gains description:     ZONE East      - lighting is 1464.375 watts, equip is 1464.375 watts, 3 occupants
+! Internal gains description:     ZONE West      - lighting is 0 watts, equip is 928.751 watts, 3 occupants
+! Internal gains description:     ZONE North     - lighting is 464.375 watts, equip is 464.375 watts, 4 occupants
+! Internal gains description:     ZONE East      - lighting is 464.375 watts, equip is 464.375 watts, 3 occupants
 !
 ! Interzone Surfaces:             3 interzone surfaces (see diagram)
 ! Internal Mass:                  None
 ! People:                         10
-! Lights:                         2343 W
-! Equipment:                      7323 W
+! Lights:                         929 W
+! Equipment:                      1857 W
 ! Windows:                        1
 ! Detached Shading:               None
 ! Daylight:                       None
@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -435,7 +435,7 @@
 
   Construction:InternalSource,
     Slab Floor with Radiant, !- Name
-    4,                       !- Source Present After Layer Number
+    3,                       !- Source Present After Layer Number
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
@@ -566,7 +566,7 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,10.00;      !- Field 3
+    Until: 24:00,5.00;       !- Field 3
 
   Schedule:Compact,
     HW LOOP TEMP SCHEDULE,   !- Name
@@ -705,7 +705,7 @@
     West Zone,               !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    2928.751,                !- Design Level {W}
+    928.751,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -739,7 +739,7 @@
     EAST ZONE,               !- Zone or ZoneList Name
     Office Lighting,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
-    1464.375,                !- Lighting Level {W}
+    464.375,                 !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Return Air Fraction
@@ -753,7 +753,7 @@
     EAST ZONE,               !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    1464.375,                !- Design Level {W}
+    464.375,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -787,7 +787,7 @@
     NORTH ZONE,              !- Zone or ZoneList Name
     Office Lighting,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
-    878.6252,                !- Lighting Level {W}
+    464.375,                 !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Return Air Fraction
@@ -801,7 +801,7 @@
     NORTH ZONE,              !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    2928.751,                !- Design Level {W}
+    464.375,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -1293,7 +1293,7 @@
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
     cooling,                 !- Loop Type
-    6.7,                     !- Design Loop Exit Temperature {C}
+    5.0,                     !- Design Loop Exit Temperature {C}
     2;                       !- Loop Design Temperature Difference {deltaC}
 
   PlantLoop,
@@ -1359,13 +1359,11 @@
 
   Branch,
     Cooling Demand Inlet,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Side Inlet Pipe,  !- Component 1 Name
     CW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    CW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Side Inlet Pipe,  !- Name
@@ -1374,43 +1372,35 @@
 
   Branch,
     Zone 1 Cooling Branch,   !- Name
-    0.001,                   !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type
     West Zone Radiant Floor, !- Component 1 Name
     Zone 1 Cooling Water Inlet Node,  !- Component 1 Inlet Node Name
-    Zone 1 Cooling Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Zone 1 Cooling Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone 2 Cooling Branch,   !- Name
-    0.001,                   !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type
     East Zone Radiant Floor, !- Component 1 Name
     Zone 2 Cooling Water Inlet Node,  !- Component 1 Inlet Node Name
-    Zone 2 Cooling Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Zone 2 Cooling Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone 3 Cooling Branch,   !- Name
-    0.001,                   !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type
     North Zone Radiant Floor,!- Component 1 Name
     Zone 3 Cooling Water Inlet Node,  !- Component 1 Inlet Node Name
-    Zone 3 Cooling Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Zone 3 Cooling Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Demand Bypass Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Side Bypass,      !- Component 1 Name
     CW Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Side Bypass,      !- Name
@@ -1419,13 +1409,11 @@
 
   Branch,
     Cooling Demand Outlet,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Demand Side Outlet Pipe,  !- Component 1 Name
     CW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CW Demand Side Outlet Pipe,  !- Name
@@ -1434,13 +1422,11 @@
 
   Branch,
     Cooling Supply Outlet,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Side Outlet Pipe, !- Component 1 Name
     Supply Side Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Side Outlet Pipe, !- Name
@@ -1449,33 +1435,27 @@
 
   Branch,
     CW Pump Branch,          !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Circ Pump,               !- Component 1 Name
     CW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    CW Pump Outlet Node,     !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     Purchased Cooling Branch,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictCooling,         !- Component 1 Object Type
     Purchased Cooling,       !- Component 1 Name
     Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Cooling Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Purchased Cooling Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Supply Bypass Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Side Bypass,      !- Component 1 Name
     CW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Side Bypass,      !- Name
@@ -1537,16 +1517,16 @@
     Circ Pump,               !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -1596,33 +1576,27 @@
 
   Branch,
     Heating Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HW Circ Pump,            !- Component 1 Name
     HW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    HW Pump Outlet Node,     !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     Heating Purchased Hot Water Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictHeating,         !- Component 1 Object Type
     Purchased Heating,       !- Component 1 Name
     Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Heating Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Side Bypass,  !- Component 1 Name
     Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Heating Supply Side Bypass,  !- Name
@@ -1631,13 +1605,11 @@
 
   Branch,
     Heating Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Outlet,   !- Component 1 Name
     Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Heating Supply Outlet,   !- Name
@@ -1662,13 +1634,11 @@
 
   Branch,
     Reheat Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Inlet Pipe,       !- Component 1 Name
     HW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Reheat Inlet Pipe,       !- Name
@@ -1677,13 +1647,11 @@
 
   Branch,
     Reheat Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Outlet Pipe,      !- Component 1 Name
     HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Reheat Outlet Pipe,      !- Name
@@ -1692,43 +1660,35 @@
 
   Branch,
     Zone 1 Radiant Branch,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type
     West Zone Radiant Floor, !- Component 1 Name
     West Zone Radiant Water Inlet Node,  !- Component 1 Inlet Node Name
-    West Zone Radiant Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    West Zone Radiant Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone 2 Radiant Branch,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type
     East Zone Radiant Floor, !- Component 1 Name
     East Zone Radiant Water Inlet Node,  !- Component 1 Inlet Node Name
-    East Zone Radiant Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    East Zone Radiant Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone 3 Radiant Branch,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type
     North Zone Radiant Floor,!- Component 1 Name
     North Zone Radiant Water Inlet Node,  !- Component 1 Inlet Node Name
-    North Zone Radiant Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    North Zone Radiant Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Reheat Bypass Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Reheat Bypass,           !- Component 1 Name
     Reheat Bypass Inlet Node,!- Component 1 Inlet Node Name
-    Reheat Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Reheat Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Reheat Bypass,           !- Name
@@ -1784,16 +1744,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictHeating,
@@ -1896,7 +1856,7 @@
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    West Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name
+    West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -1905,10 +1865,10 @@
     ,                        !- Fraction of Autosized Cooling Design Capacity
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 1 Cooling Water Outlet Node, !- Cooling Water Outlet Node Name
+    Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
@@ -1936,10 +1896,10 @@
     ,                        !- Fraction of Autosized Cooling Design Capacity
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 2 Cooling Water Outlet Node, !- Cooling Water Outlet Node Name
+    Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
@@ -1952,16 +1912,16 @@
     0.013,                   !- Hydronic Tubing Inside Diameter {m}
     autosize,                !- Hydronic Tubing Length {m}
     MeanAirTemperature,      !- Temperature Control Type
-    FractionOfAutosizedHeatingCapacity,   !- Heating Design Capacity Method
+    FractionOfAutosizedHeatingCapacity,  !- Heating Design Capacity Method
     ,                        !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     1.0,                     !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Hot Water Flow {m3/s}
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    North Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name
+    North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    FractionOfAutosizedCoolingCapacity,   !- Cooling Design Capacity Method
+    FractionOfAutosizedCoolingCapacity,  !- Cooling Design Capacity Method
     ,                        !- Cooling Design Capacity {W}
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
     1.0,                     !- Fraction of Autosized Cooling Design Capacity
@@ -1970,7 +1930,7 @@
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
@@ -2013,6 +1973,8 @@
 
   Output:Variable,*,Surface Internal Source Location Temperature,timestep;
 
+  Output:Variable,*,Surface Internal User Specified Location Temperature,timestep;
+
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 
   Output:VariableDictionary,Regular;
@@ -2040,5 +2002,5 @@
     AllSummary;              !- Report 1 Name
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 

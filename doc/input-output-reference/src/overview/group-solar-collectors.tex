@@ -68,11 +68,11 @@ The following output variables are reported for the SolarCollector:FlatPlate:Wat
   HVAC,Sum,Solar Collector Heat Transfer Energy {[}J{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Solar Collector Incident Angle Modifier {[]}}{Solar Collector Incident Angle Modifier }}\label{solar-collector-incident-angle-modifier}
+\paragraph{Solar Collector Incident Angle Modifier {[]}}\label{solar-collector-incident-angle-modifier}
 
 The incident angle modifier is an important intermediate value used in the SRCC calculation of solar collector performance. The value reported here is the combined result for the current time that includes incident angles of beam solar, diffuse solar from sky, and diffuse solar from ground.
 
-\paragraph{\texorpdfstring{Solar Collector Efficiency {[]}}{Solar Collector Efficiency }}\label{solar-collector-efficiency}
+\paragraph{Solar Collector Efficiency {[]}}\label{solar-collector-efficiency}
 
 The overall collector efficiency. This is the ratio of collected energy and the incident solar energy. The efficiency can be greater than 1 at times when the outdoor air temperature is warm enough.
 
@@ -389,7 +389,7 @@ This output variable is the ICS collector stored water average temperature at a 
 
 This output variable is the ICS collector absorber plate average temperature at a given time steps in degree Celsius.
 
-\paragraph{\texorpdfstring{Solar Collector Thermal Efficiency {[]}}{Solar Collector Thermal Efficiency }}\label{solar-collector-thermal-efficiency}
+\paragraph{Solar Collector Thermal Efficiency {[]}}\label{solar-collector-thermal-efficiency}
 
 This output variable is the instantaneous thermal efficiency of the ICS solar collector in per cent. This value is determined from net useful energy collected and the total incident solar radiation for each time step. The net useful energy collected is the sum of the energy stored in the collector and net useful energy delivered.
 
@@ -411,7 +411,7 @@ These output variables are the instantaneous skin heat loss rate and the heat lo
 
 This output variable is the heat rate and Energy transferred from the ICS collector to the collector loop fluid (water) in Watts and Joule, respectively. This value is determined from the collector water mass flow rate, specific heat of water and the temperature difference between the collector water outlet and inlet nodes at each time step. The value is positive when the fluid is heated or negative when cooled.
 
-\paragraph{\texorpdfstring{Solar Collector Transmittance Absorptance Product {[]}}{Solar Collector Transmittance Absorptance Product }}\label{solar-collector-transmittance-absorptance-product}
+\paragraph{Solar Collector Transmittance Absorptance Product {[]}}\label{solar-collector-transmittance-absorptance-product}
 
 This output variable is the transmittance-absorptance product of the covers and absorber system of the ICS solar collector. This value ranges from 0.0 to less than 1.0.
 
@@ -509,7 +509,7 @@ The output variables that are available for flat plate PVT include the following
 
 These outputs are the thermal energy and power produced by the PVT collector. PVT collectors are a type of cogenerator, producing both electrical and thermal power and these variables report the thermal portion in the same manner as other fuel-based cogenerators. The thermal energy is placed on HeatProduced meter and is attributed to SolarWater or SolarAir depending on the type of working fluid. The generator thermal production is also reported at the load center level.
 
-\paragraph{\texorpdfstring{Generator PVT Fluid Bypass Status {[]}}{Generator PVT Fluid Bypass Status }}\label{generator-pvt-fluid-bypass-status}
+\paragraph{Generator PVT Fluid Bypass Status {[]}}\label{generator-pvt-fluid-bypass-status}
 
 This output variable indicates the status a bypass damper. It is only available for air-based PVT. There are no dimensions and the range is between 0.0 and 1.0. If the value is 0.0, then there is no bypassing and all the working fluid goes through the collector. If the value is 1.0, then there is complete bypassing and all the working fluid goes around the collector. If the value is between 0.0 and 1.0, then the model is effectively mixing bypass and collector streams to target a temperature setpoint placed on the outlet node.
 
@@ -664,11 +664,11 @@ The AvailabilityManager:DifferentialThermostat object must always be the last ma
 
 \subsection{SolarCollector:UnglazedTranspired}\label{solarcollectorunglazedtranspired}
 
-This object is used to model unglazed transpired solar collectors (UTSC) used to condition outdoor air. These collectors are generally used to heat air drawn through perforated absorbers that are heated by the sun and also recover heat conducted out through the underlying wall. The SolarCollector:UnglazedTranspired****object represents a single collector attached to one or more BuildingSurface:Detailed objects and to one or more outdoor air systems. Therefore the transpired collector is part of both the thermal envelope and the HVAC system. An example file is provided called TranspiredCollectors.idf.
+This object is used to model unglazed transpired solar collectors (UTSC) used to condition outdoor air. These collectors are generally used to heat air drawn through perforated absorbers that are heated by the sun and also recover heat conducted out through the underlying wall. The SolarCollector:UnglazedTranspired object represents a single collector attached to one or more BuildingSurface:Detailed objects and to one or more outdoor air systems. Therefore the transpired collector is part of both the thermal envelope and the HVAC system. An example file is provided called TranspiredCollectors.idf.
 
 The area and orientation of the collector is obtained from BuildingSurface:Detailed objects, which are referenced by name. Although the collector surface itself is slightly detached from the underlying building wall (or roof), no additional surface object is needed to represent the collector itself. When modeling transpired collectors, it is important to consider the size of the collector when developing the building model s BuildingSurface:Detailed objects because the underlying surfaces must match the collector. For example, if the collector covers only part of the wall, then that wall should be split into separate surfaces where one matches the size of the collector. A single collector can be associated with as many BuildingSurface:Detailed objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The collector can be arranged at any tilt angle by describing the surfaces appropriately. The surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
 
-The collector conditions outdoor air and is connected to the outdoor air system using the usual method of specifying node names. Using the UTSC model requires specifying a relatively complete HVAC air system that includes an outdoor air path. This will typically require using a set of objects that, at a minimum, will include: AirLoopHVAC:ControllerList, AirLoopHVAC:OutdoorAirSystem:EquipmentList, AirLoopHVAC:OutdoorAirSystem, OutdoorAir:NodeList, OutdoorAir:Mixer, SetpointManager:MixedAir, and Controller:OutdoorAir. A single UTSC can serve more than one outdoor air system but requires also using a separate object, called SolarCollector:UnglazedTranspired:MultiSystem to specify node connections.
+The collector conditions outdoor air and is connected to the outdoor air system using the usual method of specifying node names. Using the UTSC model requires specifying a relatively complete HVAC air system that includes an outdoor air path. This will typically require using a set of objects that, at a minimum, will include: AirLoopHVAC:ControllerList, AirLoopHVAC:OutdoorAirSystem:EquipmentList, AirLoopHVAC:OutdoorAirSystem, OutdoorAir:NodeList, OutdoorAir:Mixer, SetpointManager:MixedAir, and Controller:OutdoorAir. A single UTSC can serve more than one outdoor air system but requires also using a separate object, called SolarCollector:UnglazedTranspired:Multisystem to specify node connections.
 
 Controls for the UTSC involve setting the rate of air flow and the status of a bypass damper. If the bypass damper is open, then all the ventilation air goes straight into the outdoor air mixer; if it closed, then all the air first passes through the UTSC. The bypass damper is modeled as completely open or completely closed. The UTSC bypass damper control is determined by an availability manager, the airflow set by the outdoor air mixer controls, and thermostatic type controls that decide if heating is useful. An availability schedule is used to bypass the collector for certain times of the year, eg. summer cooling season. The air flow rates are set by controls associated with the outdoor air mixer (see SetpointManager:MixedAir, and Controller:OutdoorAir). Thermostatic type control decides if the collector will provide useful heating based on either of two types of setpoints. The first type of temperature setpoint is managed by SetpointManager:MixedAir, where the UTSC model looks at a control node, usually the mixed air node. The second type is an extra setpoint especially for free heating that is managed within this object where the UTSC model looks at the zone air node.
 
@@ -688,19 +688,19 @@ This field contains the name of a schedule that determines whether or not the UT
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-2-003}
 
-This field contains the name of an air node that provides air into the UTSC. This node name should also be assigned to be an outdoor air node using the OutdoorAir:NodeList or OutdoorAir:Node objects. This node should also be named as the actuated node in a Controller:OutdoorAir object. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:MultiSystem object should be used to define the nodes.
+This field contains the name of an air node that provides air into the UTSC. This node name should also be assigned to be an outdoor air node using the OutdoorAir:NodeList or OutdoorAir:Node objects. This node should also be named as the actuated node in a Controller:OutdoorAir object. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:Multisystem object should be used to define the nodes.
 
 \paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-2-003}
 
-This field contains the name of an air node that is the outlet of the UTSC. This node name will typically be the inlet to the OutdoorAir:Mixer (if there is no other equipment on the outdoor air path). If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:MultiSystem object should be used to define the nodes.
+This field contains the name of an air node that is the outlet of the UTSC. This node name will typically be the inlet to the OutdoorAir:Mixer (if there is no other equipment on the outdoor air path). If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:Multisystem object should be used to define the nodes.
 
 \paragraph{Field: Setpoint Node Name}\label{field-setpoint-node-name-000}
 
-This field contains the name of an air node that has a setpoint manager controlling its temperature setpoint. This node name will typically be named as the control node in a a Controller:OutdoorAir object. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:MultiSystem object should be used to define the nodes.
+This field contains the name of an air node that has a setpoint manager controlling its temperature setpoint. This node name will typically be named as the control node in a a Controller:OutdoorAir object. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:Multisystem object should be used to define the nodes.
 
 \paragraph{Field: Zone Node Name}\label{field-zone-node-name-001}
 
-This field contains the name of an air node for a thermal zone that is ultimately connected to the air system. This node is used with the setpoint schedule, defined in the following field, to provide an added layer of thermostatic control for the UTSC without affecting the control of auxiliary heating. If there is a single air system that is connected to more than one zone, then a single zone should be selected based on where the thermostat might be located. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:MultiSystem object should be used to define the nodes.
+This field contains the name of an air node for a thermal zone that is ultimately connected to the air system. This node is used with the setpoint schedule, defined in the following field, to provide an added layer of thermostatic control for the UTSC without affecting the control of auxiliary heating. If there is a single air system that is connected to more than one zone, then a single zone should be selected based on where the thermostat might be located. If the UTSC is connected to more than one air system, then this field can be left blank and the SolarCollector:UnglazedTranspired:Multisystem object should be used to define the nodes.
 
 \paragraph{Field: Free Heating Setpoint Schedule Name}\label{field-free-heating-setpoint-schedule-name}
 
@@ -880,13 +880,13 @@ In addition to related output that can be obtained for air nodes and surfaces, t
   HVAC,Average,Solar Collector Surface Efficiency {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Solar Collector Heat Exchanger Effectiveness {[]}}{Solar Collector Heat Exchanger Effectiveness }}\label{solar-collector-heat-exchanger-effectiveness}
+\paragraph{Solar Collector Heat Exchanger Effectiveness {[]}}\label{solar-collector-heat-exchanger-effectiveness}
 
 The results from UTSC correlations defined by \({\varepsilon_{HX}} = \frac{{{T_{a,HX}} - {T_{amb}}}}{{{T_{s,coll}} - {T_{amb}}}}\) .
 
 \paragraph{Solar Collector Leaving Air Temperature {[}C{]}}\label{solar-collector-leaving-air-temperature-c}
 
-The temperature of air entering the plenum after being heated by the collector.
+The temperature of air entering the plenum after being heated by the collector. When there is no forced air flow or the collector is passive, then the condition of air entering the plenum or the collector leaving air is assumed to be that of outside air.
 
 \paragraph{Solar Collector Outside Face Suction Velocity {[}m/s{]}}\label{solar-collector-outside-face-suction-velocity-ms}
 
@@ -898,7 +898,7 @@ The surface temperature of the collector itself.
 
 \paragraph{Solar Collector Plenum Air Temperature {[}C{]}}\label{solar-collector-plenum-air-temperature-c}
 
-The temperature of air inside, and leaving, the plenum behind the collector.
+The temperature of air inside, and leaving, the plenum behind the collector. This plenum leaving air temperature depends on the mode of operation of the collector. When the collector is passive (no forced flow), then the passive model assumes the condition of air entering the plenum is that of outside air, or else when the collector is active, then the model sets the plenum entering air condition to transpired collector leaving air condition determined from the collector model.
 
 \paragraph{Solar Collector Sensible Heating Rate {[}W{]}}\label{solar-collector-sensible-heating-rate-w}
 
@@ -940,15 +940,15 @@ The part of mass flow rate of natural ventilation air exchange between the plenu
 
 The intensity of solar radiation incident on the UTSC collector from all sources.
 
-\paragraph{\texorpdfstring{Solar Collector System Efficiency {[]}}{Solar Collector System Efficiency }}\label{solar-collector-system-efficiency}
+\paragraph{Solar Collector System Efficiency {[]}}\label{solar-collector-system-efficiency}
 
 The overall efficiency of the UTSC system including collected solar energy and heat recovered from the underlying surface.
 
-\paragraph{\texorpdfstring{Solar Collector Surface Efficiency {[]}}{Solar Collector Surface Efficiency }}\label{solar-collector-surface-efficiency}
+\paragraph{Solar Collector Surface Efficiency {[]}}\label{solar-collector-surface-efficiency}
 
 The efficiency of the UTSC solar collector.
 
-\subsection{SolarCollector:UnglazedTranspired:MultiSystem}\label{solarcollectorunglazedtranspiredmultisystem}
+\subsection{SolarCollector:UnglazedTranspired:Multisystem}\label{solarcollectorunglazedtranspiredmultisystem}
 
 This object is used to model unglazed transpired solar collectors (UTSC) that are connected to multiple outdoor air systems. This object supplements the SolarCollector:UnglazedTranspired object and is only necessary if more than one air system is connected to a single transpired collector. After the name field, there are sets of four node names used to define the connections of each air system. Each set contains node names for inlet, outlet, control, and zone. If more than five air systems are needed, this object is extensible.
 

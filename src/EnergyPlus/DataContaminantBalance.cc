@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <DataContaminantBalance.hh>
@@ -184,10 +172,84 @@ namespace DataContaminantBalance {
 	Array1D< ZoneContamGenericDataDVS > ZoneContamGenericDVS;
 	Array1D< ZoneContamGenericDataDRS > ZoneContamGenericDRS;
 
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
+	// Clears the global data in DataContaminantBalance.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		ZoneCO2SetPoint.deallocate();
+		CO2PredictedRate.deallocate();
+		ZoneCO2Gain.deallocate();
+		ZoneCO2GainFromPeople.deallocate();
+		ZoneAirCO2Avg.deallocate();
+		ZoneAirCO2.deallocate();
+		CO2ZoneTimeMinus1.deallocate();
+		CO2ZoneTimeMinus2.deallocate();
+		CO2ZoneTimeMinus3.deallocate();
+		CO2ZoneTimeMinus4.deallocate();
+		DSCO2ZoneTimeMinus1.deallocate();
+		DSCO2ZoneTimeMinus2.deallocate();
+		DSCO2ZoneTimeMinus3.deallocate();
+		DSCO2ZoneTimeMinus4.deallocate();
+		ZoneAirCO2Temp.deallocate();
+		CO2ZoneTimeMinus1Temp.deallocate();
+		CO2ZoneTimeMinus2Temp.deallocate();
+		CO2ZoneTimeMinus3Temp.deallocate();
+		ZoneAirCO2Old.deallocate();
+		ZoneCO2MX.deallocate();
+		ZoneCO2M2.deallocate();
+		ZoneCO21.deallocate();
+		CONTRAT.deallocate();
+		MixingMassFlowCO2.deallocate();
+		NumContControlledZones = 0;
+		OutdoorCO2 = 0.0;
+		ZoneAirDensityCO.deallocate();
+		AZ.deallocate();
+		BZ.deallocate();
+		CZ.deallocate();
+		ZoneGCSetPoint.deallocate();
+		GCPredictedRate.deallocate();
+		ZoneGCGain.deallocate();
+		ZoneAirGCAvg.deallocate();
+		ZoneAirGC.deallocate();
+		GCZoneTimeMinus1.deallocate();
+		GCZoneTimeMinus2.deallocate();
+		GCZoneTimeMinus3.deallocate();
+		GCZoneTimeMinus4.deallocate();
+		DSGCZoneTimeMinus1.deallocate();
+		DSGCZoneTimeMinus2.deallocate();
+		DSGCZoneTimeMinus3.deallocate();
+		DSGCZoneTimeMinus4.deallocate();
+		ZoneAirGCTemp.deallocate();
+		GCZoneTimeMinus1Temp.deallocate();
+		GCZoneTimeMinus2Temp.deallocate();
+		GCZoneTimeMinus3Temp.deallocate();
+		ZoneAirGCOld.deallocate();
+		ZoneGCMX.deallocate();
+		ZoneGCM2.deallocate();
+		ZoneGC1.deallocate();
+		CONTRATGC.deallocate();
+		MixingMassFlowGC.deallocate();
+		OutdoorGC = 0.0;
+		ZoneAirDensityGC.deallocate();
+		AZGC.deallocate();
+		BZGC.deallocate();
+		CZGC.deallocate();
+		ZoneSysContDemand.deallocate();
+		Contaminant.SimulateContaminants = false;
+		Contaminant.CO2Simulation = false;
+		Contaminant.CO2OutdoorSchedPtr = 0;
+		Contaminant.GenericContamSimulation = false;
+		Contaminant.GenericContamOutdoorSchedPtr = 0;
+		ContaminantControlledZone.deallocate();
+		ZoneContamGenericConstant.deallocate();
+		ZoneContamGenericPDriven.deallocate();
+		ZoneContamGenericCutoff.deallocate();
+		ZoneContamGenericDecay.deallocate();
+		ZoneContamGenericBLDiff.deallocate();
+		ZoneContamGenericDVS.deallocate();
+		ZoneContamGenericDRS.deallocate();
+	}
 
 } // DataContaminantBalance
 

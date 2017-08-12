@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,18 +43,13 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef FanCoilUnits_hh_INCLUDED
 #define FanCoilUnits_hh_INCLUDED
+
+// C++ Headers
+#include <memory>
+#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -66,6 +58,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -221,13 +214,13 @@ namespace FanCoilUnits {
 		Real64 MinSATempCooling; // ASHRAE90.1 maximum supply air temperature in Cooling mode
 		Real64 MaxSATempHeating; // ASHRAE90.1 maximum supply air temperature in Heating mode
 		bool ASHRAETempControl; // ASHRAE90.1 control to temperature set point when true
-		Real64 QUnitOutNoHC; // unit output when no active heating or cooling [W]
+		Real64 QUnitOutNoHC; // unit output with coils off [W]
 		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
 		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
-		int LimitErrCountH; // count of SolveRegulaFalsi limit errors
-		int LimitErrCountC; // count of SolveRegulaFalsi limit errors
-		int ConvgErrCountH; // count of SolveRegulaFalsi iteration limit errors
-		int ConvgErrCountC; // count of SolveRegulaFalsi iteration limit errors
+		int LimitErrCountH; // count of SolveRoot limit errors
+		int LimitErrCountC; // count of SolveRoot limit errors
+		int ConvgErrCountH; // count of SolveRoot iteration limit errors
+		int ConvgErrCountC; // count of SolveRoot iteration limit errors
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
 		Real64 HeatEnergy; // unit heating output in J
@@ -419,6 +412,19 @@ namespace FanCoilUnits {
 	);
 
 	void
+	TightenAirAndWaterFlowLimits(
+		int const FanCoilNum, // Unit index in fan coil array
+		bool const CoolingLoad, // true if zone requires cooling
+		bool const HeatingLoad, // true if zone requires heating
+		int const WaterControlNode, // water control node, either cold or hot water
+		int const ControlledZoneNum, // controlling zone index
+		bool const FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
+		Real64 const QZnReq, // zone load [W]
+		Real64 & PLRMin, // minimum part-load ratio
+		Real64 & PLRMax // maximum part-load ratio
+	);
+
+	void
 	Calc4PipeFanCoil(
 		int const FanCoilNum, // Unit index in fan coil array
 		int const ControlledZoneNum, // ZoneEquipConfig index
@@ -477,6 +483,12 @@ namespace FanCoilUnits {
 	);
 
 	Real64
+	CalcFanCoilPLRResidual(
+		Real64 const PLR, // part-load ratio of air and water mass flow rate
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
 	CalcFanCoilHWLoadResidual(
 		Real64 const HWFlow, // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
@@ -498,12 +510,6 @@ namespace FanCoilUnits {
 		Array1< Real64 > const & Par // Function parameters
 	);
 	
-	Real64
-	CalcFanCoilAirFlowResidual(
-		Real64 const WaterFlow, // water mass flow rate [kg/s]
-		Array1< Real64 > const & Par // Function parameters
-	);
-
 	Real64
 	CalcFanCoilAirAndWaterFlowResidual(
 		Real64 const WaterFlow, // water mass flow rate [kg/s]

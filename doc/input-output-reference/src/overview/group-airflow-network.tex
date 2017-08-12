@@ -39,9 +39,9 @@ The Airflow Network input objects are:
 
 \textbf{AirflowNetwork:SimulationControl}
 
-\textbf{AirflowNetwork:Multizone:Zone}
+\textbf{AirflowNetwork:MultiZone:Zone}
 
-\textbf{AirflowNetwork:Multizone:Surface}
+\textbf{AirflowNetwork:MultiZone:Surface}
 
 \textbf{AirflowNetwork:MultiZone:Component:SimpleOpening}
 
@@ -63,9 +63,9 @@ The Airflow Network input objects are:
 
 \textbf{AirflowNetwork:MultiZone:WindPressureCoefficientValues}
 
-\textbf{AirflowNetwork:Intrazone:Node}
+\textbf{AirflowNetwork:IntraZone:Node}
 
-\textbf{AirflowNetwork:Intrazone:Linkage}
+\textbf{AirflowNetwork:IntraZone:Linkage}
 
 \textbf{AirflowNetwork:Distribution:Node}
 
@@ -93,9 +93,9 @@ The Airflow Network input objects are:
 \item
   \textbf{AirflowNetwork:SimulationControl} defines basic run parameters for the air flow calculations and specifies whether wind pressure coefficients are input by the user or, for rectangular buildings, calculated by the program.
 \item
-  The \textbf{AirflowNetwork:Multizone:Zone} object specifies the ventilation control that applies to all of the openable exterior and interior windows and doors in the corresponding thermal zone. Surface-level ventilation control can be used to override the zone-level ventilation control if required (see AirflowNetwork: Multizone:Surface object below).
+  The \textbf{AirflowNetwork:MultiZone:Zone} object specifies the ventilation control that applies to all of the openable exterior and interior windows and doors in the corresponding thermal zone. Surface-level ventilation control can be used to override the zone-level ventilation control if required (see AirflowNetwork: MultiZone:Surface object below).
 \item
-  \textbf{AirflowNetwork:Multizone:Surface} object indicates whether a heat transfer surface (wall, window, etc.) has a crack or opening and references an \textbf{AirflowNetwork:MultiZone:Surface:Crack, AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea, AirflowNetwork:MultiZone:Component:SimpleOpening, AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening or AirflowNetwork:MultiZone:Component:ZoneExhaustFan} object that gives the air flow characteristics of that crack, opening, or zone exhaust fan. The AirflowNetwork:Multizone:Surface object can also be used to specify individual ventilation control for openable exterior and interior windows and doors.
+  \textbf{AirflowNetwork:MultiZone:Surface} object indicates whether a heat transfer surface (wall, window, etc.) has a crack or opening and references an \textbf{AirflowNetwork:MultiZone:Surface:Crack, AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea, AirflowNetwork:MultiZone:Component:SimpleOpening, AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening or AirflowNetwork:MultiZone:Component:ZoneExhaustFan} object that gives the air flow characteristics of that crack, opening, or zone exhaust fan. The AirflowNetwork:MultiZone:Surface object can also be used to specify individual ventilation control for openable exterior and interior windows and doors.
 \item
   \textbf{AirflowNetwork:MultiZone:ReferenceCrackConditions} is used to normalize crack information that is based on measurements of crack air flow.
 \item
@@ -103,14 +103,14 @@ The Airflow Network input objects are:
 \item
   \textbf{AirflowNetwork:Distribution:Component} objects consist of \textbf{Leak, LeakageRatio, Duct, ConstantPressureDrop, ConstantVolumeFan, Coil,} and \textbf{TerminalUnit.} The components provide a relationship between pressure and airflow. The \textbf{Leak} and \textbf{Leakage} components can be used to simulate supply and/or return leaks in an air distribution system\textbf{.} The \textbf{Duct} and \textbf{ConstantPressureDrop components} can be used to deliver forced air into conditioned spaces. The components \textbf{ConstantVolumeFan, Coil, and TerminalUnit} reference normal EnergyPlus objects. The Airflow Network model gets information from these objects to perform an airflow network simulation.
 \item
-  \textbf{AirflowNetwork:Distribution:Linkage} object represents a connection between two node objects and an AirflowNetwork component. The node objects can be an AirflowNetwork:Distribution:Node, AirflowNetwork:MultiZone:ExternalNode or AirflowNetwork:Multizone:Zone.
+  \textbf{AirflowNetwork:Distribution:Linkage} object represents a connection between two node objects and an AirflowNetwork component. The node objects can be an AirflowNetwork:Distribution:Node, AirflowNetwork:MultiZone:ExternalNode or AirflowNetwork:MultiZone:Zone.
 \end{itemize}
 
-If you input wind pressure coefficients, \textbf{AirflowNetwork:Multizone:Surface} also has an associated \textbf{AirflowNetwork:MultiZone:ExternalNode}, that, via the \textbf{AirflowNetwork:Multizone:WindPressureCoefficientArray} and \textbf{AirflowNetwork:MultiZone:WindPressureCoefficientValues} objects, gives the wind pressure distribution vs.~wind direction for that node and, implicitly, for the cracks and openings in the exterior surfaces associated with that node.
+If you input wind pressure coefficients, \textbf{AirflowNetwork:MultiZone:Surface} also has an associated \textbf{AirflowNetwork:MultiZone:ExternalNode}, that, via the \textbf{AirflowNetwork:MultiZone:WindPressureCoefficientArray} and \textbf{AirflowNetwork:MultiZone:WindPressureCoefficientValues} objects, gives the wind pressure distribution vs.~wind direction for that node and, implicitly, for the cracks and openings in the exterior surfaces associated with that node.
 
-Figure~\ref{fig:relationships-among-airflownetwork-objects} shows the relationships among AirflowNetwork:Multizone objects and between AirflowNetwork:Multizone objects and regular EnergyPlus objects. In this figure an arrow from object A to object B means A references B, i.e., one of the inputs in A is the name of object B. For example, one input for AirflowNetwork: Multizone:Surface is the name of a heat transfer surface, and another is the name of a crack or opening object. The arrow between AirflowNetwork:Multizone:Surface and AirflowNetwork:MultiZone:ExternalNode is shown dashed to indicate that this reference is not used when wind pressure coefficients are calculated by the program rather than being input by the user.
+Figure~\ref{fig:relationships-among-airflownetwork-objects} shows the relationships among AirflowNetwork:MultiZone objects and between AirflowNetwork:MultiZone objects and regular EnergyPlus objects. In this figure an arrow from object A to object B means A references B, i.e., one of the inputs in A is the name of object B. For example, one input for AirflowNetwork: MultiZone:Surface is the name of a heat transfer surface, and another is the name of a crack or opening object. The arrow between AirflowNetwork:MultiZone:Surface and AirflowNetwork:MultiZone:ExternalNode is shown dashed to indicate that this reference is not used when wind pressure coefficients are calculated by the program rather than being input by the user.
 
-Figure~\ref{fig:relationships-among-airflownetwork-objects} also shows the relationships among AirflowNetwork:Distribution objects and between AirflowNetwork:Distribution objects and regular EnergyPlus objects. The AirflowNetwork:Distribution:Linkage objects link two nodes from AirflowNetwork:Distribution:Node and/or AirflowNetwork:Multizone:Zone objects with a component defined in the object AirflowNetwork:Distribution:Component. The solid arrows show a reference from object A to object B. The dashed arrows indicate the components which can be used in a linkage object. The red arrows pointing to the Zone object indicate the components that interact with the zone air. For example, the temperature in a zone where a supply leak terminates is used to calculate duct leakage energy loss. The temperature in a zone where a duct component is located is also used to calculate duct conduction loss.
+Figure~\ref{fig:relationships-among-airflownetwork-objects} also shows the relationships among AirflowNetwork:Distribution objects and between AirflowNetwork:Distribution objects and regular EnergyPlus objects. The AirflowNetwork:Distribution:Linkage objects link two nodes from AirflowNetwork:Distribution:Node and/or AirflowNetwork:MultiZone:Zone objects with a component defined in the object AirflowNetwork:Distribution:Component. The solid arrows show a reference from object A to object B. The dashed arrows indicate the components which can be used in a linkage object. The red arrows pointing to the Zone object indicate the components that interact with the zone air. For example, the temperature in a zone where a supply leak terminates is used to calculate duct leakage energy loss. The temperature in a zone where a duct component is located is also used to calculate duct conduction loss.
 
 \begin{figure}[hbtp] % fig 93
 \centering
@@ -120,7 +120,7 @@ Figure~\ref{fig:relationships-among-airflownetwork-objects} also shows the relat
 
 Much of the information needed for the air flow calculation is automatically extracted from the building description for thermal modeling. This includes things like the volume and neutral height of the zones, and the orientation and location of the building surfaces that contain cracks or openings through which air flows. From all of this information the program creates a ``pressure-flow network'' that is solved each timestep using iterative solution methods to obtain the unknown pressures and air flows.
 
-Figure~\ref{fig:plan-view-of-a-simple-air-flow-network} shows a plan view of a very simple air flow network that you can construct using the above AirflowNetwork objects. There are three thermal zones, Zone-1, Zone-2 and Zone-3. There are openable exterior windows---Window-1, Window-2 and Window-3---and openable interior doors---Door-12 and Door-23. Two External Nodes are indicated. ExternalNode-1 is associated with the façade that contains Window-1 and Window-2. ExternalNode-2 is associated with the façade containing Window-3.
+Figure~\ref{fig:plan-view-of-a-simple-air-flow-network} shows a plan view of a very simple air flow network that you can construct using the above AirflowNetwork objects. There are three thermal zones, Zone-1, Zone-2 and Zone-3. There are openable exterior windows---Window-1, Window-2 and Window-3---and openable interior doors---Door-12 and Door-23. Two External Nodes are indicated. ExternalNode-1 is associated with the fa\c{c}ade that contains Window-1 and Window-2. ExternalNode-2 is associated with the fa\c{c}ade containing Window-3.
 
 One possible air flow pattern is shown in this figure. The actual air flow pattern in a particular timestep, and the size of the flows, depends on many factors, such as (1) What is the wind pressure distribution seen by the exterior windows? (2) Are the exterior windows open or closed, and if open, how far are they open? (3) Are the interior doors open or closed? (4) What are the air temperature differences between zones and between zones and the outdoor air (which affect buoyancy flows)?
 
@@ -130,7 +130,7 @@ One possible air flow pattern is shown in this figure. The actual air flow patte
 \caption{Plan view of a simple air flow network showing a possible air flow pattern in which all of the windows and doors are open. \protect \label{fig:plan-view-of-a-simple-air-flow-network}}
 \end{figure}
 
-Figure~\ref{fig:plan-view-of-a-simple-air-flow-network} shows a possible air flow pattern in which all of the windows and doors are open. Associated with the external nodes are wind pressure coefficient distributions as a function of wind direction that are input using two AirflowNetwork:Multizone:Wind Pressure Coefficient objects. The nature of the air flows through the windows and doors is specified using AirflowNetwork:MultiZone:Component:DetailedOpening and AirflowNetwork:MultiZone:Component:SimpleOpening objects. The Airflow Network model calculates the flows each system timestep depending on various factors, including wind direction and speed, size and vertical position of openings, outdoor air temperature, and zone air temperatures.
+Figure~\ref{fig:plan-view-of-a-simple-air-flow-network} shows a possible air flow pattern in which all of the windows and doors are open. Associated with the external nodes are wind pressure coefficient distributions as a function of wind direction that are input using two AirflowNetwork:MultiZone:Wind Pressure Coefficient objects. The nature of the air flows through the windows and doors is specified using AirflowNetwork:MultiZone:Component:DetailedOpening and AirflowNetwork:MultiZone:Component:SimpleOpening objects. The Airflow Network model calculates the flows each system timestep depending on various factors, including wind direction and speed, size and vertical position of openings, outdoor air temperature, and zone air temperatures.
 
 \subsection{Airflow Network Example Files (included in the installation)}\label{airflow-network-example-files-included-in-the-installation}
 
@@ -144,23 +144,23 @@ Figure~\ref{fig:plan-view-of-a-simple-air-flow-network} shows a possible air flo
 \item
   AirflowNetwork\_Simple\_SmallOffice.idf
 \item
-  AirflowNetwork\_Multizone\_House.idf
+  AirflowNetwork\_MultiZone\_House.idf
 \item
   AirflowNetwork\_MultiZone\_House\_OvercoolDehumid.idf
 \item
-  AirflowNetwork\_Multizone\_House\_TwoSpeed.idf
+  AirflowNetwork\_MultiZone\_House\_TwoSpeed.idf
 \item
-  AirflowNetwork\_Multizone\_SmallOffice.idf
+  AirflowNetwork\_MultiZone\_SmallOffice.idf
 \item
-  AirflowNetwork\_Multizone\_SmallOffice\_CoilHXAssistedDX.idf
+  AirflowNetwork\_MultiZone\_SmallOffice\_CoilHXAssistedDX.idf
 \item
   AirflowNetwork\_MultiZone\_SmallOffice\_GenericContam.idf
 \item
-  AirflowNetwork\_Multizone\_SmallOffice\_HeatRecoveryHXSL.idf
+  AirflowNetwork\_MultiZone\_SmallOffice\_HeatRecoveryHXSL.idf
 \item
-  AirflowNetwork\_Multizone\_SmallOffice\_VAV.idf
+  AirflowNetwork\_MultiZone\_SmallOffice\_VAV.idf
 \item
-  AirflowNetwor\_Multizone\_HorizontalOpening.idf
+  AirflowNetwor\_MultiZone\_HorizontalOpening.idf
 \item
   CrossVent\_1Zone\_AirflowNetwork.idf
 \item
@@ -174,61 +174,36 @@ Figure~\ref{fig:plan-view-of-a-simple-air-flow-network} shows a possible air flo
 Here is a list of some of the things that the Airflow Network calculation can and cannot model.
 
 \subsubsection{Can Do}\label{can-do}
-
-1)~~~Air flow through cracks in exterior or interzone surfaces.
-
-2)~~~Air flow through cracks around windows and doors when closed.
-
-3)~~~Natural ventilation (i.e., air flow through open or partially open exterior windows and doors).
-
-4)~~~Zone level control of natural ventilation (all windows/doors in a zone that are defined with a component opening object have identical controls).
-
-5)~~~Individual surface control of natural ventilation for a subsurface (window, door, or glassdoor).
-
-6)~~~Modulation of natural ventilation to prevent large zone air temperature swings.
-
-7)~~~Interzone air flow (i.e., air flow through open interzone windows and doors, and through cracks in interzone surfaces).
-
-8)~~~Dependence of air flow on buoyancy effects and wind pressure.
-
-9)~~~Dependence of wind pressure on wind speed, wind direction and surface orientation.
-
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi})}
-\setcounter{enumi}{9}
-\item
-  Supply and return air leaks in an air distribution system.
-\item
-  Account for the effect of supply-air and/or return-air leakage on zone pressure when a forced air distribution system is present and is operating.
-\item
-  When duct leakage is modeled and the HVAC system is on, interzone airflow or infiltration/exfiltration can occur due to changes in zone pressure.
-\item
-  Bi-directional flow through large openings. See discussion below under AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:Multizone:Component:HorizontalOpening, and AirflowNetwork:Multizone:Component:SimpleOpening.
-\item
-  Calculate air flows and pressures in ducts or other components of a forced air distribution system.
-\item
-  Calculate zone loads when the supply air fan cycles on and off during a system timestep using the CyclingFanAndCompressor fan operation mode (Fan:OnOff).
-\item
-  Determine the impact of zone exhaust fans on air flows, pressures, air temperatures/humidity levels and energy consumption.
+\item Air flow through cracks in exterior or interzone surfaces.
+\item Air flow through cracks around windows and doors when closed.
+\item Natural ventilation (i.e., air flow through open or partially open exterior windows and doors).
+\item Zone level control of natural ventilation (all windows/doors in a zone that are defined with a component opening object have identical controls).
+\item Individual surface control of natural ventilation for a subsurface (window, door, or glassdoor).
+\item Modulation of natural ventilation to prevent large zone air temperature swings.
+\item Interzone air flow (i.e., air flow through open interzone windows and doors, and through cracks in interzone surfaces).
+\item Dependence of air flow on buoyancy effects and wind pressure.
+\item Dependence of wind pressure on wind speed, wind direction and surface orientation.
+\item Supply and return air leaks in an air distribution system.
+\item Account for the effect of supply-air and/or return-air leakage on zone pressure when a forced air distribution system is present and is operating.
+\item When duct leakage is modeled and the HVAC system is on, interzone airflow or infiltration/exfiltration can occur due to changes in zone pressure.
+\item Bi-directional flow through large openings. See discussion below under AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening, and AirflowNetwork:MultiZone:Component:SimpleOpening.
+\item Calculate air flows and pressures in ducts or other components of a forced air distribution system.
+\item Calculate zone loads when the supply air fan cycles on and off during a system timestep using the CyclingFanAndCompressor fan operation mode (Fan:OnOff).
+\item Determine the impact of zone exhaust fans on air flows, pressures, air temperatures/humidity levels and energy consumption.
 \end{enumerate}
 
 \subsubsection{Cannot Do or Restricted}\label{cannot-do-or-restricted}
-
-1)~~~The model is restricted to using a constant volume fan (Fan:ConstantVolume and Fan:OnOff) and cannot model variable volume fan equipment.
-
-2)~~~Air circulation and/or air temperature stratification within a thermal zone. For example, you should not try to divide a high space, such as an atrium, into subzones separated by artificial horizontal surfaces that have cracks or openings with the expectation that AirflowNetwork will give you a realistic temperature in each subzone and/or a realistic air flow between subzones.
-
-3)~~~The model is restricted to eleven types of coils that can be in the air distribution system (Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas, Coil:Heating:Electric,~ Coil:Heating:DX:SingleSpeed, Coil:Cooling:Water, Coil:Heating:Water, Coil:Cooling:Water:DetailedGeometry, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:MultiSpeed, Coil:Heating:DX:MultiSpeed, and Coil:Heating:Desuperheater).
-
-4)~~~The model is restricted to a single type of air distribution equipment terminal units (AirTerminal:SingleDuct:ConstantVolume:Reheat).
-
-5)~~~Pollutant transport cannot currently be modeled.
-
-6)~~~Supply and return leaks are not allowed in an AirLoopHVAC. They can only be modeled in the Zone Equipment portion of the air loop (i.e., return leaks may be modeled between the zone return node and the zone mixer inlet or the zone mixer outlet and the zone equipment loop outlet; and supply leaks may be modeled between the zone equipment loop inlet and the AirLoopHVAC:ZoneSplitter inlet node or the AirLoopHVAC:ZoneSplitter outlet node and the zone supply node).
-
-7)~~~An air distribution system must be located inside the building (i.e., the ducts must pass through zones within the building).
-
-8)~~~Zone exhaust fans must be defined in ZoneHVAC:EquipmentConnections objects.
+\begin{enumerate}
+\item The model is restricted to using a constant volume fan (Fan:ConstantVolume and Fan:OnOff) and cannot model variable volume fan equipment.
+\item Air circulation and/or air temperature stratification within a thermal zone. For example, you should not try to divide a high space, such as an atrium, into subzones separated by artificial horizontal surfaces that have cracks or openings with the expectation that AirflowNetwork will give you a realistic temperature in each subzone and/or a realistic air flow between subzones.
+\item The model is restricted to eleven types of coils that can be in the air distribution system (Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel, Coil:Heating:Electric,~ Coil:Heating:DX:SingleSpeed, Coil:Cooling:Water, Coil:Heating:Water, Coil:Cooling:Water:DetailedGeometry, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:MultiSpeed, Coil:Heating:DX:MultiSpeed, and Coil:Heating:Desuperheater).
+\item The model is restricted to a single type of air distribution equipment terminal units (AirTerminal:SingleDuct:ConstantVolume:Reheat).
+\item Pollutant transport cannot currently be modeled.
+\item Supply and return leaks are not allowed in an AirLoopHVAC. They can only be modeled in the Zone Equipment portion of the air loop (i.e., return leaks may be modeled between the zone return node and the zone mixer inlet or the zone mixer outlet and the zone equipment loop outlet; and supply leaks may be modeled between the zone equipment loop inlet and the AirLoopHVAC:ZoneSplitter inlet node or the AirLoopHVAC:ZoneSplitter outlet node and the zone supply node).
+\item An air distribution system must be located inside the building (i.e., the ducts must pass through zones within the building).
+\item Zone exhaust fans must be defined in ZoneHVAC:EquipmentConnections objects.
+\end{enumerate}
 
 The input specifications consist of five main sections: \textbf{AirflowNetwork:SimulationControl object, AirflowNetwork multizone data objects, AirflowNetwork distribution node objects, AirflowNetwork distribution component objects,} and \textbf{AirflowNetwork distribution linkage objects.} Each of these object types is described in detail below.
 
@@ -246,13 +221,13 @@ This is a unique character string associated with this instance of the AirflowNe
 
 The following selections are available to control the Airflow Network simulation:
 
-\textbf{MultizoneWithDistribution:} Multizone air flow calculations are performed during all simulation timesteps, including the impacts of the air distribution system when a HVAC system fan is operating. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{ZoneMixing} and \textbf{ZoneCrossMixing} objects specified in the input data file are not simulated.
+\textbf{MultiZoneWithDistribution:} MultiZone air flow calculations are performed during all simulation timesteps, including the impacts of the air distribution system when a HVAC system fan is operating. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{ZoneMixing} and \textbf{ZoneCrossMixing} objects specified in the input data file are not simulated.
 
-\textbf{MultizoneWithoutDistribution}: Multizone air flow calculations are performed during all simulation timesteps, but the air distribution system portion of the network is not modeled even if it is specified in the input data file. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{ZoneMixing} and \textbf{ZoneCrossMixing} objects specified in the input data file are not simulated.
+\textbf{MultiZoneWithoutDistribution}: MultiZone air flow calculations are performed during all simulation timesteps, but the air distribution system portion of the network is not modeled even if it is specified in the input data file. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{ZoneMixing} and \textbf{ZoneCrossMixing} objects specified in the input data file are not simulated.
 
-\textbf{MultizoneWithDistributionOnlyDuringFanOperation:} Multizone air flow calculations, including the impacts of the air distribution system, are only performed when the HVAC system fan is operating. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{ZoneMixing} and \textbf{ZoneCrossMixing} objects specified in the input data file are used when the HVAC system fan is OFF (if none are specified, then no air flow calculations are performed when the fan is OFF).
+\textbf{MultiZoneWithDistributionOnlyDuringFanOperation:} MultiZone air flow calculations, including the impacts of the air distribution system, are only performed when the HVAC system fan is operating. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{ZoneMixing} and \textbf{ZoneCrossMixing} objects specified in the input data file are used when the HVAC system fan is OFF (if none are specified, then no air flow calculations are performed when the fan is OFF).
 
-\textbf{NoMultizoneOrDistribution:} No multizone air flow calculations (with or without the air distribution system portion of the network) are performed during the simulation. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{ZoneMixing} and \textbf{ZoneCrossMixing} objects specified in the input data file are simulated (if none are specified, then no air flow calculations are performed). Note: Having an input data file with no AirflowNetwork:SimulationControl objects gives the same impact -- no multizone air flow calculations. However, this choice is provided as a convenience to the user to easily disable the multizone air flow calculations for an input data file that already contains AirflowNetwork objects.
+\textbf{NoMultiZoneOrDistribution:} No multizone air flow calculations (with or without the air distribution system portion of the network) are performed during the simulation. Any \textbf{ZoneInfiltration:*}, \textbf{ZoneVentilation:*}, \textbf{ZoneMixing} and \textbf{ZoneCrossMixing} objects specified in the input data file are simulated (if none are specified, then no air flow calculations are performed). Note: Having an input data file with no AirflowNetwork:SimulationControl objects gives the same impact -- no multizone air flow calculations. However, this choice is provided as a convenience to the user to easily disable the multizone air flow calculations for an input data file that already contains AirflowNetwork objects.
 
 \textbf{Note:} A \textbf{ZoneInfiltration:*} object indicates any one of \textbf{ZoneInfiltration:DesignFlowRate}, \textbf{ZoneInfiltration:EffectiveLeakageArea},and \textbf{ZoneInfiltration:FlowCoefficient} objects.A object of\textbf{ZoneVentilation:*} indicates any one of \textbf{ZoneVentilation:DesignFlowRate} and \textbf{ZoneVentilation:WindandStackOpenArea} objects\textbf{.}
 
@@ -262,13 +237,7 @@ Determines whether the wind pressure coefficients are input by the user or calcu
 
 If INPUT, you must enter an AirflowNetwork:MultiZone:WindPressureCoefficientArray object, one or more AirflowNetwork:MultiZone:ExternalNode objects, and one or more AirflowNetwork:MultiZone:WindPressureCoefficientValues objects.
 
-The second choice, SurfaceAverageCalculation, should only be used for \textbf{rectangular} buildings. In this case surface-average wind pressure coefficients vs.~wind direction are calculated by the program for the four vertical facades and the roof based on user entries for ``Building Type,'' ``Azimuth Angle of Long Axis of Building,'' and ``Ratio of Building Width Along Short Axis to Width Along Long Axis'' (see description of these fields below). With this choice you do \textbf{not} have to enter any of the following objects: AirflowNetwork:MultiZone: Wind Pressure Coefficient Array, AirflowNetwork:MultiZone:ExternalNode and AirflowNetwork:MultiZone:WindPressureCoefficientValues.
-
-\paragraph{Field: AirflowNetwork Wind Pressure Coefficient Array Name}\label{field-airflownetwork-wind-pressure-coefficient-array-name}
-
-This is the name of the AirflowNetwork:MultiZone:WindPressureCoefficientArray object that contains wind directions corresponding to the wind pressure coefficients given in the AirflowNetwork:MultiZone:WindPressureCoefficientValues objects.
-
-A value need be entered only if Wind Pressure Coefficient Type = INPUT (see description of previous field).
+The second choice, SurfaceAverageCalculation, should only be used for \textbf{rectangular} buildings. In this case surface-average wind pressure coefficients vs.~wind direction are calculated by the program for the four vertical fa\c{c}ades and the roof based on user entries for ``Building Type,'' ``Azimuth Angle of Long Axis of Building,'' and ``Ratio of Building Width Along Short Axis to Width Along Long Axis'' (see description of these fields below). With this choice you do \textbf{not} have to enter any of the following objects: AirflowNetwork:MultiZone: Wind Pressure Coefficient Array, AirflowNetwork:MultiZone:ExternalNode and AirflowNetwork:MultiZone:WindPressureCoefficientValues.
 
 \paragraph{Field: Height Selection for Local Wind Pressure Calculation}\label{field-height-selection-for-local-wind-pressure-calculation}
 
@@ -319,7 +288,7 @@ This is the aspect ratio of a rectangular footprint. It is given by the width of
 \begin{figure}[hbtp] % fig 95
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image221.png}
-\caption{Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the “Azimuth Angle of Long Axis of Building.”  *w\$\_\{short\}\$*/*w\$\_\{long\}\$* is the “Ratio of Building Width Along Short Axis to Width Along Long Axis.” \protect \label{fig:footprint-of-a-rectangular-building-showing}}
+\caption{Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the ``Azimuth Angle of Long Axis of Building.''  $w_{short}/w_{long}$ is the ``Ratio of Building Width Along Short Axis to Width Along Long Axis.'' \protect \label{fig:footprint-of-a-rectangular-building-showing}}
 \end{figure}
 
 \paragraph{Field: Height Dependence of External Node Temperature}\label{field-height-dependence-of-external-node-temperature}
@@ -329,7 +298,6 @@ This is an optional field. Input is Yes or No. The default is No. Yes is that ex
 An IDF example is shown below:
 
 \begin{lstlisting}
-
 AirflowNetwork:SimulationControl,
       AirflowNetwork_All,      !- Name
       MultiZoneWithDistribution,  !- AirflowNetwork Control
@@ -346,7 +314,7 @@ AirflowNetwork:SimulationControl,
       1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
 \end{lstlisting}
 
-AirflowNetwork:Multizone data objects are used to calculate multizone airflows. This section describes the input requirements for the following objects:
+AirflowNetwork:MultiZone data objects are used to calculate multizone airflows. This section describes the input requirements for the following objects:
 
 \begin{itemize}
 \tightlist
@@ -354,7 +322,7 @@ AirflowNetwork:Multizone data objects are used to calculate multizone airflows. 
   AirflowNetwork:MultiZone:Zone
 \end{itemize}
 
-AirflowNetwork:Multizone data objects are used to calculate multizone airflows. This section describes the input requirements for the following objects:
+AirflowNetwork:MultiZone data objects are used to calculate multizone airflows. This section describes the input requirements for the following objects:
 
 \begin{itemize}
 \item
@@ -385,11 +353,11 @@ AirflowNetwork:Multizone data objects are used to calculate multizone airflows. 
 
 A detailed description for each of these objects is provided below.
 
-\subsection{AirflowNetwork:Multizone:Zone}\label{airflownetworkmultizonezone}
+\subsection{AirflowNetwork:MultiZone:Zone}\label{airflownetworkmultizonezone}
 
-This object allows control of natural ventilation through exterior and interior openings in a zone, where ``opening'' is defined as an openable window or door. (Note that only window, door or glass door subsurfaces in a zone that are specified using AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening or AirflowNetwork:Multizone:Component:SimpleOpening and have an associated AirflowNetwork:Multizone:Surface object are considered to be openings). The control will be applied in the same way to all of the openings in the zone.
+This object allows control of natural ventilation through exterior and interior openings in a zone, where ``opening'' is defined as an openable window or door. (Note that only window, door or glass door subsurfaces in a zone that are specified using AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening or AirflowNetwork:MultiZone:Component:SimpleOpening and have an associated AirflowNetwork:MultiZone:Surface object are considered to be openings). The control will be applied in the same way to all of the openings in the zone.
 
-This object is required to perform Airflow Network calculations. Note that ventilation control for all openings is provided at the zone level as default and individual ventilation control of a surface opening can be used to override the zone-level control (see the AirflowNetwork:Multizone:Surface object description below).
+This object is required to perform Airflow Network calculations. Note that ventilation control for all openings is provided at the zone level as default and individual ventilation control of a surface opening can be used to override the zone-level control (see the AirflowNetwork:MultiZone:Surface object description below).
 
 \subsubsection{Field: Zone Name}\label{field-zone-name-001}
 
@@ -443,11 +411,11 @@ See Figure~\ref{fig:modulation-of-venting-area-according-to} or Figure~\ref{fig:
 
 \subsubsection{Field: Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor}\label{field-indoor-and-outdoor-temperature-difference-lower-limit-for-maximum-venting-open-factor}
 
-See Figure~\ref{fig:modulation-of-venting-area-according-to}. This field applies only if Ventilation Control Mode = Temperature. This value may be from zero to less than 100˚C, with the default being 0˚C. The value for this field must be less than the value specified for the following field.
+See Figure~\ref{fig:modulation-of-venting-area-according-to}. This field applies only if Ventilation Control Mode = Temperature. This value may be from zero to less than \SI{100}{\celsius}, with the default being \SI{0}{\celsius}. The value for this field must be less than the value specified for the following field.
 
 \subsubsection{Field: Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor}\label{field-indoor-and-outdoor-temperature-difference-upper-limit-for-minimun-venting-open-factor}
 
-See Figure~\ref{fig:modulation-of-venting-area-according-to}. This field applies only if Ventilation Control Mode = Temperature. This value must be greater than 0˚C, with the default being 100˚C. The value for this field must be greater than the value specified for the previous field..
+See Figure~\ref{fig:modulation-of-venting-area-according-to}. This field applies only if Ventilation Control Mode = Temperature. This value must be greater than \SI{0}{\celsius}, with the default being \SI{100}{\celsius}. The value for this field must be greater than the value specified for the previous field..
 
 \subsubsection{Field: Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor}\label{field-indoor-and-outdoor-enthalpy-difference-lower-limit-for-maximum-venting-open-factor}
 
@@ -469,6 +437,37 @@ If used with Ventilation Control Mode = Constant, the ventilation rate is consta
 
 If Ventilation Control Mode = NoVent, this schedule has no effect.
 
+\subsubsection{Field: Single Sided Wind Pressure Coefficient Algorithm}
+
+Specifies the type of single sided wind pressure coefficient algorithm to be used for
+the zone. This field is optional and is only used if Wind Pressure Coefficient Type is
+set to SurfaceAverageCalculation. The default is Standard and the two valid choices are:
+
+\textbf{Standard}: A single wind pressure coefficient is applied to all openings in the
+zone, as calculated using SurfaceAverageCalculation.
+
+\textbf{Advanced}: EnergyPlus calculates modified wind pressure coefficients for the two
+openings in the zone. This model is only valid for zones with two openings, both of which
+are on a single fa\c{c}ade (i.e. are coplanar). For zones with more than two openings,
+consider combining the openings into two. The modified wind pressure coefficients account
+for wind direction and turbulence effects on single sided ventilation rates. See the
+Engineering Reference for a detailed description of the Advanced algorithm. When the
+Advanced algorithm is selected, the difference between the two modified wind pressure
+coefficients are output to the .eio file.
+ 
+\subsubsection{Field: Fa\c{c}ade Width}
+This is the whole building width along the direction of the facade of this zone, or
+$W_F$ in Figure \ref{fig:single-sided-footprint}. This field is used in the Single
+Sided Wind Pressure Coefficient Algorithm. This field is optional and is only used if
+the Single Sided Wind Pressure Coefficient Algorithm is set to Advanced. The value must
+be greater than 0.0 m, with the default being 10 m.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/single-sided-footprint.png}
+\caption{Footprint of a rectangular building showing $W_F$, the ``Fa\c{c}ade Width'', used by the Single Sided Wind Pressure Coefficient Algorithm. \protect \label{fig:single-sided-footprint}}
+\end{figure}
+
 \subsubsection{Field: Occupant Ventilation Control Name}\label{field-occupant-ventilation-control-name}
 
 The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the ventilation control defined in the Ventilation Control Mode field will be overridden.
@@ -487,12 +486,11 @@ The name of an AirlowNetwork:OccupantVentilationControl object. The object is us
 \caption{Modulation of venting area according to inside-outside enthalpy difference. \protect \label{fig:modulation-of-venting-area-according-to-001}}
 \end{figure}
 
-\textbf{Note:} In order to establish an airflow network, each AirflowNetwork:Multizone:Zone object must have at least two surfaces defined with AirflowNetwork:Multizone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:Multizone:Surface objects facing the same Zone (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).
+\textbf{Note:} In order to establish an airflow network, each AirflowNetwork:MultiZone:Zone object must have at least two surfaces defined with AirflowNetwork:MultiZone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:MultiZone:Surface objects facing the same Zone (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).
 
 An IDF example is shown below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:Zone,
       RESISTIVE ZONE,          !- Name of Associated Thermal Zone
       Temperature,             !- Ventilation Control Mode
@@ -510,9 +508,9 @@ AirflowNetwork:MultiZone:Zone,
       VentingSched;            !- Venting Availability Schedule Name
 \end{lstlisting}
 
-\subsection{AirflowNetwork:Multizone:Surface}\label{airflownetworkmultizonesurface}
+\subsection{AirflowNetwork:MultiZone:Surface}\label{airflownetworkmultizonesurface}
 
-The AirflowNetwork:Multizone:Surface object specifies the properties of a surface ``linkage'' through which air flows. This linkage is always associated with a heat transfer surface (wall, roof, floor, or a ceiling) or subsurface (door, glass door, or window) with both faces exposed to air. The linkage specifies two connected nodes: two zone nodes defined in AirflowNetwork:Multizone:Zone objects based on inside and outside face environment for an interior surface, or a zone node defined in an AirflowNetwork:Multizone:Zone object based on inside face environment and an external node defined in an AirflowNetwork:MultiZone:ExternalNode object for an exterior surface. The associated leakage component for this surface can be a crack (or surface effective leakage area) in an exterior or interior heat transfer surface or subsurface, or an exterior or interior window, door or glass door (heat transfer subsurface) that can be opened to allow air flow. The allowed surface air leakage components are:
+The AirflowNetwork:MultiZone:Surface object specifies the properties of a surface ``linkage'' through which air flows. This linkage is always associated with a heat transfer surface (wall, roof, floor, or a ceiling) or subsurface (door, glass door, or window) with both faces exposed to air. The linkage specifies two connected nodes: two zone nodes defined in AirflowNetwork:MultiZone:Zone objects based on inside and outside face environment for an interior surface, or a zone node defined in an AirflowNetwork:MultiZone:Zone object based on inside face environment and an external node defined in an AirflowNetwork:MultiZone:ExternalNode object for an exterior surface. The associated leakage component for this surface can be a crack (or surface effective leakage area) in an exterior or interior heat transfer surface or subsurface, or an exterior or interior window, door or glass door (heat transfer subsurface) that can be opened to allow air flow. The allowed surface air leakage components are:
 
 \begin{itemize}
 \item
@@ -531,15 +529,11 @@ The AirflowNetwork:Multizone:Surface object specifies the properties of a surfac
 
 The two ``opening'' components are used to modulate openness based on required conditions.
 
-The AirflowNetwork:Multizone:Surface object allows a heat transfer surface or subsurface to have one crack (or one surface effective leakage area object), or a subsurface (i.e., window, door or glass door) to have one opening (detailed or simple).
+The AirflowNetwork:MultiZone:Surface object allows a heat transfer surface or subsurface to have one crack (or one surface effective leakage area object), or a subsurface (i.e., window, door or glass door) to have one opening (detailed or simple).
 
-An interior heat transfer surface (BuildingSurface:Detailed) whose surface name is used as the input for the Outside Boundary Condition Object field represents a floor without ground contact and is not allowed as an AirflowNetwork:Multizone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
+An interior heat transfer surface (BuildingSurface:Detailed) whose surface name is used as the input for the Outside Boundary Condition Object field represents a floor without ground contact and is not allowed as an AirflowNetwork:MultiZone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
 
-When a triangular subsurface is used, the model provides a warning and treats this subsurface as rectangular. The effective width and height calculated in the ProcessSurfaceVertices function of the SurfaceGeometry module are used to represent a rectangular subsurface.
-
-Effective width = 0.75 x Length between Vertex 1 and Vertex 2
-
-Effective height = 4 x Area / ( 3 x Length between Vertex 2 and Vertex 3 )
+When a non-rectangular subsurface is used, the model will automatically convert it into a rectangular subsurface using equivalent width and height based on an entered choice from the Equivalent Rectangle Method field or a default choice.
 
 \subsubsection{Field: Surface Name}\label{field-surface-name-000}
 
@@ -553,7 +547,7 @@ Information on this surface is used by the program as follows:
 
 (3)~~This heat transfer surface determines the height of the linkage, which is used in calculating buoyancy-related flow through the linkage.
 
-\textbf{Note:} It is possible to define an interzone surface twice in EnergyPlus, once in each of the zones that the surface separates. Previously this was a requirement of EnergyPlus (prior to version 2.0), but now it is optional and the user also has the option of only defining the surface once (EnergyPlus defines the second surface automatically within the program). For each interzone surface, use only one (of possible two) interzone surface names in the AirflowNetwork:Multizone:Surface object for ``Surface Name.'' \textbf{Do not} enter two AirflowNetwork:Multizone:Surface objects corresponding to the two possible interzone names. This would cause the air flow through the surface to be counted twice.
+\textbf{Note:} It is possible to define an interzone surface twice in EnergyPlus, once in each of the zones that the surface separates. Previously this was a requirement of EnergyPlus (prior to version 2.0), but now it is optional and the user also has the option of only defining the surface once (EnergyPlus defines the second surface automatically within the program). For each interzone surface, use only one (of possible two) interzone surface names in the AirflowNetwork:MultiZone:Surface object for ``Surface Name.'' \textbf{Do not} enter two AirflowNetwork:MultiZone:Surface objects corresponding to the two possible interzone names. This would cause the air flow through the surface to be counted twice.
 
 \subsubsection{Field: Leakage Component Name}\label{field-leakage-component-name}
 
@@ -567,19 +561,23 @@ If the name of an AirflowNetwork:MultiZone:Component:ZoneExhaustFan is given her
 
 \subsubsection{Field: External Node Name}\label{field-external-node-name}
 
-The name of the associated AirflowNetwork:MultiZone:ExternalNode object, which determines the wind pressure coefficients for the heat transfer surface. Used only if Surface Name is for an exterior surface.
+The name of the associated AirflowNetwork:MultiZone:ExternalNode object, which
+determines the wind pressure coefficients for the heat transfer surface. Used
+only if Surface Name is for an exterior surface.
 
-If Wind Pressure Coefficient Type = SurfaceAverageCalculation in the AirflowNetwork:SimulationControl object, this field is not used and a blank may be entered. If the surface is an interior (i.e., interzone) surface, leave this field blank.
+If Wind Pressure Coefficient Type = SurfaceAverageCalculation in the AirflowNetwork:SimulationControl
+object, this field is not used and a blank may be entered. If the surface is an
+interior (i.e., interzone) surface, leave this field blank.
 
 \subsubsection{Field: Window/Door Opening Factor, or Crack Factor}\label{field-windowdoor-opening-factor-or-crack-factor}
 
-If this linkage is associated with an AirflowNetwork:MultiZone:Component:DetailedOpening or AirflowNetwork:MultiZone:Component:SimpleOpening object (which means it is an openable window or door), then this field is called ``Window/Door Opening Factor'' and represents the value of the Opening Factor that is in effect when the Vent Temperature Schedule (defined in the AirflowNetwork:Multizone:Zone object) indicates that this window or door is open.
+If this linkage is associated with an AirflowNetwork:MultiZone:Component:DetailedOpening or AirflowNetwork:MultiZone:Component:SimpleOpening object (which means it is an openable window or door), then this field is called ``Window/Door Opening Factor'' and represents the value of the Opening Factor that is in effect when the Vent Temperature Schedule (defined in the AirflowNetwork:MultiZone:Zone object) indicates that this window or door is open.
 
 The AirflowNetwork model uses a combination of factors to determine the actual opening area for a window or door when it is venting. For example, consider a window that is 1.5m high and 2.0m wide (excluding frame). Assume that the AirflowNetwork:MultiZone:Component:DetailedOpening for this window has Type of Large Vertical Opening = 1 (non-pivoting window), Height Factor = 0.5 and Width Factor = 0.8. Then when the window is fully open, the opening area = height of opening (0.5x1.5) times width of opening (0.8x2.0) = 0.75x1.6 = 1.2 m\(^{2}\). If the Window/Door Opening Factor is 0.75, then the opening area = 0.75x1.2 = 0.9 m\(^{2}\).
 
-If, in addition, the window is in a thermal zone for which opening modulation has been specified (ref: AirflowNetwork:Multizone:Zone) and the multiplication factor due to modulation is 0.3 in a particular timestep, then the actual opening factor that timestep = 0.3x0.75 = 0.225 and the actual opening area that timestep = 0.3x0.9 = 0.27 m\(^{2}\).
+If, in addition, the window is in a thermal zone for which opening modulation has been specified (ref: AirflowNetwork:MultiZone:Zone) and the multiplication factor due to modulation is 0.3 in a particular timestep, then the actual opening factor that timestep = 0.3x0.75 = 0.225 and the actual opening area that timestep = 0.3x0.9 = 0.27 m\(^{2}\).
 
-If this linkage is associated with an AirflowNetwork:MultiZone:Surface:Crack object, the following crack air flow equation is used. 
+If this linkage is associated with an AirflowNetwork:MultiZone:Surface:Crack object, the following crack air flow equation is used.
 
 \begin{equation}
 Q = \left( Crack\;Factor \right) * C_T * C_Q \left( \Delta P \right)^{n}
@@ -587,29 +585,39 @@ Q = \left( Crack\;Factor \right) * C_T * C_Q \left( \Delta P \right)^{n}
 
 Where
 
-\emph{Q}~~~ = air mass flow (kg/s)
+$Q$ is the air mass flow (kg/s)
 
-\emph{C\(_{Q}\)}~ = air mass flow coefficient (kg/s @ 1 Pa)
+$C_Q$ is the air mass flow coefficient (kg/s @ 1 Pa)
 
-\emph{C\(_{T}\)}~ = reference condition temperature correction factor (dimensionless). See AirflowNetwork:MultiZone:Surface:Crack object.
+$C_T$ is the reference condition temperature correction factor (dimensionless). See AirflowNetwork:MultiZone:Surface:Crack object.
 
-\(\Delta P\) = pressure difference across crack (Pa)
+$\Delta P$ is the pressure difference across crack (Pa)
 
-\emph{n}~~~ = air flow exponent (dimensionless)
+$n$ is the air flow exponent (dimensionless)
 
-\emph{The following fields control venting. They are used only when Name of Associated Heat Transfer Surface is that of an openable exterior or interior window, door or glass door. They only apply to openings, and do not apply to surface cracks, effective leakage area or zone exhaust fans. If none of these fields is specified, or if Ventilation Control Mode = ZoneLevel, venting is controlled by the AirflowNetwork:Multizone:Zone object for the thermal zone containing the window or door (ref: AirflowNetwork:Multizone:Zone Data).}
+\emph{The following fields control venting. They are used only when Name of Associated Heat Transfer Surface is that of an openable exterior or interior window, door or glass door. They only apply to openings, and do not apply to surface cracks, effective leakage area or zone exhaust fans. If none of these fields is specified, or if Ventilation Control Mode = ZoneLevel, venting is controlled by the AirflowNetwork:MultiZone:Zone object for the thermal zone containing the window or door (ref: AirflowNetwork:MultiZone:Zone Data).}
 
 \subsubsection{Field: Ventilation Control Mode}\label{field-ventilation-control-mode-1}
 
 Specifies the type of surface-level natural ventilation control.
 
-Let T\(_{out}\) equal the outdoor air temperature, T\(_{zone}\) equal the previous timestep's zone air temperature, T\(_{set}\) equal the Vent Temperature Schedule value, H\(_{zone}\) equal the specific enthalpy of zone air from the previous timestep, and H\(_{out}\) equal the specific enthalpy of outdoor air. Then the four allowed choices for Ventilation Control Mode are:
+Let $T_{out}$ equals the outdoor air temperature, $T_{zone}$ equals the previous
+timestep's zone air temperature, $T_{set}$ equals the Vent Temperature Schedule
+value, $H_{zone}$ equals the specific enthalpy of zone air from the previous
+timestep, and $H_{out}$ equals the specific enthalpy of outdoor air. Then the
+four allowed choices for Ventilation Control Mode are:
 
-\textbf{NoVent}: The openable window or door associated with this surface is closed at all times independent of indoor or outdoor conditions. The Venting Availability Schedule is ignored in this case.
+\textbf{NoVent}: The openable window or door associated with this surface is
+closed at all times independent of indoor or outdoor conditions. The
+Venting Availability Schedule is ignored in this case.
 
-\textbf{Temperature}: The openable window or door associated with this surface is opened if T\(_{zone}\) \textgreater{} T\(_{out}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule (see below) allows venting.
+\textbf{Temperature}: The openable window or door associated with this surface
+is opened if $T_{zone} > T_{out}$ \textbf{and} $T_{zone} > T_{set}$ \textbf{and}
+Venting Availability Schedule (see below) allows venting.
 
-\textbf{Enthalpy:} The openable window or door associated with this surface is opened if H\(_{zone}\) \textgreater{} H\(_{out}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule allows venting.
+\textbf{Enthalpy:} The openable window or door associated with this surface is
+opened if $H_{zone} > H_{out}$ \textbf{and} $T_{zone} > T_{set}$ \textbf{and}
+Venting Availability Schedule allows venting.
 
 \textbf{Constant}: Whenever this object's Venting Availability Schedule allows venting, the openable window or door associated with this surface is open, independent of indoor or outdoor conditions. Note that ``Constant'' here means that the size of this opening is fixed while venting; the air flow through this opening can, of course, vary from timestep to timestep.
 
@@ -617,11 +625,19 @@ Let T\(_{out}\) equal the outdoor air temperature, T\(_{zone}\) equal the previo
 
 \textbf{CEN15251Adaptive:} The openable window or door associated with this surface is opened if the operative temperature is greater than the comfort temperature (central line) calculated from the CEN15251 adaptive comfort model \textbf{and} Venting Availability Schedule allows venting.
 
-\textbf{ZoneLevel}: Venting of the window or door is not controlled individually, but is controlled instead at the zone level. This means that the venting is determined by the AirflowNetwork:Multizone:Zone object for the thermal zone containing the window or door (ref: AirflowNetwork:Multizone:Zone object). This is the default value for this field.
+\textbf{ZoneLevel}: Venting of the window or door is not controlled individually, but is controlled instead at the zone level. This means that the venting is determined by the AirflowNetwork:MultiZone:Zone object for the thermal zone containing the window or door (ref: AirflowNetwork:MultiZone:Zone object). This is the default value for this field.
 
-\textbf{AdjacentTemperature}: This choice is used for an interior surface only. The openable interior window or door associated with this surface is opened if T\(_{zone}\) \textgreater{} T\(_{adjacent\\ zone}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule (see below) allows venting, where T\(_{adjacent\\ zone}\)is the adjacent zone temperature.
+\textbf{AdjacentTemperature}: This choice is used for an interior surface only.
+The openable interior window or door associated with this surface is opened if
+$T_{zone} > T_{adjacent\ zone}$ \textbf{and} $T_{zone} > T_{set}$ \textbf{and}
+Venting Availability Schedule (see below) allows venting, where $T_{adjacent\ zone}$
+is the adjacent zone temperature.
 
-\textbf{AdjacentEnthalpy:} This choice is also used for an interior surface only. The interior openable window or door associated with this surface is opened if H\(_{zone}\) \textgreater{} H\(_{adjacent\\ zone}\) \textbf{and} T\(_{zone}\) \textgreater{} T\(_{set}\) \textbf{and} Venting Availability Schedule allows venting, where H\(_{adjacent\\ zone}\)is the adjacent zone specific enthalpy.
+\textbf{AdjacentEnthalpy:} This choice is also used for an interior surface only.
+The interior openable window or door associated with this surface is opened if
+$H_{zone} > H_{adjacent\ zone}$ \textbf{and} $T_{zone} > T_{set}$ \textbf{and}
+Venting Availability Schedule allows venting, where $H_{adjacent\ zone}$ is the
+adjacent zone specific enthalpy.
 
 \subsubsection{Field: Ventilation Control Zone Temperature Setpoint Schedule Name}\label{field-ventilation-control-zone-temperature-setpoint-schedule-name-1}
 
@@ -679,16 +695,40 @@ If used with Ventilation Control Mode = Constant, the ventilation rate is consta
 
 If Ventilation Control Mode = NoVent, this schedule has no effect.
 
-\textbf{Note:} In order to establish an airflow network, each AirflowNetwork:Multizone:Zone object must have at least two surfaces defined with AirflowNetwork:Multizone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:Multizone:Surface objects facing the same Zone Name (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).
+\textbf{Note:} In order to establish an airflow network, each AirflowNetwork:MultiZone:Zone object must have at least two surfaces defined with AirflowNetwork:MultiZone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:MultiZone:Surface objects facing the same Zone Name (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).
 
 \subsubsection{Field: Occupant Ventilation Control Name}\label{field-occupant-ventilation-control-name-1}
 
 The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the Ventilation Control defined in the Ventilation Control Mode field will be overridden.
 
+\subsubsection{Field: Equivalent Rectangle Method }\label{equivalent-rectangle-method}
+
+This field is applied to a non-rectangular window or door. The equivalent
+rectangular surface has the same area as the non-rectangular one. The valid
+choices are: PolygonHeight, BaseSurfaceAspectRatio, and UserDefinedAspectRatio,
+with the default of PolygonHeight. When PolygonHeight is entered, the equivalent
+width is equal to the area divided by the PolygonHeight for a non-horizontal
+surface. When a surface is horizontal with the same height for all vertices,
+the model will automatically switch a choice to BaseSurfaceAspectRatio if a
+base surface is rectangular, or UserDefinedAspectRatio with the default value if
+a base surface is non-rectangular.  When BaseSurfaceAspectRatio is entered for
+a rectangular base surface, the equivalent height is equal to Square Root of
+Area divided by the base surface aspect ratio. The equivalent width is equal
+to the equivalent height times the base surface aspect ratio. When a base
+surface is non-rectangular, the model will automatically switch the choice to
+PolygonHeight for a non-horizontal base surface, and UserDefinedAspectRatio
+with the default value if a base surface is horizontal. When
+UserDefinedAspectRatio is entered, the equivalent height is equal to Square
+Root of Area divided by UserDefinedAspectRatio. The equivalent width is equal
+to the equivalent height times the user-defined aspect ratio.
+
+ \subsubsection{Field: Equivalent Rectangle Aspect Ratio}\label{equivalent-rectangular-aspect-ratio}
+
+ This field applies only if Equivalent Rectangle Method = UserDefinedAspectRatio. This value must be greater than zero, with the default being 1.0.
+
 IDF examples are provided below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:Surface,
       Zn001:Wall001,           !- Name of Associated Heat Transfer Surface
       CR-1,                    !- Leakage Component Name
@@ -752,7 +792,6 @@ The reference humidity ratio in kgWater/kgDryAir under which the Surface Crack D
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:ReferenceCrackConditions,
       ReferenceCrackConditions,      !- Name of Reference Crack Conditions
       20.0,                          !- Reference Temperature for Crack Data {C}
@@ -762,7 +801,7 @@ AirflowNetwork:MultiZone:ReferenceCrackConditions,
 
 \subsection{AirflowNetwork:MultiZone:Surface:Crack}\label{airflownetworkmultizonesurfacecrack}
 
-This object specifies the properties of air flow through a crack and the associated measurement conditions. The following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack: 
+This object specifies the properties of air flow through a crack and the associated measurement conditions. The following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack:
 
 \begin{equation}
 Q = \left( Crack\;Factor \right) * C_T * C_Q \left( \Delta P \right)^{n}
@@ -800,7 +839,7 @@ Note: The correction factor shown above is use for this particular component as 
 
 \paragraph{Field: Name}\label{field-name-2-003}
 
-This is a name for this AirflowNetwork:MultiZone:Surface:Crack object. It is referenced by an AirflowNetwork:Multizone:Surface object.
+This is a name for this AirflowNetwork:MultiZone:Surface:Crack object. It is referenced by an AirflowNetwork:MultiZone:Surface object.
 
 \paragraph{Field: Air Mass Flow Coefficient at Reference Conditions}\label{field-air-mass-flow-coefficient-at-reference-conditions}
 
@@ -812,7 +851,7 @@ The value of the exponent, \emph{n}, in the crack air flow equation. The valid r
 
 \paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions}
 
-The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:Multizone: Reference Crack Conditions object will be used.
+The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:MultiZone: Reference Crack Conditions object will be used.
 
 An IDF example is shown below:
 
@@ -854,7 +893,7 @@ where
 
 \paragraph{Field: Name}\label{field-name-3-003}
 
-This is a name for this AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea object. It is referenced by an AirflowNetwork:Multizone:Surface object.
+This is a name for this AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea object. It is referenced by an AirflowNetwork:MultiZone:Surface object.
 
 \paragraph{Field: Effective Leakage Area}\label{field-effective-leakage-area}
 
@@ -889,13 +928,15 @@ AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
 
 \subsection{AirflowNetwork:MultiZone:Component:DetailedOpening}\label{airflownetworkmultizonecomponentdetailedopening}
 
-This object specifies the properties of air flow through windows and doors (window, door and glass door heat transfer subsurfaces) when they are closed or open. The fields are similar to those for AirflowNetwork:Multizone:SurfaceCrack object when the window or door is closed, but additional fields are required to describe the air flow characteristics when the window or door is open. These additional fields include opening type, opening dimensions, degree of opening, and opening schedule.
+This object specifies the properties of air flow through windows and doors (window, door and glass door heat transfer subsurfaces) when they are closed or open. The fields are similar to those for AirflowNetwork:MultiZone:SurfaceCrack object when the window or door is closed, but additional fields are required to describe the air flow characteristics when the window or door is open. These additional fields include opening type, opening dimensions, degree of opening, and opening schedule.
 
 The AirflowNetwork model assumes that open windows or doors are vertical or close to vertical; for this reason they are called ``Large Vertical Openings.'' Such openings can have air flow moving simultaneously in two different directions depending on stack effects and wind conditions (for example, flow from inside to outside at the top of a window and from outside to inside at the bottom). AirflowNetwork models such two-directional flow, but only for vertical openings.
 
 It is assumed that the air flow through a window opening is unaffected by the presence of a shading device such as a shade or blind on the window. Also, the calculation of conductive heat transfer and solar gain through a window or door assumes that the window or door is closed.
 
-The AirflowNetwork model does not have a model for bi-directional flow through large horizontal openings. For this reason, \textbf{Air\-flow\-Net\-work:\-Multi\-Zone:\-Component:\-Detailed\-Opening should not be used for horizontal openings}. The best modeling technique in this case is to put an Air\-flow\-Net\-work:\-Multi\-Zone:\-Sur\-face:\-Crack object in a horizontal surface and use a large air mass flow coefficient. Crack flow is assumed to be uni-directional in any given timestep (but can reverse flow direction from timestep to timestep).
+The AirflowNetwork model does not have a model for bi-directional flow through large horizontal openings in exterior surfaces. For this reason, \textbf{Air\-flow\-Net\-work:\-Multi\-Zone:\-Component:\-Detailed\-Opening should not be used for exterior horizontal openings}. The best modeling technique in this case is to put an Air\-flow\-Net\-work:\-Multi\-Zone:\-Sur\-face:\-Crack object in a horizontal surface and use a large air mass flow coefficient. Crack flow is assumed to be uni-directional in any given timestep (but can reverse flow direction from timestep to timestep).
+
+For large horizontal openings in interior surfaces, see Air\-flow\-Net\-work:\-Multi\-Zone:\-Component:\-Horizontal\-Opening.
 
 A subsurface multiplier may be used to represent multiple subsurfaces and calculates total air flow when the subsurface (window, glassdoor, or door) is either closed or open. The total airflow across the surface is equal to the airflow based on the surface geometry multiplied by the subsurface multiplier.
 
@@ -987,12 +1028,11 @@ The Height Factor of the rectangular window or door for Opening Factor n. The He
 
 The Start Height Factor of the window or door for Opening Factor n. The Start Height Factor is the Start Height divided by the window or door height (see Figure~\ref{fig:window-or-door-showing-geometrical-factors}). The range is 0.0 to 1.0. The default is 0.
 
-When the opening factor value (as described under the field Window/Door Opening Factor in the AirflowNetwork:Multizone:Surface object) is between two Opening Factor field values, the values of Discharge Coefficient, Width Factor, Height Factor, and Start Height Factor are linearly interpolated.
+When the opening factor value (as described under the field Window/Door Opening Factor in the AirflowNetwork:MultiZone:Surface object) is between two Opening Factor field values, the values of Discharge Coefficient, Width Factor, Height Factor, and Start Height Factor are linearly interpolated.
 
 An IDF example is shown below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:Component:DetailedOpening,
       WiOpen1,                 !- Detailed Opening Name
       0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
@@ -1019,7 +1059,7 @@ A subsurface multiplier may be used to represent multiple subsurfaces and calcul
 
 \paragraph{Field: Name}\label{field-name-5-003}
 
-This is a name for this AirflowNetwork:MultiZone:Component:HorizontalOpening object. It is referenced by an AirflowNetwork:Multizone:Surface object.
+This is a name for this AirflowNetwork:MultiZone:Component:HorizontalOpening object. It is referenced by an AirflowNetwork:MultiZone:Surface object.
 
 \paragraph{Field: Air Mass Flow Coefficient When Opening is Closed}\label{field-air-mass-flow-coefficient-when-opening-is-closed-1}
 
@@ -1040,7 +1080,6 @@ This numeric field is used to input the discharge coefficient. This is a require
 An IDF example is shown below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:Component:HorizontalOpening,
       HrOpen,                  !- Name
       0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
@@ -1059,7 +1098,7 @@ A subsurface multiplier may be used to represent multiple subsurfaces and calcul
 
 \paragraph{Field: Name}\label{field-name-6-002}
 
-This is a name for this AirflowNetwork:MultiZone:Component:SimpleOpening object. It is referenced by an AirflowNetwork:Multizone:Surface object.
+This is a name for this AirflowNetwork:MultiZone:Component:SimpleOpening object. It is referenced by an AirflowNetwork:MultiZone:Surface object.
 
 \paragraph{Field: Air Mass Flow Coefficient When Opening is Closed}\label{field-air-mass-flow-coefficient-when-opening-is-closed-2}
 
@@ -1080,7 +1119,6 @@ This numeric field is used to input the discharge coefficient. This value must b
 An IDF example is shown below:
 
 \begin{lstlisting}
-
  AirflowNetwork:MultiZone:Component:SimpleOpening,
       WiOpen2,                 !- Simple Opening Name
       0.001,                   !- Air Mass Flow Coefficient When Opening Is Closed {kg/s-m}
@@ -1095,7 +1133,7 @@ This object specifies the properties of air flow through an exterior heat transf
 
 When the fan is on, the air mass flow rate modeled for the airflow network is based on the value defined in the MaximumFlow Rate field of the Fan:ZoneExhaust object. The airflow direction is from the corresponding zone to outdoors.
 
-When the fan is off, the following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack: 
+When the fan is off, the following power law form is used that gives air flow through the crack as a function of the pressure difference across the crack:
 
 \begin{equation}
 Q = \left( Crack\;Factor \right) * C_T * C_Q \left( \Delta P \right)^{n}
@@ -1145,7 +1183,7 @@ The value of the exponent, \emph{n}, in the crack air flow equation. The valid r
 
 \paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions-1}
 
-The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:Multizone: Reference Crack Conditions object will be used.
+The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:MultiZone: Reference Crack Conditions object will be used.
 
 An IDF example is shown below:
 
@@ -1160,52 +1198,77 @@ AirflowNetwork:MultiZone:Component:ZoneExhaustFan,
 
 \subsection{AirflowNetwork:MultiZone:ExternalNode}\label{airflownetworkmultizoneexternalnode}
 
-External nodes in the AirflowNetwork model define environmental conditions outside of the building. These conditions include wind pressure coefficients that vary from façade to façade and can be highly dependent on the building geometry.
+External nodes in the AirflowNetwork model define environmental conditions
+outside of the building. These conditions include wind pressure coefficients
+that vary from fa\c{c}ade to fa\c{c}ade and can be highly dependent on the
+building geometry.
 
-AirflowNetwork:MultiZone:ExternalNode objects do \textbf{not} have to be entered if Wind Pressure Coefficient Type = SurfaceAverageCalculation in the AirflowNetwork:SimulationControl object.
+AirflowNetwork:MultiZone:ExternalNode objects do \textbf{not} have to be
+entered if Wind Pressure Coefficient Type = SurfaceAverageCalculation in the
+AirflowNetwork:SimulationControl object.
 
 \subsubsection{Inputs}\label{inputs-8-001}
 
 \paragraph{Field: Name}\label{field-name-8-001}
 
-The external node name is associated with a particular building façade. This name is referenced by the External Node Name field of an AirflowNetwork:MultiZone:WindPressureCoefficientValues object (which gives wind pressure coefficients for the façade as a function of angle of wind incident on the façade) and by the External Node Name field of an AirflowNetwork:MultiZone:Surface object.
+The external node name is associated with a particular building fa\c{c}ade.
+This name is referenced by the External Node Name field of an AirflowNetwork:MultiZone:Surface object.
 
 \paragraph{Field: External Node Height}\label{field-external-node-height}
 
 Designates the reference height, in meters, used to calculate relative pressure. The default value is 0 meters.
 
-\paragraph{Field: Wind Pressure Coefficient Values Object Name}\label{field-wind-pressure-coefficient-values-object-name}
+\paragraph{Field: Wind Pressure Coefficient Curve Name}\label{field-wind-pressure-coefficient-values-object-name}
 
-The name of a specific AirflowNetwork:MultiZone:WindPressureCoefficientValues object (which gives wind pressure coefficients for the façade as a function of angle of wind incident on the façade).
+The name of a specific AirflowNetwork:MultiZone:WindPressureCoefficientValues
+object, curve, or table (which gives wind pressure coefficients for the
+fa\c{c}ade as a function of angle of wind incident on the fa\c{c}ade). Curves
+or tables should have the domain of 0 to 180 degrees or 0 to 360 degrees,
+depending upon the symmetry field (see below).
+
+\paragraph{Field: Symmetric Wind Pressure Coefficient Curve}\label{field-symmetric-wind-pressure-coefficient}
+Specifies the symmetry of the above named curve. The default is No, meaning
+that the curve will be evaluated from 0 to 360 degrees. Specify Yes for a
+curve that is symmetric about zero and is evaluated only up to 180 degrees.
+For this type of curve, an angle of 270 degrees is passed to the curve as
+90 degrees.
+
+\paragraph{Field: Wind Angle Type}\label{field-wind-angle-type}
+Specifies which wind angle should be used to calculate the wind pressure
+coefficient. The default is Absolute, meaning that the absolute wind direction
+angle will be used. Specifying Relative means that the angle will be relative
+to the surface normal. For a surface facing due east, the angle 0 corresponds
+to wind blowing perpendicular to and at the surface with absolute direction
+90 degrees, while 90 degrees corresponds to wind blowing parallel to the
+surface from the right (facing outward) with an absolute direction of 180 degrees.
 
 IDF examples are provided below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:ExternalNode,
       NFacade,                 !- Name
       1.524,                   !- External Node Height {m}
-      NFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+      NFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
       EFacade,                 !- Name
       1.524,                   !- External Node Height {m}
-      EFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+      EFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
       SFacade,                 !- Name
       1.524,                   !- External Node Height {m}
-      SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+      SFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
       WFacade,                 !- Name
       1.524,                   !- External Node Height {m}
-      WFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+      WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
       Horizontal,              !- Name
       3.028,                   !- External Node Height {m}
-      Horizontal_WPCValue;     !- Wind Pressure Coefficient Values Object Name
+      Horizontal_WPCValue;     !- Wind Pressure Coefficient Curve Name
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:WindPressureCoefficientArray}\label{airflownetworkmultizonewindpressurecoefficientarray}
@@ -1227,7 +1290,6 @@ Each field references the wind direction corresponding to the first through the 
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:WindPressureCoefficientArray,
       Every 30 Degrees,        !- WPC Array Name
       0,                       !- Wind Direction #1 {deg}
@@ -1262,7 +1324,7 @@ Name of the associated AirflowNetwork:MultiZone:WindPressureCoefficientArray, wh
 
 \paragraph{Field: Wind Pressure Coefficient Value 1 to Wind Pressure Coefficient Value N}\label{field-wind-pressure-coefficient-value-1-to-wind-pressure-coefficient-value-n}
 
-The WPC (wind pressure coefficient) value for the building façade indicated by the External Node Name field above. This WPC value corresponds to the first wind direction in the AirflowNetwork:MultiZone:WindPressureCoefficientArray. Note that WPC values can be positive, negative or zero.
+The WPC (wind pressure coefficient) value for the building fa\c{c}ade indicated by the External Node Name field above. This WPC value corresponds to the first wind direction in the AirflowNetwork:MultiZone:WindPressureCoefficientArray. Note that WPC values can be positive, negative or zero.
 
 \paragraph{Obtaining WPC values}\label{obtaining-wpc-values}
 
@@ -1284,7 +1346,6 @@ AirflowNetwork Model:Wind Pressure Coefficients, WFACADE, -0.56,-0.56,-0.42,-0.3
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 AirflowNetwork:MultiZone:WindPressureCoefficientValues,
       NFacade_WPCValue,        !- Name
       Every 30 Degrees,        !- AirflowNetwork:MultiZone:WindPressureCoefficientArray Name
@@ -1365,7 +1426,6 @@ The name of a schedule of closing probability that controls the closing of windo
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 AirlowNetwork:OccupantVentilationControl,
   VentilationControl,      !- Name
   5.0,                     !- Minimum Opening Time
@@ -1379,7 +1439,7 @@ AirlowNetwork:OccupantVentilationControl,
   ClosingProbabilitySch;   !- Closing Probability Schedule Name
 \end{lstlisting}
 
-\subsection{AirflowNetwork:ZoneControl:PressureController}\label{airflowNetworkzonecontrolpressureoontroller} 
+\subsection{AirflowNetwork:ZoneControl:PressureController}\label{airflowNetworkzonecontrolpressureoontroller}
 
 The AirflowNetwork:ZoneControl:PressureController object is used to control a zone to a specified indoor level of pressure using the AirflowNetwork model. The specified pressure setpoint is used to calculate the required zone exhaust fan flow rate in a controlled zone or relief air flow rate in an AirLoop.
 
@@ -1402,7 +1462,7 @@ AirflowNetwork:MultiZone:Component:ZoneExhaustFan and AirflowNetwork:Distributio
 
 \paragraph{ Field: Control Object Name}\label{field-control-name}
 
-The corresponding control object name. 
+The corresponding control object name.
 
 \paragraph{ Field: Pressure Control Availability Schedule Name}\label{field-pressure-control-availability-schedule-name}
 
@@ -1410,12 +1470,11 @@ This field contains the name of a schedule that determines whether or not the Ai
 
 \paragraph{ Field: Pressure Setpoint Schedule Name}\label{field-pressure-setpoint-schedule-name}
 
-This field contains the name of a schedule that contains the zone air pressure setpoint as a function of time. The units for pressure setpoint are Pascal. The setpoint values in the schedule must be between -50 and 100 Pascal. 
+This field contains the name of a schedule that contains the zone air pressure setpoint as a function of time. The units for pressure setpoint are Pascal. The setpoint values in the schedule must be between -50 and 100 Pascal.
 
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 AirflowNetwork:ZoneControl:PressureController,
   Pressure Controller1,           !- Name
   EAST ZONE,                      !- Controlled Zone Name
@@ -1427,15 +1486,15 @@ AirflowNetwork:ZoneControl:PressureController,
 
 \subsection{AirflowNetwork with RoomAir Models}\label{airflownetwork-roomair-models}
 
-The next two objects of AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage are used with RoomAir:Node:AirflowNetwork objects together to simulate multiple internal airflows via multiple intrazone nodes and linkages in a thermal zone. The mixed-air assumption for zone air conditions is not always appropriate. EnergyPlus includes several RoomAir models that can model the implications for different flow patterns on variations in temperature within the zone. However none of them are generalized enough for different types of air flow situations and none are coupled tightly with AirflowNetwork. A general RoomAir model based on pressure network solver will allow modeling a variety of spaces types not currently covered by existing models such as tall spaces.
+The next two objects of AirflowNetwork:IntraZone:Node and AirflowNetwork:IntraZone:Linkage are used with RoomAir:Node:AirflowNetwork objects together to simulate multiple internal airflows via multiple intrazone nodes and linkages in a thermal zone. The mixed-air assumption for zone air conditions is not always appropriate. EnergyPlus includes several RoomAir models that can model the implications for different flow patterns on variations in temperature within the zone. However none of them are generalized enough for different types of air flow situations and none are coupled tightly with AirflowNetwork. A general RoomAir model based on pressure network solver will allow modeling a variety of spaces types not currently covered by existing models such as tall spaces.
 
 Recent advancements have been made to AirflowNetwork to model large horizontal openings. This new development makes AirflowNetwork useful for not only modeling air movement between zones (and outdoors), but also within individual thermal zones.
 
-The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows. It should be pointed out that the new model works when the MultizoneWithoutDistribution is selected in the field of AirflowNetwork Control of the AirflowNetwork:SimulationControl object. The model cannot work with other choices.
+The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows. It should be pointed out that the new model works when the MultiZoneWithoutDistribution is selected in the field of AirflowNetwork Control of the AirflowNetwork:SimulationControl object. The model cannot work with other choices.
 
-\subsection{AirflowNetwork:Intrazone:Node}\label{airflownetworkintrazonenode}
+\subsection{AirflowNetwork:IntraZone:Node}\label{airflownetworkintrazonenode}
 
-This object allows users to input multiple nodes in a zone. A single object represent a node. If there is only one node per zone, then use the AirflowNetwork:Multizone:Zone input object. The zone node is not defined in this object.
+This object allows users to input multiple nodes in a zone. A single object represent a node. If there is only one node per zone, then use the AirflowNetwork:MultiZone:Zone input object. The zone node is not defined in this object.
 
 \subsubsection{Field: Name}\label{field-name-12-000}
 
@@ -1458,7 +1517,6 @@ An IDF example is provided below:
 VentilationControl, !- Name
 
 \begin{lstlisting}
-
 AirflowNetwork:IntraZone:Node,
   LeftUpper,               !- Name
   LeftUpper,               !- RoomAir:Node:AirflowNetwork Name
@@ -1466,9 +1524,9 @@ AirflowNetwork:IntraZone:Node,
   4.572;                   !- Node Height {m}
 \end{lstlisting}
 
-\subsection{AirflowNetwork:Intrazone:Linkage}\label{airflownetworkintrazonelinkage}
+\subsection{AirflowNetwork:IntraZone:Linkage}\label{airflownetworkintrazonelinkage}
 
-The input object specifies a connection between two AirflowNetwork:Intrazone:Node objects and an AiflowNetwork component defined elsewhere. The object also allow users to specify a connection between an AirflowNetwork:Intrazone:Node and an adjacent zone defined in an AirflowNetwork:MultiZone:Zone object. This object provides flexibility to define a linkage either in the same zone or in two different zones.
+The input object specifies a connection between two AirflowNetwork:IntraZone:Node objects and an AiflowNetwork component defined elsewhere. The object also allow users to specify a connection between an AirflowNetwork:IntraZone:Node and an adjacent zone defined in an AirflowNetwork:MultiZone:Zone object. This object provides flexibility to define a linkage either in the same zone or in two different zones.
 
 \subsubsection{Field: Name}\label{field-name-13-000}
 
@@ -1476,19 +1534,19 @@ The name identifies the linkage for later reference and in the output listing. E
 
 \subsubsection{Field: Node 1 Name}\label{field-node-1-name}
 
-The input designates a node name where airflow starts. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object.
+The input designates a node name where airflow starts. The node name should be defined in an AirflowNetwork:IntraZone:Node object or an AirflowNetwork:MultiZone:Zone object.
 
 \subsubsection{Field: Node 2 Name}\label{field-node-2-name}
 
-The input designates a node name where airflow ends. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object.
+The input designates a node name where airflow ends. The node name should be defined in an AirflowNetwork:IntraZone:Node object or an AirflowNetwork:MultiZone:Zone object.
 
-Note: One of Node 1 and Node 2 should be defined as an AirflowNetwork:Intrazone:Node object. In other words, both nodes cannot be defined as AirflowNetwork:MultiZone:Zone object. This type of connection should be defined as an AirflowNetwork:MultiZone:Surface object.
+Note: One of Node 1 and Node 2 should be defined as an AirflowNetwork:IntraZone:Node object. In other words, both nodes cannot be defined as AirflowNetwork:MultiZone:Zone object. This type of connection should be defined as an AirflowNetwork:MultiZone:Surface object.
 
 \subsubsection{Field: Component Name}\label{field-component-name-000}
 
-The input designates an AirflowNetwork component name associated with the two nodes. The component name should be one of the AirflowNetwork:Multizone:Component object names. The component is used for intrazone node connection only. If the next field is specified, the input of this field could be a blank.
+The input designates an AirflowNetwork component name associated with the two nodes. The component name should be one of the AirflowNetwork:MultiZone:Component object names. The component is used for intrazone node connection only. If the next field is specified, the input of this field could be a blank.
 
-It should be pointed out that an AirflowNetwork:Multizone:Surface object allows following five AirflowNetwork:Multizone:Component objects:
+It should be pointed out that an AirflowNetwork:MultiZone:Surface object allows following five AirflowNetwork:MultiZone:Component objects:
 
 \begin{itemize}
 \tightlist
@@ -1504,7 +1562,7 @@ It should be pointed out that an AirflowNetwork:Multizone:Surface object allows 
   AirflowNetwork:MultiZone:Component:HorizontalOpening
 \end{itemize}
 
-However, an AirflowNetwork:Intrazone:Linkage object without a surface connection has connection with two intrazone nodes in the same zone and allows two AirflowNetwork:Multizone:Component objects due to lack of geometry inputs.
+However, an AirflowNetwork:IntraZone:Linkage object without a surface connection has connection with two intrazone nodes in the same zone and allows two AirflowNetwork:MultiZone:Component objects due to lack of geometry inputs.
 
 \begin{itemize}
 \tightlist
@@ -1516,12 +1574,11 @@ However, an AirflowNetwork:Intrazone:Linkage object without a surface connection
 
 \subsubsection{Field: Connection Surface}\label{field-connection-surface}
 
-The input specifies an AirflowNetwork:Multizone:Surface object name, when the nodes defined above are not located in the same zone. The surface linkage will be connected by the above two nodes, instead of zone nodes in normal definition. In other words, the connection defined in an AirflowNetwork:Multizone:Surface is removed. Instead, this new connection replaces the the connection specified before. A warning message is issued to let users be aware of the changes. Since each AirflowNetwork:Multizone:Surface object has its own component defined in the Leakage Component Name field, the input of the Component Name field in this object will be ignored.
+The input specifies an AirflowNetwork:MultiZone:Surface object name, when the nodes defined above are not located in the same zone. The surface linkage will be connected by the above two nodes, instead of zone nodes in normal definition. In other words, the connection defined in an AirflowNetwork:MultiZone:Surface is removed. Instead, this new connection replaces the the connection specified before. A warning message is issued to let users be aware of the changes. Since each AirflowNetwork:MultiZone:Surface object has its own component defined in the Leakage Component Name field, the input of the Component Name field in this object will be ignored.
 
 An IDF example is provided below:
 
 \begin{lstlisting}
-
 AirflowNetwork:IntraZone:Linkage,
   IntraZoneMiddleUpperLink, !- Name
   LeftUpper,               !- Node 1 Name
@@ -1539,6 +1596,41 @@ AirflowNetwork:IntraZone:Linkage,
 The previous sections of this AirflowNetwork model discussion describe input objects used for multizone airflow calculations. The following sections describe input objects used for air distribution system simulations. These objects work when control option ``MultiZone with Distribution'' or ``MultiZone with Distribution Only During Fan Operation'' is defined in the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.
 
 The first section presents the input object for distribution system nodes. Although thermal zones are required to perform air distribution system simulations, the thermal zones are already defined in the multizone input section (described previously), so that there is no need to repeat the inputs for thermal zones when modeling an air distribution system. The same is also true for surface air leakage. This section has only one object: AirflowNetwork:Distribution:Node.
+
+\subsection{AirflowNetwork:Distribution:DuctViewFactors}\label{airflownetworkdistributionductviewfactor}
+The AirflowNetwork:Distribution:DuctViewFactors object is used to represent the information needed for simplified surface-to-duct radiation heat transfer. View factors from each duct object to each referenced surface are provided by the user. EnergyPlus calculates the heat gain to the duct from the referenced surfaces. If the object is included, radiation is calculated for the referenced duct; radiation is neglected of the object is omitted.
+
+\subsubsection{Field: Name of Linkage}\label{field-name-of-linkage}
+Name of the linkage object in which the view factors are applied.
+
+\subsubsection{Field: Surface Exposure Fraction}\label{field-surface-exposure-fraction}
+The fraction, range 0 to 1, of the duct surface that is exposed to the zone for a partially buried duct (dimensionless).
+
+\subsubsection{Field: Surface Emittance}\label{field-surface-emittance}
+The air duct surface emittance factor in the range 0 to 1 based on the material properties (dimensionless).
+
+\subsubsection{Field: Surface 1 Name}\label{field-suface-1-name}
+This field specifies the name of the surface seen by the duct. Field is extensible to accommodate as many surfaces as required.
+
+\subsubsection{Field: View Factor 1}\label{field-surface-1-view-factor}
+This field specifies the view factor from the duct to surface 1. Field is extensible to accommodate as many surfaces as required.
+
+An IDF example is provided below:
+
+\begin{lstlisting}
+AirflowNetwork:Distribution:DuctViewFactors,
+   Main Link 1,		!- Name of linkage
+   0.5,			!- Surface exposure fraction
+   0.9,			!- Duct surface emittance
+   Lshaped Zone:Wall 1,	!- To Surface 1
+   0.2,			!- View Factor 1
+   Lshaped Zone:Wall 2,	!- To Surface 2
+   0.05,		!- View Factor 2
+   Lshaped Zone:Wall 3,	!- To Surface 3
+   0.5,			!- View Factor 3
+   Lshaped Zone:Wall 4,	!- To Surface 4
+   0.25;		!- View Factor 4
+\end{lstlisting}
 
 \subsection{AirflowNetwork:Distribution:Node}\label{airflownetworkdistributionnode}
 
@@ -1588,7 +1680,6 @@ Designates the reference height in meters used to calculate relative pressure. T
 IDF examples are provided below:
 
 \begin{lstlisting}
-
 AirflowNetwork:Distribution:Node,
       EquipmentInletNode,      !- Name
       Zone Equipment Inlet Node,  !- Component Name or Node Name
@@ -1776,7 +1867,7 @@ AirflowNetwork:Distribution:Component:LeakageRatio,
 
 \subsection{AirflowNetwork:Distribution:Component:Duct}\label{airflownetworkdistributioncomponentduct}
 
-This object represents a duct component and requires 9 input fields, one alpha field and 8 numeric fields. The relationship between pressure and airflow across the component may be expressed as (2001 ASHRAE Handbook of Fundamentals, Chapter 34):
+This object represents a duct component and requires 9 input fields, one alpha field and 8 numeric fields. An additional two fields can be used to define the convection coefficients on the inner and outer surfaces of the duct. The relationship between pressure and airflow across the component may be expressed as (2001 ASHRAE Handbook of Fundamentals, Chapter 34):
 
 \begin{equation}
 \dot m = \sqrt {\frac{{2\rho {A^2}\Delta P}}{{fL/D + \sum {C_d}}}}
@@ -1850,13 +1941,21 @@ This numeric field is used to input surface roughness {[}m{]}. This value must b
 
 This numeric field is defined as a coefficient for dynamic loss {[}dimensionless{]}. It represents dynamic loss due to fittings (such as an elbow).
 
-\paragraph{Field: Overall Heat Transmittance Coefficient (U-Factor) from Air to Air}\label{field-overall-heat-transmittance-coefficient-u-factor-from-air-to-air}
+\paragraph{Field: Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction}\label{field-heat-transmittance-coefficient-u-factor-from-duct-construction}
 
-This numeric field is defined as the overall heat transmittance coefficient (U value, W/m\(^{2}\)-K) from air to air, including film coefficients at both surfaces.
+This numeric field is defines the heat transmittance coefficient (U value, W/m\(^{2}\)-K) for the duct wall construction. Film coefficents are calculated automatically, unless directly specified below.
 
 \paragraph{Field: Overall Moisture Transmittance Coefficient from Air to Air}\label{field-overall-moisture-transmittance-coefficient-from-air-to-air}
 
 This numeric field is defined as the overall moisture transmittance coefficient (kg/m\(^{2}\)) from air to air, including film coefficients at both surfaces.
+
+\paragraph{Field: Outside Convection Coefficient}\label{field-outside-convection-coefficent}
+
+This numeric field defines the outside convection coefficient (W/m\(^{2}\)-K). If the field is omitted, the film coeffient is calculated automatically as described in ASTM C1340.
+
+\paragraph{Field: Inside Convection Coefficient}\label{field-inside-convection-coefficent}
+
+This numeric field defines the inside convection coefficient (W/m\(^{2}\)-K). If the field is omitted, the film coeffient is calculated automatically as described in ASTM C1340.
 
 An IDF example is provided below:
 
@@ -1869,7 +1968,7 @@ AirflowNetwork:Distribution:Component:Duct,
       0.2827,                  !- Cross Section Area {m2}
       0.0009,                  !- Surface Roughness {m}
       0.01,                    !- Coefficient for local dynamic loss due to fitting {dimensionless}
-      0.772,                   !- Overall heat transmittance coefficient (U value) from air to air {W/m2-K}
+      0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
       0.0001;                  !- Overall moisture transmittance coefficient from air to air {kg/m2}
 \end{lstlisting}
 
@@ -1902,7 +2001,7 @@ AirflowNetwork:Distribution:Component:Fan,
 
 This component represents a cooling or heating coil. The main purpose for this object is to get calculated values (air flow and temperature/humidity conditions) from the associated coil models.
 
-\subsubsection{Inputs}\label{inputs-17}
+\subsubsection{Inputs}\label{inputs-2016-06-16}
 
 \paragraph{Field: Coil Name}\label{field-coil-name}
 
@@ -1916,7 +2015,7 @@ This field requires input of the coil type used in the AirflowNetwork model. The
 \item
   Coil:Cooling:DX:SingleSpeed
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Electric
 \item
@@ -2130,7 +2229,7 @@ AirflowNetwork:Distribution:Component:ConstantPressureDrop,
 
 \subsection{AirflowNetwork:Distribution:Component:OutdoorAirFlow}\label{airflowNetworkdistributioncomponentoutdoorairflow}
 
-The AirflowNetwork:Distribution:Component:OutdoorAirFlow object is used to allow the AirflowNetwork model to include the outdoor air flow rate in the airflow network. When the outdoor air mass flow rate is greater than zero, the airflow network model treats this object as a constant volume fan and the flow rate is provided by the Controller:OutdoorAir object. When there is no outdoor air flow rate, the model treats this object as a crack and a power law is assumed. 
+The AirflowNetwork:Distribution:Component:OutdoorAirFlow object is used to allow the AirflowNetwork model to include the outdoor air flow rate in the airflow network. When the outdoor air mass flow rate is greater than zero, the airflow network model treats this object as a constant volume fan and the flow rate is provided by the Controller:OutdoorAir object. When there is no outdoor air flow rate, the model treats this object as a crack and a power law is assumed.
 
 \subsubsection{Inputs}\label{inputs-AFN-outdoorairflow}
 
@@ -2146,9 +2245,9 @@ The value of the air mass flow coefficient, \({C_Q}\), in the crack air flow equ
 
 The value of the exponent, \emph{n}, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
 
-\paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions}
+\paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions-2016-06-16-1612}
 
-The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:Multizone: Reference Crack Conditions object will be used.
+The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:MultiZone: Reference Crack Conditions object will be used.
 
 IDF examples are provided below:
 
@@ -2181,7 +2280,7 @@ AirflowNetwork:Distribution:Linkage,
 
 \subsection{AirflowNetwork:Distribution:Component:ReliefAirFlow}\label{airflowNetworkdistributioncomponentreliefairflow}
 
-The AirflowNetwork:Distribution:Component:ReliefAirFlow object is used to allow the AirflowNetwork model to perform pressure control by varying the amount of relief air flow rate between 0 and the flow rate specified by the Controller:OutdoorAir object. When the outdoor air mass flow rate is greater than zero, the airflow network model treats this object as a constant volume fan and the flow rate is varied to reach pressure control. When there is no outdoor air flow rate, the model treats this object as a crack and a power law is assumed. 
+The AirflowNetwork:Distribution:Component:ReliefAirFlow object is used to allow the AirflowNetwork model to perform pressure control by varying the amount of relief air flow rate between 0 and the flow rate specified by the Controller:OutdoorAir object. When the outdoor air mass flow rate is greater than zero, the airflow network model treats this object as a constant volume fan and the flow rate is varied to reach pressure control. When there is no outdoor air flow rate, the model treats this object as a crack and a power law is assumed.
 
 \subsubsection{Inputs}\label{inputs-AFN-reliefairflow}
 
@@ -2189,17 +2288,17 @@ The AirflowNetwork:Distribution:Component:ReliefAirFlow object is used to allow 
 
 This is the name for this instance of the AirflowNetwork:Distribution:Component:ReliefAirFlow object.
 
-\paragraph{Field: Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions}\label{field-air-mass-flow-coefficient-when-no-outdoor-air-flow-at-reference-conditions}
+\paragraph{Field: Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions}\label{field-air-mass-flow-coefficient-when-no-outdoor-air-flow-at-reference-conditions-2016-06-16}
 
 The value of the air mass flow coefficient, \({C_Q}\), in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
 
-\paragraph{Field: Air Mass Flow Exponent When No Outdoor Air Flow}\label{field-air-mass-flow-exponent-when-no-outdoor-air-flow}
+\paragraph{Field: Air Mass Flow Exponent When No Outdoor Air Flow}\label{field-air-mass-flow-exponent-when-no-outdoor-air-flow-2016-06-16}
 
 The value of the exponent, \emph{n}, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
 
-\paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions}
+\paragraph{Field: Reference Crack Conditions}\label{field-reference-crack-conditions-2016-06-16-1613}
 
-The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:Multizone: Reference Crack Conditions object will be used.
+The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:MultiZone: Reference Crack Conditions object will be used.
 
 IDF examples are provided below:
 
@@ -2278,9 +2377,9 @@ AirflowNetwork:Distribution:Linkage,
 
 \subsubsection{Outputs}\label{outputs-002}
 
-The AirflowNetwork nodes in the following output variables includes zones defined in AirflowNetwork:Multizone:Zone objects, external nodes defined in AirflowNetwork:MultiZone:ExternalNode objects, and nodes defined in AirflowNetwork:Distribution:Node objects.
+The AirflowNetwork nodes in the following output variables includes zones defined in AirflowNetwork:MultiZone:Zone objects, external nodes defined in AirflowNetwork:MultiZone:ExternalNode objects, and nodes defined in AirflowNetwork:Distribution:Node objects.
 
-The AirflowNetwork linkage used in following output variables includes surfaces defined in AirflowNetwork:Multizone:Surface objects, and linkages defined in AirflowNetwork:Distribution:Linkage objects. The surface linkages represent airflows through surface cracks or openings between two zones or between a zone and outdoors. The distribution linkages represent airflows in an air distribution system.
+The AirflowNetwork linkage used in following output variables includes surfaces defined in AirflowNetwork:MultiZone:Surface objects, and linkages defined in AirflowNetwork:Distribution:Linkage objects. The surface linkages represent airflows through surface cracks or openings between two zones or between a zone and outdoors. The distribution linkages represent airflows in an air distribution system.
 
 \begin{itemize}
 \item
@@ -2470,7 +2569,7 @@ This is the AirflowNetwork node humidity ratio output in kgWater/kgDryAir. When 
 
 \paragraph{AFN Node Total Pressure {[}Pa{]}}\label{afn-node-total-pressure-pa}
 
-This is the AirflowNetwork node total pressure in Pa with respect to outdoor barometric pressure. The total pressure is the sum of static pressure, dynamic pressure, and elevation impact at the node's relative height. When a Fan:OnOff object is used and is scheduled to operate in the cycling fan operation mode, the value for AirflowNetwork:Distribution:Node objects reflects the total pressure when the fan is operating (ON). The total pressures for nodes associate with AirflowNetwork:Multizone:Zone objects are reported in different output variables (below).
+This is the AirflowNetwork node total pressure in Pa with respect to outdoor barometric pressure. The total pressure is the sum of static pressure, dynamic pressure, and elevation impact at the node's relative height. When a Fan:OnOff object is used and is scheduled to operate in the cycling fan operation mode, the value for AirflowNetwork:Distribution:Node objects reflects the total pressure when the fan is operating (ON). The total pressures for nodes associate with AirflowNetwork:MultiZone:Zone objects are reported in different output variables (below).
 
 \paragraph{AFN Node CO2 Concentration {[} ppm{]}}\label{afn-node-co2-concentration-ppm}
 
@@ -2521,86 +2620,86 @@ This is the AirflowNetwork linkage mass flow rate output in kg/s in the directio
 
 It should be pointed out that in general, each linkage has one directional flow at any given time, either from Node 1 to 2 or from Node 2 to 1. However, there are three components which may have flows in both directions simultaneously: AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening.
 
-When a Fan:OnOff object is used, the air mass flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air mass flow rates when the fan is off are zero for the distribution system air linkage objects. The air mass flow rates for the AirflowNetwork:Multizone:Surface object are reported in different output variables (below).
+When a Fan:OnOff object is used, the air mass flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air mass flow rates when the fan is off are zero for the distribution system air linkage objects. The air mass flow rates for the AirflowNetwork:MultiZone:Surface object are reported in different output variables (below).
 
 \paragraph{AFN Linkage Node 2 to Node 1 Mass Flow Rate {[}kg/s{]}}\label{afn-linkage-node-2-to-node-1-mass-flow-rate-kgs}
 
 This is the AirflowNetwork linkage mass flow rate output in kg/s in the direction from Node 2 to Node 1. It reports airflows from surfaces through a crack or opening, and from linkages defined in an AirflowNetwork:Distribution:Linkage object. Node 1 and Node 2 for a surface or subsurface are defined in the same manner as AFN Linkage Node 1 to Node 2 Mass Flow Rate.
 
-When a Fan:OnOff object is used, the air mass flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air mass flow rates when the fan is off are zero for the distribution system air linkage objects. The air mass flow rates for the AirflowNetwork:Multizone:Surface object are reported in different output variables (below).
+When a Fan:OnOff object is used, the air mass flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air mass flow rates when the fan is off are zero for the distribution system air linkage objects. The air mass flow rates for the AirflowNetwork:MultiZone:Surface object are reported in different output variables (below).
 
 \paragraph{AFN Linkage Node 1 to 2 Average Mass Flow Rate {[}kg/s{]}}\label{afn-linkage-node-1-to-2-average-mass-flow-rate-kgs}
 
-This is the AirflowNetwork linkage average mass flow rate in kg/s in the direction from Node 1 to Node 2 defined in the AirflowNetwork:Multizone:Surface objects. This output is only available when a Fan:OnOff object is used in the air distribution system. The average mass flow rate is weighted by the system fan part-load ratio using the calculated air mass flow rates during the fan on and off periods for the system timestep. The system fan part-load ratio is defined as the ratio of the air distribution system mass flow rate (average for the simulation timestep) to the system design mass flow rate.
+This is the AirflowNetwork linkage average mass flow rate in kg/s in the direction from Node 1 to Node 2 defined in the AirflowNetwork:MultiZone:Surface objects. This output is only available when a Fan:OnOff object is used in the air distribution system. The average mass flow rate is weighted by the system fan part-load ratio using the calculated air mass flow rates during the fan on and off periods for the system timestep. The system fan part-load ratio is defined as the ratio of the air distribution system mass flow rate (average for the simulation timestep) to the system design mass flow rate.
 
 Average surface mass flow rate = (Surface mass flow rate during on cycle * Part-load ratio) + Surface mass flow rate during off cycle * (1.0 -- Part-load ratio)
 
 \paragraph{AFN Linkage Node 2 to 1 Average Mass Flow Rate {[}kg/s{]}}\label{afn-linkage-node-2-to-1-average-mass-flow-rate-kgs}
 
-This is the AirflowNetwork linkage average mass flow rate in kg/s in the direction from Node 2 to Node 1 defined in the AirflowNetwork:Multizone:Surface objects. This output is only available when a Fan:OnOff object is used in the air distribution system. The average mass flow rate is weighted by the system fan part-load ratio using the calculated air mass flow rates during the fan on and off periods for the system timestep. The system fan part-load ratio is defined as the ratio of the air distribution system mass flow rate (average for the simulation timestep) to the system design mass flow rate.
+This is the AirflowNetwork linkage average mass flow rate in kg/s in the direction from Node 2 to Node 1 defined in the AirflowNetwork:MultiZone:Surface objects. This output is only available when a Fan:OnOff object is used in the air distribution system. The average mass flow rate is weighted by the system fan part-load ratio using the calculated air mass flow rates during the fan on and off periods for the system timestep. The system fan part-load ratio is defined as the ratio of the air distribution system mass flow rate (average for the simulation timestep) to the system design mass flow rate.
 
-\paragraph{\texorpdfstring{AFN Linkage Node 1 to Node 2 Volume Flow Rate {[}m\(^{3}\)/s{]}}{AFN Linkage Node 1 to Node 2 Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{afn-linkage-node-1-to-node-2-volume-flow-rate-m3s}
+\paragraph{AFN Linkage Node 1 to Node 2 Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{afn-linkage-node-1-to-node-2-volume-flow-rate-m3s}
 
 This is the AirflowNetwork linkage volume flow rate output in m\(^{3}\)/s in the direction from the Node 1 to Node 2. It is defined in the same manner as AFN Linkage Node 1 to Node 2 Mass Flow Rate.
 
-When a Fan:OnOff object is used, the air volume flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air volume flow rates when the fan is off are zero for the distribution system air linkage objects. The air volume flow rates for the AirflowNetwork:Multizone:Surface object are reported in different output variables (below).
+When a Fan:OnOff object is used, the air volume flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air volume flow rates when the fan is off are zero for the distribution system air linkage objects. The air volume flow rates for the AirflowNetwork:MultiZone:Surface object are reported in different output variables (below).
 
-\paragraph{\texorpdfstring{AFN Linkage Node 2 to Node 1 Volume Flow Rate {[}m\(^{3}\)/s{]}}{AFN Linkage Node 2 to Node 1 Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{afn-linkage-node-2-to-node-1-volume-flow-rate-m3s}
+\paragraph{AFN Linkage Node 2 to Node 1 Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{afn-linkage-node-2-to-node-1-volume-flow-rate-m3s}
 
 This is the AirflowNetwork linkage volume flow rate output in m\(^{3}\)/s in the direction from Node 2 to Node 1. It is defined in the same manner as AFN Linkage Node 2 to Node 1 Mass Flow Rate.
 
-When a Fan:OnOff object is used, the air volume flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air volume flow rates when the fan is off are zero for the distribution system air linkage objects. The air volume flow rates for the AirflowNetwork:Multizone:Surface object are reported in different output variables (below).
+When a Fan:OnOff object is used, the air volume flow rates reported for the AirflowNetwork:Distribution:Linkage objects are the values when the fan is operating (ON). It is assumed that the air volume flow rates when the fan is off are zero for the distribution system air linkage objects. The air volume flow rates for the AirflowNetwork:MultiZone:Surface object are reported in different output variables (below).
 
-\paragraph{\texorpdfstring{AFN Linkage Node 1 to 2 Average Volume Flow Rate {[}m\(^{3}\)/s{]}}{AFN Linkage Node 1 to 2 Average Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{afn-linkage-node-1-to-2-average-volume-flow-rate-m3s}
+\paragraph{AFN Linkage Node 1 to 2 Average Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{afn-linkage-node-1-to-2-average-volume-flow-rate-m3s}
 
-This is the AirflowNetwork linkage average volume flow rate in m\(^{3}\)/s in the direction from Node 1 to Node 2 defined in the AirflowNetwork:Multizone:Surface objects. This output is only available when a Fan:OnOff object is used. The average volume flow rate is weighted by the system fan part-load ratio using the calculated air volume flow rates during the fan on and off periods for the system timestep.
+This is the AirflowNetwork linkage average volume flow rate in m\(^{3}\)/s in the direction from Node 1 to Node 2 defined in the AirflowNetwork:MultiZone:Surface objects. This output is only available when a Fan:OnOff object is used. The average volume flow rate is weighted by the system fan part-load ratio using the calculated air volume flow rates during the fan on and off periods for the system timestep.
 
 Average surface volume flow rate = (Surface volume flow rate during on cycle * Part-load ratio) + Surface volume flow rate during off cycle * (1.0 -- Part-load ratio)
 
-\paragraph{\texorpdfstring{AFN Linkage Node 2 to 1 Average Volume Flow Rate {[}m\(^{3}\)/s{]}}{AFN Linkage Node 2 to 1 Average Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{afn-linkage-node-2-to-1-average-volume-flow-rate-m3s}
+\paragraph{AFN Linkage Node 2 to 1 Average Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{afn-linkage-node-2-to-1-average-volume-flow-rate-m3s}
 
-This is the AirflowNetwork linkage average volume flow rate in m\(^{3}\)/s in the direction from Node 2 to Node 1 defined in the AirflowNetwork:Multizone:Surface objects. This output is only available when a Fan:OnOff object is used. The average volume flow rate is weighted by the system fan part-load ratio using the calculated air volume flow rates during the fan on and off periods for the system timestep.
+This is the AirflowNetwork linkage average volume flow rate in m\(^{3}\)/s in the direction from Node 2 to Node 1 defined in the AirflowNetwork:MultiZone:Surface objects. This output is only available when a Fan:OnOff object is used. The average volume flow rate is weighted by the system fan part-load ratio using the calculated air volume flow rates during the fan on and off periods for the system timestep.
 
 \paragraph{AFN Linkage Node 1 to Node 2 Pressure Difference {[}Pa{]}}\label{afn-linkage-node-1-to-node-2-pressure-difference-pa}
 
-This is the pressure difference across a linkage in Pa. The linkage includes both objects: AirflowNetwork:Multizone:Surface and AirflowNetwork: Distribution:Linkage.
+This is the pressure difference across a linkage in Pa. The linkage includes both objects: AirflowNetwork:MultiZone:Surface and AirflowNetwork: Distribution:Linkage.
 
-When a Fan:OnOff object is used, the pressure differences reported for the AirflowNetwork:Distribution:Linkage objects are the values calculated when the fan is operating (ON). It is assumed that the pressure differences when the fan is off are zero for the distribution system air linkage objects. The pressure differences defined in the AirflowNetwork:Multizone:Surface are reported in different output variables (below).
+When a Fan:OnOff object is used, the pressure differences reported for the AirflowNetwork:Distribution:Linkage objects are the values calculated when the fan is operating (ON). It is assumed that the pressure differences when the fan is off are zero for the distribution system air linkage objects. The pressure differences defined in the AirflowNetwork:MultiZone:Surface are reported in different output variables (below).
 
 \paragraph{AFN Surface Average Pressure Difference {[}Pa{]}}\label{afn-surface-average-pressure-difference-pa}
 
-This is the average pressure difference across a linkage in Pa for the AirflowNetwork:Multizone:Surface objects only when a Fan:OnOff object is used. The average pressure difference is weighted by the system fan part-load ratio using the calculated pressure differences during the fan on and off periods for the system timestep. The system fan part-load ratio is defined as the ratio of the air distribution system mass flow rate (average for the simulation timestep) to the system design mass flow rate.
+This is the average pressure difference across a linkage in Pa for the AirflowNetwork:MultiZone:Surface objects only when a Fan:OnOff object is used. The average pressure difference is weighted by the system fan part-load ratio using the calculated pressure differences during the fan on and off periods for the system timestep. The system fan part-load ratio is defined as the ratio of the air distribution system mass flow rate (average for the simulation timestep) to the system design mass flow rate.
 
 Surface Average Pressure Difference = (Surface Average Pressure Difference during on cycle * Part-load ratio) + Surface Average Pressure Difference during off cycle * (1.0 - Part-load ratio)
 
 \paragraph{AFN Surface On Cycle Pressure Difference {[}Pa{]}}\label{afn-surface-on-cycle-pressure-difference-pa}
 
-This is the pressure difference across a linkage in Pa for the AirflowNetwork:Multizone:Surface objects only when the air distribution system fan is operating (ON). This output is only available when a Fan:OnOff object is used. When the fan part-load ratio is equal to 0.0, this pressure difference value will be zero because the air distribution system is not simulated when the fan is off for the entire timestep.
+This is the pressure difference across a linkage in Pa for the AirflowNetwork:MultiZone:Surface objects only when the air distribution system fan is operating (ON). This output is only available when a Fan:OnOff object is used. When the fan part-load ratio is equal to 0.0, this pressure difference value will be zero because the air distribution system is not simulated when the fan is off for the entire timestep.
 
 \paragraph{AFN Surface Off Cycle Pressure Difference {[}Pa{]}}\label{afn-surface-off-cycle-pressure-difference-pa}
 
-This is the pressure difference across a linkage in Pa for the AirflowNetwork:Multizone:Surface objects only when the air distribution system fan is not operating (OFF). This output is only available when a Fan:OnOff object is used. Even if the fan part-load ratio is equal to 1.0, the pressure difference calculated as if the fan were not operating (OFF) is reported.
+This is the pressure difference across a linkage in Pa for the AirflowNetwork:MultiZone:Surface objects only when the air distribution system fan is not operating (OFF). This output is only available when a Fan:OnOff object is used. Even if the fan part-load ratio is equal to 1.0, the pressure difference calculated as if the fan were not operating (OFF) is reported.
 
-\paragraph{\texorpdfstring{AFN Surface Venting Window or Door Opening Factor {[]}}{AFN Surface Venting Window or Door Opening Factor }}\label{afn-surface-venting-window-or-door-opening-factor}
+\paragraph{AFN Surface Venting Window or Door Opening Factor {[]}}\label{afn-surface-venting-window-or-door-opening-factor}
 
-The current time-step value of the venting opening factor for a particular window or door. When the window or door is venting, this is the input value of the opening factor (see AirflowNetwork:Multizone:Surface, Window/Door Opening Factor) times the multiplier for venting modulation (see description of next output variable, ``Opening Factor Multiplier for AirflowNetwork Venting Modulation''). For example, if~ the input Window/Door opening factor is 0.5 and the modulation multiplier is 0.7, then the value of this output variable will be 0.5x0.7 = 0.35.
+The current time-step value of the venting opening factor for a particular window or door. When the window or door is venting, this is the input value of the opening factor (see AirflowNetwork:MultiZone:Surface, Window/Door Opening Factor) times the multiplier for venting modulation (see description of next output variable, ``Opening Factor Multiplier for AirflowNetwork Venting Modulation''). For example, if~ the input Window/Door opening factor is 0.5 and the modulation multiplier is 0.7, then the value of this output variable will be 0.5x0.7 = 0.35.
 
-\paragraph{\texorpdfstring{AFN Surface Venting Window or Door Opening Modulation Multiplier~ {[]}}{AFN Surface Venting Window or Door Opening Modulation Multiplier~ }}\label{afn-surface-venting-window-or-door-opening-modulation-multiplier}
+\paragraph{AFN Surface Venting Window or Door Opening Modulation Multiplier~ {[]}}\label{afn-surface-venting-window-or-door-opening-modulation-multiplier}
 
-This is the multiplier on a window or door opening factor when venting modulation is in effect. See ``Modulation of Openings'' under AirflowNetwork:Multizone:Zone for a description of how the multiplier is determined.
+This is the multiplier on a window or door opening factor when venting modulation is in effect. See ``Modulation of Openings'' under AirflowNetwork:MultiZone:Zone for a description of how the multiplier is determined.
 
-When modulation is in effect the value of the multiplier is between 0.0 and 1.0. When modulation does not apply the value of the multiplier may be --1.0. When modulation applies but the surface is not venting, the value is --1.0. This is summarized in the following table. In this table, ``Zone'' means a thermal zone for which AirflowNetwork:Multizone:Zone has been specified. See object AirflowNetwork: Multizone:Zone for definition of ``Ventilation Control Mode.''
+When modulation is in effect the value of the multiplier is between 0.0 and 1.0. When modulation does not apply the value of the multiplier may be --1.0. When modulation applies but the surface is not venting, the value is --1.0. This is summarized in the following table. In this table, ``Zone'' means a thermal zone for which AirflowNetwork:MultiZone:Zone has been specified. See object AirflowNetwork: MultiZone:Zone for definition of ``Ventilation Control Mode.''
 
 % table 25
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Value of opening factor multiplier for different venting conditions. \label{table:value-of-opening-factor-multiplier-for}} \tabularnewline
-\toprule 
+\toprule
 Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Value of opening factor multiplier for different venting conditions.} \tabularnewline
-\toprule 
+\toprule
 Is surface in a Zone? & Ventilation Control Mode & Is surface venting? & Value of opening factor multiplier \tabularnewline
 \midrule
 \endhead
@@ -2616,11 +2715,11 @@ NoVent & No & -1.0 \tabularnewline
 
 \paragraph{AFN Surface Venting Inside Setpoint Temperature {[}C{]}}\label{afn-surface-venting-inside-setpoint-temperature-c}
 
-The time-step value of the venting setpoint temperature for the zone to which the surface belongs. This setpoint is determined from the Vent Temperature Schedule input (ref: AirflowNetwork:Multizone:Zone).
+The time-step value of the venting setpoint temperature for the zone to which the surface belongs. This setpoint is determined from the Vent Temperature Schedule input (ref: AirflowNetwork:MultiZone:Zone).
 
-\paragraph{\texorpdfstring{AFN Surface Venting Availability Status {[]}}{AFN Surface Venting Availability Status }}\label{afn-surface-venting-availability-status}
+\paragraph{AFN Surface Venting Availability Status {[]}}\label{afn-surface-venting-availability-status}
 
-A value of 1.0 means venting through the surface can occur if venting control conditions are satisfied. A value of 0.0 means venting through the surface cannot occur under any circumstances. This value is determined by the Venting Availability Schedule input (ref: AirflowNetwork:Multizone:Zone or AirflowNetwork:Multizone:Surface).
+A value of 1.0 means venting through the surface can occur if venting control conditions are satisfied. A value of 0.0 means venting through the surface cannot occur under any circumstances. This value is determined by the Venting Availability Schedule input (ref: AirflowNetwork:MultiZone:Zone or AirflowNetwork:MultiZone:Surface).
 
 \paragraph{AFN Zone Infiltration Sensible Heat Gain Rate {[}W{]}}\label{afn-zone-infiltration-sensible-heat-gain-rate-w}
 
@@ -2854,11 +2953,11 @@ This is the average total latent heat loss rate, in Watts, in a specific zone ca
 
 This is the total latent heat loss, in Joules, in a specific zone caused by the forced air distribution system. The total latent loss is the sum of duct leakage latent loss and duct diffusion latent loss. This value is summed over the reporting period. When a Fan:OnOff object is used, the reported value is for the system on cycle.
 
-\textbf{NOTE:} The following output variables should not be confused with similar output variables for the infiltration, mixing, and cross mixing objects (Ref. Infiltration Output, Mixing Output, or Cross Mixing Output). The output variables described below refer to infiltration, mixing, and cross-mixing when an Airflow Network Simulation is performed. The following output variables are always used to describe infiltration, mixing, and cross mixing when the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object is set to ``MultizoneWithoutDistribution'' or ``MultizoneWithDistribution''. In this case the output variables for the infiltration, mixing, and cross mixing objects will always be 0.
+\textbf{NOTE:} The following output variables should not be confused with similar output variables for the infiltration, mixing, and cross mixing objects (Ref. Infiltration Output, Mixing Output, or Cross Mixing Output). The output variables described below refer to infiltration, mixing, and cross-mixing when an Airflow Network Simulation is performed. The following output variables are always used to describe infiltration, mixing, and cross mixing when the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object is set to ``MultiZoneWithoutDistribution'' or ``MultiZoneWithDistribution''. In this case the output variables for the infiltration, mixing, and cross mixing objects will always be 0.
 
-In contrast, the following output variables are only used to describe infiltration, mixing, and cross mixing when the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object is set to ``MultizoneAirflowWithDistributionOnlyDuringFanOperation'' and the fan is operating. When the fan is not operating, the output variables for the infiltration, mixing, and cross mixing objects are used.
+In contrast, the following output variables are only used to describe infiltration, mixing, and cross mixing when the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object is set to ``MultiZoneAirflowWithDistributionOnlyDuringFanOperation'' and the fan is operating. When the fan is not operating, the output variables for the infiltration, mixing, and cross mixing objects are used.
 
-In the case where the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object is set to ``NoMultizoneOrDistribution'', the following output variables are not used and the output variables for the infiltration, mixing, and cross mixing objects are used instead.
+In the case where the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object is set to ``NoMultiZoneOrDistribution'', the following output variables are not used and the output variables for the infiltration, mixing, and cross mixing objects are used instead.
 
 \paragraph{AFN Zone Infiltration Sensible Heat Gain Energy {[}J{]}}\label{afn-zone-infiltration-sensible-heat-gain-energy-j-1}
 
@@ -2914,9 +3013,9 @@ This is a sum of mass flow rates from adjacent zones or outdoors multiplied by t
 
 The following output variables are reported only when an AirflowNetwork:OccupantVentilationControl object is used:
 
-\paragraph{\texorpdfstring{AFN Surface Venting Window or Door Opening Factor at Previous Time Step {[]}}{AFN Surface Venting Window or Door Opening Factor at Previous Time Step }}\label{afn-surface-venting-window-or-door-opening-factor-at-previous-time-step}
+\paragraph{AFN Surface Venting Window or Door Opening Factor at Previous Time Step {[]}}\label{afn-surface-venting-window-or-door-opening-factor-at-previous-time-step}
 
-The value of the venting opening factor for a particular window or door at the previous time step. When the window or door is venting, this is the input value of the opening factor (see AirflowNetwork:Multizone:Surface, Window/Door Opening Factor) times the multiplier for venting modulation (see description of next output variable, ``Opening Factor Multiplier for AirflowNetwork Venting Modulation''). For example, if the input Window/Door opening factor is 0.5 and the modulation multiplier is 0.7, then the value of this output variable will be 0.5*0.7 = 0.35.
+The value of the venting opening factor for a particular window or door at the previous time step. When the window or door is venting, this is the input value of the opening factor (see AirflowNetwork:MultiZone:Surface, Window/Door Opening Factor) times the multiplier for venting modulation (see description of next output variable, ``Opening Factor Multiplier for AirflowNetwork Venting Modulation''). For example, if the input Window/Door opening factor is 0.5 and the modulation multiplier is 0.7, then the value of this output variable will be 0.5*0.7 = 0.35.
 
 \paragraph{AFN Surface Opening Elapsed Time {[}min{]}}\label{afn-surface-opening-elapsed-time-min}
 
@@ -2926,19 +3025,19 @@ This output is the opening elapsed time in the units of minutes since the window
 
 This output is the opening elapsed time in the units of minutes since the windows closed.
 
-\paragraph{\texorpdfstring{AFN Surface Opening Status at Previous Time Step {[]}}{AFN Surface Opening Status at Previous Time Step }}\label{afn-surface-opening-status-at-previous-time-step}
+\paragraph{AFN Surface Opening Status at Previous Time Step {[]}}\label{afn-surface-opening-status-at-previous-time-step}
 
 This is the window or door opening factor control status at the previous time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no occupant ventilation control. The opening factor is determined by the Ventilation Control Mode field. A value of 1 indicates that a window or door is allowed to open. The value of 1 is determined when the opening elapsed time is less than the minimum opening time. A value of 2 denotes that a window or door is forced to close. The value of 2 is determined when the closing elapsed time is less than the minimum closing time.
 
-\paragraph{\texorpdfstring{AFN Surface Opening Status {[]}}{AFN Surface Opening Status }}\label{afn-surface-opening-status}
+\paragraph{AFN Surface Opening Status {[]}}\label{afn-surface-opening-status}
 
 This is the window or door opening factor control status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no occupant ventilation control. The opening factor is determined by the Ventilation Control Mode field. A value of 1 indicates that a window or door is allowed to open. The value of 1 is determined when the opening elapsed time is less than the minimum opening time. A value of 2 denotes that a window or door is forced to close. The value of 2 is determined when the closing elapsed time is less than the minimum closing time.
 
-\paragraph{\texorpdfstring{AFN Surface Opening Probability Status {[]}}{AFN Surface Opening Probability Status }}\label{afn-surface-opening-probability-status}
+\paragraph{AFN Surface Opening Probability Status {[]}}\label{afn-surface-opening-probability-status}
 
 This is the opening probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no opening probability control action. A value of 1 indicates that a window or door is forced to open when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept.
 
-\paragraph{\texorpdfstring{AFN Surface Closing Probability Status {[]}}{AFN Surface Closing Probability Status }}\label{afn-surface-closing-probability-status}
+\paragraph{AFN Surface Closing Probability Status {[]}}\label{afn-surface-closing-probability-status}
 
 This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept.
 

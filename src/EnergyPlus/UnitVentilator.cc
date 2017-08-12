@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -77,6 +65,7 @@
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -90,6 +79,7 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SingleDuct.hh>
 #include <SteamCoils.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
@@ -122,32 +112,25 @@ namespace UnitVentilator {
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
 	// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
 	using DataHVACGlobals::CycFanCycCoil;
+	using DataHVACGlobals::ATMixer_InletSide;
+	using DataHVACGlobals::ATMixer_SupplySide;
 
 	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// Currrent Module Unit type
 	std::string const cMO_UnitVentilator( "ZoneHVAC:UnitVentilator" );
@@ -353,6 +336,7 @@ namespace UnitVentilator {
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
+		using SingleDuct::GetATMixer;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -503,6 +487,12 @@ namespace UnitVentilator {
 				ShowContinueError( "Illegal " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
 			}}
 
+			// Get AirTerminal mixer data
+			GetATMixer( UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).ATMixerName, UnitVent( UnitVentNum ).ATMixerIndex, UnitVent( UnitVentNum ).ATMixerType, UnitVent( UnitVentNum ).ATMixerPriNode, UnitVent( UnitVentNum ).ATMixerSecNode, UnitVent( UnitVentNum ).ATMixerOutNode );
+			if (UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide || UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide) {
+				UnitVent( UnitVentNum ).ATMixerExists = true;
+			}
+
 			// Main air nodes (except outside air node):
 			// For node connections, this object is both a parent and a non-parent, because the
 			// OA mixing box is not called out as a separate component, its nodes must be connected
@@ -512,23 +502,14 @@ namespace UnitVentilator {
 			// non-parent OA mixing box within the unit ventilator.
 			// Because there is overlap between the nodes that are parent and non-parent, use a different
 			// object type for the non parent nodes
-			UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-			UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-
+			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
+				UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+				UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			} else { 
+				UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			}
 			UnitVent( UnitVentNum ).AirOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-			// Fan information:
-			//   A11, \field Supply Air Fan Object Type
-			//        \required-field
-			//        \type choice
-			//        \key Fan:ConstantVolume
-			//        \key Fan:VariableVolume
-			//        \note Allowable fan types are Fan:ConstantVolume and
-			//        \note Fan:VariableVolume
-			//   A12, \field Fan Name
-			//        \required-field
-			//        \type object-list
-			//        \object-list FansCVandVAV
 
 			UnitVent( UnitVentNum ).FanType = Alphas( 11 );
 			UnitVent( UnitVentNum ).FanName = Alphas( 12 );
@@ -538,48 +519,72 @@ namespace UnitVentilator {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				GetFanType( UnitVent( UnitVentNum ).FanName, UnitVent( UnitVentNum ).FanType_Num, errFlag, CurrentModuleObject, UnitVent( UnitVentNum ).Name );
+				if ( ! InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+					GetFanType( UnitVent( UnitVentNum ).FanName, UnitVent( UnitVentNum ).FanType_Num, errFlag, CurrentModuleObject, UnitVent( UnitVentNum ).Name );
 
-				{ auto const SELECT_CASE_var( UnitVent( UnitVentNum ).FanType_Num );
-				if ( ( SELECT_CASE_var == FanType_SimpleConstVolume ) || ( SELECT_CASE_var == FanType_SimpleVAV ) || ( SELECT_CASE_var == FanType_SimpleOnOff ) ) {
+					{ auto const SELECT_CASE_var( UnitVent( UnitVentNum ).FanType_Num );
+					if ( ( SELECT_CASE_var == FanType_SimpleConstVolume ) || ( SELECT_CASE_var == FanType_SimpleVAV ) || ( SELECT_CASE_var == FanType_SimpleOnOff ) ) {
 
-					// Get fan outlet node
-					UnitVent( UnitVentNum ).FanOutletNode = GetFanOutletNode( UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, errFlag );
-					if ( errFlag ) {
-						ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
-						ErrorsFound = true;
-					} else {
-						GetFanIndex( UnitVent( UnitVentNum ).FanName, FanIndex, errFlag, CurrentModuleObject );
-						// Other error checks should trap before it gets to this point in the code, but including just in case.
-
-						GetFanVolFlow( FanIndex, FanVolFlow );
-						if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitVent( UnitVentNum ).MaxAirVolFlow ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
-							ShowContinueError( "...air flow rate [" + TrimSigDigits( FanVolFlow, 7 ) + "] in fan object " + UnitVent( UnitVentNum ).FanName + " is less than the unit ventilator maximum supply air flow rate [" + TrimSigDigits( UnitVent( UnitVentNum ).MaxAirVolFlow, 7 ) + "]." );
-							ShowContinueError( "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate." );
-							ErrorsFound = true;
-						} else if ( FanVolFlow == AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
-							ShowContinueError( "...the fan flow rate is autosized while the unit ventilator flow rate is not." );
-							ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
-						} else if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow == AutoSize ) {
-							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
-							ShowContinueError( "...the unit ventilator flow rate is autosized while the fan flow rate is not." );
-							ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
-						}
-						// Get the fan's availability schedule
-						errFlag = false;
-						UnitVent( UnitVentNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, errFlag );
+						// Get fan outlet node
+						UnitVent( UnitVentNum ).FanOutletNode = GetFanOutletNode( UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, errFlag );
 						if ( errFlag ) {
-							ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+							ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
 							ErrorsFound = true;
+						} else {
+							GetFanIndex( UnitVent( UnitVentNum ).FanName, FanIndex, errFlag, CurrentModuleObject );
+							// Other error checks should trap before it gets to this point in the code, but including just in case.
+
+							GetFanVolFlow( FanIndex, FanVolFlow );
+							if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitVent( UnitVentNum ).MaxAirVolFlow ) {
+								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+								ShowContinueError( "...air flow rate [" + TrimSigDigits( FanVolFlow, 7 ) + "] in fan object " + UnitVent( UnitVentNum ).FanName + " is less than the unit ventilator maximum supply air flow rate [" + TrimSigDigits( UnitVent( UnitVentNum ).MaxAirVolFlow, 7 ) + "]." );
+								ShowContinueError( "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate." );
+								ErrorsFound = true;
+							} else if ( FanVolFlow == AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+								ShowContinueError( "...the fan flow rate is autosized while the unit ventilator flow rate is not." );
+								ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+							} else if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow == AutoSize ) {
+								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+								ShowContinueError( "...the unit ventilator flow rate is autosized while the fan flow rate is not." );
+								ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+							}
+							// Get the fan's availability schedule
+							errFlag = false;
+							UnitVent( UnitVentNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, errFlag );
+							if ( errFlag ) {
+								ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+								ErrorsFound = true;
+							}
 						}
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume." );
+						ErrorsFound = true;
+					}}
+				} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+					UnitVent( UnitVentNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitVent( UnitVentNum ).FanName ) ); // call constructor
+					UnitVent( UnitVentNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitVent( UnitVentNum ).FanName ); //zero-based
+					UnitVent( UnitVentNum ).FanOutletNode = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->outletNodeNum;
+					FanVolFlow = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->designAirVolFlowRate;
+					if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitVent( UnitVentNum ).MaxAirVolFlow ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...air flow rate [" + TrimSigDigits( FanVolFlow, 7 ) + "] in fan object " + UnitVent( UnitVentNum ).FanName + " is less than the unit ventilator maximum supply air flow rate [" + TrimSigDigits( UnitVent( UnitVentNum ).MaxAirVolFlow, 7 ) + "]." );
+						ShowContinueError( "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate." );
+						ErrorsFound = true;
+					} else if ( FanVolFlow == AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...the fan flow rate is autosized while the unit ventilator flow rate is not." );
+						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+					} else if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow == AutoSize ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...the unit ventilator flow rate is autosized while the fan flow rate is not." );
+						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
 					}
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
-					ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume." );
-					ErrorsFound = true;
-				}}
+					UnitVent( UnitVentNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->availSchedIndex;
+
+				}
 			}
 			// For node connections, this object is both a parent and a non-parent, because the
 			// OA mixing box is not called out as a separate component, its nodes must be connected
@@ -587,17 +592,28 @@ namespace UnitVentilator {
 			// Because there is overlap between the nodes that are parent and non-parent, use a different
 			// object type for the non parent nodes
 			//  Set connection type to 'OutdoorAir', because this is hardwired to OA conditions
-			UnitVent( UnitVentNum ).OutsideAirNode = GetOnlySingleNode( Alphas( 8 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
-			if ( ( ! lAlphaBlanks( 8 ) ) ) {
-				CheckAndAddAirNodeNumber( UnitVent( UnitVentNum ).OutsideAirNode, IsValid );
-				if ( ! IsValid ) {
-					ShowWarningError( RoutineName + CurrentModuleObject + ", Adding " + cAlphaFields( 8 ) + '=' + Alphas( 8 ) );
+			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
+				UnitVent( UnitVentNum ).OutsideAirNode = GetOnlySingleNode( Alphas( 8 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent );
+				if ( !lAlphaBlanks( 8 ) ) {
+					CheckAndAddAirNodeNumber( UnitVent( UnitVentNum ).OutsideAirNode, IsValid );
+					if (!IsValid) {
+						ShowWarningError( RoutineName + CurrentModuleObject + ", Adding " + cAlphaFields( 8 ) + '=' + Alphas( 8 ) );
+					}
+				}
+
+				UnitVent( UnitVentNum ).AirReliefNode = GetOnlySingleNode( Alphas( 9 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent );
+
+				UnitVent( UnitVentNum ).OAMixerOutNode = GetOnlySingleNode( Alphas( 10 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			} else {
+				UnitVent( UnitVentNum ).OutsideAirNode = UnitVent( UnitVentNum ).ATMixerPriNode;
+				UnitVent( UnitVentNum ).OAMixerOutNode = UnitVent( UnitVentNum ).ATMixerOutNode;
+				if ( !lAlphaBlanks( 8 ) || !lAlphaBlanks( 9 ) ||  !lAlphaBlanks( 10 ) ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\" is connected to central DOA." );
+					if ( !lAlphaBlanks( 8 ) ) { ShowContinueError( "... input field " +  cAlphaFields( 8 ) + " should have been blank. Specified = " + Alphas( 8 ) ); }
+					if ( !lAlphaBlanks( 9 ) ) { ShowContinueError( "... input field " +  cAlphaFields( 9 ) + " should have been blank. Specified = " + Alphas( 9 ) ); }
+					if ( !lAlphaBlanks( 10 ) ) { ShowContinueError( "... input field " + cAlphaFields( 10 ) + " should have been blank. Specified = " + Alphas( 10 ) ); }
 				}
 			}
-
-			UnitVent( UnitVentNum ).AirReliefNode = GetOnlySingleNode( Alphas( 9 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent );
-
-			UnitVent( UnitVentNum ).OAMixerOutNode = GetOnlySingleNode( Alphas( 10 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			if ( UnitVent( UnitVentNum ).OAControlType == FixedOAControl ) {
 				UnitVent( UnitVentNum ).OutAirVolFlow = UnitVent( UnitVentNum ).MinOutAirVolFlow;
@@ -605,8 +621,19 @@ namespace UnitVentilator {
 				UnitVent( UnitVentNum ).MaxOASchedPtr = GetScheduleIndex( UnitVent( UnitVentNum ).MinOASchedName );
 			}
 
+			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
 			// Add fan to component sets array
 			SetUpCompSets( CurrentModuleObject, UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, NodeID( UnitVent( UnitVentNum ).OAMixerOutNode ), NodeID( UnitVent( UnitVentNum ).FanOutletNode ) );
+			} else {
+				if  (UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide ) {
+					// Add fan to component sets array
+					SetUpCompSets( CurrentModuleObject, UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, NodeID( UnitVent( UnitVentNum ).ATMixerOutNode ), NodeID( UnitVent( UnitVentNum ).FanOutletNode ) );
+				}
+				if ( UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide ) {
+					// Add fan to component sets array
+					SetUpCompSets( CurrentModuleObject, UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).FanType, UnitVent( UnitVentNum ).FanName, NodeID( UnitVent( UnitVentNum ).AirInNode ), NodeID(UnitVent( UnitVentNum ).FanOutletNode ) );
+				}
+			}
 
 			if ( ! lAlphaBlanks( 18 ) ) {
 				UnitVent( UnitVentNum ).AvailManagerListName = Alphas( 18 );
@@ -650,7 +677,7 @@ namespace UnitVentilator {
 				ShowSevereError( CurrentModuleObject + " \"" + UnitVent( UnitVentNum ).Name + "\" " + cAlphaFields( 14 ) + " not found: " + Alphas( 14 ) );
 				ErrorsFound = true;
 			} else if ( lAlphaBlanks( 14 ) ) {
-				if ( UnitVent( UnitVentNum ).FanType_Num == FanType_SimpleOnOff ) {
+				if ( UnitVent( UnitVentNum ).FanType_Num == FanType_SimpleOnOff || UnitVent( UnitVentNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					UnitVent( UnitVentNum ).OpMode = CycFanCycCoil;
 				} else {
 					UnitVent( UnitVentNum ).OpMode = ContFanCycCoil;
@@ -676,7 +703,7 @@ namespace UnitVentilator {
 				//      \type choice
 				//      \key Coil:Heating:Water
 				//      \key Coil:Heating:Electric
-				//      \key Coil:Heating:Gas
+				//      \key Coil:Heating:Fuel
 				//      \key Coil:Heating:Steam
 				// A15, \field Heating Coil Name
 				//      \type object-list
@@ -696,7 +723,7 @@ namespace UnitVentilator {
 						UnitVent( UnitVentNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 					} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 						UnitVent( UnitVentNum ).HCoilType = Heating_ElectricCoilType;
-					} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+					} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 						UnitVent( UnitVentNum ).HCoilType = Heating_GasCoilType;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\", invalid" );
@@ -850,43 +877,101 @@ namespace UnitVentilator {
 					ErrorsFound = true;
 				} //IF (.NOT. lAlphaBlanks(17)) THEN - from the start of cooling coil information
 			}
+			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
+				// check that unit ventilator air inlet node is the same as a zone exhaust node
+				ZoneNodeNotFound = true;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
+						if ( UnitVent( UnitVentNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
+							ZoneNodeNotFound = false;
+							break;
+						}
+					}
+				}
+				if ( ZoneNodeNotFound ) {
+					ShowSevereError( CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\". Unit ventilator air inlet node name must be the same as a zone exhaust node name." );
+					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
+					ShowContinueError( "..Unit ventilator air inlet node name = " + NodeID( UnitVent( UnitVentNum ).AirInNode ) );
+					ErrorsFound = true;
+				}
+				// check that unit ventilator air outlet node is the same as a zone inlet node.
+				ZoneNodeNotFound = true;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
+						if ( UnitVent( UnitVentNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							UnitVent( UnitVentNum ).ZonePtr = CtrlZone;
+							ZoneNodeNotFound = false;
+							break;
+						}
+					}
+				}
+				if ( ZoneNodeNotFound ) {
+					ShowSevereError( CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\". Unit ventilator air outlet node name must be the same as a zone inlet node name." );
+					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
+					ShowContinueError( "..Unit ventilator air outlet node name = " + NodeID( UnitVent( UnitVentNum ).AirOutNode ) );
+					ErrorsFound = true;
+				}
+			} else {
+				if ( UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide ) {
+					// check that unit ventilator air outlet node is the same as a zone inlet node.
+					ZoneNodeNotFound = true;
+					for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+						if ( !ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
+							if ( UnitVent( UnitVentNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+								UnitVent( UnitVentNum ).ZonePtr = CtrlZone;
+								ZoneNodeNotFound = false;
+								break;
+							}
+						}
+					}
+					if ( ZoneNodeNotFound ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\". Unit ventilator air outlet node name must be the same as a zone inlet node name." );
+						ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
+						ShowContinueError( "..Unit ventilator air outlet node name = " + NodeID( UnitVent( UnitVentNum ).AirOutNode ) );
+						ErrorsFound = true;
+					}
 
-			// check that unit ventilator air inlet node is the same as a zone exhaust node
-			ZoneNodeNotFound = true;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
-					if ( UnitVent( UnitVentNum ).AirInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
-						ZoneNodeNotFound = false;
-						break;
+					// check that the air mixer out node is the unit ventilator air inlet node
+					if ( UnitVent( UnitVentNum ).AirInNode != UnitVent( UnitVentNum ).ATMixerOutNode ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\". unit ventilator air inlet node name must be the same as the mixer outlet node name." );
+						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:Mixer object." );
+						ShowContinueError( "..Unit ventilator air inlet node name = " + NodeID( UnitVent( UnitVentNum).AirInNode ) );
+						ErrorsFound = true;
+					}
+
+				}
+				if ( UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide ) {
+					// check that the mixer secondary air node is the unit ventilator air outlet node
+					if ( UnitVent( UnitVentNum ).AirOutNode != UnitVent( UnitVentNum ).ATMixerSecNode ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\". unit ventilator air outlet node name must be the same as the mixer secondary air inlet node name." );
+						ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object.");
+						ShowContinueError( "..Unit ventilator air outlet node name = " + NodeID( UnitVent( UnitVentNum).AirOutNode ) );
+						ErrorsFound = true;
+					}
+
+					// check that air teminal mixer outlet node is the same as a zone inlet node.
+					ZoneNodeNotFound = true;
+					for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+						if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
+							if ( UnitVent( UnitVentNum ).ATMixerOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+								UnitVent( UnitVentNum ).ZonePtr = CtrlZone;
+								ZoneNodeNotFound = false;
+								break;
+							}
+						}
+					}
+					if ( ZoneNodeNotFound ) {
+						ShowSevereError( CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\". Air mixer outlet node name must be the same as a zone inlet node name." );
+						ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
+						ShowContinueError( "..Air terminal mixer outlet node name = " + NodeID( UnitVent( UnitVentNum ).ATMixerOutNode ) );
+						ErrorsFound = true;
 					}
 				}
 			}
-			if ( ZoneNodeNotFound ) {
-				ShowSevereError( CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\". Unit ventilator air inlet node name must be the same as a zone exhaust node name." );
-				ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
-				ShowContinueError( "..Unit ventilator air inlet node name = " + NodeID( UnitVent( UnitVentNum ).AirInNode ) );
-				ErrorsFound = true;
-			}
-			// check that unit ventilator air outlet node is the same as a zone inlet node.
-			ZoneNodeNotFound = true;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
-					if ( UnitVent( UnitVentNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-						UnitVent( UnitVentNum ).ZonePtr = CtrlZone;
-						ZoneNodeNotFound = false;
-						break;
-					}
-				}
-			}
-			if ( ZoneNodeNotFound ) {
-				ShowSevereError( CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\". Unit ventilator air outlet node name must be the same as a zone inlet node name." );
-				ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
-				ShowContinueError( "..Unit ventilator air outlet node name = " + NodeID( UnitVent( UnitVentNum ).AirOutNode ) );
-				ErrorsFound = true;
-			}
-
 			{ auto const SELECT_CASE_var( UnitVent( UnitVentNum ).CoilOption );
 			if ( SELECT_CASE_var == BothOption ) { // 'HeatingAndCooling'
 				// Add cooling coil to component sets array when present
@@ -1118,7 +1203,7 @@ namespace UnitVentilator {
 
 				if ( UnitVent( UnitVentNum ).HCoilType == Heating_WaterCoilType ) {
 
-					rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 					UnitVent( UnitVentNum ).MaxHotWaterFlow = rho * UnitVent( UnitVentNum ).MaxVolHotWaterFlow;
 					UnitVent( UnitVentNum ).MinHotWaterFlow = rho * UnitVent( UnitVentNum ).MinVolHotWaterFlow;
@@ -1188,9 +1273,11 @@ namespace UnitVentilator {
 			Node( OutsideAirNode ).MassFlowRate = 0.0;
 			Node( OutsideAirNode ).MassFlowRateMaxAvail = 0.0;
 			Node( OutsideAirNode ).MassFlowRateMinAvail = 0.0;
-			Node( AirRelNode ).MassFlowRate = 0.0;
-			Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
-			Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
+			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
+				Node( AirRelNode ).MassFlowRate = 0.0;
+				Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
+				Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
+			}
 		} else {
 			Node( InNode ).MassFlowRate = UnitVent( UnitVentNum ).MaxAirMassFlow;
 			Node( InNode ).MassFlowRateMaxAvail = UnitVent( UnitVentNum ).MaxAirMassFlow;
@@ -1201,14 +1288,18 @@ namespace UnitVentilator {
 			Node( OutsideAirNode ).MassFlowRate = UnitVent( UnitVentNum ).OutAirMassFlow;
 			Node( OutsideAirNode ).MassFlowRateMaxAvail = UnitVent( UnitVentNum ).OutAirMassFlow;
 			Node( OutsideAirNode ).MassFlowRateMinAvail = UnitVent( UnitVentNum ).OutAirMassFlow;
-			Node( AirRelNode ).MassFlowRate = UnitVent( UnitVentNum ).OutAirMassFlow;
-			Node( AirRelNode ).MassFlowRateMaxAvail = UnitVent( UnitVentNum ).OutAirMassFlow;
-			Node( AirRelNode ).MassFlowRateMinAvail = UnitVent( UnitVentNum ).OutAirMassFlow;
+			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
+				Node( AirRelNode ).MassFlowRate = UnitVent( UnitVentNum ).OutAirMassFlow;
+				Node( AirRelNode ).MassFlowRateMaxAvail = UnitVent( UnitVentNum ).OutAirMassFlow;
+				Node( AirRelNode ).MassFlowRateMinAvail = UnitVent( UnitVentNum ).OutAirMassFlow;
+			}
 		}
 
 		// Initialize the relief air (same as inlet conditions to the unit ventilator...
 		// Note that mass flow rates will be taken care of later.
-		Node( AirRelNode ) = Node( InNode );
+		if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
+			Node( AirRelNode ) = Node( InNode );
+		}
 		OAMassFlowRate = 0.0;
 
 		// Just in case the unit is off and conditions do not get sent through
@@ -1222,7 +1313,9 @@ namespace UnitVentilator {
 		// These initializations only need to be done once at the start of the iterations...
 		if ( FirstHVACIteration ) {
 			// Initialize the outside air conditions...
-			Node( OutsideAirNode ).Temp = Node( OutsideAirNode ).OutAirDryBulb;
+			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
+				Node( OutsideAirNode ).Temp = Node( OutsideAirNode ).OutAirDryBulb;
+			}
 			//    Node(OutsideAirNode)%HumRat   = OutHumRat
 			//    Node(OutsideAirNode)%Press    = OutBaroPress
 			//    Node(OutsideAirNode)%Enthalpy = PsyHFnTdbW(OutDryBulbTemp,OutHumRat)
@@ -1259,6 +1352,8 @@ namespace UnitVentilator {
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
+		using WaterCoils::GetWaterCoilIndex;
+		using WaterCoils::WaterCoil;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -1335,6 +1430,9 @@ namespace UnitVentilator {
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		Real64 CoolingAirVolFlowScalable; // cooling airvolume for rate determined using scalable sizing method
 		Real64 HeatingAirVolFlowScalable; // heating airvolume for rate determined using scalable sizing method
+		bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
+		Real64 WaterCoilSizDeltaT; // water coil deltaT for design water flow rate autosizing
+		int CoilNum; // index of water coil object
 
 		PltSizHeatNum = 0;
 		ErrorsFound = false;
@@ -1360,6 +1458,8 @@ namespace UnitVentilator {
 		DataZoneNumber = UnitVent(UnitVentNum).ZonePtr;
 		ZoneCoolingOnlyFan = false;
 		ZoneHeatingOnlyFan = false;
+		DoWaterCoilSizing = false;
+		CoilNum = 0;
 
 		if ( UnitVent( UnitVentNum ).CoilOption == BothOption ) {
 			ZoneCoolingOnlyFan = true;
@@ -1681,8 +1781,26 @@ namespace UnitVentilator {
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", UnitVent( UnitVentNum ).HCoilName, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", UnitVent( UnitVentNum ).HCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
-						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitVent( UnitVentNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						if ( PltSizHeatNum > 0 ) {
+						PltSizHeatNum = MyPlantSizingIndex( "COIL:HEATING:WATER", UnitVent( UnitVentNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
+
+						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", UnitVent( UnitVentNum ).HCoilName, ErrorsFound );
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
+							DoWaterCoilSizing = true;
+						} else {
+							if ( PltSizHeatNum > 0 ) {
+								WaterCoilSizDeltaT = PlantSizData( PltSizHeatNum ).DeltaT;
+								DoWaterCoilSizing = true;
+							} else {
+								DoWaterCoilSizing = false;
+								// If there is no heating Plant Sizing object and autosizing was requested, issue fatal error message
+								ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
+								ShowContinueError( "Occurs in " + cMO_UnitVentilator + " Object=" + UnitVent( UnitVentNum ).Name );
+								ErrorsFound = true;
+							}
+						}
+
+						if ( DoWaterCoilSizing ) {
 							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
 								SizingMethod = HeatingCapacitySizing;
 								if ( UnitVent( UnitVentNum ).HVACSizingIndex > 0 ) {
@@ -1713,6 +1831,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1721,17 +1840,13 @@ namespace UnitVentilator {
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
 								}
-								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
-								MaxVolHotWaterFlowDes = DesHeatingLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+								MaxVolHotWaterFlowDes = DesHeatingLoad / ( WaterCoilSizDeltaT * Cp * rho );
 
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
 							}
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " + cMO_UnitVentilator + " Object=" + UnitVent( UnitVentNum ).Name );
-							ErrorsFound = true;
 						}
 					}
 					if ( IsAutoSize ) {
@@ -1806,6 +1921,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1879,7 +1995,23 @@ namespace UnitVentilator {
 					CoilWaterOutletNode = GetCoilWaterOutletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
 						PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						if ( PltSizCoolNum > 0 ) {
+						CoilNum = GetWaterCoilIndex( CoolingCoilType, CoolingCoilName, ErrorsFound );
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
+							DoWaterCoilSizing = true;
+						} else {
+							if ( PltSizCoolNum > 0 ) {
+								WaterCoilSizDeltaT = PlantSizData( PltSizCoolNum ).DeltaT;
+								DoWaterCoilSizing = true;
+							} else {
+								DoWaterCoilSizing = false;
+								// If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
+								ShowSevereError( "Autosizing of water coil requires a cooling loop Sizing:Plant object" );
+								ShowContinueError( "Occurs in " + cMO_UnitVentilator + " Object=" + UnitVent( UnitVentNum ).Name );
+								ErrorsFound = true;
+							}
+						}
+						if ( DoWaterCoilSizing ) {
 							if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
 								SizingMethod = CoolingCapacitySizing;
 								if ( UnitVent( UnitVentNum ).HVACSizingIndex > 0 ) {
@@ -1910,6 +2042,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoolingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1920,7 +2053,7 @@ namespace UnitVentilator {
 								}
 								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5., PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
 								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5., PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
-								MaxVolColdWaterFlowDes = DesCoolingLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
+								MaxVolColdWaterFlowDes = DesCoolingLoad / ( WaterCoilSizDeltaT * Cp * rho );
 
 								if ( MaxVolColdWaterFlowDes < 0.0 ) {
 									ShowWarningError( "Autosizing of water flow resulted in negative value." );
@@ -1935,10 +2068,6 @@ namespace UnitVentilator {
 							} else {
 								MaxVolColdWaterFlowDes = 0.0;
 							}
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " + cMO_UnitVentilator + " Object=" + UnitVent( UnitVentNum ).Name );
-							ErrorsFound = true;
 						}
 					}
 					if ( IsAutoSize ) {
@@ -2051,7 +2180,7 @@ namespace UnitVentilator {
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2110,7 +2239,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else {
 				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
 			}}
@@ -2138,7 +2267,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else {
 				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
 			}}
@@ -2162,8 +2291,6 @@ namespace UnitVentilator {
 
 		}}
 
-		// FLOW:
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlNode = 0;
 		QUnitOut = 0.0;
@@ -2409,7 +2536,7 @@ namespace UnitVentilator {
 								if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 								Par( 3 ) = double( OpMode );
 								// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-								SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
+								SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
 							}
 						}
 
@@ -2613,7 +2740,7 @@ namespace UnitVentilator {
 								if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 								Par( 3 ) = double( OpMode );
 								// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-								SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
+								SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
 							}
 						}
 						CalcUnitVentilatorComponents( UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac );
@@ -2647,7 +2774,11 @@ namespace UnitVentilator {
 		UnitVent( UnitVentNum ).HeatPower = max( 0.0, QUnitOut );
 		UnitVent( UnitVentNum ).SensCoolPower = std::abs( min( 0.0, QUnitOut ) );
 		UnitVent( UnitVentNum ).TotCoolPower = std::abs( min( 0.0, QTotUnitOut ) );
-		UnitVent( UnitVentNum ).ElecPower = FanElecPower;
+		if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			UnitVent( UnitVentNum ).ElecPower = Fans::GetFanPower( UnitVent( UnitVentNum ).Fan_Index );
+		} else {
+			UnitVent( UnitVentNum ).ElecPower = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->fanPower();
+		}
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;
@@ -2686,7 +2817,6 @@ namespace UnitVentilator {
 		// na
 
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -2696,6 +2826,8 @@ namespace UnitVentilator {
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using PlantUtilities::SetComponentFlowRate;
+		using SingleDuct::SimATMixer;
+		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2719,10 +2851,15 @@ namespace UnitVentilator {
 		Real64 mdot; // hot water or steam mass flow rate for current time step
 		Real64 PartLoadRatio; // unit ventilator part load ratio
 		int FanOpMode; // fan operating mode or fan type
+		static int ATMixOutNode( 0 ); // outlet node of ATM Mixer
+		static int ATMixerPriNode( 0 ); // primary air node of ATM Mixer
+		static int ZoneNode( 0 ); // zone node
+		Real64 SpecHumMin( 0 ); // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
 		// FLOW:
 		InletNode = UnitVent( UnitVentNum ).AirInNode;
 		OutletNode = UnitVent( UnitVentNum ).AirOutNode;
+		ZoneNode = ZoneEquipConfig( UnitVent( UnitVentNum ).ZonePtr ).ZoneNode;
 		QCoilReq = QZnReq;
 
 		if ( present( PartLoadFrac ) ) {
@@ -2738,9 +2875,24 @@ namespace UnitVentilator {
 
 		if ( FanOpMode != CycFanCycCoil ) {
 
-			SimUnitVentOAMixer( UnitVentNum, FanOpMode );
-
-			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if ( UnitVent( UnitVentNum ).ATMixerExists ) {
+				ATMixOutNode = UnitVent( UnitVentNum ).ATMixerOutNode;
+				ATMixerPriNode = UnitVent( UnitVentNum ).ATMixerPriNode;
+				if ( UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide ) {
+					// set the primary air inlet mass flow rate
+					Node( ATMixerPriNode ).MassFlowRate = min( min(Node( ATMixerPriNode ).MassFlowRateMaxAvail, OAMassFlowRate ), Node( InletNode ).MassFlowRate );
+					// now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
+					SimATMixer( UnitVent( UnitVentNum ).ATMixerName, FirstHVACIteration, UnitVent( UnitVentNum ).ATMixerIndex );
+				}
+			} else {
+				SimUnitVentOAMixer( UnitVentNum, FanOpMode );
+			}
+			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+				Fans::SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
+				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
+			}
 
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) {
 				if ( UnitVent( UnitVentNum ).CCoilType == Cooling_CoilHXAssisted ) {
@@ -2797,9 +2949,23 @@ namespace UnitVentilator {
 			// Set the fan inlet node maximum available mass flow rates for cycling fans
 			Node( InletNode ).MassFlowRateMaxAvail = AirMassFlow;
 
-			SimUnitVentOAMixer( UnitVentNum, FanOpMode );
-
-			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			if (UnitVent( UnitVentNum ).ATMixerExists) {
+				ATMixOutNode = UnitVent( UnitVentNum ).ATMixerOutNode;
+				ATMixerPriNode = UnitVent( UnitVentNum ).ATMixerPriNode;
+				if ( UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide ) {
+					// set the primary air inlet mass flow rate
+					Node( ATMixerPriNode ).MassFlowRate = min( min( Node( ATMixerPriNode ).MassFlowRateMaxAvail, OAMassFlowRate ), Node( InletNode ).MassFlowRate );
+					// now calculate the mixer outlet conditions (and the secondary air inlet flow rate)
+					SimATMixer( UnitVent( UnitVentNum ).ATMixerName, FirstHVACIteration, UnitVent( UnitVentNum ).ATMixerIndex );
+				}
+			} else {
+				SimUnitVentOAMixer( UnitVentNum, FanOpMode );
+			}
+			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+				Fans::SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
+			}
 
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) {
 
@@ -2862,14 +3028,24 @@ namespace UnitVentilator {
 				}}
 
 			}
-
 		}
-		InletNode = UnitVent( UnitVentNum ).AirInNode;
-		OutletNode = UnitVent( UnitVentNum ).AirOutNode;
 		AirMassFlow = Node( OutletNode ).MassFlowRate;
-
-		LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
-
+		// calculate delivered load
+		if ( UnitVent( UnitVentNum ).ATMixerExists ) {
+			if ( UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide ) {
+				// set the primary air inlet mass flow rate
+				Node( ATMixerPriNode ).MassFlowRate = min( Node( ATMixerPriNode ).MassFlowRateMaxAvail, OAMassFlowRate );
+				// now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
+				SimATMixer( UnitVent( UnitVentNum ).ATMixerName, FirstHVACIteration, UnitVent( UnitVentNum ).ATMixerIndex );
+				SpecHumMin = min( Node( ATMixOutNode ).HumRat, Node( InletNode ).HumRat );
+				LoadMet = Node( ATMixOutNode ).MassFlowRate * ( PsyHFnTdbW( Node( ATMixOutNode ).Temp, SpecHumMin ) - PsyHFnTdbW( Node( InletNode ).Temp, SpecHumMin) );
+			} else {
+				// ATM Mixer on inlet side
+				LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( ZoneNode ).HumRat ) - PsyHFnTdbW( Node( ZoneNode).Temp, Node( ZoneNode ).HumRat ) );
+			}
+		} else {
+			LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+		}
 	}
 
 	void
@@ -3264,7 +3440,7 @@ namespace UnitVentilator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the part-load ratio for the unit ventilator.
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 		// REFERENCES:
 		// na
 		// USE STATEMENTS:

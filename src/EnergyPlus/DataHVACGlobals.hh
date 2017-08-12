@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataHVACGlobals_hh_INCLUDED
 #define DataHVACGlobals_hh_INCLUDED
@@ -75,6 +63,13 @@ namespace DataHVACGlobals {
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
+	enum class HVACSystemRootSolverAlgorithm : int {
+		RegulaFalsi = 0,
+		Bisection,
+		RegulaFalsiThenBisection,
+		BisectionThenRegulaFalsi,
+		Alternation
+	};
 
 	// MODULE PARAMETER DEFINITIONS:
 
@@ -88,6 +83,7 @@ namespace DataHVACGlobals {
 	extern Real64 const BlankNumeric; // indicates numeric input field was blank
 	extern Real64 const RetTempMax; // maximum return air temperature [deg C]
 	extern Real64 const RetTempMin; // minimum return air temperature [deg C]
+	extern Real64 const DesCoilHWInletTempMin; // minimum heating water coil water inlet temp for UA sizing only. [deg C] 
 
 	extern int const NumOfSizingTypes; // request sizing for cooling air flow rate
 
@@ -118,12 +114,14 @@ namespace DataHVACGlobals {
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
 	extern int const ZoneCoolingLoadSizing; // zone cooling sensible load (zsz file)
 	extern int const ZoneHeatingLoadSizing; // zome heating sensible load (zsz file)
-	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling
+	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating
+	extern int const ASHRAEMinSATCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	extern int const ASHRAEMaxSATHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
 	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
 	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
 	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil
-
+	extern int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing; // identifies desiccant performance data face velocity autosisizing input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser
@@ -156,6 +154,8 @@ namespace DataHVACGlobals {
 	extern int const FanType_SimpleOnOff;
 	extern int const FanType_ZoneExhaust;
 	extern int const FanType_ComponentModel; // cpw22Aug2010 (new)
+	extern int const FanType_SystemModelObject; // 
+
 	// Fan Minimum Flow Fraction Input Method
 	extern int const MinFrac;
 	extern int const FixedMin;
@@ -196,7 +196,7 @@ namespace DataHVACGlobals {
 	extern int const CoilDX_MultiSpeedCooling;
 	extern int const CoilDX_MultiSpeedHeating;
 
-	extern int const Coil_HeatingGas;
+	extern int const Coil_HeatingGasOrOtherFuel;
 	extern int const Coil_HeatingGas_MultiStage;
 	extern int const Coil_HeatingElectric;
 	extern int const Coil_HeatingElectric_MultiStage;
@@ -305,6 +305,8 @@ namespace DataHVACGlobals {
 	// for oscillation of zone temperature to be detected.
 	extern Real64 const OscillateMagnitude;
 
+	// Parameters for HVACSystemRootFindingAlgorithm
+	extern int const Bisection;
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -327,7 +329,6 @@ namespace DataHVACGlobals {
 	extern int NumElecCircuits; // Number of electric circuits specified in simulation
 	extern int NumGasMeters; // Number of gas meters specified in simulation
 	extern int NumPrimaryAirSys; // Number of primary HVAC air systems
-	extern Real64 FanElecPower; // fan power from last fan simulation
 	extern Real64 OnOffFanPartLoadFraction; // fan part-load fraction (Fan:OnOff)
 	extern Real64 DXCoilTotalCapacity; // DX coil total cooling capacity (eio report var for HPWHs)
 	extern Real64 DXElecCoolingPower; // Electric power consumed by DX cooling coil last DX simulation
@@ -339,6 +340,7 @@ namespace DataHVACGlobals {
 	extern Real64 BalancedExhMassFlow; // balanced zone exhaust (declared as so by user)  [kg/s]
 	extern Real64 PlenumInducedMassFlow; // secondary air mass flow rate induced from a return plenum [kg/s]
 	extern bool TurnFansOn; // If true overrides fan schedule and cycles fans on
+	extern bool TurnZoneFansOnlyOn; // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
 	extern bool TurnFansOff; // If True overides fan schedule and TurnFansOn and forces fans off
 	extern bool ZoneCompTurnFansOn; // If true overrides fan schedule and cycles fans on
 	extern bool ZoneCompTurnFansOff; // If True overides fan schedule and TurnFansOn and forces fans off
@@ -499,10 +501,26 @@ namespace DataHVACGlobals {
 
 	};
 
+	struct HVACSystemRootFindingAlgorithm
+	{
+		// Members
+		std::string Algorithm;           // Choice of algorithm
+		int NumOfIter;                   // Number of Iteration Before Algorith Switch
+		HVACSystemRootSolverAlgorithm HVACSystemRootSolver; //1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5 Alternation
+										 // Default Constructor
+		HVACSystemRootFindingAlgorithm( ) :
+			NumOfIter( 5 ),
+			HVACSystemRootSolver( HVACSystemRootSolverAlgorithm::RegulaFalsi )
+		{}
+
+	};
+
+
 	// Object Data
 	extern Array1D< ZoneCompTypeData > ZoneComp;
 	extern OptStartDataType OptStartData; // For optimum start
 	extern Array1D< ComponentSetPtData > CompSetPtEquip;
+	extern HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.

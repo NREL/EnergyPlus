@@ -84,7 +84,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -624,8 +624,8 @@
     1.000000,                !- Conductivity {W/m-K}
     ,                        !- Dirt Correction Factor for Solar and Visible Transmittance
     ,                        !- Solar Diffusing
-    7.2e10,                  !- Young’s modulus {Pa}
-    0.22;                    !- Poisson’s ratio
+    7.2e10,                  !- Young's modulus {Pa}
+    0.22;                    !- Poisson's ratio
 
 !----------------------------------------------------------------------
 !         Window Gas Layers

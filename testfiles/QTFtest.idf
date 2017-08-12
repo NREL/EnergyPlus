@@ -7,7 +7,7 @@
 ! Plant:    None.
 ! SolDis=MinimalShadowing, Aniso, Detailed Interior and Exterior Convection
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,1;
 
@@ -177,9 +177,75 @@
     0.5000000,               !- Solar Absorptance
     0.5000000;               !- Visible Absorptance
 
+  Material,
+    C10 - 8 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    0.2033016,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Name
+    Rough,                   !- Roughness
+    1.2710161E-02,           !- Thickness {m}
+    1.435549,                !- Conductivity {W/m-K}
+    881.0155,                !- Density {kg/m3}
+    1673.600,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5500000,               !- Solar Absorptance
+    0.5500000;               !- Visible Absorptance
+
+  Material,
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name
+    Rough,                   !- Roughness
+    9.5402403E-03,           !- Thickness {m}
+    0.1902535,               !- Conductivity {W/m-K}
+    1121.292,                !- Density {kg/m3}
+    1673.600,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  Material,
+    B5 - 1 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    2.5E-02,                 !- Thickness {m}
+    4.0E-02,                 !- Conductivity {W/m-K}
+    91.30524,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+  Material,
+    C12 - 2 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    5.0901599E-02,           !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
   Construction,
     R13WALL,                 !- Name
     R13LAYER;                !- Outside Layer
+
+  Construction,
+    FLOOR SLAB 8 IN,         !- Name
+    C10 - 8 IN HW CONCRETE;  !- Outside Layer
+
+  Construction,
+    ROOF34,                  !- Name
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
+    B5 - 1 IN DENSE INSULATION,  !- Layer 3
+    C12 - 2 IN HW CONCRETE;  !- Layer 4
 
   Construction:InternalSource,
     Example Floor,           !- Name
@@ -281,6 +347,39 @@
     0.0000000E+00,15.24000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
     0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
     0.0000000E+00,0.0000000E+00,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR SLAB 8 IN,         !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zn001:Flr001,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF34,                  !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,0,4.572,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,15.24,4.572,  !- X,Y,Z ==> Vertex 3 {m}
+    0,15.24,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 

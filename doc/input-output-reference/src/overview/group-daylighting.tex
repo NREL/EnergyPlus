@@ -1,76 +1,40 @@
 \section{Group -- Daylighting}\label{group-daylighting}
 
-Daylighting can be invoked in EnergyPlus by the use of two objects: \textbf{Daylighting:Controls} and \textbf{Daylighting:DELight:Controls}. These are described in the following object descriptions.
+Daylighting can be invoked in EnergyPlus primarily by the use of the objects: \textbf{Daylighting:Controls} and \textbf{Daylighting:ReferencePoint}. Other objects related to daylighting are \textbf{Daylighting:DElight:ComplexFenestration}, \textbf{Output:IlluminanceMap}, and \textbf{OutputControl:IlluminanceMap:Style}.  These are described in the following object descriptions.
 
 \begin{callout}
-  Note that Daylighting:Controls and Daylighting:DELight:Controls objects may be intermixed in a single IDF but may not be used in the same zone.
+  Note that two different methodologies are used in the Daylighting:Controls object (SplitFlux and DElight) and may be intermixed in a single IDF but may not be used in the same zone.
 \end{callout}
 
 \subsection{Daylighting:Controls}\label{daylightingcontrols-000}
 
-In this method daylighting illuminance levels are calculated and then used to determine how much the electric lighting can be reduced. The daylight illuminance level in a zone depends on many factors, including sky condition; sun position; calculation point; location, size, and glass transmittance of windows; window shading devices; and reflectance of interior surfaces. Reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled and type of lighting control.
+When this object is used, daylighting illuminance levels are calculated and then used to determine how much the electric lighting can be reduced. The daylight illuminance level in a zone depends on many factors, including sky condition; sun position; calculation point; location, size, and glass transmittance of windows; window shading devices; and reflectance of interior surfaces. Reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled and type of lighting control. Two different methods of computing the daylighitng illuminance and subsequent lighting reduction called SplitFlux and DElight. After the object description below is are sections that describe the two methodologies in more detail. 
 
 \subsubsection{Inputs}\label{inputs-009}
+
+\paragraph{Field: Name}\label{field-name-001}
+
+The name of the Daylighting:Controls object.
 
 \paragraph{Field: Zone name}\label{field-zone-name-003}
 
 The name of the zone to which the following daylighting-related input applies.
 
-\paragraph{Field: Total Daylighting Reference Points}\label{field-total-daylighting-reference-points}
+\paragraph{Field: Daylighting Method}\label{field-Daylighting Method}
 
-Allowed values are 1 or 2. This the number of reference points in the zone at which horizontal daylighting illuminance will be calculated based on input for the following fields. It is assumed that the photocells that control the overhead electric lighting respond to the light levels at the specified reference points.
+The Daylighting Method field can be set to either of the following: SplitFlux or DElight. Different Zones can have different settings in the same file but in a single zone only one method should be used at a time. Guidelines for using the SplitFlux method and additional details on the DElight method are shown in following sections.
 
-\paragraph{Fields: (X,Y,Z) of First Reference Point}\label{fields-xyz-of-first-reference-point}
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-002}
 
-Required if Total Daylighting Reference Points = 1 or 2. These three fields are the X, Y and Z values of the First Reference point in the coordinate system you specified for daylighting reference points in the GlobalGeometryRules object. Figure~\ref{fig:example-showing-location-of-daylighting} shows an example using the relative coordinate (to zone) system. Z is typically at desk height (0.8 m).
-
-If you want to divide a thermal zone into two independently-controlled lighting zones, then Total Daylighting Reference Points should be set to 2 and (X,Y,Z) of the Second Reference Point (see following input fields) should also be specified.
-
-\paragraph{Fields: (X,Y,Z) of Second Reference Point}\label{fields-xyz-of-second-reference-point}
-
-The X, Y, and Z coordinates, in the same coordinate system, of the second daylighting reference point. Required if Total Daylighting Reference Points = 2. See Figure~\ref{fig:example-showing-location-of-daylighting} for an example.
-
-\begin{figure}[hbtp] % fig 53
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image095.png}
-\caption{Example showing location of daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters. \protect \label{fig:example-showing-location-of-daylighting}}
-\end{figure}
-
-\paragraph{Field: Fraction of Zone Controlled by First Reference Point}\label{field-fraction-of-zone-controlled-by-first-reference-point}
-
-The fraction of the zone's floor-area whose electric lighting is controlled by the daylight illuminance at the First Reference Point. If there is only one reference point then a fraction equal to
-
-\begin{equation}
-  1.0 - (\rm{Fraction of Zone Controlled by First Reference Point})
-\end{equation}
-
-is assumed to have no lighting control.
-
-\paragraph{Field: Fraction of Zone Controlled by Second Reference Point}\label{field-fraction-of-zone-controlled-by-second-reference-point}
-
-The fraction of the zone's floor-area whose electric lighting is controlled by the daylight illuminance at the Second Reference Point. Required if Total Daylighting Reference Points = 2. A fraction equal to
-
-\begin{equation}
-  1.0 - ([\rm{Fraction of Zone Controlled by First Reference Point}] + [\rm{Fraction of Zone Controlled by Second Reference Point}])
-\end{equation}
-
-is assumed to have no lighting control.
-
-\paragraph{Field: Illuminance SetPoint at First Reference Point}\label{field-illuminance-setpoint-at-first-reference-point}
-
-The desired lighting level (in lux) at the First Reference Point. This is the lighting level that would be produced at this reference point at night if the overhead electric lighting were operating at full input power. Recommended values depend on type of activity; they may be found, for example, in the Lighting Handbook of the Illuminating Engineering Society of North America. A typical value for general office work (excluding computer terminals) is 500 lux.
-
-\paragraph{Field: Illuminance SetPoint at Second Reference Point}\label{field-illuminance-setpoint-at-second-reference-point}
-
-The desired lighting level (in lux) at the Second Reference Point. Required if Total Daylighting Reference Points = 2. This is the lighting level that would be produced at this reference point at night if the overhead electric lighting were operating at full input power.
+This alpha field is optional and may be used to define the name of a schedule that denotes whether or not the control is available to operate during a given time period. If the schedule value is greater than zero, then the controls will be available to operate for that time period.~ If the schedule value is zero or less, then the controls will not be available. If this field is left blank, the controls will be always available. For example, this can be useful for scheduling the daylighting controls off during design days so that the daylighting controls do not affect lighting power during sizing.
 
 \paragraph{Field: Lighting Control Type}\label{field-lighting-control-type}
 
 The type of overhead electric lighting control. All reference points specified are assumed to have this type of control.
 
-For Lighting Control Type = 1 (continuous), the overhead lights dim continuously and linearly from (maximum electric power, maximum light output) to (minimum electric power, minimum light output) as the daylight illuminance increases. The lights stay on at the minimum point with further increase in the daylight illuminance.
+For Lighting Control Type set to Continuous, the overhead lights dim continuously and linearly from (maximum electric power, maximum light output) to (minimum electric power, minimum light output) as the daylight illuminance increases. The lights stay on at the minimum point with further increase in the daylight illuminance.
 
-For Lighting Control Type = 2 (stepped), the electric power input and light output vary in discrete, equally spaced steps. The number of steps is given by Number of Steps (Excluding Off) of Stepped Control. For example, if Number of Steps = 3 and Illuminance Setpoint = 600, then the following table shows the fraction of the lights that are on vs.~daylight illuminance.
+For Lighting Control Type set to Stepped, the electric power input and light output vary in discrete, equally spaced steps. The number of steps is given by Number of Steps (Excluding Off) of Stepped Control. For example, if Number of Steps = 3 and Illuminance Setpoint = 600, then the following table shows the fraction of the lights that are on vs.~daylight illuminance.
 
 % table 18
 \begin{longtable}[c]{@{}ll@{}}
@@ -93,15 +57,49 @@ Daylight illuminance & Fraction of lights that are on \tabularnewline
 \bottomrule
 \end{longtable}
 
-Lighting Control Type = 3 (continuous/off) is the same as Lighting Control Type = 1 except that the lights switch off completely when the minimum dimming point is reached.
+Lighting Control Type set to ContinuousOff is the same similar to Lighting Control Type set to Continuous except that the lights switch off completely when the minimum dimming point is reached.
+
+\paragraph{Field: Minimum Input Power Fraction for Continuous Dimming Control}\label{field-minimum-input-power-fraction-for-continuous-dimming-control}
+
+For Lighting Control Type set to Continuous, the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type set to ContinuousOff, this is the power fraction reached just before the lights switch off completely.
+
+\begin{figure}[hbtp] % fig 54
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image096.png}
+\caption{Illustration of continuous dimming relationship \protect \label{fig:illustration-of-continuous-dimming}}
+\end{figure}
+
+The figure shows the relationship between electric light output and electrical input.
+
+\paragraph{Field: Minimum Light Output Fraction for Continuous Dimming Control}\label{field-minimum-light-output-fraction-for-continuous-dimming-control}
+
+For Lighting Control Type set to Continuous, the lowest lighting output the lighting system can dim down to, expressed as a fraction of maximum light output (see figure). This is the fractional light output that the system produces at minimum input power. For Lighting Control Type set to ContinuousOff, this is the light output fraction reached just before the lights switch off completely.
+
+\paragraph{Field: Number of Stepped Control Steps}\label{field-number-of-stepped-control-steps}
+
+The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be \textgreater{}0 if Lighting Control Type is set to Stepped. The steps are assumed to be equally spaced.
+
+\begin{figure}[hbtp] % fig 55
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image097.png}
+\caption{Stepped lighting control with Number of Steps = 3. \protect \label{fig:stepped-lighting-control-with-number-of-steps}}
+\end{figure}
+
+\paragraph{Field: Probability Lighting will be Reset When Needed in Manual Stepped Control}\label{field-probability-lighting-will-be-reset-when-needed-in-manual-stepped-control}
+
+May be specified if a stepped lighting control system (Lighting Control Type set to Stepped) is manually operated, such as in a simple, one-step (on-off) system. Gives the probability the occupants of a daylit zone will set the electric lights to the correct level to obtain the required illuminance. The rest of the time the lights are assumed to be set one step too high. For example, consider an on-off lighting system (Number of Steps = 1) with a set point of 600 lux and 0.7 reset probability. Then, when daylighting exceeds 600 lux, the electric lights will be off 70\% of the time and on 30\% of the time.
+
+\paragraph{Field: Glare Calculation Daylighting Reference Point Name}\label{field-glare calculation-daylighting-reference-point-name}
+
+The Daylighting:ReferencePoint name should be specified that is used for determining the glare. Only one reference point is used to calculate the glare. This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
 
 \paragraph{Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis}\label{field-glare-calculation-azimuth-angle-of-view-direction-clockwise-from-zone-y-axis}
 
-Daylight glare from a window depends on occupant view direction. It is highest when you look directly at a window and decreases as you look away from a window. This field specifies the view direction for calculating glare. It is the angle, measured clockwise in the horizontal plane, between the zone y-axis and the occupant view direction.
+Daylight glare from a window depends on occupant view direction. It is highest when you look directly at a window and decreases as you look away from a window. This field specifies the view direction for calculating glare. It is the angle, measured clockwise in the horizontal plane, between the zone y-axis and the occupant view direction. This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
 
 \paragraph{Field: Maximum Allowable Discomfort Glare Index}\label{field-maximum-allowable-discomfort-glare-index}
 
-If a daylit zone has windows with shading devices (except exterior screens), the shades will be deployed if the daylight glare at the First Reference Point exceeds the value of this field. To get this type of glare control you have to specify Trigger = Glare, GlareOrSolarOnWindow, GlareOrHorizontalSolar, GlareOrOutsideAirTemp, GlareOrZoneAirTemp or GlareOrZoneLoad in WindowProperty:ShadingControl for one or more windows in the zone (see WindowProperty:ShadingControl).
+If a daylit zone has windows with shading devices (except exterior screens), the shades will be deployed if the daylight glare at Daylighting:ReferencePoint specified in the Glare Calculation Daylighting Reference Point Name field exceeds the value of this field. To get this type of glare control you have to specify Trigger = Glare, GlareOrSolarOnWindow, GlareOrHorizontalSolar, GlareOrOutsideAirTemp, GlareOrZoneAirTemp or GlareOrZoneLoad in WindowProperty:ShadingControl for one or more windows in the zone (see WindowProperty:ShadingControl). This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
 
 If a zone has two or more windows with glare control, the shading devices will be deployed one by one in the order in which the windows are input until the glare level at each reference point falls below Maximum Allowable Discomfort Glare Index or is as close as possible to it.
 
@@ -134,66 +132,89 @@ School classrooms & 20 \tabularnewline
 \bottomrule
 \end{longtable}
 
-\paragraph{Field: Minimum Input Power Fraction for Continuous Dimming Control}\label{field-minimum-input-power-fraction-for-continuous-dimming-control}
+\paragraph{Field: DElight Gridding Resolution}\label{field-gridding-resolution}
 
-For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
+The maximum surface area for nodes in gridding (subdividing) all surfaces in the zone when Daylighting Method is set to DElight. All reflective and transmitting surfaces will be subdivided into approximately square nodes that do not exceed this maximum. Higher resolution subdivisions require greater calculation times, but generally produce more accurate results. This same gridding resolution is also used to subdivide any Complex Fenestration System surfaces. It is advisable to perform at least one simulation of new input using a small gridding resolution such as 0.1m2 to compare these results against simulation runs at lower resolution (i.e., higher maximum area nodal grids) to get a sense of possible levels of error. This input is only used in when the Daylighting Method is set to DElight. This input is ignored when Daylighting Method is set to SplitFlux.
 
-\begin{figure}[hbtp] % fig 54
+\paragraph{Field Set (reference point name, fraction controlled, illuminance setpoint)}\label{field-set-daylightingcontrols}
+
+This set of fields is used together and can be repeated an unlimited number of times to specify some of the name of the reference point, the fraction of the zone lighting controlled by that reference point and the illuminance setpoint that should be applied for daylighting control at that reference point.
+
+\paragraph{Field: Daylighting Reference Point Name <x>}\label{field-daylighting-reference-point-name-x}
+
+The Daylighting:ReferencePoint name should be specified that is used for determining the daylighting control sensor location. 
+
+\paragraph{Field: Fraction of Zone Controlled by Reference Point <x>}\label{field-fraction-of-zone-controlled-by-reference-point-x}
+
+The fraction of the zone's floor-area whose electric lighting is controlled by the daylight illuminance at the named Daylighting:ReferencePoint. If the sum of the fractions are less than 1.0, the remaining portion is assumed to have no lighting control.
+
+\paragraph{Field: Illuminance Setpoint at Reference Point <x>}\label{field-illuminance-setpoint-at-reference-point-x}
+
+The desired lighting level (in lux) at the named Daylighting:ReferencePoint. This is the lighting level that would be produced at this reference point at night if the overhead electric lighting were operating at full input power. Recommended values depend on type of activity; they may be found, for example, in the Lighting Handbook of the Illuminating Engineering Society of North America. A typical value for general office work (excluding computer terminals) is 500 lux.
+
+\subsection{Daylighting:ReferencePoint}\label{daylightingreferencepoint-000}
+
+This object is referenced by Daylighting:Controls to identify the reference point coordinates for each sensor. The reference points in the zone are where horizontal daylighting illuminance will be calculated. It is assumed that the photocells that control the overhead electric lighting respond to the light levels at the specified coordinates. Reference points are given in coordinates specified in the GlobalGeometryRules object Daylighting Reference Point CoordinateSystem field. 
+
+When the DElight Daylighting Method is used, there may be up to a maximum of 100 reference points for each zone. Each Reference Point that is input does NOT need to be included in the control of the electric lighting system within the zone. This is determined by the fraction of the zone controlled by each Reference Point, which can be input as 0. Note when the DElight Daylighting Method is used, that the sum of all Reference Point control fractions must equal 1 to obtain correct overall results.
+
+\subsubsection{Inputs}\label{inputs-010}
+
+\paragraph{Field: Name}\label{field-name-002}
+
+The name of the Daylighting:ReferencePoint object.
+
+\paragraph{Field: Zone name}\label{field-zone-name-003}
+
+The name of the zone in which the reference point is located.
+
+\paragraph{Fields: (X,Y,Z) Coordinate of Reference Point}\label{fields-xyz-of-reference-point}
+
+These three fields are the X, Y and Z values of the reference point in the coordinate system you specified for daylighting reference points in the GlobalGeometryRules object. Figure~\ref{fig:example-showing-location-of-daylighting} shows an example using the relative coordinate (to zone) system. Z is typically at desk height (0.8 m).
+
+\begin{figure}[hbtp] % fig 53
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image096.png}
-\caption{Illustration of continuous dimming relationship \protect \label{fig:illustration-of-continuous-dimming}}
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image095.png}
+\caption{Example showing location of daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters. \protect \label{fig:example-showing-location-of-daylighting}}
 \end{figure}
 
-The figure above shows the relationship between electric light output and electrical input.
 
-\paragraph{Field: Minimum Light Output Fraction for Continuous Dimming Control}\label{field-minimum-light-output-fraction-for-continuous-dimming-control}
 
-For Lighting Control Type = 1 (continuous), the lowest lighting output the lighting system can dim down to, expressed as a fraction of maximum light output (see figure, above). This is the fractional light output that the system produces at minimum input power. For Lighting Control Type = 3 (continuous/off) this is the light output fraction reached just before the lights switch off completely.
-
-\paragraph{Field: Number of Stepped Control Steps}\label{field-number-of-stepped-control-steps}
-
-The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be \textgreater{}0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
-
-\begin{figure}[hbtp] % fig 55
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image097.png}
-\caption{Stepped lighting control with Number of Steps = 3. \protect \label{fig:stepped-lighting-control-with-number-of-steps}}
-\end{figure}
-
-\paragraph{Field: Probability Lighting will be Reset When Needed in Manual Stepped Control}\label{field-probability-lighting-will-be-reset-when-needed-in-manual-stepped-control}
-
-May be specified if a stepped lighting control system (Lighting Control Type = 2) is manually operated, such as in a simple, one-step (on-off) system. Gives the probability the occupants of a daylit zone will set the electric lights to the correct level to obtain the required illuminance. The rest of the time the lights are assumed to be set one step too high. For example, consider an on-off lighting system (Number of Steps = 1) with a set point of 600 lux and 0.7 reset probability. Then, when daylighting exceeds 600 lux, the electric lights will be off 70\% of the time and on 30\% of the time.
-
-\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-002}
-
-This alpha field is optional and may be used to define the name of a schedule that denotes whether or not the control is available to operate during a given time period. If the schedule value is greater than zero, then the controls will be available to operate for that time period.~ If the schedule value is zero or less, then the controls will not be available. If this field is left blank, the controls will be always available. For example, this can be useful for scheduling the daylighting controls off during design days so that the daylighting controls do not affect lighting power during sizing.
 
 An IDF example:
 
 \begin{lstlisting}
-Daylighting:Controls, ! Zone Name
-  1,                  ! Total Daylighting Reference Points
-  3.048,3.048,0.9,    ! X,Y,Z coordinates of first reference point {m}
-  0.0,0.0,0.0,        ! X,Y,Z coordinates of second reference point, if present {m}
-  0.99,               ! Fraction of zone controlled by first reference point
-  0.0,                ! Fraction of zone controlled by second reference point, if present
-  500.,               ! Illuminance setpoint at first reference point {lux}
-  500.,               ! Illuminance setpoint at second reference point, if present {lux}
-  1,                  ! Lighting control type {1 = continuous,2 = stepped,3 = continuous/off}
-  180.0,              ! Azimuth angle of view direction for glare calculation {deg},
-                      !   measured clockwise from zone y-axis. Value of 180 gives view
-                      !   (from reference point) that is directly at window, maximizing glare.
-  20.0,               ! Maximum discomfort glare index for window shade control
-  0.3,                ! Minimum input power fraction for continuous dimming control
-  0.2,                ! Minimum light output fraction for continuous dimming control
-  0,                  ! Number of steps, excluding off, for stepped control
-  1.0;                ! Probability electric lighting will be reset when needed (used only
-                      !   for stepped control, to simulate manual on/off control)
+
+  Daylighting:Controls,
+    West Zone_DaylCtrl,      !- Name
+    West Zone,               !- Zone Name
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Continuous,              !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    ,                        !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    West Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name
+    180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
+    20.0,                    !- Maximum Allowable Discomfort Glare Index
+    ,                        !- DElight Gridding Resolution {m2}
+    West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name
+    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    West Zone_DaylRefPt1,    !- Name
+    West Zone,               !- Zone Name
+    3.048,                   !- X-Coordinate of Reference Point {m}
+    3.048,                   !- Y-Coordinate of Reference Point {m}
+    0.9;                     !- Z-Coordinate of Reference Point {m}
+
 \end{lstlisting}
 
-\subsection{Guidelines for Daylighting Modeling (Detailed Method)}\label{guidelines-for-daylighting-modeling-detailed-method}
+\subsection{Guidelines for Daylighting Modeling Ssing the SplitFlux Method)}\label{guidelines-for-daylighting-modeling-splitflux-method}
 
-Following are some guidelines for preparing EnergyPlus input to model the effects of daylighting. Before studying these guidelines, however, you should read the description of each input field under Daylighting:Controls, and review the IDF example, above, and the sample daylighting input, PurchAirWithDaylighting.idf.
+Following are some guidelines for preparing EnergyPlus input to model the effects of daylighting when using the SplitFlux method. Before studying these guidelines, however, you should read the description of each input field under Daylighting:Controls, Daylighting:ReferencePoint, and review the IDF example, above, and the sample daylighting input, PurchAirWithDaylighting.idf.
 
 \subsubsection{Use of Window Multipliers}\label{use-of-window-multipliers}
 
@@ -225,7 +246,7 @@ Sometimes a representative room cannot be found. Figure~\ref{fig:rooms-a-b-c-and
 
 \subsubsection{Multiple Lighting Zones}\label{multiple-lighting-zones}
 
-The detailed daylighting calculation allows a thermal zone to be divided into two independently-controlled lighting zones. (See the fields: Fraction of Zone Controlled by First Reference Point, Fraction of Zone Controlled by Second Reference Point, Illuminance SetPoint at First Reference Point, and Illuminance SetPoint at Second Reference Point.) An example is shown in Figure~\ref{fig:two-independently-controlled-lighting-zones}, where a relatively deep thermal zone has two lighting zones of equal area.
+The SplitFlux daylighting calculation allows a thermal zone to be divided into multiple independently-controlled lighting zones. (See the fields: Daylighting Reference Point Name, Fraction of Zone Controlled by Reference Point, and Illuminance Setpoint at Reference Point.) An example is shown in Figure~\ref{fig:two-independently-controlled-lighting-zones}, where a relatively deep thermal zone has two lighting zones of equal area.
 
 \begin{figure}[hbtp] % fig 58
 \centering
@@ -323,157 +344,18 @@ There are two restrictions on the use of exterior-window shading devices when a 
 
 \subsection{DElight Daylighting Method}\label{delight-daylighting-method}
 
-The DElight method of analyzing daylighting in buildings is very similar to that used in the Detailed method. For each point in time, DElight calculates the interior daylighting illuminance at specified reference points and then determines how much the electric lighting can be reduced while still achieving a combined daylighting and electric lighting illuminance target. The daylight illuminance level in a zone depends on many factors, including exterior light sources; location, size, and visible light transmittance of simple and complex fenestration systems; reflectance of interior surfaces; and location of calculation reference points. The subsequent reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled, and type of lighting control.
+The DElight method of analyzing daylighting in buildings is very similar to that used in the SplitFlux method and uses the same Daylighting:Controls and Daylighting:ReferencePoint objects but the Daylighting Method should be set to DElight. For each point in time, DElight calculates the interior daylighting illuminance at specified reference points and then determines how much the electric lighting can be reduced while still achieving a combined daylighting and electric lighting illuminance target. The daylight illuminance level in a zone depends on many factors, including exterior light sources; location, size, and visible light transmittance of simple and complex fenestration systems; reflectance of interior surfaces; and location of calculation reference points. The subsequent reduction of electric lighting depends on daylight illuminance level, illuminance set point, fraction of zone controlled, and type of lighting control.
 
-There are two primary differences between the Detailed and DElight methods of calculating interior illuminance levels. The first is that DElight includes the capability of analyzing complex fenestration systems that include geometrically complicated shading systems (e.g., roof monitors) and/or optically complicated glazings (e.g., prismatic or holographic glass). The second key difference is that DElight uses a radiosity method to calculate the effects of light reflection inside a zone. These methods are discussed in more detail in the engineering documentation.
+There are two primary differences between the SplitFlux and DElight methods of calculating interior illuminance levels. The first is that DElight includes the capability of analyzing complex fenestration systems that include geometrically complicated shading systems (e.g., roof monitors) and/or optically complicated glazings (e.g., prismatic or holographic glass). The second key difference is that DElight uses a radiosity method to calculate the effects of light reflection inside a zone. These methods are discussed in more detail in the engineering documentation.
 
-There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the Detailed method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles). Another is the DElight ability to include more than two reference points in its interior illuminance and electric lighting reduction calculations. A third is the current lack of visual quality (e.g., glare) calculations performed by DElight. Fourth, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the Detailed method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fifth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
+There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the SplitFlux method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles).  A second is the current lack of visual quality (e.g., glare) calculations performed by DElight. Third, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the SplitFlux method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fourth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
 
-Input for invoking the DElight method involves three object types: \textbf{Daylighting:DELight:Controls}, \textbf{Daylighting:DELight:ReferencePoint}, and \textbf{Daylighting:DELight:ComplexFenestration}. Each of these objects is described below.
+Input for invoking the DElight method involves three object types: \textbf{Daylighting:Controls}, \textbf{Daylighting:ReferencePoint}, and \textbf{Daylighting:DELight:ComplexFenestration}. 
 
-\subsection{Daylighting:DELight:Controls}\label{daylightingdelightcontrols}
-
-The first input object required for invoking the DElight method is the Daylighting:DELight:Controls object, which defines the parameters of each daylighting zone within a building. This object must be associated with a specific thermal zone within the building for which the reduction in electric lighting due to daylight illuminance will be accounted.
-
-\subsubsection{Inputs}\label{inputs-1-008}
-
-\paragraph{Field: Name}\label{field-name-008}
-
-User name of the DElight daylighting zone to which the following input applies.
-
-\paragraph{Field: Zone Name}\label{field-zone-name-1-002}
-
-The name of the thermal Zone hosting this DElight daylighting zone. This must be a valid name that has been associated with a thermal Zone contained in the same EnergyPlus input data file.
-
-\paragraph{Field: Lighting Control Type}\label{field-lighting-control-type-1}
-
-The type of overhead electric lighting control. All reference points specified are assumed to have this type of control.
-
-For Lighting Control Type = 1 (continuous), the overhead lights dim continuously and linearly from (maximum electric power, maximum light output) to (minimum electric power, minimum light output) as the daylight illuminance increases. The lights stay on at the minimum point with further increase in the daylight illuminance.
-
-For Lighting Control Type = 2 (stepped), the electric power input and light output vary in discrete, equally spaced steps. The number of steps is given by Number of Steps (Excluding Off) of Stepped Control. For example, if Number of Steps = 3 and Illuminance Setpoint = 600, then the following table shows the fraction of the lights that are on vs.~daylight illuminance.
-
-% table 20
-\begin{longtable}[c]{@{}ll@{}}
-\caption{Example of a Stepped Lighting Control System with Three Steps \label{table:stepped-lighting-control-example-001}} \tabularnewline
-\toprule 
-Daylight illuminance & Fraction of lights that are on \tabularnewline
-\midrule
-\endfirsthead
-
-\caption[]{Example of a Stepped Lighting Control System with Three Steps} \tabularnewline
-\toprule 
-Daylight illuminance & Fraction of lights that are on \tabularnewline
-\midrule
-\endhead
-
-0-200 & 1.0 \tabularnewline
-200-400 & 2/3 \tabularnewline
-400-600 & 1/3 \tabularnewline
-600 and above & 0.0 \tabularnewline
-\bottomrule
-\end{longtable}
-
-Lighting Control Type = 3 (continuous/off) is the same as Lighting Control Type = 1 except that the lights switch off completely when the minimum dimming point is reached.
-
-\paragraph{Field: Minimum Input Power Fraction for Continuous Dimming Control}\label{field-minimum-input-power-fraction-for-continuous-dimming-control-1}
-
-For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
-
-\begin{figure}[hbtp] % fig 63
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image105.png}
-\caption{Illustration of continuous dimming relationship \protect \label{fig:illustration-of-continuous-dimming-001}}
-\end{figure}
-
-The figure above shows the relationship between electric light output and electrical input.
-
-\paragraph{Field: Minimum Light Output Fraction for Continuous Dimming Control}\label{field-minimum-light-output-fraction-for-continuous-dimming-control-1}
-
-For Lighting Control Type = 1 (continuous), the lowest lighting output the lighting system can dim down to, expressed as a fraction of maximum light output (see figure, above). This is the fractional light output that the system produces at minimum input power. For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
-
-\paragraph{Field: Number of Steps (Excluding Off) for Stepped Control}\label{field-number-of-steps-excluding-off-for-stepped-control}
-
-The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be \textgreater{}0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
-
-\begin{figure}[hbtp] % fig 64
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image106.png}
-\caption{Stepped lighting control with Number of Steps = 3. \protect \label{fig:stepped-lighting-control-with-number-of-steps-001}}
-\end{figure}
-
-\paragraph{Field: Probability Lighting Will Be Reset When Needed in Manual Stepped Control}\label{field-probability-lighting-will-be-reset-when-needed-in-manual-stepped-control-1}
-
-May be specified if a stepped lighting control system (Lighting Control Type = 2) is manually operated, such as in a simple, one-step (on-off) system. Gives the probability the occupants of a daylit zone will set the electric lights to the correct level to obtain the required illuminance. The rest of the time the lights are assumed to be set one step too high. For example, consider an on-off lighting system (Number of Steps = 1) with a set point of 600 lux and 0.7 reset probability. Then, when daylighting exceeds 600 lux, the electric lights will be off 70\% of the time and on 30\% of the time.
-
-\paragraph{Field: Gridding Resolution}\label{field-gridding-resolution}
-
-The maximum surface area for nodes in gridding (subdividing) all surfaces in the DElight zone. All reflective and transmitting surfaces will be subdivided into approximately square nodes that do not exceed this maximum. Higher resolution subdivisions require greater calculation times, but generally produce more accurate results. This same gridding resolution is also used to subdivide any Complex Fenestration System surfaces. It is advisable to perform at least one simulation of new input using a small gridding resolution such as 0.1m2 to compare these results against simulation runs at lower resolution (i.e., higher maximum area nodal grids) to get a sense of possible levels of error.
-
-An IDF example:
-
-\begin{lstlisting}
-Daylighting:DELight:Controls,
-  DElight NORTH ZONE, !- DElight Zone Name
-  NORTH ZONE,         !- Zone Name
-  1,     !- Lighting control type
-  0.3,   !- Minimum input power fraction for continuous dimming control
-  0.2,   !- Minimum light output fraction for continuous dimming control
-  0,     !- Number of steps (excluding off) for stepped control
-  1.0,   !- Probability lighting will be reset when needed in manual stepped control
-  1.0;   !- Gridding Resolution {m2}
-\end{lstlisting}
-
-\subsection{Daylighting:DELight:ReferencePoint}\label{daylightingdelightreferencepoint}
-
-The second input object required for invoking the DElight method is the Daylighting:DELight:ReferencePoint object, which defines the parameters of each Reference Point within the associated DElight daylighting zone. This object must be associated with a specific Daylighting:DELight:Controls object instance. There may be up to a maximum of 100 Reference Points for each DElight daylighting zone. Each Reference Point that is input does NOT need to be included in the control of the electric lighting system within the zone. This is determined by the fraction of the zone controlled by each Reference Point, which can be input as 0. Note that the sum of all Reference Point control fractions must equal 1 to obtain correct overall results.
-
-\subsubsection{Inputs}\label{inputs-2-008}
-
-\paragraph{Field: Name}\label{field-name-1-007}
-
-User name of the DElight daylighting Reference Point to which the following input applies.
-
-\paragraph{Field: DElight Name}\label{field-delight-name}
-
-The name of the Daylighting:DELight:Controls object instance hosting this Reference Point. This must be a valid name that has been associated with a DElight daylighting Zone contained in the same EnergyPlus input data file.
-
-\paragraph{Fields: (X,Y,Z) of Reference Point}\label{fields-xyz-of-reference-point}
-
-These three fields are the X, Y and Z values of the Reference point in the coordinate system you specified for daylighting reference points in the GlobalGeometryRules object. Figure~\ref{fig:example-showing-location-of-two-daylighting} shows an example using the relative coordinate (to zone) system. Z is typically at work surface height (e.g., 0.8m for a desk).
-
-\begin{figure}[hbtp] % fig 65
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image107.png}
-\caption{Example showing location of two daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters. \protect \label{fig:example-showing-location-of-two-daylighting}}
-\end{figure}
-
-\paragraph{Field: Fraction of Zone Controlled by Reference Point}\label{field-fraction-of-zone-controlled-by-reference-point}
-
-The zone floor-area fraction of the electric lighting that is controlled by the daylight illuminance at this Reference Point. If the sum of the values for this field for all Reference Points input for a given daylighting zone is less than 1.0, then the remaining fraction (i.e., 1.0 -- Sum) is assumed to not have lighting control.
-
-Note that Reference Points may be input with a 0.0 value for this fraction. In this case, daylight factors and interior illuminance values will be calculated for the Reference Point, but it will play no role in controlling the electric lighting within the daylighting zone to which it belongs.
-
-\paragraph{Field: Illuminance Setpoint at Reference Point}\label{field-illuminance-setpoint-at-reference-point}
-
-The desired lighting level (in lux) at this Reference Point. This is assumed to be the lighting level that would be produced at this reference point at night if the overhead electric lighting were operating at full input power. Recommended values depend on the type of activity and may be found, for example, in the Lighting Handbook of the Illuminating Engineering Society of North America. A typical value for general office work (excluding computer terminals) is 500 lux.
-
-An IDF example:
-
-\begin{lstlisting}
-Daylighting:DELight:ReferencePoint,
-  RefPt 2,              !- Reference Point Name
-  DElight NORTH ZONE,   !- DElight Zone Name
-  5.0,                  !- X-coordinate of reference point {m}
-  3.0,                  !- Y-coordinate of reference point {m}
-  0.9,                  !- Z-coordinate of reference point {m}
-  0.5,                  !- Fraction of zone controlled by reference point
-  500.;                 !- Illuminance setpoint at reference point {lux}
-\end{lstlisting}
 
 \subsection{Daylighting:DELight:ComplexFenestration}\label{daylightingdelightcomplexfenestration}
 
-The third input object related to the DElight method is the Daylighting:DElight: Complex Fenestration object. The DElight daylighting analysis method can be applied to daylighting zones that contain only simple fenestration systems such as windows and skylights that are standard EnergyPlus sub-surfaces. In this situation, no Daylighting:DElight: Complex Fenestration object would be input.
+Another input object that can only be used when the DElight Daylighting Method is used is  the Daylighting:DElight:ComplexFenestration object. The DElight daylighting analysis method can be applied to daylighting zones that contain only simple fenestration systems such as windows and skylights that are standard EnergyPlus sub-surfaces. In this situation, no Daylighting:DElight:ComplexFenestration object would be input.
 
 In addition to analyzing simple fenestration systems, DElight includes the capability of analyzing complex fenestration systems such as geometrically complicated static shading systems (e.g., roof monitors) and/or optically complicated glazings (e.g., prismatic or holographic glass). This capability is based on characterizing these complex fenestration systems (CFS) using bi-directional transmittance distribution functions (BTDF). In general, BTDF data for a specific CFS must be either measured or simulated (e.g., using ray-tracing techniques) prior to employing DElight to analyze it within EnergyPlus. The current implementation of DElight CFS calculations within EnergyPlus supports two approaches to the input of BTDF, an analytical approach and a file-based approach. The details of inputting these two approaches are described below under the User Complex Fenestration Type field.
 
@@ -491,9 +373,14 @@ User name of the DElight daylighting Complex Fenestration to which the following
 
 Type name of the DElight daylighting Complex Fenestration system to be analyzed. This type name must take one of the following two forms.
 
-BTDF\textsuperscript{GEN}Analytical Type\^{}Normal Visible Transmittance\^{}Dispersion Angle
 
-BTDF\textsuperscript{FILE}Filename
+\begin{lstlisting}
+
+BTDF^GEN^Analytical Type^Normal Visible Transmittance^Dispersion Angle
+
+BTDF^FILE^Filename
+
+\end{lstlisting}
 
 The first form above is for supported analytical CFS types which currently include WINDOW and LIGHTSHELF. While these analytical types are relatively simple, they represent flexible ways to explore diffusing CFS systems and the impact of light shelves in redirecting light through an aperture. Each of these types also requires the visible transmittance of the CFS at normal incidence angle, and a dispersion angle (in degrees) that represents the ``spread'' of transmitted light. A small dispersion angle of 10 corresponds to clear glazing while a large angle of 90 corresponds to perfectly diffusing glazing. The ``\^{}'' symbol must be used as a delimiter between sub-fields within this Complex Fenestration type name string as shown in the IDF example for WINDOW below, and in the DElight sample input data files.
 
@@ -537,7 +424,7 @@ Zone,Average,Daylighting Lighting Power Multiplier {[]}
 
 The total daylight illuminance at a DElight reference point from all of the exterior windows in a daylit zone.
 
-\paragraph{\texorpdfstring{Daylighting Lighting Power Multiplier {[]}}{Daylighting Lighting Power Multiplier }}\label{daylighting-lighting-power-multiplier}
+\paragraph{Daylighting Lighting Power Multiplier {[]}}\label{daylighting-lighting-power-multiplier}
 
 The amount by which the overhead electric lighting power in a zone is multiplied due to usage of DElight calculated daylighting to dim or switch electric lights. For example, if the multiplier is M and the electric power without dimming is P, then the electric power with dimming is M*P. The multiplier varies from 0.0, which corresponds to maximum dimming (zero electric lighting), to 1.0, which corresponds to no dimming.
 
@@ -561,29 +448,17 @@ The following daylighting-specific outputs are available for Daylighting:Control
 \item
   Zone,Average,Site Daylighting Model Sky Brightness {[]}
 \item
-  Surface,Average,Daylighting Window Reference Point 1 View Luminance {[}cd/m2{]}
+  Surface,Average,Daylighting Window Reference Point <x> View Luminance {[}cd/m2{]}
 \item
-  Surface,Average,Daylighting Window Reference Point 1 Illuminance {[}lux{]}
+  Surface,Average,Daylighting Window Reference Point <x> Illuminance {[}lux{]}
 \item
-  Zone,Average,Daylighting Reference Point 1 Illuminance {[}lux{]}
+  Zone,Average,Daylighting Reference Point <x> Illuminance {[}lux{]}
 \item
-  Zone,Average,Daylighting Reference Point 1 Glare Index {[]}
+  Zone,Average,Daylighting Reference Point <x> Glare Index {[]}
 \item
-  Zone,Sum,Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time {[}hr{]}
+  Zone,Sum,Daylighting Reference Point <x> Glare Index Setpoint Exceeded Time {[}hr{]}
 \item
-  Zone,Sum,Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time {[}hr{]}
-\item
-  Surface,Average,Daylighting Window Reference Point 2 View Luminance {[}cd/m2{]}
-\item
-  Surface,Average,Daylighting Window Reference Point 2 Illuminance {[}lux{]}
-\item
-  Zone,Average,Daylighting Reference Point 2 Illuminance {[}lux{]}, if applicable
-\item
-  Zone,Average,Daylighting Reference Point 2 Glare Index {[]}, if applicable
-\item
-  Zone,Sum,Daylighting Reference Point 2 Glare Index Setpoint Exceeded Time {[}hr{]}
-\item
-  Zone,Sum,Daylighting Reference Point 2 Daylight Illuminance Setpoint Exceeded Time {[}hr{]}
+  Zone,Sum,Daylighting Reference Point <x> Daylight Illuminance Setpoint Exceeded Time {[}hr{]}
 \item
   Zone,Average,Daylighting Lighting Power Multiplier {[]}
 \end{itemize}
@@ -608,63 +483,39 @@ A measure of the visible light content of beam solar radiation; equal to the num
 
 A measure of the visible light content of sky diffuse solar radiation; equal to the number of lumens per watt of sky diffuse solar radiation. Depends on atmospheric conditions (moisture, turbidity, cloudiness) and solar altitude.
 
-\paragraph{\texorpdfstring{Site Daylighting Model Sky Clearness {[]}}{Site Daylighting Model Sky Clearness }}\label{site-daylighting-model-sky-clearness}
+\paragraph{Site Daylighting Model Sky Clearness {[]}}\label{site-daylighting-model-sky-clearness}
 
 Clearness of sky. One of the factors used to determine sky type and luminous efficacy of solar radiation (see \emph{EnergyPlus Engineering Document}). Sky Clearness close to 1.0 corresponds to an overcast sky. Sky Clearness \textgreater{} 6 is a clear sky.
 
-\paragraph{\texorpdfstring{Site Daylighting Model Sky Brightness {[]}}{Site Daylighting Model Sky Brightness }}\label{site-daylighting-model-sky-brightness}
+\paragraph{Site Daylighting Model Sky Brightness {[]}}\label{site-daylighting-model-sky-brightness}
 
 Brightness of sky. One of the factors used to determine sky type and luminous efficacy of solar radiation (see \emph{EnergyPlus Engineering Document}).
 
-\paragraph{Daylighting Window Reference Point 1 View Luminance {[}cd/m2{]}}\label{daylighting-window-reference-point-1-view-luminance-cdm2}
+\paragraph{Daylighting Window Reference Point <x> View Luminance {[}cd/m2{]}}\label{daylighting-window-reference-point-1-view-luminance-cdm2}
 
 The area-averaged luminance of an exterior window as viewed from the first reference point in the daylit zone containing the window. In general, higher window luminance values are associated with higher daylight glare values. (Printed only for exterior windows in daylit zones without interior windows.)
 
-\paragraph{Daylighting Window Reference Point 1 Illuminance {[}lux{]}}\label{daylighting-window-reference-point-1-illuminance-lux}
+\paragraph{Daylighting Window Reference Point <x> Illuminance {[}lux{]}}\label{daylighting-window-reference-point-1-illuminance-lux}
 
 The contribution from a particular exterior window to the daylight illuminance at the first reference point in the daylit zone containing the window. (Not printed for exterior windows in daylit zones with interior windows.)
 
-\paragraph{Daylighting Reference Point 1 Illuminance {[}lux{]}}\label{daylighting-reference-point-1-illuminance-lux}
+\paragraph{Daylighting Reference Point <x> Illuminance {[}lux{]}}\label{daylighting-reference-point-1-illuminance-lux}
 
 The total daylight illuminance at the first reference point from all of the windows in a daylit zone.
 
-\paragraph{\texorpdfstring{Daylighting Reference Point 1 Glare Index {[]}}{Daylighting Reference Point 1 Glare Index }}\label{daylighting-reference-point-1-glare-index}
+\paragraph{Daylighting Reference Point <x> Glare Index {[]}}\label{daylighting-reference-point-1-glare-index}
 
 The daylight glare index at the first reference point in a daylit zone.
 
-\paragraph{Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time {[}hr{]}}\label{daylighting-reference-point-1-glare-index-setpoint-exceeded-time-hr}
+\paragraph{Daylighting Reference Point <x> Glare Index Setpoint Exceeded Time {[}hr{]}}\label{daylighting-reference-point-1-glare-index-setpoint-exceeded-time-hr}
 
 The number of hours when the calculated daylight glare index at the first reference point exceeds the glare index setpoint.
 
-\paragraph{Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time {[}hr{]}}\label{daylighting-reference-point-1-daylight-illuminance-setpoint-exceeded-time-hr}
+\paragraph{Daylighting Reference Point <x> Daylight Illuminance Setpoint Exceeded Time {[}hr{]}}\label{daylighting-reference-point-1-daylight-illuminance-setpoint-exceeded-time-hr}
 
 The number of hours when the calculated daylight illuminance at the first reference point exceeds the daylight illuminance setpoint.
 
-\paragraph{Daylighting Reference Point 2 Illuminance {[}lux{]}}\label{daylighting-reference-point-2-illuminance-lux}
-
-The total daylight illuminance at the second reference point from all of the windows in a daylit zone.
-
-\paragraph{Daylighting Window Reference Point 2 View Luminance {[}cd/m2{]}}\label{daylighting-window-reference-point-2-view-luminance-cdm2}
-
-The area-averaged luminance of an exterior window as viewed from the second reference point, if present, in the daylit zone containing the window. Note that, for a bare window, this value can be different from the corresponding value at the first reference point since different regions of the sky and ground will be visible from the two reference points, and different ranges of angles of incidence and associated glass transmittance values will be involved. (Not printed for exterior windows in daylit zones with interior windows.)
-
-\paragraph{Daylighting Window Reference Point 2 Illuminance {[}lux{]}}\label{daylighting-window-reference-point-2-illuminance-lux}
-
-The contribution from a particular exterior window to the daylight illuminance at the second reference point, if present, in the daylit zone containing the window. (Not printed for exterior windows in daylit zones with interior windows.)
-
-\paragraph{\texorpdfstring{Daylighting Reference Point 2 Glare Index {[]}}{Daylighting Reference Point 2 Glare Index }}\label{daylighting-reference-point-2-glare-index}
-
-The daylight glare index at the second reference point, if present, in a daylit zone.
-
-\paragraph{Daylighting Reference Point 2 Glare Index Setpoint Exceeded Time {[}hr{]}}\label{daylighting-reference-point-2-glare-index-setpoint-exceeded-time-hr}
-
-The number of hours when the calculated daylight glare index at the second reference point exceeds the glare index setpoint.
-
-\paragraph{Daylighting Reference Point 2 Daylight Illuminance Setpoint Exceeded Time {[}hr{]}}\label{daylighting-reference-point-2-daylight-illuminance-setpoint-exceeded-time-hr}
-
-The number of hours when the calculated daylight illuminance at the second reference point exceeds the daylight illuminance setpoint.
-
-\paragraph{\texorpdfstring{Daylighting Lighting Power Multiplier {[]}}{Daylighting Lighting Power Multiplier }}\label{daylighting-lighting-power-multiplier-1}
+\paragraph{Daylighting Lighting Power Multiplier {[]}}\label{daylighting-lighting-power-multiplier-1}
 
 The amount by which the overhead electric lighting power in a zone is multiplied due to usage of daylighting to dim or switch electric lights. For example, if the multiplier is M and the electric power without dimming is P, then the electric power with dimming is M*P. The multiplier varies from 0.0, which corresponds to maximum dimming (zero electric lighting), to 1.0, which corresponds to no dimming.
 
@@ -905,19 +756,19 @@ FenestrationSurface:Detailed,
   Zone,Average,Tubular Daylighting Device Diffuse Visible Transmittance {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Tubular Daylighting Device Beam Solar Transmittance {[]}}{Tubular Daylighting Device Beam Solar Transmittance }}\label{tubular-daylighting-device-beam-solar-transmittance}
+\paragraph{Tubular Daylighting Device Beam Solar Transmittance {[]}}\label{tubular-daylighting-device-beam-solar-transmittance}
 
 This is the transmittance of beam solar radiation through the TDD.
 
-\paragraph{\texorpdfstring{Tubular Daylighting Device Beam Visible Transmittance {[]}}{Tubular Daylighting Device Beam Visible Transmittance }}\label{tubular-daylighting-device-beam-visible-transmittance}
+\paragraph{Tubular Daylighting Device Beam Visible Transmittance {[]}}\label{tubular-daylighting-device-beam-visible-transmittance}
 
 This is the transmittance of beam visible radiation, or daylight, through the TDD.
 
-\paragraph{\texorpdfstring{Tubular Daylighting Device Diffuse Solar Transmittance {[]}}{Tubular Daylighting Device Diffuse Solar Transmittance }}\label{tubular-daylighting-device-diffuse-solar-transmittance}
+\paragraph{Tubular Daylighting Device Diffuse Solar Transmittance {[]}}\label{tubular-daylighting-device-diffuse-solar-transmittance}
 
 This is the transmittance of diffuse solar radiation through the TDD.
 
-\paragraph{\texorpdfstring{Tubular Daylighting Device Diffuse Visible Transmittance {[]}}{Tubular Daylighting Device Diffuse Visible Transmittance }}\label{tubular-daylighting-device-diffuse-visible-transmittance}
+\paragraph{Tubular Daylighting Device Diffuse Visible Transmittance {[]}}\label{tubular-daylighting-device-diffuse-visible-transmittance}
 
 This is the transmittance of diffuse visible radiation, or daylight, through the TDD.
 
@@ -1207,28 +1058,28 @@ Option & Object/Field or Output Variable & Input File \tabularnewline
 \midrule
 \endhead
 
-Allow a thermal zone to be daylit & Daylighting:Controls, Daylighting:DELight:Controls & PurchAirWithDaylighting.idf, DElight-Detailed-Comparison.idf \tabularnewline
+Allow a thermal zone to be daylit & Daylighting:Controls, Daylighting:ReferencePoint & PurchAirWithDaylighting.idf, DElight-Detailed-Comparison.idf \tabularnewline
 Specify visible transmittance of the glazing & WindowMaterial:Glazing & PurchAirWithDaylighting.idf \tabularnewline
 Specify the visible transmittance of a shading device & WindowMaterial:Shade, WindowMaterial:Screen or WindowMaterial:Blind & PurchAirWindowBlind.idf \tabularnewline
 Use a shading device to control glare & WindowMaterial:Shade or WindowMaterial:Blind; WindowProperty:ShadingControl* & PurchAirWindowBlind.idf \tabularnewline
 Use electrochromic glazing to control glare & WindowProperty:ShadingControl/Shading Type = SwitchableGlazing, Shading Control Type = On If High Glare, Glare Control Is Active = Yes* & PurchAirWithDaylighting.idf \tabularnewline
 Adjust electrochromic glazing to just meet daylighting illuminance setpoint & WindowProperty:ShadingControl/Shading Type = SwitchableGlazing, Shading Control Type = MeetDaylightIlluminanceSetpoint* & ~ \tabularnewline
 Print an illuminance map & Daylighting:Illuminance Map* & ~ \tabularnewline
-Control electric lighting response to daylight illuminance level & Daylighting:Controls/Lighting Control Type = Continuous, Stepped or Continuous/Off, plus other fields; or …. Daylighting:DELight:Controls/Lighting Control Type = Continuous, Stepped or Continuous/Off, plus other fields & PurchAirWithDaylighting.idf; DElight-Detailed-Comparison.idf \tabularnewline
+Control electric lighting response to daylight illuminance level & Daylighting:Controls/Lighting Control Type = Continuous, Stepped or Continuous/Off, plus other fields; or …. & PurchAirWithDaylighting.idf; DElight-Detailed-Comparison.idf \tabularnewline
 Add a light shelf (with Daylighting:Controls) & DaylightingDevice:Shelf * & DaylightingDeviceShelf.idf \tabularnewline
-Add a light shelf (with Daylighting:DELight:Controls) & Daylighting:DELight:Controls & DElightCFSLightShelf.idf \tabularnewline
+Add a light shelf (with Daylighting:Controls) & Daylighting:Controls using DElight & DElightCFSLightShelf.idf \tabularnewline
 Add a light pipe & DaylightingDevice:Tubular * & DaylightingDeviceTubular.idf \tabularnewline
 Model a skylight having a light well & DaylightingDevice:LightWell * & ~ \tabularnewline
 Model daylighting through double facade & See “Double Facades: Daylighting through Interior Windows”* & PurchAirWithDoubleFacadeDaylighting.idf \tabularnewline
 Add diffusing (translucent) glass & WindowMaterial:Glazing/Solar Diffusing = Yes* & ~ \tabularnewline
-Model complex fenestration & Daylighting:DELight:Controls & DElightCFSWindow.idf \tabularnewline
-Get a radiosity-based interior light inter-reflection calculation & Daylighting:DELight:Controls & DElight-Detailed-Comparison.idf \tabularnewline
+Model complex fenestration & Daylighting:Controls using DElight & DElightCFSWindow.idf \tabularnewline
+Get a radiosity-based interior light inter-reflection calculation & Daylighting:Controls using DElight & DElight-Detailed-Comparison.idf \tabularnewline
 Find effect on daylighting of solar reflected from overhangs, neighboring buildings, etc. & Building/SolarDistribution uses “withReflections” option & ~ \tabularnewline
 Find visible transmittance effect of dirt on window & WindowMaterial:Glazing/Dirt Correction Factor for Solar and Visible Transmittance* & ~ \tabularnewline
 \bottomrule
 \end{longtable}}
 
-*Used only with Daylighting:Controls
+*Used only with Daylighting:Controls with the SplitFlux Daylighting Method.
 
 \begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
 

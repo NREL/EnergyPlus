@@ -1,4 +1,4 @@
-\section{\texorpdfstring{Group -- Radiative \textbf{/} Convective Units}{Group -- Radiative / Convective Units}}\label{group-radiative-convective-units}
+\section{Group -- Radiative \textbf{/} Convective Units}\label{group-radiative-convective-units}
 
 This section describes the radiative/convective zone equipment units.~ The following units are included in this section:
 
@@ -11,6 +11,8 @@ This section describes the radiative/convective zone equipment units.~ The follo
   ZoneHVAC:Baseboard:RadiantConvective:Steam
 \item
   ZoneHVAC:Baseboard:RadiantConvective:Electric
+\item
+  ZoneHVAC:CoolingPanel:RadiantConvective:Water
 \item
   ZoneHVAC:Baseboard:Convective:Water
 \item
@@ -537,6 +539,228 @@ This field reports the amount of radiant energy transferred from the baseboard t
 
 This field reports the amount of convective energy transferred from the baseboard directly to the zone air in Joules.
 
+\subsection{ZoneHVAC:CoolingPanel:RadiantConvective:Water}\label{zonehvaccoolingpanelradiantconvectivewater}
+
+The radiant/convective cooling panel is a component of zone equipment.  Chilled water is supplied by the plant and circulated through the panel.  Through radiation and convective heat transfer, the panel absorbs energy contained within the zone to provide cooling.  Control of the panel is achieved using the methodology used for low temperature radiant systems—a piecewise linear control profile that varies the flow rate to the panel based on a control parameter defined by the user.  This is different than being controlled to meet any remaining load like the air-based systems.  However, due to the radiant nature of these devices, it is not possible to control precisely on a zone air-based load since this will result in overcooling at the next time step.  Despite this, in addition to the piecewise linear controls that have been used with low temperature radiant systems in the past, two new controls will be added for this simple model: one that varies convective output of the system to meet the remaining zone load and one that varies the total convective output of the system to meet the remaining zone load.  In these two zone load control types, the user must enter the typical zone thermostat object to replace the setpoint and throttling range input in this object.  In this component, control is accomplished by throttling the chilled water flow to the device.  Capacity rating information is required as input and is used to calculate a UA value of the unit. The unit is connected to a chilled water loop (demand side) with an inlet and outlet node. The input data dictionary definition of the unit is as follows.
+
+\subsubsection{Inputs}\label{inputs-3-028-1}
+
+\paragraph{Field: Name}\label{field-name-3-025-1}
+
+A unique user assigned name for an instance of radiant cooling panel. Any reference to this unit by another object will use this name.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-3-005-1}
+
+The name of the schedule (ref: Schedule) that denotes whether the radiant cooling panel can run during a given hour. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the hour. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the hour.
+
+\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-2-002-1}
+
+The name of the water inlet node for the radiant cooling panel.
+
+\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-2-002-1}
+
+The name of the water outlet node for the radiant cooling panel.
+
+\paragraph{Field: Rated Inlet Water Temperature}\label{field-rated-inlet-water-temperature}
+
+This field is the inlet temperature to the panel under conditions used to rate the capacity of the panel.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the zone.  The default value is 5°C (44°F).
+
+\paragraph{Field: Rated Space Temperature}\label{field-rated-space-temperature}
+
+This field is the combined space temperature (air and surface) that the panel is exposed to during the rating process to obtain a rated capacity.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the zone.  The default value is 24°C (75.2°F).
+
+\paragraph{Field: Rated Water Mass Flow Rate}\label{field-rated-water-mass-flow-rate}
+
+This field is the rated standard water flow rate in kg/s that was used to obtain the rated capacity under rated conditions.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  The default value is 0.063kg/s (1 gpm).  If it is blank or zero, the default value is assumed.
+
+\paragraph{Field: Cooling Design Capacity Method}\label{field-cooling-design-capacity-method-2}
+
+Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either \emph{CoolingDesignCapacity}, \emph{CapacityPerFloorArea}, and \emph{FractionOfAutosizedCoolingCapacity}. If this input field is left blank or zero, then autosizing is assumed. \emph{CoolingDesignCapacity} means the user specifies the magnitude of maximum or nominal cooling capacity or the program calculates the maximum or nominal design cooling capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design cooling capacity from the user specified cooling capacity per floor area and floor area of the zone served by the cooling panel unit. \emph{FractionOfAutosizedCoolingCapacity} means the program calculates the design cooling capacity from user specified fraction and the auto-sized design cooling capacity. The default method is \emph{CoolingDesignCapacity}.
+
+\paragraph{Field: Cooling Design Capacity}\label{field-cooling-design-capacity-2}
+
+This field is for the cooling panel unit nominal cooling capacity in watts. This field can be autosized by EnergyPlus. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified.
+
+\paragraph{Field: Cooling Design Capacity Per Floor Area}\label{field-cooling-design-capacity-per-floor-area-2}
+
+Enter the cooling capacity per unit floor area in W/m2 for the cooling panel unit. This field is a required field when the Cooling Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the cooling capacity from floor area of the zone served by the cooling panel unit and the cooling capacity per unit floor area value specified by the user. This field may be left blank.
+
+\paragraph{Field: Fraction of Autosized Cooling Design Capacity}\label{field-fraction-of-autosized-cooling-design-capacity-2}
+
+Enter the cooling capacity as a fraction of the autosized cooling capacity for the cooling panel. This input field is required when the Cooling Design Capacity Method is \emph{FractionOfAutosizedCoolingCapacity}. The program calculates the cooling capacity from the design autosized cooling capacity and the user specified fraction. Design day sizing run must be specified. This field may be left blank. Default value is 1.0.
+
+\paragraph{Field: Maximum Chilled Water Flow Rate}\label{field-maximum-chilled-water-flow-rate}
+
+The maximum chilled water volumetric flow rate in m3/sec.  This field can also be autosized.
+
+\paragraph{Field: Control Type}\label{field-control-type}
+
+This field specifies two different types of control categories: temperature or zone load.  For one of the temperature based controls, this field along with the throttling range and setpoint schedules determines how the user wishes to control the radiant cooling panel.  The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature.  The current field controls the choice of temperature.  For controls that are based more on zone load, the user can make one of two choices based on whether the zone load is met by only the convective output of the unit or the total output of the unit.  These zone load controls will not perform as precisely as air-based systems.  The convective zone load control will come close to meeting the current setpoint temperature (defined by the typical zone thermostat input by the user) since the convective output of the unit will be set to match the remaining zone load.  However, in the long run, this will likely overcool the space since radiant energy is being absorbed by surfaces and this will impact the zone conditions at later time steps.  The total zone load control will likely undercool the space in the short term since the total output (radiant and convective) of the unit will be set to meet the remaining zone load.  However, this will not fully impact the zone air temperature immediately since some of the energy is being absorbed from surfaces rather than the zone air.  The user must select from the following options:
+
+\begin{itemize}
+\tightlist
+\item
+  MeanAirTemperature
+\item
+  MeanRadiantTemperature
+\item
+  OperativeTemperature
+\item
+  OutdoorDryBulbTemperature
+\item
+  OutdoorWetBulbTemperature
+\item
+  ZoneConvectiveLoad
+\item
+  ZoneTotalLoad
+\end{itemize}
+
+Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, MeanAirTemperature control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
+
+\paragraph{Field: Cooling Control Throttling Range}\label{field-cooling-control-throttling-range}
+
+This field specifies the range of temperature in degrees Celsuis over which the radiant cooling panel throttles from zero flow rate up to the maximum defined by the maximum chilled water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature to define the response of the system to various zone conditions. The cooling control temperature schedule specifies the “setpoint” temperature where the flow rate to the system is at half of the maximum flow rate. For example, if the cooling control temperature setpoint is currently 25 C and the cooling throttling range is 2 C, the water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or below 24 C and the maximum flow rate when the controlling temperature is at or above 26 C. This represents a throttling range of 2 C around the setpoint of 25 C. In between 24 C and 26 C, the flow rate to the radiant system is varied linearly.  Note that this field is ignored when the control type is either ZoneLoadConvective or ZoneLoadTotal.  For the two zone load controls, the user must use a typical zone thermostat and the system output will be dependent on the remaining zone load.
+
+\paragraph{Field: Cooling Control Temperature Schedule Name}\label{field-cooling-control-temperature-schedule-name}
+
+This field specifies the cooling setpoint or control temperature for the radiant cooling panel in degrees Celsius. Used in conjunction with the previous field (cooling control throttling range), it will define whether or not the system is running and the current flow rate. Water flow rate to the system is varied linearly around the setpoint temperature based on the throttling range and the maximum cooling flow rate parameters (see above). It should be noted that this control schedule will allow different setpoint temperatures throughout the year for cooling. The control of the radiant cooling panel is based solely on the cooling control throttling range listed above, the cooling control temperature schedule, and the control temperature type listed above. The radiant cooling panel will not use any zone thermostat that might be used by other systems serving the zone in which this radiant cooling panel resides.  Note that this field is ignored when the control type is either ZoneLoadConvective or ZoneLoadTotal.  For the two zone load controls, the user must use a typical zone thermostat and the system output will be dependent on the remaining zone load.
+
+\paragraph{Field: Condensation Control Type}\label{field-condensation-control-type}
+
+Since radiant cooling panels provide a cold surface in what could be a humid zone, there is the possibility that condensation will occur on the surface of the panel. This is due to the fact that the surface temperature may drop below the dew-point temperature of the space. When this occurs, condensation on the surface will occur. Since there is no direct calculation of the surface temperature of the radiant cooling panel, the condensation check will be made at the inlet water temperature to the panel. Since the user can utilize the next parameter to adjust the differential between the dewpoint temperature and the inlet water temperature, this will allow some flexibility in controlling when the panel will shutdown to avoid condensation. In EnergyPlus, users have several options for handling potential condensation including: Off, SimpleOff, and VariableOff. When the user chooses the Off option, EnergyPlus will not do anything other than produce a warning message when condensation is predicted to occur. The program will simply continue on; no moisture will be removed from the zone air and there will be no adjustment of the surface temperature as a result of the condensation. When the user chooses the SimpleOff option, the program will predict cases where condensation will occur and shut-off the radiant system to avoid this situation. With this option, the users also have the opportunity to adjust when the system will shut down. This is specified with the next parameter (field: condensation differential parameter). When the user chooses the VariableOff option, the program will attempt to reduce the inlet temperature to the panel by locally recirculating some of the water leaving the panel and mixing it with water from the overall demand side flow.  This also means that some of the demand side water will bypass the panel. In reality, this would require a pump to achieve such mixing and recirculation, but due to the simple nature of this model, no pump definition will be required. Like the SimpleOff option, the VariableOff option uses the condensation dewpoint offset parameter to adjust when the system will try to adjust for the possibility of condensation. This parameter is optional and EnergyPlus will use the SimpleOff strategy when this parameter is not specified.
+
+\paragraph{Field: Condensation Control Dewpoint Offset}\label{field-condensation-control-dewpoint-offset}
+
+This optional parameter is only valid with the SimpleOff and VariableOff condensation handling algorithm (see previous input parameter). It establishes the difference between the calculated dew-point temperature of the space and the allowed inlet water temperature to the radiant cooling panel before the system shuts down in degrees Celsius. This parameter can be any positive, negative, or zero value. When this parameter is zero, the radiant system will shut down or recirculate water (depending on whether SimpleOff or VariableOff is used) when the inlet temperature drops to the dew-point temperature or below. When this parameter is positive, the radiant system will shut down or recirculate water when the inlet water temperature is the number of degrees Celsius above the dew-point temperature. This allows some extra safety to avoid condensation. When this parameter is negative, the radiant system will shut down or recirculate water when the inlet water temperature is the number of degrees Celsius below the dew-point temperature. This strategy allows the user to simulate a situation where small amounts of condensation are tolerable or the resistance of the panel from the water loop to the panel surface is being taken into account as condensation would likely happen at the panel surface.
+
+\paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-2-000-1}
+
+This field gives the user an opportunity to characterize the zone temperature as a function of the zone mean radiant temperature and the mean air temperature.  The performance of the unit is proportional to the difference between the water inlet temperature and the zone temperature where the zone temperature is found using a weighted average of zone mean radiant temperature and mean air temperature.  The weighting factor is this parameter and it is multiplied by the zone mean radiant temperature.  The remainder of the zone temperature calculation is made up of the zone mean air temperature.  This parameter can be difficult to quantify as the fraction radiant can vary with zone conditions.  However, by definition, a radiant system like this radiant cooling panel must exchange at least 50% of its energy to the zone via radiation.  One study has shown that a fraction radiant between 0.6 and 0.7 is a reasonable estimation.  For more information, see the EnergyPlus Engineering Reference in section Radiant System Models, subsection Simple Radiant Cooling Panel.
+
+\paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people-2-1}
+
+This field allows the user to direct some of the radiant energy to be absorbed from people rather than surfaces within the space.  This would have a direct impact on thermal comfort and would depend on the location of the people with respect to the radiant cooling panel.  All energy absorbed by the panel would have a cooling effect on people and is subtracted from the total radiant energy absorbed by the panel defined by the previous term.
+
+\paragraph{Field Set: Surface Name, Fraction of Radiant Energy to Surface}\label{field-set-surface-name-fraction-of-radiant-energy-to-surface-2-1}
+
+The following two items are repeated for an unlimited number of surface/fraction pairs. At least one surface/fraction pair must appear in an input file. In other words, at least one surface must be identified as a recipient of radiant energy from the baseboard heater.
+
+The radiant energy from the cooling panel is defined by the total energy input to the cooling panel from the chilled water loop times the fraction radiant field shown above. This radiant energy is distributed to surfaces and people using the surface and fraction pairs and the fraction to people input by the user. These fractions to people and surfaces must add up to 1.0. In other words, in an input file, the following relation should be maintained by the user input:
+
+\begin{equation}
+FractionIndicentOnPeople + \sum {FractionToSurfaces = 1}
+\end{equation}
+
+\paragraph{Field Set: Surface \textless{}x\textgreater{} Name}\label{field-set-surface-x-name-1}
+
+The radiant energy absorbed by the radiant cooling panel can be specified to be received from particular surfaces within the space.  The next series of pairs of inputs (surface name and fraction of radiant energy) specify where this radiant energy is coming from.  In essense, the fraction radiant terms for each surface are similar to a view factor.  These pairs can be repeated for up to 100 surfaces giving the user plenty of flexibility to have the radiant cooling panel interact with many potential surfaces.  This first parameter in the pair is the name of the surface defined by user input elsewhere in the input file.  Note that the surface must reside in the same zone as all of the other surfaces in the following list (that is, all surfaces listed must be in the same zone).
+
+\paragraph{Field Set: Fraction of Radiant Energy to Surface \textless{}x\textgreater{}}\label{field-set-fraction-of-radiant-energy-to-surface-x-1}
+
+In combination with the previous field, this defines what fraction of the radiant energy being absorbed by the radiant cooling panel comes from the surface named by the previous field.  These pairs of surface names and fractions of radiant energy from the surface can be repeated up to 100 times in the input for a particular radiant cooling panel.  Note that the sum of all of the radiant energy fractions plus the radiant fraction from people must add up to unity just like in the radiant-convective baseboard models.  Note that there is a small possibility that a particular surface listed in these pairs is actually lower than the temperature of the panel.  This probably will not happen unless there is another cooling surface within the zone.  In reality, absorbing net radiant energy from a colder surface would violate the Second Law of Thermodynamics.  However, in keeping with the simple nature of this model, EnergyPlus will monitor the inlet water temperature to the panel and produce a warning message if this temperature is lower than any of the surface temperature of the surfaces with which this system is interacting.
+
+An example input for the radiant cooling panel is shown below.
+
+\begin{lstlisting}
+
+ZoneHVAC:CoolingPanel:RadiantConvective:Water,
+  Radiant Cooling Panel 1,   !- Name
+  RCP Schedule 1,            !- Availability schedule
+  RCP Water Inlet Node,      !- Water Inlet node name
+  RCP Water Outlet Node,     !- Water Outlet node name
+  5.0,                       !- Rated Water Inlet Temperature {C}
+  24.0,                      !- Rated Space Temperature {C}
+  0.063,                     !- Rated Water Mass Flow Rate {kg/s}
+  5000.0,                    !- Rated cooling capacity {W}
+  0.1,                       !- Maximum water flow rate {m3/s}
+  MeanAirTemperature,        !- Temperature Control Type
+  1.0,                       !- Cooling Control Throttling Range
+  RCP Temp Schedule,         !- Cooling Control Temperature Schedule Name
+  SimpleOff,                 !- Condensation Control Type
+  1.0,                       !- Condensation Control Dewpoint Offset
+  0.65,                      !- Fraction Radiant
+  0.2,                       !- Fraction of Radiant Energy Incident on People
+  Zone 1 Floor,              !- Surface 1 Name
+  0.5,                       !- Fraction of Radiant Energy to Surface 1
+  Zone 1 West Wall,          !- Surface 2 Name
+  0.25,                      !- Fraction of Radiant Energy to Surface 2
+  Zone 1 South Wall,         !- Surface 3 Name
+  0.25;                      !- Fraction of Radiant Energy to Surface 3
+\end{lstlisting}
+
+\begin{itemize}
+\item
+  HVAC, Average, Cooling Panel Total System Cooling Rate [W]
+\item
+  HVAC, Average, Cooling Panel Total Cooling Rate [W]
+\item
+  HVAC, Average, Cooling Panel Convective Cooling Rate [W]
+\item
+  HVAC, Average, Cooling Panel Radiant Cooling Rate [W]
+\item
+  HVAC, Sum, Cooling Panel Total System Cooling Energy [J]
+\item
+  HVAC, Sum, Cooling Panel Total Cooling Energy [J]
+\item
+  HVAC, Sum, Cooling Panel Convective Cooling Energy [J]
+\item
+  HVAC, Sum, Cooling Panel Radiant Cooling Energy [J]
+\item
+  HVAC, Meter, CoolingPanel:EnergyTransfer [J]
+\item
+  HVAC, Average, Cooling Panel Water Mass Flow Rate [kg/s]
+\item
+  HVAC, Average, Cooling Panel Water Inlet Temperature [C]
+\end{itemize}
+
+\paragraph{Cooling Panel Total System Cooling Rate [W]}\label{cooling-panel-total-system-cooling-rate-w}
+
+This field is the total rate of cooling achieved by the radiant cooling panel on the zone in Watts. This is the impact of the cooling panel on the space and is the actual impact the system has on the zone.  It includes the convective heat transfer rate as well as the decreased convection from zone surfaces as a result of the operation of the unit and the radiant absorbed by people.
+
+\paragraph{Cooling Panel Total Cooling Rate [W]}\label{cooling-panel-total-cooling-rate-w}
+
+This variable is the total rate of cooling achieved by the radiant cooling panel on the zone in Watts. This value includes the sum of both the convective and the radiant energy absorbed by the panel.
+
+\paragraph{Cooling Panel Convective Cooling Rate [W]}\label{cooling-panel-convective-cooling-rate-w}
+
+This field reports the rate at which convective heat is removed by the radiant cooling panel from the zone in Watts.
+
+\paragraph{Cooling Panel Radiant Cooling Rate [W]}\label{cooling-panel-radiant-cooling-rate-w}
+
+This field reports the rate at which radiant heat is removed from people and the surfaces of the zone being served by the radiant cooling panel in Watts.
+
+\paragraph{Cooling Panel Total System Cooling Energy [J]}\label{cooling-panel-total-system-cooling-energy-j}
+
+This field is the total cooling achieved by the radiant cooling panel on the zone in Joules over the timestep being reported. This is the impact of the cooling panel on the space and is the actual impact the system has on the zone.  It includes the convective heat transfer rate as well as the decreased convection from zone surfaces as a result of the operation of the unit and the radiant absorbed by people.
+
+\paragraph{Cooling Panel Total Cooling Energy [J]}\label{cooling-panel-total-cooling-energy-j}
+
+This field reports the total heat removal from the zone by the radiant cooling panel in Joules over the timestep being reported.
+
+\paragraph{Cooling Panel Convective Cooling Energy [J]}\label{cooling-panel-convective-cooling-energy-j}
+
+This field reports the convective heat removal from the zone by the radiant cooling panel in Joules over the timestep being reported.
+
+\paragraph{Cooling Panel Radiant Cooling Energy [J]}\label{cooling-panel-radiant-cooling-energy-j}
+
+This field reports the amount of radiant heat removal from people and the surfaces of the zone being served by the radiant cooling panel in Joules over the timestep being reported.
+
+\paragraph{CoolingPanel:EnergyTransfer [J]}\label{coolingpanel-energytransfer-j}
+
+This meter report variable is the sum of the total heat removal being accomplished by all radiant cooling panels in the HVAC systems in the simulation.
+
+\paragraph{Cooling Panel Water Mass Flow Rate [kg/s]}\label{cooling-panel-water-mass-flow-rate-kgs}
+
+This field reports the water mass flow rate at the inlet node of the radiant cooling panel.  The water mass flow rate at the inlet and outlet node of the radiant cooling panel is the same value.
+
+\paragraph{Cooling Panel Water Inlet Temperature [C]}\label{cooling-panel-water-inlet-temperature-c}
+
+This field reports the water temperature at the inlet node of the radiant cooling panel.
+
+\paragraph{Cooling Panel Water Outlet Temperature [C]}\label{cooling-panel-water-outlet-temperature-c}
+
+This field reports the water temperature at the outlet node of the radiant cooling panel.
+
 \subsection{ZoneHVAC:Baseboard:Convective:Water}\label{zonehvacbaseboardconvectivewater}
 
 The hot water baseboard heater is a component of zone equipment. The component is controlled to meet any remaining zone load not met by other equipment in the zone that have higher heating priority. The control is accomplished by throttling the hot water flow. Input resembles that for the simple heating coil: there is an availability schedule, an overall UA, and a maximum hot water mass flow rate. The unit is connected to a hot water loop (demand side) with an inlet and outlet node. Finally, there is the convergence tolerance, which is the tolerance on how closely the baseboard outlet will meet the zone load. Of course, this tolerance is relative to the zone load.
@@ -604,17 +828,17 @@ An example IDF for the hot water convective baseboard is shown below.
 \begin{lstlisting}
 
 ZoneHVAC:Baseboard:Convective:Water,
-          Zone3Baseboard, ! name
-          FanAndCoilAvailSched, ! on/off schedule
-          Zone 3 Reheat Water Inlet Node, ! water inlet node
-          Zone 3 Reheat Water Outlet Node, ! water outlet node
-          HeatingDesignCapacity, !- Heating Design Capacity Method
-          autosize,!- Heating Design Capacity{ W }
-          ,        !- Heating Design Capacity Per Floor Area{ W / m2 }
-          ,        !- Fraction of Autosized Heating Design Capacity{ -}
-          500.,    ! UA
-          0.0013,  ! maximum water flow rate m3/s
-          0.001;   ! tolerance
+          Zone3Baseboard,                  !- name
+          FanAndCoilAvailSched,            !- on/off schedule
+          Zone 3 Reheat Water Inlet Node,  !- water inlet node
+          Zone 3 Reheat Water Outlet Node, !- water outlet node
+          HeatingDesignCapacity,           !- Heating Design Capacity Method
+          autosize,                        !- Heating Design Capacity{ W }
+          ,                                !- Heating Design Capacity Per Floor Area{ W / m2 }
+          ,                                !- Fraction of Autosized Heating Design Capacity{ -}
+          500.,                            !- UA
+          0.0013,                          !- maximum water flow rate m3/s
+          0.001;                           !- tolerance
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-015}
@@ -715,13 +939,13 @@ An example IDF for the electric convective baseboard is shown below.
 \begin{lstlisting}
 
 ZoneHVAC:Baseboard:Convective:Electric,
-      Zone1Baseboard,  !- Baseboard Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
+      Zone1Baseboard,          !- Baseboard Name
+      FanAndCoilAvailSched,    !- Availability Schedule Name
       HeatingDesignCapacity,   !- Heating Design Capacity Method
       5000,                    !- Heating Design Capacity{ W }
       ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
       ,                        !- Fraction of Autosized Heating Design Capacity{ -}
-      0.97;  !- Efficiency of the BaseBoard
+      0.97;                    !- Efficiency of the BaseBoard
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-012}
@@ -1144,34 +1368,34 @@ An example IDF with a constant flow low temperature radiant system is shown belo
 
 ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
       Resistive Zone Radiant Floor,  !- name of CONSTANT FLOW low temperature radiant system
-      RadiantSysAvailSched,  !- availability schedule
-      Resistive Zone,  !- Zone name
-      Zn001:Flr001,  !- Surface name or group
-      0.012,  !- Hydronic tubing inside diameter {m}
-      400.0,  !- Hydronic tubing length {m}
-      MeanAirTemperature,  !- temperature control type
-      0.0004,  !- maximum water volumetric flow rate {m3/s}
-      ,  !-schedule for flow rate (optional, non-existent means constant)
-      30000, !-Rated Pump Head in Pa
-      50,  !-Rated Power Consumption in W
-      0.87,  !-Motor Efficiency
-      0.1,  !-Fraction of Motor Inefficiencies to Fluid Stream
+      RadiantSysAvailSched,   !- availability schedule
+      Resistive Zone,         !- Zone name
+      Zn001:Flr001,           !- Surface name or group
+      0.012,                  !- Hydronic tubing inside diameter {m}
+      400.0,                  !- Hydronic tubing length {m}
+      MeanAirTemperature,     !- temperature control type
+      0.0004,                 !- maximum water volumetric flow rate {m3/s}
+      ,                       !-schedule for flow rate (optional, non-existent means constant)
+      30000,                  !-Rated Pump Head in Pa
+      50,                     !-Rated Power Consumption in W
+      0.87,                   !-Motor Efficiency
+      0.1,                    !-Fraction of Motor Inefficiencies to Fluid Stream
       Resistive Zone Radiant Water Inlet Node,  !- heating water inlet node
       Resistive Zone Radiant Water Outlet Node,  !- heating water outlet node
-      RadHeatHighWaterTemp,  !-high water temperature schedule
-      RadHeatLowWaterTemp,   !-low water temperature schedule
+      RadHeatHighWaterTemp,   !-high water temperature schedule
+      RadHeatLowWaterTemp,    !-low water temperature schedule
       RadHeatHighControlTemp, !-high control temperature schedule
       RadHeatLowControlTemp,  !-low control temperature schedule
       Zone 1 Cooling Water Inlet Node,  !- cooling water inlet node
       Zone 1 Cooling Water Outlet Node,  !- cooling water outlet node
-      RadCoolHighWaterTemp, !-cooling high water temperature schedule
-      RadCoolLowWaterTemp,  !-cooling low water temperature schedule
+      RadCoolHighWaterTemp,   !-cooling high water temperature schedule
+      RadCoolLowWaterTemp,    !-cooling low water temperature schedule
       RadCoolHighControlTemp, !- cooling high control temperature schedule
       RadCoolLowControlTemp,  !- cooling low control temperature schedule
       SimpleOff,              !- condensation control type
       0.5,                    !- condensation control dewpoint offset
       CalculateFromCircuitLength,   !- Number of Circuits
-      106.7;                   !- Circuit Length
+      106.7;                  !- Circuit Length
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-007}
@@ -1289,9 +1513,9 @@ The heat transfer energy for the heating fluid connection, in Joules.
 
 \subsection{ZoneHVAC:LowTemperatureRadiant:Electric}\label{zonehvaclowtemperatureradiantelectric}
 
-This low temperature radiant system (electric) is a component of zone equipment that is intended to model any ``radiant system'' where electric resistance heating is used to supply energy (heat) to a building surface (wall, ceiling, or floor). The component is controlled by the radiant system controls that are defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.~ If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
+This low temperature radiant system (electric) is a component of zone equipment that is intended to model any ``radiant system'' where electric resistance heating is used to supply energy (heat) to a building surface (wall, ceiling, or floor). The component is controlled by the radiant system controls that are defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first. If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
 
-The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: Low Temp Radiant System:Hydronic).
+The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model (ref: ZoneHVAC:HighTemperatureRadiant) and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:VariableFlow or ConstantFlow).
 
 \subsubsection{Inputs}\label{inputs-7-019}
 
@@ -1309,7 +1533,7 @@ This field is the name of the zone (Ref: Zone) in which the electric low tempera
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-2}
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the heating element is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how energy flow is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed, Wall:Detailed, RoofCeiling:Detailed, etc.), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-6}
 
@@ -1348,7 +1572,7 @@ Operative temperature for radiant system controls is the average of Mean Air Tem
 
 \paragraph{Field: Heating Throttling Range}\label{field-heating-throttling-range}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature (see below) to define the response of the system to various zone conditions. The heating control temperature schedule specifies the ``setpoint'' temperature where the power input to the system is at half of the maximum power input. For example, if the heating control temperature setpoint is currently 15°C and the heating throttling range is 2°C, the electrical power supplied to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or above 16°C and the maximum power input when the controlling temperature is at or below 14°C. This represents a throttling range of 2°C around the setpoint of 15°C. In between 14°C and 16°C, the power input to the radiant system is varied linearly.
+This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature (see below) to define the response of the system to various zone conditions. The heating control temperature schedule specifies the ``setpoint'' temperature where the power input to the system is at half of the maximum power input. For example, if the heating control temperature setpoint is currently 15°C and the heating throttling range is 2°C, the electrical power supplied to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or above 16°C and the maximum power input when the controlling temperature is at or below 14°C. This represents a throttling range of 2°C around the setpoint of 15°C. In between 14°C and 16°C, the power input to the radiant system is varied linearly. The minimum throttling range is 0.5°C.
 
 \paragraph{Field: Heating Setpoint Temperature Schedule Name}\label{field-heating-setpoint-temperature-schedule-name}
 
@@ -1358,17 +1582,18 @@ An example IDF with an electric low temperature radiant system is shown below.
 
 \begin{lstlisting}
 
-ZoneHVAC:LowTemperatureRadiant:Electric, Zone 2 Radiant Floor,
-           RadiantPanelAvailSched ,    ! Availability schedule
-           EAST ZONE ,                 ! Zone name (name of zone system is serving)
-           Zn002:Flr001 ,              ! Surface name (name of surface system is embedded in)
+ZoneHVAC:LowTemperatureRadiant:Electric, 
+           Zone 2 Radiant Floor,       !- Name
+           RadiantPanelAvailSched ,    !- Availability Schedule Name
+           EAST ZONE ,                 !- Zone name (name of zone system is serving)
+           Zn002:Flr001 ,              !- Surface Name or Radiant Surface Group Name
            HeatingDesignCapacity,      !- Heating Design Capacity Method
            10000,                      !- Heating Design Capacity{ W }
-           ,                           !- Heating Design Capacity Per Floor Area{ W / m2 }
-           ,                           !- Fraction of Autosized Heating Design Capacity{ -}
-           MeanAirTemperature,         ! control type (control on mean air temperature)
-           2.0 ,                       ! heating throttling range (in C)
-           Radiant Heating Setpoints ; ! heating setpoint temperatures
+           ,                           !- Heating Design Capacity Per Floor Area{ W/m2 }
+           ,                           !- Fraction of Autosized Heating Design Capacity{ - }
+           MeanAirTemperature,         !- Temperature Control Type (control on mean air temperature)
+           2.0 ,                       !- Heating Throttling Range { deltaC }
+           Radiant Heating Setpoints ; !- Heating Setpoint Temperature Schedule Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-7-007}
@@ -1400,7 +1625,7 @@ These outputs are the heating provided by the low temperature radiant system to 
 
 \subsection{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}\label{zonehvaclowtemperatureradiantsurfacegroup}
 
-A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that are serving to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallet, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how flow rate is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list must be a part of the same zone and that the zone of these surfaces must also match the zone the radiant system is attempting to condition.
+A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that serve to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallel, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how energy flow is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list must be a part of the same zone and that the zone of these surfaces must also match the zone the radiant system is attempting to condition.
 
 \subsubsection{Inputs}\label{inputs-8-017}
 
@@ -1531,32 +1756,32 @@ This field is the name of the first surface to which radiant heat transfer from 
 
 \paragraph{Field: Fraction of Radiant Energy to Surface \textless{}x\textgreater{}}\label{field-fraction-of-radiant-energy-to-surface-x-2}
 
-This field is paired with the preceding surface name (previous field) to define the fraction of radiant heat transfer leaving the high temperature radiant system that is incident on a particular surface. Users should take into account the directionality of high temperature radiant heaters and their location when defining the value for this input field. Note that the sum of all fractions plus the fraction of radiant energy incident on people must add up to less than or equal to 1.
+This field is paired with the preceding surface name (previous field) to define the fraction of radiant heat transfer leaving the high temperature radiant system that is incident on a particular surface. Users should take into account the directionality of high temperature radiant heaters and their location when defining the value for this input field. Note that the sum of all fractions plus the fraction of radiant energy incident on people must add up to 1 so that all radiant energy is taken into account and none of it is "lost".
 
 An example IDF with a high temperature radiant system is shown below.
 
 \begin{lstlisting}
 
 ZoneHVAC:HighTemperatureRadiant, Zone 2 Radiant Heater,
-           RadiantPanelAvailSched ,   ! Availability schedule
-           EAST ZONE ,                ! Zone name (name of zone system is serving)
+           RadiantPanelAvailSched ,   !- Availability schedule
+           EAST ZONE ,                !- Zone name (name of zone system is serving)
            10000,                     !- Heating Design Capacity{ W }
            ,                          !- Heating Design Capacity Per Floor Area{ W / m2 }
            ,                          !- Fraction of Autosized Heating Design Capacity{ -}
-           Gas,                       ! type of heater (either gas or electric)
-           0.8,                       ! combustion efficiency (ignored for electric radiant heaters)
-           0.80,                      ! fraction radiant
-           0.00,                      ! fraction latent
-           0.00,                      ! fraction lost
-           OperativeTemperature,      ! temperature control type (controls on operative temperature)
-           2.0 ,                      ! heating throttling range (in C)
-           Radiant Heating Setpoints, ! heating setpoint temperatures
-           0.04,                      ! fraction of radiant energy that is incident directly on people
-           Zn002:Flr001, 0.80,        ! fraction of radiant energy that is incident on the surface indicated
-           Zn002:Wall001, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-           Zn002:Wall002, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-           Zn002:Wall003, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-           Zn002:Wall004, 0.04;       ! fraction of radiant energy that is incident on the surface indicated
+           Gas,                       !- type of heater (either gas or electric)
+           0.8,                       !- combustion efficiency (ignored for electric radiant heaters)
+           0.80,                      !- fraction radiant
+           0.00,                      !- fraction latent
+           0.00,                      !- fraction lost
+           OperativeTemperature,      !- temperature control type (controls on operative temperature)
+           2.0 ,                      !- heating throttling range (in C)
+           Radiant Heating Setpoints, !- heating setpoint temperatures
+           0.04,                      !- fraction of radiant energy that is incident directly on people
+           Zn002:Flr001, 0.80,        !- fraction of radiant energy that is incident on the surface indicated
+           Zn002:Wall001, 0.04,       !- fraction of radiant energy that is incident on the surface indicated
+           Zn002:Wall002, 0.04,       !- fraction of radiant energy that is incident on the surface indicated
+           Zn002:Wall003, 0.04,       !- fraction of radiant energy that is incident on the surface indicated
+           Zn002:Wall004, 0.04;       !- fraction of radiant energy that is incident on the surface indicated
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-8-006}
@@ -1770,7 +1995,7 @@ This field is a node name used to identify the node that serves as the air outle
 
 \paragraph{Field: Fan Name}\label{field-fan-name-003}
 
-This field is the name of a fan (ref: Fan:ConstantVolume) that is part of the ventilated slab system.~ This name links the ventilated slab to particular fan data entered elsewhere in the input data file.~ A fan name is required since it is the prime mover of air in the ventilated slab system.
+This field is the name of a fan (ref: Fan:SystemModel or Fan:ConstantVolume) that is part of the ventilated slab system.  This name links the ventilated slab to particular fan data entered elsewhere in the input data file.  A fan name is required since it is the prime mover of air in the ventilated slab system.
 
 \paragraph{Field: Coil Option Type}\label{field-coil-option-type}
 
@@ -1791,7 +2016,7 @@ If \textbf{None} is selected, the ventilated slab does not have any coils, and a
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-001}
 
-This field is the type of coil (ref: Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Gas, Coil:Heating:Steam) that is used for heating in the ventilated slab system. This field must be one of the following keywords: Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Gas, Coil:Heating:Steam.~ It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system.
+This field is the type of coil (ref: Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel, Coil:Heating:Steam) that is used for heating in the ventilated slab system. This field must be one of the following keywords: Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel, Coil:Heating:Steam.~ It is used in conjunction with the heating coil name (see next field) to specify the heating coil present within the system.
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-001}
 
@@ -1993,7 +2218,7 @@ This field reports the temperature of air leaving the zone in Celsius. When syst
 
 This field reports the fan outlet air temperature for the ventilated slab system in Celsius.
 
-\paragraph{\texorpdfstring{Zone Ventilated Slab Fan Availability Status {[]}}{Zone Ventilated Slab Fan Availability Status }}\label{zone-ventilated-slab-fan-availability-status}
+\paragraph{Zone Ventilated Slab Fan Availability Status {[]}}\label{zone-ventilated-slab-fan-availability-status}
 
 This is the availability status of the ventilated slab fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the ventilated slab object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List along with Hybrid Ventilation Manager, rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 

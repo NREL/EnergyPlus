@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -76,6 +64,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <DaylightingManager.hh>
+#include <DataWindowEquivalentLayer.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -326,6 +315,7 @@ namespace WindowEquivalentLayer {
 			}
 
 			if ( Material( MaterNum ).Group == BlindEquivalentLayer ) {
+				CFS( EQLNum ).VBLayerPtr = sLayer;
 				if ( Material( MaterNum ).SlatOrientation == Horizontal ) {
 					CFS( EQLNum ).L( sLayer ).LTYPE = ltyVBHOR;
 				} else if ( Material( MaterNum ).SlatOrientation == Vertical ) {
@@ -340,6 +330,7 @@ namespace WindowEquivalentLayer {
 				CFS( EQLNum ).L( sLayer ).SWP_MAT.RHOSBDD = Material( MaterNum ).ReflBackDiffDiff;
 				CFS( EQLNum ).L( sLayer ).SWP_MAT.TAUS_DD = Material( MaterNum ).TausDiffDiff;
 				CFS( EQLNum ).L( sLayer ).PHI_DEG = Material( MaterNum ).SlatAngle;
+				CFS( EQLNum ).L( sLayer ).CNTRL = Material( MaterNum ).SlatAngleType;
 				CFS( EQLNum ).L( sLayer ).S = Material( MaterNum ).SlatSeparation;
 				CFS( EQLNum ).L( sLayer ).W = Material( MaterNum ).SlatWidth;
 				CFS( EQLNum ).L( sLayer ).C = Material( MaterNum ).SlatCrown;
@@ -893,7 +884,11 @@ namespace WindowEquivalentLayer {
 					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 				}
 				// a weighted average of the inlet temperatures.
-				RefAirTemp = SumSysMCpT / SumSysMCp;
+				if ( SumSysMCp > 0.0 ) {
+					RefAirTemp = SumSysMCpT / SumSysMCp;
+				} else {
+					RefAirTemp = MAT( ZoneNum );
+				}
 			} else {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
@@ -931,7 +926,11 @@ namespace WindowEquivalentLayer {
 						SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 					}
 					// a weighted average of the inlet temperatures.
-					RefAirTemp = SumSysMCpT / SumSysMCp;
+					if ( SumSysMCp > 0.0 ) {
+						RefAirTemp = SumSysMCpT / SumSysMCp;
+					} else {
+						RefAirTemp = MAT( ZoneNumAdj );
+					}
 				} else {
 					// currently set to mean air temp but should add error warning here
 					RefAirTemp = MAT( ZoneNumAdj );
@@ -942,7 +941,7 @@ namespace WindowEquivalentLayer {
 
 				// The IR radiance of this window's "exterior" surround is the IR radiance
 				// from surfaces and high-temp radiant sources in the adjacent zone
-				outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QRadThermInAbs( SurfNumAdj );
+				outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QCoolingPanelSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj ) + QRadThermInAbs( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
 
@@ -969,7 +968,7 @@ namespace WindowEquivalentLayer {
 		SurfOutsideEmiss = LWAbsOut;
 		// Indoor mean radiant temperature.
 		// IR incident on window from zone surfaces and high-temp radiant sources
-		rmir = SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + QRadThermInAbs( SurfNum );
+		rmir = SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + QRadThermInAbs( SurfNum );
 		TRMIN = root_4( rmir / StefanBoltzmann ); // TODO check model equation.
 
 		NL = CFS( EQLNum ).NL;
@@ -8196,9 +8195,9 @@ namespace WindowEquivalentLayer {
 		} else if ( L.CNTRL == lscVBNOBM ) {
 			// slatA set to just exclude beam
 			if ( OMEGA_DEG < 0.0 ) {
-				SLATA = VB_CriticalSlatAngle( L, 30.0 ); // assume 30 deg for diffuse
+				SLATA = VB_CriticalSlatAngle( 30.0 ); // assume 30 deg for diffuse
 			} else {
-				SLATA = VB_CriticalSlatAngle( L, OMEGA_DEG );
+				SLATA = VB_CriticalSlatAngle( OMEGA_DEG );
 			}
 		}
 
@@ -8211,7 +8210,6 @@ namespace WindowEquivalentLayer {
 
 	Real64
 	VB_CriticalSlatAngle(
-		CFSLAYER const & L, // VB layer
 		Real64 const OMEGA_DEG // incident profile angle (degrees)
 	)
 	{
@@ -8245,14 +8243,14 @@ namespace WindowEquivalentLayer {
 		// DERIVED TYPE DEFINITIONS
 		// na
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 RAT;
-		// Flow
+		//// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		//Real64 RAT;
+		//// Flow
 
 		// TODO handle vert blind cases etc
-		RAT = L.S * std::cos( OMEGA_DEG ) / L.W;
-		// limit upward slat angle to horiz = max visibility
-		VB_CriticalSlatAngle = max( 0.0, RadiansToDeg * std::asin( RAT ) - OMEGA_DEG );
+		// the slat normal points along the profile angle to block the beam solar
+		VB_CriticalSlatAngle = 90.0 - OMEGA_DEG; // 
+
 		return VB_CriticalSlatAngle;
 	}
 
@@ -9248,8 +9246,8 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 ProfAngHor; // Solar profile angle (radians) for horizontal blind
-		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
+		Real64 ProfAngVer; // Solar vertical profile angle (radians) for horizontal blind
+		Real64 ProfAngHor; // Solar horizontal profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
 		static Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
 		int Lay; // window layer index
@@ -9263,16 +9261,15 @@ namespace WindowEquivalentLayer {
 		ProfAngVer = 0.0;
 		ConstrNum = Surface( SurfNum ).Construction;
 		EQLNum = Construct( Surface( SurfNum ).Construction ).EQLConsPtr;
-
 		if ( BeamDIffFlag != isDIFF ) {
 			if ( CosIncAng( TimeStep, HourOfDay, SurfNum ) <= 0.0 ) return;
 
 			for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 				if ( IsVBLayer( CFS( EQLNum ).L( Lay ) ) ) {
 					if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBHOR ) {
-						ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngHor );
+						ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngVer );
 					} else if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBVER ) {
-						ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngVer );
+						ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngHor );
 					}
 				}
 			}
@@ -9286,12 +9283,13 @@ namespace WindowEquivalentLayer {
 				for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 					if ( IsVBLayer( CFS( EQLNum ).L( Lay ) ) ) {
 						if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBHOR ) {
-							ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngHor );
+							ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngVer );
 						} else if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBVER ) {
-							ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngVer );
+							ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngHor );
 						}
 					}
 				}
+				IncAng = std::acos( CosIncAng( TimeStep, HourOfDay, SurfNum ) );
 				CalcEQLWindowOpticalProperty( CFS( EQLNum ), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor );
 				CFSAbs( _, {1,CFSMAXNL + 1} ) = Abs1( _, {1,CFSMAXNL + 1} );
 				CFSDiffAbsTrans( _, {1,CFSMAXNL + 1}, EQLNum ) = Abs1( _, {1,CFSMAXNL + 1} );
@@ -9308,7 +9306,9 @@ namespace WindowEquivalentLayer {
 				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = CFSAbs( 2, {1,CFSMAXNL} );
 			}
 		}
-
+		if ( CFS( EQLNum ).VBLayerPtr > 0 ) {
+			SurfaceWindow( SurfNum ).SlatAngThisTSDeg = CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).PHI_DEG;
+		}
 	}
 
 	void

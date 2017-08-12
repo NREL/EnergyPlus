@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -505,6 +493,15 @@ namespace ElectricBaseboardRadiator {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
 				ShowContinueError( "The rest of the radiant energy delivered by the baseboard heater will be lost" );
 			}
+			// search zone equipment list structure for zone index
+			for ( int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
+				for ( int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList( ctrlZone ).NumOfEquipTypes; ++zoneEquipTypeNum ) {
+					if ( DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipType_Num( zoneEquipTypeNum ) == DataZoneEquipment::BBElectric_Num && DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipName( zoneEquipTypeNum ) == ElecBaseboard( BaseboardNum ).EquipName ) {
+						ElecBaseboard( BaseboardNum ).ZonePtr = ctrlZone;
+					}
+				}
+			}
+
 		}
 
 		if ( ErrorsFound ) {
@@ -715,6 +712,7 @@ namespace ElectricBaseboardRadiator {
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value of coil input field
+		Real64 FracOfAutoSzCap; // fraction of autosized capacity
 		int FieldNum = 1; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
@@ -741,23 +739,28 @@ namespace ElectricBaseboardRadiator {
 				if ( CapSizingMethod == HeatingDesignCapacity ) {
 					if ( ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 						CheckZoneSizing(CompType, CompName);
-						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 					} else {
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 					}
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 				} else if ( CapSizingMethod == CapacityPerFloorArea ) {
-					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
-					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+					if ( ZoneSizingRunDone ) {
+						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
+					}
+					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 					DataScalableCapSizingON = true;
 				} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 					CheckZoneSizing(CompType, CompName);
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					DataFracOfAutosizedHeatingCapacity = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-					TempSize = AutoSize;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
+					FracOfAutoSzCap = AutoSize;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, FracOfAutoSzCap, false, RoutineName );
+					TempSize = FracOfAutoSzCap;
+					DataFracOfAutosizedHeatingCapacity = 1.0;
 					DataScalableCapSizingON = true;
 				} else {
 					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
@@ -1093,33 +1096,34 @@ namespace ElectricBaseboardRadiator {
 
 		for ( BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum ) {
 
-			ZoneNum = ElecBaseboard( BaseboardNum ).ZonePtr;
-			QElecBaseboardToPerson( ZoneNum ) += QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribPerson;
+			if ( ElecBaseboard( BaseboardNum ).ZonePtr > 0 ) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
+				ZoneNum = ElecBaseboard( BaseboardNum ).ZonePtr;
+				QElecBaseboardToPerson( ZoneNum ) += QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribPerson;
 
-			for ( RadSurfNum = 1; RadSurfNum <= ElecBaseboard( BaseboardNum ).TotSurfToDistrib; ++RadSurfNum ) {
-				SurfNum = ElecBaseboard( BaseboardNum ).SurfacePtr( RadSurfNum );
-				if ( Surface( SurfNum ).Area > SmallestArea ) {
-					ThisSurfIntensity = ( QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribToSurf( RadSurfNum ) / Surface( SurfNum ).Area );
-					QElecBaseboardSurf( SurfNum ) += ThisSurfIntensity;
-					if ( ThisSurfIntensity > MaxRadHeatFlux ) {
-						ShowSevereError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+				for ( RadSurfNum = 1; RadSurfNum <= ElecBaseboard( BaseboardNum ).TotSurfToDistrib; ++RadSurfNum ) {
+					SurfNum = ElecBaseboard( BaseboardNum ).SurfacePtr( RadSurfNum );
+					if ( Surface( SurfNum ).Area > SmallestArea ) {
+						ThisSurfIntensity = ( QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribToSurf( RadSurfNum ) / Surface( SurfNum ).Area );
+						QElecBaseboardSurf( SurfNum ) += ThisSurfIntensity;
+						if ( ThisSurfIntensity > MaxRadHeatFlux ) {
+							ShowSevereError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+							ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
+							ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
+							ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
+							ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
+							ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
+							ShowFatalError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+						}
+					} else {
+						ShowSevereError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
 						ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
 						ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
 						ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
-						ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 						ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
-						ShowFatalError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+						ShowFatalError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
 					}
-				} else {
-					ShowSevereError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
-					ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
-					ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
-					ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
-					ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
-					ShowFatalError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
 				}
 			}
-
 		}
 
 	}

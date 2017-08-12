@@ -75,7 +75,7 @@
 ! End SimMetaData
 ! Number of Zones: 11
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -7614,17 +7614,17 @@
     Yes,                     !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -7643,28 +7643,23 @@
 
   Branch,
     DOAS_POD_1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DOAS_POD_1_OA,           !- Component 1 Name
     DOAS_POD_1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     DOAS_POD_1_OA-DOAS_POD_1_OA_CoolC 1Node,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water:DetailedGeometry,  !- Component 2 Object Type
     DOAS_POD_1_OA_CoolC 1,   !- Component 2 Name
     DOAS_POD_1_OA-DOAS_POD_1_OA_CoolC 1Node,  !- Component 2 Inlet Node Name
     DOAS_POD_1_OA_CoolC 1-DOAS_POD_1_OA_HeatC 1Node,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Water,      !- Component 3 Object Type
     DOAS_POD_1_OA_HeatC 1,   !- Component 3 Name
     DOAS_POD_1_OA_CoolC 1-DOAS_POD_1_OA_HeatC 1Node,  !- Component 3 Inlet Node Name
     DOAS_POD_1_OA_HeatC 1-DOAS_POD_1_OA_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     DOAS_POD_1_OA_Fan,       !- Component 4 Name
     DOAS_POD_1_OA_HeatC 1-DOAS_POD_1_OA_FanNode,  !- Component 4 Inlet Node Name
-    DOAS_POD_1 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    DOAS_POD_1 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     DOAS_POD_1_OA_Controllers,  !- Name
@@ -7951,17 +7946,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -7982,13 +7977,11 @@
 
   Branch,
     DUALDUCT_OTHER Dual Duct Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Duct,                    !- Component 1 Object Type
     DUALDUCT_OTHER Inlet Duct,  !- Component 1 Name
     DUALDUCT_OTHER Dual Duct Inlet Node,  !- Component 1 Inlet Node Name
-    DUALDUCT_OTHER Recirc Splitter Inlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    DUALDUCT_OTHER Recirc Splitter Inlet Node;  !- Component 1 Outlet Node Name
 
   Duct,
     DUALDUCT_OTHER Inlet Duct,  !- Name
@@ -7997,43 +7990,35 @@
 
   Branch,
     DUALDUCT_OTHER Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DUALDUCT_OTHER_OA,       !- Component 1 Name
     DUALDUCT_OTHER Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     DUALDUCT_OTHER_OA-DUALDUCT_OTHER_OA_CoolC 1Node,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water:DetailedGeometry,  !- Component 2 Object Type
     DUALDUCT_OTHER_OA_CoolC 1,  !- Component 2 Name
     DUALDUCT_OTHER_OA-DUALDUCT_OTHER_OA_CoolC 1Node,  !- Component 2 Inlet Node Name
     DUALDUCT_OTHER_OA_CoolC 1-DUALDUCT_OTHER_OA_HeatC 1Node,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Water,      !- Component 3 Object Type
     DUALDUCT_OTHER_OA_HeatC 1,  !- Component 3 Name
     DUALDUCT_OTHER_OA_CoolC 1-DUALDUCT_OTHER_OA_HeatC 1Node,  !- Component 3 Inlet Node Name
     DUALDUCT_OTHER_OA_HeatC 1-DUALDUCT_OTHER_OA_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     DUALDUCT_OTHER_OA_Fan,   !- Component 4 Name
     DUALDUCT_OTHER_OA_HeatC 1-DUALDUCT_OTHER_OA_FanNode,  !- Component 4 Inlet Node Name
-    DUALDUCT_OTHER Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    DUALDUCT_OTHER Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     DUALDUCT_OTHER Recirc Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Fan:VariableVolume,      !- Component 1 Object Type
     DUALDUCT_OTHER_RC_Fan,   !- Component 1 Name
     DUALDUCT_OTHER_RC_Fan inlet node,  !- Component 1 Inlet Node Name
     DUALDUCT_OTHER_RC_FanNode DUALDUCT_OTHER_RC_CoolC Node,  !- Component 1 Outlet Node Name
-    Active,                  !- Component 1 Branch Control Type
     Coil:Cooling:Water:DetailedGeometry,  !- Component 2 Object Type
     DUALDUCT_OTHER_RC_CoolC 1,  !- Component 2 Name
     DUALDUCT_OTHER_RC_FanNode DUALDUCT_OTHER_RC_CoolC Node,  !- Component 2 Inlet Node Name
-    DUALDUCT_OTHER Recirc Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Passive;                 !- Component 2 Branch Control Type
+    DUALDUCT_OTHER Recirc Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     DUALDUCT_OTHER_OA_Controllers,  !- Name
@@ -8348,38 +8333,34 @@
 
   Branch,
     SWHSys1 Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SWHSys1 Pump,            !- Component 1 Name
     SWHSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Equipment Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SWHSys1 Water Heater,    !- Component 1 Name
     SWHSys1 Pump-SWHSys1 Water HeaterNode,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     SWHSys1 Pump,            !- Name
     SWHSys1 Supply Inlet Node,  !- Inlet Node Name
     SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    1,                       !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    1,                       !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     1,                       !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent,            !- Pump Control Type
     ;                        !- Pump Flow Rate Schedule Name
 
@@ -8440,13 +8421,11 @@
 
   Branch,
     SWHSys1 Supply Equipment Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     SWHSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SWHSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SWHSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -8455,13 +8434,11 @@
 
   Branch,
     SWHSys1 Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Outlet Pipe,  !- Component 1 Name
     SWHSys1 Supply Mixer-SWHSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SWHSys1 Supply Outlet Pipe,  !- Name
@@ -8496,13 +8473,11 @@
 
   Branch,
     SWHSys1 Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Inlet Pipe,  !- Component 1 Name
     SWHSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Inlet Pipe-SWHSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Demand Inlet Pipe-SWHSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SWHSys1 Demand Inlet Pipe,  !- Name
@@ -8511,23 +8486,19 @@
 
   Branch,
     SWHSys1 Demand Load Branch 1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Bathrooms SHW_default,   !- Component 1 Name
     Bathrooms SHW_default Water Inlet Node,  !- Component 1 Inlet Node Name
-    Bathrooms SHW_default Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Bathrooms SHW_default Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Bypass Pipe,  !- Component 1 Name
     SWHSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SWHSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SWHSys1 Demand Bypass Pipe,  !- Name
@@ -8536,13 +8507,11 @@
 
   Branch,
     SWHSys1 Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Outlet Pipe,  !- Component 1 Name
     SWHSys1 Demand Mixer-SWHSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SWHSys1 Demand Outlet Pipe,  !- Name
@@ -8629,38 +8598,34 @@
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
     HeatSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
     HeatSys1 Pump-HeatSys1 BoilerNode,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
     HeatSys1 Supply Inlet Node,  !- Inlet Node Name
     HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    119563,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    119563,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0.0000,                  !- Coefficient 1 of the Part Load Performance Curve
     0.0216,                  !- Coefficient 2 of the Part Load Performance Curve
     -0.0325,                 !- Coefficient 3 of the Part Load Performance Curve
     1.0095,                  !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent,            !- Pump Control Type
     ;                        !- Pump Flow Rate Schedule Name
 
@@ -8691,13 +8656,11 @@
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -8706,13 +8669,11 @@
 
   Branch,
     HeatSys1 Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
     HeatSys1 Supply Mixer-HeatSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Outlet Pipe,  !- Name
@@ -8783,13 +8744,11 @@
 
   Branch,
     HeatSys1 Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Inlet Pipe,  !- Name
@@ -8798,143 +8757,115 @@
 
   Branch,
     HeatSys1 Demand Load Branch 1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corner_Class_1_Pod_1 Fan Coil Heat Coil,  !- Component 1 Name
     Corner_Class_1_Pod_1 Fan Coil Heat Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Corner_Class_1_Pod_1 Fan Coil Heat Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corner_Class_1_Pod_1 Fan Coil Heat Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Mult_Class_1_Pod_1 Fan Coil Heat Coil,  !- Component 1 Name
     Mult_Class_1_Pod_1 Fan Coil Heat Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Mult_Class_1_Pod_1 Fan Coil Heat Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Mult_Class_1_Pod_1 Fan Coil Heat Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corridor_Pod_1 Fan Coil Heat Coil,  !- Component 1 Name
     Corridor_Pod_1 Fan Coil Heat Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_Pod_1 Fan Coil Heat Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_Pod_1 Fan Coil Heat Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corner_Class_2_Pod_1 Fan Coil Heat Coil,  !- Component 1 Name
     Corner_Class_2_Pod_1 Fan Coil Heat Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Corner_Class_2_Pod_1 Fan Coil Heat Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corner_Class_2_Pod_1 Fan Coil Heat Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Mult_Class_2_Pod_1 Fan Coil Heat Coil,  !- Component 1 Name
     Mult_Class_2_Pod_1 Fan Coil Heat Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Mult_Class_2_Pod_1 Fan Coil Heat Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Mult_Class_2_Pod_1 Fan Coil Heat Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Main_Corridor Baseboard Heater,  !- Component 1 Name
     Main_Corridor Baseboard Heater Inlet Node Name,  !- Component 1 Inlet Node Name
-    Main_Corridor Baseboard Heater Outlet Node Name,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Main_Corridor Baseboard Heater Outlet Node Name;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 7,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Lobby Baseboard Heater,  !- Component 1 Name
     Lobby Baseboard Heater Inlet Node Name,  !- Component 1 Inlet Node Name
-    Lobby Baseboard Heater Outlet Node Name,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Lobby Baseboard Heater Outlet Node Name;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 8,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Mech Baseboard Heater,   !- Component 1 Name
     Mech Baseboard Heater Inlet Node Name,  !- Component 1 Inlet Node Name
-    Mech Baseboard Heater Outlet Node Name,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Mech Baseboard Heater Outlet Node Name;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 9,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Bathrooms Baseboard Heater,  !- Component 1 Name
     Bathrooms Baseboard Heater Inlet Node Name,  !- Component 1 Inlet Node Name
-    Bathrooms Baseboard Heater Outlet Node Name,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Bathrooms Baseboard Heater Outlet Node Name;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 10,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Offices Baseboard Heater,!- Component 1 Name
     Offices Baseboard Heater Inlet Node Name,  !- Component 1 Inlet Node Name
-    Offices Baseboard Heater Outlet Node Name,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Offices Baseboard Heater Outlet Node Name;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 11,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Media_Center Baseboard Heater,  !- Component 1 Name
     Media_Center Baseboard Heater Inlet Node Name,  !- Component 1 Inlet Node Name
-    Media_Center Baseboard Heater Outlet Node Name,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Media_Center Baseboard Heater Outlet Node Name;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 12,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     DOAS_POD_1_OA_HeatC 1,   !- Component 1 Name
     DOAS_POD_1_OA_HeatC 1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    DOAS_POD_1_OA_HeatC 1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    DOAS_POD_1_OA_HeatC 1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 13,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     DUALDUCT_OTHER_OA_HeatC 1,  !- Component 1 Name
     DUALDUCT_OTHER_OA_HeatC 1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    DUALDUCT_OTHER_OA_HeatC 1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    DUALDUCT_OTHER_OA_HeatC 1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
     HeatSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Bypass Pipe,  !- Name
@@ -8943,13 +8874,11 @@
 
   Branch,
     HeatSys1 Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Mixer-HeatSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Outlet Pipe,  !- Name
@@ -9036,38 +8965,34 @@
 
   Branch,
     CoolSys1 Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CoolSys1 Pump,           !- Component 1 Name
     CoolSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Supply Equipment Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     CoolSys1 Chiller,        !- Component 1 Name
     CoolSys1 Pump-CoolSys1 ChillerNode,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CoolSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     CoolSys1 Pump,           !- Name
     CoolSys1 Supply Inlet Node,  !- Inlet Node Name
     CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    149453,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    149453,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0.0000,                  !- Coefficient 1 of the Part Load Performance Curve
     0.0216,                  !- Coefficient 2 of the Part Load Performance Curve
     -0.0325,                 !- Coefficient 3 of the Part Load Performance Curve
     1.0095,                  !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent,            !- Pump Control Type
     ;                        !- Pump Flow Rate Schedule Name
 
@@ -9147,13 +9072,11 @@
 
   Branch,
     CoolSys1 Supply Equipment Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     CoolSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    CoolSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -9162,13 +9085,11 @@
 
   Branch,
     CoolSys1 Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Supply Outlet Pipe,  !- Component 1 Name
     CoolSys1 Supply Mixer-CoolSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Supply Outlet Pipe,  !- Name
@@ -9224,13 +9145,11 @@
 
   Branch,
     CoolSys1 Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Inlet Pipe,  !- Component 1 Name
     CoolSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Inlet Pipe,  !- Name
@@ -9239,93 +9158,75 @@
 
   Branch,
     CoolSys1 Demand Load Branch 1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     Corner_Class_1_Pod_1 Fan Coil Cool Coil,  !- Component 1 Name
     Corner_Class_1_Pod_1 Fan Coil Cool Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Corner_Class_1_Pod_1 Fan Coil Cool Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corner_Class_1_Pod_1 Fan Coil Cool Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Load Branch 2,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     Mult_Class_1_Pod_1 Fan Coil Cool Coil,  !- Component 1 Name
     Mult_Class_1_Pod_1 Fan Coil Cool Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Mult_Class_1_Pod_1 Fan Coil Cool Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Mult_Class_1_Pod_1 Fan Coil Cool Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Load Branch 3,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     Corridor_Pod_1 Fan Coil Cool Coil,  !- Component 1 Name
     Corridor_Pod_1 Fan Coil Cool Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_Pod_1 Fan Coil Cool Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_Pod_1 Fan Coil Cool Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Load Branch 4,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     Corner_Class_2_Pod_1 Fan Coil Cool Coil,  !- Component 1 Name
     Corner_Class_2_Pod_1 Fan Coil Cool Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Corner_Class_2_Pod_1 Fan Coil Cool Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corner_Class_2_Pod_1 Fan Coil Cool Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Load Branch 5,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     Mult_Class_2_Pod_1 Fan Coil Cool Coil,  !- Component 1 Name
     Mult_Class_2_Pod_1 Fan Coil Cool Coil Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Mult_Class_2_Pod_1 Fan Coil Cool Coil Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Mult_Class_2_Pod_1 Fan Coil Cool Coil Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Load Branch 6,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water:DetailedGeometry,  !- Component 1 Object Type
     DOAS_POD_1_OA_CoolC 1,   !- Component 1 Name
     DOAS_POD_1_OA_CoolC 1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    DOAS_POD_1_OA_CoolC 1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    DOAS_POD_1_OA_CoolC 1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Load Branch 7,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water:DetailedGeometry,  !- Component 1 Object Type
     DUALDUCT_OTHER_OA_CoolC 1,  !- Component 1 Name
     DUALDUCT_OTHER_OA_CoolC 1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    DUALDUCT_OTHER_OA_CoolC 1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    DUALDUCT_OTHER_OA_CoolC 1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Load Branch 8,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water:DetailedGeometry,  !- Component 1 Object Type
     DUALDUCT_OTHER_RC_CoolC 1,  !- Component 1 Name
     DUALDUCT_OTHER_RC_CoolC 1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    DUALDUCT_OTHER_RC_CoolC 1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    DUALDUCT_OTHER_RC_CoolC 1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Bypass Pipe,  !- Component 1 Name
     CoolSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    CoolSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Bypass Pipe,  !- Name
@@ -9334,13 +9235,11 @@
 
   Branch,
     CoolSys1 Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Outlet Pipe,  !- Component 1 Name
     CoolSys1 Demand Mixer-CoolSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Outlet Pipe,  !- Name

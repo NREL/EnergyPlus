@@ -51,7 +51,7 @@ The design day input describes the parameters to effect a ``design day'' simulat
 We refer you to the ASHRAE Handbook of Fundamentals for philosophy of what parameters are important for use as ``design conditions'' in sizing equipment.
 
 \begin{callout}
-  In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. http://www.energyplus.gov/cfm/weather\_data.cfm These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
+  In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. \url{http://www.energyplus.gov/cfm/weather_data.cfm} These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-1-024}
@@ -348,11 +348,11 @@ This schedule value is active when any Design Day objects have / use the solar s
 
 \paragraph{Sizing Period Site Humidity Condition Schedule Value {[}\%{]}}\label{sizing-period-site-humidity-condition-schedule-value}
 
-\paragraph{\texorpdfstring{Sizing Period Site Humidity Condition Schedule Value {[]}}{Sizing Period Site Humidity Condition Schedule Value }}\label{sizing-period-site-humidity-condition-schedule-value-1}
+\paragraph{Sizing Period Site Humidity Condition Schedule Value {[]}}\label{sizing-period-site-humidity-condition-schedule-value-1}
 
 This schedule value is active when any Design Day objects have / use the humidity schedule option. For those objects that don't have this option, the value will be displayed as -999.
 
-\paragraph{\texorpdfstring{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value {[]}}{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value }}\label{sizing-period-site-drybulb-temperature-range-modifier-schedule-value}
+\paragraph{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value {[]}}\label{sizing-period-site-drybulb-temperature-range-modifier-schedule-value}
 
 \paragraph{Sizing Period Site Drybulb Temperature Range Modifier Schedule Value {[}deltaC{]}}\label{sizing-period-site-drybulb-temperature-range-modifier-schedule-value-deltac}
 
@@ -1056,7 +1056,7 @@ Site:GroundTemperature:Undisturbed:FiniteDifference,
   0.408;    !- Evapotranspiration Ground Cover Parameter
 \end{lstlisting}
 
-\subsection{Site:GroundTemperature:Undisturbed:KusduaAchenbach}\label{sitegroundtemperatureundisturbedkusduaachenbach}
+\subsection{Site:GroundTemperature:Undisturbed:KusudaAchenbach}\label{sitegroundtemperatureundisturbedkusudaachenbach}
 
 Site:GroundTemperature:Undisturbed:KusudaAchenbach may be used by all objects requiring ``undisturbed'' ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Kusuda T. and P. Achenbach. 1965. The correlation uses three parameters for ground temperature at the surface to define a correlation for undisturbed ground temperatures as a function of depth and time. If one thinks of the ground temperature for a given depth as a sinusoid, the average ground temperature, amplitude (average difference between maximum ground temperature and minimum ground temperature), and the phase shift (day of minimum surface temperature) are all required to define the correlation.
 
@@ -1273,6 +1273,14 @@ Numeric field indicates the depth measured in meters from the ground surface to 
 \paragraph{Field: Simulation Timestep}\label{field-simulation-timestep}
 
 Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include ``timestep'' and ``hourly''.
+
+\paragraph{Field: Geometric Mesh Coefficient}
+
+This numeric field represents the compression of cell distribution A value in this field equal to 1 would result in a uniform distribution, while a value of 2 would provide a highly skewed distribution. Values for this field should be limited from $1.0$ to $2.0$. If this field is omitted, the default value is 1.6.
+
+\paragraph{Field: Mesh Density Parameter}
+
+This numeric integer field represents the number of cells to be placed between any two ``domain partitions'' during mesh development.~ A domain partition may be thought of as a slab edge or insulation edge. Once these components are laid out in the domain, this field number of cells are placed between the partitions. If this field is omitted, the default value is 6.
 
 An IDF example of an in-grade slab.
 
@@ -2030,19 +2038,19 @@ Unit of Angle & Equivalent time \tabularnewline
 \bottomrule
 \end{longtable}
 
-\paragraph{\texorpdfstring{Site Rain Status {[]}}{Site Rain Status }}\label{site-rain-status}
+\paragraph{Site Rain Status {[]}}\label{site-rain-status}
 
 This field shows whether or not (1 = yes, 0 = no) the weather shows ``raining''. For a Design Day, one can denote rain for the entire day but not timestep by timestep. Weather files may indicate rain for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g. daily reporting) means that it was raining during each timestep of that period.
 
-\paragraph{\texorpdfstring{Site Snow on Ground Status {[]}}{Site Snow on Ground Status }}\label{site-snow-on-ground-status}
+\paragraph{Site Snow on Ground Status {[]}}\label{site-snow-on-ground-status}
 
 This field shows whether or not (1 = yes, 0 = no) the weather shows ``snow on the ground''. For a Design Day, one can denote snow for the entire day but not timestep by timestep. Weather files may indicate snow (snow depth) for a single time interval. This is an ``averaged'' field -- thus a 1 shown for a time period (e.g. daily reporting) means that there was snow on the ground during each timestep of that period.
 
-\paragraph{\texorpdfstring{Site Daylight Saving Time Status {[]}}{Site Daylight Saving Time Status }}\label{site-daylight-saving-time-status}
+\paragraph{Site Daylight Saving Time Status {[]}}\label{site-daylight-saving-time-status}
 
 This field shows when daylight saving time (1 = yes, 0 = no) is in effect. Though shown as an average variable, this value is only set on a daily basis.
 
-\paragraph{\texorpdfstring{Site Day Type Index {[]}}{Site Day Type Index }}\label{site-day-type-index}
+\paragraph{Site Day Type Index {[]}}\label{site-day-type-index}
 
 This field shows what ``day type'' the current day is. Day types are (1 = Sunday, 2 = Monday, etc.) with Holiday = 8, SummerDesignDay = 9, WinterDesignDay = 10, CustomDay1 = 11, CustomDay2 = 12. Though shown as an average variable, this value is only set on a daily basis.
 

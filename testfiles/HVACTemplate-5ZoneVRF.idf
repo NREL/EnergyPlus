@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -1745,13 +1745,13 @@
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
     1,                       !- Rated Total Heating Capacity Sizing Ratio {W/W}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Flow/Person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
     ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
@@ -1791,13 +1791,13 @@
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
     1,                       !- Rated Total Heating Capacity Sizing Ratio {W/W}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Flow/Person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
     ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
@@ -1837,13 +1837,13 @@
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
     1,                       !- Rated Total Heating Capacity Sizing Ratio {W/W}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Flow/Person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
     ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
@@ -1883,13 +1883,13 @@
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
     1,                       !- Rated Total Heating Capacity Sizing Ratio {W/W}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Flow/Person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
     ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
@@ -1929,13 +1929,13 @@
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
     1,                       !- Rated Total Heating Capacity Sizing Ratio {W/W}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Flow/Person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
     ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}

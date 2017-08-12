@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -71,6 +59,7 @@
 // EnergyPlus Headers
 #include <HeatBalanceManager.hh>
 #include <ConductionTransferFunctionCalc.hh>
+#include <CurveManager.hh>
 #include <DataBSDFWindow.hh>
 #include <DataComplexFenestration.hh>
 #include <DataContaminantBalance.hh>
@@ -80,6 +69,7 @@
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
+#include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
@@ -96,6 +86,7 @@
 #include <General.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MatrixDataManager.hh>
@@ -110,6 +101,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -514,8 +506,8 @@ namespace HeatBalanceManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const NumConstrObjects( 5 );
-		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular" } );
+		int const NumConstrObjects( 6 );
+		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular", "EnergyManagementSystem:ConstructionIndexVariable" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -541,13 +533,20 @@ namespace HeatBalanceManager {
 			NumObjects = GetNumObjectsFound( ConstrObjects( ONum ) );
 			for ( Loop = 1; Loop <= NumObjects; ++Loop ) {
 				GetObjectItem( ConstrObjects( ONum ), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status );
-				if ( ONum != 5 ) {
-					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
-				} else {
+				if ( ONum == 5 ) {
 					CNum = FindItemInList( cAlphaArgs( 4 ), Construct );
+				} else {
+					CNum = FindItemInList( cAlphaArgs( 2 ), Construct );
 				}
 				if ( CNum == 0 ) continue;
 				Construct( CNum ).IsUsed = true;
+				if ( ONum == 4 || ONum == 6 ) {
+					// GroundHeatExchanger:Surface or EnergyManagementSystem:ConstructionIndexVariable
+					// Include all EMS constructions since they can potentially be used by a CTF surface
+					if ( !Construct( CNum ).TypeIsWindow ) {
+						Construct( CNum ).IsUsedCTF = true;
+					}
+				}
 			}
 		}
 		Unused = TotConstructs - std::count_if( Construct.begin(), Construct.end(), []( DataHeatBalance::ConstructionData const & e ){ return e.IsUsed; } );
@@ -704,6 +703,7 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::lMinimalShadowing;
+		using DataHVACGlobals::HVACSystemRootFinding;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -890,11 +890,8 @@ namespace HeatBalanceManager {
 				DefaultInsideConvectionAlgo = ASHRAESimple;
 				AlphaName( 1 ) = "Simple";
 
-			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
+			} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 				DefaultInsideConvectionAlgo = ASHRAETARP;
-				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetInsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "TARP";
 
 			} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
@@ -931,32 +928,20 @@ namespace HeatBalanceManager {
 			GetObjectItem( "SurfaceConvectionAlgorithm:Outside", 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 
-			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
+			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAESimple;
-				if ( AlphaName( 1 ) == "SIMPLE" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to SimpleCombined, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "SimpleCombined";
 
-			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
+			} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAETARP;
-				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
-				if ( AlphaName( 1 ) == "BLAST" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "TARP";
 
 			} else if ( SELECT_CASE_var == "MOWITT" ) {
 				DefaultOutsideConvectionAlgo = MoWiTTHcOutside;
 				AlphaName( 1 ) = "MoWitt";
 
-			} else if ( ( SELECT_CASE_var == "DOE-2" ) || ( SELECT_CASE_var == "DOE2" ) ) {
+			} else if ( ( SELECT_CASE_var == "DOE-2" ) ) {
 				DefaultOutsideConvectionAlgo = DOE2HcOutside;
-				if ( AlphaName( 1 ) == "DOE2" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to DOE-2, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "DOE-2";
 
 			} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
@@ -1244,6 +1229,43 @@ namespace HeatBalanceManager {
 			gio::write( OutputFileInits, Format_733 ) << "No" << "N/A" << "N/A" << "N/A";
 		}
 
+		// A new object is added by L. Gu, 4/17
+		CurrentModuleObject = "HVACSystemRootFindingAlgorithm";
+		NumObjects = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumObjects > 0 ) {
+			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( NumAlpha > 0 ) {
+				HVACSystemRootFinding.Algorithm = AlphaName( 1 );
+				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
+				if ( ( SELECT_CASE_var == "REGULAFALSI" ) ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+				} else if ( SELECT_CASE_var == "BiSECTION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
+				} else if ( SELECT_CASE_var == "BISECTIONTHENREGULAFALSI" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
+				} else if ( SELECT_CASE_var == "REGULAFALSITHENBISECTION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
+				} else if ( SELECT_CASE_var == "ALTERNATION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation;
+				} else {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames( 1 ) + ". The default choice is assigned = " + AlphaName( 1 ) );
+					ShowContinueError( "Valid choices are: RegulaFalsi, Bisection, BisectionThenRegulaFalsi, RegulaFalsiThenBisection, or Alternation." );
+				}}
+			}
+			if ( NumNumber > 0 ) {
+				HVACSystemRootFinding.NumOfIter = BuildingNumbers( 1 );
+			}
+		}
+		else {
+			HVACSystemRootFinding.Algorithm = "RegulaFalsi";
+			HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+		}
+
+		// Write Solution Algorithm to the initialization output file for User Verification
+		gio::write( OutputFileInits, Format_726 );
+		gio::write( OutputFileInits, Format_727 ) << AlphaName( 1 );
+
 	}
 
 	void
@@ -1349,6 +1371,18 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::ScanForReports;
+		using General::TrimSigDigits;
+		using WindowEquivalentLayer::lscNONE;
+		using WindowEquivalentLayer::lscVBPROF;
+		using WindowEquivalentLayer::lscVBNOBM;
+		using CurveManager::PerfCurve;
+		using CurveManager::GetCurveIndex;
+		using CurveManager::GetCurveObjectTypeNum;
+		using CurveManager::GetCurveMinMaxValues;
+		using CurveManager::CurveType_TableTwoIV;
+		using CurveManager::GetCurveInterpolationMethodNum;
+		using CurveManager::LinearInterpolationOfTable;
+		using CurveManager::SetSameIndeVariableValues;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1365,7 +1399,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int IOStat; // IO Status when calling get input subroutine
-		Array1D_string MaterialNames( 5 ); // Number of Material Alpha names defined
+		Array1D_string MaterialNames( 7 ); // Number of Material Alpha names defined
 		int MaterNum; // Counter to keep track of the material number
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
@@ -1394,6 +1428,10 @@ namespace HeatBalanceManager {
 		static bool DoReport( false );
 		Real64 DenomRGas; // Denominator for WindowGas calculations of NominalR
 		Real64 Openness; // insect screen oppenness fraction = (1-d/s)^2
+		Real64 minAngValue; // minimum value of angle
+		Real64 maxAngValue; // maximum value of angle
+		Real64 minLamValue; // minimum value of wavelength
+		Real64 maxLamValue; // maximum value of wavelength
 
 		// Added TH 1/9/2009 to read the thermochromic glazings
 		static int iTC( 0 );
@@ -1702,13 +1740,15 @@ namespace HeatBalanceManager {
 			Material( MaterNum ).Roughness = VerySmooth;
 			Material( MaterNum ).ROnly = true;
 			Material( MaterNum ).Thickness = MaterialProps( 1 );
-			Material( MaterNum ).Trans = MaterialProps( 2 );
-			Material( MaterNum ).ReflectSolBeamFront = MaterialProps( 3 );
-			Material( MaterNum ).ReflectSolBeamBack = MaterialProps( 4 );
-			Material( MaterNum ).TransVis = MaterialProps( 5 );
-			Material( MaterNum ).ReflectVisBeamFront = MaterialProps( 6 );
-			Material( MaterNum ).ReflectVisBeamBack = MaterialProps( 7 );
-			Material( MaterNum ).TransThermal = MaterialProps( 8 );
+			if ( !SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
+				Material( MaterNum ).Trans = MaterialProps( 2 );
+				Material( MaterNum ).ReflectSolBeamFront = MaterialProps( 3 );
+				Material( MaterNum ).ReflectSolBeamBack = MaterialProps( 4 );
+				Material( MaterNum ).TransVis = MaterialProps( 5 );
+				Material( MaterNum ).ReflectVisBeamFront = MaterialProps( 6 );
+				Material( MaterNum ).ReflectVisBeamBack = MaterialProps( 7 );
+				Material( MaterNum ).TransThermal = MaterialProps( 8 );
+			}
 			Material( MaterNum ).AbsorpThermalFront = MaterialProps( 9 );
 			Material( MaterNum ).AbsorpThermalBack = MaterialProps( 10 );
 			Material( MaterNum ).Conductivity = MaterialProps( 11 );
@@ -1733,6 +1773,8 @@ namespace HeatBalanceManager {
 			if ( SameString( MaterialNames( 2 ), "SpectralAverage" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
 			// No need for spectral data for BSDF either
 			if ( SameString( MaterialNames( 2 ), "BSDF" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
+			if ( SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) Material( MaterNum ).GlassSpectralAndAngle = true;
+
 			if ( Material( MaterNum ).GlassSpectralDataPtr == 0 && SameString( MaterialNames( 2 ), "Spectral" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + Material( MaterNum ).Name + "\" has " + cAlphaFieldNames( 2 ) + " = Spectral but has no matching MaterialProperty:GlazingSpectralData set" );
@@ -1743,10 +1785,10 @@ namespace HeatBalanceManager {
 				}
 			}
 
-			if ( ! SameString( MaterialNames( 2 ), "SpectralAverage" ) && ! SameString( MaterialNames( 2 ), "Spectral" ) && ! SameString( MaterialNames( 2 ), "BSDF" ) ) {
+			if ( ! SameString( MaterialNames( 2 ), "SpectralAverage" ) && ! SameString( MaterialNames( 2 ), "Spectral" ) && ! SameString( MaterialNames( 2 ), "BSDF" ) && ! SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + Material( MaterNum ).Name + "\", invalid specification." );
-				ShowContinueError( cAlphaFieldNames( 2 ) + " must be SpectralAverage, Spectral or BSDF, value=" + MaterialNames( 2 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value=" + MaterialNames( 2 ) );
 			}
 
 			// TH 8/24/2011, allow glazing properties MaterialProps(2 to 10) to equal 0 or 1: 0.0 =< Prop <= 1.0
@@ -1885,7 +1927,150 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value." );
 				ShowContinueError( cNumericFieldNames( 4 ) + " must be Yes or No, entered value=" + MaterialNames( 4 ) );
 			}
-
+			// Get SpectralAndAngle table names 
+			if ( Material( MaterNum ).GlassSpectralAndAngle ) {
+				if ( lAlphaFieldBlanks( 5 ) ) {
+					ErrorsFound = true;
+					ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", blank field." );
+					ShowContinueError( " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type." );
+				} else {
+					Material( MaterNum ).GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex( MaterialNames( 5 ) );
+					if ( Material( MaterNum ).GlassSpecAngTransDataPtr == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid name." );
+						ShowContinueError( cAlphaFieldNames( 5 ) + " requires a valid table object name, entered input=" + MaterialNames( 5 ) );
+					} else {
+						if ( GetCurveObjectTypeNum( Material( MaterNum ).GlassSpecAngTransDataPtr ) != CurveType_TableTwoIV ) {
+							ErrorsFound = true;
+							ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid table type." );
+							ShowContinueError( cAlphaFieldNames( 5 ) + " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames( 5 ) );
+						} else {
+							if ( GetCurveInterpolationMethodNum( Material( MaterNum ).GlassSpecAngTransDataPtr ) != LinearInterpolationOfTable ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( !PerfCurve( Material( MaterNum ).GlassSpecAngTransDataPtr ).OpticalProperty) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Table input." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires X unit is Angle and Y unit is Wavelength, entered table name=" + MaterialNames( 5 ) );
+							}
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( abs( maxAngValue - 90.0) > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
+							}
+						}
+					}
+				}
+				if ( lAlphaFieldBlanks( 6 ) ) {
+					ErrorsFound = true;
+					ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", blank field." );
+					ShowContinueError( " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type." );
+				} else {
+					Material( MaterNum ).GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex( MaterialNames( 6 ) );
+					if ( Material( MaterNum ).GlassSpecAngFRefleDataPtr == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid name." );
+						ShowContinueError( cAlphaFieldNames( 6 ) + " requires a valid table object name, entered input=" + MaterialNames( 6 ) );
+					} else {
+						if ( GetCurveObjectTypeNum( Material( MaterNum ).GlassSpecAngFRefleDataPtr ) != CurveType_TableTwoIV ) {
+							ErrorsFound = true;
+							ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid table type." );
+							ShowContinueError( cAlphaFieldNames( 6 ) + " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames( 6 ) );
+						} else {
+							if ( GetCurveInterpolationMethodNum( Material( MaterNum ).GlassSpecAngFRefleDataPtr ) != LinearInterpolationOfTable ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
+								ShowContinueError( cAlphaFieldNames( 6 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 6 ) );
+							}
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( abs( maxAngValue - 90.0 ) > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
+							}
+						}
+					}
+				}
+				if ( lAlphaFieldBlanks( 7 ) ) {
+					ErrorsFound = true;
+					ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", blank field." );
+					ShowContinueError( " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type." );
+				} else {
+					Material( MaterNum ).GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex( MaterialNames( 7 ) );
+					if ( Material( MaterNum ).GlassSpecAngBRefleDataPtr == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid name." );
+						ShowContinueError( cAlphaFieldNames( 7 ) + " requires a valid table object name, entered input=" + MaterialNames( 7 ) );
+					} else {
+						if ( GetCurveObjectTypeNum( Material( MaterNum ).GlassSpecAngBRefleDataPtr ) != CurveType_TableTwoIV ) {
+							ErrorsFound = true;
+							ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid table type." );
+							ShowContinueError( cAlphaFieldNames( 7 ) + " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames( 7 ) );
+						} else {
+							if ( GetCurveInterpolationMethodNum( Material( MaterNum ).GlassSpecAngBRefleDataPtr ) != LinearInterpolationOfTable ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
+								ShowContinueError( cAlphaFieldNames( 7 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 7 ) );
+							}
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( abs( maxAngValue - 90.0 ) > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
+							}
+						}
+					}
+				}
+				SetSameIndeVariableValues( Material( MaterNum ).GlassSpecAngTransDataPtr, Material( MaterNum ).GlassSpecAngFRefleDataPtr, Material( MaterNum ).GlassSpecAngBRefleDataPtr );
+			}
 		}
 
 		// Glass materials, alternative input: index of refraction and extinction coefficient
@@ -3142,11 +3327,11 @@ namespace HeatBalanceManager {
 			//  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 				if ( SameString( MaterialNames( 3 ), "FixedSlatAngle" ) ) {
-					Material( MaterNum ).SlatAngleType = 0;
+					Material( MaterNum ).SlatAngleType = lscNONE;
 				} else if ( SameString( MaterialNames( 3 ), "MaximizeSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 1;
+					Material( MaterNum ).SlatAngleType = lscVBPROF;
 				} else if ( SameString( MaterialNames( 3 ), "BlockBeamSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 2;
+					Material( MaterNum ).SlatAngleType = lscVBNOBM;
 				} else {
 					Material( MaterNum ).SlatAngleType = 0;
 				}
@@ -3275,6 +3460,16 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
 				ShowContinueError( cNumericFieldNames( 7 ) + " is <=0." );
 				ErrorsFound = true;
+			}
+
+			if ( Material( MaterNum ).InitMoisture > Material( MaterNum ).Porosity ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is greater than " + cNumericFieldNames( 13 ) + ". It must be less or equal." );
+				ShowContinueError( cNumericFieldNames( 13 ) + " = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " = " + TrimSigDigits( Material( MaterNum ).InitMoisture, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is reset to the maximum (saturation) value = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( "Simulation continues." );
+				Material( MaterNum ).InitMoisture = Material( MaterNum ).Porosity;
 			}
 
 		}
@@ -3413,6 +3608,11 @@ namespace HeatBalanceManager {
 				SetupEMSActuator( "Material", Material( MaterNum ).Name, "Surface Property Thermal Absorptance", "[ ]", Material( MaterNum ).AbsorpThermalEMSOverrideOn, Material( MaterNum ).AbsorpThermalEMSOverride );
 				SetupEMSActuator( "Material", Material( MaterNum ).Name, "Surface Property Visible Absorptance", "[ ]", Material( MaterNum ).AbsorpVisibleEMSOverrideOn, Material( MaterNum ).AbsorpVisibleEMSOverride );
 			}
+		}
+
+		// try assigning phase change material properties for each material, won't do anything for non pcm surfaces
+		for ( auto & m : Material ) {
+			m.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory( m.Name );
 		}
 
 	}
@@ -3837,6 +4037,7 @@ namespace HeatBalanceManager {
 		ConstrNum = 0;
 
 		CurrentModuleObject = "Construction:InternalSource";
+		if ( TotSourceConstructs > 0 ) AnyConstructInternalSourceInInput = true;
 		for ( Loop = 1; Loop <= TotSourceConstructs; ++Loop ) { // Loop through all constructs with sources in the input...
 
 			//Get the object names for each construction from the input processor
@@ -4354,6 +4555,7 @@ namespace HeatBalanceManager {
 
 		// Using/Aliasing
 		using DataDaylighting::ZoneDaylight;
+		using HybridModel::FlagHybridModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4390,11 +4592,7 @@ namespace HeatBalanceManager {
 				if ( SELECT_CASE_var == "SIMPLE" ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAESimple;
 
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
-					if ( cAlphaArgs( 2 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\", defaulting to TARP." );
-					}
+				} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
 
 				} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
@@ -4422,22 +4620,10 @@ namespace HeatBalanceManager {
 		if ( NumAlphas > 2 && !lAlphaFieldBlanks( 3 ) ) {
 				{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 
-				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
-					if ( cAlphaArgs( 3 ) == "SIMPLE" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to SimpleCombined." );
-					}
+				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
 					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAESimple;
 
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
-					if ( cAlphaArgs( 3 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
-					if ( cAlphaArgs( 3 ) == "BLAST" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
+				} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAETARP;
 
 				} else if ( SELECT_CASE_var == "MOWITT" ) {
@@ -4480,6 +4666,11 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+
+		if ( FlagHybridModel ){
+			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+		}
+
 	}
 
 	// End of Get Input subroutines for the HB Module
@@ -4669,6 +4860,7 @@ namespace HeatBalanceManager {
 		QHWBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QSteamBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QElecBaseboardToPerson.dimension( NumOfZones, 0.0 );
+		QCoolingPanelToPerson.dimension( NumOfZones, 0.0 );
 		XMAT.dimension( NumOfZones, 23.0 );
 		XM2T.dimension( NumOfZones, 23.0 );
 		XM3T.dimension( NumOfZones, 23.0 );
@@ -4770,38 +4962,19 @@ namespace HeatBalanceManager {
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   April 1997
 		//       MODIFIED       June 2011, Daeho Kang for individual zone maximums & convergence outputs
-		//       RE-ENGINEERED  na
+		//       				July 2016, Rick Strand for movable insulation bug fix
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is the main driver for record keeping within the
 		// heat balance.
 
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger record keeping events.
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::ReportDetailedWarmupConvergence;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//  CHARACTER(len=MaxNameLength) :: ZoneName
 		int ZoneNum;
+		int SurfNum;
 		static bool FirstWarmupWrite( true );
 
 		// Formats
@@ -4810,7 +4983,6 @@ namespace HeatBalanceManager {
 
 		// FLOW:
 
-		// Always do the following record keeping (every time step):
 		// Record Maxs & Mins for individual zone
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZTAV( ZoneNum ) > MaxTempZone( ZoneNum ) ) {
@@ -4857,13 +5029,11 @@ namespace HeatBalanceManager {
 
 		}
 
-		// There is no hourly record keeping in the heat balance.
-
-		// There is no daily record keeping in the heat balance.
-
-		// There is no environment level record keeping in the heat balance.
-
-		// There is no simulation level record keeping in the heat balance.
+		// Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
+		// exchange algorithm knows whether there has been a change in interior movable insulation or not.
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			DataSurfaces::Surface( SurfNum ).MovInsulIntPresentPrevTS = DataSurfaces::Surface( SurfNum ).MovInsulIntPresent;
+		}
 
 	}
 
@@ -5818,11 +5988,15 @@ Label20: ;
 				Material( loop ).WinShadeRightOpeningMult = 0.0;
 				Material( loop ).WinShadeAirFlowPermeability = 0.0;
 				Material( loop ).BlindDataPtr = 0;
-				Material( loop ).EMPDVALUE = 0.0;
+				Material( loop ).EMPDmu = 0.0;
 				Material( loop ).MoistACoeff = 0.0;
 				Material( loop ).MoistBCoeff = 0.0;
 				Material( loop ).MoistCCoeff = 0.0;
 				Material( loop ).MoistDCoeff = 0.0;
+				Material( loop ).EMPDSurfaceDepth = 0.0;
+				Material( loop ).EMPDDeepDepth = 0.0;
+				Material( loop ).EMPDmuCoating = 0.0;
+				Material( loop ).EMPDCoatingThickness = 0.0;
 			}
 
 			// Glass objects
@@ -7221,7 +7395,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-			VerifyName( cAlphaArgs( 1 ), Material, MaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Material, MaterNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );

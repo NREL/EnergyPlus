@@ -139,10 +139,9 @@
     SET WTmp = CoilInletW,   !- Program Line 2
     SET PTmp = Pressure,     !- <none>
     SET MyWB = @TwbFnTdbWPb TTmp WTmp PTmp,  !- <none>
-    SET IVOne = CoilInletWBT,!- <none>
     SET IVOnea = MyWB,       !- <none>
     SET IVTwo = OAT,         !- <none>
-    SET IVThree = IVOne*IVTwo,  !- <none>
+    SET IVThree = IVOnea*IVTwo,  !- <none>
     SET C1 = 0.942567793d0,  !- <none>
     SET C2 = 0.009543347D0,  !- <none>
     SET C2a = 0.009543347e0, !- <none>
@@ -150,10 +149,10 @@
     SET C4 = 0.011042676d0,  !- <none>
     SET C5 = 0.000005249d0,  !- <none>
     SET C6 = 0.000009720d0,  !- <none>
-    SET CurveInput = C1+(C2*IVOnea) + (C3*IVOne*IVone) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),  !- <none>
+    SET CurveInput = C1+(C2*IVOnea) + (C3*IVOnea*IVonea) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),  !- <none>
     SET CurveInput2 = CurveInput,  !- <none>
     IF OAT > 31.0,           !- <none>
-    SET CurveInput = C1-(C2a*IVOnea) + (C3*IVOne*IVone) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),  !- <none>
+    SET CurveInput = C1-(C2a*IVOnea) + (C3*IVOnea*IVonea) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),  !- <none>
     ENDIF,                   !- <none>
     SET CurveOverwrite = CurveInput;  !- <none>
 
@@ -257,7 +256,7 @@
 
   Output:Variable,West Zone,Zone Air Temperature,Hourly;
 
-  Version,8.5;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1551,18 +1550,17 @@
     Zone1PTHPAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone1PTHPOAMixer,        !- Outdoor Air Mixer Name
-    0.32,                    !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    0.32,                    !- Supply Air Flow Rate During Heating Operation {m3/s}
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    0.028,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.028,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0.0186,                  !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0.32,                    !- Cooling Supply Air Flow Rate {m3/s}
+    0.32,                    !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    0.028,                   !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.028,                   !- Heating Outdoor Air Flow Rate {m3/s}
+    0.0186,                  !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     Zone1PTHPFan,            !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Zone1PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone1PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -1580,18 +1578,17 @@
     Zone2PTHPAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone2PTHPOAMixer,        !- Outdoor Air Mixer Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     Zone2PTHPFan,            !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Zone2PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -1609,18 +1606,17 @@
     Zone3PTHPAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone3PTHPOAMixer,        !- Outdoor Air Mixer Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone3PTHPFan,            !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Zone3PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone3PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}

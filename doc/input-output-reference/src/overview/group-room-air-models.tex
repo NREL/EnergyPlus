@@ -621,7 +621,7 @@ Average airflow velocity in the jet region in front of the window, in meters per
 
 Average airflow velocity in the recirculation region of the flow in meters per second.
 
-\paragraph{\texorpdfstring{Room Air Zone Recirculation and Inflow Rate Ratio {[]}}{Room Air Zone Recirculation and Inflow Rate Ratio }}\label{room-air-zone-recirculation-and-inflow-rate-ratio}
+\paragraph{Room Air Zone Recirculation and Inflow Rate Ratio {[]}}\label{room-air-zone-recirculation-and-inflow-rate-ratio}
 
 Ratio between airflow rate in the recirculation regions and the total inflow rate, non-dimensional.
 
@@ -633,11 +633,11 @@ Area of the inflow aperture in square meters. This area can change due to variat
 
 Length of the room along the cross ventilation direction, in meters.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Mixing Status {[]}}{Room Air Zone Is Mixing Status }}\label{room-air-zone-is-mixing-status}
+\paragraph{Room Air Zone Is Mixing Status {[]}}\label{room-air-zone-is-mixing-status}
 
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or significant momentum conservation is occurring (UCSD CV model used). The value 1 means well-mixed; 0 means cross ventilation is present. Transition to mixed flow can occur due to three mechanism: reduction in inflow velocity, reduction in inflow aperture area and dominance of buoyancy effects. A value of 1 is yes, a value of 0 is no.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Recirculating Status {[]}}{Room Air Zone Is Recirculating Status }}\label{room-air-zone-is-recirculating-status}
+\paragraph{Room Air Zone Is Recirculating Status {[]}}\label{room-air-zone-is-recirculating-status}
 
 An integer flag that indicates whether recirculations are present in the flow. A cross ventilation flow does not have recirculations whenever the inflow area is similar to the room cross section area (such as airflow in a typical corridor). A value of 1 is yes, a value of 0 is no.
 
@@ -654,7 +654,7 @@ This model is applicable to interior spaces that are served by an underfloor air
 
 The following fields are used to define an instance of the `UCSD UFAD Interior Model Controls' object.
 
-\subsubsection{Inputs}\label{inputs-10-017}
+\subsubsection{Inputs}\label{inputs-2016-06-17-0938}
 
 \paragraph{Field: Zone Name}\label{field-zone-name-6-003}
 
@@ -867,7 +867,7 @@ This model simulates a thermal zone using a network approach by assuming intra-z
     Airflow\-Net\-work:\-Intra\-zone:\-Link\-age
 \end{itemize}
 
-The first \emph{five} \textbf{objects} are described below. The last two objects are described in the Airflow Network Model section.
+The first five objects are described below. The last two objects are described in the Airflow Network Model section. This model also requires additional AirflowNetwork:* objects to form a complete network. 
 
 \subsection{RoomAirSettings:AirflowNetwork}\label{roomairsettingsairflownetwork}
 
@@ -1106,11 +1106,11 @@ The temperature of the region near the floor in degrees C.
 
 The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper well-mixed subzone.
 
-\paragraph{\texorpdfstring{Room Air Zone Recommended Minimum Flow Fraction {[]}}{Room Air Zone Recommended Minimum Flow Fraction }}\label{room-air-zone-recommended-minimum-flow-fraction}
+\paragraph{Room Air Zone Recommended Minimum Flow Fraction {[]}}\label{room-air-zone-recommended-minimum-flow-fraction}
 
 The ratio of the minimum recommended flow rate to the actual flow rate. Here flow rate means the sum of infiltration, ventilation, mixing and system air flow rates. The minimum flow is the flow needed to establish the boundary between the occupied and mixed subzones at 1.5 meters.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Mixed Status {[]}}{Room Air Zone Is Mixed Status }}\label{room-air-zone-is-mixed-status}
+\paragraph{Room Air Zone Is Mixed Status {[]}}\label{room-air-zone-is-mixed-status}
 
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD DV model used). The value 1 means well-mixed; 0 means stratified.
 
@@ -1177,15 +1177,15 @@ Area of the inflow aperture in square meters. This area can change due to variat
 
 Length of the room along the cross ventilation direction, in meters.
 
-\paragraph{\texorpdfstring{Room Air Zone Recirculation and Inflow Rate Ratio {[]}}{Room Air Zone Recirculation and Inflow Rate Ratio }}\label{room-air-zone-recirculation-and-inflow-rate-ratio-1}
+\paragraph{Room Air Zone Recirculation and Inflow Rate Ratio {[]}}\label{room-air-zone-recirculation-and-inflow-rate-ratio-1}
 
 Ratio between airflow rate in the recirculation region and inflow rate, non-dimensional.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Mixing Status {[]}}{Room Air Zone Is Mixing Status }}\label{room-air-zone-is-mixing-status-1}
+\paragraph{Room Air Zone Is Mixing Status {[]}}\label{room-air-zone-is-mixing-status-1}
 
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or significant momentum conservation is occurring (UCSD CV model used). The value 1 means well-mixed; 0 means cross ventilation is present. Transition to mixed flow can occur due to three mechanism: reduction in inflow velocity, reduction in inflow aperture area and dominance of buoyancy effects. A value of 1 is yes, a value of 0 is no.
 
-\paragraph{\texorpdfstring{Room Air Zone Is Recirculating Status {[]}}{Room Air Zone Is Recirculating Status }}\label{room-air-zone-is-recirculating-status-1}
+\paragraph{Room Air Zone Is Recirculating Status {[]}}\label{room-air-zone-is-recirculating-status-1}
 
 An integer flag that indicates whether recirculations are present in the flow. A cross ventilation flow does not have recirculations whenever the inflow area is similar to the room cross section area (such as airflow in a typical corridor). A value of 1 is yes, a value of 0 is no.
 
@@ -1228,7 +1228,7 @@ The temperature of the lower, occupied subzone in degrees C.
 
 The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper subzone..
 
-\paragraph{\texorpdfstring{Room Air Zone Is Mixed Status {[]}}{Room Air Zone Is Mixed Status }}\label{room-air-zone-is-mixed-status-1}
+\paragraph{Room Air Zone Is Mixed Status {[]}}\label{room-air-zone-is-mixed-status-1}
 
 An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD UFI model used). The value 1 means well-mixed; 0 means stratified.
 
@@ -1244,7 +1244,7 @@ The temperature at the user specified comfort height in degrees C.
 
 The temperature at the height of the thermostat (specified by user input) in degrees C.
 
-\paragraph{\texorpdfstring{Room Air Zone Transition Height Gamma Value {[]}}{Room Air Zone Transition Height Gamma Value }}\label{room-air-zone-transition-height-gamma-value}
+\paragraph{Room Air Zone Transition Height Gamma Value {[]}}\label{room-air-zone-transition-height-gamma-value}
 
 Value of gamma -- a dimensionless ``height'' used in calculating the transition height. Lower values of gamma indicate increased stratification, higher values less. Generally the values should be between 2 and 30.
 
@@ -1256,7 +1256,7 @@ The heat in watts driving the plumes in the occupied subzone.
 
 The convective heat gain from windows in an UnderFloorAirDistributionExterior zone.
 
-\paragraph{\texorpdfstring{Room Air Zone Temperature Stratification Fraction {[]}}{Room Air Zone Temperature Stratification Fraction }}\label{room-air-zone-temperature-stratification-fraction}
+\paragraph{Room Air Zone Temperature Stratification Fraction {[]}}\label{room-air-zone-temperature-stratification-fraction}
 
 This output, (Phi) is a measure of temperature stratification in the space. It is the difference between the occupied subzone temperature and the supply temperature divided by difference between the return temperature and the supply temperature. Technically it is equal to Kc. As phi approaches 1, the space is fully mixed. As phi approaches 0, the space becomes fully stratified. Expressed as an equation:
 

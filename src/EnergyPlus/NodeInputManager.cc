@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <string>
@@ -145,6 +133,8 @@ namespace NodeInputManager {
 	Array1D< NodeListDef > NodeLists; // Node Lists
 	namespace {
 		bool CalcMoreNodeInfoMyOneTimeFlag( true ); // one time flag
+		Array1D_int GetOnlySingleNodeNodeNums;
+		bool GetOnlySingleNodeFirstTime( true );
 	}
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -168,6 +158,9 @@ namespace NodeInputManager {
 		MaxCheckNodes = 0;
 		NodeVarsSetup = false;
 		NodeLists.deallocate();
+		GetOnlySingleNodeNodeNums.deallocate();
+		GetOnlySingleNodeFirstTime = true;
+		NodeWetBulbRepReq.deallocate();
 	}
 
 	void
@@ -276,7 +269,7 @@ namespace NodeInputManager {
 			NodeNumbers( 1 ) = 0;
 		}
 
-		// Most calls to this routined use a fixed fluid stream number for all nodes, this is the default
+		// Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
 		FluidStreamNum = NodeFluidStream;
 		for ( Loop = 1; Loop <= NumNodes; ++Loop ) {
 			if ( NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes ) {
@@ -825,23 +818,23 @@ namespace NodeInputManager {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NumNodes;
-		static Array1D_int NodeNums;
+
 		int FluidType;
 		std::string ConnectionType;
-		static bool firstTime( true );
+
 		int NumParams;
 		int NumAlphas;
 		int NumNums;
 
-		if ( firstTime ) {
+		if ( GetOnlySingleNodeFirstTime ) {
 			GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
-			NodeNums.dimension( NumParams, 0 );
-			firstTime = false;
+			GetOnlySingleNodeNodeNums.dimension( NumParams, 0 );
+			GetOnlySingleNodeFirstTime = false;
 		}
 
 		FluidType = NodeFluidType;
 
-		GetNodeNums( NodeName, NumNodes, NodeNums, errFlag, FluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
+		GetNodeNums( NodeName, NumNodes, GetOnlySingleNodeNodeNums, errFlag, FluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
 
 		if ( NumNodes > 1 ) {
 			ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
@@ -850,7 +843,7 @@ namespace NodeInputManager {
 			ShowContinueError( "...a Nodelist may not be valid in this context." );
 			errFlag = true;
 		} else if ( NumNodes == 0 ) {
-			NodeNums( 1 ) = 0;
+			GetOnlySingleNodeNodeNums( 1 ) = 0;
 		}
 		if ( NumNodes > 0 ) {
 			if ( NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes ) {
@@ -862,7 +855,7 @@ namespace NodeInputManager {
 			//                                  ConnectionType,NodeFluidStream,ObjectIsParent,errFlag)
 		}
 
-		GetSingleNodeResult = NodeNums( 1 );
+		GetSingleNodeResult = GetOnlySingleNodeNodeNums( 1 );
 
 		return GetSingleNodeResult;
 
@@ -1103,9 +1096,6 @@ namespace NodeInputManager {
 		// Input is the existing node data plus environment variables. Output is
 		// stored in MoreNodeInfo.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::OutBaroPress;
@@ -1118,7 +1108,6 @@ namespace NodeInputManager {
 		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyTdpFnWPb;
 		using Psychrometrics::PsyCpAirFnWTdb;
-		using DataGlobals::InitConvTemp;
 		using OutputProcessor::ReqReportVariables;
 		using OutputProcessor::ReqRepVars;
 		using OutputProcessor::NumOfReqVariables;
@@ -1131,18 +1120,9 @@ namespace NodeInputManager {
 		using FluidProperties::NumOfGlycols;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMoreNodeInfo" );
 		static std::string const NodeReportingCalc( "NodeReportingCalc:" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iNode; // node loop index
@@ -1166,15 +1146,13 @@ namespace NodeInputManager {
 		Real64 SteamDensity;
 		Real64 EnthSteamInDry;
 		Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
-		//  REAL(r64)     :: rRhoVapor
-		//  INTEGER,save :: Count=0
 		Real64 rho;
 		Real64 Cp;
 		Real64 rhoStd;
 
 		if ( CalcMoreNodeInfoMyOneTimeFlag ) {
 			RhoAirStdInit = StdRhoAir;
-			RhoWaterStdInit = RhoH2O( InitConvTemp );
+			RhoWaterStdInit = RhoH2O( DataGlobals::InitConvTemp );
 			NodeWetBulbRepReq.allocate( NumOfNodes );
 			NodeWetBulbSchedPtr.allocate( NumOfNodes );
 			NodeRelHumidityRepReq.allocate( NumOfNodes );
@@ -1306,7 +1284,7 @@ namespace NodeInputManager {
 					Cp = CPCW( Node( iNode ).Temp );
 				} else {
 					Cp = GetSpecificHeatGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
-					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
+					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], DataGlobals::InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 					rho = GetDensityGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 				}
 

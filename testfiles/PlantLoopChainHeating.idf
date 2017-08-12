@@ -12,7 +12,7 @@
 ! System:   None.
 ! Plant:    A chain of 3 plant loops that connect a LoadProfile:Plant to DistrictHeating by heat exchangers
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -191,39 +191,35 @@
 
   Branch,
     USE Supply Inlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     USE Pump,                !- Component 1 Name
     USE Supply Inlet Node,   !- Component 1 Inlet Node Name
-    USE Supply Pump-Heating Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    USE Supply Pump-Heating Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     USE Pump,                !- Name
     USE Supply Inlet Node,   !- Inlet Node Name
     USE Supply Pump-Heating Node,  !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    2250,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    2250,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     USE Heating Branch,      !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     TRANSFER to USE HX,      !- Component 1 Name
     USE Supply Heating Inlet Node,  !- Component 1 Inlet Node Name
-    USE Supply Heating Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    USE Supply Heating Outlet Node;  !- Component 1 Outlet Node Name
 
   HeatExchanger:FluidToFluid,
     TRANSFER to USE HX,      !- Name
@@ -243,13 +239,11 @@
 
   Branch,
     USE Supply Outlet Branch,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     USE Supply Outlet Pipe,  !- Component 1 Name
     USE Supply Heating-Pipe Node,  !- Component 1 Inlet Node Name
-    USE Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    USE Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     USE Supply Outlet Pipe,  !- Name
@@ -281,13 +275,11 @@
 
   Branch,
     USE Demand Inlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     USE Demand Inlet Pipe,   !- Component 1 Name
     USE Demand Inlet Node,   !- Component 1 Inlet Node Name
-    USE Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    USE Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     USE Demand Inlet Pipe,   !- Name
@@ -296,13 +288,11 @@
 
   Branch,
     USE Load Profile Branch 1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
     Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name
-    Demand Load Profile 1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile 1,          !- Name
@@ -314,13 +304,11 @@
 
   Branch,
     USE Demand Outlet Branch,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     USE Demand Outlet Pipe,  !- Component 1 Name
     USE Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name
-    USE Demand Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    USE Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     USE Demand Outlet Pipe,  !- Name
@@ -405,39 +393,35 @@
 
   Branch,
     TRANSFER Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     TRANSFER Pump,           !- Component 1 Name
     TRANSFER Supply Inlet Node,  !- Component 1 Inlet Node Name
-    TRANSFER Supply Pump-Heating Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Supply Pump-Heating Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     TRANSFER Pump,           !- Name
     TRANSFER Supply Inlet Node,  !- Inlet Node Name
     TRANSFER Supply Pump-Heating Node,  !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    2250,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    2250,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     TRANSFER Heating Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     SOURCE to TRANSFER HX,   !- Component 1 Name
     TRANSFER Supply Heating Inlet Node,  !- Component 1 Inlet Node Name
-    TRANSFER Supply Heating Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Supply Heating Outlet Node;  !- Component 1 Outlet Node Name
 
   HeatExchanger:FluidToFluid,
     SOURCE to TRANSFER HX,   !- Name
@@ -457,13 +441,11 @@
 
   Branch,
     TRANSFER Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TRANSFER Supply Outlet Pipe,  !- Component 1 Name
     TRANSFER Supply Heating-Pipe Node,  !- Component 1 Inlet Node Name
-    TRANSFER Supply Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TRANSFER Supply Outlet Pipe,  !- Name
@@ -495,13 +477,11 @@
 
   Branch,
     TRANSFER Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TRANSFER Demand Inlet Pipe,  !- Component 1 Name
     TRANSFER Demand Inlet Node,  !- Component 1 Inlet Node Name
-    TRANSFER Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TRANSFER Demand Inlet Pipe,  !- Name
@@ -510,23 +490,19 @@
 
   Branch,
     TRANSFER Demand HX Branch 1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     TRANSFER to USE HX,      !- Component 1 Name
     TRANSFER Demand HX Inlet Node,  !- Component 1 Inlet Node Name
-    TRANSFER Demand HX Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    TRANSFER Demand HX Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     TRANSFER Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TRANSFER Demand Outlet Pipe,  !- Component 1 Name
     TRANSFER Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name
-    TRANSFER Demand Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    TRANSFER Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TRANSFER Demand Outlet Pipe,  !- Name
@@ -611,39 +587,35 @@
 
   Branch,
     SOURCE Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SOURCE Pump,             !- Component 1 Name
     SOURCE Supply Inlet Node,!- Component 1 Inlet Node Name
-    SOURCE Supply Pump-Heating Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Supply Pump-Heating Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     SOURCE Pump,             !- Name
     SOURCE Supply Inlet Node,!- Inlet Node Name
     SOURCE Supply Pump-Heating Node,  !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    2250,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    2250,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     SOURCE Heating Branch,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictHeating,         !- Component 1 Object Type
     SOURCE Purchased Heating,!- Component 1 Name
     SOURCE Supply Heating Inlet Node,  !- Component 1 Inlet Node Name
-    SOURCE Supply Heating Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Supply Heating Outlet Node;  !- Component 1 Outlet Node Name
 
   DistrictHeating,
     SOURCE Purchased Heating,!- Name
@@ -653,13 +625,11 @@
 
   Branch,
     SOURCE Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SOURCE Supply Outlet Pipe,  !- Component 1 Name
     SOURCE Supply Heating-Pipe Node,  !- Component 1 Inlet Node Name
-    SOURCE Supply Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SOURCE Supply Outlet Pipe,  !- Name
@@ -691,13 +661,11 @@
 
   Branch,
     SOURCE Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SOURCE Demand Inlet Pipe,!- Component 1 Name
     SOURCE Demand Inlet Node,!- Component 1 Inlet Node Name
-    SOURCE Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SOURCE Demand Inlet Pipe,!- Name
@@ -706,23 +674,19 @@
 
   Branch,
     SOURCE Demand HX Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     HeatExchanger:FluidToFluid,  !- Component 1 Object Type
     SOURCE to TRANSFER HX,   !- Component 1 Name
     SOURCE Demand HX Inlet Node,  !- Component 1 Inlet Node Name
-    SOURCE Demand HX Outlet Node,  !- Component 1 Outlet Node Name
-    ;                        !- Component 1 Branch Control Type
+    SOURCE Demand HX Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SOURCE Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SOURCE Demand Outlet Pipe,  !- Component 1 Name
     SOURCE Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name
-    SOURCE Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SOURCE Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SOURCE Demand Outlet Pipe,  !- Name

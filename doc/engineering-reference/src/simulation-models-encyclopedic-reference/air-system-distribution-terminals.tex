@@ -58,7 +58,7 @@ The no reheat version of the single duct VAV heat and cool terminal unit contain
 
 2)~~~Coil:Heating:Electric
 
-3)~~~Coil:Heating:Gas
+3)~~~Coil:Heating:Fuel
 
 4)~~~Coil:Heating:Steam
 
@@ -266,17 +266,17 @@ Both types of PIU are modeled as compound components. The series unit, in sequen
 
 1.~~~~AirLoopHVAC:ZoneMixer
 
-2.~~~~Fan:ConstantVolume
+2.~~~~Fan:SystemModel or Fan:ConstantVolume
 
-3.~~~~Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Gas or Coil:Heating:Steam
+3.~~~~Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel or Coil:Heating:Steam
 
 The parallel unit contains a fan (in the secondary air stream, an air mixer, and a heating coil. In terms of EnergyPlus objects this is:
 
-1.~~~~Fan:ConstantVolume
+1.~~~~Fan:SystemModel or Fan:ConstantVolume
 
 2.~~~~AirLoopHVAC:ZoneMixer
 
-3.~~~~Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Gas or Coil:Heating:Steam
+3.~~~~Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel or Coil:Heating:Steam
 
 Both units are forward models: their inputs are defined by the state of their inlets: namely the air inlet and the hot water~ inlet. The outputs of the models are the conditions of the outlet air stream: flow rate, temperature and humidity ratio. The PIUs data and simulation are encapsulated in the module \emph{PoweredInductionUnits}. The main simulation routine for the units within the module are \emph{CalcSeriesPIU} and \emph{CalcParallelPIU}.
 
@@ -296,39 +296,47 @@ The calculation is performed by simulating the sub-components in the order given
 
 From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\) . The subroutine \emph{CalcSeriesPIU} needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
 
-·~~~~~~~~If the unit is scheduled off, the primary and secondary flow rates are set to zero.
-
-·~~~~~~~~If there is no primary air flow (or less than .001 kg/s), the primary air flow is set to zero and the secondary air flow is set to the constant total air flow input by the user.
-
-·~~~~~~~~If the zone temperature is in the deadband or the zone load is less than 1 watt or the zone needs heating, the primary air flow rate is set to the minimum flow rate specified by the input and the secondary air flow rate is set to the difference between the fixed total air flow rate and the primary air flow rate.
-
-·~~~~~~~~Otherwise, the zone needs cooling and the unit is active.
-
-§~We determine the fan temperature rise: the secondary air flow is set to the max total air flow, primary air flow to zero, and the mixer and fan are simulated. The fan delta T is the difference between the temperature at the fan's outlet node and inlet node.
-
-§~We calculate the unit air outlet temperature needed to meet the zone cooling load: \({T_{out}} = C{p_h} + {\dot Q_{z,req}}/({\dot m_{air,tot}}\cdot {c_{p,air,z}})\)
-
-§~The temperature needed at the outlet of the mixer is then: \({T_{mix}} = {T_{out}} - \Delta {T_{fan}}\)
-
-§~We can then set the primary air flow rate.
-
-·~~~~~~~~If \({T_{mix}} \le {T_{in,pri}}\) then \({\dot m_{pri}} = {\dot m_{pri,max}}\)
-
-·~~~~~~~~else if \({T_{mix}} \ge {T_{in,pri}}\) and \({T_{mix}} \ge {T_{in,sec}}\) then \({\dot m_{pri}} = {\dot m_{pri,min}}\)
-
-·~~~~~~~~otherwise \({\dot m_{pri}} = {\dot m_{air,tot}}\cdot ({T_{in,sec}} - {T_{mix}})/({T_{in,sec}} - {T_{in,pri}})\) , subject to the constraints that the flow rate can't be bigger than the max and min allowed.
+\begin{itemize}
+  \item
+    If the unit is scheduled off, the primary and secondary flow rates are set to zero.
+  \item
+    If there is no primary air flow (or less than .001 kg/s), the primary air flow is set to zero and the secondary air flow is set to the constant total air flow input by the user.
+  \item
+    If the zone temperature is in the deadband or the zone load is less than 1 watt or the zone needs heating, the primary air flow rate is set to the minimum flow rate specified by the input and the secondary air flow rate is set to the difference between the fixed total air flow rate and the primary air flow rate.
+  \item
+    Otherwise, the zone needs cooling and the unit is active.
+    \begin{itemize}
+      \item 
+        We determine the fan temperature rise: the secondary air flow is set to the max total air flow, primary air flow to zero, and the mixer and fan are simulated. The fan delta T is the difference between the temperature at the fan's outlet node and inlet node.
+      \item
+        We calculate the unit air outlet temperature needed to meet the zone cooling load: \({T_{out}} = C{p_h} + {\dot Q_{z,req}}/({\dot m_{air,tot}}\cdot {c_{p,air,z}})\)
+      \item
+        The temperature needed at the outlet of the mixer is then: \({T_{mix}} = {T_{out}} - \Delta {T_{fan}}\)
+      \item
+        We can then set the primary air flow rate.
+    \end{itemize}
+  \item
+    If \({T_{mix}} \le {T_{in,pri}}\) then \({\dot m_{pri}} = {\dot m_{pri,max}}\)
+  \item
+    else if \({T_{mix}} \ge {T_{in,pri}}\) and \({T_{mix}} \ge {T_{in,sec}}\) then \({\dot m_{pri}} = {\dot m_{pri,min}}\)
+  \item
+    otherwise \({\dot m_{pri}} = {\dot m_{air,tot}}\cdot ({T_{in,sec}} - {T_{mix}})/({T_{in,sec}} - {T_{in,pri}})\), subject to the constraints that the flow rate can't be bigger than the max and min allowed.
+\end{itemize}
 
 The air flow rates are now determined and we can fire the air mixer (Call \emph{SimAir-Mixer}) and fan (Call \emph{SimulateFanComponents}) component simulations. Finally we simulate the heating coil:
 
-·~~~~~~~~for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
+\begin{itemize}
+  \item
+    for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
 
 \begin{equation}
-({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}
+  ({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}
 \end{equation}
 
 to within the heating convergence tolerance.
-
-·~~~~~~~~For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+  \item
+    For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+\end{itemize}
 
 Finally the unit sensible output is calculated:
 
@@ -342,33 +350,40 @@ where \emph{PsyHFnTdb} is the EnergyPlus function giving enthalpy as a function 
 
 From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\) . The subroutine \emph{CalcParallelPIU} needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
 
-·~~~~~~~~If the unit is scheduled off, the primary and secondary flow rates are set to zero.
-
-·~~~~~~~~If there is no primary air flow (or less than .001 kg/s), the primary air flow is set to zero and the secondary air flow is set to the max secondary air flow input by the user.
-
-·~~~~~~~~If the zone temperature is in the deadband or the zone load is less than 1 watt or the zone needs heating, the primary air flow rate is set to the minimum flow rate specified by the input and the secondary air flow rate is set to max secondary air flow input by the user.
-
-·~~~~~~~~Otherwise, the zone needs cooling and the unit is active.
-
-§~We determine the fan temperature rise: the secondary air flow is set to the max secondary air flow, primary air flow to zero, and the fan and mixer are simulated. The fan delta T is defined as the difference between the temperature at the mixer outlet node and the fan inlet node.
-
-§~Assuming that the fan is off, we calculate the primary air flow needed to meet the cooling demand.
+\begin{itemize}
+  \item
+    If the unit is scheduled off, the primary and secondary flow rates are set to zero.
+  \item
+    If there is no primary air flow (or less than .001 kg/s), the primary air flow is set to zero and the secondary air flow is set to the max secondary air flow input by the user.
+  \item
+    If the zone temperature is in the deadband or the zone load is less than 1 watt or the zone needs heating, the primary air flow rate is set to the minimum flow rate specified by the input and the secondary air flow rate is set to max secondary air flow input by the user.
+  \item
+    Otherwise, the zone needs cooling and the unit is active.
+  \begin{itemize}
+    \item
+      We determine the fan temperature rise: the secondary air flow is set to the max secondary air flow, primary air flow to zero, and the fan and mixer are simulated. The fan delta T is defined as the difference between the temperature at the mixer outlet node and the fan inlet node.
+    \item
+      Assuming that the fan is off, we calculate the primary air flow needed to meet the cooling demand.
 
 \begin{equation}
-{\dot m_{pri}} = {\dot Q_{z,req}}/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))
+  {\dot m_{pri}} = {\dot Q_{z,req}}/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))
 \end{equation}
 
 The flow rate is constrained to be between the min and max primary air flow rates. If this calculated primary flow rate is greater than the fan-on flow rate, the secondary flow rate is set to zero and we are done. Otherwise, the fan is on and we need to recalculate the primary air flow rate.
 
 \begin{equation}
-{\dot m_{pri}} = ({\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{sec}}\cdot ({T_{in,sec}} + \Delta {T_{fan}} - {T_z}))/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))
+  {\dot m_{pri}} = ({\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{sec}}\cdot ({T_{in,sec}} + \Delta {T_{fan}} - {T_z}))/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))
 \end{equation}
 
 The secondary flow rate is set to the user input fixed flow rate. The primary air flow rate is constrained to be between the min and max primary flow rated.
+  \end{itemize}
+\end{itemize}
 
 The air flow rates are now determined and we can fire the fan (Call \emph{SimulateFanComponents}) and air mixer (Call \emph{SimAirMixer}) component simulations. Finally we simulate the heating coil:
 
-·~~~~~~~~for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
+\begin{itemize}
+  \item
+    for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
 
 \begin{equation}
 ({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}
@@ -376,7 +391,9 @@ The air flow rates are now determined and we can fire the fan (Call \emph{Simula
 
 to within the heating convergence tolerance.
 
-·~~~~~~~~For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+  \item
+    For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+\end{itemize}
 
 Finally the unit sensible output is calculated:
 
@@ -398,7 +415,7 @@ The input object AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan provides a m
 
 \subsubsection{Model}\label{model-2}
 
-The VS fan VAV terminal unit is modeled as a compound component consisting of two sub-components: a fan and a heating coil. In terms of EnergyPlus objects the fan is a \emph{Fan:VariableVolume} object and the heating coil is a \emph{Coil:Heating:Water}, \emph{Coil:Heating:Electric} or a \emph{Coil:Heating:Gas}. The terminal unit is a forward model: its inputs are defined by the state of its inlets: namely its air inlet and its hot water~ inlet, if it has a hot water coil. The outputs of the model are the conditions of the outlet air stream: flow rate, temperature and humidity ratio. The terminal unit data and simulation are encapsulated in the module \emph{SingleDuct}. The main simulation routine for the unit within the module is \emph{SimVAVVS}.
+The VS fan VAV terminal unit is modeled as a compound component consisting of two sub-components: a fan and a heating coil. In terms of EnergyPlus objects the fan is a \emph{Fan:VariableVolume} object and the heating coil is a \emph{Coil:Heating:Water}, \emph{Coil:Heating:Electric} or a \emph{Coil:Heating:Fuel}. The terminal unit is a forward model: its inputs are defined by the state of its inlets: namely its air inlet and its hot water~ inlet, if it has a hot water coil. The outputs of the model are the conditions of the outlet air stream: flow rate, temperature and humidity ratio. The terminal unit data and simulation are encapsulated in the module \emph{SingleDuct}. The main simulation routine for the unit within the module is \emph{SimVAVVS}.
 
 \subsubsection{Inputs and Data}\label{inputs-and-data-2}
 
@@ -625,7 +642,7 @@ Where,
 
 \({\dot v_{HW,rated}}\) Volume flow rate of hot water per meter length at rating point, in m\(^{3}\)/s-m.
 
-The performance capacity model described above is controlled to modulate water flow through the beam's convector using the non-linear numerical solver in EnergyPlus called Solve Regula Falsi. The predicted zone load to setpoint \({\dot Q_{Zone, Required}}\) is adjusted by \({\dot Q_{SA}}\) to determine the required beam load.
+The performance capacity model described above is controlled to modulate water flow through the beam's convector using the non-linear numerical solver in EnergyPlus called Solve root solver. The predicted zone load to setpoint \({\dot Q_{Zone, Required}}\) is adjusted by \({\dot Q_{SA}}\) to determine the required beam load.
 
 \begin{equation}
 {\dot Q_{Beam, Required}} = {\dot Q_{Zone, Required}} - {\dot Q_{SA}}
@@ -743,7 +760,7 @@ When all four inputs are autosized, which is the usual case, there is no simple 
 
 Overhead beam type air terminals induce room air to flow over the convector by the directing primary supply air through special nozzles. Therefore, the cooling and heating capacity of the beam's convector is not separable from the primary flow rate, varying the primary flow rate varies the beam capacity. The design primary flow rate is chosen to be largest value that satisfies three requirements: (1) the ventilation requirement, (2) the design cooling load (if cooling is present), (3) and the design heating load (if heating is present).
 
-The sizing method here uses the non-linear solver inside EnergyPlus, called Solve Regula Falsi, to arrive at a set of sizes that meet the design load. The solver is for a single independent variable and although we have four sizes to solve for, we can reduce the problem to finding a suitable design primary supply air flow rate and then the other sizes can be determined from that as shown above. The solver needs as its input a minimum and a maximum ``x-value,'' which here is the primary supply air flow rate, and then it searches for a solution that minimizes a residual. In general the design primary supply flow rate that meets the load is somewhere between the minimum flow required for ventilation and a maximum flow where the primary supply flow meets all the zone's design load without any help from the beam's convector. For example if the supply air is cold, as it would be for latent control, and there is a cooling load then there will be a relatively large air flow rate that meets all the load without any cooling from chilled water circulating through the beam. This larger air flow serves as the upper bound for the solver.
+The sizing method here uses the non-linear solver inside EnergyPlus, called root solver, to arrive at a set of sizes that meet the design load. The solver is for a single independent variable and although we have four sizes to solve for, we can reduce the problem to finding a suitable design primary supply air flow rate and then the other sizes can be determined from that as shown above. The solver needs as its input a minimum and a maximum ``x-value,'' which here is the primary supply air flow rate, and then it searches for a solution that minimizes a residual. In general the design primary supply flow rate that meets the load is somewhere between the minimum flow required for ventilation and a maximum flow where the primary supply flow meets all the zone's design load without any help from the beam's convector. For example if the supply air is cold, as it would be for latent control, and there is a cooling load then there will be a relatively large air flow rate that meets all the load without any cooling from chilled water circulating through the beam. This larger air flow serves as the upper bound for the solver.
 
 When sizing for the cooling design load, the following design values are set for use in the model calculations:
 

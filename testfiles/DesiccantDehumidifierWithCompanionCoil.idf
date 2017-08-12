@@ -91,7 +91,7 @@
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:TwoSpeed, Coil:Heating:Gas, Coil:Cooling:DX:SingleSpeed
+! Coils:                          Coil:Cooling:DX:TwoSpeed, Coil:Heating:Fuel, Coil:Cooling:DX:SingleSpeed
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -2083,58 +2083,47 @@
 
   Branch,
     VAV Sys 1 Main Branch,   !- Name
-    2.5893,                  !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name
     Mixed Air Node 1,        !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 1,!- Component 2 Name
     Mixed Air Node 1,        !- Component 2 Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 1,     !- Component 3 Name
     Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     Supply Fan 1,            !- Component 4 Name
     Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name
-    VAV Sys 1 Outlet Node,   !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name
 
   Branch,
     Desiccant Air Loop Main Branch,  !- Name
-    1.05,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     Desiccant DXSystem OA System,  !- Component 1 Name
     Desiccant DXSystem Air Loop Inlet Node,  !- Component 1 Inlet Node Name
     Desiccant DXSystem Mixed Air Node,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     Desiccant DXSystem Cooling Coil Sys,  !- Component 2 Name
     Desiccant DXSystem Mixed Air Node,  !- Component 2 Inlet Node Name
     HX Process Inlet Node,   !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Dehumidifier:Desiccant:System,  !- Component 3 Object Type
     Desiccant 1,             !- Component 3 Name
     HX Process Inlet Node,   !- Component 3 Inlet Node Name
     HX Process Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Desiccant DXSystem Supply Fan,  !- Component 4 Name
     HX Process Outlet Node,  !- Component 4 Inlet Node Name
     Desiccant Supply Fan Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE,                  !- Component 4 Branch Control Type
-    Coil:Heating:Gas,        !- Component 5 Object Type
+    Coil:Heating:Fuel,       !- Component 5 Object Type
     Desiccant Process Heating Coil,  !- Component 5 Name
     Desiccant Supply Fan Outlet Node,  !- Component 5 Inlet Node Name
-    Desiccant DXSystem Air Loop Outlet Node,  !- Component 5 Outlet Node Name
-    PASSIVE;                 !- Component 5 Branch Control Type
+    Desiccant DXSystem Air Loop Outlet Node;  !- Component 5 Outlet Node Name
 
   AirLoopHVAC,
     VAV Sys 1,               !- Name
@@ -2284,8 +2273,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     Zone Max Humidity Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     HX Process Outlet Node,  !- Setpoint Node or NodeList Name
     SPACE5-1 Node;           !- Control Zone Air Node Name
 
@@ -2481,13 +2468,13 @@
     0.3,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     SPACE1-1 Zone Coil,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     SPACE1-1 In Node,        !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -2501,13 +2488,13 @@
     0.3,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     SPACE2-1 Zone Coil,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     SPACE2-1 In Node,        !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -2521,13 +2508,13 @@
     0.3,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     SPACE3-1 Zone Coil,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     SPACE3-1 In Node,        !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -2541,13 +2528,13 @@
     0.3,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     SPACE4-1 Zone Coil,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     SPACE4-1 In Node,        !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -2688,60 +2675,67 @@
     Desiccant DXSystem Return Air Mixer Outlet Node,  !- Outlet Node Name
     SPACE5-1 Out Node;       !- Inlet 1 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPACE1-1 Zone Coil,      !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     19243,                   !- Nominal Capacity {W}
     SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE1-1 In Node;        !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPACE2-1 Zone Coil,      !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     14751,                   !- Nominal Capacity {W}
     SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE2-1 In Node;        !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPACE3-1 Zone Coil,      !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     25204,                   !- Nominal Capacity {W}
     SPACE3-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE3-1 In Node;        !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPACE4-1 Zone Coil,      !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     20350,                   !- Nominal Capacity {W}
     SPACE4-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE4-1 In Node;        !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main heating Coil 1,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     4438.1,                  !- Nominal Capacity {W}
     Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 1 Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 1 Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Desiccant Process Heating Coil,  !- Name
     Constant,                !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     1000000,                 !- Nominal Capacity {W}
     Desiccant Supply Fan Outlet Node,  !- Air Inlet Node Name
     Desiccant DXSystem Air Loop Outlet Node,  !- Air Outlet Node Name
     Desiccant DXSystem Air Loop Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Desiccant Regen Coil,    !- Name
     FanAvailSched,           !- Availability Schedule Name
-    1,                       !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    1,                       !- Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Regen Coil Inlet Node,   !- Air Inlet Node Name
     HX Regen Inlet Node;     !- Air Outlet Node Name
@@ -2784,6 +2778,7 @@
     HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name
     HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     4,                       !- Maximum Cycling Rate {cycles/hr}
@@ -2821,16 +2816,23 @@
     HX Process Outlet Node,  !- Air Inlet Node Name
     Desiccant Supply Fan Outlet Node;  !- Air Outlet Node Name
 
-  Fan:ConstantVolume,
-    Desiccant Regen Fan,     !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    205.5,                   !- Pressure Rise {Pa}
-    1.05,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    HX Regen Outlet Node,    !- Air Inlet Node Name
-    Regen Fan Outlet Node;   !- Air Outlet Node Name
+
+Fan:SystemModel,
+  Desiccant Regen Fan , !- Name
+  FanAvailSched , !- Availability Schedule Name
+  HX Regen Outlet Node,  !- Air Inlet Node Name
+  Regen Fan Outlet Node,  !- Air Outlet Node Name
+  1.05 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  205.5, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.7;  !- Fan Total Efficiency 
 
 ! Modeling Munters HCU (humidity control unit)
 
@@ -2840,10 +2842,10 @@
     HeatExchanger:Desiccant:BalancedFlow,  !- Desiccant Heat Exchanger Object Type
     Desiccant Heat Exchanger 1,  !- Desiccant Heat Exchanger Name
     HX Process Outlet Node,  !- Sensor Node Name
-    Fan:ConstantVolume,      !- Regeneration Air Fan Object Type
+    Fan:SystemModel,      !- Regeneration Air Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Air Fan Name
     DrawThrough,             !- Regeneration Air Fan Placement
-    Coil:Heating:Gas,        !- Regeneration Air Heater Object Type
+    Coil:Heating:Fuel,       !- Regeneration Air Heater Object Type
     Desiccant Regen Coil,    !- Regeneration Air Heater Name
     46.111111,               !- Regeneration Inlet Air Setpoint Temperature {C}
     Coil:Cooling:DX:SingleSpeed,  !- Companion Cooling Coil Object Type
@@ -2938,21 +2940,29 @@
     Relief Air Outlet Node,  !- Secondary Air Inlet Node Name
     OA Heat Recovery Secondary Outlet Node;  !- Secondary Air Outlet Node Name
 
-  Fan:OnOff,
-    OA Desiccant Regen Fan,  !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    205.5,                   !- Pressure Rise {Pa}
-    2.5893,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    OA HX Regen Outlet Node, !- Air Inlet Node Name
-    OA Regen Fan Outlet Node;!- Air Outlet Node Name
-
-  Coil:Heating:Gas,
+  
+Fan:SystemModel,
+  OA Desiccant Regen Fan , !- Name
+  FanAvailSched , !- Availability Schedule Name
+  OA HX Regen Outlet Node,  !- Air Inlet Node Name
+  OA Regen Fan Outlet Node,  !- Air Outlet Node Name
+  2.5893 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  205.5, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.70;  !- Fan Total Efficiency 
+  
+  Coil:Heating:Fuel,
     OA Desiccant Regen Coil, !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.80,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.80,                    !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     OA Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
     OA HX Regen Inlet Node;  !- Air Outlet Node Name
@@ -2963,10 +2973,10 @@
     HeatExchanger:Desiccant:BalancedFlow,  !- Desiccant Heat Exchanger Object Type
     OA Desiccant Heat Exchanger,  !- Desiccant Heat Exchanger Name
     OA Desiccant Process Outlet Node,  !- Sensor Node Name
-    Fan:OnOff,               !- Regeneration Air Fan Object Type
+    Fan:SystemModel,               !- Regeneration Air Fan Object Type
     OA Desiccant Regen Fan,  !- Regeneration Air Fan Name
     DrawThrough,             !- Regeneration Air Fan Placement
-    Coil:Heating:Gas,        !- Regeneration Air Heater Object Type
+    Coil:Heating:Fuel,       !- Regeneration Air Heater Object Type
     OA Desiccant Regen Coil, !- Regeneration Air Heater Name
     46.111111;               !- Regeneration Inlet Air Setpoint Temperature {C}
 
@@ -2985,8 +2995,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     SPACE1-1 Humidistat Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     Mixed Air Node 1,        !- Setpoint Node or NodeList Name
     SPACE1-1 Node;           !- Control Zone Air Node Name
 

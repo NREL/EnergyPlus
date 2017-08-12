@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     anyplace           Load Calc,  !- Name
@@ -322,7 +322,7 @@
     autocalculate;           !- Volume {m3}
 
   GlobalGeometryRules,
-    LowerLeftCorner,         !- Starting Vertex Position
+    UpperLeftCorner,         !- Starting Vertex Position
     CounterClockwise,        !- Vertex Entry Direction
     Relative;                !- Coordinate System
 
@@ -337,10 +337,10 @@
     NoWind,                  !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096,0,4.572,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,4.572,               !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,                   !- X,Y,Z ==> Vertex 2 {m}
+    6.096,0,0,               !- X,Y,Z ==> Vertex 3 {m}
+    6.096,0,4.572;           !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     OSCTest:East Wall,       !- Name
@@ -353,10 +353,10 @@
     NoWind,                  !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    0,6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
-    0,6.096,4.572,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+    0,6.096,4.572,           !- X,Y,Z ==> Vertex 1 {m}
+    0,6.096,0,               !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}
+    0,0,4.572;               !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     OSCTest:North Wall,      !- Name
@@ -369,10 +369,10 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    -6.096,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    -6.096,0,4.572,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096,6.096,4.572,       !- X,Y,Z ==> Vertex 1 {m}
+    6.096,6.096,0,           !- X,Y,Z ==> Vertex 2 {m}
+    0,6.096,0,               !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,4.572;           !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     OSCTest:West Wall,       !- Name
@@ -385,10 +385,10 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    0,-6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
-    3.153951E-05,-6.096,4.572,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096,0,4.572,           !- X,Y,Z ==> Vertex 1 {m}
+    6.096,0,0,               !- X,Y,Z ==> Vertex 2 {m}
+    6.096,6.096,0,           !- X,Y,Z ==> Vertex 3 {m}
+    6.096,6.096,4.572;       !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     OSCTest:Ceiling,         !- Name
@@ -664,6 +664,7 @@
     ,                        !- Availability Schedule Name
     OSCTest-Inlet,           !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

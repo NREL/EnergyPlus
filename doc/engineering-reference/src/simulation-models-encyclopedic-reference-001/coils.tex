@@ -171,7 +171,7 @@ and the coil bypass factor is:
 
 If the iterative procedure doesn't converge, or the coil bypass factor is too large (greater than 0.5), or the apparatus dewpoint enthalpy is less than the saturated air enthalpy at the water inlet temperature, the design outlet air conditions are reset to 90\% relative humidity at the same outlet enthalpy. The above design calculations are then repeated.
 
-We are now ready to calculate the design coil UA. This will be accomplished by inverting the simple coil calculation routine \emph{CoolingCoil} using the Regula Falsi method. First we make an initial estimate of the coil UA.
+We are now ready to calculate the design coil UA. This will be accomplished by inverting the simple coil calculation routine \emph{CoolingCoil} using the root solver method. First we make an initial estimate of the coil UA.
 
 \begin{equation}
 \Delta {h_{lmd}} = (({h_{air,in}} - {h_{w,sat,out}}) - ({h_{air,out}} - {h_{w,sat,in}}))/log(({h_{air,in}} - {h_{w,sat,out}}) - ({h_{air,out}} - {h_{w,sat,in}}))
@@ -214,7 +214,7 @@ using the following assumptions:
   Airside combined heat and mass transfer coefficient = 140 (W/m2∙°C)
 \end{itemize}
 
-Interior and exterior U values (really UA's per unit exterior surface area) are calculated by dividing the above UA's by the area. The resulting U\(_{coil,ext}\) is assumed to be U\(_{coil,ext,wet}\); U\(_{coil,ext,dry}\) is set equal to U\(_{coil,ext,wet}\). We now have all the starting values needed for inverting the simple coil model using the chosen Regula Falsi iterative method. Once the iteration is completed, we have coil UA's and U's that yield the design outlet air and water enthalpies given the inlet design conditions and flow rates. Note that the simple coil model can not exactly match the specified design outlet air temperature and humidity ratio. It can only match the design air outlet enthalpy. Generally the simple coil model will yield outlet conditions near the saturation curve if any dehumidification is occuring. Typical outlet relative humidities are around 95\%.
+Interior and exterior U values (really UA's per unit exterior surface area) are calculated by dividing the above UA's by the area. The resulting U\(_{coil,ext}\) is assumed to be U\(_{coil,ext,wet}\); U\(_{coil,ext,dry}\) is set equal to U\(_{coil,ext,wet}\). We now have all the starting values needed for inverting the simple coil model using the chosen root solver iterative method. Once the iteration is completed, we have coil UA's and U's that yield the design outlet air and water enthalpies given the inlet design conditions and flow rates. Note that the simple coil model can not exactly match the specified design outlet air temperature and humidity ratio. It can only match the design air outlet enthalpy. Generally the simple coil model will yield outlet conditions near the saturation curve if any dehumidification is occuring. Typical outlet relative humidities are around 95\%.
 
 \subsubsection{Variable UA}\label{variable-ua}
 
@@ -226,33 +226,45 @@ There are two modes of coil analysis in the operating block. They are the Simple
 
 The operating block for Detailed Mode Analysis of this coil model is divided into three modes of coil performance. The modes being
 
-n~Coil is completely dry: There is no moisture condensation on the coil surface and the coil is a dry coil. This is an extreme condition when the entering air has very low humidity ratio or is dry air.
-
-n~Coil is completely wet: The entire coil is wet due to complete condensation on the surface of the coil.
-
-n~Part Wet Part Dry Mode: This is the usual/frequent mode of operation of coil, as shown in Figure~\ref{fig:energyplus-program-schematic}, where part of the coil at entry of air is dry and as air cools condensation occurs and part of the coil becomes wet.
+\begin{itemize}
+  \item
+    Coil is completely dry: There is no moisture condensation on the coil surface and the coil is a dry coil. This is an extreme condition when the entering air has very low humidity ratio or is dry air.
+  \item
+    Coil is completely wet: The entire coil is wet due to complete condensation on the surface of the coil.
+  \item
+    Part Wet Part Dry Mode: This is the usual/frequent mode of operation of coil, as shown in Figure~\ref{fig:energyplus-program-schematic}, where part of the coil at entry of air is dry and as air cools condensation occurs and part of the coil becomes wet.
+\end{itemize}
 
 The Part Wet Part Dry Mode of operation is essentially a function the Coil Completely Dry and Coil Completely Wet mode. This subroutine iterates between the Dry Coil and the Wet Coil to give outputs, a detailed explanation is given later in the document. The operating block requires 5 inputs, which are mentioned earlier in the document. These inputs are automatically generated from the node connections in Energy Plus. The user does not have to input any information to run this coil model.
 
 The option to identify which mode of operation the coil should perform ie, for a given set of inputs would the coil be Dry, Wet or Part Wet Part Dry, is decided by set of conditions described below.
 
-n~\textbf{IF} (\textbf{Temperature Dewpoint Air \textless{} Water Inlet Temperature}) \textbf{THEN} the coil is Dry and we call the Subroutine Coil Completely Dry. ~In this case outlet temperature of air would be higher than the air dewpoint and hence there would be no condensation.
-
-n~\textbf{IF} (\textbf{Temperature Dewpoint Air \textgreater{} Water Inlet Temperature}) \textbf{THEN} the coil is completely wet, call subroutine Coil Completely Wet, it is assumed that moisture condensation occurs over completely surface of the coil. However we go ahead and check for the coil being partially wet with the following condition.
-
-n~\textbf{IF (AirDewPointTemp \textless{} AirInletCoilSurfTemp) THEN,} the coil is Partially Wet because there is possibility that air temperature will go below its dewpoint and moisture will condense on latter part of the cooling coil.
+\begin{itemize}
+  \item
+    \textbf{IF} (\textbf{Temperature Dewpoint Air \textless{} Water Inlet Temperature}) \textbf{THEN} the coil is Dry and we call the Subroutine Coil Completely Dry. ~In this case outlet temperature of air would be higher than the air dewpoint and hence there would be no condensation.
+  \item
+    \textbf{IF} (\textbf{Temperature Dewpoint Air \textgreater{} Water Inlet Temperature}) \textbf{THEN} the coil is completely wet, call subroutine Coil Completely Wet, it is assumed that moisture condensation occurs over completely surface of the coil. However we go ahead and check for the coil being partially wet with the following condition.
+  \item
+    \textbf{IF (AirDewPointTemp \textless{} AirInletCoilSurfTemp) THEN,} the coil is Partially Wet because there is possibility that air temperature will go below its dewpoint and moisture will condense on latter part of the cooling coil.
+\end{itemize}
 
 The Operating Block for Simple Mode Analysis is divided into two modes of coil performance, the two modes being
 
-n~Coil is completely dry: There is no moisture condensation on the coil surface and the coil is a dry coil.
-
-n~Coil is completely wet: The entire coil is wet due to complete condensation on the surface of the coil.
+\begin{itemize}
+  \item
+    Coil is completely dry: There is no moisture condensation on the coil surface and the coil is a dry coil.
+  \item
+    Coil is completely wet: The entire coil is wet due to complete condensation on the surface of the coil.
+\end{itemize}
 
 The option to identify which mode of operation the Simple mode analysis should perform ie, for a given set of inputs would the coil be Dry or Wet is decided by set of conditions described below.
 
-n~\textbf{IF} (\textbf{Temperature Dewpoint Air \textless{} Water Inlet Temperature}) \textbf{THEN} the coil is Dry and we call the Subroutine Coil Completely Dry.~ In this case outlet temperature of air would be higher than the air dewpoint and hence there would be no condensation.
-
-n~\textbf{IF} (\textbf{Temperature Dewpoint Air \textgreater{} Water Inlet Temperature}) \textbf{THEN} the coil is completely wet, call subroutine Coil Completely Wet, it is assumed that moisture condensation occurs over completely surface of the coil. However we go ahead and check for the coil being partially wet with the following condition.
+\begin{itemize}
+  \item
+    \textbf{IF} (\textbf{Temperature Dewpoint Air \textless{} Water Inlet Temperature}) \textbf{THEN} the coil is Dry and we call the Subroutine Coil Completely Dry.~ In this case outlet temperature of air would be higher than the air dewpoint and hence there would be no condensation.
+  \item
+    \textbf{IF} (\textbf{Temperature Dewpoint Air \textgreater{} Water Inlet Temperature}) \textbf{THEN} the coil is completely wet, call subroutine Coil Completely Wet, it is assumed that moisture condensation occurs over completely surface of the coil. However we go ahead and check for the coil being partially wet with the following condition.
+\end{itemize}
 
 The above is a simple mode of analysis and the results are very slightly different from the detailed mode of analysis. The algorithms used in Simple mode and the Detailed mode are identically similar. The surface area wet fraction in the coil is reported as 1.0 or 0.0 for wet or dry coil respectively. The program defaults to simple mode of analysis for enabling higher execution speed.
 
@@ -398,9 +410,13 @@ The Coil would perform under part wet part dry conditions when Air Dewpoint Temp
 
 This problem is solved utilizing the fact that the Exit conditions from the Dry Part of the Coil would become the inlet conditions to the wet part of the coil (see Figure~\ref{fig:simplified-schematic-of-coolingdehumidifying}) and the coil model determines by iteration what fraction of the coil is wet and based on that it calculates the areas and subsequently the UA values of that dry and wet part, based on the area of the dry and wet part respectively. Explained below are the steps followed to the estimating the wet dry behavior of the coil.
 
-n~Iterate between the Dry Coil and the Wet Coil. First calculate Coil Completely Dry performance by estimating the wet dry interface water temperature using equation and inputting this variable as the water inlet temperature to dry Coil.
+\begin{itemize}
+  \item Iterate between the Dry Coil and the Wet Coil. First calculate Coil Completely Dry performance by estimating the wet dry interface water temperature using equation and inputting this variable as the water inlet temperature to dry Coil.
+\end{itemize}
 
-\(WetDryInterfac{e_{WaterTemp}} = {\rm{WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{ + Are}}{{\rm{a}}_{{\rm{WetFraction}}}}{\rm{*(WaterTem}}{{\rm{p}}_{{\rm{Outlet}}}}{\rm{ - WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{)}}\) ~~~
+\begin{equation}
+  WetDryInterfac{e_{WaterTemp}} = {\rm{WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{ + Are}}{{\rm{a}}_{{\rm{WetFraction}}}}{\rm{*(WaterTem}}{{\rm{p}}_{{\rm{Outlet}}}}{\rm{ - WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{)}}
+\end{equation}
 
 The value of Surface Area Wet fraction is estimated initially as follows
 
@@ -838,7 +854,7 @@ The output of the coil in watts is:
 {\dot Q_{coil}} = {\dot C_{water}}\cdot ({T_{water,in}} - {T_{water,out}})
 \end{equation}
 
-The UA value is recalculated for each timestep.~ A nominal UA, \emph{UA\(_{0}\)}, at the rating point is calculated by the program using the input for rated conditions and a search routine called regula falsi.
+The UA value is recalculated for each timestep.~ A nominal UA, \emph{UA\(_{0}\)}, at the rating point is calculated by the program using the input for rated conditions and a search routine called root solver.
 
 User input for the ratio of convective heat transfers at the nominal or rated operating point, ``\emph{r},'' is used in the model.~ This ratio is defined as
 
@@ -854,7 +870,7 @@ where,
 
 \emph{~~~~~ A} is the surface area
 
-The value calculated for \emph{UA\(_{0}\)} is used with the input for \emph{r} to characterize the convective heat transfer on the water sides at the nominal rating operation point using
+The value calculated for \emph{UA}\(_{0}\) is used with the input for \emph{r} to characterize the convective heat transfer on the water sides at the nominal rating operation point using
 
 \begin{equation}
 {\left( {{{\left( {hA} \right)}_w}} \right)_0} = U{A_0}\left( {\frac{{r + 1}}{r}} \right)
@@ -1075,13 +1091,13 @@ SlopeRated = \,\left( {\frac{{{\omega_{in}} - {\omega_{out}}}}{{{T_{db,in}}\, - 
 
 where
 
-\emph{ω\(_{in}\)} = humidity ratio of the air entering the cooling coil at rated conditions, kg/kg
+\(\omega_{in}\) = humidity ratio of the air entering the cooling coil at rated conditions, kg/kg
 
-\emph{ω\(_{out}\)} = humidity ratio of the air leaving the cooling coil at rated conditions, kg/kg
+\(\omega_{out}\) = humidity ratio of the air leaving the cooling coil at rated conditions, kg/kg
 
-\emph{T\(_{db,in}\)} = dry-bulb temperature of the air entering the cooling coil at rated conditions, °C
+\(T_{db,in}\) = dry-bulb temperature of the air entering the cooling coil at rated conditions, °C
 
-\emph{T\(_{db,out}\)} = dry-bulb temperature of the air leaving the cooling coil at rated conditions, °C
+\(T_{db,out}\) = dry-bulb temperature of the air leaving the cooling coil at rated conditions, °C
 
 Along with the rated entering air conditions, the algorithm then searches along the saturation curve of the psychrometric chart until the slope of the line between the point on the saturation curve and the inlet air conditions matches \emph{SlopeRated}. Once this point, the apparatus dewpoint, is found on the saturation curve the coil bypass factor at rated conditions is calculated as follows:
 
@@ -1091,11 +1107,11 @@ B{F_{rated}} = \,\frac{{{h_{out,rated}}\,\, - \,{h_{ADP}}}}{{{h_{in,rated}}\,\, 
 
 where
 
-\emph{h\(_{out,rated}\)} = enthalpy of the air leaving the cooling coil at rated conditions, J/kg
+\(h_{out,rated}\) = enthalpy of the air leaving the cooling coil at rated conditions, J/kg
 
-\emph{h\(_{in,rated}\)} = enthalpy of the air entering the cooling coil at rated conditions, J/kg
+\(h_{in,rated}\) = enthalpy of the air entering the cooling coil at rated conditions, J/kg
 
-\emph{h\(_{ADP}\)} = enthalpy of saturated air at the coil apparatus dewpoint, J/kg
+\(h_{ADP}\) = enthalpy of saturated air at the coil apparatus dewpoint, J/kg
 
 The coil bypass factor is analogous to the ``ineffectiveness'' (1-ε) of a heat exchanger, and can be described in terms of the number of transfer of unit (NTU).
 
@@ -1159,7 +1175,7 @@ where
 
 \subsubsection{Dry Coil Conditions}\label{dry-coil-conditions}
 
-If the model determines that the cooling coil is dry (ω\(_{in}\) \textless{} ω\(_{ADP}\)), then equations (455) and (456) are invalid since they are functions of entering wet-bulb temperature. Under dry-coil conditions, coil performance is a function of dry-bulb temperature rather than wet-bulb temperature. In this case, the model recalculates the performance of the DX cooling unit using the calculation procedure described above but with ω\(_{in\\ =}\) ω\(_{dry,}\) where ω\(_{dry}\) is the inlet air humidity ratio at the coil dry-out point (SHR = 1.0).
+If the model determines that the cooling coil is dry (\(\omega_{in}\) \textless{} \(\omega_{ADP}\)), then equations (455) and (456) are invalid since they are functions of entering wet-bulb temperature. Under dry-coil conditions, coil performance is a function of dry-bulb temperature rather than wet-bulb temperature. In this case, the model recalculates the performance of the DX cooling unit using the calculation procedure described above but with \(\omega_{in\\ =}\) \(\omega_{dry,}\) where \(\omega_{dry}\) is the inlet air humidity ratio at the coil dry-out point (SHR = 1.0).
 
 \subsubsection{SHR Calculation Using User Specified SHR Modifier Curves}\label{shr-calculation-using-user-specified-shr-modifier-curves}
 
@@ -1229,11 +1245,11 @@ If the user wishes to model an air-cooled condenser that has evaporative media p
 
 where
 
-\emph{T\(_{c,i}\)} = the temperature of the air entering the condenser coil, °C
+\(T_{c,i}\) = the temperature of the air entering the condenser coil, °C
 
-\emph{T\(_{wb,o}\)} = the wet-bulb temperature of the outdoor air, °C
+\(T_{wb,o}\) = the wet-bulb temperature of the outdoor air, °C
 
-\emph{T\(_{db,o}\)} = the dry-bulb temperature of the outdoor air, °C
+\(T_{db,o}\) = the dry-bulb temperature of the outdoor air, °C
 
 In this case, the Total Cooling Capacity Modifier Curve (function of temperature) and the Energy Input Ratio Modifier Curve (function of temperature) input fields for this object should reference performance curves that are a function of outdoor dry-bulb temperature. Be aware that the evaporative media will significantly reduce the dry-bulb temperature of the air entering the condenser coil, so the Total Cooling Capacity and EIR Modifier Curves must be valid for the expected range of dry-bulb temperatures that will be entering the condenser coil.
 
@@ -1261,7 +1277,7 @@ where
 
 \({\mathop m\limits^ \bullet_{_{air}}}\) ~~~~~~~~~ = evaporative condenser air mass flow rate, kg/s
 
-~\({\omega_{evapcond,in}}\) ~ = humidity ratio of outdoor air entering the evap condenser, kg/kg
+\({\omega_{evapcond,in}}\) ~ = humidity ratio of outdoor air entering the evap condenser, kg/kg
 
 \({\omega_{evapcond,out}}\) = humidity ratio of air leaving the evap condenser, kg/kg
 
@@ -1331,9 +1347,9 @@ The following discussion applies to both cycling fan and continuous fan operatio
 
 Figure~\ref{fig:concepts-of-moisture-buildup-and-evaporation} graphically depicts the latent degradation concepts and defines several key model parameters. After the cooling coil starts to operate, the coil temperature is eventually reduced below the dewpoint temperature of the entering air. Moisture from the air then builds on the surface of the coil until time t\(_{o}\) has elapsed and the total moisture mass on the coil is M\(_{o}\). After this time (t\(_{o}\)), moisture begins to fall from the coil and all of the latent capacity provided by the coil is ``useful'' since this condensate is collected and removed from the unit. When the coil cycles off and the supply air fan continues to operate, the initial moisture mass buildup on the coil (M\(_{o}\)) evaporates back into the supply air stream. If the cooling coil cycles back on before all of the moisture has evaporated, then the time until the first condensate removal (t\(_{o}\)) is shorter for this cooling cycle since the coil is already partially wetted.
 
-Figure~\ref{fig:concepts-of-moisture-buildup-and-evaporation} also shows several parameters that are used in the latent degradation model. The ratio of the coil's moisture holding capacity (M\(_{o}\)) and the steady-state latent capacity (\({\mathop Q\limits^ \bullet_L}\) ) is defined as \emph{t\(_{wet}\)} : the nominal time for moisture to fall from the coil (ignoring transient effects at startup and starting with a dry coil). The ratio of the initial moisture evaporation rate (\({\mathop Q\limits^ \bullet_e}\) ) and the steady-state latent capacity (\({\mathop Q\limits^ \bullet_L}\) ) is defined as \(\gamma\) . Both \emph{t\(_{wet}\)}and \(\gamma\) ~at the rated air volume flow rate and temperature conditions are required model inputs. Two other model inputs are the Maximum ON/OFF Cycling Rate (cycles per hour, \emph{N\(_{max}\)}) and the time constant (\(\tau\) , in seconds) for the cooling coil's latent capacity to reach steady state after startup. The development of the latent degradation model is fully described by Henderson and Rengarajan (1996). The model implemented in EnergyPlus is for their ``linear decay'' evaporation model.
+Figure~\ref{fig:concepts-of-moisture-buildup-and-evaporation} also shows several parameters that are used in the latent degradation model. The ratio of the coil's moisture holding capacity (M\(_{o}\)) and the steady-state latent capacity (\({\mathop Q\limits^ \bullet_L}\) ) is defined as \(t_{wet}\): the nominal time for moisture to fall from the coil (ignoring transient effects at startup and starting with a dry coil). The ratio of the initial moisture evaporation rate (\({\mathop Q\limits^ \bullet_e}\) ) and the steady-state latent capacity (\({\mathop Q\limits^ \bullet_L}\) ) is defined as \(\gamma\) . Both \(t_{wet}\) and \(\gamma\) at the rated air volume flow rate and temperature conditions are required model inputs. Two other model inputs are the Maximum ON/OFF Cycling Rate (cycles per hour, \(N_{max}\)) and the time constant (\(\tau\) , in seconds) for the cooling coil's latent capacity to reach steady state after startup. The development of the latent degradation model is fully described by Henderson and Rengarajan (1996). The model implemented in EnergyPlus is for their ``linear decay'' evaporation model.
 
-During the simulation, all of the steady-state calculations described previously in equations (449) through (462) are completed. The latent degradation model then modifies the steady-state sensible heat ratio for the coil as shown below. The value of \emph{t\(_{wet}\)} at the current air volume flow rate and entering air conditions is first calculated based on the rated value of \emph{t\(_{wet}\)} entered by the user:
+During the simulation, all of the steady-state calculations described previously in equations (449) through (462) are completed. The latent degradation model then modifies the steady-state sensible heat ratio for the coil as shown below. The value of \(t_{wet}\) at the current air volume flow rate and entering air conditions is first calculated based on the rated value of \(t_{wet}\) entered by the user:
 
 \begin{equation}
 {t_{wet}} = Minimum\left( {{t_{wet,rated}}\left( {\frac{{{{\mathop Q\limits^ \bullet  }_{latent,rated}}}}{{{{\mathop Q\limits^ \bullet  }_{latent}}}}} \right),\,\,{t_{wet,\max }}} \right)
@@ -1341,15 +1357,15 @@ During the simulation, all of the steady-state calculations described previously
 
 where
 
-\emph{t\(_{wet}\)}~ = nominal time for condensate removal to begin at the current airflow and entering air conditions, starting with a dry coil (sec)
+\(t_{wet}\) = nominal time for condensate removal to begin at the current airflow and entering air conditions, starting with a dry coil (sec)
 
-\emph{t\(_{wet,rated}\)} = nominal time for condensate removal to begin at the coil's rated airflow and entering air conditions, starting with a dry coil (sec)
+\(t_{wet,rated}\) = nominal time for condensate removal to begin at the coil's rated airflow and entering air conditions, starting with a dry coil (sec)
 
 \({\mathop Q\limits^ \bullet_{latent,rated}}\) = cooling coil latent capacity at the rated airflow and temperature conditions, W
 
 \({\mathop Q\limits^ \bullet_{latent}}\) = cooling coil latent capacity at the current airflow and temperature conditions, W
 
-\emph{t\(_{wet,max}\)} = maximum allowed value for \emph{t\(_{wet}\)} (9999.0 sec)
+\(t_{wet,max}\) = maximum allowed value for \(t_{wet}\) (9999.0 sec)
 
 Likewise, the value of \(\gamma\) at the current air volume flow rate and entering air conditions is calculated based on the rated value of \(\gamma\) entered by the user:
 
@@ -1363,13 +1379,13 @@ where:
 
 \({\gamma_{rated}}\) = \(\gamma\) ~at rated air flow and entering air conditions
 
-\emph{T\(_{db,i}\)} = dry-bulb temperature of the air entering the cooling coil, °C
+\(T_{db,i}\) = dry-bulb temperature of the air entering the cooling coil, °C
 
-\emph{T\(_{wb,i}\)} = wet-bulb temperature of the air entering the cooling coil, °C
+\(T_{wb,i}\) = wet-bulb temperature of the air entering the cooling coil, °C
 
-\emph{T\(_{db,rated}\)} = dry-bulb temperature of air entering the cooling coil at rated conditions (26.7°C)
+\(T_{db,rated}\) = dry-bulb temperature of air entering the cooling coil at rated conditions (26.7°C)
 
-\emph{T\(_{wb,rated}\)} = wet-bulb temperature of air entering the cooing coil at rated conditions (19.4°C)
+\(T_{wb,rated}\) = wet-bulb temperature of air entering the cooing coil at rated conditions (19.4°C)
 
 The cooling coil on and off times are then calculated based on the maximum number of cycles per hour and the calculated run-time fraction for the coil.
 
@@ -1383,13 +1399,13 @@ The cooling coil on and off times are then calculated based on the maximum numbe
 
 where
 
-\emph{t\(_{on}\)} = duration of cooling coil on-cycle (sec)
+\(t_{on}\) = duration of cooling coil on-cycle (sec)
 
-\emph{N\(_{max}\)} = maximum on/off cycles per hour (cph)
+\(N_{max}\) = maximum on/off cycles per hour (cph)
 
 \emph{X} = cooling coil runtime fraction (-)
 
-\emph{t\(_{off}\)} = duration of cooling coil off-cycle (sec)
+\(t_{off}\) = duration of cooling coil off-cycle (sec)
 
 For cycling fan systems, the duration of the heating coil on and off cycles are also calculated. When the heating coil operates for a longer duration of time than the cooling coil, latent degradation can also occur. For this case, the off-cycle time (i.e., the amount of time the fan operates longer than the cooling coil) is recalculated and based on the difference between the heating coil on-cycle time and the cooling coil on-cycle time. Ton and Toff for the heating coil are calculated in the same manner as shown above except that the heating run-time fraction is used for the calculations. This model assumes that the cycling rate of the cooling and heating coils are the same. In addition, since the heating coil cycling rate may be different than the cooling coil (based on run-time fractions), the heating coil may also turn on again before the next cooling coil on-cycle. The following equations are used when the heating coil operates for a longer time period than does the cooling coil.
 
@@ -1412,13 +1428,13 @@ toff = MIN\left( {toff,ton,heating - ton} \right)
 
 where
 
-\emph{t\(_{on,heating}\)} = duration of heating coil on-cycle (sec)
+\(t_{on,heating}\) = duration of heating coil on-cycle (sec)
 
-\emph{X\(_{,heating}\)} = heating coil runtime fraction (-)
+\(X_{,heating}\) = heating coil runtime fraction (-)
 
-\emph{t\(_{off,heating}\)} = duration of heating coil off-cycle (sec)
+\(t_{off,heating}\) = duration of heating coil off-cycle (sec)
 
-The equation for calculating the time \emph{t\(_{o}\)} when moisture first begins to fall from the cooling coil is shown below, and is solved iteratively by EnergyPlus:
+The equation for calculating the time \(t_{o}\) when moisture first begins to fall from the cooling coil is shown below, and is solved iteratively by EnergyPlus:
 
 \begin{equation}
 \mathop t\nolimits_o^{j + 1}  = \gamma {t_{off}} - \left( {\frac{{\mathop \gamma \nolimits^2 }}{{4{t_{wet}}}}} \right)\mathop t\nolimits_{off}^2  - \tau \left( {\mathop e\nolimits^{\frac{{\mathop t\nolimits_o^j }}{\tau }} \,\, - \,\,1} \right)\,\,,\,\,\,\mathop t\nolimits_{off}^{}  \le \,\left( {\frac{{2{t_{wet}}}}{\gamma }} \right)
@@ -1432,7 +1448,7 @@ where
 
 \emph{j} = iteration number
 
-The part-load latent heat ratio of the cooling coil is then calculated with \(t_o^{}\) , \emph{t\(_{on}\)} and \(\tau\) , which is in turn used to calculate the ``effective'' sensible heat ratio of the cooling including part-load latent degradation effects.
+The part-load latent heat ratio of the cooling coil is then calculated with \(t_o\) , \emph{t\(_{on}\)} and \(\tau\) , which is in turn used to calculate the ``effective'' sensible heat ratio of the cooling including part-load latent degradation effects.
 
 \begin{equation}
 \frac{{LHR}}{{LH{R_{ss}}}} = Maximum\left( {\left( {\frac{{{t_{on}} - {t_o}}}{{{t_{on}} + \tau \left( {{e^{\left( {\frac{{ - {t_{on}}}}{\tau }} \right)}}\,\, - \,\,1} \right)}}} \right),0.0} \right)
@@ -1448,7 +1464,7 @@ where
 
 \(LH{R_{ss}}\) = latent heat ratio at steady-state conditions (\(1 - SH{R_{ss}}\) ~with \(SH{R_{ss}}\) ~from eqn. (462))
 
-\(SH{R_{eff}}\) = part-load sensible heat ratio**(\(SH{R_{ss}}\) \emph{~≤\(SH{R_{eff}}\) ~≤} 1.0)
+\(SH{R_{eff}}\) = part-load sensible heat ratio (\(SH{R_{ss}}\) ≤ \(SH{R_{eff}}\) ≤ 1.0)
 
 \(SH{R_{ss}}\) = steady-state sensible heat ratio (from eqn. (462))
 
@@ -1559,9 +1575,9 @@ EE{R_{TestB}} = \frac{{{{\dot Q}_{Total,Net,TestB}}}}{{Powe{r_{Total,TestB}}}}
 
 where,
 
-\emph{PLF\(_{0.5}\)} = Part Load Fraction Correlation Curve evaluated at a part load ratio (PLR) of 0.5 (dimensionless)
+\(PLF_{0.5}\) = Part Load Fraction Correlation Curve evaluated at a part load ratio (PLR) of 0.5 (dimensionless)
 
-\emph{EER\(_{TestB}\)} = Energy efficiency ratio with 19.44°C wet-bulb temperature air entering the cooling coil, 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W/W)
+\(EER_{TestB}\) = Energy efficiency ratio with 19.44°C wet-bulb temperature air entering the cooling coil, 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W/W)
 
 \({\dot Q_{Total,Net,TestB}}\) = Net total cooling capacity with 19.44°C wet-bulb temperature air entering the cooling coil, 27.78°C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W)
 
@@ -1583,7 +1599,7 @@ EE{R_{}} = \frac{{{{\dot Q}_{Standard\,Rating}}}}{{Powe{r_{Total,Rated}}}}
 
 \begin{equation}
   \begin{array}{rl}
-    Power_{Total,Rated} &= \dot{Q}_{Total,Rated} \PB{TotCapTempModFac_{TestB}}\PB{TotCapFlowModFac_{Rated}}\cdot EIR_{Rated} \\
+    Power_{Total,Rated} &= \dot{Q}_{Total,Rated} \PB{TotCapTempModFac_{Rated}}\PB{TotCapFlowModFac_{Rated}}\cdot EIR_{Rated} \\
                         &+ \PB{FanPowerPerVolFlowRate \cdot \dot{V}_{Rated}}
   \end{array}
 \end{equation}
@@ -1641,7 +1657,9 @@ where,
 
 \({\dot Q_{Total,Net,PartLoad}}\) ~ = ~~~~ Net total cooling capacity with 19.44°C wet-bulb temperature air entering the cooling coil rated air volume flow through the cooling coil (W). The dry-bulb temperature of air entering the air-cooled condenser varies (B = 27.5°C, C = 20.0°C, D = 18.3°C).
 
-\(Powe{r_{Total,PartLoad}}\) ~ = Total electric power (compressors, condenser fans and evaporator fan) with 19.44°C wet-bulb temperature air entering the cooling coil and air flow rate across the evaporator at the Rated Air Volume Flow Rate (W). The dry-bulb temperature of air entering the air-cooled condenser varies (B = 27.5°C, C = 20.0°C, D = 18.3°C).\(Powe{r_{CompCondFan,{\kern 1pt} PartLoad}}\) ~ = Electric power of the compressor and condenser fan at the various part-load ratios, with 19.44°C wet-bulb temperature air entering the cooling coil and rated supply air volume flow rate (W). The dry-bulb temperature of air entering the air-cooled condenser varies per the part-load ratio (B = 27.5°C, C = 20.0°C, D = 18.3°C).
+\(Powe{r_{Total,PartLoad}}\) ~ = Total electric power (compressors, condenser fans and evaporator fan) with 19.44°C wet-bulb temperature air entering the cooling coil and air flow rate across the evaporator at the Rated Air Volume Flow Rate (W). The dry-bulb temperature of air entering the air-cooled condenser varies (B = 27.5°C, C = 20.0°C, D = 18.3°C).
+
+\(Powe{r_{CompCondFan,{\kern 1pt} PartLoad}}\) ~ = Electric power of the compressor and condenser fan at the various part-load ratios, with 19.44°C wet-bulb temperature air entering the cooling coil and rated supply air volume flow rate (W). The dry-bulb temperature of air entering the air-cooled condenser varies per the part-load ratio (B = 27.5°C, C = 20.0°C, D = 18.3°C).
 
 \(EIRTempModFa{c_{PartLoad}}\) ~ = Energy Input Ratio Function of Temperature Curve evaluated with 19.44°C wet-bulb temperature air entering the cooling coil and dry-bulb temperature of air entering the air-cooled condenser corresponding to the reduced part-load ratio (B = 27.5°C, C = 20.0°C, D = 18.3°C) (dimensionless).
 
@@ -1657,9 +1675,9 @@ LF = \frac{{\left( {{\raise0.7ex\hbox{{\% Load}} \!\mathord{\left/ {\vphantom {{
 
 where,
 
-\emph{\(\% Load\)}~ = Part-load operating points, i.e., 75\% (B), 50\% (C), 25\% (D)
+\(\% Load\) = Part-load operating points, i.e., 75\% (B), 50\% (C), 25\% (D)
 
-The calculations for \emph{Q\(_{Total,Net,PartLoad}\)} and \emph{Power\(_{Total,PartLoad}\)} are calculated in nearly the same way as \emph{Q\(_{Total,Net,TestB}\)} and \emph{Power\(_{Total,TestB}\)} are calculated for SEER (defined above). The only difference is that these cooling capacity and power values, used for calculating EER\(_{B}\)/EER\(_{C}\)/EER\(_{D}\) for IEER, are calculated for a series of dry-bulb temperatures of air entering the air-cooled condenser (B = 27.5°C, C = 20.0°C, D = 18.3°C) and part-load performance degradiation correction is also applied to the condensing unit electric power calculation.
+The calculations for \(Q_{Total,Net,PartLoad}\) and \(Power_{Total,PartLoad}\) are calculated in nearly the same way as \(Q_{Total,Net,TestB}\) and \(Power_{Total,TestB}\) are calculated for SEER (defined above). The only difference is that these cooling capacity and power values, used for calculating \(EER_{B} / EER_{C} / EER_{D}\) for IEER, are calculated for a series of dry-bulb temperatures of air entering the air-cooled condenser (B = 27.5°C, C = 20.0°C, D = 18.3°C) and part-load performance degradiation correction is also applied to the condensing unit electric power calculation.
 
 \subsubsection{ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils}\label{ansiashrae-127---standard-ratings-of-single-speed-dx-cooling-coils}
 
@@ -1791,7 +1809,9 @@ The calculation procedures in this model, including defrost and crankcase heater
 
 The following procedure provides the detailed description of the exception.
 
-n~Total delivered cooling capacity
+\begin{itemize}
+  \item Total delivered cooling capacity
+\end{itemize}
 
 The total delivered cooling capacity for speed 1 operating at the cycling ratio needed to meet the requested cooling load is:
 
@@ -1805,15 +1825,17 @@ where,
 
 \({\mathop m\limits^\cdot_{Speed\,\,1}}\) = air mass flow rate through cooling coil at Speed 1 as set by the parent object {[}kg/s{]}
 
-\emph{h\(_{outlet,full}\)} = specific enthalpy of the coil outlet air during full-load operation at Speed 1 (no cycling) {[}J/kg{]}
+\(h_{outlet,full}\) = specific enthalpy of the coil outlet air during full-load operation at Speed 1 (no cycling) {[}J/kg{]}
 
-\emph{h\(_{inlet}\)} = specific enthalpy of the coil inlet air {[}J/kg{]}
+\(h_{inlet}\) = specific enthalpy of the coil inlet air {[}J/kg{]}
 
 \emph{CycRatio} = cycling ratio at Speed 1, ratio of requested heating load to the full-load capacity of the coil at Speed 1 {[}dimensionless{]}
 
 It is assumed that the coil provides no cooling capacity when the coil is OFF, even if the supply air fan continues to operate.
 
-n~Outlet air specific enthalpy
+\begin{itemize}
+  \item Outlet air specific enthalpy
+\end{itemize}
 
 The average specific enthalpy of the coil outlet air is then calculated based on the total delivered cooling capacity and the average air mass flow rate entering the coil:
 
@@ -1831,7 +1853,9 @@ Q\(_{coil,cycling}\) = total capacity at full load {[}W{]}
 
 \({\mathop m\limits^\cdot_{inlet}}\) = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the cooling coil is ON and the specified flow rate when the cooling coil is OFF for the time step being simulated.
 
-n~Sensible capacity
+\begin{itemize}
+  \item Sensible capacity
+\end{itemize}
 
 The minimum humidity ratio (HR\(_{min}\) ) is based on humidity ratios between inlet and full load outlet as:
 
@@ -1857,7 +1881,9 @@ h\(_{outlet,full}\) = full load specific enthalpy at the coil outlet as a functi
 
 h\(_{inlet}\) = specific enthalpy at the coil inlet {[}J/kg{]}
 
-n~Latent capacity
+\begin{itemize}
+  \item Latent capacity
+\end{itemize}
 
 The latent capacity is the difference between total and sensible capacities
 
@@ -1869,7 +1895,9 @@ where
 
 Q\(_{coil,latent}\) = delivered latent cooling capacity {[}W{]}
 
-n~Average outlet air humidity ratio
+\begin{itemize}
+  \item Average outlet air humidity ratio
+\end{itemize}
 
 The averaged outlet HR can be calculated as:
 
@@ -1881,7 +1909,9 @@ where
 
 \(\lambda\) = heat of vaporization as a function of HR\(_{min}\) and CycRatio * T\(_{outlet,full}\)+(1-CycRatio) * T\(_{inlet}\) {[}J/kg{]}
 
-n~Average outlet air temperature
+\begin{itemize}
+  \item Average outlet air temperature
+\end{itemize}
 
 Using the above averaged outlet humidity ratio and specific enthalpy, the averaged outlet temperature can be calculated using the psych function of PsyTdbFnHW.
 
@@ -1893,7 +1923,9 @@ The crankcase heater defined for this DX cooling coil is enabled during the time
 
 This section describes how higher speed operation is simulated. When the required sensible load is less than the full load sensible capacity at Speed n (Speed Number \textgreater{} 1), the following calculations are performed:
 
-n~Bypass factor at Speed n-1 and Speed n
+\begin{itemize}
+  \item Bypass factor at Speed n-1 and Speed n
+\end{itemize}
 
 \begin{equation}
 BypassFacto{r_n} = f(RatedBypassFacto{r_n},RatedFlowRat{e_n},ActualFowRat{e_n})
@@ -1917,9 +1949,17 @@ i~~~~ = Speed n or Speed n-1
 
 The bypass factor at Speed n is a function of the bypass factor at the rated conditions, rated airflow rate, and actual flow rate at Speed n. The calculation is performed by a function, called AdjustCBF in the DXCoil module.
 
-n~Total capacity at Speed n-1 and Speed n
+\begin{itemize}
+  \item Total capacity at Speed n-1 and Speed n
+\end{itemize}
 
-\(TotCa{p_{n - 1}} = f(RatedCa{p_{n - 1}},TotCapTempModFa{c_{n - 1}},TotCapFlowModFa{c_{n - 1}},BypassFacto{r_{n - 1}})\) \(TotCa{p_n} = f(RatedCa{p_n},TotCapTempModFa{c_n},TotCapFlowModFa{c_n},BypassFacto{r_n})\)
+\begin{equation}
+  TotCa{p_{n - 1}} = f(RatedCa{p_{n - 1}},TotCapTempModFa{c_{n - 1}},TotCapFlowModFa{c_{n - 1}},BypassFacto{r_{n - 1}})
+\end{equation}
+
+\begin{equation}
+ TotCa{p_n} = f(RatedCa{p_n},TotCapTempModFa{c_n},TotCapFlowModFa{c_n},BypassFacto{r_n})
+\end{equation}
 
 where
 
@@ -1935,7 +1975,9 @@ i~~~~ = Speed n or Speed n-1
 
 The calculation is performed by a subroutine, called CalcTotCapSHR in the DXCoil module.
 
-n~EIR at Speed n-1 and Speed n
+\begin{itemize}
+  \item EIR at Speed n-1 and Speed n
+\end{itemize}
 
 \begin{equation}
 EI{R_{n - 1}} = RatedEI{R_{n - 1}}*EIRTempModFa{c_{n - 1}}*EIRFlowModFa{c_{n - 1}}
@@ -1957,11 +1999,15 @@ EIRFlowModFac\(_{i}\) = Energy input ratio modifier as a function of ratio of th
 
 i~~~~ = n or n-1
 
-n~Full load outlet conditions at Speed n-1 and Speed n
+\begin{itemize}
+  \item Full load outlet conditions at Speed n-1 and Speed n
+\end{itemize}
 
 The calculation procedure of full load outlet conditions at Speed n-1 and Speed n is the same as the calculation procedure used in the Coil:Cooling:DX:SingleSpeed model (Ref. Coil:Cooling:DX:SingleSpeed). The difference is that the outlet conditions at Speed n-1 are calculated based on the total cooling capacity and mass flow rate at Speed n-1, while the outlet conditions at Speed n are calculated based on the total cooling capacity and mass flow rate at Speed n.
 
-n~Effective total cooling capacity
+\begin{itemize}
+  \item Effective total cooling capacity
+\end{itemize}
 
 \begin{equation}
 \begin{array}{l}
@@ -1984,7 +2030,9 @@ h\(_{outlet,full\_Speed\, n}\) = full load specific enthalpy at the coil outlet 
 
 h\(_{outlet,full\_Speed\, n-1}\) = full load specific enthalpy at the coil outlet at Speed n-1 {[}J/kg{]}
 
-n~Average outlet air specific enthalpy
+\begin{itemize}
+  \item Average outlet air specific enthalpy
+\end{itemize}
 
 \begin{equation}
   {h_{outlet,average}} = {h_{inlet}} - \frac{Q_{coil,SpeedRatio}}{{\mathop m\limits^\cdot  }_{inlet}}
@@ -1998,7 +2046,9 @@ h\(_{inlet}\) = specific enthalpy at the coil inlet {[}J/kg{]}
 
 \({\mathop m\limits^\cdot_{inlet}}\) = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Speed n and the specified flow rate when the heating coil is at Speed n-1 for the time step being simulated.
 
-n~Effective sensible cooling capacity
+\begin{itemize}
+  \item Effective sensible cooling capacity
+\end{itemize}
 
 The minimum humidity ratio (HR\(_{min}\)) is calculated as
 
@@ -2023,7 +2073,9 @@ h\(_{outlet,full\_Speed\\ n-1}\) = full load specific enthalpy at the coil outle
 
 h\(_{inlet}\)~~~~~~~~~~~~ = specific enthalpy at the coil inlet {[}J/kg{]}
 
-n~Aaverage outlet air humidity ratio and temperature
+\begin{itemize}
+  \item Average outlet air humidity ratio and temperature
+\end{itemize}
 
 The effective latent cooling capacity is the difference between the total and sensible capacity:
 
@@ -2045,7 +2097,9 @@ where
 
 At the given averaged outlet humidity ratio and specific enthalpy, the averaged outlet temperature can be calculated using the psych function of PsyTdbFnHW.
 
-n~Calculate combined energy input
+\begin{itemize}
+  \item Calculate combined energy input
+\end{itemize}
 
 When the input for the field `Apply Part Load Fraction to Speeds Greater than 1' is No in the object (equivalent to a single compressor), the combined energy output is calculated as follows:
 
@@ -2061,13 +2115,17 @@ CoolingPower = Power used in Watt
 
 RTF = Run time fraction at Speed n
 
-n~Latent degradation
+\begin{itemize}
+  \item Latent degradation
+\end{itemize}
 
 When the supply fan operation mode is ContinuousFanWithCyclingCompressorand the input of the Apply Latent Degradation to Speeds Greater than 1 is Yes, the latent degradation is included at Speed n. The calculation procedure is the same as one in the Coil:Cooling:DX:SingleSpeed object. The difference is that the rated values and run time fraction at Speed n are used. The adjusted SHR is used to calculate full load outlet conditions at Speed n.
 
 It is expected to have less latent degradation at Speed n than Speed 1. Therefore, smaller values of the latent degradation inputs at Speed n than those at Speed 1 are recommended.
 
-n~Crankcase heater
+\begin{itemize}
+  \item Crankcase heater
+\end{itemize}
 
 There is no power need at higher speed operation.
 
@@ -2145,15 +2203,15 @@ For multi-speed compressor the SEER value is weighted average performance at dif
 
 Where,
 
-\emph{q\(_{c}\)}(T\(_{j}\))/N = ~ = the ratio of space cooling capacity provided by the unit during periods of the space cooling season when the outdoor temperature fell within the range represented by bin temperature \emph{T\(_{j}\)} to the total number of hours in the cooling season (N), (W)
+\(q_{c}\)(T\(_{j}\))/N = ~ = the ratio of space cooling capacity provided by the unit during periods of the space cooling season when the outdoor temperature fell within the range represented by bin temperature \(T_{j}\) to the total number of hours in the cooling season (N), (W)
 
-\emph{e\(_{c}\)}(T\(_{j}\))/N = the ratio of the electrical energy consumed by the unit during periods of the space cooling season when the outdoor temperature fell within the range represented by bin temperature Tj to the total number of hours in the cooling season (N), W.
+\(e_{c}\)(T\(_{j}\))/N = the ratio of the electrical energy consumed by the unit during periods of the space cooling season when the outdoor temperature fell within the range represented by bin temperature Tj to the total number of hours in the cooling season (N), W.
 
-\emph{j} ~~~ ~ = the bin number, dimensionless. For cooling season j ranges from 1 to 8.
+\emph{j} = the bin number, dimensionless. For cooling season j ranges from 1 to 8.
 
-\emph{T\(_{j}\)}~~~ = ~~~~~~~~ outdoor air bin temperature, °C. Outdoor temperatures are ``binned'' such that calculations are only performed based one temperature within the bin. Bins of 2.8 °C with 8 cooling season bin temperatures being 19.44°C, 22.22°C, 25.0°C, 27.78°C, 30.56°C, 33.33°C, 36.11°C, 38.89°C.
+\(T_{j}\) = outdoor air bin temperature, °C. Outdoor temperatures are ``binned'' such that calculations are only performed based one temperature within the bin. Bins of 2.8 °C with 8 cooling season bin temperatures being 19.44°C, 22.22°C, 25.0°C, 27.78°C, 30.56°C, 33.33°C, 36.11°C, 38.89°C.
 
-The steady-state cooling capacity delivered and the electric power inputs when the DX coil is operating at minimum compressor speed (\emph{k = 1}), and outdoor air temperature \emph{T\(_{j}\)}, are determined by linear interpolation using the values of B1 and F1 tests as follows:
+The steady-state cooling capacity delivered and the electric power inputs when the DX coil is operating at minimum compressor speed (\emph{k = 1}), and outdoor air temperature \(T_{j}\), are determined by linear interpolation using the values of B1 and F1 tests as follows:
 
 \begin{equation}
 \dot Q_c^{k = 1}({T_j}) = \dot Q_c^{k = 1}(19.44) + \frac{{\dot Q_c^{k = 1}(27.78) - \dot Q_c^{k = 1}(19.44)}}{{27.78 - 19.44}}\left( {{T_j} - 19.44} \right)
@@ -2163,7 +2221,7 @@ The steady-state cooling capacity delivered and the electric power inputs when t
 \dot E_c^{k = 1}({T_j}) = \dot E_c^{k = 1}(19.44) + \frac{{\dot E_c^{k = 1}(27.78) - \dot E_c^{k = 1}(19.44)}}{{27.78 - 19.44}}\left( {{T_j} - 19.44} \right)
 \end{equation}
 
-The steady-state cooling capacities and electric power inputs at the minimum speed and test condition \emph{B\(_{1}\)} and \emph{F\(_{1}\)} are calculated from the minimum (low) speed performance curves as follows:
+The steady-state cooling capacities and electric power inputs at the minimum speed and test condition \(B_{1}\) and \(F_{1}\) are calculated from the minimum (low) speed performance curves as follows:
 
 \begin{equation}
 \dot Q_c^{k = 1}(27.78) = \dot Q_{T,\,CRated}^{k = 1} \cdot CAPFT_{TestB1}^{k = 1} \cdot CAPFFF_{TestB1}^{k = 1} - FanPower_{CRated}^{k = 1}
@@ -2213,7 +2271,7 @@ Where,
 
 \(FanPowerPerVolFlowRat{e^{k = 1}}\) ~ = ~ the rated Indoor Coil fan power per volume flow rate at low (minimum) compressor speed specified value by the user, (W/(m3/s))
 
-The steady-state cooling capacity delivered and the electric power inputs when the DX cooling coil is operating at maximum (high) compressor speed (\emph{k = 2}), and outdoor air temperature \emph{T\(_{j}\)}, are determined as follows:
+The steady-state cooling capacity delivered and the electric power inputs when the DX cooling coil is operating at maximum (high) compressor speed (\emph{k = 2}), and outdoor air temperature \(T_{j}\), are determined as follows:
 
 \begin{equation}
 \dot Q_c^{k = 2}({T_j}) = \dot Q_c^{k = 2}(27.78) + \frac{{\dot Q_c^{k = 2}(35.0) - \dot Q_c^{k = 2}(27.78)}}{{35.0 - 27.78}}\left( {{T_j} - 27.78} \right)
@@ -2223,7 +2281,7 @@ The steady-state cooling capacity delivered and the electric power inputs when t
 \dot E_c^{k = 2}({T_j}) = \dot E_c^{k = 2}(27.78) + \frac{{\dot E_c^{k = 2}(35.0) - \dot E_c^{k = 2}(27.7)}}{{35.0 - 27.78}}\left( {{T_j} - 27.78} \right)
 \end{equation}
 
-The steady-state cooling capacities and electric power input at the maximum speed and test condition \emph{A\(_{2}\)} and \emph{B\(_{2}\)} are determined from the maximum (high) speed performance curves as follows:
+The steady-state cooling capacities and electric power input at the maximum speed and test condition \(A_{2}\) and \(B_{2}\) are determined from the maximum (high) speed performance curves as follows:
 
 \begin{equation}
 \dot Q_c^{k = 2}(35.0) = \dot Q_{T,\,CRated}^{k = 2} \cdot CAPFT_{TestA2}^{k = 2} \cdot CAPFFF_{TestA2}^{k = 2} - FanPower_{CRated}^{k = 2}
@@ -2233,10 +2291,16 @@ The steady-state cooling capacities and electric power input at the maximum spee
 \dot E_c^{k = 2}(35.0) = \left[ {\frac{{\dot Q_c^{k = 2}(35.0)}}{{COP_{CRated}^{k = 2}}}} \right] \cdot EIRFT_{TestA2}^{k = 2} \cdot EIRFFF_{TestA2}^{k = 2} + FanPower_{CRated}^{k = 2}
 \end{equation}
 
-\(\dot Q_c^{k = 2}(27.78) = \dot Q_{T,\,CRated}^{k = 2} \cdot CAPFT_{TestB2}^{k = 2} \cdot CAPFFF_{TestB2}^{k = 2} - FanPower_{CRated}^{k = 2}\) ~\(\dot E_c^{k = 2}(27.78) = \left[ {\frac{{\dot Q_c^{k = 2}(19.44)}}{{COP_{CRated}^{k = 2}}}} \right] \cdot EIRFT_{TestB2}^{k = 2} \cdot EIRFFF_{TestB2}^{k = 2} + FanPower_{CRated}^{k = 2}\)
+\begin{equation}
+  \dot Q_c^{k = 2}(27.78) = \dot Q_{T,\,CRated}^{k = 2} \cdot CAPFT_{TestB2}^{k = 2} \cdot CAPFFF_{TestB2}^{k = 2} - FanPower_{CRated}^{k = 2}
+\end{equation}
 
 \begin{equation}
-FanPower_{CRated}^{k = 2} = FanPowerPerVolFlowRat{e^{k = 2}} \cdot {\rm{\dot V}}_{CRated}^{k = 2}
+  \dot E_c^{k = 2}(27.78) = \left[ {\frac{{\dot Q_c^{k = 2}(19.44)}}{{COP_{CRated}^{k = 2}}}} \right] \cdot EIRFT_{TestB2}^{k = 2} \cdot EIRFFF_{TestB2}^{k = 2} + FanPower_{CRated}^{k = 2}
+\end{equation}
+
+\begin{equation}
+  FanPower_{CRated}^{k = 2} = FanPowerPerVolFlowRat{e^{k = 2}} \cdot {\rm{\dot V}}_{CRated}^{k = 2}
 \end{equation}
 
 Where,
@@ -2267,7 +2331,7 @@ Where,
 
 \(FanPowerPerVolFlowRate{k^{k = 2}}\) ~ = the Rated Evaporator (Indoor Coil) Fan Power Per Volume Flow rate at maximum (high) compressor speed specified value by the user, (W/(m3/s))
 
-The above steps show how the cooling capacity and electric power inputs are determined when the DX cooling coil is operating at minimum (low) and maximum (high) compressor speeds.~ But the unit may operate at minimum (low) speed capacity, cycle on--off, cycle between successiave lower and higher compressor speed capacity, or operate at maximum (high) speed capacity depending on the building cooling load. The operating range of the DX cooling coil is determined based on the building cooling load for each binned outside air temperature. The building cooling load at an outdoor air temperature \emph{T\(_{j}\)}, is calculated as follows:
+The above steps show how the cooling capacity and electric power inputs are determined when the DX cooling coil is operating at minimum (low) and maximum (high) compressor speeds.~ But the unit may operate at minimum (low) speed capacity, cycle on--off, cycle between successiave lower and higher compressor speed capacity, or operate at maximum (high) speed capacity depending on the building cooling load. The operating range of the DX cooling coil is determined based on the building cooling load for each binned outside air temperature. The building cooling load at an outdoor air temperature \(T_{j}\), is calculated as follows:
 
 \begin{equation}
 BL({T_j}) = \left( {\frac{{{T_j} - 18.3}}{{35.0 - 18.3}}} \right)\left( {\frac{{\dot Q_c^{k = 2}(35.0)}}{{1.1}}} \right)
@@ -2275,7 +2339,7 @@ BL({T_j}) = \left( {\frac{{{T_j} - 18.3}}{{35.0 - 18.3}}} \right)\left( {\frac{{
 
 Where,
 
-\emph{BL(T\(_{j}\))}~~~~~~~~~ = the building space cooling load corresponding to outdoor temperature of \emph{T\(_{j}\)}, (W).
+\emph{BL(T}\(_{j}\))~~~~~~~~~ = the building space cooling load corresponding to outdoor temperature of \(T_{j}\), (W).
 
 \(\dot Q_c^{k = 2}(35.0)\) = the cooling capacity determined from the standard A2 test, (W)
 
@@ -2319,19 +2383,25 @@ n\(_{i}\)/N = fractional bin hours for the cooling season; the ratio of the numb
 \dot Q_c^{k = 1}({T_j}) < BL({T_j}) < \dot Q_c^{k = 2}({T_j})
 \end{equation}
 
-\(\frac{{{q_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot Q_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot Q_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}\) \(\frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot E_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}\)
+\begin{equation}
+  \frac{{{q_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot Q_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot Q_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+\end{equation}
+
+\begin{equation}
+  \frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot E_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+\end{equation}
 
 \begin{equation}
 {X^{k = 1}}({T_j}) = \frac{{\dot Q_c^{k = 2}({T_j}) - BL({T_j})}}{{\dot Q_c^{k = 2}({T_j}) - \dot Q_c^{k = 1}({T_j})}}
 \end{equation}
 
-\emph{Case 3}:~ The steady-state cooling capacity when the unit is operating continuously at maximum (high) compressor speed capacity at outdoor air temperature \emph{T\(_{j}\)}. That is the building cooling load is greater or equal to the available capacity at maximum (high) compressor speed:
+\emph{Case 3}:~ The steady-state cooling capacity when the unit is operating continuously at maximum (high) compressor speed capacity at outdoor air temperature \(T_{j}\). That is the building cooling load is greater or equal to the available capacity at maximum (high) compressor speed:
 
 \begin{equation}
 BL({T_j}) \ge \dot Q_c^{k = 2}({T_j})
 \end{equation}
 
-For units when operating continuously at maximum (high) compressor speed (k = 2) at temperature \emph{T\(_{j}\)}, the delivered cooling capacity and electric power inputs are calculated as follows:
+For units when operating continuously at maximum (high) compressor speed (k = 2) at temperature \(T_{j}\), the delivered cooling capacity and electric power inputs are calculated as follows:
 
 \begin{equation}
 \frac{{{q_c}({T_j})}}{N} = \left[ {\dot Q_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
@@ -2546,13 +2616,13 @@ Point & Net Capacity & Coil inlet wetbulb & Coil inlet drybulb & Condenser inlet
 \endhead
 
 A & 100\% & 19.4C & 26.7C & 35.0C & Rated High speed flow rate \tabularnewline
-B & 75\% & 19.4C & 26.7C & 27.5C & Regula falsi result where coil leaving drybulb matches Point A \tabularnewline
+B & 75\% & 19.4C & 26.7C & 27.5C & root solver result where coil leaving drybulb matches Point A \tabularnewline
 C & 50\% & 19.4C & 26.7C & 20.0C \tabularnewline
 D & 25\% & 19.4C & 26.7C & 18.3C \tabularnewline
 \bottomrule
 \end{longtable}
 
-The units are assumed to be VAV and Standard 340/360 is be applied as for VAV indoor supply fan.~ Because the standard stipulates ``the airflow rate at part load should be adjusted to maintain the full load measured leaving dry-bulb temperature,'' the part load rating test points ``B'', ``C'', and ``D'' are evaluated by using the entire DX coil model calculations to obtain the supply air conditions leaving the coil and iterating on supply air flow rate to find the supply air flow rate.~ The numerical method called Regula Falsi is used to find the supply flow rate at each of the part load test points.~ Once the supply air flow rate is known, the two-speed DX coil model results are used to determine EER at the part load test points.
+The units are assumed to be VAV and Standard 340/360 is be applied as for VAV indoor supply fan.~ Because the standard stipulates ``the airflow rate at part load should be adjusted to maintain the full load measured leaving dry-bulb temperature,'' the part load rating test points ``B'', ``C'', and ``D'' are evaluated by using the entire DX coil model calculations to obtain the supply air conditions leaving the coil and iterating on supply air flow rate to find the supply air flow rate.~ The numerical method called root solver is used to find the supply flow rate at each of the part load test points.~ Once the supply air flow rate is known, the two-speed DX coil model results are used to determine EER at the part load test points.
 
 When evaluating the two-speed DX coil model, the speed ratio and cycling ratio are specified based on the desired or target net capacity.~ When the low speed net capacity is lower than the target part load net capacity, the speed ratio is calculated using
 
@@ -2680,7 +2750,11 @@ where
 
 ff\(_{a}\) = actual air mass flow rate/design air mass flow rate, at one speed level.
 
-~~~~~~~~~ \(\begin{array}{l}{\rm{DesignAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) = {\rm{}}\\\quad \quad \quad {\rm{ReferenceUnitAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times {\rm{CapacityScaleFactor}}\end{array}\)
+\begin{equation}
+  \begin{array}{l}
+    {\rm{DesignAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) = {\rm{}}\\\quad \quad \quad {\rm{ReferenceUnitAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times {\rm{CapacityScaleFactor}}
+  \end{array}
+\end{equation}
 
 a-d = regression curve fit coefficients, if no data for correction, the user can simply put a = 1.0, and the other coefficients as 0.0.
 
@@ -2960,17 +3034,17 @@ For a temperature setpoint coil the delta temperature from the coil inlet temper
 
 ~~~~~ HeatingCoil(CoilNum)\%ElecUseLoad = HeatingCoilLoad/Effic
 
-\subsection{Gas Air Heating Coil}\label{gas-air-heating-coil}
+\subsection{Fuel-fired Air Heating Coil}\label{gas-air-heating-coil}
 
-The gas-powered heating coil (object name: Coil:Heating:Gas) is a simple capacity model with user inputted gas burner efficiency.~ The default for the gas burner efficiency is 80\%.~ This coil only has air nodes to connect it in the system.~ The coil can be used in the air loop simulation or in the zone equipment as a reheat coil.~ Depending on where it is used determines if this coil is temperature or capacity controlled.~ If used in the air loop simulation it will be controlled to a specified temperature scheduled from the SetpointManager.~ If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.~ The gas coil has additional features that can add a part load correction and a parasitic gas or electric load.
+The fuel-powered heating coil (object name: Coil:Heating:Fuel) is a simple capacity model with user inputted burner efficiency.~ The default for the burner efficiency is 80\%.~ This coil only has air nodes to connect it in the system.~ The coil can be used in the air loop simulation or in the zone equipment as a reheat coil.~ Depending on where it is used determines if this coil is temperature or capacity controlled.~ If used in the air loop simulation it will be controlled to a specified temperature scheduled from the SetpointManager.~ If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.~ The fuel coil has additional features that can add a part load correction and a parasitic fuel or electric load.
 
 The parasitic electric load associated with the gas coil operation, such as an inducer fan, etc.~ This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation time step.
 
-The parasitic gas load associated with the gas coil's operation (Watts), such as a standing pilot light.~ The model assumes that this parasitic load is consumed only for the portion of the simulation time step where the gas heating coil is not operating.
+The parasitic fuel load associated with the gas coil's operation (Watts), such as a standing pilot light.~ The model assumes that this parasitic load is consumed only for the portion of the simulation time step where the gas heating coil is not operating.
 
 \subsubsection{Field: Part Load Fraction Correlation (function of part load ratio)}\label{field-part-load-fraction-correlation-function-of-part-load-ratio}
 
-The part load correction defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of gas consumption rate by the heating coil as a function of the part load ratio (PLR, sensible heating load/nominal capacity of the heating coil).~ For any simulation time step, the nominal gas consumption rate (heating load/burner efficiency) is divided by the part-load fraction (PLF) if a part-load curve has been defined.~ The part-load curve accounts for efficiency losses due to transient coil operation.
+The part load correction defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of fuel consumption rate by the heating coil as a function of the part load ratio (PLR, sensible heating load/nominal capacity of the heating coil).~ For any simulation time step, the nominal fuel consumption rate (heating load/burner efficiency) is divided by the part-load fraction (PLF) if a part-load curve has been defined.~ The part-load curve accounts for efficiency losses due to transient coil operation.
 
 The part-load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the heating coil runs continuously for the simulation time step).~ For PLR values between 0 and 1 ( 0 \textless{} = PLR \textless{} 1), the following rules apply:
 
@@ -2992,17 +3066,19 @@ For a better understanding of how the coil meets the temperature setpoint in the
 
 These models (object names Coil:Heating:Electric:MultiStage and Coil:Heating:Gas:MultiStage) simulate the performance of multi stage electric and gas heating systems with two to four discrete air flow stages. Each stage has a set of user inputted gas burner efficiency, Nominal capacity, and Parasitic electric load (for gas coil only). The full load supply airflow rate is dependent on the stage number and is set by its parent object (Ref: AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed). The part-load impact on coil energy use is automatically applied to the lowest stage.
 
-When the model determines performance at Stage 1 (the lowest stage) or cycling between OFF and Stage 1, its performance is almost the same as the performance for the Coil:Heating:Electric and~ Coil:Heating:Gas models. However, the outlet conditions are calculated slightly differently. Therefore, the Coil:Heating:Electric and~ Coil:Heating:Gas model may be considered as subsets of the multistage model described here. When the multistage coil model determines performance at higher stages (above 1), the model linearly interpolates the performance at two consecutive stages (n-1 and n) as needed to meet the heating load, with the fraction of time at each speed established by the speed ratio. For the time being, this coil model can only be called by the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed.
+When the model determines performance at Stage 1 (the lowest stage) or cycling between OFF and Stage 1, its performance is almost the same as the performance for the Coil:Heating:Electric and~ Coil:Heating:Fuel models. However, the outlet conditions are calculated slightly differently. Therefore, the Coil:Heating:Electric and~ Coil:Heating:Fuel model may be considered as subsets of the multistage model described here. When the multistage coil model determines performance at higher stages (above 1), the model linearly interpolates the performance at two consecutive stages (n-1 and n) as needed to meet the heating load, with the fraction of time at each speed established by the speed ratio. For the time being, this coil model can only be called by the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed.
 
 \subsubsection{Model Inputs}\label{model-inputs-1}
 
-The model inputs are also very similar to the inputs of the Coil:Heating:Electric and~ Coil:Heating:Gas objects. The main difference is that this multistage model requires a set of fields at each speed, such as nominal capacity, and efficiency.
+The model inputs are also very similar to the inputs of the Coil:Heating:Electric and~ Coil:Heating:Fuel objects. The main difference is that this multistage model requires a set of fields at each speed, such as nominal capacity, and efficiency.
 
 \subsubsection{Stage 1 Operation}\label{stage-1-operation}
 
 The following procedure provides the detailed description of the exception.
 
-n~Total delivered heating capacity
+\begin{itemize}
+  \item Total delivered heating capacity
+\end{itemize}
 
 The total delivered heating capacity for Stage 1 operating at the cycling ratio needed to meet the requested heating load is:
 
@@ -3024,7 +3100,9 @@ where,
 
 It is assumed that the coil provides no heating capacity when the coil is OFF, even if the supply air fan continues to operate.
 
-n~Outlet air specific enthalpy
+\begin{itemize}
+  \item Outlet air specific enthalpy
+\end{itemize}
 
 The average specific enthalpy of the coil outlet air is then calculated based on the delivered sensible heating capacity and the average air mass flow rate entering the coil:
 
@@ -3038,7 +3116,9 @@ where,
 
 \({\mathop m\limits^\cdot_{inlet}}\) ~~~~~~~~ = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiStage, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is ON and the specified flow rate when the heating coil is OFF for the time step being simulated.
 
-n~Outlet air temperature
+\begin{itemize}
+  \item Outlet air temperature
+\end{itemize}
 
 The heating coil's outlet air humidity ratio equals the inlet air humidity ratio since the coil does not change the moisture content of the air. So the average outlet air temperature is calculated based on the inlet air humidity ratio and the average outlet air enthalpy using the psychrometric function PsyTdbFnHW.
 
@@ -3048,7 +3128,9 @@ The main reason for using the above approach is that outlet air conditions are c
 
 This section describes how higher Stage operation is simulated. When the required sensible load is less than the full load sensible capacity at Stage n (Stage Number \textgreater{} 1), the following calculations are performed:
 
-n~Total delivered heating capacity at Stage n-1 and Stage n
+\begin{itemize}
+  \item Total delivered heating capacity at Stage n-1 and Stage n
+\end{itemize}
 
 \begin{equation}
 TotCa{p_{n - 1}} = MSNominalCa{p_{n - 1}}
@@ -3066,7 +3148,9 @@ where,
 
 i = Stage n or Stage n-1
 
-n~Full load outlet air specific enthalpy at Stage n-1 and Stage n
+\begin{itemize}
+  \item Full load outlet air specific enthalpy at Stage n-1 and Stage n
+\end{itemize}
 
 \begin{equation}
 {h_{outlet,full_Speed_n}} = {h_{inlet}} - (MSNominalCa{p_n}/{\mathop m\limits^._{inlet}})
@@ -3082,7 +3166,9 @@ where,
 
 \emph{h\(_{outlet,full\_Stage\_n-1}\)} = specific enthalpy of the coil outlet air during full-load operation at Stage n-1 (no cycling) {[}J/kg{]}
 
-n~Effective total heating capacity
+\begin{itemize}
+  \item Effective total heating capacity
+\end{itemize}
 
 \begin{equation}
   \begin{array}{l}
@@ -3099,7 +3185,9 @@ where,
 
 \({\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n - 1}^ \cdot }\) ~~~ = air mass flow rate through heating coil at Stage 1 as set by the parent object {[}kg/s{]}
 
-n~Average outlet air enthalpy
+\begin{itemize}
+  \item Average outlet air enthalpy
+\end{itemize}
 
 \begin{equation}
   h_{outlet,average} = h_{inlet} - \frac{Q_{coil,SpeedRatio}}{{\mathop m\limits^\cdot }_{inlet}}
@@ -3113,11 +3201,16 @@ where,
 
 \({\dot m_{inlet}}\) = Mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiStage, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Stage n and the specified flow rate when the heating coil is at Stage n-1 for the time step being simulated.
 
-n~Average outlet air temperature
+\begin{itemize}
+  \item Average outlet air temperature
+\end{itemize}
 
-The heating coil's outlet air humidity ratio equals the inlet air humidity ratio since the coil does not change the moisture content of the air. So the average outlet air temperature is calculated based on the inlet air humidity ratio and the average outlet air enthalpy using the psychrometric function PsyTdbFnHW.
+    The heating coil's outlet air humidity ratio equals the inlet air humidity ratio since the coil does not change the moisture content of the air. So the average outlet air temperature is calculated based on the inlet air humidity ratio and the average outlet air enthalpy using the psychrometric function PsyTdbFnHW.
 
-n~Full load energy inputs at Stage n-1 and Stage n
+\begin{itemize}
+  \item
+    Full load energy inputs at Stage n-1 and Stage n
+\end{itemize}
 
 \begin{equation}
 HeatingPowe{r_n} = MSNominalCa{p_n}/MSEfficienc{y_n}
@@ -3133,7 +3226,9 @@ where,
 
 \emph{MSEfficiency\(_{n-1}\)} = Efficiency at stage n-1
 
-n~Calculate combined energy input
+\begin{itemize}
+  \item Calculate combined energy input
+\end{itemize}
 
 \begin{equation}
 HeatingPower = HeatingPowe{r_n}\left( {SpeedRatio} \right) + HeatingPowe{r_{n - 1}}(1.0 - SpeedRatio)
@@ -3157,7 +3252,9 @@ The user must input the total heating capacity, coefficient of performance (COP)
 
 Depending on the defrost strategy that is selected, the user must also input up to six performance curves that describe the change in total heating capacity and efficiency at part-load conditions, and efficiency during reverse-cycle defrosting:
 
-n~The total heating capacity modifier curve (function of temperature) can be a function of both the outdoor and indoor air dry-bulb temperature or only the outdoor air dry-bulb temperature. User has the choice of a bi-quadratic curve with two independent variables or a quadratic curve as well as a cubic curve with a single independent variable. The bi-quadratic curve is recommended if sufficient manufacturer data is available as it provides sensitivity to the indoor air dry-bulb temperature and a more realistic output. The output of this curve is multiplied by the rated total heating capacity to give the total heating capacity at specific temperature operating conditions (i.e., at an outdoor or indoor air temperature different from the rating point temperature).
+\begin{itemize}
+  \item
+The total heating capacity modifier curve (function of temperature) can be a function of both the outdoor and indoor air dry-bulb temperature or only the outdoor air dry-bulb temperature. User has the choice of a bi-quadratic curve with two independent variables or a quadratic curve as well as a cubic curve with a single independent variable. The bi-quadratic curve is recommended if sufficient manufacturer data is available as it provides sensitivity to the indoor air dry-bulb temperature and a more realistic output. The output of this curve is multiplied by the rated total heating capacity to give the total heating capacity at specific temperature operating conditions (i.e., at an outdoor or indoor air temperature different from the rating point temperature).
 
 \begin{equation}
 TotCapTempModFac = \,a + \,b\left( {{T_{db,o}}} \right)\,\, + \,\,c{\left( {{T_{db,o}}} \right)^2}
@@ -3179,7 +3276,8 @@ where
 
 \({T_{db,o}}\) ~~~~ = dry-bulb temperature of the air entering the outdoor coil, °C
 
-n~The total heating capacity modifier curve (function of flow fraction) is a quadratic or cubic curve with the independent variable being the ratio of the actual air flow rate across the heating coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated total heating capacity and the total heating capacity modifier curve (function of temperature) to give the total heating capacity at the specific temperature and air flow conditions at which the coil is operating.
+  \item
+The total heating capacity modifier curve (function of flow fraction) is a quadratic or cubic curve with the independent variable being the ratio of the actual air flow rate across the heating coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated total heating capacity and the total heating capacity modifier curve (function of temperature) to give the total heating capacity at the specific temperature and air flow conditions at which the coil is operating.
 
 \begin{equation}
 TotCapFlowModFac = \,a + \,b\left( {ff} \right)\,\, + \,\,c{\left( {ff} \right)^2}
@@ -3199,7 +3297,8 @@ ff = flow{\rm{ }}fraction = \left( {\frac{{Actual{\rm{ }}air{\rm{ }}mass{\rm{ }}
 
 \textbf{Note:}~ The actual volumetric airflow rate through the heating coil for any simulation time step where the DX unit is operating should be between 0.00002684 m\(^{3}\)/s and .00008056 m\(^{3}\)/s per watt of rated total heating capacity (200 - 600 cfm/ton). The simulation will issue a warning message if this airflow range is exceeded.
 
-n~The energy input ratio (EIR) modifier curve (function of temperature) can be a function of both the outdoor and indoor air dry-bulb temperature or only the outdoor air dry-bulb temperature. User has the choice of a bi-quadratic curve with two independent variables or a quadratic curve as well as a cubic curve with a single independent variable. The bi-quadratic curve is recommended if sufficient manufacturer data is available as it provides sensitivity to the indoor air dry-bulb temperature and a more realistic output. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) to give the EIR at specific temperature operating conditions (i.e., at an outdoor or indoor air temperature different from the rating point temperature).
+  \item
+The energy input ratio (EIR) modifier curve (function of temperature) can be a function of both the outdoor and indoor air dry-bulb temperature or only the outdoor air dry-bulb temperature. User has the choice of a bi-quadratic curve with two independent variables or a quadratic curve as well as a cubic curve with a single independent variable. The bi-quadratic curve is recommended if sufficient manufacturer data is available as it provides sensitivity to the indoor air dry-bulb temperature and a more realistic output. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) to give the EIR at specific temperature operating conditions (i.e., at an outdoor or indoor air temperature different from the rating point temperature).
 
 \begin{equation}
 EIRTempModFac = \,a + \,b\left( {{T_{db,o}}} \right)\,\, + \,\,c{\left( {{T_{db,o}}} \right)^2}
@@ -3217,7 +3316,8 @@ or
 EIRTempModFac = \,a + \,b\left( {{T_{db,i}}} \right)\,\, + \,\,c{\left( {{T_{db,i}}} \right)^2}\,\, + \,\,d\left( {{T_{db,o}}} \right) + e{\left( {{T_{db,o}}} \right)^2} + f\left( {{T_{db,i}}} \right)\left( {{T_{db,o}}} \right)
 \end{equation}
 
-n~The energy input ratio (EIR) modifier curve (function of flow fraction) is a quadratic or cubic curve with the independent variable being the ratio of the actual air flow rate across the heating coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the coil is operating.
+  \item
+The energy input ratio (EIR) modifier curve (function of flow fraction) is a quadratic or cubic curve with the independent variable being the ratio of the actual air flow rate across the heating coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the coil is operating.
 
 \begin{equation}
 EIRFlowModFac = \,a + \,b\left( {ff} \right)\,\, + \,\,c{\left( {ff} \right)^2}
@@ -3229,7 +3329,8 @@ or
 EIRFlowModFac = \,a + \,b\left( {ff} \right)\,\, + \,\,c{\left( {ff} \right)^2}\, + \,\,d{\left( {ff} \right)^3}
 \end{equation}
 
-n~The part-load fraction correlation (function of part-load ratio) is a quadratic or cubic curve with the independent variable being part-load ratio (sensible heating load / steady-state heating capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the ``effective'' EIR for a given simulation time step. The part-load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+  \item
+The part-load fraction correlation (function of part-load ratio) is a quadratic or cubic curve with the independent variable being part-load ratio (sensible heating load / steady-state heating capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the ``effective'' EIR for a given simulation time step. The part-load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
 
 \begin{equation}
 PartLoadFrac = \,PLF\, = \,a + \,b\left( {PLR} \right)\,\, + \,\,c{\left( {PLR} \right)^2}
@@ -3257,7 +3358,8 @@ A typical part load fraction correlation for a conventional, single-speed DX hea
 
 ~~~~~~~~~~~ PLF = 0.85 + 0.15(PLR)
 
-n~The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: outdoor air dry-bulb temperature and the heating coil entering air wet-bulb temperature. The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
+  \item
+The defrost energy input ratio (EIR) modifier curve (function of temperature) is a bi-quadratic curve with two independent variables: outdoor air dry-bulb temperature and the heating coil entering air wet-bulb temperature. The output of this curve is multiplied by the heating coil capacity, the fractional defrost time period and the runtime fraction of the heating coil to give the defrost power at the specific temperatures at which the coil is operating. This curve is only required when a reverse-cycle defrost strategy is specified.
 
 \begin{equation}
 DefrostEIRTempModFac = \,a + \,b\left( {{T_{wb,i}}} \right)\,\, + \,\,c{\left( {{T_{wb,i}}} \right)^2} + \,\,d\left( {{T_{db,o}}} \right)\,\, + \,\,e{\left( {{T_{db,o}}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_{db,o}}} \right)
@@ -3268,6 +3370,7 @@ where
 \({T_{wb,i}}\) ~~~~ ~ = wet-bulb temperature of the air entering the indoor heating coil, °C
 
 \({T_{db,o}}\) ~~~~ = dry-bulb temperature of the air entering the outdoor coil, °C
+\end{itemize}
 
 All six curves are accessed through EnergyPlus' built-in performance curve equation manager (curve:quadratic, curve:cubic and curve:biquadratic). It is not imperative that the user utilize all coefficients shown in the preceding equations \{ through \} in items (1) through (6) if their performance equation has fewer terms (e.g., if the user's PartLoadFrac performance curve is linear instead of quadratic or cubic, simply enter the appropriate values for the coefficients a and b, and set the remaining coefficients to zero).
 
@@ -3793,7 +3896,9 @@ The model inputs are also very similar to the inputs of the Coil:Heating:DX:Sing
 
 The calculation procedures in this model, including defrost and crankcase heater, are indentical to the Coil:Heating:DX:SingleSpeed object (Ref: Coil:Heating:DX:SingleSpeed) with one exception: outlet node condition calculation when the supply air fan operation mode is ContinuousFanWithCyclingCompressor. The following procedure provides the detailed description of the exception.
 
-n~Total delivered heating capacity
+\begin{itemize}
+  \item Total delivered heating capacity
+\end{itemize}
 
 The total delivered heating capacity for speed 1 operating at the cycling ratio needed to meet the requested heating load is:
 
@@ -3815,7 +3920,9 @@ where,
 
 It is assumed that the coil provides no heating capacity when the coil is OFF, even if the supply air fan continues to operate.
 
-n~Outlet air specific enthalpy
+\begin{itemize}
+  \item Outlet air specific enthalpy
+\end{itemize}
 
 The average specific enthalpy of the coil outlet air is then calculated based on the delivered sensible heating capacity and the average air mass flow rate entering the coil:
 
@@ -3829,7 +3936,9 @@ where,
 
 \({\dot m_{inlet}}\) ~~~~~~~~ = mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is ON and the specified flow rate when the heating coil is OFF for the time step being simulated.
 
-n~Outlet air temperature
+\begin{itemize}
+  \item Outlet air temperature
+\end{itemize}
 
 The heating coil's outlet air humidity ratio equals the inlet air humidity ratio since the coil does not change the moisture content of the air. So the average outlet air temperature is calculated based on the inlet air humidity ratio and the average outlet air enthalpy using the psychrometric function PsyTdbFnHW.
 
@@ -3841,9 +3950,15 @@ The crankcase heater defined for this DX heating coil is enabled during the time
 
 This section describes how higher speed operation is simulated. When the required sensible load is less than the full load sensible capacity at Speed n (Speed Number \textgreater{} 1), the following calculations are performed:
 
-n~Total delivered heating capacity at Speed n-1 and Speed n
+Total delivered heating capacity at Speed n-1 and Speed n
 
-\(TotCa{p_{n - 1}} = RatedCa{p_{n - 1}}\left( {TotCapTempModFa{c_{n - 1}}} \right)\left( {TotCapFlowModFa{c_{n - 1}}} \right)\) \(TotCa{p_n} = RatedCa{p_n}\left( {TotCapTempModFa{c_n}} \right)\left( {TotCapFlowModFa{c_n}} \right)\)
+\begin{equation}
+  TotCa{p_{n - 1}} = RatedCa{p_{n - 1}}\left( {TotCapTempModFa{c_{n - 1}}} \right)\left( {TotCapFlowModFa{c_{n - 1}}} \right)
+\end{equation}
+
+\begin{equation}
+  TotCa{p_n} = RatedCa{p_n}\left( {TotCapTempModFa{c_n}} \right)\left( {TotCapFlowModFa{c_n}} \right)
+\end{equation}
 
 where,
 
@@ -3857,7 +3972,9 @@ where,
 
 i~~~~ = Speed n or Speed n-1
 
-n~EIR at Speed n-1 and Speed n
+\begin{itemize}
+  \item EIR at Speed n-1 and Speed n
+\end{itemize}
 
 \begin{equation}
 EI{R_{n - 1}} = RatedEI{R_{n - 1}}\left( {EIRTempModFa{c_{n - 1}}} \right)\left( {EIRFlowModFa{c_{n - 1}}} \right)
@@ -3879,7 +3996,9 @@ where,
 
 i~~~~ = Speed n or Speed n-1
 
-n~Full load outlet air specific enthalpy at Speed n-1 and Speed n
+\begin{itemize}
+  \item Full load outlet air specific enthalpy at Speed n-1 and Speed n
+\end{itemize}
 
 \begin{equation}
   h_{outlet,full_Speed,n} = h_{inlet} - \frac{TotCap_{n} \cdot HeatingCapacityMultiplier}{\dot{m}_{inlet}}
@@ -3897,7 +4016,9 @@ where,
 
 \emph{h\(_{outlet,full\_Speed\\ n-1}\)}~~~~~~ = specific enthalpy of the coil outlet air during full-load operation at Speed n-1 (no cycling) {[}J/kg{]}
 
-n~Effective total heating capacity
+\begin{itemize}
+  \item Effective total heating capacity
+\end{itemize}
 
 \begin{equation}
   \begin{array}{rl}
@@ -3914,7 +4035,9 @@ where,
 
 \({\mathop {{\rm{ }}m}\limits_{Speed{\kern 1pt} n - 1}^ \cdot }\) ~~~ = air mass flow rate through heating coil at Speed 1 as set by the parent object {[}kg/s{]}
 
-n~Average outlet air enthalpy
+\begin{itemize}
+  \item Average outlet air enthalpy
+\end{itemize}
 
 \begin{equation}
   h_{outlet,average} = h_{inlet} - \frac{Q_{coil,SpeedRatio}}{\dot{m}_{inlet}}
@@ -3928,11 +4051,15 @@ where,
 
 \({\dot m_{inlet}}\) ~~~~~~~~ = Mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Speed n and the specified flow rate when the heating coil is at Speed n-1 for the time step being simulated.
 
-n~Average outlet air temperature
+\begin{itemize}
+  \item Average outlet air temperature
+\end{itemize}
 
 The heating coil's outlet air humidity ratio equals the inlet air humidity ratio since the coil does not change the moisture content of the air. So the average outlet air temperature is calculated based on the inlet air humidity ratio and the average outlet air enthalpy using the psychrometric function PsyTdbFnHW.
 
-n~Full load energy inputs at Speed n-1 and Speed n
+\begin{itemize}
+  \item Full load energy inputs at Speed n-1 and Speed n
+\end{itemize}
 
 \begin{equation}
 HeatingPowe{r_n} = TotCa{p_n}\left( {EI{R_n}} \right)\left( {HeatingCapacityMultiplier} \right)\left( {InputPowerMultiplier} \right)
@@ -3946,7 +4073,9 @@ where,
 
 \emph{InputPowerMultiplier}~~~~~~~ = Frost adjustment factor for heating power calculation (Ref. Coil:Heating:DX:SingleSpeed)
 
-n~Calculate combined energy input
+\begin{itemize}
+  \item Calculate combined energy input
+\end{itemize}
 
 When the input for the field `Apply Part Load Fraction to Speeds Greater than 1' is No (equivalent to a single compressor), the combined energy output is calculated as follows:
 
@@ -3966,7 +4095,9 @@ HeatingPower~~~~~~~~~ = Power used in Watt
 
 RTF~~~~~~~~~~~~~~~~~~~~~~~ = Run time fraction (SpeedRatio/Part-load Fraction) at Speed n
 
-n~Calculate defrost power
+\begin{itemize}
+  \item Calculate defrost power
+\end{itemize}
 
 When the defrost strategy is resistive, the power calculation is the same as Speed 1 operation (Ref. Coil:Heating:DX:SingleSpeed). When the defrost strategy is reverse-cycle, the following calculations are performed:
 
@@ -4018,7 +4149,9 @@ where,
 
 RTF~~~~~~~~~~~ = Run time fraction (SpeedRatio/Part-load Fraction) at Speed n
 
-n~Crankcase heater
+\begin{itemize}
+  \item Crankcase heater
+\end{itemize}
 
 There is no power need at higher speed operation.
 
@@ -4237,15 +4370,20 @@ BL\left( {{T_j}} \right) \ge \dot Q_c^{k = 2}\left( {{T_j}} \right)
 For units when operating continuously at maximum compressor speed (k = 2) speed at temperature \emph{T\(_{j}\)}, the delivered heating capacity and electric power inputs are calculated as follows:
 
 \begin{equation}
-\frac{{{e_c}({T_j})}}{N} = \left[ {\dot E_h^{k = 2}({T_j}) \cdot {\delta ^``}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+  \frac{e_c(T_j)}{N} = \left[ \dot{E}_h^{k = 2}(T_j) \cdot \delta''(T_j) \right] \cdot \frac{n_j}{N}
 \end{equation}
 
 \begin{equation}
-\frac{{RH\left( {{T_j}} \right)}}{N}{\rm{ = }}\left\{ {BL\left( {{{\rm{T}}_{\rm{j}}}} \right) - \left[ {{\rm{\dot Q}}_h^{k = 2}\left( {{{\rm{T}}_{\rm{j}}}} \right) \cdot {{\rm{\delta }}^``}\left( {{{\rm{T}}_{\rm{j}}}} \right)} \right]} \right\} \cdot \frac{{{n_j}}}{N}
+  \frac{RH(T_j)}{N} = \left\{ BL(T_j) - \left[\dot{Q}_h^{k = 2}(T_j) \cdot \delta''(T_j) \right] \right\} \cdot \frac{n_j}{N}
 \end{equation}
 
 \begin{equation}
-{\delta ^``}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ \begin{array}{l}0,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{off}}}}\,{\rm{or}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}\, < \,1\\ {\textstyle{1 \over 2}},\quad {\rm{if}}\,{{\rm{T}}_{{\rm{off}}}} < {{\rm{T}}_{\rm{j}}}\, \le \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\\1,\quad {\rm{if}}\,{{\rm{T}}_{\rm{j}}}\, > \,{{\rm{T}}_{{\rm{on}}}}\,{\rm{and}}\,\frac{{{\rm{\dot Q}}_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}}{{\dot E_h^{k = 2}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{)}}}} \ge \,1\;\end{array} \right\}
+\delta''(T_j) = \left\{
+\begin{array}{l}
+  0,\quad \text{if}\,T_j \le T_{\text{off}} \, \text{or} \, \frac{\dot{Q}_h^{k = 2}(T_j)}{\dot{E}_h^{k=2}(T_j)} < 1 \\
+  \frac{1}{2},\quad \text{if}\,T_{\text{off}} < T_j \le T_{\text{on}}\,\text{and}\,\frac{\dot{Q}_h^{k=2}(T_j)}{\dot{E}_h^{k=2}(T_j)} \ge 1 \\
+  1,\quad \text{if}\,T_j > T_{\text{on}} \, \text{and} \, \frac{\dot{Q}_h^{k=2}(T_j)}{\dot{E}_h^{k=2}(T_j)} \ge 1
+\end{array} \right\}
 \end{equation}
 
 X(T\(_{j}\))~~~~~~~~~~~ = ~~~~~~~~~ the heating mode load factor for temperature bin j, (-)
@@ -4256,9 +4394,9 @@ X(T\(_{j}\))~~~~~~~~~~~ = ~~~~~~~~~ the heating mode load factor for temperature
 
 \({\rm{\delta }}\left( {{{\rm{T}}_{\rm{j}}}} \right)\) ~~~~~~~ = ~~~~~~~~~ the heat pump low temperature cut-off factor, (-)
 
-T\(_{off}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatically shut off, °C. (If no such temperature exists, Tj is always greater than T\(_{off}\) and T\(_{on}\)).
+\(T_{off}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatically shut off, °C. (If no such temperature exists, Tj is always greater than T\(_{off}\) and T\(_{on}\)).
 
-T\(_{on}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatically turned back on, if applicable, following an automatic shut-off, °C.
+\(T_{on}\)~ = ~~~~~~~~ the outdoor temperature when the compressor is automatically turned back on, if applicable, following an automatic shut-off, °C.
 
 % table 62
 \begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
@@ -5071,6 +5209,130 @@ Kosar, D. 2006. Dehumidification Enhancements, ASHRAE Journal, Vol. 48, No. 2, F
 Kosar, D. et al. 2006. Dehumidification Enhancement of Direct Expansion Systems Through Component Augmentation of the Cooling Coil. 15\(^{th}\) Symposium on Improving Building Systems in Hot and Humid Climates, July 24-26, 2006.
 
 Nimmo, B.G. et al. 1993.DEAC: Desiccant Enhancement of Cooling-Based Dehumidification. ASHRAE Transactions, Vol.99, Part 1, Paper number CH-93-4-4, pp.~842-848.
+
+
+\subsection{Air Source Integrated Heat Pump}\label{Air-Source-Integrated-Heat-Pump-Section}
+
+\subsubsection{Overview}\label{overview-ASIHP}
+
+Air Source Integrated Heat Pump (ASIHP) is an air source, multi-functional spacing conditioning unit with water heating function (WH), which usually uses a variable-speed compressor, variable-speed indoor blower, and outdoor fan. By recovering the condenser waste heat for water heating, ASIHPs are able to achieve significant energy savings. 
+
+\subsubsection{Model Description}\label{model-description-ASIHP}
+
+The latest technology for commercial air conditioners and air-to-air heat pumps can utilize a variable-speed compressor with a variable-speed indoor blower and outdoor fan. Integrated heat pumps are multi-functional units capable of space conditioning and water heating. They use condenser waste heat for water heating, and thus achieve significant energy saving. The control and operation of ASIHPs are complicated because they have six working modes in total:  (1) space cooling (SC), (2) space heating (SH), (3) dedicated water heating (DWH), (4) combined space cooling and water heating with full condensing (SCWH), (5) combined space cooling and water heating with desuperheating (SCDWH), and (6) combined space heating and water heating with desuperheating (SHDWH). 
+
+The SC mode has the same operation as Coil:Cooling:DX:VariableSpeed. The SH mode has the same operation as Coil:Heating:DX:VariableSpeed. The DWH mode uses outdoor air as the heating source, which can be represented by an object of Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. The SCWH mode uses indoor air as the heating source and full condenser heat for water heating.  Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed is used for the mode. 
+
+The SCDWH mode uses the superheated section of an outdoor condenser to heat the water. In this combined SCDWH mode, the cooling function is simulated using an object of Coil:Cooling:DX:VariableSpeed, containing temperature correction curves as a function of the indoor air and ambient temperatures at each speed level. The water heating function is simulated using an object of Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, having temperature correction curves as a function of the ambient air temperature and entering water temperature at each speed level.  It should be noted that the rated power and power correction curves are contained in the Coil:Cooling:DX:VariableSpeed object. Thus, the power values and curves in the Coil:WaterHeating:AirToWater--HeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted by the cooling coil part. 
+
+The SHDWH uses the superheated section of an indoor condenser to heat the water. In this combined mode, the heating function is simulated using an object of Coil:Heating:DX:VariableSpeed, having temperature correction curves as a function of the indoor air and ambient temperatures at each speed level. The water heating function is simulated using an object of Coil:WaterHeating:AirTo--WaterHeatPump:VariableSpeed, having temperature correction curves as a function of the ambient air temperature and entering water temperature at each speed level. It should be noted that the rated power and power correction curves are contained in the Coil:Heating:DX:VariableSpeed object. Thus, the power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted by the heating coil. Coil:Heating:DX:VariableSpeed object calculates the total heating capacity added to the indoor air flow. The WH capacity is calculated using Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed. 
+
+The parent object of the ASIHP is named as CoilSystem:IntegratedHeatPump--:AirSource, which is a collection of all the sub-models as above. Also, CoilSystem:IntegratedHeatPump:AirSource facilitates mode switch and control algorithms. 
+
+
+\subsubsection{WORKING MODES}\label{WORKING-MODES-ASIHP}
+
+The ASIHP is a collection of working modes, i.e., objects, as described below: 
+
+Space Cooling Mode (SC):
+
+--Coil object: Coil:Cooling:DX:VariableSpeed. 
+
+--Loop object: AirLoopHVAC:UnitarySystem,  which refers to the CoilSystem:IntegratedHeatPump:AirSource object. 
+
+--Load matching: the same as a regular variable-speed air source heat pump in cooling mode.
+
+Space Heating Mode (SH):
+
+--Coil object: Coil:Heating:DX:VariableSpeed.
+
+--Loop object: AirLoopHVAC:UnitarySystem, which refers to the CoilSystem:IntegratedHeatPump:AirSource object. 
+
+--Load matching: the same as a regular variable-speed air source heat pump in heating mode
+
+Dedicated Water Heating Mode (DWH):
+
+--Coil object: Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. The water heating coil uses outdoor air as the heating source. 
+
+--Loop object: WaterHeater:HeatPump:PumpedCondenser, which refers to the CoilSystem:IntegratedHeatPump:AirSource object. 
+
+--Load matching: the same as a regular variable-speed heat pump water heating coil with outdoor air source.
+
+Combined Space Cooling and Water Heating with Full Condensing Mode (SCWH):
+
+--Coil object: Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. The water heating coil uses indoor air as the heating source. 
+
+--Loop object: 
+
+--Air side: the same loop object as the SC mode, i.e., AirLoopHVAC:UnitarySystem, which refers to the CoilSystem:IntegratedHeatPump:AirSource object. 
+
+--Water side: the same loop object as the DWH mode, i.e., WaterHeater:HeatPump: PumpedCondenser, which refers to the CoilSystem:IntegratedHeatPump:AirSource object. 
+
+--Load matching: 
+
+--If one chooses to match the space cooling load, iterate the AirLoopHVAC object, and the water heating capacity in the water tank object is resultant.
+
+--If one chooses to match the water heating load, iterate the water tank object, and the space cooling capacity is resultant.
+
+Combined Space Cooling and Water Heating with Desuperheating Mode (SCDWH):
+
+--Coil object: use two coil objects, Coil:Cooling:DX:VariableSpeed and -- Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. The desuperheater heat is used for water heating, which changes with the compressor speed and operation conditions. This is a dual-function coil, which provides both space cooling and water heating, and so performance curves for the dual functions will be included in the coil objects, respectively. These should be different objects from the SCWH mode and SC mode. The water heating coil contains temperature correction curves as a function of the ambient air temperature and entering water temperature. 
+
+It should be noted that the rated power and power correction curves are contained in the Coil:Cooling:DX:VariableSpeed object. Thus, the power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted by the cooling coil part. 
+
+--Loop object: 
+
+--Air side: the same loop object as the SC mode, i.e., AirLoopHVAC:--UnitarySystem.
+
+--Water side:  the same loop object as the DWH mode, i.e., WaterHeater:--HeatPump:PumpedCondenser.
+
+--Load matching: 
+
+Always match the space cooling load by iterating the AirLoopHVAC object, and the water heating amount in the water tank object is resultant.
+
+Combined Space Heating and Water Heating with Desuperheating Mode (SHDWH):
+
+--Coil object: use two coil objects, Coil:Heating:DX:VariableSpeed and Coil:--WaterHeating: AirToWaterHeatPump:VariableSpeed, contained in CoilSystem:--IntegratedHeatPump:AirSource. The desuperheater heat is used for water heating, which changes with the compressor speed and operation conditions. This is a dual-function coil, which provides both space heating and water heating, and so performance curves for the dual functions will be included in the coil objects, respectively. 
+
+It should be noted that the rated power and power correction curves are contained in the Coil:Heating:DX:VariableSpeed object. Thus, the power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted for by the heating coil part. 
+
+The Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object contains rated water heating capacity and capacity correction curves to simulate water heating capacity as a function of the outdoor air temperature and the water entering temperature at each speed level. The Coil:Heating:DX:VariableSpeed object calculates the total heating capacity, added to indoor air flow. 
+
+--Loop object: 
+
+--Air side: share the same air side connections as the SH mode, i.e., AirLoopHVAC:UnitarySystem.
+
+--Water side: the same loop object as the DWH mode, i.e., WaterHeater:--HeatPump:PumpedCondenser.
+
+--Load matching: 
+
+Always match the space heating load by iterating the AirLoopHVAC object, and the water heating amount in the water tank object is resultant.
+
+\subsubsection{CONTROL AND MODE SWITCH}\label{CONTROL-AND-MODE-SWITCH-ASIHP}
+
+At the beginning of each time step, an CoilSystem:IntegratedHeatPump:AirSource object surveys calls from all of its connected parent objects and nodes, e.g.,  AirLoopHVAC:UnitarySystem, WaterHeater:HeatPump:PumpedCondenser. Upon analyzing the space conditioning and water heating calls, the ASIHP will operate in a selected mode for the following timestep, as shown below:
+
+Case I: 
+If there is only a space cooling call, – run SC mode.
+ 
+Case II: 
+If there is only a space heating call, – run SH mode.
+
+Case III: 
+If there is only a water heating call, and if ambient temperature and indoor temperature are larger than the temperature settings above which indoor overcooling is allowed, – run SCWH mode to match the water heating load above a minimum speed allowed.
+Else – run DWH mode.
+
+Case IV:
+If there are simultaneous space cooling and water heating calls, and if the sum of heated water going through the ASIHP is less than the threshold, – run SCDWH mode by iterating the speed to match the space cooling load above a minimum speed specified.
+Else – run SCWH mode to match either the space cooling load or the water heating load, as specified, above a minimum speed allowed.
+
+Case V: 
+If there are simultaneous space heating and water heating calls, and if the ambient temperature and indoor temperature are larger than temperature settings above which water heating has a higher priority and space heating call can be ignored – run DWH mode.
+Otherwise, if running time of the water heating is less than a setting, – run SHDWH mode to match the space heating load by iterating the compressor speed above a minimum speed specified, with the WH electric element in the water tank disabled.
+Otherwise, if running time of the water heating is bigger than the setting, – run SHDWH mode to match the space heating load by iterating the compressor speed above a minimum speed allowed, with the WH electric element enabled.
+
+
+
 
 \subsection{Single-Speed Electric Heat Pump DX Water Heating Coil}\label{single-speed-electric-heat-pump-dx-water-heating-coil}
 
@@ -6569,7 +6831,7 @@ Keith C. Rice, 2011, DOE/ORNL Heat Pump Design Model:
 
 S.A. Klein 2011, User Manual of Engineering Equation Solver V8
 
-\subsubsection{Secondary Coils of DX Systems and Heat Pumps}\label{secondary-coils-of-dx-systems-and-heat-pumps}
+\subsection{Secondary Coils of DX Systems and Heat Pumps}\label{secondary-coils-of-dx-systems-and-heat-pumps}
 
 \subsubsection{Overview}\label{overview-15}
 
@@ -6590,7 +6852,7 @@ The secondary coil performance calculation is invoked using inputs in the DX coi
 \textbf{Cooling Operating Mode:} the primary DX cooling coil of a DX system serving a primary zone is on and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects. This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. The heat rejected by the secondary coil (condenser) of a DX system or heat pump operating in cooling mode is given by:
 
 \begin{equation}
-  Q_{cond} = Q_{Evap}+P_{CompCondFan}
+  Q_{Cond} = Q_{Evap}+P_{CompCondFan}
 \end{equation}
 
 where
@@ -6598,11 +6860,11 @@ where
 \begin{itemize}
 \tightlist
 \item
-  \(Q\_\rm{Evap}\) is the cooling load delivered by the primary DX cooling coil system, W 
+  \(Q_{Evap}\) is the cooling load delivered by the primary DX cooling coil system, W 
 \item
-  \(P\_\rm{CompCondFan}\) is the compressor and evaporator fan electric power input of a heat pump in heating mode, W
+  \(P_{CompCondFan}\) is the compressor and evaporator fan electric power input of a heat pump in heating mode, W
 \item
-  \(Q\_\rm{cond}\) is the heat rejected by the secondary coil (condenser) of a DX system or heat pump, W
+  \(Q_{Cond}\) is the heat rejected by the secondary coil (condenser) of a DX system or heat pump, W
 \end{itemize}
 
 Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in \protect\hyperlink{SchematicDXAndSecondary}{Figure}. Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked. New input field required as add-on to the DX cooling coil objects is ``\emph{Zone Name for Secondary Coil (condenser) Placement}''.
@@ -6616,7 +6878,7 @@ Heat rejected by a secondary coil (condenser) calculated at each time step becom
 \textbf{Heating Operating Mode:} When a heat pump operates in heating mode then energy is extracted from the secondary zone. The total energy extracted is estimated by rearranging the equation above as follows:
 
 \begin{equation}
-Q_\text{Evap} = Q_\text{cond} - P_\text{CompCondFan}
+Q_{Evap} = Q_{Cond} - P_{CompCondFan}
 \end{equation}
 
 where
@@ -6624,11 +6886,11 @@ where
 \begin{itemize}
 \tightlist
 \item
-  (Q\_\text{cond}) is the heat delivered by the primary heating DX coil to the primary zone, W
+  \(Q_{Cond}\) is the heat delivered by the primary heating DX coil to the primary zone, W
 \item
-  (P\_\text{CompCondFan}) is the compressor and condenser fan electric power input of a DX system or heat pump in cooling mode, W
+  \(P_{CompCondFan}\) is the compressor and condenser fan electric power input of a DX system or heat pump in cooling mode, W
 \item
-  (Q\_\text{Evap}) is the energy extracted by secondary coil (evaporator) from the secondary zone, W
+  \(Q_{Evap}\) is the energy extracted by secondary coil (evaporator) from the secondary zone, W
 \end{itemize}
 
 The total energy extracted from a secondary zone may contain sensible and latent components. The secondary coil model checks for the coil inlet and full load outlet air condition to determine whether dehumidification will occur. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and the secondary air flow fraction. If the secondary coil operation is dry, then the SHR is set to 1.0. In addition, the model assumes that defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to outside. Thus defrosting energy is not included in the zone energy balance. The heat extracted from the secondary zone may contain sensible and latent components and the secondary coil model does the sensible/latent heat split calculation.
@@ -6638,7 +6900,7 @@ The total energy extracted from a secondary zone may contain sensible and latent
 The SHR calculation method uses user specified SHR modifying curves for temperature and flow fraction. The modifying curves correct the rated SHR value for a given secondary DX coil (evaporator) entering air temperatures and air mass flow fraction for a given speed. If these SHR modifying curves are not specified a constant SHR will be assumed. These two curves are a biquadratic SHR modifier curve for temperature (SHRFT), and a quadratic SHR correction curve for flow fraction (SHRFFF). The SHR is given by:
 
 \begin{equation}
-SHR = SHR_\text{rated}\cdot SHRFT\left(T_\text{wb,secondaryZone},T_\text{db,primaryCoil}\right)\cdot SHRFFF(FF)
+SHR = SHR_{rated}\cdot SHRFT\left(T_{wb,secondaryZone},T_{db,primaryCoil}\right)\cdot SHRFFF(FF)
 \end{equation}
 
 where
@@ -6646,11 +6908,13 @@ where
 \begin{itemize}
 \tightlist
 \item
-  (SHRFT) is the sensible heat ratio modifier normalized biquadratic curve as a function of secondary DX coil entering air wet-bulb and primary DX coil entering air dry-bulb temperatures, (-). The secondary DX coil (evaporator) entering air wet-bulb temperature is the secondary zone air wet-bulb temperature.
+  \(SHRFT\) is the sensible heat ratio modifier normalized biquadratic curve as a function of secondary DX coil entering air wet-bulb and primary DX coil entering air dry-bulb temperature. The secondary DX coil (evaporator) entering air wet-bulb temperature is the secondary zone air wet-bulb temperature.
 \item
-  (SHRFFF) is the sensible heat ratio modifier normalized quadratic curve as a function of air mass flow fraction. Flow fraction is the ratio of actual to rated mass flow rate of air through the secondary DX coil, (-).
+  \(SHRFFF\) is the sensible heat ratio modifier normalized quadratic curve as a function of air mass flow fraction. 
 \item
-  (SHR\_\text{rated}) is the sensible heat ratio at rated condition, (-).
+  \(FF\), flow fraction,  is the ratio of actual to rated mass flow rate of air through the secondary DX coil.
+\item
+  \(SHR_{rated}\) is the sensible heat ratio at rated conditions.
 \end{itemize}
 
 For multispeed secondary DX coils when the system is cycling between two speeds of \emph{n} and \emph{n}-1 the operating SHR is weighted using \emph{SpeedRatio} as follows:
@@ -6664,11 +6928,11 @@ where
 \begin{itemize}
 \tightlist
 \item
-  (SHR\_n) is the sensible heat ratio at speed n determined from user specified rated SHR, and SHR modifier curves at speed \emph{n}, (-)
+  \(SHR_n\) is the sensible heat ratio at speed n determined from user specified rated SHR, and SHR modifier curves at speed \emph{n},
 \item
-  (SHR\_\{n-1\}) is the sensible heat ratio at speed \emph{n}-1 determined from user specified rated SHR, and \emph{SHR} modifier curves at speed \emph{n}-1, (-).
+  \(SHR_{n-1}\) is the sensible heat ratio at speed \emph{n}-1 determined from user specified rated SHR, and \emph{SHR} modifier curves at speed \emph{n}-1,
 \item
-  \emph{SpeedRatio} is a parameter that relates performance between successive compressor speeds, (-).
+  \(SpeedRatio\) is a parameter that relates performance between successive compressor speeds,
 \end{itemize}
 
 \subsubsection{Sensible and Latent Split}\label{sensible-and-latent-split}
@@ -6676,56 +6940,69 @@ where
 The air enthalpy difference across the secondary DX coil (evaporator) at full load is given by:
 
 \begin{equation}
-h_\text{Delta} = \frac{\left(Q_\text{Evap}/PLR\right)}{\dot{m}_\text{cond}}
+  h_{Delta} = \frac{\left(Q_{Evap}/PLR\right)}{\dot{m}_{Cond}}
 \end{equation}
 
 The coil outlet enthalpy is calculated as follows:
 
 \begin{equation}
-h_\text{Outlet} = h_\text{Inlet}-h_\text{Delta}
+  h_{Outlet} = h_{Inlet}-h_{Delta}
 \end{equation}
 
-Using the SHR calculated above and secondary DX coil outlet temperature is given by:
+Using the SHR calculated above, the secondary DX coil outlet humidity ratio and dry-bulb temperature are given by:
 
 \begin{equation}
-T_\text{OutletNode} = T_\text{ZoneAirNode} -  \frac{\left(Q_\text{Evap}/PLR\right)\cdot SHR}{\dot{m}_\text{cond}c_p}
+  h_{T_{in},\omega_{out}} = h_{Inlet} - \left(1.0 - SHR\right) \cdot \frac{\left(Q_{Evap}/PLR\right)\cdot SHR}{\dot{m}_{Cond}\cdot c_p}
+\end{equation}
+
+\begin{equation}
+  \omega_{Outlet} = \omega( T_{Inlet}, h_{T_{in},\omega_{out}} )
+\end{equation}
+
+\begin{equation}
+  T_{Outlet} = T( h_{Outlet}, \omega_{Outlet} )
 \end{equation}
 
 Calculate the saturated outlet temperature at the outlet enthalpy and check the secondary outlet air condition if super-saturation has occurred:
 
 \begin{equation}
-T_\text{OutletNode, Sat} = T_\text{SAT}\left(h_\text{Outlet}, P_\text{Tot}\right)
+  T_{Outlet, Sat} = T_{SAT}\left(h_{Outlet}, P_{Tot}\right)
 \end{equation}
 
-\begin{lstlisting}
-IF(\(T_\text{OutletNode} > T_\text{OutletNode, Sat}\)) Then
-    \(\omega_\text{OutletNode} > \omega_\text{InletNode}\)
-ELSE
-    (\(T_\text{OutletNode} = T_\text{OutletNode, Sat}\)
-    The coil outlet humidity ratio is determined using psychrometric functions as follows.
-    \(\omega_\text{OutletNode} = \omega\left(T_\text{OutletNode,Sat},h_\text{Outlet}\right)\)
-ENDIF
-\end{lstlisting}
+If \(T_{Outlet} \leq T_{Outlet, Sat}\), then
 
-where
+\begin{equation}
+  T_{Outlet} = T_{Outlet, Sat}
+\end{equation}
 
-\(h\_\text{Inlet}\) is the enthalpy of air entering the passive coil (J/kg)
+\begin{equation}
+  \omega_{Outlet} = \omega\left(T_{Outlet,Sat},h_{Outlet}\right)
+\end{equation}
 
-\(h\_\text{Outlet}\) is the enthalpy of air leaving the passive coil, (J/kg) 
+where:
+\begin{itemize}
 
-\(\dot{m}_{\text{sec}}\) is the secondary DX coil mass flow rate, (kg/s) 
+  \item \(h_{Inlet}\) is the enthalpy of air entering the passive coil (J/kg)
 
-PLR is the primary DX cooling coil compressor part-load ratio, (-)
+  \item \(h_{Outlet}\) is the enthalpy of air leaving the passive coil (J/kg) 
 
-\(P_{Tot}\) is the total pressure at the inlet of secondary DX coil, (Pa)
+  \item \(h_{T_{in},\omega_{out}}\) is the enthalpy of air at the leaving humidity ratio and the entering dry bulb temerature
 
-\(T\_\text{OutletNode}\) is the secondary coil outlet air temperature, (degC) 
+  \item \(\dot{m}_{sec}\) is the secondary DX coil mass flow rate (kg/s) 
 
-\(T\_\text{OutletNode,Sat}\) is the secondary coil saturated air temperature at the outlet enthalpy, (degC)
+  \item PLR is the primary DX cooling coil compressor part-load ratio
 
-\(\omega\_\text{InletNode}\) is the secondary coil inlet node air humidity ratio, (kgH2O/kgDryair) 
+  \item \(P_{Tot}\) is the total pressure at the inlet of secondary DX coil (Pa)
 
-\(\omega\_\text{OutletNode}\) is the secondary coil outlet node air humidity ratio, (kgH2O/kgDryair)
+  \item \(T_{Outlet}\) is the secondary coil outlet air temperature (degC) 
+
+  \item \(T_{Outlet,Sat}\) is the secondary coil saturated air temperature at the outlet enthalpy (degC)
+
+  \item \(\omega_{Inlet}\) is the secondary coil inlet node air humidity ratio (kgH2O/kgDryair) 
+
+  \item \(\omega_{Outlet}\) is the secondary coil outlet node air humidity ratio (kgH2O/kgDryair)
+
+\end{itemize}
 
 Reference: Dixon, Erin Elizabeth, ``Energy Model Development and Heating Energy Investigation of the Nested Thermal Envelope Design (NTED (tm))'' (2010). Theses and dissertations. Paper 974.
 

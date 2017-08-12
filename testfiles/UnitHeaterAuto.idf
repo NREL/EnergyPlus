@@ -93,7 +93,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -1205,33 +1205,27 @@
 
   Branch,
     Heating Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HW Circ Pump,            !- Component 1 Name
     HW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    HW Pump Outlet Node,     !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     Heating Purchased Hot Water Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictHeating,         !- Component 1 Object Type
     Purchased Heating,       !- Component 1 Name
     Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Heating Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Side Bypass,  !- Component 1 Name
     Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Heating Supply Side Bypass,  !- Name
@@ -1240,13 +1234,11 @@
 
   Branch,
     Heating Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Outlet,   !- Component 1 Name
     Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Heating Supply Outlet,   !- Name
@@ -1257,16 +1249,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   BranchList,
@@ -1303,13 +1295,11 @@
 
   Branch,
     ZonesHWInletBranch,      !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWInletPipe,        !- Component 1 Name
     HW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ZonesHWInletPipe,        !- Name
@@ -1318,13 +1308,11 @@
 
   Branch,
     ZonesHWOutletBranch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWOutletPipe,       !- Component 1 Name
     HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ZonesHWOutletPipe,       !- Name
@@ -1333,43 +1321,35 @@
 
   Branch,
     Zone1HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Zone1UnitHeatHeatingCoil,!- Component 1 Name
     Zone1UnitHeatHWInletNode,!- Component 1 Inlet Node Name
-    Zone1UnitHeatHWOutletNode,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone1UnitHeatHWOutletNode;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone2HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Zone2UnitHeatHeatingCoil,!- Component 1 Name
     Zone2UnitHeatHWInletNode,!- Component 1 Inlet Node Name
-    Zone2UnitHeatHWOutletNode,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone2UnitHeatHWOutletNode;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone3HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Zone3UnitHeatHeatingCoil,!- Component 1 Name
     Zone3UnitHeatHWInletNode,!- Component 1 Inlet Node Name
-    Zone3UnitHeatHWOutletNode,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone3UnitHeatHWOutletNode;  !- Component 1 Outlet Node Name
 
   Branch,
     ZonesHWBypassBranch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWBypassPipe,       !- Component 1 Name
     ZonesHWBypassInletNode,  !- Component 1 Inlet Node Name
-    ZonesHWBypassOutletNode, !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    ZonesHWBypassOutletNode; !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ZonesHWBypassPipe,       !- Name
@@ -1462,27 +1442,33 @@
     UnitHeatAvailability,    !- Availability Schedule Name
     Zone1UnitHeatAirInletNode,  !- Air Inlet Node Name
     Zone1UnitHeatAirOutletNode,  !- Air Outlet Node Name
-    Fan:ConstantVolume,      !- Supply Air Fan Object Type
+    Fan:SystemModel,      !- Supply Air Fan Object Type
     Zone1UnitHeatFan,        !- Supply Air Fan Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone1UnitHeatHeatingCoil,!- Heating Coil Name
-    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    ON,                        !- Supply Air Fan Operating Mode Schedule Name
     Yes,                     !- Supply Air Fan Operation During No Heating
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
-  Fan:ConstantVolume,
-    Zone1UnitHeatFan,        !- Name
-    UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
+  Fan:SystemModel,
+    Zone1UnitHeatFan ,          !- Name
+    UnitHeatAvailability ,      !- Availability Schedule Name
     Zone1UnitHeatAirInletNode,  !- Air Inlet Node Name
-    Zone1UnitHeatFanOutletNode;  !- Air Outlet Node Name
+    Zone1UnitHeatFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE ,                   !- Design Maximum Air Flow Rate
+    Discrete ,                   !- Speed Control Method
+    0.0,                         !- Electric Power Minimum Flow Rate Fraction
+    75.0,                        !- Design Pressure Rise
+    0.9 ,                        !- Motor Efficiency
+    1.0 ,                        !- Motor In Air Stream Fraction
+    AUTOSIZE,                    !- Design Electric Power Consumption
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                            !- Electric Power Per Unit Flow Rate
+    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
+    0.50;                        !- Fan Total Efficiency
 
   Coil:Heating:Water,
     Zone1UnitHeatHeatingCoil,!- Name
@@ -1529,27 +1515,33 @@
     UnitHeatAvailability,    !- Availability Schedule Name
     Zone2UnitHeatAirInletNode,  !- Air Inlet Node Name
     Zone2UnitHeatAirOutletNode,  !- Air Outlet Node Name
-    Fan:ConstantVolume,      !- Supply Air Fan Object Type
+    Fan:SystemModel,      !- Supply Air Fan Object Type
     Zone2UnitHeatFan,        !- Supply Air Fan Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone2UnitHeatHeatingCoil,!- Heating Coil Name
-    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    ON,                        !- Supply Air Fan Operating Mode Schedule Name
     No,                      !- Supply Air Fan Operation During No Heating
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
-  Fan:ConstantVolume,
-    Zone2UnitHeatFan,        !- Name
-    UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Zone2UnitHeatAirInletNode,  !- Air Inlet Node Name
-    Zone2UnitHeatFanOutletNode;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone2UnitHeatFan , !- Name
+  UnitHeatAvailability , !- Availability Schedule Name
+  Zone2UnitHeatAirInletNode,  !- Air Inlet Node Name
+  Zone2UnitHeatFanOutletNode,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   Coil:Heating:Water,
     Zone2UnitHeatHeatingCoil,!- Name
@@ -1596,27 +1588,34 @@
     UnitHeatAvailability,    !- Availability Schedule Name
     Zone3UnitHeatAirInletNode,  !- Air Inlet Node Name
     Zone3UnitHeatAirOutletNode,  !- Air Outlet Node Name
-    Fan:ConstantVolume,      !- Supply Air Fan Object Type
+    Fan:SystemModel,      !- Supply Air Fan Object Type
     Zone3UnitHeatFan,        !- Supply Air Fan Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone3UnitHeatHeatingCoil,!- Heating Coil Name
-    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    ON ,                        !- Supply Air Fan Operating Mode Schedule Name
     Yes,                     !- Supply Air Fan Operation During No Heating
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
-  Fan:ConstantVolume,
-    Zone3UnitHeatFan,        !- Name
-    UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Zone3UnitHeatAirInletNode,  !- Air Inlet Node Name
-    Zone3UnitHeatFanOutletNode;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone3UnitHeatFan , !- Name
+  UnitHeatAvailability , !- Availability Schedule Name
+  Zone3UnitHeatAirInletNode,  !- Air Inlet Node Name
+  Zone3UnitHeatFanOutletNode,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
+
 
   Coil:Heating:Water,
     Zone3UnitHeatHeatingCoil,!- Name

@@ -60,28 +60,10 @@ Choosing Central Cooling Capacity Control Method = \emph{VAV}, \emph{Bypass}, \e
   \midrule
   \endhead
 
-  VAV &
-  \(\begin{array}{rl}
-    T_{cc,exit} &= T_{cool,supply} \\ 
-    \dot{V}_{cc,air} &= \frac{\dot{m}_{cc,air,peak}}{\rho_{air}}
-  \end{array}\) \tabularnewline
-  Bypass &
-  \(\begin{array}{rl}
-    T_{cc,exit} &= T_{cool,supply} \\ 
-    \dot{V}_{cc,air} &=
-      \dot{V}_{cc,air,max}\cdot\max \left(0, \min \left(1,
-        \frac{T_{mix,at-peak}-T_{sup,avg}}{T_{mix,at-peak}-T_{cc,exit}} \right) \right)
-  \end{array}\) \tabularnewline
-  VT &
-  \(\begin{array}{rl}
-    T_{cc,exit} &= \max\left(T_{cool,supply}, T_{sup,avg}\right) \\ 
-    \dot{V}_{cc,air} &= \dot{V}_{cc,air,max}
-  \end{array}\) \tabularnewline
-  OnOff &
-  \(\begin{array}{rl}
-    T_{cc,exit} &= T_{cool,supply} \\
-    \dot{V}_{cc,air} &=\dot{V}_{sys,air,max}
-  \end{array}\) \tabularnewline
+  VAV & \(\begin{array}{rl} T_{cc,exit} &= T_{cool,supply} \\ \dot{V}_{cc,air} &= \frac{\dot{m}_{cc,air,peak}}{\rho_{air}} \end{array}\) \tabularnewline
+  Bypass & \(\begin{array}{rl} T_{cc,exit} &= T_{cool,supply} \\ \dot{V}_{cc,air} &= \dot{V}_{cc,air,max}\cdot\max \left(0, \min \left(1, \frac{T_{mix,at-peak}-T_{sup,avg}}{T_{mix,at-peak}-T_{cc,exit}} \right) \right) \end{array}\) \tabularnewline
+  VT & \(\begin{array}{rl} T_{cc,exit} &= \max\left(T_{cool,supply}, T_{sup,avg}\right) \\ \dot{V}_{cc,air} &= \dot{V}_{cc,air,max} \end{array}\) \tabularnewline
+  OnOff & \(\begin{array}{rl} T_{cc,exit} &= T_{cool,supply} \\ \dot{V}_{cc,air} &=\dot{V}_{sys,air,max} \end{array}\) \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -155,7 +137,7 @@ where \(\dot{V}_{cc,air}\) is calculated above in the Initial Calculations secti
 
 To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperatures and humidity ratios. The inlet and outlet conditions depend on whether the coil is in the outside air stream and if it is not, whether or not there is outside air preconditioning.
 
-\paragraph{\texorpdfstring{\textbf{Coil in outside air stream}:}{Coil in outside air stream:}}\label{coil-in-outside-air-stream}
+\paragraph{\textbf{Coil in outside air stream}:}\label{coil-in-outside-air-stream}
 
 \begin{itemize}
 \item
@@ -168,7 +150,7 @@ To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperat
   \(W_{air,out,des} = W_{sys,precool}\) (the specified Precool Design Humidity Ratio from the System:Sizing object)
 \end{itemize}
 
-\paragraph{\texorpdfstring{\textbf{Coil in main air stream, no preconditioning of outside air} }{Coil in main air stream, no preconditioning of outside air }}\label{coil-in-main-air-stream-no-preconditioning-of-outside-air}
+\paragraph{\textbf{Coil in main air stream, no preconditioning of outside air} }\label{coil-in-main-air-stream-no-preconditioning-of-outside-air}
 
 \begin{itemize}
 \item
@@ -181,7 +163,7 @@ To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperat
   \(W_{air,out,des} = W_{sup,cool}\) (the specified Central Cooling Design Supply Air Humidity Ratio from the Sizing:System object)
 \end{itemize}
 
-\paragraph{\texorpdfstring{\textbf{Coil in main air stream, outside air preconditioned} }{Coil in main air stream, outside air preconditioned }}\label{coil-in-main-air-stream-outside-air-preconditioned}
+\paragraph{\textbf{Coil in main air stream, outside air preconditioned} }\label{coil-in-main-air-stream-outside-air-preconditioned}
 
 The oustide air fraction is calculated as (where V\(_{cc,air}\) is calculated as above)
 
@@ -238,7 +220,7 @@ The enthalpies are given by:
 \end{equation}
 Where the inputs to those functions are the coil inlet design conditions. For coils in terminal units these are set at the system level to the system design supply air temperature. For zonal units they are set to design return air, mixed air, or outside air as appropriate to the unit. T\(_{air,out,des}\) is set to the zone cooling design supply air temperature as specified in the \emph{Zone:Sizing} inputs. W\(_{air,out,des}\) is set to the zone cooling design supply air humidity ratio as specified in the \emph{Zone:Sizing} inputs.
 
-\subsubsection{\texorpdfstring{Design Water Flow Rate (m\(^{3}\)/s) - System Coils}{Design Water Flow Rate (m\^{}\{3\}/s) - System Coils}}\label{design-water-flow-rate-m3s---system-coils}
+\subsubsection{Design Water Flow Rate (m\(^{3}\)/s) - System Coils}\label{design-water-flow-rate-m3s---system-coils}
 
 The design water volumetric flow rate is calculated using:
 
@@ -248,7 +230,7 @@ The design water volumetric flow rate is calculated using:
 
 Where \(\Delta T_{w,des}\) is just the \emph{Loop Design Temperature Difference} user input from \emph{Sizing:Plant} (if the coil is in the outside air stream, 1/2 the \emph{Loop Design Temperature Difference} is used). The design coil load \emph{Load\(_{coil,des}\)} is calculated from:
 
-\subsubsection{\texorpdfstring{Design Water Flow Rate (m\(^{3}\)/s) - Zone Coils}{Design Water Flow Rate (m\^{}\{3\}/s) - Zone Coils}}\label{design-water-flow-rate-m3s---zone-coils}
+\subsubsection{Design Water Flow Rate (m\(^{3}\)/s) - Zone Coils}\label{design-water-flow-rate-m3s---zone-coils}
 
 If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit or an ZoneHVAC:FourPipeFanCoil, the chilled water flow rate is passed down from the terminal unit or fan coil sizing calculations. Otherwise the flow is set to:
 
@@ -374,15 +356,11 @@ The outlet air humidity ratio depends on whether the coil is in the outside air 
 \tightlist
 \item
   If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit, then:
+\item
+  Get the dewpoint temperature at W$_{air,in,des}$: $T_{dp,in} = \text{PsyTdpFnWPb}\left(W_{air,in,des},P_{air,std}\right)$
+\item
+  If T$_{dp,in}$ < = T$_{w,in,des}$ set W$_{air,out,des}$ = W$_{air,in,des}$. Otherwise set W$_{air,out,des}$ = min(PsyWFnTdbRhPb(T$_{air,out,des}$,0.9,P$_{air,std}$),W$_{air,in,des}$)
 \end{itemize}
-
-\begin{lstlisting}
--   Get the dewpoint temperature at W$_{air,in,des}$: $T_{dp,in} = \text{PsyTdpFnWPb}\left(W_{air,in,des},P_{air,std}\right)$
-\end{lstlisting}
-
-\begin{lstlisting}
--   If T$_{dp,in}$ < = T$_{w,in,des}$ set W$_{air,out,des}$ = W$_{air,in,des}$. Otherwise set W$_{air,out,des}$ = min(PsyWFnTdbRhPb(T$_{air,out,des}$,0.9,P$_{air,std}$),W$_{air,in,des}$)
-\end{lstlisting}
 
 \subsubsection{Design Inlet Water Temperature - System Coils}\label{design-inlet-water-temperature---system-coils}
 
@@ -1275,74 +1253,154 @@ where
 
 \subsection{Electric Chiller Sizing}\label{electric-chiller-sizing}
 
-Generally chillers will need nominal cooling capacity, evaporator flow rate and condenser flow rate. All 3 quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.
+Generally chillers will need nominal cooling capacity, evaporator flow rate and condenser flow rate. All three quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.  Chillers may also have a third plant loop connection for heat recovery and this flow rate can also be obtained. 
 
-All chillers on a loop are sized to meet the full loop load. If there are multiple chillers on a loop that call for autosizing, they will all be assigned the same cooling capacity and evaporator flow rate.
+All chillers on a loop are sized to meet the full loop load multiplied by a component-level sizing factor.  This sizing factor is set by the user in the chiller input object. If there are multiple chillers on a loop that call for autosizing, they will all use their own sizing factor applied to the loop level flow rate.
 
 \subsubsection{Nominal Cooling Capacity}\label{nominal-cooling-capacity}
 
 \begin{equation}
-\dot Qchiller,nom = Cp,w\cdot \rho w\cdot \Delta Tloop,des\cdot \dot Vloop,des
+\dot Q_{chiller,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
 where
 
-\emph{C\(_{p,w}\)} is the specific heat of water at 5 \(^{o}\)C;
+\( C_{p,w} \) is the specific heat of evaporator loop fluid at 5 \(^{o}\)C;
 
-\emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
+\( \rho_w \) is the density of evaporator loop fluid at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{loop,des}\)} is the chilled water loop design temperature rise;
+\( \Delta T_{loop,des} \) is the chilled water loop design temperature rise (from the chilled water loop's Sizing:Plant input data);
 
-\(\dot Vloop,des\) is the loop design volumetric flow rate.
+\( \dot V_{loop,des} \) is the loop design volume flow rate.
+
+\( f_{size} \) is the chiller's sizing factor.
 
 \subsubsection{Design Evaporator Volumetric Water Flow Rate}\label{design-evaporator-volumetric-water-flow-rate}
 
+The evaporator flow rate is set equal to the loop's design flow rate multiplied by the chiller's sizing factor.
+
 \begin{equation}
-\dot Vevap,des = \dot Vloop,des
+\dot V_{evap,des} = \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
-\subsubsection{Design Condenser Volumetric Water Flow Rate}\label{design-condenser-volumetric-water-flow-rate}
+\subsubsection{Design Condenser Volume Flow Rate}\label{design-condenser-volume-flow-rate}
+
+The condenser flow rate is obtained by balancing the total heat rejected at full capacity with the heat transferred by the condenser fluid at the design temperature difference using the fluid properties for the condenser loop.
 
 \begin{equation}
-\dot Vcond,des = \dot Qchiller,nom\cdot (1 + 1/COPchiller,nom)/(\Delta Tloop,des\cdot Cp,w\cdot \rho w)
+\dot V_{cond,des} = \dot Q_{chiller,nom} \cdot (1 + 1/COP_{chiller,nom})/(\Delta T_{loop,des} \cdot C_{p,w} \cdot \rho_w)
 \end{equation}
 
 where
 
-\emph{C\(_{p,w}\)} is the specific heat of water at design condenser inlet temperature;
+\( C_{p,w} \) is the specific heat of condenser loop fluid at design condenser inlet temperature;
 
-\emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
+\( \rho_w \) is the density of condenser loop fluid at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{loop,des}\)} is the chilled water loop design temperature rise;
+\( \Delta T_{loop,des} \) is the condenser loop design temperature rise (from condenser loop's Sizing:Plant input data);
 
-\emph{COP\(_{chiller,nom}\)} is the chiller nominal COP.
+\( COP_{chiller,nom} \) is the chiller's nominal COP.
 
-Boiler Sizing
+\subsubsection{Design Heat Recovery Volume Water Flow Rate}\label{design-heat-recovery-chiller-volume-water-flow-rate}
 
-Generally boilers will need nominal heating capacity and rate. Both quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.
+The chiller heat recovery volume flow rate, \( \dot V_{hr,des} \), is obtained from the condenser volume flow rate modified by a capacity fraction.
 
-All boilers on a loop are sized to meet the full loop load. If there are multiple boilers on a loop that call for autosizing, they will all be assigned the same heating capacity and flow rate.
+\begin{equation}
+\dot V_{hr,des} = \dot V_{cond,des} \cdot F_{HR,cap} 
+\end{equation}
+
+where
+
+\( F_{HR,cap} \) is user input from the field called Condenser Heat Recovery Relative Capacity Fraction.
+
+
+\subsection{Water to Water Heat Pump Sizing}\label{WWHP-sizing}
+
+Generally water to water heat pumps will need nominal capacity and fluid volume flow rates for both the load and source sides.  The models for HeatPump:WaterToWater:EquationFit:Cooling and HeatPump:WaterToWater:EquationFit:Heating also need a reference power consumption.  
+
+\subsubsection{Reference Load Side Flow Rate}\label{WWHP-ref-load-side-flow-rate}
+
+The load side design fluid flow rate, \( \dot V_{load,des} \), is set equal to the load side loop's total design flow rate multipled by a component-level sizing factor.
+\begin{equation}
+\dot V_{load,des} = \dot V_{loop,des} \cdot f_{size}
+\end{equation}
+
+where
+
+\( \dot V_{loop,des} \) is the loop design volume flow rate;
+
+\( f_{size} \) is the heat pump's sizing factor.
+
+\subsubsection{Reference Capacity}\label{wwhp-ref-capacity}
+
+The nominal capacity is determined from the loop design flow rate, loop design temperature difference and load side fluid properties.
+
+\begin{equation}
+\dot Q_{hp,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot V_{loop,des} \cdot f_{size}
+\end{equation}
+
+where
+
+\( C_{p,w} \) is the specific heat of load side loop fluid at standard conditions (5.05 \(^{o}\)C for cooling, 60.0 \(^{o}\)C for heating);
+
+\( \rho_w \) is the density of load side loop fluid at standard conditions (5.05 \(^{o}\)C for cooling, 60.0 \(^{o}\)C for heating);
+
+\( \Delta T_{loop,des} \) is the load side loop design temperature rise (from load side loop's Sizing:Plant input data).
+
+\subsubsection{Reference Source Side Flow Rate}\label{WWHP-ref-source-side-flow-rate}
+
+The source side design fluid flow rate, \( \dot V_{source,des} \), is obtained by balancing the total heat supplied or rejected at full capacity with the heat transferred by the source side fluid at the design temperature difference using the fluid properties for the source side loop.
+
+For the cooling heat pump, the heat rejected includes the compressor work,
+\begin{equation}
+\dot V_{source,des} = \dot Q_{hp,nom} \cdot (1 + 1/COP_{hp,nom})/(\Delta T_{loop,des} \cdot C_{p,w} \cdot \rho_w)
+\end{equation}
+
+For the heating heat pump, the heat supplied is reduced by the compressor work,
+
+\begin{equation}
+\dot V_{source,des} = \dot Q_{hp,nom} \cdot (1 - 1/COP_{hp,nom})/(\Delta T_{loop,des} \cdot C_{p,w} \cdot \rho_w)
+\end{equation}
+
+where
+
+\( COP_{hp,nom} \) is the reference coefficient of performance.  This is from user input if reference power consumption is autosized.
+
+\subsubsection{Reference Power Consumption}\label{wwhp-ref-power-consumption}
+
+The reference power consumption is the capacity divided by COP
+\begin{equation}
+P_{hp,nom} = \dot Q_{hp,nom} / COP_{hp,nom}
+\end{equation}
+
+\subsection{Boiler Sizing}\label{boiler-sizing}
+
+Generally boilers will need nominal heating capacity and water volume flow rate. Both quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.
+
+All boilers on a loop are sized to meet the full loop load multipled by a component-level sizing factor. If there are multiple boilers on a loop that call for autosizing, they will all be assigned a heating capacity and flow rate using their own sizing factor.
 
 \subsubsection{Nominal Capacity}\label{nominal-capacity}
 
 \begin{equation}
-\dot Qboiler,nom = Cp,w\cdot \rho w\cdot \Delta Tloop,des\cdot \dot Vloop,des
+\dot Q_{boiler,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
 where
 
-\emph{C\(_{p,w}\)} is the specific heat of water at the boiler design outlet temperature;
+\( C_{p,w} \) is the specific heat of water at the boiler design outlet temperature;
 
-\emph{r\(_{w}\)} is the density of water at standard conditions (5.05 \(^{o}\)C);
+\( \rho_w \) is the density of water at standard conditions (5.05 \(^{o}\)C);
 
-\emph{DT\(_{loop,des}\)} is the hot water loop design temperature decrease;
+\( \Delta T_{loop,des} \) is the hot water loop design temperature decrease;
 
-\(\dot Vloop,des\) is the loop design volumetric flow rate.
+\( \dot V_{loop,des} \) is the loop design volumetric flow rate.
 
-\subsubsection{Design Evaporator Volumetric Water Flow Rate}\label{design-evaporator-volumetric-water-flow-rate-1}
+\( f_{size} \) is the boiler's sizing factor.
+
+\subsubsection{Design Water Volume Flow Rate}\label{design-boiler-water-flow-rate-1}
 
 \begin{equation}
-\dot Vdes = \dot Vloop,des
+\dot Vdes = \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
 \subsection{Plant Heat Exchanger Sizing}\label{plant-heat-exchanger-sizing}
@@ -1444,13 +1502,13 @@ Where,
 
 where
 
-\({\dot m_w}\) * iswater mass flow rate, kg/s;*
+\({\dot m_w}\) is water mass flow rate, kg/s;
 
-\({\dot m_a}\) * is design air mass flow rate, kg/s;*
+\({\dot m_a}\) is design air mass flow rate, kg/s;
 
-\emph{ω\(_{o}\) is design outlet humidity ratio, kg-water/kg-air;}
+\(\omega_{o}\) is design outlet humidity ratio, kg-water/kg-air;
 
-\emph{ω\(_{i}\) is design inlet humidity ratio, kg-water/kg-air.}
+\(\omega_{i}\) is design inlet humidity ratio, kg-water/kg-air.
 
 The air mass flow rate and humidity ratios are determined based upon zone design conditions. If the unit is part of zone equipment, then:
 
@@ -1462,20 +1520,13 @@ The air mass flow rate and humidity ratios are determined based upon zone design
 {\omega_i} = Min\left( {OutHumRatAtCoolPea{k_{zone}},OutHumRatAtHeatPea{k_{zone}}} \right)
 \end{equation}
 
-\begin{lstlisting}
-  ${\omega_o} = Max\left( {ZoneHumRatAtCoolPea{k_{zone}},ZoneHumRatAtHeatPea{k_{zone}}} \right)$ 
-\end{lstlisting}
+\begin{equation}
+  {\omega_o} = Max\left( {ZoneHumRatAtCoolPea{k_{zone}},ZoneHumRatAtHeatPea{k_{zone}}} \right)
+\end{equation}
 
 where
 
-\emph{r\(_{a}\) is the density of air at design conditions, kg/s.}
-
-\begin{itemize}
-\item
-  \begin{itemize}
-  \item
-  \end{itemize}
-\end{itemize}
+\(r_{a}\) is the density of air at design conditions, kg/s.
 
 If the unit is part of the central air system, then check if outdoor air system is present. If outdoor air system is part of the air loop and design outdoor air flow rate is greater than zero, then:
 
@@ -1487,9 +1538,9 @@ If the unit is part of the central air system, then check if outdoor air system 
 {\omega_i} = Min\left( {CoolOutHumRa{t_{sys}},HeatOutHumRa{t_{sys}}} \right)
 \end{equation}
 
-\begin{lstlisting}
-  ${\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)$ 
-\end{lstlisting}
+\begin{equation}
+  {\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)
+\end{equation}
 
 Otherwise, air mass flow rate is determined as follows:
 
@@ -1513,7 +1564,7 @@ for duct type = \emph{heating}
 
 for duct type = \emph{other}
 
-\({\dot m_a} = DesMainVolFlo{w_{sys}} \cdot {\rho_a}\) ,
+\({\dot m_a} = DesMainVolFlo{w_{sys}} \cdot {\rho_a}\),
 
 and the humidity ratios are:
 
@@ -1521,9 +1572,9 @@ and the humidity ratios are:
 {\omega_i} = Min\left( {CoolMixHumRa{t_{sys}},HeatMixHumRa{t_{sys}}} \right)
 \end{equation}
 
-\begin{lstlisting}
-  ${\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)$ 
-\end{lstlisting}
+\begin{equation}
+  {\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)
+\end{equation}
 
 \subsection{Cooling Tower Sizing}\label{cooling-tower-sizing}
 
@@ -1623,7 +1674,7 @@ Then we assign the inputs needed for the model.
 
 \emph{T\(_{in,air,wb}\)} = 25.6 \(^{o}\)C (78 \(^{o}\)F design air inlet wetbulb temperature)
 
-\emph{W\(_{in}\)} is calculated from the entering air drybulb and wetbulb.
+\(W_{in}\) is calculated from the entering air drybulb and wetbulb.
 
 The inlet water mass flow rate is just the design volumetric flow rate times the density of water.
 
@@ -1631,11 +1682,11 @@ The inlet water temperature is set slightly differently for the 2 input methods.
 
 \emph{UFactorTimesAreaAndDesignWaterFlowRate}
 
-\emph{T\(_{in,water}\)} = \emph{T\(_{loop,exit,des}\)}+\emph{DT\(_{loop,des}\)}
+\(T_{in,water}\) = \(T_{loop,exit,des}\) + \(DT_{loop,des}\)
 
 \emph{NominalCapacity}
 
-\emph{T\(_{in,water}\)} = 35 \(^{o}\)C (95 \(^{o}\)F design inlet water temperature).
+\(T_{in,water}\) = 35 \(^{o}\)C (95 \(^{o}\)F design inlet water temperature).
 
 We now have all the data needed to obtain UA. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function. In this case it finds the UA that will zero the residual function - the difference between the design tower load and the tower output divided by the design tower load. The residual is calculated in the function \emph{SimpleTowerUAResidual.}
 
@@ -1710,15 +1761,13 @@ Finally
 
 \subsubsection{ElseifPerformance Input Method = NominalCapacitythen}\label{elseifperformance-input-method-nominalcapacitythen}
 
-\begin{lstlisting}
-  ${\dot Q_{fan,nom}} = 0.0105 \bullet {\dot Q_{fluidcooler,nom}}$ 
-\end{lstlisting}
+\begin{equation}
+  {\dot Q_{fan,nom}} = 0.0105 \bullet {\dot Q_{fluidcooler,nom}}
+\end{equation}
 
 Where
 
-\begin{lstlisting}
-  ${\dot Q_{fluidcooler,nom}}$  is provided by the user.
-\end{lstlisting}
+\({\dot Q_{fluidcooler,nom}}\) is provided by the user.
 
 \subsubsection{Design Air Flow Rate}\label{design-air-flow-rate-1}
 
@@ -2016,7 +2065,21 @@ Fan Coil units are compound components: each unit contains a fan, hot water coil
 
 where
 
-\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\begin{itemize}
+\tightlist
+\item
+  \(c_{p,air}\) is specific heat of air evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio, J/kgC.
+\item
+  \(\dot{V}_{max,hw}\) is maximum hot water flow rate, m$^{3}/s$.
+\item
+  \(\dot{Q}_{coil,des}\) is heating coil design load, W.
+\item
+  \(c_{p,w}\) is specific heat of hot water, J/kgC.
+\item
+  \(\rho_{w}\) is density of hot water, m$^{3}/kg$.
+\item
+  \(\Delta T_{loop,des}\) is hot water loop design temperature difference, deltaC.
+\end{itemize}
 
 \subsubsection{Maximum Cold Water Flow}\label{maximum-cold-water-flow}
 
@@ -2037,12 +2100,26 @@ where
 \end{equation}
 
 \begin{equation}
-  \dot{V}_{max,hw} = \dot{Q}_{coil,des} / (c_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des})
+  \dot{V}_{max,cw} = \dot{Q}_{coil,des} / (c_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des})
 \end{equation}
 
 where
 
-\emph{c\(_{p,air}\)} is evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio.
+\begin{itemize}
+\tightlist
+\item
+  \(c_{p,air}\) is specific heat of air evaluated at the average of the inlet \& outlet temperatures and the coil outlet humidity ratio, J/kgC.
+\item
+  \(\dot{V}_{max,cw}\) is maximum cold water flow rate, m$^{3}/s$.
+\item
+  \(\dot{Q}_{coil,des}\) is cooling coil design load, W.
+\item
+  \(c_{p,w}\) is specific heat of cold water, J/kgC.
+\item
+  \(\rho_{w}\) is density of cold water, m$^{3}/kg$.
+\item
+  \(\Delta T_{loop,des}\) is cold water loop design temperature difference, deltaC.
+\end{itemize}
 
 \subsection{Window Air Conditioner Sizing}\label{window-air-conditioner-sizing}
 
@@ -2589,3 +2666,29 @@ The maximum supply air temperature can also be automatically selected. The value
 \begin{equation}
 T_{SA,max} = \text{HeatDesTemp}_{ZoneOrSystem}
 \end{equation}
+
+\subsubsection{Single Zone VAV Temperature Limits}\label{single-zone-vav-temperature-limits}
+
+The minimum and maximum supply air temperature limits for the single zone VAV model are calculated using a fraction of the control zone design load and the low speed fan operating air volume flow rate. When using the single zone VAV model, the minimum and maximum supply air temperature limits are used to control the system when low speed fan operation under low load conditions and to modulate the fan speed to limit the outlet air temperature at higher zone loads. These limits are not enforced once the system fan speed reaches the maximum. See Figure~\ref{fig:example-of-the-energyplus-unitary-system-single-zone-vav-model}.
+
+\begin{equation}
+T_{sup} = T_{zone,at-peak}+\frac{\dot{Q}_{sens,at-peak} * frac}{\rho_{air}c_{p,air}\dot{V}_{air,min}}
+\end{equation}
+
+where
+
+\emph{T\(_{sup}\) is the supply air temperature limit to meet a fraction of the zone design load, (\(^{o}\)C)}
+
+\emph{T\(_{zone,at-peak}\) is the zone air temperature at the time of peak design load, (\(^{o}\)C)}
+
+\emph{Q\(_{sens,at-peak}\) is the zone design cooling or heating load, (W) (negative for cooling)}
+
+\emph{frac is the fraction of zone design load at minimum fan speed, 50\% for the single zone VAV model}
+
+\emph{rho\(_{air}\) is the density of air at standard conditions, (kg/m\(^{3}\))}
+
+\emph{c\(_{p,air}\) is the specific heat of zone air, (J/kg K)}
+
+\emph{V\(_{air,min}\) is the air volume flow rate at minimum fan speed, (m\(^{3}\)/s)}
+
+

@@ -1,6 +1,6 @@
 \section{Definitions File \& Custom File Processing}\label{definitions-file-custom-file-processing}
 
-\subsection{\texorpdfstring{Description of ``Def'' input file}{Description of Def input file}}\label{description-of-def-input-file}
+\subsection{Description of ``Def'' input file}\label{description-of-def-input-file}
 
 Some of the data formats have inherent omissions (e.g.~TMY does not have location data, BLAST ASCII does not have elevations). In order to overcome this limitation and to provide further flexibility, a definitions file (extension must be .def) is implemented. By naming this with the same ``file name'' as your input file (in the same folder), the weather converter will read the format and use that data, as appropriate, in the file conversions. The .def file uses Fortran ``Namelist'' input fields as shown in the example below. For flexibility, you can also define a ``presets.def'' file (such as when you have a list of files to process and the format or some portion is all the same between the group of files. The two def files (one named the same as the file name for the raw data and one named presets.def) will both be processed. Conflicts between the two will be shown in the .audit file. The set of namelist groups is:
 
@@ -192,7 +192,7 @@ Custom or User & Custom Data File \tabularnewline
 
 This field can be used to specify multi-interval (per hour) files. Without this field, the only formats that can have multiple intervals per hour are the EPW and CSV file formats - using the header record DataPeriods value for that field.
 
-\subsubsection{\texorpdfstring{Fields below only used in ``Custom'' format processing}{Fields below only used in Custom format processing}}\label{fields-below-only-used-in-custom-format-processing}
+\subsubsection{Fields below only used in ``Custom'' format processing}\label{fields-below-only-used-in-custom-format-processing}
 
 \subsubsection{Field: DataElements}\label{field-dataelements}
 
@@ -741,7 +741,7 @@ In ``normal'' file processing, conversion from the input data elements to the EP
 
 \subsection{Custom File Processing - Solar Radiation Value Calculation}\label{custom-file-processing---solar-radiation-value-calculation}
 
-EnergyPlus only uses the solar radiation data for Direct Normal and Diffuse Horizontal radation in its calculations. But many data sources have only Global Horizontal (sometimes called Total) or none of the solar radiation elements.
+EnergyPlus only uses the solar radiation data for Direct Normal and Diffuse Horizontal radation in its calculations. But many data sources have only Global Horizontal (sometimes called Total) or none of the solar radiation elements. When global radiation is available, then a different model (Perez Model) is used to split the global into direct normal and diffuse horizontal values.
 
 With any two of the solar components, it is reasonable to use the simple relationship of Global, Diffuse and Direct, such as:
 
@@ -755,11 +755,19 @@ Using known solar position (calculated internally by the Weather converter from 
 Direct_{normalradiation} = \frac{Direct_{horizontalradiation}}{\sin(Solar_{height}}
 \end{equation}
 
-Thus, having two of the solar radiation components makes it relatively simple to derive the third.
+In custom weather file processing does the following:
 
-However, many data sources may not have any solar radiation components. A study was undertaken to find an appropriate solar model to fill in missing solar data for weather files. The goal was to determine one or more possible solar models to use in the weather conversion/creation process. One model seemed better overall with the usual given data from the sources than others. The model, termed Zhang-Huang, has been used in a variety of locations and data creations, including the upcoming IWEC2 data. The model uses a simplistic approach of recent drybulb temperatures, sky cover, global solar constant and solar position. This model is only used when all solar values are missing from the incoming data. When global radiation is available, then a different model (Perez split) is used to split the global into direct normal and diffuse horizontal values.
+\begin{itemize}
+\tightlist
+\item
+  If you have two of the solar radiation components, then you can easily compute the third
+\item
+  If you have global horizontal then Perez model is used for the direct/diffuse components split.
+\item
+  If you have no solar data, then Zhang-Huang model is used to estimate global horizontal, and Perez model is used to split that into direct and diffuse components.
+\end{itemize}
 
-Results, of course, can vary depending on locations.
+However, many data sources may not have any solar radiation components. A study was undertaken to find an appropriate solar model to fill in missing solar data for weather files. The goal was to determine one or more possible solar models to use in the weather conversion/creation process. One model seemed better overall with the usual given data from the sources than others. The model, termed Zhang-Huang, has been used in a variety of locations and data creations, including the upcoming IWEC2 data. The model uses a simplistic approach of recent drybulb temperatures, cloud-cover, global solar constant and solar position. This model is only used when all solar values are missing from the incoming data. Results, of course, can vary depending on locations.
 
 For example, in Brisbane AUS, comparing the solar creation with the original IWEC data looks very good:
 

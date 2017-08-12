@@ -135,11 +135,11 @@ When the heat exchanger assisted cooling coil is used with a furnace or unitary 
 \item
   MinimumLimit: \emph{FixedMinimum} \textbar{} \emph{ProportionalMinimum}
 \item
-  Minimum outside air schedule (schedule values multiply the minimum outside air flow rate)
+  Minimum Outdoor Air Schedule (schedule values multiply the minimum outside air flow rate)
 \item
-  Minimum Outside air flow Schedule(schedule values sets the limit on minimum outside air)
+  Minimum Fraction of Outdoor Air Schedule(schedule values sets the limit on minimum outside air fraction)
 \item
-  Maximum Outside air flow Schedule(schedule values sets the maximum amount of outside air possible in the system)
+  Maximum Fraction of Outdoor Air Schedule(schedule values sets the maximum outside air fraction possible in the system)
 \item
   Name of Controller:MechanicalVentilation object
 \item
@@ -264,7 +264,7 @@ The economizer schedule is then checked to determine if a ``push-button'' type e
 
 If \emph{S\(_{oa,init}\)} is greater than \({f_{oa,\min }}\) and less than 1 and the mixed air mass flow rate is greater than \({\dot m_{verysmall}}\) (\({10^{ - 30}}\) ) and night venting is not occuring and \emph{HighHumidityOperationFlag} is false then
 
-·~~~~~~~~we calculate a final outside air signal \emph{S\(_{oa}\)} by using the regula falsi method routine \emph{SolveRegulaFalsi} to zero the residual \({T_{mix,set}} - {T_{mix}}\) by varying the outside air mass flow rate \({S_{oa}}\cdot {\dot m_{mix}}\) . Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function \emph{PsyTdbFnHW} is used to obtain \emph{T\(_{mix}\)} from the mixed air enthalpy and humidity ratio.
+·~~~~~~~~we calculate a final outside air signal \emph{S\(_{oa}\)} by using the root solver method routine \emph{SolveRegulaFalsi} to zero the residual \({T_{mix,set}} - {T_{mix}}\) by varying the outside air mass flow rate \({S_{oa}}\cdot {\dot m_{mix}}\) . Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function \emph{PsyTdbFnHW} is used to obtain \emph{T\(_{mix}\)} from the mixed air enthalpy and humidity ratio.
 
 Otherwise
 
@@ -281,12 +281,6 @@ Otherwise
 \end{equation}
 
 ·~~~~~~~~If night ventilation is occuring, \({S_{oa}} = 1\) .(Night Ventilation has priority over the above constraints)
-
-·~~~~~~~~If the Minimum Outside air flow Schedule and the Maximum outside air flow schedule is available , Out Air signal \emph{S oa},\emph{init} ~is checked against those fractions from the schedule.
-
-~~~~~ S\(_{oa}\)~ = Maximum( Minimum OA fraction, S\(_{oa}\))
-
-~~~~~ S\(_{oa}\)~~~ = Minimum(Maximum OA fraction, S\(_{oa}\))
 
 Now the outside air flow rate is calculated:
 
@@ -310,13 +304,26 @@ Otherwise
 
 Then the following constraints are applied.
 
-·~~~~~~~~\({\dot m_{oa}}\) ~must be greater than or equal to the air primary loop total exhaust air mass flow rate (\({\dot m_{exhaust}}\) ).
+\begin{itemize}
+\item  \({\dot m_{oa}}\) ~must be greater than or equal to the air primary loop total exhaust air mass flow rate (\({\dot m_{exhaust}}\) ).
 
-·~~~~~~~~If \emph{MinimumLimit} = \emph{Fixed Minimum}, \({\dot m_{oa}}\) ~must be greater than or equal to the minimum outside air mass flow rate.
+\item  If \emph{MinimumLimit} = \emph{Fixed Minimum}, \({\dot m_{oa}}\) ~must be greater than or equal to the minimum outside air mass flow rate.
 
-·~~~~~~~~\({\dot m_{oa}}\) ~must be \(\le {\dot m_{mix}}\) .
+\item  If the Minimum Fraction of Outdoor Air Schedule or the Maximum Fraction of Outdoor Air Schedule is available , outside air fraction S\(_{oa}\) = \({\dot m_{oa}}\) / \({\dot m_{mix}}\) ~is checked against those fractions from the schedule.
 
-·~~~~~~~~\({\dot m_{oa}}\) ~must be \(\le\) ~the maximum outside air mass flow rate.
+S\(_{oa}\) = Maximum( Minimum OA fraction, S\(_{oa}\))
+
+S\(_{oa}\) = Minimum( Maximum OA fraction, S\(_{oa}\))
+
+\item  \({\dot m_{oa}}\) ~must be \(\le\) ~the maximum outside air mass flow rate.
+
+\item  If there is an EMS override set \({\dot m_{oa}}\) = EMS actuated OA mass flow rate.
+
+\item  If there is a demand limiting override set \({\dot m_{oa}}\) = Demand limiting OA mass flow rate.
+
+\item  \({\dot m_{oa}}\) ~must be \(\le {\dot m_{mix}}\) .
+
+\end{itemize}
 
 If heat recovery bypass control is selected, the type of control determines how heat recovery is simulated. If BypassWhenWithinEconomizerLimits is selected, heat recovery is only active when the EconomizerOperationFlag is false. If BypassWhenOAFlowGreaterThanMinimum is selected \emph{and} the EconomizerOperationFlag is true \emph{and} the outside air mass flow rate is greater than the minimum flow rate, heat recovery is disabled, otherwise heat recovery is active. The heat recovery bypass control option is used to optimize heat recovery in heating mode. Heat recovery is commonly used to reduce the cooling load when outdoor conditions are higher than indoor conditions, however, when outdoor conditions are favorable the heat exchanger can be turned off and the economizer may be used to also reduce the cooling load. Economizer mode is typically involves increasing the outdoor air flow rate. At some point the outdoor air flow rate must be reduced and the heat exchanger should be turned back on to reduce or avoid an indoor heating requirement. This option will typically be used with some form of supply air temperature control used with the heat recovery equipment (Ref. HeatExchanger).
 

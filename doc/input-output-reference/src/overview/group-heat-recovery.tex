@@ -184,32 +184,30 @@ This output is the electric consumption of the unit in Joules for the timestep b
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image423.png}
-\caption{}
+\caption{Schematic of the Sensible and Latent Air-to-Air Heat Exchanger}
 \end{figure}
 
 The sensible and latent air-to-air heat exchanger is an HVAC component typically used for exhaust or relief air heat recovery (Figure 150). Heat exchanger performance can be specified to transfer sensible energy, latent energy or both between the supply and exhaust air streams. The input requires no geometric data. Performance is defined by specifying sensible and/or latent effectiveness at 75\% and 100\% of the nominal (rated) supply air flow rate at two operating conditions as shown in Table~\ref{table:operating-conditions-for-defining-heat}.
 
-Figure 150. Schematic of the Sensible and Latent Air-to-Air Heat Exchanger
-
 % table 30
 \begin{longtable}[c]{@{}lll@{}}
 \caption{Operating Conditions for Defining Heat Exchanger Performance \label{table:operating-conditions-for-defining-heat}} \tabularnewline
-\toprule 
-Parameter & Conditions \tabularnewline
+\toprule
+Parameter & Conditions & \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Operating Conditions for Defining Heat Exchanger Performance} \tabularnewline
-\toprule 
-Parameter & Conditions \tabularnewline
+\toprule
+Parameter & Conditions & \tabularnewline
 \midrule
 \endhead
 
-Heating & Cooling \tabularnewline
+& Heating & Cooling \tabularnewline
 Entering supply air temperature: &  &  \tabularnewline
 Dry-bulb: & 1.7°C (35°F) & 35°C (95°F) \tabularnewline
 Wet-bulb: & 0.6°C (33°F) & 26°C (78°F) \tabularnewline
-Entering supply air temperature: &  &  \tabularnewline
+Entering exhaust air temperature: &  &  \tabularnewline
 Dry-bulb: & 21°C (70°F) & 24°C (75°F) \tabularnewline
 Wet-bulb: & 14°C (58°F) & 17C (63F) \tabularnewline
 \bottomrule
@@ -235,7 +233,7 @@ To model a sensible and latent air-to-air heat exchanger located in an air loop,
 \item
   HeatExchanger:AirToAir:SensibleAndLatent
 \item
-  Coil:Heating:Water, Coil:Heating:Electric or Coil:Heating:Gas (if preheat frost control is to be modeled)
+  Coil:Heating:Water, Coil:Heating:Electric or Coil:Heating:Fuel (if preheat frost control is to be modeled)
 \item
   SetpointManager:Scheduled (if supply air outlet temperature control is used)
 \end{itemize}
@@ -337,13 +335,13 @@ The appropriate threshold temperature varies with exhaust (inlet) air temperatur
 % table 31
 \begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
 \caption{Typical threshold temperatures \label{table:typical-threshold-temperatures}} \tabularnewline
-\toprule 
+\toprule
 Frost Control Type & Heat Exchanger Type & Energy Exchange & Threshold Temperature \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Typical threshold temperatures} \tabularnewline
-\toprule 
+\toprule
 Frost Control Type & Heat Exchanger Type & Energy Exchange & Threshold Temperature \tabularnewline
 \midrule
 \endhead
@@ -519,11 +517,11 @@ This output is the electric consumption rate of the unit in Watts. This rate is 
 
 This output is the electric consumption of the unit in Joules for the timestep being reported. This ouput is also added to a meter with ResourceType = Electricity, EndUseKey = HeatRecovery, GroupKey = System (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Heat Exchanger Sensible Effectiveness {[]}}{Heat Exchanger Sensible Effectiveness }}\label{heat-exchanger-sensible-effectiveness}
+\paragraph{Heat Exchanger Sensible Effectiveness {[]}}\label{heat-exchanger-sensible-effectiveness}
 
 This output is the average sensible effectiveness of the heat exchanger (excluding bypass air, if any) over the timestep being reported.
 
-\paragraph{\texorpdfstring{Heat Exchanger Latent Effectiveness {[]}}{Heat Exchanger Latent Effectiveness }}\label{heat-exchanger-latent-effectiveness}
+\paragraph{Heat Exchanger Latent Effectiveness {[]}}\label{heat-exchanger-latent-effectiveness}
 
 This output is the average latent effectiveness of the heat exchanger (excluding bypass air, if any) over the timestep being reported.
 
@@ -535,7 +533,7 @@ This output is the average mass flow rate in kg/second of the supply (primary) a
 
 This output is the average mass flow rate in kg/second of the exhaust (secondary) air stream that is bypassing the heat exchanger over the timestep being reported. This flow rate is equal to the total exhaust mass flow rate through the heat exchanger \textbf{unit} minus the amount passing through the exhaust side of the heat exchanger \textbf{core}.
 
-\paragraph{\texorpdfstring{Heat Exchanger Defrost Time Fraction {[]}}{Heat Exchanger Defrost Time Fraction }}\label{heat-exchanger-defrost-time-fraction}
+\paragraph{Heat Exchanger Defrost Time Fraction {[]}}\label{heat-exchanger-defrost-time-fraction}
 
 This output is the average fraction of the reporting timestep when frost control is being implemented.
 

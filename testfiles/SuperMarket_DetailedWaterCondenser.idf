@@ -135,7 +135,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.5;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1505,6 +1505,7 @@
     WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     3.0,                     !- Maximum Cycling Rate {cycles/hr}
@@ -1663,163 +1664,131 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    5.5,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan 1,            !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
     DX Coil Air Inlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 3 Object Type
     Supermarket Rooftop DX,  !- Component 3 Name
     DX Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     DX Coil Air Outlet Node, !- Component 3 Outlet Node Name
-    SERIESACTIVE,            !- Component 3 Branch Control Type
     Coil:Heating:Water,      !- Component 4 Object Type
     Air Loop Heating Coil,   !- Component 4 Name
     DX Coil Air Outlet Node, !- Component 4 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 4 Outlet Node Name
-    SERIESACTIVE;            !- Component 4 Branch Control Type
+    Air Loop Outlet Node;    !- Component 4 Outlet Node Name
 
   Branch,
     HW Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump 2,                  !- Component 1 Name
     HW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    HW Supply Pump-Heating Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HW Supply Pump-Heating Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Water Heater Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Water Heater 1,          !- Component 1 Name
     HW Supply Heating Inlet Node,  !- Component 1 Inlet Node Name
-    HW Supply Heating Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Heating Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HW Supply Outlet Branch, !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Supply Outlet Pipe,   !- Component 1 Name
     HW Supply Heating-Pipe Node,  !- Component 1 Inlet Node Name
-    HW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     HW Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Inlet Pipe,    !- Component 1 Name
     HW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    HW Demand Pipe-Coil Node,!- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Pipe-Coil Node;!- Component 1 Outlet Node Name
 
   Branch,
     HW Coil Branch,          !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Air Loop Heating Coil,   !- Component 1 Name
     Heating Coil Water Inlet Node,  !- Component 1 Inlet Node Name
-    Heating Coil Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Heating Coil Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HW Demand Bypass,        !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Bypass Pipe,   !- Component 1 Name
     HW Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    HW Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HW Demand Outlet Branch, !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HW Demand Outlet Pipe,   !- Component 1 Name
     HW Demand Coil-Pipe Node,!- Component 1 Inlet Node Name
-    HW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     Supply Inlet Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump 1,                  !- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
-    Supply Pump-Cooling Node,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Supply Pump-Cooling Node;!- Component 1 Outlet Node Name
 
   Branch,
     Cooling Branch,          !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     Water Heater 1,          !- Component 1 Name
     Water Heater Source Inlet Node,  !- Component 1 Inlet Node Name
     Supply Cooling Inlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoolingTower:SingleSpeed,!- Component 2 Object Type
     Cooling Tower 1,         !- Component 2 Name
     Supply Cooling Inlet Node,  !- Component 2 Inlet Node Name
-    Supply Cooling Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE;                 !- Component 2 Branch Control Type
+    Supply Cooling Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     Supply Outlet Branch,    !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
     Supply Cooling-Pipe Node,!- Component 1 Inlet Node Name
-    Supply Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Outlet Node;      !- Component 1 Outlet Node Name
 
   Branch,
     Demand Inlet Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Pipe-Cond Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Pipe-Cond Node;   !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Branch,        !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Refrigeration:Condenser:WaterCooled,  !- Component 1 Object Type
     MediumTempCondenser,     !- Component 1 Name
     Condenser Inlet Node,    !- Component 1 Inlet Node Name
-    Condenser Outlet Node,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     Demand Outlet Branch,    !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name
     Demand Cond-Pipe Node,   !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
@@ -1968,32 +1937,32 @@
     Pump 2,                  !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Supply Pump-Heating Node,  !- Outlet Node Name
-    0.0008,                  !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    170,                     !- Rated Power Consumption {W}
+    0.0008,                  !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    170,                     !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     ,                        !- Fraction of Motor Inefficiencies to Fluid Stream
     ,                        !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     ,                        !- Coefficient 3 of the Part Load Performance Curve
     ,                        !- Coefficient 4 of the Part Load Performance Curve
-    ,                        !- Minimum Flow Rate {m3/s}
+    ,                        !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Pump:VariableSpeed,
     Pump 1,                  !- Name
     Supply Inlet Node,       !- Inlet Node Name
     Supply Pump-Cooling Node,!- Outlet Node Name
-    0.003,                   !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    750,                     !- Rated Power Consumption {W}
+    0.003,                   !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    750,                     !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     ,                        !- Fraction of Motor Inefficiencies to Fluid Stream
     ,                        !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     ,                        !- Coefficient 3 of the Part Load Performance Curve
     ,                        !- Coefficient 4 of the Part Load Performance Curve
-    ,                        !- Minimum Flow Rate {m3/s}
+    ,                        !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
 !-   ===========  ALL OBJECTS IN CLASS: COOLINGTOWER:SINGLESPEED ===========
@@ -2015,6 +1984,10 @@
     100000,                  !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Design Inlet Air Dry-Bulb Temperature
+    ,                        !- Design Inlet Air Wet-Bulb Temperature
+    ,                        !- Design Approach Temperature
+    ,                        !- Design Range Temperature
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
@@ -2241,8 +2214,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     Rooftop DX Humidity Set Point Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     DX Coil Air Outlet Node, !- Setpoint Node or NodeList Name
     SalesFloor Node;         !- Control Zone Air Node Name
 
@@ -2709,7 +2680,7 @@
   Refrigeration:Condenser:AirCooled,
     LowTempCondenser,        !- Name
     LowTempCondenserHRCurve, !- Rated Effective Total Heat Rejection Rate Curve Name
-    0.,                      !- Rated Subcooling Temperature Difference {DeltaC}
+    0.,                      !- Rated Subcooling Temperature Difference {deltaC}
     TwoSpeed,                !- Condenser Fan Speed Control Type
     2600.,                   !- Rated Fan Power {W}
     ,                        !- Minimum Fan Air Flow Ratio {dimensionless}
@@ -2723,7 +2694,7 @@
     MediumTempCondenser,     !- Name
     58000.,                  !- Rated Effective Total Heat Rejection Rate {W}
     29.4,                    !- Rated Condensing Temperature {C}
-    0.0,                     !- Rated Subcooling Temperature Difference {DeltaC}
+    0.0,                     !- Rated Subcooling Temperature Difference {deltaC}
     10.0,                    !- Rated Water Inlet Temperature {C}
     Condenser Inlet Node,    !- Water Inlet Node Name
     Condenser Outlet Node,   !- Water Outlet Node Name

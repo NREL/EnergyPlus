@@ -636,7 +636,7 @@ This field contains the fraction of inverter thermal losses that enter the zone 
 
 \paragraph{Field: Inverter Efficiency}\label{field-inverter-efficiency}
 
-This field contains the value for inverter efficiency. In the simple model, efficiency is a constant. This is the so-called 1-term model. Input data for different types of inverters is available at http://www.gosolarcalifornia.org/equipment/inverter\_tests/summaries where the CEC Efficiency would be the value to enter here.
+This field contains the value for inverter efficiency. In the simple model, efficiency is a constant. This is the so-called 1-term model. Input data for different types of inverters is available at \url{http://www.gosolarcalifornia.org/equipment/inverter_tests/summaries} where the CEC Efficiency would be the value to enter here.
 
 An example IDF showing how this object is used is provided below:
 
@@ -722,7 +722,7 @@ ElectricLoadCenter:Inverter:FunctionOfPower,
 
 This input object is used to model conversion from Direct Current (DC) to Alternating Current (AC) in an electric load center that contains photovoltaic modules. Such a load center has an array of photovoltaic modules that feed an inverter DC power and the inverter produces AC power. This input object is for an inverter model where efficiency is interpolated using a look up table.
 
-This object was designed for use with data contained in the Inverter Performance Test Summaries available at http://www.gosolarcalifornia.org/equipment/inverter\_tests/summaries. All of the data needed for this object can be found there by make and model of inverter. The core of the data set is a 3x6 matrix of efficiency at different voltage and power levels. These form the look up table used in the model. Note that EnergyPlus PV models currently model only power and not the voltage and current situation. Therefore, only the nominal voltage data are used. This is the middle row of data in the Go Solar summaries.
+This object was designed for use with data contained in the Inverter Performance Test Summaries available at \url{http://www.gosolarcalifornia.org/equipment/inverter_tests/summaries}. All of the data needed for this object can be found there by make and model of inverter. The core of the data set is a 3x6 matrix of efficiency at different voltage and power levels. These form the look up table used in the model. Note that EnergyPlus PV models currently model only power and not the voltage and current situation. Therefore, only the nominal voltage data are used. This is the middle row of data in the Go Solar summaries.
 
 \subsubsection{Inputs}\label{inputs-5-008}
 
@@ -830,7 +830,7 @@ Each inverter can report the following seven output variables.
   HVAC,Sum,Inverter Ancillary AC Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Inverter DC to AC Efficiency {[]}}{Inverter DC to AC Efficiency }}\label{inverter-dc-to-ac-efficiency}
+\paragraph{Inverter DC to AC Efficiency {[]}}\label{inverter-dc-to-ac-efficiency}
 
 This is the efficiency with which DC power is converted to AC power by the inverter.
 
@@ -910,14 +910,14 @@ An example IDF showing how this object is used is provided below:
 
 \begin{lstlisting}
 
-ElectricLoadCenter:Storage:Converter, 
-  Grid Charge Converter , !- Name 
+ElectricLoadCenter:Storage:Converter,
+  Grid Charge Converter , !- Name
   ALWAYS\_ON , !- Availability Schedule Name
-  SimpleFixed , !- Power Conversion Efficiency Method 
+  SimpleFixed , !- Power Conversion Efficiency Method
   0.95 , !- Simple Fixed Efficiency
-  , !- Design Maximum Continuous Input Power 
-  , !- Efficiency Function of Power Curve Name 20 
-  , !- Ancillary Power Consumed In Standby 
+  , !- Design Maximum Continuous Input Power
+  , !- Efficiency Function of Power Curve Name 20
+  , !- Ancillary Power Consumed In Standby
   , !- Zone Name 0.25; !- Radiative Fraction
 \end{lstlisting}
 
@@ -953,7 +953,7 @@ Each converter can report the following output variables
   HVAC,Sum,Converter Ancillary AC Electric Energy {[}J{]}
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Converter AC to DC Efficiency {[]}}{Converter AC to DC Efficiency }}\label{converter-ac-to-dc-efficiency}
+\subsubsection{Converter AC to DC Efficiency {[]}}\label{converter-ac-to-dc-efficiency}
 
 This is the efficiency with which AC power is converted to DC power by the converter
 
@@ -991,7 +991,7 @@ These outputs are the power and energy consumed in standby operation when the co
 
 \subsection{ElectricLoadCenter:Storage:Simple}\label{electricloadcenterstoragesimple}
 
-This input object is used to model storage of electricity in an electric load center. This is a simple model that does not attempt to represent any of the characteristics of a real storage device such as a battery. The type of power, AC or DC, depends on the configuration chosen as the Electrical Buss Type in the ElectricLoadCenter:Distribution object.
+This input object is used to model storage of electricity in an electric load center. This can be used to model a battery or other forms of electrical storage in a simplified manner. The type of power, AC or DC, depends on the configuration chosen as the Electrical Buss Type in the ElectricLoadCenter:Distribution object.
 
 \subsubsection{Inputs}\label{inputs-6-007}
 
@@ -1101,11 +1101,9 @@ These outputs are total electricity power or energy drawn from the storage devic
 
 These outputs are the thermal power or energy losses from both charging and drawing electrical power in or out of the storage device. These losses are the result of inefficiencies in charging and drawing.
 
-\subsection{ElectricLoadCenter:Storage: Battery}\label{electricloadcenterstorage-battery}
+\subsection{ElectricLoadCenter:Storage:Battery}\label{electricloadcenterstorage-battery}
 
-This object uses the kinetic battery model (KiBaM) to simulate rechargeable battery banks in an electrical load center. The battery bank is a collection of one or more individual battery modules. Given the surplus or deficit power from the electrical system and the state of charge from the previous time step, this object can model the voltage, current, and energy losses with charging and discharging during each time step. The cumulative battery damage can be also modeled and reported at the end of each simulation run.
-
-This object allows the simulation of both lead-acid and Nickel Cadmium batteries. With input parameters derived from specific battery tests, the object is expected to support other battery types such as Lithium-ion batteries.
+This object uses the kinetic battery model (KiBaM) to simulate rechargeable battery banks in an electrical load center. This model is intended to represent technologies such as lead-acid that encounter significant rate or kinetic limitations. The battery bank is a collection of one or more individual battery modules. Given the surplus or deficit power from the electrical system and the state of charge from the previous time step, this object can model the voltage, current, and energy losses with charging and discharging during each time step. The cumulative battery damage can be also modeled and reported at the end of each simulation run.
 
 The kinetic battery model assumes that part of the battery s energy storage capacity is immediately available in discharging or charging while the rest is chemically bound. As a function of constant current, the battery capacity is related to three parameters: the maximum capacity at infinitesimal current, the capacity ratio of available charges, and the conversion ratio between available charges and bound charges. These parameters are usually obtained via curve fitting based on battery data sheets or test data.
 
@@ -1113,55 +1111,57 @@ Each individual battery module is modeled as a voltage source in series with an 
 
 The object offers user the option to perform battery life calculation. If battery life is modeled, the user needs to provide a group of coefficients for the correlation between the number of cycles for battery failure and the corresponding cycle range. More detailed information can be found from the Engineering Reference.
 
-\subsubsection{Field: Name}\label{field-name-7-004}
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}\label{field-name-7-004}
 
 This alpha field contains the identifying name for the battery bank.
 
-\subsubsection{Field: Availability Schedule Name}\label{field-availability-schedule-name-6-000}
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-6-000}
 
 This alpha field contains the schedule name (ref. Schedule objects) that describes when the battery is available. A schedule value greater than 0 (usually 1 is used) indicates that electrical energy can be stored or drawn from the battery. A value less than or equal to 0 (usually 0 is used) denotes that the battery is not available. If this field is blank, the schedule has values of 1 for all time periods.
 
-\subsubsection{Field: Zone Name}\label{field-zone-name-6-000}
+\paragraph{Field: Zone Name}\label{field-zone-name-6-000}
 
 This field contains the name of the thermal zone where the battery is located. Entering a valid name of zone here will direct EnergyPlus to include the energy storage losses as heat gains to the named thermal zone. If the battery is not within a thermal zone, this field can be left blank and the thermal energy associated with storage losses is removed from the building model.
 
-\subsubsection{Field: Radiative Fraction}\label{field-radiative-fraction-4}
+\paragraph{Field: Radiative Fraction}\label{field-radiative-fraction-4}
 
 This field contains the fraction of storage losses that enter the zone as long-wave thermal radiation. This numeric filed should have a value between 0.0 and 1.0. The balance of the losses is convective. This field is not used if the previous field for zone name is left blank.
 
-\subsubsection{Field: Number of Battery Modules in Parallel}\label{field-number-of-battery-modules-in-parallel}
+\paragraph{Field: Number of Battery Modules in Parallel}\label{field-number-of-battery-modules-in-parallel}
 
 This field defines the number of modules connected in parallel in the battery bank.
 
-\subsubsection{Field: Number of Battery Modules in Series}\label{field-number-of-battery-modules-in-series}
+\paragraph{Field: Number of Battery Modules in Series}\label{field-number-of-battery-modules-in-series}
 
 This field defines the number of modules connected in series in the battery bank. The total number of modules in a battery bank is equal to the number of modules in parallel times the number of modules in series.
 
-\subsubsection{Field: Maximum Module Capacity}\label{field-maximum-module-capacity}
+\paragraph{Field: Maximum Module Capacity}\label{field-maximum-module-capacity}
 
 This field indicates the maximum capacity of one battery module. It is evaluated as the total Amp-hours available when a full battery is discharged at infinitesimal current. This capacity is for an individual battery module, not for the whole battery bank. The maximum capacity can be found from manufacture s data or derived from test data by curve fitting.
 
-\subsubsection{Field: Initial Fractional State of Charge}\label{field-initial-fractional-state-of-charge}
+\paragraph{Field: Initial Fractional State of Charge}\label{field-initial-fractional-state-of-charge}
 
 This field describes the initial state of charge in terms of the fraction of maximum capacity as defined in the previous field.
 
-\subsubsection{Field: Fraction of Available Charge Capacity}\label{field-fraction-of-available-charge-capacity}
+\paragraph{Field: Fraction of Available Charge Capacity}\label{field-fraction-of-available-charge-capacity}
 
 The kinetic battery model assumes that battery is a two-tank electrical energy storage device: an available tank and a bound tank. The available tank can be immediately charged or discharged, while the bound tank can only be charged or discharged via the available tank. This field specifies the fraction of total charge in the battery that is part of the available tank. The ratio of available charge capacity to total capacity is a parameter usually derived from test data by curve fitting.
 
-\subsubsection{Field: Change Rate from Bound Charge to Available Charge}\label{field-change-rate-from-bound-charge-to-available-charge}
+\paragraph{Field: Change Rate from Bound Charge to Available Charge}\label{field-change-rate-from-bound-charge-to-available-charge}
 
 This field specifies the rate at which the charge flows between the available tank and the bound tank. It is a parameter used to calculate the conversion between available charge and chemically bound charge when charging and discharging the battery. This parameter is usually derived from test data by curve fitting.
 
-\subsubsection{Field: Fully Charged Module Open Circuit Voltage}\label{field-fully-charged-module-open-circuit-voltage}
+\paragraph{Field: Fully Charged Module Open Circuit Voltage}\label{field-fully-charged-module-open-circuit-voltage}
 
 This field indicates the open circuit voltage for a fully charged battery module. It can be found from manufacture s data or battery tests.
 
-\subsubsection{Field: Fully Discharged Module Open Circuit Voltage}\label{field-fully-discharged-module-open-circuit-voltage}
+\paragraph{Field: Fully Discharged Module Open Circuit Voltage}\label{field-fully-discharged-module-open-circuit-voltage}
 
 This field indicates the open circuit voltage for a fully discharged battery module. It can be found from manufacture s data or battery tests.
 
-\subsubsection{Field: Voltage Change Curve Name for Charging}\label{field-voltage-change-curve-name-for-charging}
+\paragraph{Field: Voltage Change Curve Name for Charging}\label{field-voltage-change-curve-name-for-charging}
 
 This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (\(\Delta E\) ) as a function of the battery state of charge in charging. The change of open circuit voltage is relative to a fully discharged battery.
 
@@ -1173,7 +1173,7 @@ The curve has the following form:
 
 where X is the battery charge divided by the maximum capacity at a given current. More details can be found from the Engineering Reference.
 
-\subsubsection{Field: Voltage Change Curve Name for Discharging}\label{field-voltage-change-curve-name-for-discharging}
+\paragraph{Field: Voltage Change Curve Name for Discharging}\label{field-voltage-change-curve-name-for-discharging}
 
 This field specifies the name of a rectangular hyperbola type 2 performance curve (ref: Curve:RectangularHyperbola2 in Performance Curves) that determines the change of open circuit voltage (\(\Delta E\) ) as a function of the battery state of charge in discharging. The change of open circuit voltage is relative to a fully charged battery.
 
@@ -1185,31 +1185,31 @@ The curve has the following form:
 
 where X is the removed charge divided by the maximum capacity at a given current. More details can be found from the Engineering Reference.
 
-\subsubsection{Field: Module Internal Electrical Resistance}\label{field-module-internal-electrical-resistance}
+\paragraph{Field: Module Internal Electrical Resistance}\label{field-module-internal-electrical-resistance}
 
 This field specifies the battery internal resistance in ohms. In theory, the electrical resistance within the battery varies with the state of charge and depends on whether it is in charging or discharging. In the kinetic battery model, the internal resistance is assumed as constant and the terminal voltage varies with current and state of charge. The internal resistance may be obtained from the battery manufacture or battery test data. Note that the field is for an individual module, not for the whole battery bank.
 
-\subsubsection{Field: Maximum Module Discharging Current}\label{field-maximum-module-discharging-current}
+\paragraph{Field: Maximum Module Discharging Current}\label{field-maximum-module-discharging-current}
 
 This field indicates the maximum current at which the battery can be discharged continuously. The limit on discharge current is usually defined by the battery manufacture to avoid battery damage. The limit is for an individual battery module.
 
-\subsubsection{Field: Module Cut-off Voltage}\label{field-module-cut-off-voltage}
+\paragraph{Field: Module Cut-off Voltage}\label{field-module-cut-off-voltage}
 
 This field specifies the minimum allowable voltage, below which the battery is generally regarded as empty. The cut-off voltage is usually defined by the battery manufacture and it is for an individual battery module.
 
-\subsubsection{Field: Module Charge Rate Limit}\label{field-module-charge-rate-limit}
+\paragraph{Field: Module Charge Rate Limit}\label{field-module-charge-rate-limit}
 
 This field specifies the limit on charging current relative to the remaining charge until the battery is full. This limit reflects the common practice that the charge rate is reduced as the battery gets more charged.
 
-\subsubsection{Field: Battery Life Calculation}\label{field-battery-life-calculation}
+\paragraph{Field: Battery Life Calculation}\label{field-battery-life-calculation}
 
 This field indicates whether the battery life model is activated in the simulation. If the battery life model is activated, the following five inputs on curve coefficients are required; otherwise, they are not used.
 
-\subsubsection{Field: Number of Cycle Bins}\label{field-number-of-cycle-bins}
+\paragraph{Field: Number of Cycle Bins}\label{field-number-of-cycle-bins}
 
 This field specifies the number of equally ranged cycle bins in battery life simulation. If 10 bins are used, the cycle ranges will include 10\%, 20\%, \ldots{}, 100\%.
 
-\subsubsection{Field: Battery Cycle Life Curve Name}\label{field-battery-cycle-life-curve-name}
+\paragraph{Field: Battery Cycle Life Curve Name}\label{field-battery-cycle-life-curve-name}
 
 This field specifies the name of a double exponential decay curve (ref: Curve:DoubleExponentialDecay in Performance Curves) that correlates the cycles of battery failure (C\(_{F}\)) and fractional depth of discharge (R). The curve is:
 
@@ -1275,7 +1275,7 @@ ElectricLoadCenter:Storage:Battery,
   1.0;                                     !- Maximum Value of x
 \end{lstlisting}
 
-\subsection{ElectricLoadCenter: Storage:Battery Outputs}\label{electricloadcenter-storagebattery-outputs}
+\subsubsection{Outputs}\label{electricloadcenter-storagebattery-outputs}
 
 \begin{itemize}
 \item
@@ -1306,49 +1306,49 @@ ElectricLoadCenter:Storage:Battery,
   HVAC,Sum,Electric Storage Thermal Loss Energy {[}J{]}
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Electric Storage Operating Mode Index {[]}}{Electric Storage Operating Mode Index }}\label{electric-storage-operating-mode-index}
+\paragraph{Electric Storage Operating Mode Index {[]}}\label{electric-storage-operating-mode-index}
 
 This output reports the battery mode of operation: 0 for idle; 1 for discharging; 2 for charging. It is expected that more operation modes would be added when a smart and active power dispatch controller is used in future.
 
-\subsubsection{Electric Storage Charge State {[}Ah{]}}\label{electric-storage-charge-state-ah}
+\paragraph{Electric Storage Charge State {[}Ah{]}}\label{electric-storage-charge-state-ah}
 
 The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module
 
-\subsubsection{\texorpdfstring{Electric Storage Charge Fraction {[]}}{Electric Storage Charge Fraction }}\label{electric-storage-charge-fraction}
+\paragraph{Electric Storage Charge Fraction {[]}}\label{electric-storage-charge-fraction}
 
 This output is the ratio between the electrical storage state of charge and the maximum capacity.
 
-\subsubsection{Electric Storage Charge Power {[}W{]}}\label{electric-storage-charge-power-w-1}
+\paragraph{Electric Storage Charge Power {[}W{]}}\label{electric-storage-charge-power-w-1}
 
-\subsubsection{Electric Storage Charge Energy {[}J{]}}\label{electric-storage-charge-energy-j-1}
+\paragraph{Electric Storage Charge Energy {[}J{]}}\label{electric-storage-charge-energy-j-1}
 
 These outputs are total electricity power or energy fed into the battery. This is the rate of amount of charging.
 
-\subsubsection{Electric Storage Production Decrement Energy {[}J{]}}\label{electric-storage-production-decrement-energy-j-1}
+\paragraph{Electric Storage Production Decrement Energy {[}J{]}}\label{electric-storage-production-decrement-energy-j-1}
 
 This output is the total electricity energy decremented from electricity production because it has fed into the battery. This output has the opposite sign of Electric Storage Charge Energy but is otherwise similar. This decrement output variable is also a meter associated with the resource type ElectricityProduced that reduces the metered electricity production to account for power that went into storage after production.
 
-\subsubsection{Electric Storage Discharge Power {[}W{]}}\label{electric-storage-discharge-power-w-1}
+\paragraph{Electric Storage Discharge Power {[}W{]}}\label{electric-storage-discharge-power-w-1}
 
-\subsubsection{Electric Storage Discharge Energy {[}J{]}}\label{electric-storage-discharge-energy-j-1}
+\paragraph{Electric Storage Discharge Energy {[}J{]}}\label{electric-storage-discharge-energy-j-1}
 
 These outputs are total electricity power or energy drawn from the battery. This is the rate or amount of discharging. The energy from storage output variable is also a meter associated with the resource type ElectricityProduced that increases the metered electricity production to account for power that has come back out of storage.
 
-\subsubsection{Electric Storage Total Current {[}A{]}}\label{electric-storage-total-current-a}
+\paragraph{Electric Storage Total Current {[}A{]}}\label{electric-storage-total-current-a}
 
 This output is the current to or from the battery bank depending on whether the battery is in the state of charging or discharging. The value is positive for discharging and negative for charging.
 
-\subsubsection{Electric Storage Total Voltage {[}V{]}}\label{electric-storage-total-voltage-v}
+\paragraph{Electric Storage Total Voltage {[}V{]}}\label{electric-storage-total-voltage-v}
 
 This output is the total terminal voltage of the battery bank.
 
-\subsubsection{Electric Storage Thermal Loss Rate {[}W{]}}\label{electric-storage-thermal-loss-rate-w-1}
+\paragraph{Electric Storage Thermal Loss Rate {[}W{]}}\label{electric-storage-thermal-loss-rate-w-1}
 
-\subsubsection{Electric Storage Thermal Loss Energy {[}J{]}}\label{electric-storage-thermal-loss-energy-j-1}
+\paragraph{Electric Storage Thermal Loss Energy {[}J{]}}\label{electric-storage-thermal-loss-energy-j-1}
 
 These outputs are the thermal power or energy losses from both charging and drawing electrical power in or out of the storage device. These losses are due to the battery internal resistance in charging and discharging.
 
-\subsubsection{\texorpdfstring{Electric Storage Degradation Fraction {[]}}{Electric Storage Degradation Fraction }}\label{electric-storage-degradation-fraction}
+\paragraph{Electric Storage Degradation Fraction {[]}}\label{electric-storage-degradation-fraction}
 
 This output reports the fractional battery life used up at a point of time. For example, a value of 0.4 at the end of one year simulation means that the 40\% of the battery life is used up, so the battery needs to be replaced every two and a half years.
 
@@ -2262,7 +2262,7 @@ This output variable is the average electric power produced by the generator in 
 
 This output variable is the electric energy produced by the generator in Joules for the timestep being reported. This output is also added to a meter with Resource Type = ElectricityProduced, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). This is the net electric energy produced, accounting for ancillary electric consumption during generator operation.
 
-\paragraph{\texorpdfstring{Generator LHV Basis Electric Efficiency {[]}}{Generator LHV Basis Electric Efficiency }}\label{generator-lhv-basis-electric-efficiency}
+\paragraph{Generator LHV Basis Electric Efficiency {[]}}\label{generator-lhv-basis-electric-efficiency}
 
 This output variable is the average electric efficiency of the generator (lower heating value basis) for the timestep being reported. The electric efficiency is the Generator Produced Electric Power in Watts divided by the generator s fuel energy consumption rate in Watts (lower heating value basis).
 
@@ -2659,11 +2659,11 @@ This report is the net electrical power produced by the generator in watts.
 
 This report is the net electrical energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
 
-\paragraph{\texorpdfstring{Generator Electric Efficiency {[]}}{Generator Electric Efficiency }}\label{generator-electric-efficiency}
+\paragraph{Generator Electric Efficiency {[]}}\label{generator-electric-efficiency}
 
 This is the result for electrical efficiency.
 
-\paragraph{\texorpdfstring{Generator Thermal Efficiency {[]}}{Generator Thermal Efficiency }}\label{generator-thermal-efficiency}
+\paragraph{Generator Thermal Efficiency {[]}}\label{generator-thermal-efficiency}
 
 This is the result for thermal efficiency.
 
@@ -2980,7 +2980,7 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Sum, Generator Fuel Cell Model Iteration Count {[]}
 \item
-  HVAC,Sum,Generator Regula Falsi Iteration Count {[]}
+  HVAC,Sum,Generator Root Solver Iteration Count {[]}
 \end{itemize}
 
 \paragraph{Generator Air Inlet Temperature {[}C{]}}\label{generator-air-inlet-temperature-c}
@@ -3103,7 +3103,7 @@ This variable provides the results for the power losses associated with ineffici
 
 This variable provides the results for \({P_{el}}\) , which is the net DC electrical power produced by the fuel cell power module.
 
-\paragraph{\texorpdfstring{Generator DC Power Efficiency {[]}}{Generator DC Power Efficiency }}\label{generator-dc-power-efficiency}
+\paragraph{Generator DC Power Efficiency {[]}}\label{generator-dc-power-efficiency}
 
 This variable provides the results for \({\varepsilon_{el}}\) , which is the electrical efficiency of the fuel cell power module.
 
@@ -3135,19 +3135,19 @@ This variable provides the results for \({P_{el,ancillaries - AC}}\) , which is 
 
 This variable provides the results for the energy used by AC ancillaries. It is also added to the appropriate meters.
 
-\paragraph{\texorpdfstring{Generator Fuel Cell Model Iteration Count {[]}}{Generator Fuel Cell Model Iteration Count }}\label{generator-fuel-cell-model-iteration-count}
+\paragraph{Generator Fuel Cell Model Iteration Count {[]}}\label{generator-fuel-cell-model-iteration-count}
 
 This variable provides information on the numerical method used to calculate the FC model. EnergyPlus uses a sequential substitution iterative algorithm to solve the main heat balance equation for the FC model. This output variable indicates the number of iterations needed to converge.
 
-\paragraph{\texorpdfstring{Generator Regula Falsi Iteration Count {[]}}{Generator Regula Falsi Iteration Count }}\label{generator-regula-falsi-iteration-count}
+\paragraph{Generator Root Solver Iteration Count {[]}}\label{generator-regula-falsi-iteration-count}
 
-This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas s enthalpy. A Regula Falsi numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the Regula Falsi method to converge.
+This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas s enthalpy. A root solver numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the root solver method to converge.
 
 \paragraph{Generator Heat Recovery Exit Gas Temperature {[}C{]}}\label{generator-heat-recovery-exit-gas-temperature-c}
 
 This is the temperature of the exiting gas for heat recovery in C.
 
-\paragraph{\texorpdfstring{Generator Heat Recovery Exit Gas H2O Vapor Fraction {[]}}{Generator Heat Recovery Exit Gas H2O Vapor Fraction }}\label{generator-heat-recovery-exit-gas-h2o-vapor-fraction}
+\paragraph{Generator Heat Recovery Exit Gas H2O Vapor Fraction {[]}}\label{generator-heat-recovery-exit-gas-h2o-vapor-fraction}
 
 This is the water vapor fraction in the exit gas.
 
@@ -3401,11 +3401,11 @@ This field contains the coefficient r\(_{3}\) in the equation above.
 
 \subsubsection{Field: Stack Coolant Flow Rate}\label{field-stack-coolant-flow-rate}
 
-The stack cooler is assumed to have a closed water circulation loop that is used to extract heat from the stack and move it to a cogeneration heat exchanger and/or an air cooler. This field is used to enter the flow rate of coolant in this loop.
+The stack cooler is assumed to have a closed water circulation loop that is used to extract heat from the stack and move it to a cogeneration heat exchanger and/or an air cooler. This field is used to enter the mass flow rate of coolant in this loop in kg/s.
 
 \subsubsection{Field: Stack Cooler U-Factor Times Area Value}\label{field-stack-cooler-u-factor-times-area-value}
 
-This is the heat transfer coefficient between the stack and the coolant.
+This is the heat transfer coefficient between the stack and the coolant in W/K.
 
 \subsubsection{Field: Fs-cogen Adjustment Factor}\label{field-fs-cogen-adjustment-factor}
 
@@ -3417,11 +3417,11 @@ This field provides the value for an adjustment factor, \({F_{s - cogen}}\) , us
 
 \subsubsection{Field: Stack Cogeneration Exchanger Area}\label{field-stack-cogeneration-exchanger-area}
 
-This field provides the value for the cogeneration heat exchanger area, \({A_{s - cogen}}\)
+This field provides the value for the cogeneration heat exchanger area, \({A_{s - cogen}}\) in m2.
 
 \subsubsection{Field: Stack Cogeneration Exchanger Nominal Flow Rate}\label{field-stack-cogeneration-exchanger-nominal-flow-rate}
 
-This field provides the value for \(\dot N_{s - cogen}^0\) in the following relation for the cogeneration heat exchanger convection coefficient, \({h_{s - cogen}}\) :
+This field provides the value in kg/s for \(\dot N_{s - cogen}^0\) in the following relation for the cogeneration heat exchanger convection coefficient, \({h_{s - cogen}}\) :
 
 \begin{equation}
 {h_{s - cogen}} = h_{s - cogen}^0 \cdot {\left( {\frac{{{{\dot N}_{s - cogen}}}}{{\dot N_{s - cogen}^0}}} \right)^{{n_s}}}
@@ -3429,7 +3429,7 @@ This field provides the value for \(\dot N_{s - cogen}^0\) in the following rela
 
 \subsubsection{Field: Stack Cogeneration Exchanger Nominal Heat Transfer Coefficient}\label{field-stack-cogeneration-exchanger-nominal-heat-transfer-coefficient}
 
-This field provides the value for \(h_{s - cogen}^0\) in the relation above for the cogeneration heat exchanger convection coefficient, \({h_{s - cogen}}\) .
+This field provides the value for \(h_{s - cogen}^0\) in the relation above for the cogeneration heat exchanger convection coefficient, \({h_{s - cogen}}\) in W/m2-K.
 
 \subsubsection{Field: Stack Cogeneration Exchanger Nominal Heat Transfer Coefficient Exponent}\label{field-stack-cogeneration-exchanger-nominal-heat-transfer-coefficient-exponent}
 
@@ -3437,9 +3437,9 @@ This field provides the value for \({n_s}\) is the relation above for the cogene
 
 \subsubsection{Field: Stack Cooler Pump Power}\label{field-stack-cooler-pump-power}
 
-This field is the power used by the stack cooler s circulating pump in Watts. It is a constant power draw whenever the stack cooler is active.
+This field is the power used by the stack cooler's circulating pump in Watts. It is a constant power draw whenever the stack cooler is active.
 
-\subsubsection{Field: Stack Cooler Pump Heat loss}\label{field-stack-cooler-pump-heat-loss}
+\subsubsection{Field: Stack Cooler Pump Heat Loss Fraction}\label{field-stack-cooler-pump-heat-loss}
 
 This field is the fraction of the pump power consumption that is lost to the surround zone.
 
@@ -3518,13 +3518,13 @@ This field is used to control how heat losses from three other subsystems within
 % table 32
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \caption{Air Intake Heat Recovery Mode Choices \label{table:air-intake-heat-recovery-mode-choices}} \tabularnewline
-\toprule 
+\toprule
 Field Choice & Inverter Heat Losses Recovered? & Electrical Storage Heat Losses Recovered? & Auxiliary Heater Losses Recovered? \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Air Intake Heat Recovery Mode Choices} \tabularnewline
-\toprule 
+\toprule
 Field Choice & Inverter Heat Losses Recovered? & Electrical Storage Heat Losses Recovered? & Auxiliary Heater Losses Recovered? \tabularnewline
 \midrule
 \endhead
@@ -3769,7 +3769,7 @@ Generator:FuelCell:AuxiliaryHeater,
   ;                                               !- Minimum Heating Capacity in Kmol per Second
 \end{lstlisting}
 
-Generator:FuelCell:ExhaustGasToWaterHeatExchanger
+\subsection{Generator:FuelCell:ExhaustGasToWaterHeatExchanger}
 
 This object is used to describe the exhaust gas heat exchanger subsystem of the FC used to recovery thermal energy.
 
@@ -4240,7 +4240,7 @@ This output variable is the power of DC electricity produced by the PV array in 
 
 This output variable is the energy in DC electricity produced by the PV array, in Joules.
 
-\paragraph{\texorpdfstring{Generator PV Array Efficiency {[]}}{Generator PV Array Efficiency }}\label{generator-pv-array-efficiency}
+\paragraph{Generator PV Array Efficiency {[]}}\label{generator-pv-array-efficiency}
 
 This output variable is the resulting efficiency of the PV array .
 
@@ -4305,13 +4305,13 @@ The following table shows several sample PV array types with their input values.
 % table 33
 \begin{longtable}[c]{p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
 \caption{Photovoltaics Array Types with Values \label{table:photovoltaics-array-types-with-values}} \tabularnewline
-\toprule 
+\toprule
  & Short Circuit Current & Open Circuit Voltage & Voltage at Maximum Power & Current at Maximum Power & Temperature Coefficient of Short Circuit Current & Temperature Coefficient of Open Circuit Voltage & Number of Cells in Series per Module & Cell Temperature at NOCT Conditions & Module Area \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Photovoltaics Array Types with Values} \tabularnewline
-\toprule 
+\toprule
  & Short Circuit Current & Open Circuit Voltage & Voltage at Maximum Power & Current at Maximum Power & Temperature Coefficient of Short Circuit Current & Temperature Coefficient of Open Circuit Voltage & Number of Cells in Series per Module & Cell Temperature at NOCT Conditions & Module Area \tabularnewline
 \midrule
 \endhead
@@ -4845,12 +4845,12 @@ where
 If the user does not input any field of these parameters, the simple approximation model for the power coefficient will be used (see previous maximum power coefficient field). That is, the analytical approximation model of the power coefficient will be chosen only if the user inputs all these six parameters. The user also has the ability to modify each parameter when the specific value of the system is available. The default values are given in the table below.
 
 \begin{longtable}[c]{@{}llllll@{}}
-\toprule 
+\toprule
 C & C & C & C & C & C \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 C & C & C & C & C & C \tabularnewline
 \midrule
 \endhead
@@ -4935,11 +4935,11 @@ This report is the local wind speed at the specific height of the wind turbine.
 
 This report is the local density of the air at the specific height of the wind turbine.
 
-\paragraph{\texorpdfstring{Generator Turbine Tip Speed Ratio {[]}}{Generator Turbine Tip Speed Ratio }}\label{generator-turbine-tip-speed-ratio}
+\paragraph{Generator Turbine Tip Speed Ratio {[]}}\label{generator-turbine-tip-speed-ratio}
 
 This report is the ratio between the rotational speed of the tip of the blades and the ambient wind speed at the height of the hub or pole of the wind turbine.
 
-\paragraph{\texorpdfstring{Generator Turbine Power Coefficient {[]}}{Generator Turbine Power Coefficient }}\label{generator-turbine-power-coefficient}
+\paragraph{Generator Turbine Power Coefficient {[]}}\label{generator-turbine-power-coefficient}
 
 This report represents the efficiency of the power extraction from the ambient wind of the wind turbine. It is function of the tip speed ratio and pitch angle. It is only valid for HAWT systems.
 

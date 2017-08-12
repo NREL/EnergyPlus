@@ -12,7 +12,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with DistrictCooling.
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Plant Load Profile Cooling,  !- Name
@@ -126,7 +126,7 @@
     Supply Outlet Node,      !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     3,                       !- Minimum Loop Temperature {C}
-    0.01,                   !- Maximum Loop Flow Rate {m3/s}
+    0.01,                    !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     Supply Inlet Node,       !- Plant Side Inlet Node Name
@@ -140,13 +140,13 @@
     OPTIMAL;                 !- Load Distribution Scheme
 
   SetpointManager:ReturnTemperature:ChilledWater,
-    Main Loop Setpoint Manager, !- Name
+    Main Loop Setpoint Manager,  !- Name
     Supply Outlet Node,      !- Plant Loop Supply Outlet Node
     Supply Inlet Node,       !- Plant Loop Supply Inlet Node
-    7.0,                     !- Minimum Supply Temperature Setpoint
-    10.0,                    !- Maximum Supply Temperature Setpoint
+    7.0,                     !- Minimum Supply Temperature Setpoint {C}
+    10.0,                    !- Maximum Supply Temperature Setpoint {C}
     Constant,                !- Return Temperature Setpoint Input Type
-    12.0,                    !- Return Temperature Setpoint Constant Value
+    12.0,                    !- Return Temperature Setpoint Constant Value {C}
     ;                        !- Return Temperature Setpoint Schedule Name
 
   PlantEquipmentOperationSchemes,
@@ -191,55 +191,49 @@
 
   Branch,
     Supply Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump,                    !- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
-    Supply Pump-Cooling Node,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Supply Pump-Cooling Node;!- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     Pump,                    !- Name
     Supply Inlet Node,       !- Inlet Node Name
     Supply Pump-Cooling Node,!- Outlet Node Name
-    0.01,                    !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    4250,                    !- Rated Power Consumption {W}
+    0.01,                    !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    4250,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     Cooling Branch,          !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictCooling,         !- Component 1 Object Type
     Purchased Cooling,       !- Component 1 Name
     Supply Cooling Inlet Node,  !- Component 1 Inlet Node Name
-    Supply Cooling Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Supply Cooling Outlet Node;  !- Component 1 Outlet Node Name
 
   DistrictCooling,
     Purchased Cooling,       !- Name
-    Supply Cooling Inlet Node,  !- Hot Water Inlet Node Name
-    Supply Cooling Outlet Node,  !- Hot Water Outlet Node Name
+    Supply Cooling Inlet Node,  !- Chilled Water Inlet Node Name
+    Supply Cooling Outlet Node,  !- Chilled Water Outlet Node Name
     1000000;                 !- Nominal Capacity {W}
 
   Branch,
     Supply Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
     Supply Cooling-Pipe Node,!- Component 1 Inlet Node Name
-    Supply Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Outlet Pipe,      !- Name
@@ -252,20 +246,18 @@
 
   Branch,
     Demand Branch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile 1,          !- Name
     Demand Inlet Node,       !- Inlet Node Name
     Demand Outlet Node,      !- Outlet Node Name
     Load Profile 1 Load Schedule,  !- Load Schedule Name
-    0.01,                   !- Peak Flow Rate {m3/s}
+    0.01,                    !- Peak Flow Rate {m3/s}
     Load Profile 1 Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name
 
   ScheduleTypeLimits,
@@ -289,28 +281,28 @@
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
-    UNTIL: 2:00, 0,        !- Field 3
-    UNTIL: 4:00, -10000,        !- Field 3
-    UNTIL: 6:00, -30000,        !- Field 3
-    UNTIL: 8:00, -60000,        !- Field 3
-    UNTIL: 10:00,-80000,        !- Field 3
-    UNTIL: 12:00,-100000,        !- Field 3
-    UNTIL: 14:00,-150000,        !- Field 3
-    UNTIL: 16:00,-190000,        !- Field 3
-    UNTIL: 18:00,-200000,        !- Field 5
-    UNTIL: 20:00,-150000,           !- Field 7
-    UNTIL: 22:00,-100000,       !- Field 9
-    UNTIL: 24:00,-50000;      !- Field 11
-        
+    UNTIL: 2:00,0,           !- Field 3
+    UNTIL: 4:00,-10000,      !- Field 5
+    UNTIL: 6:00,-30000,      !- Field 7
+    UNTIL: 8:00,-60000,      !- Field 9
+    UNTIL: 10:00,-80000,     !- Field 11
+    UNTIL: 12:00,-100000,    !- Field 13
+    UNTIL: 14:00,-150000,    !- Field 15
+    UNTIL: 16:00,-190000,    !- Field 17
+    UNTIL: 18:00,-200000,    !- Field 19
+    UNTIL: 20:00,-150000,    !- Field 21
+    UNTIL: 22:00,-100000,    !- Field 23
+    UNTIL: 24:00,-50000;     !- Field 25
+
   Schedule:Compact,
     Load Profile 1 Flow Frac Schedule,  !- Name
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
     UNTIL: 06:00,1.0,        !- Field 3
-    UNTIL: 12:00,0.85,       !- Field 3
-    UNTIL: 18:00,0.7,        !- Field 3
-    UNTIL: 24:00,0.9;        !- Field 3
+    UNTIL: 12:00,0.85,       !- Field 5
+    UNTIL: 18:00,0.7,        !- Field 7
+    UNTIL: 24:00,0.9;        !- Field 9
 
   Output:VariableDictionary,Regular;
 
@@ -351,5 +343,5 @@
     AllSummary;              !- Report 1 Name
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 

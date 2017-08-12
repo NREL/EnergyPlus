@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef SwimmingPool_hh_INCLUDED
 #define SwimmingPool_hh_INCLUDED
@@ -143,6 +131,8 @@ namespace SwimmingPool {
 		Real64 PeopleHeatGain; // Current heat gain from people
 		int GlycolIndex; // index in fluid property routines for water
 		Real64 WaterMass; // pool water mass
+		Real64 SatPressPoolWaterTemp; // Saturation pressure at the pool water temperature
+		Real64 PartPressZoneAirTemp; // Partial pressure of water vapor in the air
 		// Report data
 		Real64 PoolWaterTemp; // Average pool water temperature
 		Real64 WaterInletTemp; // water inlet temperature
@@ -198,6 +188,8 @@ namespace SwimmingPool {
 			PeopleHeatGain( 0.0 ),
 			GlycolIndex( 0 ),
 			WaterMass( 0.0 ),
+			SatPressPoolWaterTemp( 0.0 ),
+			PartPressZoneAirTemp( 0.0 ),
 			PoolWaterTemp( 23.0 ),
 			WaterInletTemp( 0.0 ),
 			WaterOutletTemp( 0.0 ),
@@ -240,10 +232,24 @@ namespace SwimmingPool {
 	);
 
 	void
+	InitSwimmingPoolPlantLoopIndex(
+		int const PoolNum, // number of the swimming pool
+		bool & MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+	);
+	
+	void
 	CalcSwimmingPool(
 		int const PoolNum // Index of the swimming pool under consideration within the derived types
 	);
 
+	void CalcSwimmingPoolEvap(
+		Real64 & EvapRate, // Evaporation rate
+		int const PoolNum, // Pool index
+		int const SurfNum, // Surface index
+		Real64 const MAT, // mean air temperature
+		Real64 const HumRat // zone air humidity ratio
+	);
+	
 	void
 	UpdateSwimmingPool(
 		int const PoolNum // Index of the swimming pool under consideration within the derived types

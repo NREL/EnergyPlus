@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HeatBalanceManager Unit Tests
 
@@ -94,6 +82,78 @@ using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names )
+	{
+		std::string const idf_objects = delimited_string( {
+			"Version,8.6;",
+			"  WindowMaterial:Gap,",
+			"    Gap_1_Layer,             !- Name",
+			"    0.0127,                  !- Thickness {m}",
+			"    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)",
+			"    101325.0000;             !- Pressure {Pa}",
+			"  WindowGap:DeflectionState,",
+			"    DeflectionState_813_Measured_Gap_1,  !- Name",
+			"    0.0120;                  !- Deflected Thickness {m}",
+			"  WindowMaterial:Gap,",
+			"    Gap_6_Layer,             !- Name",
+			"    0.0060,                  !- Thickness {m}",
+			"    Gap_6_W_0_0060,          !- Gas (or Gas Mixture)",
+			"    101300.0000,             !- Pressure {Pa}",
+			"    DeflectionState_813_Measured_Gap_1;  !- Deflection State",
+		    "  WindowMaterial:Gap,",
+			"    Gap_1_Layer,             !- Name",
+			"    0.0100,                  !- Thickness {m}",
+			"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
+			"    101325.0000;             !- Pressure {Pa}",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+
+		GetMaterialData( ErrorsFound );
+
+		EXPECT_TRUE( ErrorsFound );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2 )
+	{
+		std::string const idf_objects = delimited_string(
+			{
+				"Version,8.6;",
+				"  WindowGap:DeflectionState,",
+				"    DeflectionState_813_Measured_Gap_1,  !- Name",
+				"    0.0120;                  !- Deflected Thickness {m}",
+				"  WindowMaterial:Gap,",
+				"    Gap_6_Layer,             !- Name",
+				"    0.0060,                  !- Thickness {m}",
+				"    Gap_6_W_0_0060,          !- Gas (or Gas Mixture)",
+				"    101300.0000,             !- Pressure {Pa}",
+				"    DeflectionState_813_Measured_Gap_1;  !- Deflection State",
+				"  WindowMaterial:Gap,",
+				"    Gap_1_Layer,             !- Name",
+				"    0.0127,                  !- Thickness {m}",
+				"    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)",
+				"    101325.0000;             !- Pressure {Pa}",
+				"  WindowMaterial:Gap,",
+				"    Gap_1_Layer,             !- Name",
+				"    0.0100,                  !- Thickness {m}",
+				"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
+				"    101325.0000;             !- Pressure {Pa}",
+			}
+		);
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+
+		GetMaterialData( ErrorsFound );
+
+		EXPECT_TRUE( ErrorsFound );
+
+	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ProcessZoneData )
 	{
@@ -511,6 +571,48 @@ namespace EnergyPlus {
 		EXPECT_EQ( "EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
 		EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
 		EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation )
+	{
+		std::string const idf_objects = delimited_string( {
+		"  Version,8.6;",
+  
+		"  Material:RoofVegetation,",
+		"    ThickSoil,               !- Name",
+		"    0.5,                     !- Height of Plants {m}",
+		"    5,                       !- Leaf Area Index {dimensionless}",
+		"    0.2,                     !- Leaf Reflectivity {dimensionless}",
+		"    0.95,                    !- Leaf Emissivity",
+		"    180,                     !- Minimum Stomatal Resistance {s/m}",
+		"    EcoRoofSoil,             !- Soil Layer Name",
+		"    MediumSmooth,            !- Roughness",
+		"    0.36,                    !- Thickness {m}",
+		"    0.4,                     !- Conductivity of Dry Soil {W/m-K}",
+		"    641,                     !- Density of Dry Soil {kg/m3}",
+		"    1100,                    !- Specific Heat of Dry Soil {J/kg-K}",
+		"    0.95,                    !- Thermal Absorptance",
+		"    0.8,                     !- Solar Absorptance",
+		"    0.7,                     !- Visible Absorptance",
+		"    0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer",
+		"    0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer",
+		"    0.45,                    !- Initial Volumetric Moisture Content of the Soil Layer",
+		"    Advanced;                !- Moisture Diffusion Calculation Method",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+		GetMaterialData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+
+		// check the "Material:RoofVegetation" names
+		EXPECT_EQ( Material( 1 ).Name, "THICKSOIL" );
+		// check maximum (saturated) moisture content 
+		EXPECT_EQ( 0.4, Material( 1 ).Porosity );
+		// check initial moisture Content was reset
+		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input
 
 	}
 }

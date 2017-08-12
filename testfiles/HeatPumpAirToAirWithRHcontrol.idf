@@ -96,7 +96,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -110,7 +110,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1260,12 +1260,13 @@
     HPCoolEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     HPCoolEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPCoolPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     4,                       !- Maximum Cycling Rate {cycles/hr}
     45;                      !- Latent Capacity Time Constant {s}
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
   Coil:Heating:DX:SingleSpeed,
     HP DX Heating Coil 1,    !- Name
@@ -1292,10 +1293,11 @@
     0.166667,                !- Defrost Time Period Fraction
     20000;                   !- Resistive Defrost Heater Capacity {W}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Supplemental Heating Coil,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
@@ -1307,9 +1309,9 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    1.60,                    !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.60,                    !- Supply Air Flow Rate During Heating Operation {m3/s}
-    1.60,                    !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    1.60,                    !- Cooling Supply Air Flow Rate {m3/s}
+    1.60,                    !- Heating Supply Air Flow Rate {m3/s}
+    1.60,                    !- No Load Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Air Fan Object Type
     Supply Fan 1,            !- Supply Air Fan Name
@@ -1317,7 +1319,7 @@
     HP DX Heating Coil 1,    !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supplemental Heating Coil,  !- Supplemental Heating Coil Name
     80,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -1437,18 +1439,15 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.6,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:AirToAir,  !- Component 2 Object Type
     GasHeat DXAC Furnace 1,  !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node;    !- Component 2 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 

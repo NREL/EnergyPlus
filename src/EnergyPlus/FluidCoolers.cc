@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -107,22 +95,14 @@ namespace FluidCoolers {
 	// PURPOSE OF THIS MODULE:
 	// Model the performance of fluid coolers
 
-	// METHODOLOGY EMPLOYED:
-
 	// REFERENCES:
 	// Based on cooling tower by Shirey, Raustad: Dec 2000; Shirey, Sept 2002
 
-	// OTHER NOTES:
-	// none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::KelvinConv;
 	using DataGlobals::SecInHour;
 	using DataGlobals::WarmupFlag;
-	using DataGlobals::InitConvTemp;
 	using namespace DataHVACGlobals;
 	using namespace DataLoopNode;
 	using DataEnvironment::StdBaroPress;
@@ -144,7 +124,6 @@ namespace FluidCoolers {
 	using FluidProperties::GetSpecificHeatGlycol;
 	using General::TrimSigDigits;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	std::string const cFluidCooler_SingleSpeed( "FluidCooler:SingleSpeed" );
 	std::string const cFluidCooler_TwoSpeed( "FluidCooler:TwoSpeed" );
@@ -156,8 +135,6 @@ namespace FluidCoolers {
 	int const FluidCooler_TwoSpeed( 2 );
 
 	static std::string const BlankString;
-
-	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumSimpleFluidCoolers( 0 ); // Number of similar fluid coolers
@@ -971,7 +948,7 @@ namespace FluidCoolers {
 		// Begin environment initializations
 		if ( MyEnvrnFlag( FluidCoolerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 			SimpleFluidCooler( FluidCoolerNum ).DesWaterMassFlowRate = SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate * rho;
 			InitComponentNodes( 0.0, SimpleFluidCooler( FluidCoolerNum ).DesWaterMassFlowRate, SimpleFluidCooler( FluidCoolerNum ).WaterInletNodeNum, SimpleFluidCooler( FluidCoolerNum ).WaterOutletNodeNum, SimpleFluidCooler( FluidCoolerNum ).LoopNum, SimpleFluidCooler( FluidCoolerNum ).LoopSideNum, SimpleFluidCooler( FluidCoolerNum ).BranchNum, SimpleFluidCooler( FluidCoolerNum ).CompNum );
 			MyEnvrnFlag( FluidCoolerNum ) = false;
@@ -1035,7 +1012,7 @@ namespace FluidCoolers {
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -1122,7 +1099,7 @@ namespace FluidCoolers {
 
 		if ( SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num == PIM_UFactor && SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUAWasAutoSized ) {
 			if ( PltSizCondNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 				if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity = DesFluidCoolerLoad;
@@ -1151,7 +1128,7 @@ namespace FluidCoolers {
 							ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
 							ShowFatalError( "Review and revise design input values as appropriate." );
 						}
-						rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+						rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 						tmpHighSpeedFanPower = 0.0105 * DesFluidCoolerLoad;
@@ -1211,7 +1188,7 @@ namespace FluidCoolers {
 							ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
 							ShowFatalError( "Review and revise design input values as appropriate." );
 						}
-						rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+						rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 						tmpHighSpeedAirFlowRate = DesFluidCoolerLoad / ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp - SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) * 4.0;
@@ -1264,7 +1241,7 @@ namespace FluidCoolers {
 						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
 						ShowFatalError( "Review and revise design input values as appropriate." );
 					}
-					rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+					rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 					DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 					Par( 1 ) = DesFluidCoolerLoad;
@@ -1279,7 +1256,7 @@ namespace FluidCoolers {
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, CalledFrom );
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 						ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1352,7 +1329,7 @@ namespace FluidCoolers {
 
 		if ( SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 			if ( SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesFluidCoolerLoad = SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity;
 				Par( 1 ) = DesFluidCoolerLoad;
@@ -1367,7 +1344,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1479,7 +1456,7 @@ namespace FluidCoolers {
 			}
 
 			if ( SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow && SimpleFluidCooler( FluidCoolerNum ).FluidCoolerLowSpeedNomCap > 0.0 ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesFluidCoolerLoad = SimpleFluidCooler( FluidCoolerNum ).FluidCoolerLowSpeedNomCap;
 				Par( 1 ) = DesFluidCoolerLoad;
@@ -1494,7 +1471,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, CalledFrom );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );

@@ -56,7 +56,7 @@
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -69,7 +69,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -336,12 +336,6 @@
     .0063;                   !- Thickness {m}
 
   Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
     Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
     LoE CLEAR 6MM,           !- Outside Layer
     AIR 6MM,                 !- Layer 2
@@ -377,8 +371,18 @@
     CC15;                    !- Outside Layer
 
   Construction,
+    UNDRWALL,                !- Name
+    CC24;                    !- Outside Layer
+
+  Construction,
     FURNITURE,               !- Name
     WD10;                    !- Outside Layer
+
+  Construction,
+    INTWALL-1,               !- Name
+    GP02,                    !- Outside Layer
+    AL21,                    !- Layer 2
+    GP02;                    !- Layer 3
 
 ! original origin (0,0,0)
 
@@ -390,8 +394,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 ! original origin (0,8.794457436,0)
 
@@ -403,8 +407,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 ! original origin (0,0,3.352800369)
 
@@ -416,8 +420,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 ! original origin (0,8.794457436,0)
 
@@ -429,8 +433,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 ! original origin (0,0,-2.438400269)
 
@@ -442,8 +446,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    2.438400269,             !- Ceiling Height {m}
-    724.992004395;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   GlobalGeometryRules,
     LowerLeftCorner,         !- Starting Vertex Position
@@ -513,6 +517,38 @@
     17.588914871,17.588914871,0,  !- X,Y,Z ==> Vertex 2 {m}
     17.588914871,17.588914871,3.352800369,  !- X,Y,Z ==> Vertex 3 {m}
     17.588914871,8.794457436,3.352800369;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    IntWall-F1,              !- Name
+    Wall,                    !- Surface Type
+    INTWALL-1,               !- Construction Name
+    ZNF1,                    !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    ZSF1,                    !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,8.794457436,3.352800369,  !- X,Y,Z ==> Vertex 1 {m}
+    0,8.794457436,0,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,8.794457436,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,8.794457436,3.352800369;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    IntWall-F2,              !- Name
+    Wall,                    !- Surface Type
+    INTWALL-1,               !- Construction Name
+    ZNF2,                    !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    ZSF2,                    !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,8.794457436,6.705600738,  !- X,Y,Z ==> Vertex 1 {m}
+    0,8.794457436,3.352800369,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,8.794457436,3.352800369,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,8.794457436,6.705600738;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     NWall,                   !- Name
@@ -817,6 +853,71 @@
     17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
     17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,-2.4384;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BSMT-WALL-1,             !- Name
+    WALL,                    !- Surface Type
+    UNDRWALL,                !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BSMT-WALL-2,             !- Name
+    WALL,                    !- Surface Type
+    UNDRWALL,                !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    17.588914871,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,17.588914871,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BSMT-WALL-3,             !- Name
+    WALL,                    !- Surface Type
+    UNDRWALL,                !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    17.588914871,17.588914871,0,  !- X,Y,Z ==> Vertex 1 {m}
+    17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    0,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    0,17.588914871,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BSMT-WALL-4,             !- Name
+    WALL,                    !- Surface Type
+    UNDRWALL,                !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,17.588914871,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
 
   FenestrationSurface:Detailed,
     EWWndw,                  !- Name
@@ -1361,6 +1462,7 @@
 
   OtherEquipment,
     BASE-1 OthEq 1,          !- Name
+    None,                    !- Fuel Type
     BASE-1,                  !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -1709,103 +1811,83 @@
 
   Branch,
     Air Loop 1 Main Branch,  !- Name
-    0.71,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Air Loop 1 Inlet Node,   !- Component 1 Inlet Node Name
     Mixed Air 1 Node,        !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 1,!- Component 2 Name
     Mixed Air 1 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 1,     !- Component 3 Name
     DX Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 1 Air Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan 1,            !- Component 4 Name
     Main Heating Coil 1 Air Outlet Node,  !- Component 4 Inlet Node Name
-    Air Loop 1 Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop 1 Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     Air Loop 2 Main Branch,  !- Name
-    0.67,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 2,                !- Component 1 Name
     Air Loop 2 Inlet Node,   !- Component 1 Inlet Node Name
     Mixed Air 2 Node,        !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 2,!- Component 2 Name
     Mixed Air 2 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 2 Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 2,     !- Component 3 Name
     DX Cooling Coil 2 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 2 Air Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan 2,            !- Component 4 Name
     Main Heating Coil 2 Air Outlet Node,  !- Component 4 Inlet Node Name
-    Air Loop 2 Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop 2 Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     Air Loop 3 Main Branch,  !- Name
-    0.79,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 3,                !- Component 1 Name
     Air Loop 3 Inlet Node,   !- Component 1 Inlet Node Name
     Mixed Air 3 Node,        !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 3,!- Component 2 Name
     Mixed Air 3 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 3 Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 3,     !- Component 3 Name
     DX Cooling Coil 3 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 3 Air Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan 3,            !- Component 4 Name
     Main Heating Coil 3 Air Outlet Node,  !- Component 4 Inlet Node Name
-    Air Loop 3 Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop 3 Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     Air Loop 4 Main Branch,  !- Name
-    0.75,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 4,                !- Component 1 Name
     Air Loop 4 Inlet Node,   !- Component 1 Inlet Node Name
     Mixed Air 4 Node,        !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 4,!- Component 2 Name
     Mixed Air 4 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 4 Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 4,     !- Component 3 Name
     DX Cooling Coil 4 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 4 Air Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan 4,            !- Component 4 Name
     Main Heating Coil 4 Air Outlet Node,  !- Component 4 Inlet Node Name
-    Air Loop 4 Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop 4 Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Air Loop 1,              !- Name
@@ -2197,37 +2279,41 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 4;              !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 1,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 1 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 1 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 2,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 2 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 2 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 2 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 3,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 3 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 3 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 3 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 4,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 4 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 4 Air Outlet Node,  !- Air Outlet Node Name

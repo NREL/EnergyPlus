@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::WeatherManager Unit Tests
 
@@ -225,3 +213,72 @@ TEST_F( EnergyPlusFixture, JGDate_Test )
 
 }
 
+TEST_F( EnergyPlusFixture, interpolateWindDirectionTest )
+{
+	// simple test in each quadrant
+	EXPECT_EQ( interpolateWindDirection( 0, 90, 0.5 ), 45. );
+	EXPECT_EQ( interpolateWindDirection( 10, 80, 0.5 ), 45. );
+	EXPECT_EQ( interpolateWindDirection( 20, 80, 0.7 ), 62. );
+	EXPECT_EQ( interpolateWindDirection( 20, 80, 0.3 ), 38. );
+
+	EXPECT_EQ( interpolateWindDirection( 90, 180, 0.5 ), 135. );
+	EXPECT_EQ( interpolateWindDirection( 100, 170, 0.5 ), 135. );
+	EXPECT_EQ( interpolateWindDirection( 110, 170, 0.7 ), 152. );
+	EXPECT_EQ( interpolateWindDirection( 110, 170, 0.3 ), 128. );
+
+	EXPECT_EQ( interpolateWindDirection( 180, 270, 0.5 ), 225. );
+	EXPECT_EQ( interpolateWindDirection( 190, 260, 0.5 ), 225. );
+	EXPECT_EQ( interpolateWindDirection( 200, 260, 0.7 ), 242. );
+	EXPECT_EQ( interpolateWindDirection( 200, 260, 0.3 ), 218. );
+
+	EXPECT_EQ( interpolateWindDirection( 270, 360, 0.5 ), 315. );
+	EXPECT_EQ( interpolateWindDirection( 280, 350, 0.5 ), 315. );
+	EXPECT_EQ( interpolateWindDirection( 290, 350, 0.7 ), 332. );
+	EXPECT_EQ( interpolateWindDirection( 290, 350, 0.3 ), 308. );
+
+	// tests across 180 degree angle
+	EXPECT_EQ( interpolateWindDirection( 170, 190, 0.7 ), 184. );
+	EXPECT_EQ( interpolateWindDirection( 170, 190, 0.3 ), 176. );
+	EXPECT_EQ( interpolateWindDirection( 100, 260, 0.7 ), 212. );
+	EXPECT_EQ( interpolateWindDirection( 100, 260, 0.3 ), 148. );
+
+	// tests across 0 degree angle (which was issue #5682)
+	EXPECT_EQ( interpolateWindDirection( 350, 10, 0.7 ),   4. );
+	EXPECT_EQ( interpolateWindDirection( 350, 10, 0.3 ), 356. );
+	EXPECT_EQ( interpolateWindDirection( 300, 80, 0.7 ),  38. );
+	EXPECT_EQ( interpolateWindDirection( 300, 80, 0.3 ), 342. );
+
+	EXPECT_EQ( interpolateWindDirection( 350, 10, 0.5 ),   0. );
+	EXPECT_EQ( interpolateWindDirection( 340, 10, 0.5 ), 355. );
+	EXPECT_EQ( interpolateWindDirection( 280, 10, 0.5 ), 325. );
+	EXPECT_EQ( interpolateWindDirection( 260, 10, 0.5 ), 315. );
+	EXPECT_EQ( interpolateWindDirection( 200, 10, 0.7 ), 319. );
+	EXPECT_EQ( interpolateWindDirection( 200, 10, 0.3 ), 251. );
+	EXPECT_EQ( interpolateWindDirection( 350, 160, 0.7 ), 109. );
+	EXPECT_EQ( interpolateWindDirection( 350, 160, 0.3 ), 41. );
+
+	// tests for new failures
+	EXPECT_EQ( interpolateWindDirection( 70, 30, 0.25 ), 60. );
+
+	// tests across 180 degree angle (reversed)
+	EXPECT_EQ( interpolateWindDirection( 190, 170, 0.3 ), 184. );
+	EXPECT_EQ( interpolateWindDirection( 190, 170, 0.7 ), 176. );
+	EXPECT_EQ( interpolateWindDirection( 260, 100, 0.3 ), 212. );
+	EXPECT_EQ( interpolateWindDirection( 260, 100, 0.7 ), 148. );
+
+	// tests across 0 degree angle (reversed)
+	EXPECT_EQ( interpolateWindDirection( 10, 350, 0.3 ), 4. );
+	EXPECT_EQ( interpolateWindDirection( 10, 350, 0.7 ), 356. );
+	EXPECT_EQ( interpolateWindDirection( 80, 300, 0.3 ), 38. );
+	EXPECT_EQ( interpolateWindDirection( 80, 300, 0.7 ), 342. );
+
+	EXPECT_EQ( interpolateWindDirection( 10, 350, 0.5 ), 0. );
+	EXPECT_EQ( interpolateWindDirection( 10, 340, 0.5 ), 355. );
+	EXPECT_EQ( interpolateWindDirection( 10, 280, 0.5 ), 325. );
+	EXPECT_EQ( interpolateWindDirection( 10, 260, 0.5 ), 315. );
+	EXPECT_EQ( interpolateWindDirection( 10, 200, 0.3 ), 319. );
+	EXPECT_EQ( interpolateWindDirection( 10, 200, 0.7 ), 251. );
+	EXPECT_EQ( interpolateWindDirection( 160, 350, 0.3 ), 109. );
+	EXPECT_EQ( interpolateWindDirection( 160, 350, 0.7 ), 41. );
+
+}

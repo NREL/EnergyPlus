@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::OutputReportTabular Unit Tests
 
@@ -79,6 +67,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -150,6 +139,75 @@ TEST( OutputReportTabularTest, RealToStr )
 	EXPECT_EQ( "0.123457E+06", RealToStr( 123456.789, 5 ) );
 
 }
+
+TEST(OutputReportTabularTest, isNumber)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, isNumber");
+	EXPECT_TRUE(isNumber("0"));
+	EXPECT_TRUE(isNumber("0.12"));
+	EXPECT_TRUE(isNumber("0.12E01"));
+	EXPECT_TRUE(isNumber("-6"));
+	EXPECT_TRUE(isNumber("-6.12"));
+	EXPECT_TRUE(isNumber("-6.12E-09"));
+	EXPECT_TRUE(isNumber(" 0"));
+	EXPECT_TRUE(isNumber(" 0.12"));
+	EXPECT_TRUE(isNumber(" 0.12E01"));
+	EXPECT_TRUE(isNumber("0 "));
+	EXPECT_TRUE(isNumber("0.12 "));
+	EXPECT_TRUE(isNumber("0.12E01 "));
+	EXPECT_TRUE(isNumber(" 0 "));
+	EXPECT_TRUE(isNumber(" 0.12 "));
+	EXPECT_TRUE(isNumber(" 0.12E01 "));
+}
+
+TEST(OutputReportTabularTest, digitsAferDecimal)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, digitsAferDecimal");
+	EXPECT_EQ(0, digitsAferDecimal("0"));
+	EXPECT_EQ(0, digitsAferDecimal("1."));
+	EXPECT_EQ(2, digitsAferDecimal("0.12"));
+	EXPECT_EQ(4, digitsAferDecimal("0.1234"));
+	EXPECT_EQ(2, digitsAferDecimal("3.12E01"));
+	EXPECT_EQ(0, digitsAferDecimal("-6"));
+	EXPECT_EQ(0, digitsAferDecimal("-6."));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12"));
+	EXPECT_EQ(5, digitsAferDecimal("-6.12765"));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12E-09"));
+}
+
+TEST(OutputReportTabularTest, splitCommaString)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, splitCommaString");
+	std::vector<std::string> actual;
+	actual.push_back("part1");
+	EXPECT_EQ(actual, splitCommaString("part1"));
+	actual.push_back("part2");
+	EXPECT_EQ(actual, splitCommaString("part1,part2"));
+	EXPECT_EQ(actual, splitCommaString(" part1,part2 "));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 "));
+	actual.push_back("part3");
+	EXPECT_EQ(actual, splitCommaString("part1,part2,part3"));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 , part3 "));
+}
+
+TEST(OutputReportTabularTest, unitsFromHeading)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
+	std::string unitString;
+	SetupUnitConversions();
+	unitsStyle = unitsStyleInchPound;
+	unitString = "";
+	EXPECT_EQ(96, unitsFromHeading(unitString)); 
+	EXPECT_EQ("", unitString);
+	unitString = "Zone Floor Area {m2}";
+	EXPECT_EQ(46, unitsFromHeading(unitString));
+	EXPECT_EQ("Zone Floor Area {ft2}", unitString);
+	unitString = "Fictional field {nonsense}";
+	EXPECT_EQ(0, unitsFromHeading(unitString));
+	EXPECT_EQ("Fictional field {nonsense}", unitString);
+
+}
+
 
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
 {
@@ -242,8 +300,70 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 	EXPECT_EQ( 0, indexUnitConv );
 	EXPECT_EQ( "", curUnits );
-	EXPECT_EQ( 0.0, curConversionFactor );
+	EXPECT_EQ( 1.0, curConversionFactor );
 	EXPECT_EQ( 0.0, curConversionOffset );
+
+	varNameWithUnits = "ZONE PEOPLE OCCUPANT COUNT[]";
+	LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
+	GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
+	EXPECT_EQ( 96, indexUnitConv );
+	EXPECT_EQ( "", curUnits );
+	EXPECT_EQ( 1.0, curConversionFactor );
+	EXPECT_EQ( 0.0, curConversionOffset );
+
+	std::vector<std::string> units = {
+		"[ ]",
+		"[%]",
+		"[]",
+		"[A]",
+		"[ach]",
+		"[Ah]",
+		"[C]",
+		"[cd/m2]",
+		"[clo]",
+		"[deg]",
+		"[deltaC]",
+		"[hr]",
+		"[J/kg]",
+		"[J/kg-K]",
+		"[J/kgWater]",
+		"[J/m2]",
+		"[J]",
+		"[K/m]",
+		"[kg/kg]",
+		"[kg/m3]",
+		"[kg/s]",
+		"[kg]",
+		"[kgWater/kgDryAir]",
+		"[kgWater/s]",
+		"[kmol/s]",
+		"[L]",
+		"[lum/W]",
+		"[lux]",
+		"[m/s]",
+		"[m]",
+		"[m2]",
+		"[m3/s]",
+		"[m3]",
+		"[min]",
+		"[Pa]",
+		"[ppm]",
+		"[rad]",
+		"[rev/min]",
+		"[s]",
+		"[V]",
+		"[W/K]",
+		"[W/m2]",
+		"[W/m2-C]",
+		"[W/m2-K]",
+		"[W/W]",
+		"[W]"
+	};
+
+	for ( auto u : units ) {
+		LookupSItoIP( u, indexUnitConv, curUnits );
+		EXPECT_NE( indexUnitConv, 0 );
+	}
 
 }
 
@@ -1980,28 +2100,23 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 
 		"Branch,",
 		"  DOAS Main Branch,        !- Name",
-		"  autosize,                !- Maximum Flow Rate {m3/s}",
 		"  ,                        !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"  DOAS OA System,          !- Component 1 Name",
 		"  DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name",
 		"  DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name",
-		"  Passive,                 !- Component 1 Branch Control Type",
 		"  CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 		"  DOAS Cooling Coil,       !- Component 2 Name",
 		"  DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
 		"  DOAS Cooling Coil Outlet,!- Component 2 Outlet Node Name",
-		"  Passive,                 !- Component 2 Branch Control Type",
-		"  Coil:Heating:Gas,        !- Component 2 Object Type",
+		"  Coil:Heating:Fuel,        !- Component 2 Object Type",
 		"  DOAS Heating Coil,       !- Component 2 Name",
 		"  DOAS Cooling Coil Outlet,  !- Component 2 Inlet Node Name",
 		"  DOAS Heating Coil Outlet,!- Component 2 Outlet Node Name",
-		"  Passive,                 !- Component 2 Branch Control Type",
 		"  Fan:VariableVolume,      !- Component 3 Object Type",
 		"  DOAS Supply Fan,         !- Component 3 Name",
 		"  DOAS Heating Coil Outlet,!- Component 3 Inlet Node Name",
-		"  DOAS Supply Fan Outlet,  !- Component 3 Outlet Node Name",
-		"  Active;                  !- Component 3 Branch Control Type",
+		"  DOAS Supply Fan Outlet;  !- Component 3 Outlet Node Name",
 
 		"AirLoopHVAC:SupplyPath,",
 		"  DOAS Supply Path,        !- Name",
@@ -2086,6 +2201,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
 		"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
+		"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
 		"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
 		"	0.0,                   !- Maximum Cycling Rate",
@@ -2098,9 +2214,10 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		"	0.0,                   !- Crankcase Heater Capacity",
 		"	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  DOAS Heating Coil,       !- Name",
 		"  AvailSched,              !- Availability Schedule Name",
+		"  Gas,                     !- Fuel Type",
 		"  0.8,                     !- Gas Burner Efficiency",
 		"  autosize,                !- Nominal Capacity {W}",
 		"  DOAS Cooling Coil Outlet,  !- Air Inlet Node Name",
@@ -2960,28 +3077,23 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 
 		"Branch,",
 		"  DOAS Main Branch,        !- Name",
-		"  autosize,                !- Maximum Flow Rate {m3/s}",
 		"  ,                        !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"  DOAS OA System,          !- Component 1 Name",
 		"  DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name",
 		"  DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name",
-		"  Passive,                 !- Component 1 Branch Control Type",
 		"  CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 		"  DOAS Cooling Coil,       !- Component 2 Name",
 		"  DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
 		"  DOAS Cooling Coil Outlet,!- Component 2 Outlet Node Name",
-		"  Passive,                 !- Component 2 Branch Control Type",
-		"  Coil:Heating:Gas,        !- Component 2 Object Type",
+		"  Coil:Heating:Fuel,        !- Component 2 Object Type",
 		"  DOAS Heating Coil,       !- Component 2 Name",
 		"  DOAS Cooling Coil Outlet,  !- Component 2 Inlet Node Name",
 		"  DOAS Heating Coil Outlet,!- Component 2 Outlet Node Name",
-		"  Passive,                 !- Component 2 Branch Control Type",
 		"  Fan:VariableVolume,      !- Component 3 Object Type",
 		"  DOAS Supply Fan,         !- Component 3 Name",
 		"  DOAS Heating Coil Outlet,!- Component 3 Inlet Node Name",
-		"  DOAS Supply Fan Outlet,  !- Component 3 Outlet Node Name",
-		"  Active;                  !- Component 3 Branch Control Type",
+		"  DOAS Supply Fan Outlet;  !- Component 3 Outlet Node Name",
 
 		"AirLoopHVAC:SupplyPath,",
 		"  DOAS Supply Path,        !- Name",
@@ -3066,6 +3178,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 		"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
 		"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
+		"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
 		"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
 		"	0.0,                   !- Maximum Cycling Rate",
@@ -3078,9 +3191,10 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 		"	0.0,                   !- Crankcase Heater Capacity",
 		"	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  DOAS Heating Coil,       !- Name",
 		"  AvailSched,              !- Availability Schedule Name",
+		"  Gas,                     !- Fuel Type",
 		"  0.8,                     !- Gas Burner Efficiency",
 		"  autosize,                !- Nominal Capacity {W}",
 		"  DOAS Cooling Coil Outlet,  !- Air Inlet Node Name",
@@ -4378,6 +4492,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"    ,                        !- Availability Schedule Name                                         ",
 		"    ZONE 1 INLETS,           !- Zone Supply Air Node Name                                          ",
 		"    ,                        !- Zone Exhaust Air Node Name                                         ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                         ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                         ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}       ",
@@ -4437,6 +4552,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"    ,                        !- Availability Schedule Name                                         ",
 		"    ZONE 2 INLETS,           !- Zone Supply Air Node Name                                          ",
 		"    ,                        !- Zone Exhaust Air Node Name                                         ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                         ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                         ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}       ",
@@ -4496,6 +4612,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"    ,                        !- Availability Schedule Name                                         ",
 		"    ZONE 3 INLETS,           !- Zone Supply Air Node Name                                          ",
 		"    ,                        !- Zone Exhaust Air Node Name                                         ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                         ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                         ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}       ",
@@ -4555,6 +4672,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"    ,                        !- Availability Schedule Name                                         ",
 		"    ZONE 4 INLETS,           !- Zone Supply Air Node Name                                          ",
 		"    ,                        !- Zone Exhaust Air Node Name                                         ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                         ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                         ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}       ",
@@ -5479,26 +5597,40 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    2.6575,6.8425,2.5,  !- X,Y,Z ==> Vertex 3 {m}                                         ",
 		"    2.6575,7.1575,2.5;  !- X,Y,Z ==> Vertex 4 {m}                                         ",
 		"                                                                                          ",
-		"  Daylighting:Controls,                                                                   ",
-		"    Daylit Zone,             !- Zone Name                                                 ",
-		"    2,                       !- Total Daylighting Reference Points                        ",
-		"    2.5,                     !- X-Coordinate of First Reference Point {m}                 ",
-		"    5.0,                     !- Y-Coordinate of First Reference Point {m}                 ",
-		"    0.8,                     !- Z-Coordinate of First Reference Point {m}                 ",
-		"    2.5,                     !- X-Coordinate of Second Reference Point {m}                ",
-		"    3.0,                     !- Y-Coordinate of Second Reference Point {m}                ",
-		"    0.8,                     !- Z-Coordinate of Second Reference Point {m}                ",
-		"    1.0,                     !- Fraction of Zone Controlled by First Reference Point      ",
-		"    0.0,                     !- Fraction of Zone Controlled by Second Reference Point     ",
-		"    550,                     !- Illuminance Setpoint at First Reference Point {lux}       ",
-		"    0,                       !- Illuminance Setpoint at Second Reference Point {lux}      ",
-		"    1,                       !- Lighting Control Type                                     ",
-		"    0.0,                     !- Glare Calculation Azimuth Angle of View Direction Clockwis",
-		"    20.0,                    !- Maximum Allowable Discomfort Glare Index                  ",
-		"    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Contro",
-		"    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Contr",
-		"    0,                       !- Number of Stepped Control Steps                           ",
-		"    1.0;                     !- Probability Lighting will be Reset When Needed in Manual S",
+		"  Daylighting:Controls,                                                                                                  ",
+		"    Daylit Zone_DaylCtrl,    !- Name                                                                                     ",
+		"    Daylit Zone,             !- Zone Name                                                                                ",
+		"    SplitFlux,               !- Daylighting Method                                                                       ",
+		"    ,                        !- Availability Schedule Name                                                               ",
+		"    Continuous,              !- Lighting Control Type                                                                    ",
+		"    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control             ",
+		"    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control            ",
+		"    ,                        !- Number of Stepped Control Steps                                                          ",
+		"    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control                 ",
+		"    Daylit Zone_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name                                       ",
+		"    0.0,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}       ",
+		"    20.0,                    !- Maximum Allowable Discomfort Glare Index                                                 ",
+		"    ,                        !- DElight Gridding Resolution {m2}                                                         ",
+		"    Daylit Zone_DaylRefPt1,  !- Daylighting Reference Point 1 Name                                                       ",
+		"    1.0,                     !- Fraction of Zone Controlled by Reference Point 1                                         ",
+		"    550,                     !- Illuminance Setpoint at Reference Point 1 {lux}                                          ",
+		"    Daylit Zone_DaylRefPt2,  !- Daylighting Reference Point 2 Name                                                       ",
+		"    0.0,                     !- Fraction of Zone Controlled by Reference Point 2                                         ",
+		"    0;                       !- Illuminance Setpoint at Reference Point 2 {lux}                                          ",
+		"                                                                                                                         ",
+		"  Daylighting:ReferencePoint,                                                                                            ",
+		"    Daylit Zone_DaylRefPt1,  !- Name                                                                                     ",
+		"    Daylit Zone,             !- Zone Name                                                                                ",
+		"    2.5,                     !- X-Coordinate of Reference Point {m}                                                      ",
+		"    5.0,                     !- Y-Coordinate of Reference Point {m}                                                      ",
+		"    0.8;                     !- Z-Coordinate of Reference Point {m}                                                      ",
+		"                                                                                                                         ",
+		"  Daylighting:ReferencePoint,                                                                                            ",
+		"    Daylit Zone_DaylRefPt2,  !- Name                                                                                     ",
+		"    Daylit Zone,             !- Zone Name                                                                                ",
+		"    2.5,                     !- X-Coordinate of Reference Point {m}                                                      ",
+		"    3.0,                     !- Y-Coordinate of Reference Point {m}                                                      ",
+		"    0.8;                     !- Z-Coordinate of Reference Point {m}                                                      ",
 		"                                                                                          ",
 		"  OutputControl:IlluminanceMap:Style,                                                     ",
 		"    Comma;                   !- Column Separator                                          ",
@@ -5589,6 +5721,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    ,                        !- Availability Schedule Name                                ",
 		"    Daylit Zone Supply Node, !- Zone Supply Air Node Name                                 ",
 		"    ,                        !- Zone Exhaust Air Node Name                                ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAi",
@@ -5647,6 +5780,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    ,                        !- Availability Schedule Name                                ",
 		"    Standard Zone Supply Node,  !- Zone Supply Air Node Name                              ",
 		"    ,                        !- Zone Exhaust Air Node Name                                ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAi",
@@ -5848,5 +5982,444 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 	EXPECT_EQ( "      114.72", tabularData[103][10] ); // window opening area
 
 }
+
+
+TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"Output:Table:Monthly,",
+		"Space Gains Annual Report, !- Name",
+		"2, !-  Digits After Decimal",
+		"Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+		"SumOrAverageDuringHoursShown, !- Aggregation Type for Variable or Meter 1",
+		"Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+		"Maximum, !- Aggregation Type for Variable or Meter 2",
+		"Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+		"Minimum; !- Aggregation Type for Variable or Meter 2",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	Real64 extLitUse;
+
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+
+	DataGlobals::DoWeathSim = true;
+	DataGlobals::TimeStepZone = 0.25;
+
+	GetInputTabularMonthly( );
+	EXPECT_EQ( MonthlyInputCount, 1 );
+	InitializeTabularMonthly( );
+
+	EXPECT_TRUE(isInvalidAggregationOrder());
+
+}
+
+
+TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, CollectPeakZoneConditions_test" );
+
+	Psychrometrics::InitializePsychRoutines();
+
+	CompLoadTablesType compLoad;
+	int timeOfMax = 10;
+	int zoneIndex = 1;
+	bool isCooling = true;
+
+	Zone.allocate( 1 );
+	Zone( 1 ).Multiplier = 1;
+	Zone( 1 ).ListMultiplier = 1;
+	Zone( 1 ).FloorArea = 12.;
+
+	CoolPeakDateHrMin.allocate( 1 );
+	CoolPeakDateHrMin( 1 ) = "06/30 13:15:00";
+
+	CalcFinalZoneSizing.allocate( 1 );
+	CalcFinalZoneSizing( 1 ).CoolOutTempSeq.allocate( 10 );
+	CalcFinalZoneSizing( 1 ).CoolOutTempSeq( 10 ) = 38.;
+	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq.allocate( 10 );
+	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq( 10 ) = 0.01459;
+	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq.allocate( 10 );
+	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq( 10 ) = 24.;
+	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq.allocate( 10 );
+	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq( 10 ) = 0.00979;
+	CalcFinalZoneSizing( 1 ).DesCoolLoad = 500.;
+	CalcFinalZoneSizing( 1 ).ZnCoolDgnSAMethod = SupplyAirTemperature;
+	CalcFinalZoneSizing( 1 ).CoolDesTemp = 13.;
+	CalcFinalZoneSizing( 1 ).DesCoolVolFlow = 3.3;
+
+	FinalZoneSizing.allocate( 1 );
+	FinalZoneSizing( 1 ).DesCoolLoad = 600.;
+
+	CollectPeakZoneConditions( compLoad, timeOfMax, zoneIndex, isCooling );
+
+	EXPECT_EQ( compLoad.peakDateHrMin, "06/30 13:15:00" );
+	EXPECT_EQ( compLoad.outsideDryBulb, 38. );
+	EXPECT_EQ( compLoad.outsideHumRatio, 0.01459 );
+	EXPECT_EQ( compLoad.zoneDryBulb, 24. );
+	EXPECT_EQ( compLoad.zoneHumRatio, 0.00979 );
+	EXPECT_EQ( compLoad.peakDesSensLoad, 500. );
+	EXPECT_EQ( compLoad.designPeakLoad, 600. );
+	EXPECT_EQ( compLoad.supAirTemp, 13. );
+	EXPECT_EQ( compLoad.mainFanAirFlow, 3.3 );
+	EXPECT_NEAR( compLoad.airflowPerFlrArea, 3.3 / 12., 0.0001 );
+	EXPECT_NEAR( compLoad.totCapPerArea, 600. / 12., 0.0001 );
+	EXPECT_NEAR( compLoad.airflowPerTotCap, 3.3 / 600., 0.0001 );
+	EXPECT_NEAR( compLoad.areaPerTotCap, 12. / 600., 0.0001 );
+
+}
+
+TEST( OutputReportTabularTest, CollectPeakAirLoopConditions_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, CollectPeakAirLoopConditions_test" );
+
+	CompLoadTablesType compLoad;
+	int airLoopIndex = 1;
+	bool isCooling = true;
+
+	CalcSysSizing.allocate( 1 );
+	CalcSysSizing( 1 ).SensCoolCap = 500.;
+
+	FinalSysSizing.allocate( 1 );
+	FinalSysSizing( 1 ).CoolSupTemp = 13.;
+	FinalSysSizing( 1 ).MixTempAtCoolPeak = 18.;
+	FinalSysSizing( 1 ).SensCoolCap = 600.;
+	FinalSysSizing( 1 ).DesMainVolFlow = 3.3;
+	FinalSysSizing( 1 ).DesOutAirVolFlow = 0.12;
+
+	CollectPeakAirLoopConditions( compLoad, airLoopIndex, isCooling );
+
+	EXPECT_EQ( compLoad.supAirTemp, 13. );
+	EXPECT_EQ( compLoad.mixAirTemp, 18. );
+	EXPECT_EQ( compLoad.designPeakLoad, 600. );
+	EXPECT_EQ( compLoad.peakDesSensLoad, 500. );
+	EXPECT_EQ( compLoad.mainFanAirFlow, 3.3 );
+	EXPECT_EQ( compLoad.outsideAirFlow, 0.12 );
+	EXPECT_EQ( compLoad.diffDesignPeak, 100. );
+
+	isCooling = false;
+
+	CalcSysSizing( 1 ).HeatCap = 800.;
+
+	FinalSysSizing.allocate( 1 );
+	FinalSysSizing( 1 ).HeatSupTemp = 45.;
+	FinalSysSizing( 1 ).HeatMixTemp = 37.;
+	FinalSysSizing( 1 ).HeatCap = 900.;
+	FinalSysSizing( 1 ).DesMainVolFlow = 3.3;
+	FinalSysSizing( 1 ).DesOutAirVolFlow = 0.12;
+
+
+	CollectPeakAirLoopConditions( compLoad, airLoopIndex, isCooling );
+
+	EXPECT_EQ( compLoad.supAirTemp, 45. );
+	EXPECT_EQ( compLoad.mixAirTemp, 37. );
+	EXPECT_EQ( compLoad.designPeakLoad, -900. );
+	EXPECT_EQ( compLoad.peakDesSensLoad, -800. );
+	EXPECT_EQ( compLoad.mainFanAirFlow, 3.3 );
+	EXPECT_EQ( compLoad.outsideAirFlow, 0.12 );
+	EXPECT_EQ( compLoad.diffDesignPeak, -100. );
+
+}
+
+TEST( OutputReportTabularTest, ComputeEngineeringChecks_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, ComputeEngineeringChecks_test" );
+
+	CompLoadTablesType compLoad;
+
+	compLoad.outsideAirFlow = 0.12;
+	compLoad.mainFanAirFlow = 0.50;
+	compLoad.floorArea = 13.;
+	compLoad.designPeakLoad = 800;
+
+	ComputeEngineeringChecks( compLoad );
+
+	EXPECT_EQ( compLoad.outsideAirRatio, 0.12/0.50 );
+	EXPECT_EQ( compLoad.airflowPerFlrArea, 0.50/13. );
+	EXPECT_EQ( compLoad.totCapPerArea, 800./13. );
+	EXPECT_EQ( compLoad.airflowPerTotCap, 0.50/800. );
+	EXPECT_EQ( compLoad.areaPerTotCap, 13./800. );
+
+}
+
+TEST( OutputReportTabularTest, GetZoneComponentAreas_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, GetZoneComponentAreas_test" );
+
+	Array1D< ZompComponentAreasType > areas;
+	areas.allocate(1);
+
+	Zone.allocate( 1 );
+	NumOfZones = 1;
+	Zone( 1 ).FloorArea = 12.;
+
+	Surface.allocate(13);
+
+	Surface( 1 ).GrossArea = 5.;  //extWall
+	Surface( 1 ).Class = SurfaceClass_Wall;
+	Surface( 1 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 1 ).Zone = 1;
+	Surface( 1 ).HeatTransSurf = true;
+
+	Surface( 2 ).GrossArea = 6.; //grdCntWall
+	Surface( 2 ).Class = SurfaceClass_Wall;
+	Surface( 2 ).ExtBoundCond = GroundFCfactorMethod;
+	Surface( 2 ).Zone = 1;
+	Surface( 2 ).HeatTransSurf = true;
+
+	Surface( 3 ).GrossArea = 7.; //intZoneWall
+	Surface( 3 ).Class = SurfaceClass_Wall;
+	Surface( 3 ).ExtBoundCond = 2;
+	Surface( 3 ).Zone = 1;
+	Surface( 3 ).HeatTransSurf = true;
+
+	Surface( 4 ).GrossArea = 8.; //roof
+	Surface( 4 ).Class = SurfaceClass_Roof;
+	Surface( 4 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 4 ).Zone = 1;
+	Surface( 4 ).HeatTransSurf = true;
+
+	Surface( 5 ).GrossArea = 9.; //ceiling
+	Surface( 5 ).Class = SurfaceClass_Roof;
+	Surface( 5 ).ExtBoundCond = 5;
+	Surface( 5 ).Zone = 1;
+	Surface( 5 ).HeatTransSurf = true;
+
+	Surface( 6 ).GrossArea = 10.; //extFloor
+	Surface( 6 ).Class = SurfaceClass_Floor;
+	Surface( 6 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 6 ).Zone = 1;
+	Surface( 6 ).HeatTransSurf = true;
+
+	Surface( 7 ).GrossArea = 11.; //grndCntFloor
+	Surface( 7 ).Class = SurfaceClass_Floor;
+	Surface( 7 ).ExtBoundCond = Ground;
+	Surface( 7 ).Zone = 1;
+	Surface( 7 ).HeatTransSurf = true;
+
+	Surface( 8 ).GrossArea = 12.; //intZoneFloor
+	Surface( 8 ).Class = SurfaceClass_Floor;
+	Surface( 8 ).ExtBoundCond = 3;
+	Surface( 8 ).Zone = 1;
+	Surface( 8 ).HeatTransSurf = true;
+
+	Surface( 9 ).GrossArea = 13.; //fenestration
+	Surface( 9 ).Class = SurfaceClass_Window;
+	Surface( 9 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 9 ).Zone = 1;
+	Surface( 9 ).HeatTransSurf = true;
+
+	Surface( 10 ).GrossArea = 14.; //door
+	Surface( 10 ).Class = SurfaceClass_Door;
+	Surface( 10 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 10 ).Zone = 1;
+	Surface( 10 ).HeatTransSurf = true;
+
+	Surface( 11 ).GrossArea = 15.; //door (again)
+	Surface( 11 ).Class = SurfaceClass_GlassDoor;
+	Surface( 11 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 11 ).Zone = 1;
+	Surface( 11 ).HeatTransSurf = true;
+
+	Surface( 12 ).GrossArea = 16.; //fenestration (again)
+	Surface( 12 ).Class = SurfaceClass_TDD_Dome;
+	Surface( 12 ).ExtBoundCond = ExternalEnvironment;
+	Surface( 12 ).Zone = 1;
+	Surface( 12 ).HeatTransSurf = true;
+
+	Surface( 13 ).GrossArea = 17.; //grndCntFloor (again)
+	Surface( 13 ).Class = SurfaceClass_Floor;
+	Surface( 13 ).ExtBoundCond = KivaFoundation;
+	Surface( 13 ).Zone = 1;
+	Surface( 13 ).HeatTransSurf = true;
+
+	GetZoneComponentAreas( areas );
+
+	EXPECT_EQ( 12., areas( 1 ).floor );
+	EXPECT_EQ( 8., areas( 1 ).roof );
+	EXPECT_EQ( 9., areas( 1 ).ceiling );
+	EXPECT_EQ( 5., areas( 1 ).extWall );
+	EXPECT_EQ( 7., areas( 1 ).intZoneWall );
+	EXPECT_EQ( 6., areas( 1 ).grndCntWall );
+	EXPECT_EQ( 10., areas( 1 ).extFloor );
+	EXPECT_EQ( 12., areas( 1 ).intZoneFloor );
+	EXPECT_EQ( 28., areas( 1 ).grndCntFloor );
+	EXPECT_EQ( 29., areas( 1 ).fenestration );
+	EXPECT_EQ( 29., areas( 1 ).door );
+
+}
+
+TEST( OutputReportTabularTest, CombineLoadCompResults_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, CombineLoadCompResults_test" );
+
+	CompLoadTablesType compLoadTotal;
+	compLoadTotal.cells.allocate( 10, 30 );
+	compLoadTotal.cells = 0.;
+	compLoadTotal.cellUsed.allocate( 10, 30 );
+	compLoadTotal.cellUsed = false;
+
+	CompLoadTablesType compLoadPartial;
+	compLoadPartial.cells.allocate( 10, 30 );
+	compLoadPartial.cells = 0.;
+	compLoadPartial.cellUsed.allocate( 10, 30 );
+	compLoadPartial.cellUsed = false;
+
+	Real64 multiplier = 3.;
+
+	compLoadPartial.cells( 1, 1) = 1.1;
+	compLoadPartial.cells( 4, 25 ) = 1.2;
+	compLoadPartial.cellUsed( 3, 17 ) = true;
+	compLoadPartial.outsideWebBulb = 17.;
+	compLoadPartial.diffDesignPeak = 11.;
+
+	CombineLoadCompResults( compLoadTotal, compLoadPartial, multiplier );
+
+	EXPECT_EQ( 1.1 * 3., compLoadTotal.cells( 1, 1 ) );
+	EXPECT_EQ( 1.2 * 3., compLoadTotal.cells( 4, 25 ) );
+	EXPECT_EQ( true, compLoadTotal.cellUsed( 3, 17 ) );
+	EXPECT_EQ( 17., compLoadTotal.outsideWebBulb );
+	EXPECT_EQ( 33., compLoadTotal.diffDesignPeak );
+
+}
+
+TEST( OutputReportTabularTest, AddTotalRowsForLoadSummary_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, AddTotalRowsForLoadSummary_test" );
+
+	CompLoadTablesType compLoad;
+	compLoad.cells.allocate( cPerArea, rGrdTot );
+	compLoad.cells = 0.;
+	compLoad.cellUsed.allocate( cPerArea, rGrdTot );
+	compLoad.cellUsed = true;
+
+	compLoad.cells( cSensInst, rLights ) = 3.;
+	compLoad.cells( cSensInst, rRefrig ) = 4.;
+	compLoad.cells( cLatent, rLights ) = 10.;
+	compLoad.cells( cLatent, rRefrig ) = 20.;
+
+	compLoad.cells( cArea, rLights ) = 5.;
+	compLoad.cells( cArea, rRefrig ) = 5.;
+
+	AddTotalRowsForLoadSummary( compLoad );
+
+	EXPECT_EQ( 3. + 4., compLoad.cells( cSensInst, rGrdTot ) );
+	EXPECT_EQ( 10 + 20., compLoad.cells( cLatent, rGrdTot ) );
+	EXPECT_EQ( 3. + 10., compLoad.cells( cTotal, rLights ) );
+	EXPECT_EQ( 4 + 20., compLoad.cells( cTotal, rRefrig ) );
+
+	EXPECT_EQ( 37., compLoad.cells( cTotal, rGrdTot ) );
+
+	EXPECT_EQ( 100. * 13. / 37., compLoad.cells( cPerc, rLights ) );
+	EXPECT_EQ( 100. * 24. / 37., compLoad.cells( cPerc, rRefrig ) );
+
+	EXPECT_EQ( 13. / 5., compLoad.cells( cPerArea, rLights ) );
+	EXPECT_EQ( 24. / 5., compLoad.cells( cPerArea, rRefrig ) );
+
+}
+
+TEST( OutputReportTabularTest, LoadSummaryUnitConversion_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, LoadSummaryUnitConversion_test" );
+
+	CompLoadTablesType compLoad;
+	compLoad.cells.allocate( cPerArea, rGrdTot );
+	compLoad.cells = 0.;
+	compLoad.cellUsed.allocate( cPerArea, rGrdTot );
+	compLoad.cellUsed = true;
+
+	compLoad.cells( cSensInst, rLights ) = 3.;
+	compLoad.cells( cLatent, rLights ) = 10.;
+
+	compLoad.cells( cArea, rLights ) = 5.;
+
+	compLoad.outsideDryBulb = 20.;
+	compLoad.mainFanAirFlow = 0.7;
+	compLoad.airflowPerTotCap = 0.2;
+	compLoad.totCapPerArea = 0.15;
+
+	unitsStyle = unitsStyleInchPound;
+	Real64 powerConversion = getSpecificUnitMultiplier( "W", "Btu/h" );
+	Real64 areaConversion = getSpecificUnitMultiplier( "m2", "ft2" );
+	Real64 airFlowConversion = getSpecificUnitMultiplier( "m3/s", "ft3/min" );
+	Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier( "m3/s-m2", "ft3/min-ft2" );
+	int tempConvIndx = getSpecificUnitIndex( "C", "F" );
+
+	LoadSummaryUnitConversion( compLoad );
+
+	EXPECT_EQ( 3. * powerConversion, compLoad.cells( cSensInst, rLights ) );
+	EXPECT_EQ( 10. * powerConversion, compLoad.cells( cLatent, rLights ) );
+	EXPECT_EQ( 5. * areaConversion, compLoad.cells( cArea, rLights ) );
+	EXPECT_EQ( 5. * areaConversion, compLoad.cells( cArea, rLights ) );
+
+	EXPECT_EQ( ConvertIP( tempConvIndx, 20. ), compLoad.outsideDryBulb );
+	EXPECT_EQ( 0.7 * airFlowConversion, compLoad.mainFanAirFlow );
+	EXPECT_EQ( 0.2 * airFlowPerAreaConversion / powerConversion, compLoad.airflowPerTotCap );
+	EXPECT_EQ( 0.15 * powerConversion / areaConversion, compLoad.totCapPerArea );
+
+}
+
+
+TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, CreateListOfZonesForAirLoop_test" );
+
+	CompLoadTablesType compLoad;
+	Array1D_int zoneToAirLoop;
+
+	NumOfZones = 15;
+	compLoad.zoneIndices.allocate( NumOfZones );
+	compLoad.zoneIndices = 0;
+
+	zoneToAirLoop.allocate( NumOfZones );
+	zoneToAirLoop( 1 ) = 3;
+	zoneToAirLoop( 2 ) = 2;
+	zoneToAirLoop( 3 ) = 1;
+	zoneToAirLoop( 4 ) = 1;
+	zoneToAirLoop( 5 ) = 2;
+	zoneToAirLoop( 6 ) = 3;
+	zoneToAirLoop( 7 ) = 1;
+	zoneToAirLoop( 8 ) = 1;
+	zoneToAirLoop( 9 ) = 2;
+	zoneToAirLoop( 10 ) = 2;
+	zoneToAirLoop( 11 ) = 1;
+	zoneToAirLoop( 12 ) = 1;
+	zoneToAirLoop( 13 ) = 3;
+	zoneToAirLoop( 14 ) = 3;
+	zoneToAirLoop( 15 ) = 1;
+
+	CreateListOfZonesForAirLoop( compLoad, zoneToAirLoop, 1 );
+	EXPECT_EQ( 3, compLoad.zoneIndices( 1 ) );
+	EXPECT_EQ( 4, compLoad.zoneIndices( 2 ) );
+	EXPECT_EQ( 7, compLoad.zoneIndices( 3 ) );
+	EXPECT_EQ( 8, compLoad.zoneIndices( 4 ) );
+	EXPECT_EQ( 11, compLoad.zoneIndices( 5 ) );
+	EXPECT_EQ( 12, compLoad.zoneIndices( 6 ) );
+	EXPECT_EQ( 15, compLoad.zoneIndices( 7 ) );
+	EXPECT_EQ( 0, compLoad.zoneIndices( 8 ) );
+
+	compLoad.zoneIndices = 0;
+	CreateListOfZonesForAirLoop( compLoad, zoneToAirLoop, 2 );
+	EXPECT_EQ( 2, compLoad.zoneIndices( 1 ) );
+	EXPECT_EQ( 5, compLoad.zoneIndices( 2 ) );
+	EXPECT_EQ( 9, compLoad.zoneIndices( 3 ) );
+	EXPECT_EQ( 10, compLoad.zoneIndices( 4 ) );
+	EXPECT_EQ( 0, compLoad.zoneIndices( 5 ) );
+
+	compLoad.zoneIndices = 0;
+	CreateListOfZonesForAirLoop( compLoad, zoneToAirLoop, 3 );
+	EXPECT_EQ( 1, compLoad.zoneIndices( 1 ) );
+	EXPECT_EQ( 6, compLoad.zoneIndices( 2 ) );
+	EXPECT_EQ( 13, compLoad.zoneIndices( 3 ) );
+	EXPECT_EQ( 14, compLoad.zoneIndices( 4 ) );
+	EXPECT_EQ( 0, compLoad.zoneIndices( 5 ) );
+
+}
+
 
 

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -1071,33 +1059,48 @@ namespace ZoneContaminantPredictorCorrector {
 				}
 			}
 
-			if ( NumAlphas > 5 ) {
-				ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedule = cAlphaArgs( 6 );
-				if ( lAlphaFieldBlanks( 6 ) ) {
+			ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedName = cAlphaArgs( 6 );
+			ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex = GetScheduleIndex( cAlphaArgs( 6 ) );
+			if ( ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex > 0 ) {
+				// Check validity of control types.
+				ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex, ">=", 0.0, "<=", 2000.0 );
+				if ( !ValidScheduleType ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"" );
+					ShowContinueError( "..contains values outside of range [0,2000 ppm]." );
+					ErrorsFound = true;
+				}
+				else {
+					Zone( ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum ).ZoneMaxCO2SchedIndex = ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex;
+				}
+			}
+
+			if ( NumAlphas > 6 ) {
+				ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedule = cAlphaArgs( 7 );
+				if ( lAlphaFieldBlanks( 7 ) ) {
 					ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr = ScheduleAlwaysOn;
 				} else {
-					ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
+					ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) );
 					if ( ContaminantControlledZone( ContControlledZoneNum ).AvaiSchedPtr == 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
 						// Check validity of control types.
 						ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr, ">=", 0.0, "<=", 1.0 );
 						if ( ! ValidScheduleType ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 6 ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 7 ) + "\"" );
 							ShowContinueError( "..contains values outside of range [0,1]." );
 							ErrorsFound = true;
 						}
 					}
 				}
-				if ( lAlphaFieldBlanks( 7 ) ) {
-					ShowSevereError( cCurrentModuleObject + " \"" + cAlphaArgs( 7 ) + "\" is required, but blank." );
+				if ( lAlphaFieldBlanks( 8 ) ) {
+					ShowSevereError( cCurrentModuleObject + " \"" + cAlphaArgs( 8 ) + "\" is required, but blank." );
 					ErrorsFound = true;
 				} else {
-					ContaminantControlledZone( ContControlledZoneNum ).GCSetPointSchedName = cAlphaArgs( 7 );
-					ContaminantControlledZone( ContControlledZoneNum ).GCSPSchedIndex = GetScheduleIndex( cAlphaArgs( 7 ) );
+					ContaminantControlledZone( ContControlledZoneNum ).GCSetPointSchedName = cAlphaArgs( 8 );
+					ContaminantControlledZone( ContControlledZoneNum ).GCSPSchedIndex = GetScheduleIndex( cAlphaArgs( 8 ) );
 					if ( ContaminantControlledZone( ContControlledZoneNum ).GCSPSchedIndex == 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				}
@@ -1662,7 +1665,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum );
 						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of CO2 Load means that
@@ -1744,7 +1747,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum );
 						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds; 
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of GC Load means that
@@ -2231,13 +2234,13 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( ZoneMassFlowRate > 0.0 ) {
 				if ( Contaminant.CO2Simulation ) {
 					B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + ( CO2MassFlowRate ) + MixingMassFlowCO2( ZoneNum );
-					A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 						// Multizone airflow calculated in AirflowNetwork
 						B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
 						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
 				}
 			} else if ( ZoneMassFlowRate <= 0.0 ) {
 				if ( Contaminant.CO2Simulation ) {
@@ -2248,7 +2251,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO;
 						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 				}
 			}
 
@@ -2292,13 +2295,13 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( ZoneMassFlowRate > 0.0 ) {
 				if ( Contaminant.GenericContamSimulation ) {
 					B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + ( GCMassFlowRate ) + MixingMassFlowGC( ZoneNum );
-					A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 						// Multizone airflow calculated in AirflowNetwork
 						B = GCGain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC ) + GCMassFlowRate;
 						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 				}
 			} else if ( ZoneMassFlowRate <= 0.0 ) {
 				if ( Contaminant.GenericContamSimulation ) {
@@ -2309,7 +2312,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC;
 						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 				}
 			}
 

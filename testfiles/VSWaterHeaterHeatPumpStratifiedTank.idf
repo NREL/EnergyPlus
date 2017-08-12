@@ -9,7 +9,7 @@
 ! System:   None.
 ! Plant:    Plant loop with one WaterHeater:Stratified object with variable-speed heat pump water heating connected to two water use equipment
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Water Heater DHW Plant Loop Example,  !- Name
@@ -195,7 +195,7 @@
 
   PlantEquipmentList,
     DHW Plant Equipment,     !- Name
-    WaterHeater:HeatPump:PumpedCondenser,    !- Equipment 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,  !- Equipment 1 Object Type
     PlantHeatPumpWaterHeater;!- Equipment 1 Name
 
   SetpointManager:Scheduled,
@@ -231,13 +231,11 @@
 
   Branch,
     Water Heater Use Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     DHW Pump,                !- Component 1 Name
     Water Heater Use Loop Inlet Node,  !- Component 1 Inlet Node Name
-    DHW Pump Outlet Node,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    DHW Pump Outlet Node;    !- Component 1 Outlet Node Name
 
 ! No pumping energy; water mains pressure only
 
@@ -245,27 +243,25 @@
     DHW Pump,                !- Name
     Water Heater Use Loop Inlet Node,  !- Inlet Node Name
     DHW Pump Outlet Node,    !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    0,                       !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    0,                       !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     1.0,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     Water Heater Use Branch, !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
-    WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,  !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
     Water Heater Use Inlet Node,  !- Component 1 Inlet Node Name
-    Water Heater Use Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Water Heater Use Outlet Node;  !- Component 1 Outlet Node Name
 
   WaterHeater:HeatPump:PumpedCondenser,
     PlantHeatPumpWaterHeater,!- Name
@@ -289,7 +285,7 @@
     Water Heater Use Inlet Node,  !- Tank Use Side Inlet Node Name
     Water Heater Use Outlet Node,  !- Tank Use Side Outlet Node Name
     Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,  !- DX Coil Object Type
-    HPWHPlantDXCoilVS,       !- Variable-speed DX Coil Name
+    HPWHPlantDXCoilVS,       !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
@@ -303,8 +299,8 @@
     ,                        !- Inlet Air Mixer Node Name
     ,                        !- Outlet Air Splitter Node Name
     ,                        !- Inlet Air Mixer Schedule Name
-    ,                        !- Control Logic
-    1.0;                     !- Control Sensor Location In Stratified Tank
+    ,                        !- Tank Element Control Logic
+    1.0;                     !- Control Sensor 1 Height In Stratified Tank {m}
 
   WaterHeater:Stratified,
     Water Heater Tank,       !- Name
@@ -360,18 +356,18 @@
     ,                        !- Indirect Water Heating Recovery Time {hr}
     6,                       !- Number of Nodes
     0.1,                     !- Additional Destratification Conductivity {W/m-K}
-    0.15,                    !- Node 1 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 2 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 3 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 4 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 5 Additional Loss Coefficient {W/m2-K}
-    0.1;                     !- Node 6 Additional Loss Coefficient {W/m2-K}
+    0.15,                    !- Node 1 Additional Loss Coefficient {W/K}
+    ,                        !- Node 2 Additional Loss Coefficient {W/K}
+    ,                        !- Node 3 Additional Loss Coefficient {W/K}
+    ,                        !- Node 4 Additional Loss Coefficient {W/K}
+    ,                        !- Node 5 Additional Loss Coefficient {W/K}
+    0.1;                     !- Node 6 Additional Loss Coefficient {W/K}
 
   Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
     HPWHPlantDXCoilVS,       !- Name
-	10,						 !- Number of Speeds
-	10,						 !- Nominal speed level
-    25000.0,                 !- Rated Heating Capacity {W}
+    10,                      !- Number of Speeds {dimensionless}
+    10,                      !- Nominal Speed Level {dimensionless}
+    25000.0,                 !- Rated Water Heating Capacity {W}
     29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
     22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
     55.72,                   !- Rated Condenser Inlet Water Temperature {C}
@@ -389,126 +385,126 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-	400.00,					 !- Speed 1 Water Heating capacity {W} of Reference Unit
-	5.0, 					 !- Speed 1 Water Heating COP {W/W} of Reference Unit
-	0.80, 					 !- Speed 1 Sensible Heat Transfer Ratio of Reference Unit
-	0.020140,                !- Speed 1 Air Flow Rate of Reference Unit
-	0.000018,                !- Speed 1 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 1 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	800.00,					 !- Speed 2 Water Heating capacity {W} of Reference Unit
-	4.8, 					 !- Speed 2 Water Heating COP {W/W} of Reference Unit
-	0.79, 					 !- Speed 2 Sensible Heat Transfer Ratio of Reference Unit
-	0.040280,                !- Speed 2 Air Flow Rate of Reference Unit
-	0.000036,                !- Speed 2 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 2 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	1200.00,				 !- Speed 3 Water Heating capacity {W} of Reference Unit
-	4.4, 					 !- Speed 3 Water Heating COP {W/W} of Reference Unit
-	0.78, 					 !- Speed 3 Sensible Heat Transfer Ratio of Reference Unit
-	0.060420,                !- Speed 3 Air Flow Rate of Reference Unit
-	0.000054,                !- Speed 3 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 3 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	1600.00,				 !- Speed 4 Water Heating capacity {W} of Reference Unit
-	4.0, 					 !- Speed 4 Water Heating COP {W/W} of Reference Unit
-	0.77, 					 !- Speed 4 Sensible Heat Transfer Ratio of Reference Unit
-	0.080560,                !- Speed 4 Air Flow Rate of Reference Unit
-	0.000072,                !- Speed 4 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 4 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	2000.00,				 !- Speed 5 Water Heating capacity {W} of Reference Unit
-	3.8, 					 !- Speed 5 Water Heating COP {W/W} of Reference Unit
-	0.76, 					 !- Speed 5 Sensible Heat Transfer Ratio of Reference Unit
-	0.100700,                !- Speed 5 Air Flow Rate of Reference Unit
-	0.000090,                !- Speed 5 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 5 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	2400.00,				 !- Speed 6 Water Heating capacity {W} of Reference Unit
-	3.4, 					 !- Speed 6 Water Heating COP {W/W} of Reference Unit
-	0.75, 					 !- Speed 6 Sensible Heat Transfer Ratio of Reference Unit
-	0.120840,                !- Speed 6 Air Flow Rate of Reference Unit
-	0.000108,                !- Speed 6 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 6 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	2800.00,				 !- Speed 7 Water Heating capacity {W} of Reference Unit
-	3.0, 					 !- Speed 7 Water Heating COP {W/W} of Reference Unit
-	0.74, 					 !- Speed 7 Sensible Heat Transfer Ratio of Reference Unit
-	0.140980,                !- Speed 7 Air Flow Rate of Reference Unit
-	0.000126,                !- Speed 7 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 7 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	3200.00,				 !- Speed 8 Water Heating capacity {W} of Reference Unit
-	2.6, 					 !- Speed 8 Water Heating COP {W/W} of Reference Unit
-	0.73, 					 !- Speed 8 Sensible Heat Transfer Ratio of Reference Unit
-	0.161120,                !- Speed 8 Air Flow Rate of Reference Unit
-	0.000144,                !- Speed 8 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 8 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	3600.00,				 !- Speed 9 Water Heating capacity {W} of Reference Unit
-	2.3, 					 !- Speed 9 Water Heating COP {W/W} of Reference Unit
-	0.72, 					 !- Speed 9 Sensible Heat Transfer Ratio of Reference Unit
-	0.181260,                !- Speed 9 Air Flow Rate of Reference Unit
-	0.000162,                !- Speed 9 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 9 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating COP Function of Water Flow Fraction Curve Name
-	4000.00,				 !- Speed 10 Water Heating capacity {W} of Reference Unit
-	2.0, 					 !- Speed 10 Water Heating COP {W/W} of Reference Unit
-	0.70, 					 !- Speed 10 Sensible Heat Transfer Ratio of Reference Unit
-	0.201400,                !- Speed 10 Air Flow Rate of Reference Unit
-	0.000179,                !- Speed 10 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 10 Water Pump Power of Reference Unit	
-    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
-    ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
-    HPWHHeatingCOPFTemp,     !- Heating COP Function of Temperature Curve Name
-    ConstantCubic,           !- Heating COP Function of Air Flow Fraction Curve Name
-    ConstantCubic;           !- Heating COP Function of Water Flow Fraction Curve Namee
+    400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
+    5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
+    0.80,                    !- Rated Sensible Heat Ratio at Speed 1
+    0.020140,                !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000018,                !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 1 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 1 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 1 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 1 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 1 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 1 COP Function of Water Flow Fraction Curve Name
+    800.00,                  !- Rated Water Heating Capacity at Speed 2 {W}
+    4.8,                     !- Rated Water Heating COP at Speed 2 {W/W}
+    0.79,                    !- Rated Sensible Heat Ratio at Speed 2
+    0.040280,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000036,                !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 2 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 2 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 2 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 2 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 2 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 2 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 2 COP Function of Water Flow Fraction Curve Name
+    1200.00,                 !- Rated Water Heating Capacity at speed 3 {W}
+    4.4,                     !- Rated Water Heating COP at Speed 3 {W/W}
+    0.78,                    !- Rated Sensible Heat Ratio at Speed 3
+    0.060420,                !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000054,                !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 3 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 3 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 3 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 3 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 3 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 3 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 3 COP Function of Water Flow Fraction Curve Name
+    1600.00,                 !- Rated Water Heating Capacity at Speed 4 {W}
+    4.0,                     !- Rated Water Heating COP at Speed 4 {W/W}
+    0.77,                    !- Rated Sensible Heat Ratio at Speed 4
+    0.080560,                !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000072,                !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 4 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 4 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 4 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 4 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 4 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 4 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 4 COP Function of Water Flow Fraction Curve Name
+    2000.00,                 !- Rated Water Heating Capacity at Speed 5 {W}
+    3.8,                     !- Rated Water Heating COP at Speed 5 {W/W}
+    0.76,                    !- Rated Sensible Heat Ratio at Speed 5
+    0.100700,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000090,                !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 5 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 5 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 5 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 5 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 5 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 5 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 5 COP Function of Water Flow Fraction Curve Name
+    2400.00,                 !- Rated Water Heating Capacity at Speed 6 {W}
+    3.4,                     !- Rated Water Heating COP at Speed 6 {W/W}
+    0.75,                    !- Rated Sensible Heat Ratio at Speed 6
+    0.120840,                !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000108,                !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 6 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 6 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 6 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 6 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 6 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 6 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 6 COP Function of Water Flow Fraction Curve Name
+    2800.00,                 !- Rated Water Heating Capacity at Speed 7 {W}
+    3.0,                     !- Rated Water Heating COP at Speed 7 {W/W}
+    0.74,                    !- Rated Sensible Heat Ratio at Speed 7
+    0.140980,                !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000126,                !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 7 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 7 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 7 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 7 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 7 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 7 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 7 COP Function of Water Flow Fraction Curve Name
+    3200.00,                 !- Rated Water Heating Capacity at Speed 8 {W}
+    2.6,                     !- Rated Water Heating COP at Speed 8 {W/W}
+    0.73,                    !- Rated Sensible Heat Ratio at Speed 8
+    0.161120,                !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000144,                !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 8 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 8 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 8 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 8 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 8 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 8 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 8 COP Function of Water Flow Fraction Curve Name
+    3600.00,                 !- Rated Water Heating Capacity at Speed 9 {W}
+    2.3,                     !- Rated Water Heating COP at Speed 9 {W/W}
+    0.72,                    !- Rated Sensible Heat Ratio at Speed 9
+    0.181260,                !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000162,                !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 9 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 9 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 9 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 9 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 9 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 9 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 9 COP Function of Water Flow Fraction Curve Name
+    4000.00,                 !- Rated Water Heating Capacity at Speed 10 {W}
+    2.0,                     !- Rated Water Heating COP at Speed 10 {W/W}
+    0.70,                    !- Rated Sensible Heat Ratio at Speed 10
+    0.201400,                !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000179,                !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
+    10.0,                    !- Speed 10 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    HPWHHeatingCapFTemp,     !- Speed 10 Total WH Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 10 Total WH Capacity Function of Air Flow Fraction Curve Name
+    ConstantCubic,           !- Speed 10 Total WH Capacity Function of Water Flow Fraction Curve Name
+    HPWHHeatingCOPFTemp,     !- Speed 10 COP Function of Temperature Curve Name
+    ConstantCubic,           !- Speed 10 COP Function of Air Flow Fraction Curve Name
+    ConstantCubic;           !- Speed 10 COP Function of Water Flow Fraction Curve Name
 
   Curve:Biquadratic,
     HPWHHeatingCapFTemp,     !- Name
@@ -555,14 +551,14 @@
     1.0;                     !- Maximum Value of x
 
   Curve:Cubic,
-   ConstantCubic,   !- Name
-   1,               !- Coefficient1 Constant
-   0,               !- Coefficient2 x
-   0,               !- Coefficient3 x
-   0,               !- Coefficient4 x
-   -100,            !- Minimum Value of x
-   100;             !- Maximum Value of x
-	
+    ConstantCubic,           !- Name
+    1,                       !- Coefficient1 Constant
+    0,                       !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0,                       !- Coefficient4 x**3
+    -100,                    !- Minimum Value of x
+    100;                     !- Maximum Value of x
+
   Fan:OnOff,
     HPWHPlantFan,            !- Name
     PlantHPWHSch,            !- Availability Schedule Name
@@ -593,13 +589,11 @@
 
   Branch,
     Water Heater Use Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Water Heater Use Outlet Pipe,  !- Component 1 Name
     Water Heater Use Outlet Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Water Heater Use Loop Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Water Heater Use Loop Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Water Heater Use Outlet Pipe,  !- Name
@@ -633,13 +627,11 @@
 
   Branch,
     Demand Inlet Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Pipe-DHW Node,    !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Pipe-DHW Node;    !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Inlet Pipe,       !- Name
@@ -648,13 +640,11 @@
 
   Branch,
     Domestic Hot Water Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Domestic Hot Water,      !- Component 1 Name
     Domestic Hot Water Inlet Node,  !- Component 1 Inlet Node Name
-    Domestic Hot Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Domestic Hot Water Outlet Node;  !- Component 1 Outlet Node Name
 
   WaterUse:Connections,
     Domestic Hot Water,      !- Name
@@ -737,13 +727,11 @@
 
   Branch,
     Demand Outlet Branch,    !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name
     Demand DHW-Pipe Node,    !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Outlet Pipe,      !- Name

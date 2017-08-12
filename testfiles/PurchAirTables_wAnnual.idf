@@ -99,7 +99,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -1076,6 +1076,7 @@
     ,                        !- Availability Schedule Name
     NODE_1,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1104,6 +1105,7 @@
     ,                        !- Availability Schedule Name
     NODE_2,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1132,6 +1134,7 @@
     ,                        !- Availability Schedule Name
     NODE_3,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2297,7 +2300,6 @@
 
   Output:Meter:MeterFileOnly,Gas:Building,runperiod;
 
-
   Output:Table:Monthly,
     Zone Cooling Summary,    !- Name
     ,                        !- Digits After Decimal
@@ -2328,318 +2330,313 @@
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 3
 
-
- 
   Output:Table:Annual,
-    Zone Electric Annual Summary,   !- Name
-    ,                               !- Filter
-    INTERMITTENT,                   !- Schedule Name
+    Zone Electric Annual Summary,  !- Name
+    ,                        !- Filter
+    INTERMITTENT,            !- Schedule Name
     Zone Lights Electric Energy,  !- Variable or Meter or EMS Variable or Field 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
+    ,                        !- Digits After Decimal 1
     Zone Lights Electric Energy,  !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
+    ,                        !- Digits After Decimal 2
     Zone Electric Equipment Electric Energy,  !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
+    ,                        !- Digits After Decimal 3
     Zone Electric Equipment Electric Energy,  !- Variable or Meter or EMS Variable or Field 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
+    ;                        !- Digits After Decimal 4
 
   Output:Table:Annual,
-    Window Annual Report,           !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Surface Window Transmitted Solar Radiation Rate,  !- Variable or Meter 1 Name
+    Window Annual Report,    !- Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Surface Window Transmitted Solar Radiation Rate,  !- Variable or Meter or EMS Variable or Field 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Surface Window Transmitted Beam Solar Radiation Rate,  !- Variable or Meter 2 Name
+    ,                        !- Digits After Decimal 1
+    Surface Window Transmitted Beam Solar Radiation Rate,  !- Variable or Meter or EMS Variable or Field 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Surface Window Transmitted Diffuse Solar Radiation Rate,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Surface Window Transmitted Diffuse Solar Radiation Rate,  !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Surface Window Heat Gain Rate,  !- Variable or Meter 4 Name
+    ,                        !- Digits After Decimal 3
+    Surface Window Heat Gain Rate,  !- Variable or Meter or EMS Variable or Field 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    ,                        !- field Digits After Decimal 4
-    Surface Window Heat Loss Rate,  !- Variable or Meter 5 Name
+    ,                        !- Digits After Decimal 4
+    Surface Window Heat Loss Rate,  !- Variable or Meter or EMS Variable or Field 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    ,                        !- field Digits After Decimal 5
-    Surface Window Inside Face Glazing Condensation Status,  !- Variable or Meter 6 Name
+    ,                        !- Digits After Decimal 5
+    Surface Window Inside Face Glazing Condensation Status,  !- Variable or Meter or EMS Variable or Field 6 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 6
-    ,                        !- field Digits After Decimal 6
-    Surface Shading Device Is On Time Fraction,  !- Variable or Meter 7 Name
+    ,                        !- Digits After Decimal 6
+    Surface Shading Device Is On Time Fraction,  !- Variable or Meter or EMS Variable or Field 7 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 7
-    ,                        !- field Digits After Decimal 7
-    Surface Storm Window On Off Status,  !- Variable or Meter 8 Name
+    ,                        !- Digits After Decimal 7
+    Surface Storm Window On Off Status,  !- Variable or Meter or EMS Variable or Field 8 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 8
-    ,                        !- field Digits After Decimal 8
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 9 Name
+    ,                        !- Digits After Decimal 8
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 9 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 9
-    ,                        !- field Digits After Decimal 9
-    Site Outdoor Air Wetbulb Temperature,  !- Variable or Meter 10 Name
+    ,                        !- Digits After Decimal 9
+    Site Outdoor Air Wetbulb Temperature,  !- Variable or Meter or EMS Variable or Field 10 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 10
-    ;                        !- field Digits After Decimal 10
+    ;                        !- Digits After Decimal 10
 
   Output:Table:Annual,
-    Surface Annual Report,           !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
+    Surface Annual Report,   !- Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Surface Inside Face Temperature, !- Variable or Meter 2 Name
+    ,                        !- Digits After Decimal 1
+    Surface Inside Face Temperature,  !- Variable or Meter or EMS Variable or Field 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Surface Outside Face Temperature, !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Surface Outside Face Temperature,  !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Surface Inside Face Convection Heat Gain Rate per Area, !- Variable or Meter 4 Name
+    ,                        !- Digits After Decimal 3
+    Surface Inside Face Convection Heat Gain Rate per Area,  !- Variable or Meter or EMS Variable or Field 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    ,                        !- field Digits After Decimal 4
-    Surface Outside Face Convection Heat Gain Rate per Area, !- Variable or Meter 5 Name
+    ,                        !- Digits After Decimal 4
+    Surface Outside Face Convection Heat Gain Rate per Area,  !- Variable or Meter or EMS Variable or Field 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    ;                        !- field Digits After Decimal 5
+    ;                        !- Digits After Decimal 5
 
   Output:Table:Annual,
-    Roof Annual Report,           !- Name
-    roof,                           !- Filter
-    ,                               !- Schedule Name
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
+    Roof Annual Report,      !- Name
+    roof,                    !- Filter
+    ,                        !- Schedule Name
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Surface Inside Face Temperature, !- Variable or Meter 2 Name
+    ,                        !- Digits After Decimal 1
+    Surface Inside Face Temperature,  !- Variable or Meter or EMS Variable or Field 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Surface Outside Face Temperature, !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Surface Outside Face Temperature,  !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Surface Inside Face Convection Heat Gain Rate per Area, !- Variable or Meter 4 Name
+    ,                        !- Digits After Decimal 3
+    Surface Inside Face Convection Heat Gain Rate per Area,  !- Variable or Meter or EMS Variable or Field 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    ,                        !- field Digits After Decimal 4
-    Surface Outside Face Convection Heat Gain Rate per Area, !- Variable or Meter 5 Name
+    ,                        !- Digits After Decimal 4
+    Surface Outside Face Convection Heat Gain Rate per Area,  !- Variable or Meter or EMS Variable or Field 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    ;                        !- field Digits After Decimal 5
+    ;                        !- Digits After Decimal 5
 
   Output:Table:Annual,
-    Space Gains Annual Report,             !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Zone People Total Heating Energy,  !- Variable or Meter 1 Name
+    Space Gains Annual Report,  !- Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Zone People Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Zone Lights Total Heating Energy,  !- Variable or Meter 2 Name
+    ,                        !- Digits After Decimal 1
+    Zone Lights Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Zone Electric Equipment Total Heating Energy,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Zone Electric Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Zone Gas Equipment Total Heating Energy,  !- Variable or Meter 4 Name
+    ,                        !- Digits After Decimal 3
+    Zone Gas Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    ,                        !- field Digits After Decimal 4
-    Zone Hot Water Equipment Total Heating Energy,  !- Variable or Meter 5 Name
+    ,                        !- Digits After Decimal 4
+    Zone Hot Water Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    ,                        !- field Digits After Decimal 5
-    Zone Steam Equipment Total Heating Energy,  !- Variable or Meter 6 Name
+    ,                        !- Digits After Decimal 5
+    Zone Steam Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    ,                        !- field Digits After Decimal 6
-    Zone Other Equipment Total Heating Energy,  !- Variable or Meter 7 Name
+    ,                        !- Digits After Decimal 6
+    Zone Other Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 7 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 7
-    ,                        !- field Digits After Decimal 7
-    Zone Infiltration Sensible Heat Gain Energy,  !- Variable or Meter 8 Name
+    ,                        !- Digits After Decimal 7
+    Zone Infiltration Sensible Heat Gain Energy,  !- Variable or Meter or EMS Variable or Field 8 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 8
-    ,                        !- field Digits After Decimal 8
-    Zone Infiltration Sensible Heat Loss Energy,  !- Variable or Meter 9 Name
+    ,                        !- Digits After Decimal 8
+    Zone Infiltration Sensible Heat Loss Energy,  !- Variable or Meter or EMS Variable or Field 9 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 9
-    ;                        !- field Digits After Decimal 9
+    ;                        !- Digits After Decimal 9
 
   Output:Table:Annual,
-    Peak Space Gains Annual Report,        !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Zone People Total Heating Energy,  !- Variable or Meter 1 Name
+    Peak Space Gains Annual Report,  !- Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Zone People Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Zone Lights Total Heating Energy,  !- Variable or Meter 2 Name
+    ,                        !- Digits After Decimal 1
+    Zone Lights Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Zone Electric Equipment Total Heating Energy,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Zone Electric Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Zone Gas Equipment Total Heating Energy,  !- Variable or Meter 4 Name
+    ,                        !- Digits After Decimal 3
+    Zone Gas Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    ,                        !- field Digits After Decimal 4
-    Zone Hot Water Equipment Total Heating Energy,  !- Variable or Meter 5 Name
+    ,                        !- Digits After Decimal 4
+    Zone Hot Water Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
-    ,                        !- field Digits After Decimal 5
-    Zone Steam Equipment Total Heating Energy,  !- Variable or Meter 6 Name
+    ,                        !- Digits After Decimal 5
+    Zone Steam Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 6 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 6
-    ,                        !- field Digits After Decimal 6
-    Zone Other Equipment Total Heating Energy,  !- Variable or Meter 7 Name
+    ,                        !- Digits After Decimal 6
+    Zone Other Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 7 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 7
-    ,                        !- field Digits After Decimal 7
-    Zone Infiltration Sensible Heat Gain Energy,  !- Variable or Meter 8 Name
+    ,                        !- Digits After Decimal 7
+    Zone Infiltration Sensible Heat Gain Energy,  !- Variable or Meter or EMS Variable or Field 8 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 8
-    ,                        !- field Digits After Decimal 8
-    Zone Infiltration Sensible Heat Loss Energy,  !- Variable or Meter 9 Name
+    ,                        !- Digits After Decimal 8
+    Zone Infiltration Sensible Heat Loss Energy,  !- Variable or Meter or EMS Variable or Field 9 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 9
-    ;                        !- field Digits After Decimal 9
+    ;                        !- Digits After Decimal 9
 
   Output:Table:Annual,
     Space Gain Components at Cooling Peak Annual Report,  !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Zone Air System Sensible Cooling Rate,  !- Variable or Meter 1 Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Zone Air System Sensible Cooling Rate,  !- Variable or Meter or EMS Variable or Field 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Zone People Total Heating Energy,  !- Variable or Meter 2 Name
+    ,                        !- Digits After Decimal 1
+    Zone People Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 2 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Zone Lights Total Heating Energy,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Zone Lights Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Zone Electric Equipment Total Heating Energy,  !- Variable or Meter 4 Name
+    ,                        !- Digits After Decimal 3
+    Zone Electric Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
-    ,                        !- field Digits After Decimal 4
-    Zone Gas Equipment Total Heating Energy,  !- Variable or Meter 5 Name
+    ,                        !- Digits After Decimal 4
+    Zone Gas Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    ,                        !- field Digits After Decimal 5
-    Zone Hot Water Equipment Total Heating Energy,  !- Variable or Meter 6 Name
+    ,                        !- Digits After Decimal 5
+    Zone Hot Water Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    ,                        !- field Digits After Decimal 6
-    Zone Steam Equipment Total Heating Energy,  !- Variable or Meter 7 Name
+    ,                        !- Digits After Decimal 6
+    Zone Steam Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
-    ,                        !- field Digits After Decimal 7
-    Zone Other Equipment Total Heating Energy,  !- Variable or Meter 8 Name
+    ,                        !- Digits After Decimal 7
+    Zone Other Equipment Total Heating Energy,  !- Variable or Meter or EMS Variable or Field 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    ,                        !- field Digits After Decimal 8
-    Zone Infiltration Sensible Heat Gain Energy,  !- Variable or Meter 9 Name
+    ,                        !- Digits After Decimal 8
+    Zone Infiltration Sensible Heat Gain Energy,  !- Variable or Meter or EMS Variable or Field 9 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 9
-    ,                        !- field Digits After Decimal 9
-    Zone Infiltration Sensible Heat Loss Energy,  !- Variable or Meter 10 Name
+    ,                        !- Digits After Decimal 9
+    Zone Infiltration Sensible Heat Loss Energy,  !- Variable or Meter or EMS Variable or Field 10 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 10
-    ;                        !- field Digits After Decimal 10
+    ;                        !- Digits After Decimal 10
 
   Output:Table:Annual,
     Cooling Space Gain Max Min Bin Annual Report,  !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Zone Air System Sensible Cooling Rate,  !- Variable or Meter 1 Name
-    SumOrAverage,             !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Zone Air System Sensible Cooling Rate,  !- Variable or Meter 2 Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Zone Air System Sensible Cooling Rate,  !- Variable or Meter or EMS Variable or Field 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    ,                        !- Digits After Decimal 1
+    Zone Air System Sensible Cooling Rate,  !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Zone Air System Sensible Cooling Rate,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Zone Air System Sensible Cooling Rate,  !- Variable or Meter or EMS Variable or Field 3 Name
     Minimum,                 !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Zone Air System Sensible Cooling Rate,  !- Variable or Meter 4 Name
-    HourInTenBinsMinToMax,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
+    ,                        !- Digits After Decimal 3
+    Zone Air System Sensible Cooling Rate,  !- Variable or Meter or EMS Variable or Field 4 Name
+    HourInTenBinsMinToMax,   !- Aggregation Type for Variable or Meter 4
+    ;                        !- Digits After Decimal 4
 
   Output:Table:Annual,
     Energy Consumption - Electricity & Natural Gas Annual Report,  !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Electricity:Facility,    !- Variable or Meter 1 Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Electricity:Facility,    !- Variable or Meter or EMS Variable or Field 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Electricity:Facility,    !- Variable or Meter 2 Name
+    ,                        !- Digits After Decimal 1
+    Electricity:Facility,    !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Gas:Facility,            !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Gas:Facility,            !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Gas:Facility,            !- Variable or Meter 4 Name
+    ,                        !- Digits After Decimal 3
+    Gas:Facility,            !- Variable or Meter or EMS Variable or Field 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
+    ;                        !- Digits After Decimal 4
 
   Output:Table:Annual,
     Daytime Energy Consumption - Electricity & Natural Gas Annual Report,  !- Name
-    ,                               !- Filter
-    INTERMITTENT,                   !- Schedule Name
-    Electricity:Facility,    !- Variable or Meter 1 Name
+    ,                        !- Filter
+    INTERMITTENT,            !- Schedule Name
+    Electricity:Facility,    !- Variable or Meter or EMS Variable or Field 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Electricity:Facility,    !- Variable or Meter 2 Name
+    ,                        !- Digits After Decimal 1
+    Electricity:Facility,    !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Gas:Facility,            !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Gas:Facility,            !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Gas:Facility,            !- Variable or Meter 4 Name
+    ,                        !- Digits After Decimal 3
+    Gas:Facility,            !- Variable or Meter or EMS Variable or Field 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
-
+    ;                        !- Digits After Decimal 4
 
   Output:Table:Annual,
     Outdoor Temperature Max Min Bin Annual Report,  !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
-    SumOrAverage,             !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 2 Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    ,                        !- Digits After Decimal 1
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 3 Name
     Minimum,                 !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 4 Name
-    HourInTenBinsMinToMax,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
-  
+    ,                        !- Digits After Decimal 3
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 4 Name
+    HourInTenBinsMinToMax,   !- Aggregation Type for Variable or Meter 4
+    ;                        !- Digits After Decimal 4
+
   Output:Table:Annual,
     Daytime Outdoor Temperature Min Max Bin Annual Report,  !- Name
-    ,                               !- Filter
-    INTERMITTENT,                   !- Schedule Name
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
-    SumOrAverage,             !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 2 Name
+    ,                        !- Filter
+    INTERMITTENT,            !- Schedule Name
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    ,                        !- Digits After Decimal 1
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 3 Name
     Minimum,                 !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 4 Name
-    HourInTenBinsMinToMax,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
+    ,                        !- Digits After Decimal 3
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 4 Name
+    HourInTenBinsMinToMax,   !- Aggregation Type for Variable or Meter 4
+    ;                        !- Digits After Decimal 4
 
   Output:Table:Annual,
     Outdoor Temperature Zero Max Bin Annual Report,  !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
-    SumOrAverage,             !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 2 Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    ,                        !- Digits After Decimal 1
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 3 Name
     Minimum,                 !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 4 Name
-    HourInTenBinsZeroToMax,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
+    ,                        !- Digits After Decimal 3
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 4 Name
+    HourInTenBinsZeroToMax,  !- Aggregation Type for Variable or Meter 4
+    ;                        !- Digits After Decimal 4
 
   Output:Table:Annual,
     Outdoor Temperature Min Zero Bin Annual Report,  !- Name
-    ,                               !- Filter
-    ,                               !- Schedule Name
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 1 Name
-    SumOrAverage,             !- Aggregation Type for Variable or Meter 1
-    ,                        !- field Digits After Decimal 1
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 2 Name
+    ,                        !- Filter
+    ,                        !- Schedule Name
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    ,                        !- Digits After Decimal 1
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    ,                        !- field Digits After Decimal 2
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
+    ,                        !- Digits After Decimal 2
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 3 Name
     Minimum,                 !- Aggregation Type for Variable or Meter 3
-    ,                        !- field Digits After Decimal 3
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 4 Name
-    HourInTenBinsMinToZero,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
+    ,                        !- Digits After Decimal 3
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 4 Name
+    HourInTenBinsMinToZero,  !- Aggregation Type for Variable or Meter 4
+    ;                        !- Digits After Decimal 4
 
-
-  

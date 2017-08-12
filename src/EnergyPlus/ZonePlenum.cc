@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -79,6 +67,7 @@
 #include <NodeInputManager.hh>
 #include <PoweredInductionUnits.hh>
 #include <Psychrometrics.hh>
+#include <PurchasedAirManager.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -324,6 +313,7 @@ namespace ZonePlenum {
 		using DataZoneEquipment::EquipConfiguration;
 		using namespace DataIPShortCuts;
 		using PoweredInductionUnits::PIUInducesPlenumAir;
+		using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -470,12 +460,14 @@ namespace ZonePlenum {
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) = NodeNums( NodeNum );
 					UniqueNodeError = false;
-					CheckUniqueNodes( "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ) );
-					if ( UniqueNodeError ) {
-						ShowContinueError( "Occurs for ReturnPlenum = " + AlphArray( 1 ) );
-						ErrorsFound = true;
+					if ( ! CheckPurchasedAirForReturnPlenum( ZonePlenumNum ) ) {
+						CheckUniqueNodes( "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ) );
+						if ( UniqueNodeError ) {
+							ShowContinueError( "Occurs for ReturnPlenum = " + AlphArray( 1 ) );
+							ErrorsFound = true;
+						}
+						PIUInducesPlenumAir( ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) );
 					}
-					PIUInducesPlenumAir( ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) );
 				}
 			} else {
 				ShowContinueError( "Invalid Induced Air Outlet Node or NodeList name in AirLoopHVAC:ReturnPlenum object = " + ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName );
@@ -1441,6 +1433,66 @@ namespace ZonePlenum {
 
 	//        End of Reporting subroutines for the ZonePlenum Module
 	// *****************************************************************************
+
+	int
+	GetReturnPlenumIndex(
+		int const & ExNodeNum
+	)
+	{
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int PlenumNum; // loop counter
+		int InducedNodeNum; // loop counter
+		int WhichPlenum; // index to return plenum
+
+						 // Obtains and Allocates ZonePlenum related parameters from input file
+		if ( GetInputFlag ) { // First time subroutine has been entered
+			GetZonePlenumInput();
+			GetInputFlag = false;
+		}
+
+		WhichPlenum = 0;
+		if ( NumZoneReturnPlenums > 0 ) {
+			for ( PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum ) {
+				if ( ExNodeNum != ZoneRetPlenCond( PlenumNum ).OutletNode ) continue;
+				WhichPlenum = PlenumNum;
+				break;
+			}
+			if ( WhichPlenum == 0 ) {
+				for ( PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum ) {
+					for ( InducedNodeNum = 1; InducedNodeNum <= ZoneRetPlenCond( PlenumNum ).NumInducedNodes; ++InducedNodeNum ) {
+						if ( ExNodeNum != ZoneRetPlenCond( PlenumNum ).InducedNode( InducedNodeNum ) ) continue;
+						WhichPlenum = PlenumNum;
+						break;
+					}
+					if ( WhichPlenum > 0 ) break;
+				}
+			}
+		}
+
+		return WhichPlenum;
+
+	}
+
+	void
+	GetReturnPlenumName(
+		int const & ReturnPlenumIndex,
+		std::string & ReturnPlenumName
+	)
+	{
+
+		// Obtains and Allocates ZonePlenum related parameters from input file
+		if ( GetInputFlag ) { // First time subroutine has been entered
+			GetZonePlenumInput();
+			GetInputFlag = false;
+		}
+
+		ReturnPlenumName = " ";
+		if ( NumZoneReturnPlenums > 0 ) {
+			ReturnPlenumName = ZoneRetPlenCond( ReturnPlenumIndex ).ZonePlenumName;
+		}
+
+	}
 
 } // ZonePlenum
 

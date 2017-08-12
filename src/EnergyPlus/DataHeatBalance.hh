@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataHeatBalance_hh_INCLUDED
 #define DataHeatBalance_hh_INCLUDED
@@ -75,6 +63,7 @@
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
 #include <DataWindowEquivalentLayer.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -298,6 +287,7 @@ namespace DataHeatBalance {
 	extern int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
 	extern int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
 	extern int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
+	extern int const IntGainTypeOf_FanSystemModel;
 
 	//Parameters for checking surface heat transfer models
 	extern Real64 const HighDiffusivityThreshold; // used to check if Material properties are out of line.
@@ -432,6 +422,7 @@ namespace DataHeatBalance {
 	extern bool StormWinChangeThisDay; // True if a storm window has been added or removed from any
 	// window during the current day; can only be true for first
 	// time step of the day.
+	extern bool AnyConstructInternalSourceInInput; // true if the user has entered any constructions with internal sources
 	extern bool AdaptiveComfortRequested_CEN15251; // true if people objects have adaptive comfort requests. CEN15251
 	extern bool AdaptiveComfortRequested_ASH55; // true if people objects have adaptive comfort requests. ASH55
 	extern int NumRefrigeratedRacks; // Total number of refrigerated case compressor racks in input
@@ -607,10 +598,6 @@ namespace DataHeatBalance {
 
 	extern Array1D< Real64 > const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
-	//Variables Dimensioned to Number of Zones
-	extern Array1D< Real64 > MVFC; // Design Mixing Flow Rate [m3/s] (Cross Zone Mixing)
-	extern Array1D< Real64 > MTC; // Control Temperature For Mixing [C] (Cross Zone Mixing)
-
 	extern Real64 ZeroPointerVal;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
@@ -710,15 +697,15 @@ namespace DataHeatBalance {
 		Real64 WinShadeAirFlowPermeability; // The effective area of openings in the shade itself, expressed as a
 		//  fraction of the shade area
 		bool EMPDMaterialProps; // True if EMPD properties have been assigned
-		Real64 EMPDVALUE;
-		Real64 MoistACoeff;
-		Real64 MoistBCoeff;
-		Real64 MoistCCoeff;
-		Real64 MoistDCoeff;
-		Real64 EMPDaCoeff;
-		Real64 EMPDbCoeff;
-		Real64 EMPDcCoeff;
-		Real64 EMPDdCoeff;
+		Real64 EMPDmu; // Water Vapor Diffusion Resistance Factor (dimensionless)
+		Real64 MoistACoeff; // Moisture Equation Coefficient a
+		Real64 MoistBCoeff; // Moisture Equation Coefficient b
+		Real64 MoistCCoeff; // Moisture Equation Coefficient c
+		Real64 MoistDCoeff; // Moisture Equation Coefficient d
+		Real64 EMPDSurfaceDepth; // Surface-layer penetrtion depth (m)
+		Real64 EMPDDeepDepth; // Deep-layer penetration depth (m)
+		Real64 EMPDCoatingThickness; // Coating Layer Thickness (m)
+		Real64 EMPDmuCoating; // Coating Layer water vapor diffusion resistance factor (dimensionless)
 		// EcoRoof-Related properties, essentially for the plant layer,
 		//    the soil layer uses the same resource as a regular material
 		int EcoRoofCalculationMethod; // 1-Simple, 2-SchaapGenuchten
@@ -800,6 +787,11 @@ namespace DataHeatBalance {
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
 		int SlatOrientation; // horizontal or veritical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
+		HysteresisPhaseChange::HysteresisPhaseChange * phaseChange = nullptr;
+		bool GlassSpectralAndAngle; // if SpectralAndAngle is an entered choice
+		int GlassSpecAngTransDataPtr; // Data set index of transmittance as a function of spectral and angle associated with a window glass material
+		int GlassSpecAngFRefleDataPtr; // Data set index of front reflectance as a function of spectral and angle associated with a window glass material 
+		int GlassSpecAngBRefleDataPtr; // Data set index of back reflectance as a function of spectral and angle associated with a window glass material 
 
 		// Default Constructor
 		MaterialProperties() :
@@ -873,15 +865,15 @@ namespace DataHeatBalance {
 			WinShadeRightOpeningMult( 0.0 ),
 			WinShadeAirFlowPermeability( 0.0 ),
 			EMPDMaterialProps( false ),
-			EMPDVALUE( 0.0 ),
+			EMPDmu( 0.0 ),
 			MoistACoeff( 0.0 ),
 			MoistBCoeff( 0.0 ),
 			MoistCCoeff( 0.0 ),
 			MoistDCoeff( 0.0 ),
-			EMPDaCoeff( 0.0 ),
-			EMPDbCoeff( 0.0 ),
-			EMPDcCoeff( 0.0 ),
-			EMPDdCoeff( 0.0 ),
+			EMPDSurfaceDepth( 0.0 ),
+			EMPDDeepDepth( 0.0 ),
+			EMPDCoatingThickness( 0.0 ),
+			EMPDmuCoating( 0.0 ),
 			EcoRoofCalculationMethod( 0 ),
 			HeightOfPlants( 0.0 ),
 			LAI( 0.0 ),
@@ -955,7 +947,11 @@ namespace DataHeatBalance {
 			SlatCrown( 0.0 ),
 			SlatAngle( 0.0 ),
 			SlatAngleType( 0 ),
-			SlatOrientation( 0 )
+			SlatOrientation( 0 ),
+			GlassSpectralAndAngle( false ),
+			GlassSpecAngTransDataPtr( 0 ),
+			GlassSpecAngFRefleDataPtr( 0 ), 
+			GlassSpecAngBRefleDataPtr( 0 )
 		{}
 
 	};
@@ -987,6 +983,7 @@ namespace DataHeatBalance {
 		Array1D_int LayerPoint; // Pointer array which refers back to
 		// the Material structure; LayerPoint(i)=j->Material(j)%Name,etc
 		bool IsUsed; // Marked true when the construction is used
+		bool IsUsedCTF; // Mark true when the construction is used for a surface with CTF calculations
 		Real64 InsideAbsorpVis; // Inside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 OutsideAbsorpVis; // Outside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 InsideAbsorpSolar; // Inside Layer solar absorptance of an opaque surface; not used for windows.
@@ -1150,6 +1147,7 @@ namespace DataHeatBalance {
 			TotGlassLayers( 0 ),
 			LayerPoint( MaxLayersInConstruct, 0 ),
 			IsUsed( false ),
+			IsUsedCTF( false ),
 			InsideAbsorpVis( 0.0 ),
 			OutsideAbsorpVis( 0.0 ),
 			InsideAbsorpSolar( 0.0 ),
@@ -1303,6 +1301,7 @@ namespace DataHeatBalance {
 		// Calculated after input
 		Real64 FloorArea; // Floor area used for this zone
 		Real64 CalcFloorArea; // Calculated floor area used for this zone
+		Real64 CeilingArea; // Ceiling area for the zone
 		bool HasFloor; // Has "Floor" surface
 		bool HasRoof; // Has "Roof" or "Ceiling" Surface
 		bool HasInterZoneWindow; // Interzone Window(s) present in this zone
@@ -1356,7 +1355,21 @@ namespace DataHeatBalance {
 		bool EnforcedReciprocity; // if zone required forced reciprocity --
 		//   less out of bounds temperature errors allowed
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
+		int ZoneMaxCO2SchedIndex; // Index for the schedule the schedule which determines maximum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
+		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
+		// Hybrid Modeling
+		Real64 ZoneMeasuredTemperature; // Measured zone air temperature input by user
+		Real64 ZoneVolCapMultpSens; // Zone temperature capacity multiplier, i.e. internal thermal mass multiplier
+		Real64 ZoneVolCapMultpMoist; // Zone humidity capacity multiplier
+		Real64 ZoneVolCapMultpCO2; // Zone carbon dioxide capacity multiplier
+		Real64 ZoneVolCapMultpGenContam; // Zone generic contaminant capacity multiplier
+		Real64 ZoneVolCapMultpSensHM; // Calculated temperature capacity multiplier by hybrid model
+		Real64 ZoneVolCapMultpSensHMSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMCountSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMAverage; // Temperature capacity multiplier average
+		Real64 MCPIHM; // Calcualted mass flow rate by hybrid model
+		Real64 InfilOAAirChangeRateHM; // Calcualted infilgration air change per hour by hybrid model
 
 		// Default Constructor
 		ZoneData() :
@@ -1373,6 +1386,7 @@ namespace DataHeatBalance {
 			UserEnteredFloorArea( AutoCalculate ),
 			FloorArea( 0.0 ),
 			CalcFloorArea( 0.0 ),
+			CeilingArea( 0.0 ), 
 			HasFloor( false ),
 			HasRoof( false ),
 			HasInterZoneWindow( false ),
@@ -1421,7 +1435,21 @@ namespace DataHeatBalance {
 			TempOutOfBoundsReported( false ),
 			EnforcedReciprocity( false ),
 			ZoneMinCO2SchedIndex( 0 ),
-			ZoneContamControllerSchedIndex( 0 )
+			ZoneMaxCO2SchedIndex( 0 ),
+			ZoneContamControllerSchedIndex( 0 ),
+			FlagCustomizedZoneCap( false ),
+			// Hybrid Modeling
+			ZoneMeasuredTemperature( 0.0 ),
+			ZoneVolCapMultpSens( 1.0 ),
+			ZoneVolCapMultpMoist( 1.0 ),
+			ZoneVolCapMultpCO2( 1.0 ),
+			ZoneVolCapMultpGenContam( 1.0 ),
+			ZoneVolCapMultpSensHM( 1.0 ),
+			ZoneVolCapMultpSensHMSum( 0.0 ),
+			ZoneVolCapMultpSensHMCountSum( 0.0 ),
+			ZoneVolCapMultpSensHMAverage( 1.0 ),
+			MCPIHM( 0.0 ),
+			InfilOAAirChangeRateHM( 0.0 )
 		{}
 
 		void
@@ -1704,6 +1732,7 @@ namespace DataHeatBalance {
 		Real64 LostEnergy; // Lost energy (converted to work) [J]
 		Real64 TotGainEnergy; // Total heat gain [J]
 		std::string EndUseSubcategory; // user defined name for the end use category
+		int OtherEquipFuelType; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
 
 		// Default Constructor
 		ZoneEquipData() :
@@ -1734,7 +1763,9 @@ namespace DataHeatBalance {
 			ConGainEnergy( 0.0 ),
 			LatGainEnergy( 0.0 ),
 			LostEnergy( 0.0 ),
-			TotGainEnergy( 0.0 )
+			TotGainEnergy( 0.0 ),
+			EndUseSubcategory( "" ),
+			OtherEquipFuelType( 0 )
 		{}
 
 	};
@@ -2817,7 +2848,8 @@ namespace DataHeatBalance {
 		Real64 OABalanceMdot; // Mass flow rate of Air {kg/s} due to OA air balance
 		Real64 OABalanceAirChangeRate; // OA air balance air change rate (ach)
 		Real64 OABalanceFanElec; // Fan Electricity {W} due to OA air balance
-
+		Real64 SumEnthalpyM = 0.0; // Zone sum of EnthalpyM
+		Real64 SumEnthalpyH = 0.0; // Zone sum of EnthalpyH
 		// Default Constructor
 		AirReportVars() :
 			MeanAirTemp( 0.0 ),
@@ -2885,7 +2917,9 @@ namespace DataHeatBalance {
 			OABalanceMass( 0.0 ),
 			OABalanceMdot( 0.0 ),
 			OABalanceAirChangeRate( 0.0 ),
-			OABalanceFanElec( 0.0 )
+			OABalanceFanElec( 0.0 ),
+			SumEnthalpyM( 0.0 ),
+			SumEnthalpyH( 0.0 )
 		{}
 
 	};
@@ -3136,6 +3170,8 @@ namespace DataHeatBalance {
 		Real64 SteamLostRate;
 		Real64 SteamTotGainRate;
 		// Other Equipment
+		Real64 OtherPower;
+		Real64 OtherConsump;
 		Real64 OtherRadGain;
 		Real64 OtherConGain;
 		Real64 OtherLatGain;
@@ -3267,6 +3303,8 @@ namespace DataHeatBalance {
 			SteamLatGainRate( 0.0 ),
 			SteamLostRate( 0.0 ),
 			SteamTotGainRate( 0.0 ),
+			OtherPower( 0.0 ),
+			OtherConsump( 0.0 ),
 			OtherRadGain( 0.0 ),
 			OtherConGain( 0.0 ),
 			OtherLatGain( 0.0 ),
@@ -3354,6 +3392,7 @@ namespace DataHeatBalance {
 	extern Array1D< HeatReclaimRefrigeratedRackData > HeatReclaimRefrigeratedRack;
 	extern Array1D< HeatReclaimRefrigCondenserData > HeatReclaimRefrigCondenser;
 	extern Array1D< HeatReclaimDXCoilData > HeatReclaimDXCoil;
+	extern Array1D< HeatReclaimDXCoilData > HeatReclaimVS_DXCoil;
 	extern Array1D< AirReportVars > ZnAirRpt;
 	extern Array1D< TCGlazingsType > TCGlazings;
 	extern Array1D< ZoneEquipData > ZoneCO2Gen;

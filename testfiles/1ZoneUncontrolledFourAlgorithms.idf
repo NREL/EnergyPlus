@@ -85,7 +85,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,20;
 
@@ -503,11 +503,15 @@
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     GP01,                    !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
+    27.3004417577,           !- Water Vapor Diffusion Resistance Factor {dimensionless}
     0.072549,                !- Moisture Equation Coefficient a {dimensionless}
     0.397173,                !- Moisture Equation Coefficient b {dimensionless}
     0.007774,                !- Moisture Equation Coefficient c {dimensionless}
-    11.7057;                 !- Moisture Equation Coefficient d {dimensionless}
+    11.7057,                 !- Moisture Equation Coefficient d {dimensionless}
+    0.004,                   !- Surface Layer Penetration Depth {m}
+    0,                       !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 
   Zone,
     ZONE ONE,                !- Name
@@ -723,6 +727,7 @@
 
   OtherEquipment,
     Test 352a,               !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -735,6 +740,7 @@
 
   OtherEquipment,
     Test 352 minus,          !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

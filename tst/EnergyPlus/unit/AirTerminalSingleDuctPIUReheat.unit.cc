@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::AirTerminal SingleDuct Series PIU Reheat Unit Tests
 
@@ -107,6 +95,17 @@ namespace EnergyPlus {
 			"    autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0001;                  !- Convergence Tolerance",
+
+			"  Fan:ConstantVolume,",
+			"    SPACE1-1 PIU Fan,        !- Name",
+			"    ReheatCoilAvailSched,    !- Availability Schedule Name",
+			"    0.5,                     !- Fan Total Efficiency",
+			"    50.0,                    !- Pressure Rise {Pa}",
+			"    autosize,                !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1.0,                     !- Motor In Airstream Fraction",
+			"    SPACE1-1 ATU Fan Inlet Node,  !- Air Inlet Node Name",
+			"    SPACE1-1 Zone Coil Air In Node;  !- Air Outlet Node Name",
 
 			"  Coil:Heating:Water,",
 			"    SPACE1-1 Zone Coil,      !- Name",
@@ -191,6 +190,8 @@ namespace EnergyPlus {
 		EXPECT_EQ( "SPACE1-1 ZONE COIL", PIU( 1 ).HCoil ); // heating coil name
 		EXPECT_EQ( "COIL:HEATING:WATER", PIU( 1 ).HCoilType ); // hot water heating coil
 		EXPECT_GT( PIU( 1 ).HotControlNode, 0 );  // none zero integer node index is expected
+
+		//PIU.deallocate();
 
 	}
 }

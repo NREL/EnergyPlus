@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataSizing_hh_INCLUDED
 #define DataSizing_hh_INCLUDED
@@ -166,6 +154,7 @@ namespace DataSizing {
 	// based on the generic contaminant setpoint
 	extern int const SOAM_IAQPCOM; // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	// based on the generic contaminant setpoint
+	extern int const SOAM_ProportionalControlDesOARate; // Calculate the system level outdoor air flow rates based on design OA rate
 
 	// Zone HVAC Equipment Supply Air Sizing Option
 	extern int const None;
@@ -272,7 +261,8 @@ namespace DataSizing {
 	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataNonZoneNonAirloopValue; // used when equipment is not located in a zone or airloop
-	extern int DataZoneNumber; // a pointer to a served by zoneHVAC equipment
+	extern int DataZoneUsedForSizing; // pointer to control zone for air loop equipment
+	extern int DataZoneNumber; // a pointer to a zone served by zoneHVAC equipment
 	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
@@ -298,6 +288,11 @@ namespace DataSizing {
 	extern char SizingFileColSep; // Character to separate columns in sizing outputs
 	extern int DataDesicDehumNum; // index to desiccant dehumidifier
 	extern bool DataDesicRegCoil; // TRUE if heating coil desiccant regeneration coil
+	extern bool HRFlowSizingFlag; // True, if it is a heat recovery heat exchanger flow sizing
+	extern Real64 DataWaterCoilSizCoolDeltaT; // used for sizing cooling coil water design flow rate
+	extern Real64 DataWaterCoilSizHeatDeltaT; // used for sizing heating coil water design flow rate
+	extern bool DataNomCapInpMeth; // True if heating coil is sized by CoilPerfInpMeth == NomCap
+
 	// Types
 
 	struct ZoneSizingInputData
@@ -332,6 +327,7 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
+		bool DesCoolMinAirFlowFracUsInpFlg; // user input for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -349,6 +345,7 @@ namespace DataSizing {
 		int ZoneAirDistributionIndex; // index to the zone air distribution object
 		int ZoneDesignSpecOAIndex; // index to the zone design spec OA object
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		Real64 ZoneVentilationEff; // zone ventilation efficiency
 		bool AccountForDOAS; // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
 		int DOASControlStrategy; // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
 		// 3=supply cold ventilation air
@@ -375,6 +372,7 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
+			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			DesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -387,6 +385,7 @@ namespace DataSizing {
 			ZoneAirDistributionIndex( 0 ),
 			ZoneDesignSpecOAIndex( 0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
+			ZoneVentilationEff( 0.0 ),
 			AccountForDOAS( false ),
 			DOASControlStrategy( 0 ),
 			DOASLowSetpoint( 0.0 ),
@@ -428,6 +427,7 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
+		bool DesCoolMinAirFlowFracUsInpFlg; // user flag for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -453,18 +453,22 @@ namespace DataSizing {
 		Real64 DesCoolOAFlowFrac; // zone design cooling OA air volume fraction [-]
 		bool EMSOverrideDesCoolMassOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolMassFlow; // Value EMS directing to use for Design Cooling air mass flow [kg/s]
-		Real64 DesHeatLoad; // zone design heating load [W]
+		Real64 DesHeatLoad; // zone design heating load including sizing factor and scaled to match airflow sizing [W]
+		Real64 NonAirSysDesHeatLoad; // base zone design heating load including sizing factor [W]
 		bool EMSOverrideDesHeatLoadOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatLoad; // Value EMS directing to use for zone design heating load  [W]
-		Real64 DesCoolLoad; // zone design cooling load [W]
+		Real64 DesCoolLoad; // zone design cooling load including sizing factor and scaled to match airflow sizing [W]
+		Real64 NonAirSysDesCoolLoad; // base zone design cooling load including sizing factor [W]
 		bool EMSOverrideDesCoolLoadOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolLoad; // Value EMS directing to use for zone design cooling load  [W]
 		Real64 DesHeatDens; // zone design heating air density [kg/m3]
 		Real64 DesCoolDens; // zone design cooling air density [kg/m3]
-		Real64 DesHeatVolFlow; // zone design heating air volume flow rate [m3/s]
+		Real64 DesHeatVolFlow; // zone design heating air volume flow rate including sizing factor and scaled to match airflow sizing [m3/s]
+		Real64 NonAirSysDesHeatVolFlow; // base zone design heating air volume flow rate including sizing factor [m3/s]
 		bool EMSOverrideDesHeatVolOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatVolFlow; // Value EMS directing to use for Design Heating air volume flow [m3/s]
 		Real64 DesCoolVolFlow; // zone design cooling air volume flow rate [m3/s]
+		Real64 NonAirSysDesCoolVolFlow; // base zone design cooling air volume flow rate including sizing factor [m3/s]
 		bool EMSOverrideDesCoolVolOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolVolFlow; // Value EMS directing to use for Design cooling air volume flow [m3/s]
 		Real64 DesHeatVolFlowMax; // zone design heating maximum air volume flow rate [m3/s]
@@ -541,6 +545,7 @@ namespace DataSizing {
 		Real64 ZoneADEffCooling; // the zone air distribution effectiveness in cooling mode
 		Real64 ZoneADEffHeating; // the zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		Real64 ZoneVentilationEff; // zone ventilation efficiency
 		Real64 ZonePrimaryAirFraction; // the zone primary air fraction for cooling based calculations
 		Real64 ZonePrimaryAirFractionHtg; // the zone primary air fraction for heating based calculations
 		Real64 ZoneOAFracCooling; // OA fraction in cooling mode
@@ -592,6 +597,7 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
+			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			InpDesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -613,17 +619,21 @@ namespace DataSizing {
 			EMSOverrideDesCoolMassOn( false ),
 			EMSValueDesCoolMassFlow( 0.0 ),
 			DesHeatLoad( 0.0 ),
+			NonAirSysDesHeatLoad( 0.0 ),
 			EMSOverrideDesHeatLoadOn( false ),
 			EMSValueDesHeatLoad( 0.0 ),
 			DesCoolLoad( 0.0 ),
+			NonAirSysDesCoolLoad(0.0),
 			EMSOverrideDesCoolLoadOn( false ),
 			EMSValueDesCoolLoad( 0.0 ),
 			DesHeatDens( 0.0 ),
 			DesCoolDens( 0.0 ),
 			DesHeatVolFlow( 0.0 ),
+			NonAirSysDesHeatVolFlow( 0.0 ),
 			EMSOverrideDesHeatVolOn( false ),
 			EMSValueDesHeatVolFlow( 0.0 ),
 			DesCoolVolFlow( 0.0 ),
+			NonAirSysDesCoolVolFlow( 0.0 ),
 			EMSOverrideDesCoolVolOn( false ),
 			EMSValueDesCoolVolFlow( 0.0 ),
 			DesHeatVolFlowMax( 0.0 ),
@@ -672,6 +682,7 @@ namespace DataSizing {
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
+			ZoneVentilationEff( 0.0 ),
 			ZonePrimaryAirFraction( 0.0 ),
 			ZonePrimaryAirFractionHtg( 0.0 ),
 			ZoneOAFracCooling( 0.0 ),
@@ -972,11 +983,15 @@ namespace DataSizing {
 		Real64 DesCoolVolFlowMin; // design minimum system cooling flow rate [m3/s]
 		Array1D< Real64 > HeatFlowSeq; // daily sequence of system heating air mass flow rate
 		//  (zone time step)
+		Array1D< Real64 > SumZoneHeatLoadSeq; // daily sequence of zones summed heating load [W]
+		//  (zone time step)
 		Array1D< Real64 > CoolFlowSeq; // daily sequence of system cooling air mass flow rate
 		//  (zone time step)
 		Array1D< Real64 > SumZoneCoolLoadSeq; // daily sequence of zones summed cooling load [W]
 		//  (zone time step)
 		Array1D< Real64 > CoolZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
+		//  (zone time step)
+		Array1D< Real64 > HeatZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
 		//  (zone time step)
 		Array1D< Real64 > SensCoolCapSeq; // daily sequence of system sensible cooling capacity
 		//  (zone time step)
@@ -1000,6 +1015,8 @@ namespace DataSizing {
 		//  [zone time step]
 		Array1D< Real64 > SysHeatOutHumRatSeq; // daily sequence of system heating outside humidity ratios
 		//   [kg water/kg dry air] [zone time step]
+		Array1D< Real64 > SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
+		Array1D< Real64 > SysDOASLatAddSeq; // daily sequence of latent heat addition rate from DOAS supply air [W]
 		int SystemOAMethod; // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 		Real64 MaxZoneOAFraction; // maximum value of min OA for zones served by system
 		Real64 SysUncOA; // uncorrected system outdoor air flow based on zone people and zone area
@@ -1116,17 +1133,24 @@ namespace DataSizing {
 	{
 		// Members
 		int SensCoolPeakDD; // design day containing the sensible cooling peak
+		std::string cSensCoolPeakDDDate; // date string of design day causing sensible cooling peak
 		int TotCoolPeakDD; // design day containing total cooling peak
+		std::string cTotCoolPeakDDDate; // date string of design day causing total cooling peak
 		int CoolFlowPeakDD; // design day containing the cooling air flow peak
+		std::string cCoolFlowPeakDDDate; // date string of design day causing cooling air flow peak
+		int HeatPeakDD; // design day containing the heating peak
+		std::string cHeatPeakDDDate; // date string of design day causing heating peak
 		Array1D< int > TimeStepAtSensCoolPk; // time step of the sensible cooling peak
 		Array1D< int > TimeStepAtTotCoolPk; // time step of the total cooling peak
 		Array1D< int > TimeStepAtCoolFlowPk; // time step of the cooling air flow peak
+		Array1D< int > TimeStepAtHeatPk; // time step of the heating peak
 
 		// Default Constructor
 		SysSizPeakDDNumData() :
 			SensCoolPeakDD( 0 ),
 			TotCoolPeakDD( 0 ),
-			CoolFlowPeakDD( 0 )
+			CoolFlowPeakDD( 0 ),
+			HeatPeakDD( 0 )
 		{}
 
 	};
@@ -1157,6 +1181,39 @@ namespace DataSizing {
 			DesVolFlowRate( 0.0 ),
 			VolFlowSizingDone( false ),
 			PlantSizFac( 1.0 )
+		{}
+
+	};
+
+	// based on ZoneSizingData but only have member variables that are related to the CheckSum/
+	struct FacilitySizingData
+	{
+		// Members  
+		int CoolDDNum; // design day index of design day causing heating peak
+		int HeatDDNum; // design day index of design day causing heating peak
+		int TimeStepNumAtCoolMax; // time step number (in day) at cooling peak
+		Array1D< Real64 > DOASHeatAddSeq; // daily sequence of zone DOAS heat addition rate (zone time step) [W]
+		Array1D< Real64 > DOASLatAddSeq; // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
+		Array1D< Real64 > CoolOutHumRatSeq; // daily sequence of outdoor humidity ratios (cooling, zone time step)
+		Array1D< Real64 > CoolOutTempSeq; // daily sequence of outdoor temperatures (cooling, zone time step)
+		Array1D< Real64 > CoolZoneTempSeq; // daily sequence of zone temperatures (cooling, zone time step)
+		Array1D< Real64 > CoolLoadSeq; // daily sequence of cooling load (cooling, zone time step)
+		Real64 DesCoolLoad; // zone design cooling load [W]
+		int TimeStepNumAtHeatMax; // time step number (in day) at Heating peak
+		Array1D< Real64 > HeatOutHumRatSeq; // daily sequence of outdoor humidity ratios (heating, zone time step)
+		Array1D< Real64 > HeatOutTempSeq; // daily sequence of outdoor temperatures (heating, zone time step)
+		Array1D< Real64 > HeatZoneTempSeq; // daily sequence of zone temperatures (heating, zone time step)
+		Array1D< Real64 > HeatLoadSeq; // daily sequence of heating load (cooling, zone time step)
+		Real64 DesHeatLoad; // zone design heating load [W]
+		
+	        // Default Constructor
+		FacilitySizingData( ):
+			CoolDDNum( 0 ),
+			HeatDDNum( 0 ),
+			TimeStepNumAtCoolMax( 0 ),
+			DesCoolLoad( 0.0 ),
+			TimeStepNumAtHeatMax( 0 ),
+			DesHeatLoad( 0.0 )
 		{}
 
 	};
@@ -1210,7 +1267,7 @@ namespace DataSizing {
 		Real64 OAFlowPerZone; // - OA requirement per zone
 		Real64 OAFlowACH; // - OA requirement per zone per hour
 		int OAFlowFracSchPtr; // - Fraction schedule applied to total OA requirement
-		Real64 MaxOAFractionSchValue; // - Maximum value from OAFlow fraction schedule (used for sizing)
+		int OAPropCtlMinRateSchPtr; // - Fraction schedule applied to Proportional Control Minimum Outdoor Air Flow Rate 
 
 		// Default Constructor
 		OARequirementsData() :
@@ -1219,8 +1276,8 @@ namespace DataSizing {
 			OAFlowPerArea( 0.0 ),
 			OAFlowPerZone( 0.0 ),
 			OAFlowACH( 0.0 ),
-			OAFlowFracSchPtr( 0 ),
-			MaxOAFractionSchValue( 0.0 )
+			OAFlowFracSchPtr( DataGlobals::ScheduleAlwaysOn ),
+			OAPropCtlMinRateSchPtr( DataGlobals::ScheduleAlwaysOn )
 		{}
 
 	};
@@ -1234,13 +1291,15 @@ namespace DataSizing {
 		Real64 ZoneADEffHeating; // - Zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // - Zone air secondary recirculation ratio
 		int ZoneADEffSchPtr; // - Zone air distribution effectiveness schedule index
+		Real64 ZoneVentilationEff; // Zone ventilation effectiveness
 
 		// Default Constructor
 		ZoneAirDistributionData() :
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
-			ZoneADEffSchPtr( 0 )
+			ZoneADEffSchPtr( 0 ),
+			ZoneVentilationEff( 0.0 )
 		{}
 
 	};
@@ -1249,9 +1308,9 @@ namespace DataSizing {
 	extern Array1D< OARequirementsData > OARequirements;
 	extern Array1D< ZoneAirDistributionData > ZoneAirDistribution;
 	extern Array1D< ZoneSizingInputData > ZoneSizingInput; // Input data for zone sizing
-	extern Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design
+	extern Array2D< ZoneSizingData > ZoneSizing; // Data for zone sizing (all data, all design)
 	extern Array1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
-	extern Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data,
+	extern Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data)
 	extern Array1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
 	extern Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
 	extern Array1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
@@ -1267,6 +1326,9 @@ namespace DataSizing {
 	extern Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	extern Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 	extern Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	// used only for Facility Load Component Summary
+	extern Array1D< FacilitySizingData > CalcFacilitySizing; // Data for facility sizing 
+	extern FacilitySizingData CalcFinalFacilitySizing; // Final data for facility sizing 
 
 	// Clears the global data in DataSizing.
 	// Needed for unit tests, should not be normally called.

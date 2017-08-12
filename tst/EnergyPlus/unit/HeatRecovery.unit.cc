@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::Heat Recovery Unit Tests
 
@@ -77,9 +65,6 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
@@ -118,6 +103,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Real64 Tnode = 0.0;
 	Real64 SetPointTemp = 19.0;
 	Real64 PartLoadRatio = 0.25;
+	int BalDesDehumPerfDataIndex = 1;
 
 	CurZoneEqNum = 0;
 	CurSysNum = 0;
@@ -157,8 +143,13 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Node( ExchCond( ExchNum ).SupInletNode ).MassFlowRate = ExchCond( ExchNum ).SupInMassFlow;
 	Node( ExchCond( ExchNum ).SecInletNode ).MassFlowRate = ExchCond( ExchNum ).SecInMassFlow;
 
+	HeatExchCondNumericFields.allocate( ExchNum );
+	HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( 5 );
+	BalDesDehumPerfNumericFields.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
+
 	// HXUnitOn is false so expect outlet = inlet
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ExchCond( ExchNum ).SupInTemp;
@@ -171,7 +162,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	// HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) );
@@ -180,7 +171,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) );
@@ -193,7 +184,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	// HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = SetPointTemp;
@@ -202,7 +193,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint;
@@ -228,7 +219,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 	// HXUnitOn is false so expect outlet = inlet
 	HXUnitOn = false;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ExchCond( ExchNum ).SupInTemp, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
@@ -239,14 +230,14 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	// HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
@@ -257,14 +248,14 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	// HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
@@ -274,7 +265,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Node( ExchCond( ExchNum ).SupInletNode ).MassFlowRate = ExchCond( ExchNum ).SupInMassFlow / 4.0;
 	Node( ExchCond( ExchNum ).SecInletNode ).MassFlowRate = ExchCond( ExchNum ).SecInMassFlow / 4.0;
 	ExchCond( ExchNum ).ControlToTemperatureSetPoint = false;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
@@ -283,9 +274,6 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		std::string const idf_objects = delimited_string( {
 			" Version,8.4;",
@@ -407,33 +395,27 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 
 			" Branch,",
 			"   AHU Main Branch, !- Name",
-			" 	autosize, !- Maximum Flow Rate {m3/s}",
 			"	,         !- Pressure Drop Curve Name",
 			"   AirLoopHVAC:OutdoorAirSystem, !- Component 1 Object Type",
 			"   AHU OA system,           !- Component 1 Name",
 			"   AHU air loop inlet,      !- Component 1 Inlet Node Name",
 			"   AHU mixed air outlet,    !- Component 1 Outlet Node Name",
-			"   Passive,                 !- Component 1 Branch Control Type",
 			" Coil:Cooling:water,        !- Component 2 Object Type",
 			"   AHU cooling coil,        !- Component 2 Name",
 			"   AHU mixed air outlet,    !- Component 2 Inlet Node Name",
 			"   AHU cooling coil outlet, !- Component 2 Outlet Node Name",
-			"   Passive,                 !- Component 2 Branch Control Type",
 			" Coil:Heating:Water,        !- Component 3 Object Type",
 			"   AHU Heating coil,        !- Component 3 Name",
 			"   AHU cooling coil outlet, !- Component 3 Inlet Node Name",
 			"   AHU Heating Coil Outlet, !- Component 3 Outlet Node Name",
-			"   Passive,                 !- Component 3 Branch Control Type",
 			" HeatExchanger:AirToAir:SensibleAndLatent, !- Component 4 Object Type",
 			"   enthalpy HX,             !- Component 4 Name",
 			"   AHU Heating Coil Outlet, !- Component 4 Inlet Node Name",
 			"   AHU Supply fan Inlet,    !- Component 4 Outlet Node Name",
-			"   Passive,                 !- Component 4 Branch Control Type",
 			" Fan:VariableVolume,        !- Component 5 Object Type",
 			"   AHU Supply Fan,          !- Component 5 Name",
 			"   AHU Supply fan Inlet,    !- Component 5 Inlet Node Name",
-			"   AHU Supply fan Outlet,   !- Component 5 Outlet Node Name",
-			"   Active;                  !- Component 5 Branch Control Type",
+			"   AHU Supply fan Outlet;   !- Component 5 Outlet Node Name",
 
 			" AirLoopHVAC,",
 			"   AHU,                   !- Name",
@@ -496,21 +478,15 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		GetReturnAirPathInput();
-		GetAirPathData();		
+		GetAirPathData();
 		ASSERT_EQ( SimAirServingZones::HeatXchngr, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 4 ).CompType_Num );
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 }
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
-	int write_stat;
 	Real64 Qhr_HeatingRateTot( 0.0 );
 	int InletNode( 0 ); // Heat Recovery primary air inlet node number
 	int OutletNode( 0 ); // Heat Recovery primary air outlet node number
-
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 
 	std::string const idf_objects = delimited_string( {
@@ -3143,293 +3119,236 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"Branch,",
 		"    SPACE1-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE1-1 Cooling Coil,   !- Component 1 Name",
 		"    SPACE1-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE1-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE1-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE1-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE1-1 Heating Coil,   !- Component 1 Name",
 		"    SPACE1-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE1-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE1-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE2-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE2-1 Cooling Coil,   !- Component 1 Name",
 		"    SPACE2-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE2-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE2-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE2-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE2-1 Heating Coil,   !- Component 1 Name",
 		"    SPACE2-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE2-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE2-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE3-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE3-1 Cooling Coil,   !- Component 1 Name",
 		"    SPACE3-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE3-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE3-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE3-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE3-1 Heating Coil,   !- Component 1 Name",
 		"    SPACE3-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE3-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE3-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE4-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE4-1 Cooling Coil,   !- Component 1 Name",
 		"    SPACE4-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE4-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE4-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE4-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE4-1 Heating Coil,   !- Component 1 Name",
 		"    SPACE4-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE4-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE4-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE5-1 Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    SPACE5-1 Cooling Coil,   !- Component 1 Name",
 		"    SPACE5-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE5-1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE5-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    SPACE5-1 Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
+
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    SPACE5-1 Heating Coil,   !- Component 1 Name",
 		"    SPACE5-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-		"    SPACE5-1 Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    SPACE5-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    DOAS Main Branch,        !- Name",
-		"    autosize,                !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"    DOAS OA System,          !- Component 1 Name",
 		"    DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name",
 		"    DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name",
-		"    Passive,                 !- Component 1 Branch Control Type",
 		"    HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 1 Object Type",
 		"    DOAS Heat Recovery,      !- Component 2 Name",
 		"    DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
 		"    DOAS Heat Recovery Supply Outlet,  !- Component 2 Outlet Node Name",
-		"    Passive,                 !- Component 2 Branch Control Type",
 		"    Coil:Cooling:Water,      !- Component 3 Object Type",
 		"    DOAS Cooling Coil,       !- Component 3 Name",
 		"    DOAS Heat Recovery Supply Outlet,   !- Component 3 Inlet Node Name",
 		"    DOAS Cooling Coil Outlet,!- Component 3 Outlet Node Name",
-		"    Passive,                 !- Component 3 Branch Control Type",
 		"    Coil:Heating:Water,      !- Component 4 Object Type",
 		"    DOAS Heating Coil,       !- Component 4 Name",
 		"    DOAS Cooling Coil Outlet,!- Component 4 Inlet Node Name",
 		"    DOAS Heating Coil Outlet,!- Component 4 Outlet Node Name",
-		"    Passive,                 !- Component 4 Branch Control Type",
 		"    Fan:VariableVolume,      !- Component 5 Object Type",
 		"    DOAS Supply Fan,         !- Component 5 Name",
 		"    DOAS Heating Coil Outlet,!- Component 5 Inlet Node Name",
-		"    DOAS Supply Fan Outlet,  !- Component 5 Outlet Node Name",
-		"    Active;                  !- Component 5 Branch Control Type",
+		"    DOAS Supply Fan Outlet;  !- Component 5 Outlet Node Name",
 
 		"Branch,",
 		"    DOAS Cooling Coil ChW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Cooling:Water,      !- Component 1 Object Type",
 		"    DOAS Cooling Coil,       !- Component 1 Name",
 		"    DOAS Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name",
-		"    DOAS Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    DOAS Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    DOAS Heating Coil HW Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    DOAS Heating Coil,       !- Component 1 Name",
 		"    DOAS Heating Coil HW Inlet,  !- Component 1 Inlet Node Name",
-		"    DOAS Heating Coil HW Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    DOAS Heating Coil HW Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Main Boiler HW Branch,   !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    Purchased Heating,         !- Component 1 Name",
 		"    Purchased Heat Inlet Node, !- Component 1 Inlet Node Name",
-		"    Purchased Heat Outlet Node,   !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    Purchased Heat Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Main Chiller ChW Branch, !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictCooling,         !- Component 1 Object Type",
 		"    Purchased Cooling,            !- Component 1 Name",
 		"    Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Purchased Cooling Outlet Node, !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    Purchased Cooling Outlet Node; !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Hot Water Loop HW Supply Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Supply Side Bypass Pipe,  !- Component 1 Name",
 		"    Hot Water Loop HW Supply Bypass Inlet,  !- Component 1 Inlet Node Name",
-		"    Hot Water Loop HW Supply Bypass Outlet,  !- Component 1 Outlet Node Name",
-		"    Bypass;                  !- Component 1 Branch Control Type",
+		"    Hot Water Loop HW Supply Bypass Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Hot Water Loop HW Supply Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:ConstantSpeed,      !- Component 1 Object Type",
 		"    Hot Water Loop HW Supply Pump,  !- Component 1 Name",
 		"    Hot Water Loop HW Supply Inlet,  !- Component 1 Inlet Node Name",
-		"    Hot Water Loop HW Pump Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    Hot Water Loop HW Pump Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Hot Water Loop HW Supply Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Supply Outlet Pipe,  !- Component 1 Name",
 		"    Hot Water Loop HW Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-		"    Hot Water Loop HW Supply Outlet,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    Hot Water Loop HW Supply Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Hot Water Loop HW Demand Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Demand Inlet Pipe,  !- Component 1 Name",
 		"    Hot Water Loop HW Demand Inlet,  !- Component 1 Inlet Node Name",
-		"    Hot Water Loop HW Demand Inlet Pipe Outlet,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    Hot Water Loop HW Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Hot Water Loop HW Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Demand Side Bypass Pipe,  !- Component 1 Name",
 		"    Hot Water Loop HW Demand Bypass Inlet,  !- Component 1 Inlet Node Name",
-		"    Hot Water Loop HW Demand Bypass Outlet,  !- Component 1 Outlet Node Name",
-		"    Bypass;                  !- Component 1 Branch Control Type",
+		"    Hot Water Loop HW Demand Bypass Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Hot Water Loop HW Demand Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Hot Water Loop HW Demand Outlet Pipe,  !- Component 1 Name",
 		"    Hot Water Loop HW Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-		"    Hot Water Loop HW Demand Outlet,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    Hot Water Loop HW Demand Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Chilled Water Loop ChW Supply Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Supply Side Bypass Pipe,  !- Component 1 Name",
 		"    Chilled Water Loop ChW Supply Bypass Inlet,  !- Component 1 Inlet Node Name",
-		"    Chilled Water Loop ChW Supply Bypass Outlet,  !- Component 1 Outlet Node Name",
-		"    Bypass;                  !- Component 1 Branch Control Type",
+		"    Chilled Water Loop ChW Supply Bypass Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Chilled Water Loop ChW Supply Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:ConstantSpeed,      !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Supply Pump,  !- Component 1 Name",
 		"    Chilled Water Loop ChW Supply Inlet,  !- Component 1 Inlet Node Name",
-		"    Chilled Water Loop ChW Pump Outlet,  !- Component 1 Outlet Node Name",
-		"    Active;                  !- Component 1 Branch Control Type",
+		"    Chilled Water Loop ChW Pump Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Chilled Water Loop ChW Supply Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Supply Outlet Pipe,  !- Component 1 Name",
 		"    Chilled Water Loop ChW Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-		"    Chilled Water Loop ChW Supply Outlet,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    Chilled Water Loop ChW Supply Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Chilled Water Loop ChW Demand Inlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Demand Inlet Pipe,  !- Component 1 Name",
 		"    Chilled Water Loop ChW Demand Inlet,  !- Component 1 Inlet Node Name",
-		"    Chilled Water Loop ChW Demand Inlet Pipe Outlet,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    Chilled Water Loop ChW Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Chilled Water Loop ChW Demand Bypass Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Demand Side Bypass Pipe,  !- Component 1 Name",
 		"    Chilled Water Loop ChW Demand Bypass Inlet,  !- Component 1 Inlet Node Name",
-		"    Chilled Water Loop ChW Demand Bypass Outlet,  !- Component 1 Outlet Node Name",
-		"    Bypass;                  !- Component 1 Branch Control Type",
+		"    Chilled Water Loop ChW Demand Bypass Outlet;  !- Component 1 Outlet Node Name",
 
 		"Branch,",
 		"    Chilled Water Loop ChW Demand Outlet Branch,  !- Name",
-		"    ,                        !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Chilled Water Loop ChW Demand Outlet Pipe,  !- Component 1 Name",
 		"    Chilled Water Loop ChW Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-		"    Chilled Water Loop ChW Demand Outlet,  !- Component 1 Outlet Node Name",
-		"    Passive;                 !- Component 1 Branch Control Type",
+		"    Chilled Water Loop ChW Demand Outlet;  !- Component 1 Outlet Node Name",
 
 		"BranchList,",
 		"    DOAS Branches,           !- Name",
@@ -3731,7 +3650,10 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    Hot Water Loop HW Demand Side Connectors,  !- Demand Side Connector List Name",
 		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"PlantLoop,",
 		"    Chilled Water Loop Chilled Water Loop,  !- Name",
@@ -3755,7 +3677,9 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
 		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
-		"    None;                    !- Common Pipe Simulation",
+		"    None,                    !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"PlantEquipmentList,",
 		"    Hot Water Loop All Equipment,           !- Name",
@@ -3869,11 +3793,11 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
-	OutputProcessor::TimeValue.allocate( 2 ); // 
+	OutputProcessor::TimeValue.allocate( 2 ); //
 	ManageSimulation(); // run the design day
 
 	ASSERT_EQ( "DOAS HEAT RECOVERY", ExchCond( 1 ).Name );  // Name of Heat Recovery Exchange On Main Air Loop
-	ASSERT_EQ( ExchCond( 1 ).Name, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 2 ).Name );  // Heat Recovery Exchange On Main Air Loop	
+	ASSERT_EQ( ExchCond( 1 ).Name, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 2 ).Name );  // Heat Recovery Exchange On Main Air Loop
 
 	ASSERT_NEAR( -17.300, ExchCond( 1 ).SupInTemp, 0.001 ); // Heat Recovery Exchanger Primary Air Inlet Temp
 	ASSERT_GT( ExchCond( 1 ).SupOutTemp, ExchCond( 1 ).SupInTemp ); // Heat Recovery Exchanger is On in heating mode
@@ -3885,8 +3809,116 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	Qhr_HeatingRateTot = ExchCond( 1 ).SupInMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 	ASSERT_NEAR( Qhr_HeatingRateTot, ExchCond( 1 ).TotHeatingRate, 0.01 );
 
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileSysSizing, flags ); }
+}
+
+TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
+	
+	int ExchNum( 1 );
+	int BalDesDehumPerfDataIndex( 1 );
+	Real64 FaceVelocity;
+	Real64 SysVolFlow;
+
+	SysSizingRunDone = true;
+	DataSizing::NumSysSizInput = 1;
+	DataSizing::SysSizInput.allocate( NumSysSizInput );
+	DataSizing::CurSysNum = 1; // primary air system
+	DataSizing::CurOASysNum = 0; // no OA system 
+	DataSizing::CurZoneEqNum = 0; // size it based on system
+	DataSizing::SysSizInput( CurSysNum ).AirLoopNum = 1;
+
+	// initialize sizing required variables
+	ExchCond.allocate( ExchNum );
+	ExchCond( ExchNum ).ExchTypeNum = HX_DESICCANT_BALANCED;
+	ExchCond( ExchNum ).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
+	ExchCond( ExchNum ).NomSupAirVolFlow = AutoSize;
+	ExchCond( ExchNum ).PerfDataIndex = BalDesDehumPerfDataIndex;
+
+	BalDesDehumPerfData.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfNumericFields.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).Name = "DehumPerformanceData";
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
+
+	// autosize nominal vol flow and face velocity
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames( 1 ) = "Nominal Air Flow Rate";
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow = AutoSize;
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames( 2 ) = "Nominal Air Face Velocity";
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel = AutoSize;
+
+	// initialize sizing variables
+	DataSizing::CurDuctType = DataHVACGlobals::Main;
+	FinalSysSizing.allocate( CurSysNum );
+	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
+
+	// initialize UnitarySysEqSizing capacity flag to false; not unitary system
+	UnitarySysEqSizing.allocate( CurSysNum );
+	UnitarySysEqSizing( CurSysNum ).CoolingCapacity = false;
+	UnitarySysEqSizing( CurSysNum ).HeatingCapacity = false;
+
+	// calc heat recovery sizing
+	SizeHeatRecovery( ExchNum );
+	
+	// test autosized nominal vol flow rate
+	EXPECT_EQ( 1.0, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow ); // m3/s
+
+	// size nominal face velocity
+	SysVolFlow = BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow;
+	FaceVelocity = 4.30551 + 0.01969 * SysVolFlow;
+
+	// test autosized face velocity
+	EXPECT_EQ( FaceVelocity, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel ); // m/s
+}
+
+TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
+
+	int ExchNum = 1;
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.5;",
+
+		"  HeatExchanger:AirToAir:SensibleAndLatent,",
+		"    HEATRECOVERY HX IN ERV,  !- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
+		"    0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
+		"    0.68,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
+		"    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
+		"    0.73,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
+		"    0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
+		"    0.68,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
+		"    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
+		"    0.73,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
+		"    ERV OA Inlet Node,       !- Supply Air Inlet Node Name",
+		"    HR Pri Air Outlet Node,  !- Supply Air Outlet Node Name",
+		"    Zone 1 Exhaust Node,     !- Exhaust Air Inlet Node Name",
+		"    HR Sec aIR Outlet Node,  !- Exhaust Air Outlet Node Name",
+		"    50.0,                    !- Nominal Electric Power {W}",
+		"    No,                      !- Supply Air Outlet Temperature Control",
+		"    Rotary,                  !- Heat Exchanger Type",
+		"    None,                    !- Frost Control Type",
+		"    1.7;                     !- Threshold Temperature {C}",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	// get heat recovery heat exchanger generic
+	GetHeatRecoveryInput();
+
+	// initialize
+	DataSizing::CurZoneEqNum = 1;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+
+	// the HR HX is in Zone Equipment ERV
+	ZoneEqSizing.allocate( CurZoneEqNum );
+	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
+	ZoneEqSizing( CurZoneEqNum ).AirVolFlow = 1.0;
+
+	// size the HX nominal supply air volume flow rate 
+	SizeHeatRecovery( ExchNum );
+
+	// verify the name and autosized supply air flow rate
+	EXPECT_EQ( ExchCond( ExchNum ).Name, "HEATRECOVERY HX IN ERV" );
+	EXPECT_EQ( ExchCond( ExchNum ).NomSupAirVolFlow, 1.0 );
 
 }

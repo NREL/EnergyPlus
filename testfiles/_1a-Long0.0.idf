@@ -10,7 +10,7 @@
 ! Plant:    None.
 ! Modified:
 
-  Version,8.5;
+  Version,8.7;
 
   Site:Location,
     UNKNOWN,                 !- Name
@@ -1102,6 +1102,7 @@
 
   OtherEquipment,
     ZONE ONE OthEq 1,        !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     Sch 1,                   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

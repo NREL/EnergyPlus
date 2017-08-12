@@ -95,7 +95,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:SingleSpeed, COIL:DX:HeatingEmpirical, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, COIL:DX:HeatingEmpirical, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     NONE,                    !- Name
@@ -1247,7 +1247,7 @@
     Zn001:Wall001,           !- Surface Name
     1.0E-2,                  !- Mass Transfer Coefficient {m/s}
     GC Source Schedule,      !- Schedule Name
-    2.0;                     !- Henry adsorption constant or partition coefficient {dimensionless}
+    2.0;                     !- Henry Adsorption Constant or Partition Coefficient {dimensionless}
 
   SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
     EAST ZONE GC DVS,        !- Name
@@ -1398,18 +1398,15 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.7,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:AirToAir,  !- Component 2 Object Type
     DXAC Heat Pump 1,        !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node;    !- Component 2 Outlet Node Name
 
   AirLoopHVAC,
     Typical Terminal Reheat 1,  !- Name
@@ -1576,9 +1573,9 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    1.7,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.7,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
-    1.7,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    1.7,                     !- Cooling Supply Air Flow Rate {m3/s}
+    1.7,                     !- Heating Supply Air Flow Rate {m3/s}
+    1.7,                     !- No Load Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Air Fan Object Type
     Supply Fan 1,            !- Supply Air Fan Name
@@ -1586,7 +1583,7 @@
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Heat Pump ACDXCoil 1,    !- Cooling Coil Name
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -1634,6 +1631,7 @@
     CO2AvailSchedule,        !- Carbon Dioxide Control Availability Schedule Name
     CO2SetpointSchedule,     !- Carbon Dioxide Setpoint Schedule Name
     ,                        !- Minimum Carbon Dioxide Concentration Schedule Name
+    ,                        !- Maximum Carbon Dioxide Concentration Schedule Name
     GCAvailSchedule,         !- Generic Contaminant Control Availability Schedule Name
     GCSetpointSchedule;      !- Generic Contaminant Setpoint Schedule Name
 
@@ -1663,10 +1661,11 @@
     Zone 2 Outlet Node,      !- Inlet 2 Node Name
     Zone 3 Outlet Node;      !- Inlet 3 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name

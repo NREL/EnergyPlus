@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -718,25 +718,29 @@
     autocalculate;           !- Volume {m3}
 
   Daylighting:Controls,
+    West Zone_DaylCtrl,      !- Name
     West Zone,               !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    3.048,                   !- X-Coordinate of First Reference Point {m}
-    3.048,                   !- Y-Coordinate of First Reference Point {m}
-    0.9,                     !- Z-Coordinate of First Reference Point {m}
-    0.0,                     !- X-Coordinate of Second Reference Point {m}
-    0.0,                     !- Y-Coordinate of Second Reference Point {m}
-    0.0,                     !- Z-Coordinate of Second Reference Point {m}
-    1.0,                     !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    500.,                    !- Illuminance Setpoint at First Reference Point {lux}
-    500.,                    !- Illuminance Setpoint at Second Reference Point {lux}
-    1,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Continuous,              !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    ,                        !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    West Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name
     180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.0,                    !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    0,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name
+    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    West Zone_DaylRefPt1,    !- Name
+    West Zone,               !- Zone Name
+    3.048,                   !- X-Coordinate of Reference Point {m}
+    3.048,                   !- Y-Coordinate of Reference Point {m}
+    0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Output:IlluminanceMap,
     Map1,                    !- Name
@@ -1351,6 +1355,7 @@
     ,                        !- Availability Schedule Name
     NODE_1,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1379,6 +1384,7 @@
     ,                        !- Availability Schedule Name
     NODE_2,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1407,6 +1413,7 @@
     ,                        !- Availability Schedule Name
     NODE_3,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

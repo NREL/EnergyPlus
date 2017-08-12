@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -1412,12 +1412,12 @@
     ZN_1_FLR_1_SEC_1 Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     ZN_1_FLR_1_SEC_1 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     ZN_1_FLR_1_SEC_1 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
@@ -1954,12 +1954,12 @@
     ZN_1_FLR_1_SEC_2 Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     ZN_1_FLR_1_SEC_2 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     ZN_1_FLR_1_SEC_2 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
@@ -2496,12 +2496,12 @@
     ZN_1_FLR_1_SEC_3 Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     ZN_1_FLR_1_SEC_3 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     ZN_1_FLR_1_SEC_3 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
@@ -3038,12 +3038,12 @@
     ZN_1_FLR_1_SEC_4 Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     ZN_1_FLR_1_SEC_4 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     ZN_1_FLR_1_SEC_4 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
@@ -3566,12 +3566,12 @@
     ZN_1_FLR_1_SEC_5 Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     ZN_1_FLR_1_SEC_5 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     ZN_1_FLR_1_SEC_5 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
@@ -3840,38 +3840,34 @@
 
   Branch,
     SHWSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SHWSys1 Pump,            !- Component 1 Name
     SHWSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Water Inlet NodeviaConnector,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SHWSys1 Water Inlet NodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Stratified,  !- Component 1 Object Type
     SHWSys1 Water Heater,    !- Component 1 Name
     SHWSys1 Water Inlet Node,!- Component 1 Inlet Node Name
-    SHWSys1 Water Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     SHWSys1 Pump,            !- Name
     SHWSys1 Supply Inlet Node,  !- Inlet Node Name
     SHWSys1 Water Inlet NodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    1,                       !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    1,                       !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     1,                       !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   WaterHeater:Stratified,
@@ -3945,13 +3941,11 @@
 
   Branch,
     SHWSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     SHWSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    SHWSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -3960,13 +3954,11 @@
 
   Branch,
     SHWSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Outlet Pipe,  !- Component 1 Name
     SHWSys1 Supply Mixer-SHWSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Supply Outlet Pipe,  !- Name
@@ -4028,13 +4020,11 @@
 
   Branch,
     SHWSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Inlet Pipe,  !- Component 1 Name
     SHWSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Inlet Pipe,  !- Name
@@ -4043,113 +4033,91 @@
 
   Branch,
     SHWSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Bypass Pipe,  !- Component 1 Name
     SHWSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    SHWSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Bypass Pipe,  !- Name
@@ -4158,13 +4126,11 @@
 
   Branch,
     SHWSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Outlet Pipe,  !- Component 1 Name
     SHWSys1 Demand Mixer-SHWSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Outlet Pipe,  !- Name
@@ -4261,48 +4227,42 @@
 
   Branch,
     MICROCHP SENERTECH Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     MICROCHP SENERTECH Pump, !- Component 1 Name
     MICROCHP SENERTECH Supply Inlet Node,  !- Component 1 Inlet Node Name
-    MICROCHP SENERTECH Pump-MicroCoGen1NodeviaConnector,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    MICROCHP SENERTECH Pump-MicroCoGen1NodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     MICROCHP SENERTECH Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Generator:MicroCHP,      !- Component 1 Object Type
     MicroCoGen1,             !- Component 1 Name
     MICROCHP SENERTECH Pump-MicroCoGen1Node,  !- Component 1 Inlet Node Name
-    MICROCHP SENERTECH Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    MICROCHP SENERTECH Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SOFC Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Generator:FuelCell:ExhaustGasToWaterHeatExchanger,  !- Component 1 Object Type
     FCT SOFC Exhaust HX,     !- Component 1 Name
     Small SOFC Heat Rec Inlet Node,  !- Component 1 Inlet Node Name
-    Small SOFC Heat Rec Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Small SOFC Heat Rec Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     MICROCHP SENERTECH Pump, !- Name
     MICROCHP SENERTECH Supply Inlet Node,  !- Inlet Node Name
     MICROCHP SENERTECH Pump-MicroCoGen1NodeviaConnector,  !- Outlet Node Name
-    0.0008,                  !- Rated Flow Rate {m3/s}
-    20000,                   !- Rated Pump Head {Pa}
-    140.0000,                !- Rated Power Consumption {W}
+    0.0008,                  !- Design Maximum Flow Rate {m3/s}
+    20000,                   !- Design Pump Head {Pa}
+    140.0000,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Generator:MicroCHP,
@@ -4443,7 +4403,7 @@
     TemperatureFromAirNode,  !- Fuel Temperature Modeling Mode
     MicroCoGen1 air inlet node,  !- Fuel Temperature Reference Node Name
     ,                        !- Fuel Temperature Schedule Name
-    NullCubic,               !- Compressor Power Function of Fuel Rate Curve Name
+    NullCubic,               !- Compressor Power Multiplier Function of Fuel Rate Curve Name
     1.0000,                  !- Compressor Heat Loss Factor
     GaseousConstituents,     !- Fuel Type
     ,                        !- Liquid Generic Fuel Lower Heating Value {kJ/kg}
@@ -4479,13 +4439,11 @@
 
   Branch,
     MICROCHP SENERTECH Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Supply Equipment Bypass Pipe,  !- Component 1 Name
     MICROCHP SENERTECH Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    MICROCHP SENERTECH Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    MICROCHP SENERTECH Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     MICROCHP SENERTECH Supply Equipment Bypass Pipe,  !- Name
@@ -4494,13 +4452,11 @@
 
   Branch,
     MICROCHP SENERTECH Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Supply Outlet Pipe,  !- Component 1 Name
     MICROCHP SENERTECH Supply Mixer-MICROCHP SENERTECH Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    MICROCHP SENERTECH Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    MICROCHP SENERTECH Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     MICROCHP SENERTECH Supply Outlet Pipe,  !- Name
@@ -4535,13 +4491,11 @@
 
   Branch,
     MICROCHP SENERTECH Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Demand Inlet Pipe,  !- Component 1 Name
     MICROCHP SENERTECH Demand Inlet Node,  !- Component 1 Inlet Node Name
-    MICROCHP SENERTECH Demand Inlet Pipe-MICROCHP SENERTECH Demand Mixer,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    MICROCHP SENERTECH Demand Inlet Pipe-MICROCHP SENERTECH Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     MICROCHP SENERTECH Demand Inlet Pipe,  !- Name
@@ -4550,23 +4504,19 @@
 
   Branch,
     MICROCHP SENERTECH Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Stratified,  !- Component 1 Object Type
     SHWSys1 Water Heater,    !- Component 1 Name
     MICROCHP SENERTECH Water Inlet Node,  !- Component 1 Inlet Node Name
-    MICROCHP SENERTECH Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    MICROCHP SENERTECH Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     MICROCHP SENERTECH Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Demand Bypass Pipe,  !- Component 1 Name
     MICROCHP SENERTECH Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    MICROCHP SENERTECH Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    MICROCHP SENERTECH Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     MICROCHP SENERTECH Demand Bypass Pipe,  !- Name
@@ -4575,13 +4525,11 @@
 
   Branch,
     MICROCHP SENERTECH Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     MICROCHP SENERTECH Demand Outlet Pipe,  !- Component 1 Name
     MICROCHP SENERTECH Demand Mixer-MICROCHP SENERTECH Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    MICROCHP SENERTECH Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    MICROCHP SENERTECH Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     MICROCHP SENERTECH Demand Outlet Pipe,  !- Name
@@ -4930,9 +4878,9 @@
     Main Load Center,        !- Name
     Generator List,          !- Generator List Name
     FollowThermal,           !- Generator Operation Scheme Type
-    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     AlternatingCurrent;      !- Electrical Buss Type
 
   ElectricLoadCenter:Generators,
@@ -4947,9 +4895,9 @@
     Generic Renewable Gen,   !- Name
     Fake wind turbine list,  !- Generator List Name
     Baseload,                !- Generator Operation Scheme Type
-    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     AlternatingCurrent;      !- Electrical Buss Type
 
   ElectricLoadCenter:Generators,
@@ -4996,9 +4944,9 @@
     SOFC Electric Load Center,  !- Name
     Micro-Generators,        !- Generator List Name
     Baseload,                !- Generator Operation Scheme Type
-    0.0,                     !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0.0,                     !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     AlternatingCurrent;      !- Electrical Buss Type
 
   ElectricLoadCenter:Generators,
@@ -5111,7 +5059,7 @@
     TemperatureFromAirNode,  !- Fuel Temperature Modeling Mode
     SOFC Air Inlet Node,     !- Fuel Temperature Reference Node Name
     ,                        !- Fuel Temperature Schedule Name
-    Null Cubic,              !- Compressor Power Function of Fuel Rate Curve Name
+    Null Cubic,              !- Compressor Power Multiplier Function of Fuel Rate Curve Name
     1.0,                     !- Compressor Heat Loss Factor
     GaseousConstituents,     !- Fuel Type
     ,                        !- Liquid Generic Fuel Lower Heating Value {kJ/kg}

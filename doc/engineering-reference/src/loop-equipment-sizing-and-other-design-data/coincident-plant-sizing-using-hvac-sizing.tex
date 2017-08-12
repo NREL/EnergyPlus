@@ -20,23 +20,18 @@ The analysis will proceed as follows:
   Compare the flow rate from step 5 to the current value for plant loop flow rate and calculate a normalized change using
 \end{enumerate}
 
-\begin{lstlisting}
--   $\rm{Normalized_Change} = \frac{ \left| \rm{NewFlowRate}-\rm{PreviousFlowRate} \right|} \rm{PreviousFlowRate}$
-\end{lstlisting}
+\begin{equation}
+  \text{Normalized\_Change} = \frac{\left|\text{NewFlowRate}-\text{PreviousFlowRate}\right|}{\text{PreviousFlowRate}}
+\end{equation}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{6}
-\tightlist
-\item
-  Normalized\_Change = \(\frac{\left|\text{NewFlowRate}-\text{PreviousFlowRate}\right|}{\text{PreviousFlowRate}}\)
-\end{enumerate}
-
-\begin{lstlisting}
--   Compare magnitude of Normalized\_Change to a threshold, currently set at 0.005, to determine if it was significant or not.
--   If change is significant, then alter the size result for that plant loop. Set flags that sizes have changed and sizing calculations need to be called again. Trigger special setup timesteps with flags set so that all plant system and component level sizes will be recomputed. Not this will call and resize all of plant so that if one loop has coincident sizing and it places a load on a loop that has noncoincident sizing, the noncoincident loop might still change size because the loop it depends on changed. Call for another Sizing Pass.
--   If change is not significant, then leave the sizes alone and do not trigger resizing. Do not call for another Sizing Pass.
-\end{lstlisting}
+\begin{itemize}
+  \item
+    Compare magnitude of Normalized\_Change to a threshold, currently set at 0.005, to determine if it was significant or not.
+  \item
+    If change is significant, then alter the size result for that plant loop. Set flags that sizes have changed and sizing calculations need to be called again. Trigger special setup timesteps with flags set so that all plant system and component level sizes will be recomputed. Not this will call and resize all of plant so that if one loop has coincident sizing and it places a load on a loop that has noncoincident sizing, the noncoincident loop might still change size because the loop it depends on changed. Call for another Sizing Pass.
+  \item
+    If change is not significant, then leave the sizes alone and do not trigger resizing. Do not call for another Sizing Pass.
+\end{itemize}
 
 See OutputDetailsAndExamples documentation for a description of a fairly comprehensive report sent the EIO file called ``Plant Coincident Sizing Algorithm'' which provides the user details for each execution of the algorithm. There is also a predefined summary table
 

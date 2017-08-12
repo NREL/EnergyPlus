@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     VRF TU with DOAS RH Control,  !- Name
@@ -2211,17 +2211,17 @@
     Yes,                     !- 100% Outdoor Air in Heating
     0.00924,                 !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.003,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ZoneSum,                 !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2252,28 +2252,23 @@
 
   Branch,
     DOAS Main Branch,        !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DOAS OA System,          !- Component 1 Name
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     DOAS Supply Fan,         !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
     DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
-    Active,                  !- Component 2 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 3 Object Type
     DOAS DX Cooling System,  !- Component 3 Name
     DOAS Supply Fan Outlet,  !- Component 3 Inlet Node Name
     DOAS Cooling Coil Outlet,!- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     DOAS Heating Coil,       !- Component 4 Name
     DOAS Cooling Coil Outlet,!- Component 4 Inlet Node Name
-    DOAS Heating Coil Outlet,!- Component 4 Outlet Node Name
-    Passive;                 !- Component 4 Branch Control Type
+    DOAS Heating Coil Outlet;!- Component 4 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     DOAS Supply Path,        !- Name
@@ -2423,6 +2418,7 @@
     VarSpeedCoolEIRLSFT,     !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     Main Cooling Coil 1 Condenser Node,  !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- High Speed Evaporative Condenser Effectiveness {dimensionless}
     ,                        !- High Speed Evaporative Condenser Air Flow Rate {m3/s}
     ,                        !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}
@@ -2587,17 +2583,18 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     DOAS Heating Coil,       !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     DOAS Cooling Coil Outlet,!- Air Inlet Node Name
     DOAS Heating Coil Outlet,!- Air Outlet Node Name
     DOAS Heating Coil Outlet,!- Temperature Setpoint Node Name
     0.0,                     !- Parasitic Electric Load {W}
     DOAS Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Gas Load {W}
+    0;                       !- Parasitic Fuel Load {W}
 
   Curve:Cubic,
     DOAS Heating Coil PLF-FPLR,  !- Name
@@ -2780,13 +2777,13 @@
     ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE1-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE1-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0.0,                     !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Heating Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
@@ -2807,13 +2804,13 @@
     ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE2-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE2-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0.0,                     !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Heating Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
@@ -2834,13 +2831,13 @@
     ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE3-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE3-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0.0,                     !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Heating Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
@@ -2861,13 +2858,13 @@
     ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE4-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE4-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0.0,                     !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Heating Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
@@ -2888,13 +2885,13 @@
     ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE5-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE5-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0.0,                     !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- Heating Outdoor Air Flow Rate {m3/s}
+    0.0,                     !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type

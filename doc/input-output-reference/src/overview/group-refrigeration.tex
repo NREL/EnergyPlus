@@ -5,16 +5,13 @@ There are two ways to model a supermarket refrigeration system.~ The first, and 
 For the first approach, the input objects needed are:
 
 \begin{itemize}
-\item
-  One Refrigeration:CompressorRack object
-\item
-  At least one refrigeration load, which may be any combination of:
-\item
-  Refrigeration:Case or
-\item
-  Refrigeration:WalkIn or
-\item
-  Refrigeration:CaseAndWalkInList objects .
+  \item  One Refrigeration:CompressorRack object
+  \item  At least one refrigeration load, which may be any combination of:
+  \begin{itemize}
+    \item  Refrigeration:Case or
+    \item  Refrigeration:WalkIn or
+    \item  Refrigeration:CaseAndWalkInList objects .
+  \end{itemize}
 \end{itemize}
 
 The second approach requires more input objects but also allows the user to model more complex systems.~ This detailed approach must be used whenever loads are transferred from one system to another, such as with secondary loops, cascade condensers, or mechanical subcoolers. Again lists are used to enter multiple load or compressor names.
@@ -22,38 +19,26 @@ The second approach requires more input objects but also allows the user to mode
 For the detailed approach, the input objects needed are:
 
 \begin{itemize}
-\item
-  One Refrigeration:System object
-\item
-  At least one refrigeration load object which may include any combination of:
-\item
-  Refrigeration:Case,
-\item
-  Refrigeration:WalkIn,
-\item
-  Refrigeration:CaseAndWalkInList (may include any combination of cases and walk in cooler names, OR, a list of air chiller names)
-\item
-  Refrigeration:SecondarySystem,
-\item
-  Refrigeration:Condenser:Cascade (as a load, cooling a lower-temperature system) objects,
-\item
-  Refrigeration:TransferLoadList (may include cascade condenser loads and/or secondary loop loads)
-\item
-  Refrigeration:AirChiller
-\item
-  At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
-\item
-  One condenser object which may be either:
-\item
-  Refrigeration:Condenser:AirCooled,
-\item
-  Refrigeration:Condenser:EvaporativeCooled,
-\item
-  Refrigeration:Condenser:WaterCooled, or
-\item
-  Refrigeration:Condenser:Cascade (rejecting heat from this system)
-\item
-  The object Refrigeration:Subcooler may optionally be included to describe either a liquid suction or mechanical subcooler.
+  \item  One Refrigeration:System object
+  \item  At least one refrigeration load object which may include any combination of:
+  \begin{itemize}
+    \item  Refrigeration:Case,
+    \item  Refrigeration:WalkIn,
+    \item  Refrigeration:CaseAndWalkInList (may include any combination of cases and walk in cooler names, OR, a list of air chiller names)
+    \item  Refrigeration:SecondarySystem,
+    \item  Refrigeration:Condenser:Cascade (as a load, cooling a lower-temperature system) objects,
+    \item  Refrigeration:TransferLoadList (may include cascade condenser loads and/or secondary loop loads)
+    \item  Refrigeration:AirChiller
+  \end{itemize}
+  \item  At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
+  \item  One condenser object which may be either:
+  \begin{itemize}
+    \item  Refrigeration:Condenser:AirCooled,
+    \item  Refrigeration:Condenser:EvaporativeCooled,
+    \item  Refrigeration:Condenser:WaterCooled, or
+    \item  Refrigeration:Condenser:Cascade (rejecting heat from this system)
+  \end{itemize}
+  \item  The object Refrigeration:Subcooler may optionally be included to describe either a liquid suction or mechanical subcooler.
 \end{itemize}
 
 Output variables are also available to describe the total heat exchange between all refrigeration objects and the zones containing these objects. These variables are described at the end of this section after all the refrigeration objects.
@@ -359,7 +344,7 @@ This output is the electric power input to the rack compressor(s) in Watts.
 
 This is the electricity consumption of the rack compressor(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Refrigeration Compressor Runtime Fraction {[]}}{Refrigeration Compressor Runtime Fraction }}\label{refrigeration-compressor-runtime-fraction}
+\paragraph{Refrigeration Compressor Runtime Fraction {[]}}\label{refrigeration-compressor-runtime-fraction}
 
 This is the runtime operating ratio for the compressor.
 
@@ -433,7 +418,7 @@ This output is the electric power input to the rack compressor(s) in Watts.
 
 This is the electricity consumption of the rack compressor(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Refrigeration Air Chiller System Compressor Runtime Fraction {[]}}{Refrigeration Air Chiller System Compressor Runtime Fraction }}\label{refrigeration-air-chiller-system-compressor-runtime-fraction}
+\paragraph{Refrigeration Air Chiller System Compressor Runtime Fraction {[]}}\label{refrigeration-air-chiller-system-compressor-runtime-fraction}
 
 This is the runtime fraction for the compressor serving air chillers.
 
@@ -473,11 +458,11 @@ This is the electrical power requirement in Watts for the timestep being reporte
 
 This is the electricity consumption in Joules of the water heater used to prevent freezing of the evaporative cooling system for the compressor rack condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume Flow Rate {[}m\(^{3}\)/s{]}}{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-water-volume-flow-rate-m3s}
+\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-water-volume-flow-rate-m3s}
 
 The volumetric flow rate in m\(^{3}\)/s of water consumed while providing evaporative cooling of the compressor rack condenser.
 
-\paragraph{\texorpdfstring{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume {[}m\(^{3}\){]}}{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume {[}m\^{}\{3\}{]}}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-water-volume-m3}
+\paragraph{Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume {[}m\(^{3}\){]}}\label{refrigeration-air-chiller-compressor-rack-evaporative-condenser-water-volume-m3}
 
 This is the water consumed by evaporation in m\(^{3}\) while providing evaporative cooling of the compressor rack condenser for the timestep being reported. This output is also added to a meter with Resource Type = Water, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
@@ -924,7 +909,7 @@ This field is the electricity consumption of the refrigerated case lights in Jou
 
 This field is the output of the Defrost Energy Correction Curve which denotes the variation in defrost energy at off-rated conditions. The output of the defrost energy correction curve directly impacts the energy used during the defrost time period. It does not, however, impact the duration of the defrost period. This output is available only for Electric with Temperature Termination, Hot-Gas with Temperature Termination, or Hot-Brine with Temperature Termination case defrost types.
 
-\paragraph{\texorpdfstring{Refrigeration Case Latent Credit Curve Value {[]}}{Refrigeration Case Latent Credit Curve Value }}\label{refrigeration-case-latent-credit-curve-value}
+\paragraph{Refrigeration Case Latent Credit Curve Value {[]}}\label{refrigeration-case-latent-credit-curve-value}
 
 This field is the output of the Latent Case Credit Curve which denotes the variation in latent case credits at off-rated conditions. The output of the latent case credit curve directly impacts the amount of frost formation on the refrigerated case evaporator coil and the requirement for defrost.
 
@@ -2280,7 +2265,7 @@ This output is the heat removed from the refrigerated cases by the compressor in
 
 This is the heat removed from the refrigerated cases by the compressor in Joules for the timestep being reported.
 
-\paragraph{\texorpdfstring{Refrigeration Compressor Run Time~ Fraction {[]}}{Refrigeration Compressor Run Time~ Fraction }}\label{refrigeration-compressor-run-time-fraction}
+\paragraph{Refrigeration Compressor Run Time~ Fraction {[]}}\label{refrigeration-compressor-run-time-fraction}
 
 This is the fraction of the time step when the compressor ran to meet the load.~ It is a value between 0.0 and 1.0.
 
@@ -2302,7 +2287,7 @@ This output is the heat removed from the refrigerated cases by the compressor in
 
 This is the heat removed from the refrigerated cases by the compressor in Joules for the timestep being reported.
 
-\paragraph{\texorpdfstring{Refrigeration Chiller Compressor Run Time~ Fraction {[]}}{Refrigeration Chiller Compressor Run Time~ Fraction }}\label{refrigeration-chiller-compressor-run-time-fraction}
+\paragraph{Refrigeration Chiller Compressor Run Time~ Fraction {[]}}\label{refrigeration-chiller-compressor-run-time-fraction}
 
 This is the fraction of the time step when the compressor ran to meet the load.~ It is a value between 0.0 and 1.0.
 
@@ -2909,11 +2894,11 @@ This is the electrical power requirement in Watts for the timestep being reporte
 
 This is the electricity consumption in Joules of the water heater used to prevent freezing of the evaporative cooling system for the condenser for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Refrigeration System Condenser Evaporated Water Volume Flow Rate {[}m\(^{3}\)/s{]}}{Refrigeration System Condenser Evaporated Water Volume Flow Rate {[}m\^{}\{3\}/s{]}}}\label{refrigeration-system-condenser-evaporated-water-volume-flow-rate-m3s}
+\paragraph{Refrigeration System Condenser Evaporated Water Volume Flow Rate {[}m\(^{3}\)/s{]}}\label{refrigeration-system-condenser-evaporated-water-volume-flow-rate-m3s}
 
 The volumetric flow rate in m\(^{3}\)/s of water consumed while providing evaporative cooling of the condenser.
 
-\paragraph{\texorpdfstring{Refrigeration System Condenser Evaporated Water Volume {[}m\(^{3}\){]}}{Refrigeration System Condenser Evaporated Water Volume {[}m\^{}\{3\}{]}}}\label{refrigeration-system-condenser-evaporated-water-volume-m3}
+\paragraph{Refrigeration System Condenser Evaporated Water Volume {[}m\(^{3}\){]}}\label{refrigeration-system-condenser-evaporated-water-volume-m3}
 
 This is the water consumed by evaporation in m\(^{3}\) while providing evaporative cooling of the condenser for the timestep being reported. This output is also added to a meter with Resource Type = Water, End Use Key = Refrigeration, Group Key = Plant. Use of an optional subkey category is also available, with default to the General end-use subcategory (Ref. Output:Meter objects).
 

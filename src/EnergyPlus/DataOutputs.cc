@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,21 +43,14 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <DataOutputs.hh>
+#include <InputProcessor.hh>
+#include "UtilityRoutines.hh"
 
 namespace EnergyPlus {
 
@@ -110,9 +100,31 @@ namespace DataOutputs {
 	int iTotalAutoCalculatableFields; // number of fields that can be autocalculated
 
 	// Object Data
-	Array1D< OutputReportingVariables > OutputVariablesForSimulation;
-
+	std::unordered_map < std::string, std::unordered_map< std::string, OutputReportingVariables > > OutputVariablesForSimulation;
 	// Functions
+
+	OutputReportingVariables::OutputReportingVariables(
+		std::string const & KeyValue,
+		std::string const & VariableName
+	) :
+		key( KeyValue ),
+		variableName( VariableName )
+	{
+		if ( KeyValue == "*" ) return;
+		for ( auto const & c : KeyValue ) {
+			if ( c == ' ' || c == '_' || std::isalnum( c ) ) continue;
+			is_simple_string = false;
+			break;
+		}
+		if ( is_simple_string ) return;
+		pattern = std::unique_ptr< RE2 >( new RE2( KeyValue ) );
+		case_insensitive_pattern = std::unique_ptr< RE2 >( new RE2( "(?i)" + KeyValue ) );
+		if ( ! pattern->ok() ) {
+			ShowSevereError( "Regular expression \"" + KeyValue + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
+			ShowContinueError( pattern->error() );
+			ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
+		}
+	}
 
 	// Clears the global data in DataOutputs.
 	// Needed for unit tests, should not be normally called.
@@ -128,7 +140,7 @@ namespace DataOutputs {
 		iTotalAutoSizableFields = int();
 		iNumberOfAutoCalcedFields = int();
 		iTotalAutoCalculatableFields = int();
-		OutputVariablesForSimulation.deallocate();
+		OutputVariablesForSimulation.clear();
 	}
 
 	bool
@@ -141,66 +153,34 @@ namespace DataOutputs {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
-		//       MODIFIED       na
+		//       MODIFIED       December 2016
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up a key and variable name value and determines if they are
 		// in the list of required variables for a simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
+		auto const found_variable = OutputVariablesForSimulation.find( InputProcessor::MakeUPPERCase( VariableName ) );
+		if ( found_variable == OutputVariablesForSimulation.end() ) return false;
 
-		// REFERENCES:
-		// na
+		auto found_key = found_variable->second.find( KeyedValue );
+		if ( found_key != found_variable->second.end() ) return true;
 
-		// USE STATEMENTS:
-		// na
+		found_key = found_variable->second.find( "*" );
+		if ( found_key != found_variable->second.end() ) return true;
 
-		// Return value
-		bool InVariableList;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int Found;
-		int Item;
-
-		InVariableList = false;
-		Found = 0;
-		for ( Item = 1; Item <= NumConsideredOutputVariables; ++Item ) {
-			if ( ! equali( VariableName, OutputVariablesForSimulation( Item ).VarName ) ) continue;
-			Found = Item;
-			break;
-		}
-		if ( Found != 0 ) {
-			if ( equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || OutputVariablesForSimulation( Found ).Key == "*" ) {
-				InVariableList = true;
-			} else {
-				while ( Found != 0 ) {
-					Found = OutputVariablesForSimulation( Found ).Next;
-					if ( Found != 0 ) {
-						if ( equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || OutputVariablesForSimulation( Found ).Key == "*" ) {
-							InVariableList = true;
-							break;
-						}
-					}
-				}
+		for ( auto it = found_variable->second.begin(); it != found_variable->second.end(); ++it ) {
+			if ( equali( KeyedValue, it->second.key ) ) return true;
+			if ( it->second.is_simple_string ) continue;
+			if (
+				( it->second.pattern != nullptr && RE2::FullMatch( KeyedValue, *it->second.pattern ) ) || // match against regex as written
+				( it->second.case_insensitive_pattern != nullptr && RE2::FullMatch( KeyedValue, *it->second.case_insensitive_pattern ) ) // attempt case-insensitive regex comparison
+				)
+			{
+				return true;
 			}
 		}
-
-		return InVariableList;
-
+		return false;
 	}
 
 } // DataOutputs

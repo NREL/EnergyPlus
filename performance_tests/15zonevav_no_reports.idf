@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  VERSION,8.4;
+  VERSION,8.6;
 
   Timestep,4;
 
@@ -1764,25 +1764,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_1_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    7.500,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    7.500,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_1,  !- Name
@@ -2015,7 +2019,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_1 VAV Box Reheat Coil,  !- Name
@@ -2162,25 +2168,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_2_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    5.215,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    5.215,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_2,  !- Name
@@ -2413,7 +2423,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_2 VAV Box Reheat Coil,  !- Name
@@ -2560,25 +2572,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_3_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    5.000,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    5.000,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_3,  !- Name
@@ -2811,7 +2827,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_3 VAV Box Reheat Coil,  !- Name
@@ -2958,25 +2976,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_4_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    9.785,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    9.785,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_4,  !- Name
@@ -3209,7 +3231,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_4 VAV Box Reheat Coil,  !- Name
@@ -3356,25 +3380,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_5_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    7.500,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_5,        !- Zone Name
+    7.500,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_5,  !- Name
@@ -3607,7 +3635,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_5 VAV Box Reheat Coil,  !- Name
@@ -3754,25 +3784,29 @@
     0.0000,30.8600,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_6_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_6,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    15.430,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_6,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    15.430,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_6,  !- Name
@@ -4005,7 +4039,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_6 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_6 VAV Box Reheat Coil,  !- Name
@@ -4152,25 +4188,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_7_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_7,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.930,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_7,        !- Zone Name
+    2.930,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_7,  !- Name
@@ -4403,7 +4443,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_7 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_7 VAV Box Reheat Coil,  !- Name
@@ -4550,25 +4592,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_8_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_8,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    5.215,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_8,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    5.215,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_8,  !- Name
@@ -4801,7 +4847,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_8 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_8 VAV Box Reheat Coil,  !- Name
@@ -4948,25 +4996,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_9_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_9,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    9.570,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_9,        !- Zone Name
+    9.570,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_9,  !- Name
@@ -5199,7 +5251,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_9 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_9 VAV Box Reheat Coil,  !- Name
@@ -5346,25 +5400,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_10_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_10,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    9.785,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_10,       !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    9.785,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_10,  !- Name
@@ -5597,7 +5655,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_10 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_10 VAV Box Reheat Coil,  !- Name
@@ -5744,25 +5804,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_11_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_11,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.930,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_11,       !- Zone Name
+    2.930,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_11,  !- Name
@@ -5995,7 +6059,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_11 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_11 VAV Box Reheat Coil,  !- Name
@@ -6142,25 +6208,29 @@
     0.0000,40.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_12_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_12,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    20.000,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_12,       !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    20.000,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_12,  !- Name
@@ -6393,7 +6463,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_12 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_12 VAV Box Reheat Coil,  !- Name
@@ -6771,7 +6843,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_13 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_13 VAV Box Reheat Coil,  !- Name
@@ -7117,7 +7191,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_14 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_14 VAV Box Reheat Coil,  !- Name
@@ -7495,7 +7571,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_15 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_15 VAV Box Reheat Coil,  !- Name
@@ -7641,6 +7719,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -7649,28 +7728,23 @@
 
   Branch,
     VAV WITH REHEAT Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     VAV WITH REHEAT_OA,      !- Component 1 Name
     VAV WITH REHEAT Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     VAV WITH REHEAT_OA-VAV WITH REHEAT_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water,      !- Component 2 Object Type
     VAV WITH REHEAT_CoolC,   !- Component 2 Name
     VAV WITH REHEAT_OA-VAV WITH REHEAT_CoolCNode,  !- Component 2 Inlet Node Name
     VAV WITH REHEAT_CoolC-VAV WITH REHEAT_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Water,      !- Component 3 Object Type
     VAV WITH REHEAT_HeatC,   !- Component 3 Name
     VAV WITH REHEAT_CoolC-VAV WITH REHEAT_HeatCNode,  !- Component 3 Inlet Node Name
     VAV WITH REHEAT_HeatC-VAV WITH REHEAT FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     VAV WITH REHEAT Fan,     !- Component 4 Name
     VAV WITH REHEAT_HeatC-VAV WITH REHEAT FanNode,  !- Component 4 Inlet Node Name
-    VAV WITH REHEAT Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    VAV WITH REHEAT Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     VAV WITH REHEAT_OA_Controllers,  !- Name
@@ -7912,38 +7986,34 @@
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
     HeatSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
     HeatSys1 Pump-HeatSys1 BoilerNode,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
     HeatSys1 Supply Inlet Node,  !- Inlet Node Name
     HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    15000,                   !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    15000,                   !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
   Output:PreprocessorMessage,
@@ -7986,13 +8056,11 @@
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -8001,13 +8069,11 @@
 
   Branch,
     HeatSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
     HeatSys1 Supply Mixer-HeatSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Outlet Pipe,  !- Name
@@ -8087,13 +8153,11 @@
 
   Branch,
     HeatSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Inlet Pipe,  !- Name
@@ -8102,173 +8166,139 @@
 
   Branch,
     HeatSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_6 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_6 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_6 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_6 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_7 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_7 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_7 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_7 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_8 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_8 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_8 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_8 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_9 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_9 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_9 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_9 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_10 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_10 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_10 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_10 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_11 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_11 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_11 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_11 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_12 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_12 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_12 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_12 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_13 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_13 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_13 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_13 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_14 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_14 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_14 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_14 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_15 VAV Box Reheat Coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_15 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_15 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_15 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 16,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     VAV WITH REHEAT_HeatC,   !- Component 1 Name
     VAV WITH REHEAT_HeatCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    VAV WITH REHEAT_HeatCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV WITH REHEAT_HeatCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
     HeatSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Bypass Pipe,  !- Name
@@ -8277,13 +8307,11 @@
 
   Branch,
     HeatSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Mixer-HeatSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Outlet Pipe,  !- Name
@@ -8370,38 +8398,34 @@
 
   Branch,
     CoolSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CoolSys1 Pump,           !- Component 1 Name
     CoolSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     CoolSys1 Chiller,        !- Component 1 Name
     CoolSys1 Pump-CoolSys1 ChillerNode,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CoolSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     CoolSys1 Pump,           !- Name
     CoolSys1 Supply Inlet Node,  !- Inlet Node Name
     CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    15000,                   !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    15000,                   !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
   Chiller:Electric,
@@ -8435,13 +8459,11 @@
 
   Branch,
     CoolSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     CoolSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    CoolSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -8450,13 +8472,11 @@
 
   Branch,
     CoolSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Supply Outlet Pipe,  !- Component 1 Name
     CoolSys1 Supply Mixer-CoolSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Supply Outlet Pipe,  !- Name
@@ -8491,13 +8511,11 @@
 
   Branch,
     CoolSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Inlet Pipe,  !- Component 1 Name
     CoolSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Inlet Pipe,  !- Name
@@ -8506,23 +8524,19 @@
 
   Branch,
     CoolSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     VAV WITH REHEAT_CoolC,   !- Component 1 Name
     VAV WITH REHEAT_CoolCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    VAV WITH REHEAT_CoolCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV WITH REHEAT_CoolCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Bypass Pipe,  !- Component 1 Name
     CoolSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    CoolSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Bypass Pipe,  !- Name
@@ -8531,13 +8545,11 @@
 
   Branch,
     CoolSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Outlet Pipe,  !- Component 1 Name
     CoolSys1 Demand Mixer-CoolSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Outlet Pipe,  !- Name
@@ -8627,31 +8639,27 @@
 
   Branch,
     TowerWaterSys Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     TowerWaterSys Pump,      !- Component 1 Name
     TowerWaterSys Supply Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     TowerWaterSys Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     TowerWaterSys CoolTower, !- Component 1 Name
     TowerWaterSys Pump-TowerWaterSys CoolTowerNode,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    TowerWaterSys Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:ConstantSpeed,
     TowerWaterSys Pump,      !- Name
     TowerWaterSys Supply Inlet Node,  !- Inlet Node Name
     TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent;            !- Pump Control Type
@@ -8676,13 +8684,11 @@
 
   Branch,
     TowerWaterSys Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Supply Equipment Bypass Pipe,  !- Component 1 Name
     TowerWaterSys Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    TowerWaterSys Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Supply Equipment Bypass Pipe,  !- Name
@@ -8691,13 +8697,11 @@
 
   Branch,
     TowerWaterSys Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Supply Outlet Pipe,  !- Component 1 Name
     TowerWaterSys Supply Mixer-TowerWaterSys Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    TowerWaterSys Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Supply Outlet Pipe,  !- Name
@@ -8732,13 +8736,11 @@
 
   Branch,
     TowerWaterSys Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Inlet Pipe,  !- Component 1 Name
     TowerWaterSys Demand Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Inlet Pipe-TowerWaterSys Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    TowerWaterSys Demand Inlet Pipe-TowerWaterSys Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Inlet Pipe,  !- Name
@@ -8747,23 +8749,19 @@
 
   Branch,
     TowerWaterSys Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     CoolSys1 Chiller,        !- Component 1 Name
     CoolSys1 Chiller Water Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Chiller Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CoolSys1 Chiller Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     TowerWaterSys Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Bypass Pipe,  !- Component 1 Name
     TowerWaterSys Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    TowerWaterSys Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Bypass Pipe,  !- Name
@@ -8772,13 +8770,11 @@
 
   Branch,
     TowerWaterSys Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Outlet Pipe,  !- Component 1 Name
     TowerWaterSys Demand Mixer-TowerWaterSys Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    TowerWaterSys Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Outlet Pipe,  !- Name

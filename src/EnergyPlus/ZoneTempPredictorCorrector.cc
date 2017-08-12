@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -74,6 +62,7 @@
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
 #include <DataHVACGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
@@ -85,7 +74,10 @@
 #include <EMSManager.hh>
 #include <FaultsManager.hh>
 #include <General.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
+#include <OutputReportPredefined.hh>
+#include <OutputReportTabular.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -96,6 +88,8 @@
 #include <UtilityRoutines.hh>
 #include <ZonePlenum.hh>
 #include <DirectAirManager.hh>
+#include <WeatherManager.hh>
+
 
 namespace EnergyPlus {
 
@@ -149,6 +143,8 @@ namespace ZoneTempPredictorCorrector {
 	using namespace DataRoomAirModel;
 	using namespace DataZoneControls;
 	using namespace FaultsManager;
+	using namespace HybridModel;
+	using ScheduleManager::GetCurrentScheduleValue;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -166,14 +162,26 @@ namespace ZoneTempPredictorCorrector {
 
 	Array1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
 
+	Array1D_string const AdaptiveComfortModelTypes( 8, { "None", "AdaptiveASH55CentralLine", "AdaptiveASH5590PercentUpperLine", "AdaptiveASH5580PercentUpperLine", "AdaptiveCEN15251CentralLine", "AdaptiveCEN15251CategoryIUpperLine", "AdaptiveCEN15251CategoryIIUpperLine", "AdaptiveCEN15251CategoryIIIUpperLine" } );
+
+
 	int const iZC_TStat( 1 );
 	int const iZC_TCTStat( 2 );
 	int const iZC_OTTStat( 3 );
 	int const iZC_HStat( 4 );
 	int const iZC_TandHStat( 5 );
 	int const iZC_StagedDual( 6 );
-	Array1D_int const iZControlTypes( 6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual } );
+	Array1D_int const iZControlTypes(6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual });
 
+	int const ADAP_NONE( 1 );
+	int const ASH55_CENTRAL( 2 );
+	int const ASH55_UPPER_90( 3 );
+	int const ASH55_UPPER_80( 4 );
+	int const CEN15251_CENTRAL( 5 );
+	int const CEN15251_UPPER_I( 6 );
+	int const CEN15251_UPPER_II( 7 );
+	int const CEN15251_UPPER_III( 8 );
+	
 	int const SglHeatSetPoint( 1 );
 	int const SglCoolSetPoint( 2 );
 	int const SglHCSetPoint( 3 );
@@ -250,6 +258,8 @@ namespace ZoneTempPredictorCorrector {
 	Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
 	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
+	Array1D< Real64 > AdapComfortSetPointSummerDesDay(7, -1);
 
 	// Functions
 	void
@@ -282,6 +292,13 @@ namespace ZoneTempPredictorCorrector {
 		SetPointSingleCoolingFanger.deallocate();
 		SetPointSingleHeatCoolFanger.deallocate();
 		SetPointDualHeatCoolFanger.deallocate();
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.deallocate();
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.deallocate();
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.deallocate();
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.deallocate();
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.deallocate();
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.deallocate();
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.deallocate();
 	}
 
 	void
@@ -305,26 +322,8 @@ namespace ZoneTempPredictorCorrector {
 		// depending on the simulation status and determines the correct
 		// temperature setpoint for each zone from the schedule manager.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  INTEGER :: zoneloop
@@ -376,9 +375,6 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using namespace InputProcessor;
@@ -391,16 +387,11 @@ namespace ZoneTempPredictorCorrector {
 		using General::FindNumberInList;
 		using General::RoundSigDigits;
 		using General::CheckCreatedZoneItemName;
+		using WeatherManager::NumDaysInYear;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneAirSetpoints: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
 
 		// DERIVED TYPE DEFINITIONS:
 
@@ -1540,20 +1531,103 @@ namespace ZoneTempPredictorCorrector {
 
 		if ( allocated( TComfortControlTypes ) ) TComfortControlTypes.deallocate();
 
-		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrrector Procedure
+		// Get the Hybrid Model setting inputs
+		GetHybridModelZone();
+		
+		// Default multiplier values
+		Real64 ZoneVolCapMultpSens = 1.0;
+		Real64 ZoneVolCapMultpMoist = 1.0;
+		Real64 ZoneVolCapMultpCO2 = 1.0;
+		Real64 ZoneVolCapMultpGenContam = 1.0;
+
+		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-		NumNums = GetNumObjectsFound( cCurrentModuleObject );
-		if ( NumNums == 0 ) {
-			ZoneVolCapMultpSens = 1.0;
-			ZoneVolCapMultpMoist = 1.0;
-			ZoneVolCapMultpCO2 = 1.0;
-			ZoneVolCapMultpGenContam = 1.0;
+		int NumZoneCapaMultiplier = GetNumObjectsFound( cCurrentModuleObject );
+		if ( NumZoneCapaMultiplier == 0 ) {
+		// Assign default multiplier values to all zones
+			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
+				Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
+				Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
+				Zone( ZoneNum ).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
+				Zone( ZoneNum ).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
+			}
+
 		} else {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ZoneVolCapMultpSens = rNumericArgs( 1 );
-			ZoneVolCapMultpMoist = rNumericArgs( 2 );
-			ZoneVolCapMultpCO2 = rNumericArgs( 3 );
-			ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+		
+			// Allow user to specify ZoneCapacitanceMultiplier:ResearchSpecial at zone level
+			// Added by S. Lee and R. Zhang in Oct. 2016.
+			// Assign the user inputted multipliers to specified zones
+			for ( int ZoneCapNum = 1; ZoneCapNum <= NumZoneCapaMultiplier; ZoneCapNum++ ) {
+				GetObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+				if( lAlphaFieldBlanks( 2 )){
+				// default multiplier values for all the zones not specified
+					ZoneVolCapMultpSens = rNumericArgs( 1 );
+					ZoneVolCapMultpMoist = rNumericArgs( 2 );
+					ZoneVolCapMultpCO2 = rNumericArgs( 3 );
+					ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+				} else {
+				// multiplier values for the specified zone 
+					int ZoneNum = 0;
+					ZLItem = 0;
+					Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+					if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+					if ( Item1 > 0 ) {
+						ZoneNum = Item1;
+						Zone( ZoneNum ).FlagCustomizedZoneCap = true;
+						Zone( ZoneNum ).ZoneVolCapMultpSens = rNumericArgs( 1 );
+						Zone( ZoneNum ).ZoneVolCapMultpMoist = rNumericArgs( 2 );
+						Zone( ZoneNum ).ZoneVolCapMultpCO2 = rNumericArgs( 3 );
+						Zone( ZoneNum ).ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+					} else if ( ZLItem > 0 ) {
+						for( int ZonePtrNum = 1; ZonePtrNum < ZoneList( ZLItem ).NumOfZones; ZonePtrNum++ ){
+							ZoneNum = ZoneList( ZLItem ).Zone( ZonePtrNum );
+							Zone( ZoneNum ).FlagCustomizedZoneCap = true;
+							Zone( ZoneNum ).ZoneVolCapMultpSens = rNumericArgs( 1 );
+							Zone( ZoneNum ).ZoneVolCapMultpMoist = rNumericArgs( 2 );
+							Zone( ZoneNum ).ZoneVolCapMultpCO2 = rNumericArgs( 3 );
+							Zone( ZoneNum ).ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+						}
+
+					} else {
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+						ErrorsFound = true;
+					}
+				}
+			}
+			
+			// Assign default multiplier values to all the other zones
+			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
+				if( ! Zone( ZoneNum ).FlagCustomizedZoneCap ){
+					Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
+					Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
+					Zone( ZoneNum ).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
+					Zone( ZoneNum ).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
+				}
+			}
+
+			// Calculate the average multiplier value from all zones
+			{				
+				Real64 ZoneVolCapMultpSens_temp = 0.0;
+				Real64 ZoneVolCapMultpMoist_temp = 0.0;
+				Real64 ZoneVolCapMultpCO2_temp = 0.0;
+				Real64 ZoneVolCapMultpGenContam_temp = 0.0;
+
+				for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
+					ZoneVolCapMultpSens_temp += Zone( ZoneNum ).ZoneVolCapMultpSens;
+					ZoneVolCapMultpMoist_temp += Zone( ZoneNum ).ZoneVolCapMultpMoist;
+					ZoneVolCapMultpCO2_temp += Zone( ZoneNum ).ZoneVolCapMultpCO2;
+					ZoneVolCapMultpGenContam_temp += Zone( ZoneNum ).ZoneVolCapMultpGenContam;
+				}
+
+				if( NumOfZones > 0 ){
+					ZoneVolCapMultpSens = ZoneVolCapMultpSens_temp / NumOfZones;
+					ZoneVolCapMultpMoist = ZoneVolCapMultpMoist_temp / NumOfZones;
+					ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2_temp / NumOfZones;
+					ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam_temp / NumOfZones;
+				}
+			}
+
 		}
 
 		gio::write( OutputFileInits, Format_700 );
@@ -1613,6 +1687,27 @@ namespace ZoneTempPredictorCorrector {
 							}
 						}
 
+						// added Jan, 2017 - Xuan Luo
+						// read adaptive comfort model and calculate adaptive thermal comfort setpoint
+						if ( TempControlledZone( TempControlledZoneNum ).OperativeTempControl ) {
+							if ( NumAlphas >= 4 && ! lAlphaFieldBlanks( 4 ) ) {
+								int adaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+								if( !adaptiveComfortModelTypeIndex ) {
+									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
+									ErrorsFound = true;
+								} else if ( adaptiveComfortModelTypeIndex != ADAP_NONE ) {
+									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortTempControl = true;
+									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+									if ( !AdapComfortDailySetPointSchedule.initialized ) {
+										Array1D< Real64 > runningAverageASH( NumDaysInYear, 0.0 );
+										Array1D< Real64 > runningAverageCEN( NumDaysInYear, 0.0 );
+										CalculateMonthlyRunningAverageDryBulb( runningAverageASH, runningAverageCEN );
+										CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN );
+									}
+								}
+							}
+						}
+
 						// CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
 						SetupOutputVariable( "Zone Thermostat Operative Temperature [C]", ZnAirRpt( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).ThermOperativeTemp, "Zone", "Average", Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).Name );
 					}
@@ -1662,6 +1757,27 @@ namespace ZoneTempPredictorCorrector {
 									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid values " + cAlphaFieldNames( 3 ) + "=[" + cAlphaArgs( 3 ) + "\"." );
 									ShowContinueError( "..Values outside of range [0.0,0.9)." );
 									ErrorsFound = true;
+								}
+							}
+						}
+
+						// added Jan, 2017 - Xuan Luo
+						// read adaptive comfort model and calculate adaptive thermal comfort setpoint
+						if ( TempControlledZone( TempControlledZoneNum ).OperativeTempControl ) {
+							if ( NumAlphas >= 4 && ! lAlphaFieldBlanks( 4 ) ) {
+								int adaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+								if ( !adaptiveComfortModelTypeIndex ) {
+									ShowSevereError(cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
+									ErrorsFound = true;
+								} else if ( adaptiveComfortModelTypeIndex != ADAP_NONE ) {
+									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortTempControl = true;
+									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+									if ( !AdapComfortDailySetPointSchedule.initialized ) {
+										Array1D< Real64 > runningAverageASH( NumDaysInYear, 0.0 );
+										Array1D< Real64 > runningAverageCEN( NumDaysInYear, 0.0 );
+										CalculateMonthlyRunningAverageDryBulb( runningAverageASH, runningAverageCEN );
+										CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN ); 
+									}
 								}
 							}
 						}
@@ -2000,6 +2116,220 @@ namespace ZoneTempPredictorCorrector {
 
 	}
 
+	void CalculateMonthlyRunningAverageDryBulb(
+		Array1D< Real64 > & runningAverageASH,
+		Array1D< Real64 > & runningAverageCEN		
+	) 
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Xuan Luo
+		//       DATE WRITTEN   January 2017
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine calculate the monthly running average dry bulb temperature;
+
+		// Using/Aliasing
+
+		using WeatherManager::NumDaysInYear;
+		using DataStringGlobals::inStatFileName;
+		using OutputReportTabular::GetColumnUsingTabs;
+		using OutputReportTabular::StrToReal;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static gio::Fmt fmtA( "(A)" );
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		std::string lineIn;
+		std::string lineAvg;
+		std::string epwLine;
+
+		Real64 dryBulb;
+		Real64 avgDryBulb;
+
+		int epwFile;
+		bool epwFileExists;
+
+		int readStat;
+		int calcEndDay;
+		int calcStartDayASH;
+		int calcStartDayCEN;
+
+		std::string::size_type pos;
+		int ind, i, j;
+
+		Array1D< Real64 > adaptiveTemp( NumDaysInYear, 0.0 );
+		Array1D< Real64 > dailyDryTemp( NumDaysInYear, 0.0 );
+
+
+		readStat = 0;
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); epwFileExists = flags.exists(); }
+
+		if ( epwFileExists ) {
+			//Read hourly dry bulb temperature first
+			epwFile = GetNewUnitNumber();
+			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, DataStringGlobals::inputWeatherFileName, flags ); readStat = flags.ios(); }
+			if ( readStat != 0 ) {
+				ShowFatalError( "CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read)." );
+			}
+			for ( i = 1; i <= 9; ++i ) { // Headers
+				{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
+			}
+			for ( i = 1; i <= NumDaysInYear; ++i ) {
+				avgDryBulb = 0.0;
+				for ( j = 1; j <= 24; ++j ) {
+					{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
+					for ( ind = 1; ind <= 6; ++ind ) {
+						pos = index( epwLine, ',' );
+						epwLine.erase( 0, pos + 1 );
+					}
+					pos = index( epwLine, ',' );
+					dryBulb = StrToReal( epwLine.substr( 0, pos ) );
+					avgDryBulb += ( dryBulb / 24.0 );
+				}
+				dailyDryTemp( i ) = avgDryBulb;
+			}
+			gio::close( epwFile );
+
+			//Calculate monthly running average dry bulb temperature.
+			int dayOfYear = 0;
+			while ( dayOfYear < NumDaysInYear ) {
+				dayOfYear++;
+				calcEndDay = dayOfYear - 1;
+				calcStartDayASH = calcEndDay - 30;
+				calcStartDayCEN = calcEndDay - 7;
+
+				if ( calcStartDayASH > 0 ) {
+					for ( i = calcStartDayASH; i <= calcStartDayASH + 30; i++ ) {
+						avgDryBulb = dailyDryTemp( i );
+						runningAverageASH( dayOfYear ) = runningAverageASH( dayOfYear ) + avgDryBulb;
+					}
+					runningAverageASH( dayOfYear ) /= 30;
+				}
+				else { // Do special things for wrapping the epw
+					calcStartDayASH += NumDaysInYear;
+					for ( i = 1; i <= calcEndDay; i++ ) {
+						avgDryBulb = dailyDryTemp( i );
+						runningAverageASH( dayOfYear ) = runningAverageASH( dayOfYear ) + avgDryBulb;
+					}
+					for ( i = calcStartDayASH; i < NumDaysInYear; i++ ) {
+						avgDryBulb = dailyDryTemp( i );
+						runningAverageASH( dayOfYear ) = runningAverageASH( dayOfYear ) + avgDryBulb;
+					}
+					runningAverageASH( dayOfYear ) /= 30;
+				}
+
+				if ( calcStartDayCEN > 0 ) {
+					for ( i = calcStartDayCEN; i <= calcStartDayCEN + 7; i++ ) {
+						avgDryBulb = dailyDryTemp( i );
+						runningAverageCEN( dayOfYear ) = runningAverageCEN( dayOfYear ) + avgDryBulb;
+					}
+					runningAverageCEN( dayOfYear ) /= 7;
+				}
+				else { // Do special things for wrapping the epw
+					calcStartDayCEN += NumDaysInYear;
+					for ( i = 1; i <= calcEndDay; i++ ) {
+						avgDryBulb = dailyDryTemp( i );
+						runningAverageCEN( dayOfYear ) = runningAverageCEN( dayOfYear ) + avgDryBulb;
+					}
+					for ( i = calcStartDayCEN; i < NumDaysInYear; i++ ) {
+						avgDryBulb = dailyDryTemp( i );
+						runningAverageCEN( dayOfYear ) = runningAverageCEN( dayOfYear ) + avgDryBulb;
+					}
+					runningAverageCEN( dayOfYear ) /= 7;
+				}
+			}
+		}
+		else {
+			ShowFatalError( "CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read)." );
+		}
+		
+	}
+
+	void CalculateAdaptiveComfortSetPointSchl(
+		Array1D< Real64 > const & runningAverageASH,
+		Array1D< Real64 > const & runningAverageCEN
+	) 
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Xuan Luo
+		//       DATE WRITTEN   January 2017
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine calculate the zone operative temperature setpoint using adaptive comfort model.
+
+		// Using/Aliasing
+		using WeatherManager::DesDayInput;
+		using WeatherManager::NumDaysInYear;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int const summerDesignDayTypeIndex( 9 );
+		Real64 GrossApproxAvgDryBulbDesignDay( 0.0 );
+
+		for ( size_t i = 1; i <= DesDayInput.size(); i++ ) {
+			// Summer design day
+			if ( DesDayInput( i ).DayType == summerDesignDayTypeIndex ) {
+				GrossApproxAvgDryBulbDesignDay = ( DesDayInput( i ).MaxDryBulb + ( DesDayInput( i ).MaxDryBulb - DesDayInput( i ).DailyDBRange ) ) / 2.0;				
+				if ( GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 33.5 ) {
+					AdapComfortSetPointSummerDesDay( 1 ) = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
+					AdapComfortSetPointSummerDesDay( 2 ) = 0.31 * GrossApproxAvgDryBulbDesignDay + 20.3;
+					AdapComfortSetPointSummerDesDay( 3 ) = 0.31 * GrossApproxAvgDryBulbDesignDay + 21.3;
+				}
+				if ( GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 30 ) {
+					AdapComfortSetPointSummerDesDay( 4 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
+					AdapComfortSetPointSummerDesDay( 5 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;;
+					AdapComfortSetPointSummerDesDay( 6 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;;
+					AdapComfortSetPointSummerDesDay( 7 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;;
+				}
+			}
+		}
+
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.allocate( NumDaysInYear );
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.allocate( NumDaysInYear );
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.allocate( NumDaysInYear );
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.allocate( NumDaysInYear );
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.allocate( NumDaysInYear );
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.allocate( NumDaysInYear );
+		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.allocate( NumDaysInYear );
+
+		// Calculate the set points based on different models, set flag as -1 when running average temperature is not in the range.
+		for ( int day = 1; day <= NumDaysInYear; day++ ) {
+			if ( runningAverageASH( day ) > 10 && runningAverageASH( day ) < 33.5 ) {
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = 0.31 * runningAverageASH( day ) + 17.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = 0.31 * runningAverageASH( day ) + 20.3;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = 0.31 * runningAverageASH( day ) + 21.3;
+			}
+			else {
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = -1;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = -1;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = -1;
+			}
+			if ( runningAverageCEN( day ) > 10 && runningAverageCEN( day ) < 30 ) {
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( day ) = 0.33 * runningAverageCEN( day ) + 18.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( day ) = 0.33 * runningAverageCEN( day ) + 20.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( day ) = 0.33 * runningAverageCEN( day ) + 21.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( day ) = 0.33 * runningAverageCEN( day ) + 22.8;
+			}
+			else {
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( day ) = -1;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( day ) = -1;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( day ) = -1;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( day ) = -1;
+			}
+		}
+		AdapComfortDailySetPointSchedule.initialized = true;
+	}
+
 	void
 	InitZoneAirSetPoints()
 	{
@@ -2017,25 +2347,14 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataSurfaces::Surface;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitZoneAirSetpoints: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -2054,6 +2373,7 @@ namespace ZoneTempPredictorCorrector {
 		// FLOW:
 		if ( InitZoneAirSetPointsOneTimeFlag ) {
 			TempZoneThermostatSetPoint.dimension( NumOfZones, 0.0 );
+			AdapComfortCoolingSetPoint.dimension( NumOfZones, 0.0 );
 			ZoneThermostatSetPointHi.dimension( NumOfZones, 0.0 );
 			ZoneThermostatSetPointLo.dimension( NumOfZones, 0.0 );
 
@@ -2113,6 +2433,9 @@ namespace ZoneTempPredictorCorrector {
 			ZTM2.dimension( NumOfZones, 0.0 );
 			ZTM3.dimension( NumOfZones, 0.0 );
 
+			PreviousMeasuredZT1.dimension(NumOfZones, 0.0);
+			PreviousMeasuredZT2.dimension(NumOfZones, 0.0);
+			PreviousMeasuredZT3.dimension(NumOfZones, 0.0);
 			// Allocate Derived Types
 			ZoneSysEnergyDemand.allocate( NumOfZones );
 			ZoneSysMoistureDemand.allocate( NumOfZones );
@@ -2158,7 +2481,7 @@ namespace ZoneTempPredictorCorrector {
 				SetupOutputVariable( "Zone Thermostat Control Type []", TempControlType( Loop ), "Zone", "Average", Zone( Loop ).Name );
 				SetupOutputVariable( "Zone Thermostat Heating Setpoint Temperature [C]", ZoneThermostatSetPointLo( Loop ), "Zone", "Average", Zone( Loop ).Name );
 				SetupOutputVariable( "Zone Thermostat Cooling Setpoint Temperature [C]", ZoneThermostatSetPointHi( Loop ), "Zone", "Average", Zone( Loop ).Name );
-
+				SetupOutputVariable( "Zone Adaptive Comfort Operative Temperature Set Point [C]", AdapComfortCoolingSetPoint( Loop ), "Zone", "Average", Zone( Loop ).Name);
 				SetupOutputVariable( "Zone Predicted Sensible Load Room Air Correction Factor [ ]", LoadCorrectionFactor( Loop ), "System", "Average", Zone( Loop ).Name );
 
 				if ( allocated( StageZoneLogic ) ) {
@@ -2219,6 +2542,7 @@ namespace ZoneTempPredictorCorrector {
 			WZoneTimeMinus3Temp = 0.0;
 			ZoneAirHumRatTemp = 0.0;
 			TempZoneThermostatSetPoint = 0.0;
+			AdapComfortCoolingSetPoint = 0.0;
 			ZoneThermostatSetPointHi = 0.0;
 			ZoneThermostatSetPointLo = 0.0;
 
@@ -2261,7 +2585,9 @@ namespace ZoneTempPredictorCorrector {
 			ZoneW1 = OutHumRat;
 			ZoneWMX = OutHumRat;
 			ZoneWM2 = OutHumRat;
-
+			PreviousMeasuredZT1 = 0.0;
+			PreviousMeasuredZT2 = 0.0;
+			PreviousMeasuredZT3 = 0.0;
 			MyEnvrnFlag = false;
 		}
 
@@ -2382,94 +2708,6 @@ namespace ZoneTempPredictorCorrector {
 			} //Demand manager
 		}
 
-		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
-			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
-				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-			if ( TempControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
-				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-		}
-		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
-			if ( ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
-				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-			if ( ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
-				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-
-		}
-
 		if ( ErrorsFound ) {
 			ShowFatalError( "InitZoneAirSetpoints - program terminates due to previous condition." );
 		}
@@ -2521,9 +2759,6 @@ namespace ZoneTempPredictorCorrector {
 		//     the type of system being simulated.
 		// 3.  Calculate zone energy requirements
 
-		// REFERENCES:
-		// na
-
 		// USE STATEMENTS:
 
 		// Using/Aliasing
@@ -2559,15 +2794,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 SumIntGain; // Zone sum of convective internal gains
@@ -2729,7 +2955,7 @@ namespace ZoneTempPredictorCorrector {
 
 			}
 
-			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 			AirCap = AIRRAT( ZoneNum );
 			RAFNFrac = 0.0;
 
@@ -2764,7 +2990,7 @@ namespace ZoneTempPredictorCorrector {
 						+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHATsurf
 						- RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHATref
 						+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMCpT + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SysDepZoneLoadsLagged;
-					AirCap = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume * ZoneVolCapMultpSens
+					AirCap = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume * Zone( ZoneNum ).ZoneVolCapMultpSens
 						* RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).RhoAir
 						* RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).CpAir
 						/ ( TimeStepSys*SecInHour );
@@ -2843,12 +3069,6 @@ namespace ZoneTempPredictorCorrector {
 		// This routine sets what the setpoints for each controlled zone should be based on schedules.
 		// This is called each time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleValuesForDay;
@@ -2858,17 +3078,6 @@ namespace ZoneTempPredictorCorrector {
 		using InputProcessor::SameString;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RelativeZoneNum;
@@ -2915,9 +3124,8 @@ namespace ZoneTempPredictorCorrector {
 				SchedTypeIndex = TempControlledZone( RelativeZoneNum ).ControlTypeSchIndx( SchedNameIndex );
 
 				SetPointTempSchedIndex = SetPointSingleHeating( SchedTypeIndex ).TempSchedIndex;
-				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
+				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );			
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
-
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
 
@@ -2929,6 +3137,15 @@ namespace ZoneTempPredictorCorrector {
 
 				SetPointTempSchedIndex = SetPointSingleCooling( SchedTypeIndex ).TempSchedIndex;
 				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
+
+				//Added Jan 17 (X. Luo)
+				//Adjust operative temperature based on adaptive comfort model
+				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
+					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
+					AdapComfortCoolingSetPoint( ActualZoneNum ) = TempZoneThermostatSetPoint ( ActualZoneNum );
+				}
+				
+
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
@@ -2943,6 +3160,14 @@ namespace ZoneTempPredictorCorrector {
 
 				SetPointTempSchedIndex = SetPointSingleHeatCool( SchedTypeIndex ).TempSchedIndex;
 				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
+
+				//Added Jan 17 (X. Luo)
+				//Adjust operative temperature based on adaptive comfort model
+				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
+					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
+					AdapComfortCoolingSetPoint( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
+				}				
+
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -2976,6 +3201,14 @@ namespace ZoneTempPredictorCorrector {
 				SetPointTempSchedIndexHot = SetPointDualHeatCool( SchedTypeIndex ).HeatTempSchedIndex;
 				SetPointTempSchedIndexCold = SetPointDualHeatCool( SchedTypeIndex ).CoolTempSchedIndex;
 				ZoneThermostatSetPointHi( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexCold );
+
+				//Added Jan 17 (X. Luo)
+				//Adjust operative temperature based on adaptive comfort model
+				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
+					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
+					AdapComfortCoolingSetPoint( ActualZoneNum ) = ZoneThermostatSetPointHi( ActualZoneNum );
+				}
+
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
 
 				ZoneThermostatSetPointLo( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexHot );
@@ -3010,7 +3243,7 @@ namespace ZoneTempPredictorCorrector {
 			}}
 
 			//Apply offset for faulty therostats_Feb. 2015, zrp
-			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )) {
 
 				//  loop through the FaultsThermostatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyThermostat; ++iFault ) {
@@ -3043,6 +3276,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		if ( NumComfortControlledZones > 0 ) CalcZoneAirComfortSetPoints();
+		OverrideAirSetPointsforEMSCntrl( );
 
 	}
 
@@ -3059,12 +3293,6 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates the predicted system load for a time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataLoopNode::Node;
@@ -3072,15 +3300,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 LoadToHeatingSetPoint;
@@ -3410,12 +3629,6 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcPredictedHumidityRatio" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 LatentGain; // Zone latent load
 		Real64 RhoAir;
@@ -3462,7 +3675,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			// Apply offsets for faulty humidistats_Feb. 2015, zrp
-			if ( ( NumFaultyHumidistat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+			if ( ( NumFaultyHumidistat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ) {
 
 				//  loop through the FaultsHumidistatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault ) {
@@ -3616,7 +3829,7 @@ namespace ZoneTempPredictorCorrector {
 				B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
 				A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 			}
-			C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
 			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
 				RoomAirNode = RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID;
@@ -3626,7 +3839,7 @@ namespace ZoneTempPredictorCorrector {
 				B = ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumIntLatentGain / H2OHtOfVap )
 					+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMW + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHmARaW;
 				C = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).RhoAir * RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume
-					* ZoneVolCapMultpMoist / ( SecInHour * TimeStepSys );
+					* Zone( ZoneNum ).ZoneVolCapMultpMoist / ( SecInHour * TimeStepSys );
 			}
 
 			// Use a 3rd Order derivative to predict zone moisture addition or removal and
@@ -3719,19 +3932,13 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Russell Taylor
 		//       DATE WRITTEN   ???
-		//       MODIFIED       November 1999, LKL;
+		//       MODIFIED       November 1999, LKL; November 2016 Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang;
 		//       RE-ENGINEERED  July 2003 (Peter Graham Ellis)
 		//                      February 2008 (Brent Griffith reworked history )
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine updates the zone air temperature and modifies the system
 		// time step.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
@@ -3764,18 +3971,13 @@ namespace ZoneTempPredictorCorrector {
 		using DataRoomAirModel::RoomAirModel_UserDefined;
 		using RoomAirModelManager::ManageAirModel;
 		using General::TrimSigDigits;
+		using DataEnvironment::DayOfYear;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CorrectZoneAirTemp" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CpAir; // specific heat of air
@@ -3791,9 +3993,11 @@ namespace ZoneTempPredictorCorrector {
 		static Real64 TempDepCoef( 0.0 ); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
 		static Real64 TempIndCoef( 0.0 ); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
 		static Real64 AirCap( 0.0 ); // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"
+		static Real64 AirCapHM(0.0); // Air power capacity for hybrid modeling 
 		static Real64 SNLoad( 0.0 ); // Sensible load calculated for zone in watts and then loaded in report variables
 		static int ZoneNum( 0 );
 		static int ZoneNodeNum( 0 ); // System node number for air flow through zone either by system or as a plenum
+
 		//  LOGICAL,SAVE   :: OneTimeFlag = .TRUE.
 		//unusd1208  LOGICAL,SAVE   :: MyEnvrnFlag = .TRUE.
 		Real64 TempSupplyAir;
@@ -3862,7 +4066,7 @@ namespace ZoneTempPredictorCorrector {
 				WZoneTimeMinus3Temp( ZoneNum ) = WZoneTimeMinus3( ZoneNum );
 			}
 
-			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 
 			AirCap = AIRRAT( ZoneNum );
 
@@ -3997,6 +4201,122 @@ namespace ZoneTempPredictorCorrector {
 				SNLoad = 0.0;
 			}
 
+			//Hybrid modeling start: Added by Sang Hoon Lee May 2015
+			if ( ( HybridModelZone( ZoneNum ).InfiltrationCalc || HybridModelZone( ZoneNum ).InternalThermalMassCalc ) && ( !WarmupFlag ) && ( !DoingSizing ) ) {
+
+				Zone( ZoneNum ).ZoneMeasuredTemperature = GetCurrentScheduleValue( HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureSchedulePtr );
+
+				// HM calculation only HM calculation period start
+				if ( DayOfYear >= HybridModelZone( ZoneNum ).HybridStartDayOfYear && DayOfYear <= HybridModelZone( ZoneNum ).HybridEndDayOfYear ){
+
+					Real64 HMMultiplierAverage( 1.0 );
+					Real64 MultpHM( 1.0 );
+					Real64 InfilOAACHHM( 0.0 );
+
+					ZT( ZoneNum ) = Zone( ZoneNum ).ZoneMeasuredTemperature;
+
+					// Hybrid Modeling-Infiltration calcualtion start
+					if ( HybridModelZone( ZoneNum ).InfiltrationCalc && SumSysMCpT == 0 && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
+
+						// Calculate MCPI used for hybrid modeling included in TempIndCoef and TempDepCoef
+						Real64 a = Zone( ZoneNum ).OutDryBulbTemp;
+						Real64 b = SumIntGain + SumHATsurf - SumHATref + MCPTV( ZoneNum ) + MCPTM( ZoneNum ) + MCPTE( ZoneNum ) + MCPTC( ZoneNum ) + MDotCPOA( ZoneNum ) * Zone( ZoneNum ).OutDryBulbTemp;
+						Real64 c = SumHA + MCPV( ZoneNum ) + MCPM( ZoneNum ) + MCPE( ZoneNum ) + MCPC( ZoneNum ) + MDotCPOA( ZoneNum );
+						Real64 d = AirCap;
+						//Use3rdOrder
+						Real64 AA = b + d * ( 3.0 * PreviousMeasuredZT1( ZoneNum ) - ( 3.0 / 2.0 ) * PreviousMeasuredZT2( ZoneNum ) + ( 1.0 / 3.0 ) * PreviousMeasuredZT3( ZoneNum ) );
+						Real64 BB = ( 11.0 / 6.0 ) * d + c;
+						Real64 InfilVolumeOADensityHM;
+						Real64 AirDensity;
+						Real64 CpAir;
+						Real64 MCPIHM;
+						static std::string const RoutineNameInfiltration( "CalcAirFlowSimple:Infiltration" );
+
+     					CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneNum ).OutDryBulbTemp );
+						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Zone( ZoneNum ).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration );
+						if ( Zone( ZoneNum ).ZoneMeasuredTemperature == Zone( ZoneNum ).OutDryBulbTemp ){
+							MCPIHM = 0.0;
+						}
+						else {
+							MCPIHM = ( AA - Zone( ZoneNum ).ZoneMeasuredTemperature * BB ) / ( Zone( ZoneNum ).ZoneMeasuredTemperature - a ); // MCPIHM calculation using Use3rdOrder method 
+						}
+
+						InfilVolumeOADensityHM = ( MCPIHM / CpAir / AirDensity ) * TimeStepZone * SecInHour;
+						
+						if ( abs( Zone( ZoneNum ).ZoneMeasuredTemperature - Zone( ZoneNum ).OutDryBulbTemp ) > 5.0 && abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) < 0.1 ) {// Filter
+							InfilOAACHHM = InfilVolumeOADensityHM / ( TimeStepZone * Zone( ZoneNum ).Volume );
+							InfilOAACHHM = max( 0.0, min( 10.0, InfilOAACHHM ) );  // ACH max 10, min 0
+						} else {
+							InfilOAACHHM = 0.0;
+						}
+
+						Zone(ZoneNum).InfilOAAirChangeRateHM = InfilOAACHHM;
+						Zone(ZoneNum).MCPIHM = InfilOAACHHM * CpAir * AirDensity / SecInHour * Zone( ZoneNum ).Volume;
+
+					} // Hybrid model infiltration calcualtion end
+
+					// Hybrid modeling internal thermal mass calcualtion start
+					if ( HybridModelZone( ZoneNum).InternalThermalMassCalc && SumSysMCpT == 0 && ZT( ZoneNum ) != PreviousMeasuredZT1( ZoneNum ) && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
+
+						// Calculate air capacity using UseAnalyticalSolution
+						if ( TempDepCoef == 0.0 ) {
+							AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ); // Inverse equation
+						}
+						else {
+							Real64 AirCapHM_temp = 0.0;
+							if ( TempIndCoef == TempDepCoef * ZT( ZoneNum ) ){
+								AirCapHM_temp = 0.0;
+							}
+							else {
+								AirCapHM_temp = ( TempIndCoef - TempDepCoef * PreviousMeasuredZT1( ZoneNum ) ) / ( TempIndCoef - TempDepCoef * ZT( ZoneNum ) );
+							}
+
+							if ( (AirCapHM_temp > 0 ) && ( AirCapHM_temp != 1 ) ){ // Avoide IND
+								AirCapHM = TempDepCoef / std::log( AirCapHM_temp ); // Inverse equation
+							}
+							else {
+								AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) );
+							}
+						}
+
+						// Calculate multiplier
+						if ( abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) > 0.05 ){ // Filter
+							MultpHM = AirCapHM / ( Zone( ZoneNum ).Volume * PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ) ) * ( TimeStepZone * SecInHour ); // Inverse equation
+							if ( ( MultpHM < 1.0 ) || ( MultpHM > 30.0 ) ){ // Temperature capacity multiplier greater than 1 and less than 30
+								MultpHM = 1.0; // Default value 1.0 
+							}
+						}
+						else {
+							MultpHM = 1.0; // Default value 1.0 
+						}
+
+						// For timestep output
+						Zone(ZoneNum).ZoneVolCapMultpSensHM = MultpHM;
+						
+						// Calculate the average multiplier of the zone for the whole running period
+						{
+							// count for hybrid model calculations
+							if( MultpHM > 1.0 ){
+								Zone( ZoneNum ).ZoneVolCapMultpSensHMSum += MultpHM;
+								Zone( ZoneNum ).ZoneVolCapMultpSensHMCountSum++;
+							}
+							
+							// Calculate and store the multiplier average at the end of HM simulations 
+							if ( DayOfYear == HybridModelZone( ZoneNum ).HybridEndDayOfYear && EndDayFlag ){
+								HMMultiplierAverage = Zone( ZoneNum ).ZoneVolCapMultpSensHMSum / Zone( ZoneNum ).ZoneVolCapMultpSensHMCountSum;
+								Zone( ZoneNum ).ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
+							}
+						}
+					} // Hybrid model internal thermal mass calcualtion end
+				}
+
+				// Update zone temperatures in the previous steps
+				PreviousMeasuredZT3( ZoneNum ) = PreviousMeasuredZT2( ZoneNum );
+				PreviousMeasuredZT2( ZoneNum ) = PreviousMeasuredZT1( ZoneNum );
+				PreviousMeasuredZT1( ZoneNum ) = ZT( ZoneNum );
+
+			} // Hybrid model end
+			
 			MAT( ZoneNum ) = ZT( ZoneNum );
 
 			// Determine sensible load heating/cooling rate and energy
@@ -4069,24 +4389,9 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		static std::string const CorrectZoneAirTemp( "CorrectZoneAirTemp" );
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -4190,24 +4495,7 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -4302,25 +4590,6 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
 		int LoopNode;
@@ -4387,9 +4656,6 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine updates the zone humidities.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron
 		// for BLAST.
@@ -4411,12 +4677,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CorrectZoneHumRat" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NodeNum;
@@ -4489,7 +4749,6 @@ namespace ZoneTempPredictorCorrector {
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
 				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
-			ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
 
 			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
 				TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;
@@ -4559,13 +4818,13 @@ namespace ZoneTempPredictorCorrector {
 		// Check for the flow and NO flow condition
 		if ( ZoneMassFlowRate > 0.0 ) {
 			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
-			A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+			A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 				// Multizone airflow calculated in AirflowNetwork
 				B = ( LatentGain / H2OHtOfVap ) + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum );
-				A = TotExitMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
+				A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
 			}
-			C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 		} else if ( ZoneMassFlowRate <= 0.0 ) {
 			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutHumRat ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum );
 			A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum );
@@ -4574,7 +4833,7 @@ namespace ZoneTempPredictorCorrector {
 				B = ( LatentGain / H2OHtOfVap ) + SumHmARaW( ZoneNum ) + AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW;
 				A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
 			}
-			C = RhoAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 		}
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
@@ -4651,23 +4910,7 @@ namespace ZoneTempPredictorCorrector {
 		// The down step ratio, DSRatio = OldTimeStep/ NewTimeStep
 		//  is expected to be roughly integer-valued and near 2.0 or 3.0 or 4.0 or more.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 oldTime0;
@@ -4760,12 +5003,6 @@ namespace ZoneTempPredictorCorrector {
 		// If Tref is not used at all, SumHATref = 0, and SumHA /= 0.
 		// For future implementations, Tref can be easily converted into an array to
 		// allow a different reference temperature to be specified for each surface.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using namespace DataSurfaces;
@@ -5019,11 +5256,12 @@ namespace ZoneTempPredictorCorrector {
 				// determine supply air temperature as a weighted average of the inlet temperatures.
 				if ( SumSysMCp > 0.0 ) {
 					RefAirTemp = SumSysMCpT / SumSysMCp;
+					SumHATref += HA * RefAirTemp;
 				} else {
-					// no system flow (yet) so just use last value for inlet node temp, this can happen early in the environment
-					RefAirTemp = NodeTemp;
+					// no system flow (yet) so just use zone air temperature
+					// #5906
+					SumHA += HA;
 				}
-				SumHATref += HA * RefAirTemp;
 			} else {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
@@ -5069,9 +5307,6 @@ namespace ZoneTempPredictorCorrector {
 		//  they are not necessarily proper averages for what happend over entire zone time step
 		//  these are not mulitplied by zone multipliers.
 		//  The values are all Watts.
-
-		// METHODOLOGY EMPLOYED:
-		// na
 
 		// REFERENCES:
 		// Equation 5 in Engineering Reference.
@@ -5304,8 +5539,8 @@ namespace ZoneTempPredictorCorrector {
 				if ( SumSysMCp > 0.0 ) {
 					RefAirTemp = SumSysMCpT / SumSysMCp;
 				} else {
-					// no system flow (yet) so just use last value for inlet node temp, this can happen early in the environment
-					RefAirTemp = NodeTemp;
+					// no system flow (yet) so just use last value for zone air temp
+					RefAirTemp = MAT( ZoneNum );
 				}
 
 			} else {
@@ -5368,7 +5603,7 @@ namespace ZoneTempPredictorCorrector {
 
 		{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
 		if ( SELECT_CASE_var == Use3rdOrder ) {
-			CzdTdt = RhoAir * CpAir * Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * ( MAT( ZoneNum ) - ZTM1( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+			CzdTdt = RhoAir * CpAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * ( MAT( ZoneNum ) - ZTM1( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 			// Exact solution
 		} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
 			CzdTdt = TempIndCoef - TempDepCoef * MAT( ZoneNum );
@@ -5412,12 +5647,6 @@ namespace ZoneTempPredictorCorrector {
 		// This function verifies that a zone (by name) has a Zone Control:Thermostatic
 		// object entered.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
@@ -5425,19 +5654,6 @@ namespace ZoneTempPredictorCorrector {
 		bool HasThermostat; // True if does, false if not.
 
 		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetZoneAirStatsInputFlag ) {
 			GetZoneAirSetPoints();
@@ -5470,12 +5686,6 @@ namespace ZoneTempPredictorCorrector {
 		// This function verifies that a zone (by name) has a ZoneHVAC:EquipmentConnections
 		// object entered.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -5484,19 +5694,6 @@ namespace ZoneTempPredictorCorrector {
 		// Return value
 
 		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		return ( FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName ) > 0 );
 	}
@@ -5520,27 +5717,7 @@ namespace ZoneTempPredictorCorrector {
 		// until that is reached unless it goes to less than the
 		// MinTimeStepSys.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iZone;
@@ -5632,24 +5809,11 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// pass in data and alter setpoint if needed
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalance::MRT;
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 thisMRT; // local variable for mean radiant temperature in this zone
@@ -5676,6 +5840,80 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	void
+	AdjustOperativeSetPointsforAdapComfort(
+		int const TempControlledZoneID,
+		Real64 & ZoneAirSetPoint
+		)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Xuan Luo
+		//       DATE WRITTEN   Jan 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine adjust the operative setpoints for each controlled adaptive thermal comfort models.
+
+		// Using/Aliasing
+		using DataEnvironment::DayOfYear;
+		using WeatherManager::DesDayInput;
+		using WeatherManager::Envrn;
+		using WeatherManager::Environment;		
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int originZoneAirSetPoint = ZoneAirSetPoint;
+		int AdaptiveComfortModelTypeIndex = TempControlledZone( TempControlledZoneID ).AdaptiveComfortModelTypeIndex;
+
+		// FLOW:
+		// adjust zone operative setpoint
+		if ( !( TempControlledZone( TempControlledZoneID ).AdaptiveComfortTempControl ) ) return; // do nothing to setpoint
+		if ( ( Environment( Envrn ).KindOfEnvrn != ksDesignDay ) && ( Environment( Envrn ).KindOfEnvrn != ksHVACSizeDesignDay ) ) {
+			// Adjust run period cooling set point 
+			switch ( AdaptiveComfortModelTypeIndex ) {
+				case ASH55_CENTRAL:
+					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( DayOfYear );
+					break;
+				case ASH55_UPPER_90:
+					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( DayOfYear );
+					break;
+				case ASH55_UPPER_80:
+					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( DayOfYear );
+					break;				
+				case CEN15251_CENTRAL:
+					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(DayOfYear);
+					break;
+				case CEN15251_UPPER_I:
+					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( DayOfYear );
+					break;
+				case CEN15251_UPPER_II:
+					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( DayOfYear );
+					break;
+				case CEN15251_UPPER_III:
+					ZoneAirSetPoint = AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear );
+					break;
+				default:
+					;
+			}
+		}
+		else {
+			int const envrnDayNum( Environment( Envrn ).DesignDayNum );
+			int const summerDesignDayTypeIndex( 9 );
+			// Adjust summer design day set point
+			if ( DesDayInput( envrnDayNum ).DayType == summerDesignDayTypeIndex ) {
+				ZoneAirSetPoint = AdapComfortSetPointSummerDesDay( AdaptiveComfortModelTypeIndex - 1 );
+			}
+		}
+		// If adaptive operative temperature not applicable, set back
+		if ( ZoneAirSetPoint < originZoneAirSetPoint ) {
+			ZoneAirSetPoint = originZoneAirSetPoint;
+		}
+		// If meet fault flag, set back
+		if ( ZoneAirSetPoint == -1 ) {
+			ZoneAirSetPoint = originZoneAirSetPoint;
+		}
+	}
+
+	void
 	CalcZoneAirComfortSetPoints()
 	{
 
@@ -5689,29 +5927,12 @@ namespace ZoneTempPredictorCorrector {
 		// This routine sets the thermal comfort setpoints for each controlled zone based on air tempeature
 		// obtained from thermal comfort models.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using General::TrimSigDigits;
 		using ThermalComfort::ManageThermalComfort;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RelativeZoneNum;
@@ -6010,14 +6231,9 @@ namespace ZoneTempPredictorCorrector {
 		// obtained from thermal comfort models.
 		// This is called each time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using ThermalComfort::CalcThermalComfortFanger;
 
 		// Locals
@@ -6025,14 +6241,8 @@ namespace ZoneTempPredictorCorrector {
 		// 0 = Solution; 1 = Set to Min; 2 Set to Max
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Acc( 0.001 ); // accuracy control for SolveRegulaFalsi
-		int const MaxIter( 500 ); // iteration control for SolveRegulaFalsi
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		Real64 const Acc( 0.001 ); // accuracy control for SolveRoot
+		int const MaxIter( 500 ); // iteration control for SolveRoot
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tmin; // Minimun drybulb setpoint temperature
@@ -6041,7 +6251,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 PMVMin; // Minimum allowed PMV value
 		Real64 PMVMax; // Calculated PMV value
 		Array1D< Real64 > Par( 2 ); // Passed parameter for RegularFalsi function
-		int SolFla; // feed back flag from SolveRegulaFalsi
+		int SolFla; // feed back flag from SolveRoot
 		static int IterLimitExceededNum1( 0 );
 		static int IterLimitErrIndex1( 0 );
 		static int IterLimitExceededNum2( 0 );
@@ -6057,7 +6267,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( PMVSet > PMVMin && PMVSet < PMVMax ) {
 			Par( 1 ) = PMVSet;
 			Par( 2 ) = double( PeopleNum );
-			SolveRegulaFalsi( Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par );
+			SolveRoot( Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par );
 			if ( SolFla == -1 ) {
 				if ( ! WarmupFlag ) {
 					++IterLimitExceededNum1;
@@ -6205,6 +6415,138 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 	}
+
+	void
+	OverrideAirSetPointsforEMSCntrl(
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   June 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine overrides the air temperature setpoint based on EMS
+
+		// Locals
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Loop; // index of temp control
+		int ZoneNum; // Zone index
+
+		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
+			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
+				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
+
+				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+			if ( TempControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
+				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
+
+				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
+			if ( ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
+				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
+				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointFanger ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+			if ( ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
+				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
+				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointFanger ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+
+		}
+
+	}
+
 
 } // ZoneTempPredictorCorrector
 

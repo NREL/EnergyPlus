@@ -61,7 +61,6 @@
 !   Air Loop System Component Loads,
 !   Air Loop System Component Energy Use,
 !   Mechanical Ventilation Loads,
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Output:Table:Monthly,

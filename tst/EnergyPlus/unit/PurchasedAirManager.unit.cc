@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::PurchasedAirManager (Ideal Loads) Unit Tests
 
@@ -63,42 +51,95 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::PurchasedAirManager;
 using namespace ObjexxFCL;
+using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
-using namespace DataGlobals;
-using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataSurfaces;
+using namespace EnergyPlus::DataZoneEnergyDemands;
+using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::PurchasedAirManager;
+using namespace EnergyPlus::ZoneEquipmentManager;
+using namespace EnergyPlus::ZonePlenum;
 
+class ZoneIdealLoadsTest : public EnergyPlusFixture {
+public:
+	int IdealLoadsSysNum = 1;
+	int NumNodes = 1; // number of zone inlet and zone exhaust nodes
+	bool ErrorsFound = false;
+
+protected:
+	virtual void SetUp() {
+		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+
+		DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate( 1 );
+		DataHeatBalFanSys::ZoneThermostatSetPointHi( 1 ) = 23.9; // 75F
+		DataHeatBalFanSys::ZoneThermostatSetPointLo.allocate( 1 );
+		DataHeatBalFanSys::ZoneThermostatSetPointLo( 1 ) = 23.0; // 73.4F
+
+		FinalZoneSizing.allocate( 1 );
+		ZoneEqSizing.allocate( 1 );
+		CurZoneEqNum = 1;
+		CurSysNum = 0;
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
+		ZoneSizingRunDone = true;
+
+		ZoneSysEnergyDemand.allocate( 1 );
+		ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 1000.0;
+		ZoneSysEnergyDemand( 1 ).OutputRequiredToHeatingSP = 1000.0;
+		ZoneSysEnergyDemand( 1 ).OutputRequiredToCoolingSP = 2000.0;
+		ZoneSysMoistureDemand.allocate( 1 );
+		NonAirSystemResponse.allocate( 1 );
+		SysDepZoneLoads.allocate( 1 );
+		MassConservation.allocate( 1 );
+		ZoneIntGain.allocate( 1 );
+		SurfaceWindow.allocate( 1 );
+		RefrigCaseCredit.allocate( 1 );
+		ZoneLatentGain.allocate( 1 );
+
+		TempControlType.allocate( 1 );
+		TempControlType( 1 ) = DataHVACGlobals::SingleHeatingSetPoint;
+		CurDeadBandOrSetback.allocate( 1 );
+		DeadBandOrSetback.allocate( 1 );
+		DeadBandOrSetback( 1 ) = false;
+
+		ZoneAirHumRat.allocate( 1 );
+		ZoneAirHumRat( 1 ) = 0.07;
+
+		DataZoneEquipment::ZoneEquipInputsFilled = false;
+
+	}
+
+	virtual void TearDown() {
+		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+	}
+};
 
 TEST_F( EnergyPlusFixture, SizePurchasedAirTest_Test1 )
 {
 
 	int PurchAirNum = 1;
-	int write_stat;
-	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
-//	eso_stream = gio::out_stream( OutputFileStandard );
-
-	//ZoneEquipConfig.allocate( 1 );
-	//ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
-	//ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-
-	//Zone.allocate( 1 );
-	//Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
@@ -154,9 +195,6 @@ TEST_F( EnergyPlusFixture, SizePurchasedAirTest_Test1 )
 	EXPECT_DOUBLE_EQ( 2.0, PurchAir( PurchAirNum ).MaxCoolVolFlowRate );
 	EXPECT_NEAR( 160.0, PurchAir( PurchAirNum ).MaxCoolTotCap, 0.1 );
 
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-
 	ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
 	ZoneEqSizing.deallocate();
 	ZoneHVACSizing.deallocate();
@@ -176,6 +214,7 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 		", !- Availability Schedule Name",
 		"ZONE 1 INLETS, !- Zone Supply Air Node Name",
 		", !- Zone Exhaust Air Node Name",
+		", !- System Inlet Air Node Name",
 		"50, !- Maximum Heating Supply Air Temperature{ C }",
 		"13, !- Minimum Cooling Supply Air Temperature{ C }",
 		"0.015, !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
@@ -197,7 +236,7 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 		", !- Outdoor Air Economizer Type",
 		", !- Heat Recovery Type",
 		", !- Sensible Heat Recovery Effectiveness{ dimensionless }",
-		";                        !- Latent Heat Recovery Effectiveness{ dimensionless }",
+		"; !- Latent Heat Recovery Effectiveness{ dimensionless }",
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -219,3 +258,118 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 
 }
 
+TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
+
+	std::string const idf_objects = delimited_string( {
+
+		"Zone,",
+		"  EAST ZONE,                      !- Name",
+		"  0,                              !- Direction of Relative North{ deg }",
+		"  0,                              !- X Origin{ m }",
+		"  0,                              !- Y Origin{ m }",
+		"  0,                              !- Z Origin{ m }",
+		"  1,                              !- Type",
+		"  1,                              !- Multiplier",
+		"  autocalculate,                  !- Ceiling Height{ m }",
+		"  autocalculate;                  !- Volume{ m3 }",
+
+		"Zone,",
+		"  PLENUM ZONE,                    !- Name",
+		"  0,                              !- Direction of Relative North{ deg }",
+		"  0,                              !- X Origin{ m }",
+		"  0,                              !- Y Origin{ m }",
+		"  0,                              !- Z Origin{ m }",
+		"  1,                              !- Type",
+		"  1,                              !- Multiplier",
+		"  autocalculate,                  !- Ceiling Height{ m }",
+		"  autocalculate;                  !- Volume{ m3 }",
+
+		"ZoneHVAC:IdealLoadsAirSystem,",
+		"  ZONE 1 IDEAL LOADS,             !- Name",
+		"  ,                               !- Availability Schedule Name",
+		"  Zone Inlet Node,                !- Zone Supply Air Node Name",
+		"  Zone Exhaust Node,              !- Zone Exhaust Air Node Name",
+		"  Plenum Outlet Node,             !- System Inlet Air Node Name",
+		"  50,                             !- Maximum Heating Supply Air Temperature{ C }",
+		"  13,                             !- Minimum Cooling Supply Air Temperature{ C }",
+		"  0.015,                          !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+		"  0.009,                          !- Minimum Cooling Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+		"  NoLimit,                        !- Heating Limit",
+		"  autosize,                       !- Maximum Heating Air Flow Rate{ m3 / s }",
+		"  ,                               !- Maximum Sensible Heating Capacity{ W }",
+		"  NoLimit,                        !- Cooling Limit",
+		"  autosize,                       !- Maximum Cooling Air Flow Rate{ m3 / s }",
+		"  ,                               !- Maximum Total Cooling Capacity{ W }",
+		"  ,                               !- Heating Availability Schedule Name",
+		"  ,                               !- Cooling Availability Schedule Name",
+		"  ConstantSupplyHumidityRatio,    !- Dehumidification Control Type",
+		"  ,                               !- Cooling Sensible Heat Ratio{ dimensionless }",
+		"  ConstantSupplyHumidityRatio,    !- Humidification Control Type",
+		"  ,                               !- Design Specification Outdoor Air Object Name",
+		"  ,                               !- Outdoor Air Inlet Node Name",
+		"  ,                               !- Demand Controlled Ventilation Type",
+		"  ,                               !- Outdoor Air Economizer Type",
+		"  ,                               !- Heat Recovery Type",
+		"  ,                               !- Sensible Heat Recovery Effectiveness{ dimensionless }",
+		"  ;                               !- Latent Heat Recovery Effectiveness{ dimensionless }",
+
+		"ZoneHVAC:EquipmentConnections,",
+		"  EAST ZONE,                      !- Zone Name",
+		"  ZoneEquipment,                  !- Zone Conditioning Equipment List Name",
+		"  Zone Inlet Node,                !- Zone Air Inlet Node or NodeList Name",
+		"  Zone Exhaust Node,              !- Zone Air Exhaust Node or NodeList Name",
+		"  Zone Node,                      !- Zone Air Node Name",
+		"  Zone Outlet Node;               !- Zone Return Air Node Name",
+
+		"ZoneHVAC:EquipmentList,",
+		"  ZoneEquipment,                  !- Name",
+		"  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
+		"  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
+		"  1,                              !- Zone Equipment 1 Cooling Sequence",
+		"  1;                              !- Zone Equipment 1 Heating or No - Load Sequence",
+
+		"AirLoopHVAC:ReturnPlenum,",
+		"  DOAS Zone Return Plenum,        !- Name",
+		"  PLENUM ZONE,                    !- Zone Name",
+		"  Plenum Node,                    !- Zone Node Name", // illegal use of non-unique zone node name
+		"  Plenum Outlet Node,             !- Outlet Node Name",
+		"  ,                               !- Induced Air Outlet Node or NodeList Name",
+		"  Zone Exhaust Node;              !- Inlet 1 Node Name",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+
+	DataGlobals::DoWeathSim = true;
+
+	bool ErrorsFound = false;
+	GetZoneData( ErrorsFound );
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 1;
+	AllocateHeatBalArrays();
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	bool FirstHVACIteration( true );
+	bool SimZone( true );
+	bool SimAir( false );
+	ManageZoneEquipment( FirstHVACIteration, SimZone, SimAir ); // read zone equipment configuration and list objects and simulate ideal loads air system
+
+	EXPECT_EQ( PurchAir( 1 ).Name, "ZONE 1 IDEAL LOADS" );
+	// Ideal loads air system found the plenum it is attached to
+	EXPECT_EQ( PurchAir( 1 ).ReturnPlenumIndex, 1 );
+	// The ideal loads air system inlet air node is equal to the zone return plenum outlet node
+	EXPECT_EQ( PurchAir( 1 ).PlenumExhaustAirNodeNum, ZoneRetPlenCond( 1 ).OutletNode );
+	// The ideal loads air system ZoneSupplyAirNodeNum is equal to the zone air inlet node
+	EXPECT_EQ( PurchAir( 1 ).ZoneSupplyAirNodeNum, ZoneEquipConfig( 1 ).InletNode( 1 ) );
+	// The ideal loads air system ZoneExhaustAirNodeNum is equal to the zone exhaust air node num
+	EXPECT_EQ( PurchAir( 1 ).ZoneExhaustAirNodeNum, ZoneEquipConfig( 1 ).ExhaustNode( 1 ) );
+	// The zone exhaust air node is equal to the zone return plenum inlet air node
+	EXPECT_EQ( ZoneEquipConfig( 1 ).ExhaustNode( 1 ), ZoneRetPlenCond( 1 ).InletNode( 1 ) );
+	// The ideal loads air system has a non-zero mass flow rate
+	EXPECT_GT( PurchAir( 1 ).SupplyAirMassFlowRate, 0.0 );
+	// The ideal loads air system mass flow rate is equal to all nodes attached to this system
+	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).ZoneSupplyAirNodeNum ).MassFlowRate );
+	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).ZoneExhaustAirNodeNum ).MassFlowRate );
+	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).PlenumExhaustAirNodeNum ).MassFlowRate );
+
+}

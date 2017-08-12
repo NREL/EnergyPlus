@@ -70,7 +70,7 @@
 ! Solair Distribution:            None
 !
 ! HVAC:                           A unitary system of UNITARYSYSTEM:MULTISPEEDHEATPUMP:AIRTOAIR provides space cooling and
-!                                 heating. The system has a supplemental heating coil as Coil:Heating:Gas.
+!                                 heating. The system has a supplemental heating coil as Coil:Heating:Fuel.
 !                                 Thermostat setting at 22C for space heating and 26.6C for space cooling.
 !                                 Heating and cooling performance curves are based on performance data of Carrier 25HNA948A30
 !                                 outdoor section with FE5ANB006 Indoor section (low and high speeds).
@@ -84,7 +84,7 @@
 ! Purchased Hot Water:            No
 ! Coils:                          Coil:Heating:DX:MultiSpeed
 !                                 Coil:Cooling:DX:MultiSpeed
-!                                 Coil:Heating:Gas
+!                                 Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -99,7 +99,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Single family House,     !- Name
@@ -1339,13 +1339,11 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    0.7551,                  !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,  !- Component 1 Object Type
     TwoSpeed Heat Pump 1,    !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Air Loop Outlet Node;    !- Component 1 Outlet Node Name
 
   AirLoopHVAC,
     Typical Residential System,  !- Name
@@ -1398,7 +1396,7 @@
     -8.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:MultiSpeed,  !- Cooling Coil Object Type
     ACDXCoil 1,              !- Cooling Coil Name
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supp Heating Coil 1,     !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -1408,17 +1406,17 @@
     80.0,                    !- Maximum Temperature for Heat Recovery {C}
     ,                        !- Heat Recovery Water Inlet Node Name
     ,                        !- Heat Recovery Water Outlet Node Name
-    0.2,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0.2,                     !- No Load Supply Air Flow Rate {m3/s}
     2,                       !- Number of Speeds for Heating
     2,                       !- Number of Speeds for Cooling
-    0.6135,                  !- Speed 1 Supply Air Flow Rate During Heating Operation {m3/s}
-    0.7551,                  !- Speed 2 Supply Air Flow Rate During Heating Operation {m3/s}
-    ,                        !- Speed 3 Supply Air Flow Rate During Heating Operation {m3/s}
-    ,                        !- Speed 4 Supply Air Flow Rate During Heating Operation {m3/s}
-    0.6135,                  !- Speed 1 Supply Air Flow Rate During Cooling Operation {m3/s}
-    0.7551,                  !- Speed 2 Supply Air Flow Rate During Cooling Operation {m3/s}
-    ,                        !- Speed 3 Supply Air Flow Rate During Cooling Operation {m3/s}
-    ;                        !- Speed 4 Supply Air Flow Rate During Cooling Operation {m3/s}
+    0.6135,                  !- Heating Speed 1 Supply Air Flow Rate {m3/s}
+    0.7551,                  !- Heating Speed 2 Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Speed 3 Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Speed 4 Supply Air Flow Rate {m3/s}
+    0.6135,                  !- Cooling Speed 1 Supply Air Flow Rate {m3/s}
+    0.7551,                  !- Cooling Speed 2 Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Speed 3 Supply Air Flow Rate {m3/s}
+    ;                        !- Cooling Speed 4 Supply Air Flow Rate {m3/s}
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZoneDirectAir,           !- Name
@@ -1460,10 +1458,11 @@
     Return Air Mixer Outlet, !- Outlet Node Name
     Zone Outlet Node;        !- Inlet 1 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Supp Heating Coil 1,     !- Name
     HVACAvailSched,          !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     35000,                   !- Nominal Capacity {W}
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
@@ -1475,6 +1474,7 @@
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Outdoor Condenser Air Node,  !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1

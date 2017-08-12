@@ -18,7 +18,7 @@
 ! Plant:    None.
 !
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,4;
 
@@ -780,5 +780,5 @@
     AllSummary;              !- Report 1 Name
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 

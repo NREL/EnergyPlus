@@ -4,16 +4,16 @@ Building energy code and standards like ASHRAE 90.1, 90.2 and California Title 2
 
 A simplified approach is introduced to create equivalent constructions and model the ground heat transfer through underground walls and ground floors for the building energy code compliance calculations. The approach is to create constructions based on the user defined C or F factor with two layers: one concrete layer (0.15 m thick) with thermal mass, and one fictitious insulation layer with no thermal mass.
 
+Three objects are used in the C and F factor calculations:
+
 \begin{itemize}
-\item
-  Three objects are used in the C and F factor calculations:
 \item
   Construction:CfactorUndergroundWall
 \item
   Construction:FfactorGroundFloor
+\item
+  Site:GroundTemperature:FCfactorMethod
 \end{itemize}
-
-Site:GroundTemperature:FCfactorMethod
 
 Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (Construction:CfactorUndergroundWall) and F-factor (Construction:FfactorGroundFloor) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available.
 
@@ -23,21 +23,23 @@ Detailed description of the three objects is in the Input Output Reference docum
 
 The steady state heat transfer through the floor is calculated as,
 
-Q = Area * U\(_{eff}\) * (T\(_{air,out}\) -- T\(_{air,in}\)) = (T\(_{air,out}\) -- T\(_{air,in}\)) * (P\(_{exp}\) * F-factor)
+\begin{equation}
+  Q = \text{Area} \cdot U_{eff} \cdot (T_{air,out} - T_{air,in}) = (T_{air,out} - T_{air,in}) \cdot (P_{exp} \cdot \text{F-factor})
+\end{equation}
 
 Where,
 
-Q is the steady state heat transfer through the floor in Watt
+\(Q\) is the steady state heat transfer through the floor in Watt
 
 Area is the area of the floor in m\(^{2}\)
 
-U\(_{eff}\) is the effective heat transfer coefficient including the floor construction, the soil, and the thermal resistance of the interior and exterior air films.
+\(U_{eff}\) is the effective heat transfer coefficient including the floor construction, the soil, and the thermal resistance of the interior and exterior air films.
 
-T\(_{air,in}\) is the indoor air temperature in °C
+\(T_{air,in}\) is the indoor air temperature in °C
 
-T\(_{air,out}\) is the outside air temperature in °C
+\(T_{air,out}\) is the outside air temperature in °C
 
-P\(_{exp}\) is the exposed perimeter of the floor in m
+\(P_{exp}\) is the exposed perimeter of the floor in m
 
 F-Factor is the heat transfer through the floor, induced by a unit temperature difference between the outside and inside air temperature, on the per linear length of the exposed perimeter of the floor. The unit is W/m·K.
 

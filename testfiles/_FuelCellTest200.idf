@@ -23,7 +23,7 @@
 
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Test Harness for MicroCogen,  !- Name
@@ -226,6 +226,7 @@
     ,                        !- Availability Schedule Name
     Garage inlet,            !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.009,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -366,9 +367,9 @@
     Electric Load Center,    !- Name
     Micro-Generators,        !- Generator List Name
     TrackElectrical,         !- Generator Operation Scheme Type
-    0.0,                     !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0.0,                     !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     AlternatingCurrent;      !- Electrical Buss Type
 
   ElectricLoadCenter:Generators,
@@ -484,7 +485,7 @@
     TemperatureFromAirNode,  !- Fuel Temperature Modeling Mode
     SOFC Air Inlet Node,     !- Fuel Temperature Reference Node Name
     ,                        !- Fuel Temperature Schedule Name
-    Fictitious Fuel Compressor Power Curve,  !- Compressor Power Function of Fuel Rate Curve Name
+    Fictitious Fuel Compressor Power Curve,  !- Compressor Power Multiplier Function of Fuel Rate Curve Name
     1.0,                     !- Compressor Heat Loss Factor
     GaseousConstituents,     !- Fuel Type
     ,                        !- Liquid Generic Fuel Lower Heating Value {kJ/kg}
@@ -651,31 +652,27 @@
 
   Branch,
     Heat Recovery Supply Branch,  !- Name
-    1.50E-04,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Heat Recovery Circ Pump, !- Component 1 Name
     Heat Recovery Supply Inlet Node,  !- Component 1 Inlet Node Name
     Small SOFC Heat Rec Inlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE,                  !- Component 1 Branch Control Type
     Generator:FuelCell:ExhaustGasToWaterHeatExchanger,  !- Component 2 Object Type
     Fictitious SOFC Exhaust HX,  !- Component 2 Name
     Small SOFC Heat Rec Inlet Node,  !- Component 2 Inlet Node Name
     Small SOFC Heat Rec Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Pipe:Adiabatic,          !- Component 3 Object Type
     Heat Recovery Supply Outlet,  !- Component 3 Name
     Small SOFC Heat Rec Outlet Node,  !- Component 3 Inlet Node Name
-    Heat Recovery Supply Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE;                 !- Component 3 Branch Control Type
+    Heat Recovery Supply Outlet Node;  !- Component 3 Outlet Node Name
 
   Pump:ConstantSpeed,
     Heat Recovery Circ Pump, !- Name
     Heat Recovery Supply Inlet Node,  !- Inlet Node Name
     Small SOFC Heat Rec Inlet Node,  !- Outlet Node Name
-    1.50E-04,                !- Rated Flow Rate {m3/s}
-    50000,                   !- Rated Pump Head {Pa}
-    0.0,                     !- Rated Power Consumption {W}
+    1.50E-04,                !- Design Flow Rate {m3/s}
+    50000,                   !- Design Pump Head {Pa}
+    0.0,                     !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Continuous,              !- Pump Control Type
@@ -694,18 +691,15 @@
 
   Branch,
     Heat Recovery Demand Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heat Recovery Inlet Pipe,!- Component 1 Name
     Heat Recovery Demand Inlet Node,  !- Component 1 Inlet Node Name
     Heat Recovery Demand Drain Node,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     WaterUse:Connections,    !- Component 2 Object Type
     Heat Recovery Drain,     !- Component 2 Name
     Heat Recovery Demand Drain Node,  !- Component 2 Inlet Node Name
-    Heat Recovery Demand Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Heat Recovery Demand Outlet Node;  !- Component 2 Outlet Node Name
 
   Pipe:Adiabatic,
     Heat Recovery Inlet Pipe,!- Name
@@ -877,7 +871,7 @@
 
   Output:Variable,*,Generator Fuel Cell Model Iteration Count,timestep;
 
-  Output:Variable,*,Generator Regula Falsi Iteration Count,timestep;
+  Output:Variable,*,Generator Root Solver Iteration Count,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 

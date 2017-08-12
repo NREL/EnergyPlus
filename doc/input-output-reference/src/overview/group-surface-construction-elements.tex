@@ -31,19 +31,21 @@ There are several material additions that can be made to the basic material prop
 \item
   MaterialProperty:MoisturePenetrationDepth:Settings
 \item
-  Material\-Prop\-erty:\-Heat\-And\-Moisture\-Trans\-fer:\-Sorp\-tion\-Iso\-therm
+  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
 \item
   MaterialProperty:HeatAndMoistureTransfer:Diffusion
 \item
   MaterialProperty:HeatAndMoistureTransfer:Settings
 \item
-  Material\-Prop\-erty:\-Heat\-And\-Moisture\-Trans\-fer:\-Re\-dist\-ribu\-tion
+  MaterialProperty:HeatAndMoistureTransfer:Redistribution
 \item
   MaterialProperty:HeatAndMoistureTransfer:Suction
 \item
-  Material\-Prop\-erty:\-Heat\-And\-Moisture\-Trans\-fer:\-Thermal\-Con\-ductivity
+  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
 \item
   MaterialProperty:PhaseChange
+\item
+  MaterialProperty:PhaseChangeHysteresis
 \end{itemize}
 
 These material property objects are used in conjunction with the basic material specification and reference back to the name of the basic material type. Without the basic material type specified the program, will give a severe error and terminate. For example, specifying the moisture materials and changing the HeatBalanceAlgorithm to a moisture simulation will allow the moisture simulation to take place.
@@ -84,15 +86,15 @@ This field represents the specific heat of the material layer in units of J/(kg-
 
 \paragraph{Field: Thermal Absorptance}\label{field-thermal-absorptance}
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). The default value for this field is 0.9.
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength (>2.5 microns) radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). The default value for this field is 0.9.
 
 \paragraph{Field: Solar Absorptance}\label{field-solar-absorptance}
 
-The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
+The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 microns) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 \paragraph{Field: Visible Absorptance}\label{field-visible-absorptance}
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation ( 0.37 to 0.78 microns weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 An IDF example:
 
@@ -129,15 +131,15 @@ This field is used to enter the thermal resistance (R-value) of the material lay
 
 \paragraph{Field: Thermal Absorptance}\label{field-thermal-absorptance-1}
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). The default value for this field is 0.9.
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength (>2.5 microns) radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). The default value for this field is 0.9.
 
 \paragraph{Field: Solar Absorptance}\label{field-solar-absorptance-1}
 
-The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
+The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 microns) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 \paragraph{Field: Visible Absorptance}\label{field-visible-absorptance-1}
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation ( 0.37 to 0.78 microns weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 An IDF example:
 
@@ -244,120 +246,291 @@ Material:AirGap,B1 - AIRSPACE RESISTANCE,  ! Material Name
 
 \subsection{MaterialProperty:MoisturePenetrationDepth:Settings}\label{materialpropertymoisturepenetrationdepthsettings}
 
-This material is used to describe the five moisture material properties that are used in the EMPD (Effective Moisture Penetration Depth) heat balance solution algorithm (known there as MoisturePenetrationDepthConductionTransferFunction). The EMPD algorithm is a simplified, lumped moisture model that simulates moisture storage and release from interior surfaces. The model uses ``actual'' convective mass transfer coefficients that are determined by existing heat and mass transfer relationships, e.g.~the Lewis relation. An effective moisture penetration depth may be determined from either experimental or detailed simulation data by using actual surface areas and moisture sorption isotherms.
+This material is used to describe the nine moisture material properties
+that are used in the EMPD (Effective Moisture Penetration Depth) heat
+balance solution algorithm. The EMPD algorithm is a simplified, lumped
+moisture model that simulates moisture storage and release from interior
+surfaces. The model uses convective mass transfer
+coefficients that are determined by existing heat and mass transfer
+relationships, e.g.~the Lewis relation. The EMPD model includes two
+fictitious layers of material with uniform moisture content: a surface
+layer, which accounts for short-term moisture buffering, and a deep
+layer, which accounts for more slowly responding moisture buffering. The
+model calculates the moisture transfer between the air and the surface
+layer and between the surface layer and the deep layer. This moisture
+transfer impacts the zone humidity, and also impacts the zone
+temperature through latent-to-sensible conversion from the heat of
+adsorption.
 
-This moisture model will be used when the appropriate EMPD moisture materials are specified and the Solution Algorithm parameter is set to EMPD.
+This moisture model is used when the appropriate EMPD moisture
+materials are specified and the Solution Algorithm parameter is set to
+MoisturePenetrationDepthConductionTransferFunction.
 
-\subsubsection{Inputs}\label{inputs-4-033}
+\subsubsection{Inputs}\label{empd-inputs}
 
-\paragraph{Field: Name}\label{field-name-4-028}
+\paragraph{Field: Name}\label{field-name}
 
-This field is a unique reference name that the user assigns to a particular material. This name can then be referred to by other input data (ref: Construction object).
+This field is a unique reference name that the user assigns to a
+particular material. This name can then be referred to by other input
+data (ref: Construction object).
 
-\paragraph{Field: Moisture Penetration Depth}\label{field-moisture-penetration-depth}
+\paragraph{Field: Water Vapor Diffusion Resistance
+	Factor}\label{field-water-vapor-diffusion-resistance-factor}
 
-This field is used to enter the effective moisture penetration depth of the material layer. Units for this parameter are (m).
+The vapor diffusion resistance factor is the resistance to water vapor
+diffusion \emph{relative} to the resistance to water vapor diffusion in
+stagnant air. In other words, \(\mu\) equals 1 for air, and is generally
+greater than 1 for building materials.
 
-\paragraph{Field: Constants to Define Moisture Equilibrium Equation}\label{field-constants-to-define-moisture-equilibrium-equation}
+The equation for \(\mu\) is:
 
-The next four fields, coefficients ``a'', ``b'', ``c'', and ``d'', help define the sorption isotherm curve used for building materials under equilibrium conditions. They are used to define the relationship between the material's moisture content and the surface air relative humidity (ref: Effective Moisture Penetration Depth (EMPD) Model in the Engineering Reference):
+\[ \mu = \frac {\delta_{perm,air}} {\delta_{perm}} \]
 
-\begin{equation}
-U = a{\varphi ^b} + c{\varphi ^d}
-\end{equation}
+where \(\delta_{perm,air}\) is the permeability of water vapor in air
+{[}kg/m-s-Pa{]}, and \(\delta_{perm}\) is the permeability of water
+vapor in the material. The permeability of water vapor in air can be
+estimated as:
+
+\[ \delta_{perm,air} = \frac {2 \times 10^{-7} \cdot T^{0.81}} {P_{ambient}} \]
+
+where \(T\) is the temperature {[}C{]} and \(P_{ambient}\) the ambient
+atmospheric pressure {[}Pa{]}.
+
+\paragraph{Fields: Moisture equilibrium
+	constants}\label{fields-moisture-equilibrium-constants}
+
+The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d}, 
+define the sorption isotherm curve used for building materials under
+equilibrium conditions. They define the relationship between
+the material's moisture content and the surface air relative humidity
+(ref: Effective Moisture Penetration Depth (EMPD) Model in the
+Engineering Reference):
+
+\[ u = a \cdot \phi^b + c \cdot \phi^d \]
 
 where
 
-a,b,c,d~~~~~~~~~ ~~~~ = Coefficients to define the relationship between the material's moisture content and the surface air relative humidity
+\(a,b,c,d\) = Coefficients to define the relationship between the
+material's moisture content and the surface air relative humidity
 
-U~~~~~~~~~~~~~~~~~~~~~ = Moisture content defined as the mass fraction of water contained in a material {[}kg/kg{]}
+\(u\) = Moisture content defined as the mass fraction of water contained
+in a material, per mass of dry material {[}kg/kg{]}
 
-\(\varphi\) ~~~~~~~~~~~~~~~~~~~ = Surface air relative humidity {[}0 to 1{]}
+\(\phi\) = Surface air relative humidity {[}0 to 1{]},
 
-\paragraph{The next four fields are dimensionless coefficients:}\label{the-next-four-fields-are-dimensionless-coefficients}
+\paragraph{Field: Surface Layer Penetration
+	Depth}\label{field-surface-layer-penetration-depth}
 
-\paragraph{Field: Moisture Equation Coefficient a}\label{field-moisture-equation-coefficient-a}
+The Surface Layer Penetration Depth is the fictitious thickness of the
+surface layer in meters, and is used to calculate the volume of material
+that participates in short-term moisture transfer and storage. This
+layer has a uniform moisture content, and can be considered a
+\emph{lumped-capacitance}. The penetration depth is based on the amount
+of material that interacts with the zone air when subject to a cyclic
+relative humidity variation. It also impacts the mass transfer resistance
+between the zone air and this layer, with thinner depths resulting in lower
+mass transfer resistances (ref: Effective Moisture Penetration Depth (EMPD) Model
+in the Engineering Reference). For this reason very small values can lead to
+instabilities depending on the timestep.The surface penetration depth can be
+estimated with the following equation:
 
-\paragraph{Field: Moisture Equation Coefficient b}\label{field-moisture-equation-coefficient-b}
+\[ d_{EMPD,surf} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{surf}}{\rho_{material} \frac{du}{d\phi} \pi}} \]
 
-\paragraph{Field: Moisture Equation Coefficient c}\label{field-moisture-equation-coefficient-c}
+where
 
-\paragraph{Field: Moisture Equation Coefficient d}\label{field-moisture-equation-coefficient-d}
+\(\delta_{perm}\) = water vapor permeability in the material, kg/m-s-Pa
+(see Vapor diffusion resistance factor above)
 
-Ann IDF example showing how it is used in conjunction with Material in synchronous pairs:
+\(P_{sat}\) = saturated vapor pressure at some nominal temperature, Pa
+
+\(\tau_{surf}\) = cycle period of typical RH variations, s. 24 hours
+(87600 s) is often used.
+
+\(\rho_{material}\) = dry density of material, kg/m\^{}3
+
+\(\frac{du}{d\phi}\) = slope of moisture soprtion curve,
+\(a b \phi^{b-1} + c d \phi^{d-1}\)
+
+If this field is left blank or set to \texttt{autocalculate}, 
+the above equation will be used to calculate the surface layer penetration depth 
+assuming a $\tau_{surf}$ of 24 hours.
+To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. If calculating $d_{EMPD,surf}$, the assumed value of $\tau_{surf}$ should not be less than 4x the simulation timestep to ensure an accurate and stable solution.
+
+\paragraph{Field: Deep Layer Penetration
+	Depth}\label{field-deep-layer-penetration-depth}
+
+The Deep Layer Penetration Depth is the fictitious thickness of the deep
+layer in meters, and is used to calculate the volume of material that
+participates in long-term moisture transfer and storage. This layer has
+a uniform moisture content, and can be considered a
+\emph{lumped-capacitance}. The deep penetration depth is based on the
+amount of material that interacts with the surface layer when subject to
+cyclic relative humidity variation. The deep penetration depth can be
+estimated with the following equation:
+
+\[ d_{EMPD,deep} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{deep}} {\rho_{material} \frac{du}{d\phi} \pi}} \]
+
+where each term is the same as the surface layer, except that the cycle
+period is different. This is usually on the order of weeks for the deep
+layer.
+
+If this field is left blank or set to \texttt{autocalculate}, 
+the above equation will be used to calculate the deep layer penetration depth 
+assuming a $\tau_{deep}$ of three weeks. To use a period different than 3 weeks, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{deep}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}.
+
+
+\paragraph{Field: Coating Layer
+	Thickness}\label{field-coating-layer-thickness}
+
+The Coating Layer Thickness (in meters) adds an additional resistance
+between the surface layer and the zone and represents a thin coating,
+such as paint, plaster, or other wall coverings.
+
+This input is optional, and an input of zero implies no coating.
+
+\paragraph{Field: Coating Layer Water Vapor Diffusion Resistance
+	Factor}\label{field-coating-layer-water-vapor-diffusion-resistance-factor}
+
+The vapor diffusion resistance factor of the coating is the coating's
+resistance to water vapor diffusion \emph{relative} to the resistance to
+water vapor diffusion in stagnant air (see Vapor diffusion resistance
+factor section above).
+
+This input is optional, and an input of zero implies no coating.
+
+Below are two IDF examples:
+
+This set of inputs can be used for aerated concrete (assuming linear
+sorption curve). Density, input elsewhere, is 650 kg/m\^{}3:
 
 \begin{lstlisting}
-
-  Material,
-      E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
-      Smooth,                  !- Roughness
-      1.9050000E-02,           !- Thickness {m}
-      0.7264224,               !- Conductivity {W/m-K}
-      1601.846,                !- Density {kg/m3}
-      836.8000,                !- Specific Heat {J/kg-K}
-      0.9000000,               !- Thermal Absorptance
-      0.9200000,               !- Solar Absorptance
-      0.9200000;               !- Visible Absorptance
-
-
-
-
-   MaterialProperty:MoisturePenetrationDepth:Settings,
-      E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
-      0.004,                   !- Effective Moisture Penetration Depth {m}
-      0.072549,           !- Moisture Equation Coefficient a {dimensionless}
-      0.397173,           !- Moisture Equation Coefficient b {dimensionless}
-      0.007774,           !- Moisture Equation Coefficient c {dimensionless}
-      11.7057;            !- Moisture Equation Coefficient d {dimensionless}
-
-
-    Material,
-      C10 - 8 IN HW CONCRETE,  !- Name
-      MediumRough,             !- Roughness
-      0.2033016,               !- Thickness {m}
-      1.729577,                !- Conductivity {W/m-K}
-      2242.585,                !- Density {kg/m3}
-      836.8000,                !- Specific Heat {J/kg-K}
-      0.9000000,               !- Thermal Absorptance
-      0.6500000,               !- Solar Absorptance
-      0.6500000;               !- Visible Absorptance
-
-
-   MaterialProperty:MoisturePenetrationDepth:Settings,
-      C10 - 8 IN HW CONCRETE,  !- Name
-      0.004,                   !- Effective Moisture Penetration Depth {m}
-      0.018062,             !- Moisture Equation Coefficient a {dimensionless}
-      0.451879,             !- Moisture Equation Coefficient b {dimensionless}
-      0.026178,             !- Moisture Equation Coefficient c {dimensionless}
-      10.8356;              !- Moisture Equation Coefficient d {dimensionless}
+MaterialProperty:MoisturePenetrationDepth:Settings,
+Concrete,            !- Name
+6.55,                !- Water Vapor Diffusion Resistance Factor {dimensionless}
+0.066,               !- Moisture Equation Coefficient a {dimensionless}
+1,                   !- Moisture Equation Coefficient b {dimensionless}
+0,                   !- Moisture Equation Coefficient c {dimensionless}
+1,                   !- Moisture Equation Coefficient d {dimensionless}
+0.007,               !- Surface Layer Penetration Depth {m}
+0.024,               !- Deep Layer Penetration Depth {m}
+0,                   !- Coating Layer Thickness {m}
+1;                   !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-035}
+This set of inputs is for gypsum board with density 750 kg/m\^{}3. This
+also assumes 2 coats of latex paint:
 
-Output variables applicable to heat transfer surfaces using EMPD model:
+\begin{lstlisting}
+MaterialProperty:MoisturePenetrationDepth:Settings,
+Concrete,            !- Name
+6.0,                 !- Water Vapor Diffusion Resistance Factor {dimensionless}
+0.0065,              !- Moisture Equation Coefficient a {dimensionless}
+0.65,                !- Moisture Equation Coefficient b {dimensionless}
+0.022,               !- Moisture Equation Coefficient c {dimensionless}
+10,                  !- Moisture Equation Coefficient d {dimensionless}
+0.021,               !- Surface Layer Penetration Depth {m}
+0.08,                !- Deep Layer Penetration Depth {m}
+0.0003,              !- Coating Layer Thickness {m}
+6000;                !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+\end{lstlisting}
 
-\begin{itemize}
-\item
-  Zone,Average,EMPD Surface Inside Face Water Vapor Density {[}kg/m3{]}
-\item
-  Zone,Average,EMPD Surface Inside Face Humidity Ratio {[}kgWater/kgDryAir{]}
-\item
-  Zone,Average,EMPD Surface Inside Face Relative Humidity {[}\%{]}
-\end{itemize}
+Finally, here are values representing the empirical whole-house inputs
+from Woods et al., 2014 (see Engineering Reference). Density is 800
+kg/m\^{}3:
 
-The following variables apply only to surfaces, where the material assigned to the inside layers is MaterialProperty:MoisturePenetrationDepth:Settings. The EMPD (Effective Moisture Penetration Depth) moisture balance solution algorithm is used to calculate the inside surface moisture levels.
+\begin{lstlisting}
+MaterialProperty:MoisturePenetrationDepth:Settings,
+Concrete,            !- Name
+8.0,                 !- Water Vapor Diffusion Resistance Factor {dimensionless}
+0.012,               !- Moisture Equation Coefficient a {dimensionless}
+1,                   !- Moisture Equation Coefficient b {dimensionless}
+0,                   !- Moisture Equation Coefficient c {dimensionless}
+1,                   !- Moisture Equation Coefficient d {dimensionless}
+0.019,               !- Surface Layer Penetration Depth {m}
+0.113,               !- Deep Layer Penetration Depth {m}
+0,                   !- Coating Layer Thickness {m}
+1;                   !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+\end{lstlisting}
 
-\paragraph{EMPD Surface Inside Face Water Vapor Density {[}kg/m3{]}}\label{empd-surface-inside-face-water-vapor-density-kgm3}
+Other materials inputs can be estimated using the equations above and
+material properties from a variety of sources, such as
+\href{http://www.iea-ebc.org/fileadmin/user_upload/images/Pictures/EBC_Annex_24_Report_3.pdf}{\emph{Kumaran,
+		1996}}, the \href{http://WUFI.de/en/}{\emph{WUFI}} simulation software,
+or the \href{http://www.techstreet.com/products/1719052}{\emph{ASHRAE
+		1018-RP}} report.
 
-The vapor density at the inside surface, where the EMPD moisture balance solution algorithm is applied.
+\subsubsection{Outputs}\label{moisture-penetration-depth-empd-outputs}
 
-\paragraph{EMPD Surface Inside Face Humidity Ratio {[}kgWater/kgDryAir{]}}\label{empd-surface-inside-face-humidity-ratio-kgwaterkgdryair}
+\paragraph{EMPD Surface Inside Face Water Vapor Density
+	{[}kg/m3{]}}\label{empd-surface-inside-face-water-vapor-density-kgm3}
 
-The humidity ratio at the inside surface, where the EMPD moisture balance solution algorithm is applied.
+The vapor density at the inside face of the surface, where the EMPD
+moisture balance solution algorithm is applied. This is the
+\emph{actual} surface, separated from the zone air only by the
+convective mass transfer coefficient.
 
-\paragraph{EMPD Surface Inside Face Relative Humidity {[}\%{]}}\label{empd-surface-inside-face-relative-humidity}
+Units are kg of water per cubic meter of air.
 
-The relative humidity at the inside surface, where the EMPD moisture balance solution algorithm is applied.
+\paragraph{EMPD Surface Layer Moisture Content
+	{[}kg/kg{]}}\label{empd-surface-layer-moisture-content-kgkg}
+
+The moisture content, \emph{u}, of the fictitious surface layer. The
+surface layer node is not at the actual surface, but is instead at the
+center of surface layer, which has a uniform moisture content. This node
+is separated from the inside face of the surface by a diffusive
+resistance, as described in the Engineering Reference.
+
+Units are kg of water per kg of solid material (e.g., gypsum).
+
+\paragraph{EMPD Deep Layer Moisture Content
+	{[}kg/kg{]}}\label{empd-deep-layer-moisture-content-kgkg}
+
+The moisture content, \emph{u}, of the fictitious deep layer. The deep
+layer node interacts only with the surface layer node through a
+diffusive resistance.
+
+Units are kg of water per kg of solid material.
+
+\paragraph{EMPD Surface Layer Equivalent Relative Humidity
+	{[}\%{]}}\label{empd-surface-layer-equivalent-relative-humidity}
+
+The equivalent relative humidity of the surface layer, converted from
+the surface-layer moisture content discussed above and the surface
+temperature. The moisture content is related to the relative humidity
+through the slope of the moisture curve, the surface penetration depth,
+and the material density, as discussed in the engineering reference.
+
+\paragraph{EMPD Deep Layer Equivalent Relative Humidity
+	{[}\%{]}}\label{empd-deep-layer-equivalent-relative-humidity}
+
+The equivalent relative humidity of the deep layer, converted from the
+deep-layer moisture content discussed above and the surface temperature.
+
+\paragraph{EMPD Surface Layer Equivalent Humidity Ratio
+	{[}kgWater/kgDryAir{]}}\label{empd-surface-layer-equivalent-humidity-ratio-kgwaterkgdryair}
+
+The equivalent humidity ratio of the surface layer. Units are kg of
+water per kg of dry air.
+
+\paragraph{EMPD Deep Layer Equivalent Humidity Ratio
+	{[}kgWater/kgDryAir{]}}\label{empd-deep-layer-equivalent-humidity-ratio-kgwaterkgdryair}
+
+The equivalent humidity ratio of the deep layer. Units are kg of water
+per kg of dry air.
+
+\paragraph{EMPD Surface Moisture Flux to Zone
+	{[}kg/m2-s{]}}\label{empd-surface-moisture-flux-to-zone-kgm2-s}
+
+The mass flux of water vapor from the surface layer of a specific
+surface to the zone air. A positive mass flux is from the surface to the
+zone.
+
+\paragraph{EMPD Deep Layer Moisture Flux
+	{[}kg/m2-s{]}}\label{empd-deep-layer-moisture-flux-kgm2-s}
+
+The mass flux of water vapor from the deep layer of a specific surface
+to the surface layer of that surface. A positive flux is from the
+surface layer to the deep layer.
 
 \subsection{MaterialProperty:PhaseChange}\label{materialpropertyphasechange}
 
@@ -382,8 +555,6 @@ where:
 k\(_{o}\) is the 20C value of thermal conductivity(normal idf~ input)
 
 k\(_{1}\) is the change in conductivity per degree temperature difference from 20C
-
-(this field).
 
 \paragraph{Field Set: Temperature-Enthalpy}\label{field-set-temperature-enthalpy}
 
@@ -440,6 +611,108 @@ HeatBalanceAlgorithm,
       70000,           !- Enthalpy 3, (J/kg)
       100.,            !- Temperature 4, C
       137000;          !- Enthalpy 4, (J/kg)
+\end{lstlisting}
+
+\subsection{MaterialProperty:PhaseChangeHysteresis}\label{materialpropertyphasechangehysteresis}
+
+This object is used to describe an advanced level of physics belonging to phase change materials used in building envelopes.
+The base phase change input object describes a single process curve whereby a material moves from a crystallized to liquid state and back.
+This input object adds a hysteresis effect, allowing the melting/freezing process to follow different curves, representing an effect that is commonly seen in actual building envelope phase change material applications.
+This object also allows users to enter characteristic properties of the processes instead of a detailed temperature/enthalpy curve, making it more amenable for studies in which the user does not have the detailed test data required to generate the temperature/enthalpy curve.
+
+\subsubsection{Inputs}\label{materialpropertyphasechangehysteresis-inputs}
+
+The MaterialProperty:PhaseChangeHysteresis object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
+
+\paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This input must match the name of a material defined elsewhere within EnergyPlus.  The thermal properies of that material are then overridden by the properties defind in this object.
+
+\paragraph{Field: Temperature Coefficient for Thermal Conductivity}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This field is used to enter the temperature dependent coefficient for thermal conductivity of the material.~ Units for this parameter are (W/(m-K\(^{2}\)). This is the thermal conductivity change per unit temperature excursion from 20 C. The conductivity value at 20 C is the one specified with the basic material properties of the regular material specified in the name field. The thermal conductivity is obtained from:
+
+\begin{equation}
+k = {k_o} + {k_1}({T_i} - 20)
+\end{equation}
+
+where:
+
+k\(_{o}\) is the 20C value of thermal conductivity(normal idf~ input)
+
+k\(_{1}\) is the change in conductivity per degree temperature difference from 20C
+
+\paragraph{Field: Latent Heat during the Entire Phase Change Process}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the total amount of latent heat absorbed or discharged during the transition from solid to liquid or back, in Joules.
+The shapes of the enthalpy curves differ based on direction, but the total amount of energy from one state to the other does not.
+
+\paragraph{Field: Liquid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the constant specific heat while the material is fully liquid, in J/kg-K.
+
+\paragraph{Field: High Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the width of the enthalpy/specific heat melting curve, on the high side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+\paragraph{Field: Peak Melting Temperature}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the center (peak) of the melting curve, in Kelvin.
+
+\paragraph{Field: Low Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the width of the enthalpy/specific heat melting curve, on the low side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+\paragraph{Field: Solid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the constant specific heat while the material is fully crystallized, in J/kg-K.
+
+\paragraph{Field: High Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the width of the enthalpy/specific heat freezing curve, on the high side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+\paragraph{Field: Peak Freezing Temperature}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the center (peak) of the freezing curve, in Kelvin.  This will be higher than the peak melting temperature based on empirical data.
+
+\paragraph{Field: Low Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the width of the enthalpy/specific heat freezing curve, on the low side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+Next is an IDF example showing how it is used in conjunction with the Material:
+
+Note, the following Heat Balance Algorithm is necessary (only specified once). Also, when using ConductionFiniteDifference, it is more efficient to set the zone timestep shorter than those used for the ConductionTransferFunction solution algorithm. It should be set to 12 timesteps per hour or greater, and can range up to 60.
+
+\begin{lstlisting}
+
+  HeatBalanceAlgorithm, ConductionFiniteDifference;
+
+  Timestep, 12;
+
+  Material,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    1.9050000E-02,           !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1601.846,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  MaterialProperty:PhaseChangeHysteresis,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,   !- Name
+    0,                       !- Temperature Coefficient for Thermal Conductivity {W/m-K2}
+    10000,                   !- Latent Heat of Fusion {J/kg}
+    2000,                    !- Liquid State Specific Heat {J/kg-K}
+    1,                       !- High Temperature Difference of Melting Curve {deltaC}
+    20,                      !- Peak Melting Temperature {C}
+    1,                       !- Low Temperature Difference of Melting Curve {deltaC}
+    2000,                    !- Solid State Specific Heat {J/kg-K}
+    1,                       !- High Temperature Difference of Freezing Curve {deltaC}
+    23,                      !- Peak Freezing Temperature {C}
+    1;                       !- Low Temperature Difference of Freezing Curve {deltaC}
+
 \end{lstlisting}
 
 \subsection{MaterialProperty:VariableThermalConductivity}\label{materialpropertyvariablethermalconductivity}
@@ -515,7 +788,7 @@ The following output variables are applicable to all opaque heat transfer surfac
   Zone,Average,CondFD Surface Temperature Node \textless{}1\textgreater{} {[}C{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{CondFD Inner Solver Loop Iteration Count {[]}}{CondFD Inner Solver Loop Iteration Count }}\label{condfd-inner-solver-loop-iteration-count}
+\paragraph{CondFD Inner Solver Loop Iteration Count {[]}}\label{condfd-inner-solver-loop-iteration-count}
 
 This outputs the count of iterations on the inner solver loop of CondFD for each surface.
 
@@ -817,7 +1090,7 @@ MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
         2.602;     !- Thermal Conductivity \#2
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-2-021}
+\subsubsection{Surface Outputs}\label{outputs-2-021}
 
 \begin{itemize}
 \item
@@ -832,8 +1105,6 @@ MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
   Zone,Average,HAMT Surface Outside Face Temperature {[}C{]}
 \item
   Zone,Average,HAMT Surface Outside Face Relative Humidity {[}\%{]}
-\item
-  Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
 \end{itemize}
 
 \paragraph{HAMT Surface Average Water Content Ratio {[}kg/kg{]}}\label{hamt-surface-average-water-content-ratio-kgkg}
@@ -862,13 +1133,29 @@ This output is the temperature on the external ``surface'' of the surface.
 
 This output is the relative humidity on the external ``surface'' of the surface.
 
-Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
-
-Zone,Average,HAMT Surface Water Content Cell N {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Relative Humidity Cell N {[}\%{]}
+\subsubsection{Internal Cell Outputs}\label{outputs-2-021}
 
 Detailed profile data for the variables Temperature {[}C{]}, Relative Humidity {[}\%{]} and Water Content {[}kg/kg{]} within each surface can also be reported. To calculate the heat and moisture transfer through surfaces HAMT splits up surfaces into discrete cells. Each cell is composed of a single material and has a position within the surface. HAMT automatically assigns cells to construction objects so that there are more cells closer to boundaries between materials and also at the ``surfaces'' of the surface. It is not possible for users to define their own cells.
+
+Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format. The output also contains the HAMT cell origins and cell number for each surface combination. The coordinate system origin is defined as the exterior surface of the construction.
+
+\begin{lstlisting}
+! <HAMT cells>, Surface Name, Construction Name, Cell Numbers
+! <HAMT origins>, Surface Name, Construction Name, Cell origins (m)
+HAMT cells, FLOOR,FLOOR,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,  16,  17
+HAMT origins,FLOOR,FLOOR, 0.0000000, 0.0122726, 0.0601616, 0.1512518, 0.2766268, 0.4240140, 0.5789860, 0.7263732, 0.8517482, 0.9428384, 0.9907274, 1.0035729, 1.0056459, 1.0090000, 1.0123541, 1.0144271, 1.0150000
+\end{lstlisting}
+
+Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
+ 
+\begin{itemize}
+\item
+  Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
+\item
+  Zone,Average,HAMT Surface Water Content Cell N {[}kg/kg{]}
+\item
+  Zone,Average,HAMT Surface Relative Humidity Cell N {[}\%{]}
+\end{itemize}
 
 \paragraph{HAMT Surface Relative Humidity Cell \textless{}N\textgreater{} {[}\%{]}}\label{hamt-surface-relative-humidity-cell-n}
 
@@ -881,31 +1168,6 @@ This is the temperature of the cell in the surface.
 \paragraph{HAMT Surface Water Content Cell \textless{}N\textgreater{} {[}kg/kg{]}}\label{hamt-surface-water-content-cell-n-kgkg}
 
 This is the relative water content of the cell in the surface.
-
-Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format.
-
-\begin{lstlisting}
-! <HAMT cells>, Surface Name, Construction Name, Cell Numbers
-! <HAMT origins>, Surface Name, Construction Name, Cell origins (m)
-\end{lstlisting}
-
-The output also contains the HAMT cell origins and cell number for each construction -- surface combination. The coordinate system origin is defined as the exterior surface of the construction. Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
-
-HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell\#\textgreater{}
-
-It is better to specify the ``key'' or Surface Name in this output.
-
-So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
-
-\begin{lstlisting}
-
-Output:Variable,
-      East Wall,               !- Key Value
-      HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-      Hourly;                  !- Reporting Frequency
-\end{lstlisting}
-
-By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
 
 \subsection{Materials for Glass Windows and Doors}\label{materials-for-glass-windows-and-doors}
 
@@ -927,11 +1189,13 @@ The name of the glass layer. It corresponds to a layer in a window construction.
 
 \paragraph{Field: Optical Data Type}\label{field-optical-data-type}
 
-Valid values for this field are SpectralAverage, Spectral, BSDF.
+Valid values for this field are SpectralAverage, Spectral, SpectralAndAngle, and BSDF.
 
 If Optical Data Type = SpectralAverage, the values you enter for solar transmittance and reflectance are assumed to be averaged over the solar spectrum, and the values you enter for visible transmittance and reflectance are assumed to be averaged over the solar spectrum and weighted by the response of~ the human eye. There is an EnergyPlus Reference Data Set for WindowMaterial:Glazing that contains spectral average properties for many different types of glass.
 
 If Optical Data Type = Spectral, then, in the following field, you must enter the name of a spectral data set defined with the WindowGlassSpectralData object. In this case, the values of~ solar and visible transmittance and reflectance in the fields below should be blank.
+
+If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with the Table:TwoIndependentVariables object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
 
 If Optical Data Type = BSDF, the Construction:ComplexFenestrationState object must be used to define the window construction layers. The Construction:ComplexFenestrationState object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
 
@@ -994,11 +1258,18 @@ This is a factor that corrects for the presence of dirt on the glass. The progra
 Representative values of the dirt correction factor are shown in Table~\ref{table:dirt-correction-factors}.
 
 \begin{longtable}[c]{@{}llll@{}}
-\caption{Dirt Correction Factors \protect \label{table:dirt-correction-factors}} \\
-\toprule 
+\caption{Dirt Correction Factors \label{table:dirt-correction-factors}} \\
+\toprule
+Type of Location & \multicolumn{3}{c}{Angle of Glazing} \\ \cmidrule(r){2-4}
+                 & Vertical & 45$^{o}$ & Horizontal \\ \midrule
+\endfirsthead
+
+\caption[]{Dirt Correction Factors} \\
+\toprule
 Type of Location & \multicolumn{3}{c}{Angle of Glazing} \\ \cmidrule(r){2-4}
                  & Vertical & 45$^{o}$ & Horizontal \\ \midrule
 \endhead
+
 Non-industrial & 0.9 & 0.8 & 0.7 \\
 Industrial & 0.7 & 0.6 & 0.5 \\
 Very Dirty & 0.6 & 0.5 & 0.4 \\
@@ -1034,6 +1305,20 @@ A measure of the stiffness of an elastic material.~ It is defined as the ratio o
 
 The ratio, when a sample object is stretched, of the contraction or transverse strain (perpendicular to the applied load), to the extension or axial strain (in the direction of the applied load). This value is used only with complex fenestration systems defined through the Construction:ComplexFenestrationState object. The default value for glass is 0.22.
 
+\paragraph{Field: Window Glass Spectral and Incident Angle Transmittance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-transmittance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+\paragraph{Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-front-reflectance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+\paragraph{Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-back-reflectance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+It should be pointed out that when Optical Data Type = SpectralAndAngle for a glass layer in a construction, the table input data are converted into polynomial curve fits with 6 coefficients, so that all outputs of optical properties for the same construction will be curve values for a given incident angle. Therefore, the values may be slightly different from input values.
+  
 IDF examples of Spectral average and using a Spectral data set:
 
 \begin{lstlisting}
@@ -1067,6 +1352,36 @@ MATERIAL:WINDOWGLASS, GLASS - CLEAR SHEET 1 / 8 IN,
       0.84,  ! IR emissivity: front side
       0.84,  ! IR emissivity: back side
       0.798; ! Conductivity {W/m-K}
+      
+\end{lstlisting}
+
+IDF example using a SpectralAndAngle data set:
+
+\begin{lstlisting}
+
+  WindowMaterial:Glazing ,SPECTRAL AND ANGLE GLASS INNER PANE, ! Material name
+    SpectralAndAngle, ! Optical data type {SpectralAverage or Spectral}
+    , !- Name of spectral data set
+
+    0.0099, ! Thickness {m}
+    ,  !- Solar transmittance at normal incidence
+    ,  !- Solar reflectance at normal incidence: front side
+    ,  !- Solar reflectance at normal incidence: back side
+    ,  !- Visible transmittance at normal incidence
+    ,  !- Visible reflectance at normal incidence: front side
+    ,  !- Visible reflectance at normal incidence: back side
+    0.0,   !- IR transmittance at normal incidence
+    0.84,  !- IR emissivity: front side
+    0.84,  !- IR emissivity: back side
+    0.798, !- Conductivity {W/m-K}
+    ,      !- Dirt Correction Factor for Solar and Visible Transmittance
+    ,      !- Solar Diffusing
+    ,      !- Young's modulus
+    ,      !- Poisson's ratio
+    TranmittanceDataSet,  !- Window Glass Spectral and Incident Angle Transmittance Data Set Table Name
+    FrontReflectanceDataSet,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
+    BackReflectanceDataSet;      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
+
 \end{lstlisting}
 
 IDF example of Spectral Data Type = BSDF
@@ -1897,7 +2212,7 @@ Transmittance averaged over the solar spectrum and weighted by the response of t
 
 Reflectance averaged over the solar spectrum and weighted by the response of the human eye. Assumed same on both side of shade and independent of incidence angle.
 
-\paragraph{Field: Thermal Hemispherical Emissivity}\label{field-thermal-hemispherical-emissivity}
+\paragraph{Field: Infrared Hemispherical Emissivity}\label{field-infrared-hemispherical-emissivity}
 
 Effective long-wave emissivity. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{eff}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
 
@@ -1907,7 +2222,7 @@ Effective long-wave emissivity. Assumed same on both sides of shade. We can appr
 
 For most non-metallic materials \(\varepsilon\) is about 0.9.
 
-\paragraph{Field: Thermal Transmittance}\label{field-thermal-transmittance}
+\paragraph{Field: Infrared Transmittance}\label{field-infrared-transmittance}
 
 Effective long-wave transmittance. Assumed independent of incidence angle. We can approximate this effective long-wave transmittance, \(T_{\rm{eff}}\) as follows. Let \(\eta\) be the ``openness'' of the shade, i.e., the ratio of the area of openings in the shade to the overall shade area. Let the long-wave transmittance of the shade material be \(T\). Then
 
@@ -1976,8 +2291,8 @@ WindowMaterial:Shade,
   0.3000000,                    !- Solar Reflectance
   .05,                          !- Visible transmittance
   0.3000000,                    !- Visible reflectance
-  0.9000000,                    !- Thermal Hemispherical Emissivity
-  0.0,                          !- Thermal Transmittance
+  0.9000000,                    !- Infrared Hemispherical Emissivity
+  0.0,                          !- Infrared Transmittance
   0.003,                        !- Thickness {m}
   0.1,                          !- Conductivity {W/m-K}
   0.050,                        !- Shade to glass distance {m}
@@ -2112,11 +2427,11 @@ The back-side slat reflectance for hemispherically diffuse visible radiation. Th
 
 The slat Infrared transmittance. It is zero for solid metallic, wooden or glass slats, but may be non-zero in some cases (e.g., thin plastic slats).
 
-\paragraph{Field: Front Side Slat Infrared~ Hemispherical Emissivity}\label{field-front-side-slat-infrared-hemispherical-emissivity}
+\paragraph{Field: Front Side Slat Infrared Hemispherical Emissivity}\label{field-front-side-slat-infrared-hemispherical-emissivity}
 
 Front-side hemispherical emissivity of the slat. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
 
-\paragraph{Field: Back Side Slat Infrared~ Hemispherical Emissivity}\label{field-back-side-slat-infrared-hemispherical-emissivity}
+\paragraph{Field: Back Side Slat Infrared Hemispherical Emissivity}\label{field-back-side-slat-infrared-hemispherical-emissivity}
 
 Back-side hemispherical emissivity of the slat. Approximately 0.9 for most materials. The most common exception is bare (unpainted) metal slats or slats finished with a metallic paint.
 
@@ -2636,7 +2951,7 @@ WindowMaterial:Shade:EquivalentLayer,
 
 Specifies the optical and thermal properties of equivalent layer window drape fabric materials.
 
-Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (infrared) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%.
+Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%.
 
 \begin{figure}[hbtp] % fig 21
 \centering
@@ -2758,7 +3073,7 @@ The perpendicular length between the slat cord ~and the curve (m). Crown = 0.062
 
 \paragraph{Field: Slat Angle}\label{field-slat-angle-2}
 
-The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). If the ``Slat Angle Control'' input field below specified is ``FixedSlatAngle'', then the slat angle is fixed at ``Slat Angle'' value entered.~ Minimum value is zero, and the maximum value allowed is 180.0 degrees.~ The default value is 45 degrees.
+The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). The slat angle is +ve if the tip of the slat front face is tilted upward, or else the slat angle is -ve if the tip of the slat front face is tilted downward. The slat angle varies between -90 to +90.~ If the ``Slat Angle Control'' input field below specified is ``FixedSlatAngle'', then the slat angle is fixed at ``Slat Angle'' value entered.~ Minimum value allowed is -90.0, and the maximum value allowed is 90.0 degrees.~ The default value is 45 degrees.
 
 \paragraph{Field: Front Side Slat Beam-Diffuse Solar Transmittance}\label{field-front-side-slat-beam-diffuse-solar-transmittance}
 
@@ -2816,7 +3131,7 @@ This value is the slat front side diffuse-diffuse visible reflectance for hemisp
 
 This value is the slat back side diffuse-diffuse visible reflectance for hemispherically diffuse visible spectrum range of solar radiation. Minimum value is 0.0, and the maximum value is less than 1.0.~ This input field is not used currently.
 
-\paragraph{Field: Slat Infrared Transmittance}\label{field-slat-infrared-transmittance}
+\paragraph{Field: Slat Infrared Transmittance}\label{field-slat-Infrared-transmittance}
 
 This value is the long-wave hemispherical transmittance of the slat material. Assumed to be the same for both sides of the slat. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.0.
 
@@ -3247,15 +3562,15 @@ This field represents the specific heat of the material layer in units of J/(kg-
 
 \paragraph{Field: Thermal Absorptance}\label{field-thermal-absorptance-2}
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). Typical values are from .9 to .98. The default value for this field is 0.9.
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength (>2.5 microns) radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). Typical values are from .9 to .98. The default value for this field is 0.9.
 
 \paragraph{Field: Solar Absorptance}\label{field-solar-absorptance-2}
 
-The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. Typical values are from .6 to .85. The default value for this field is 0.7.
+The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 microns) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. Typical values are from .6 to .85. The default value for this field is 0.7.
 
 \paragraph{Field: Visible Absorptance}\label{field-visible-absorptance-2}
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.5 and 1.0. The default value for this field is 0.75.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation ( 0.37 to 0.78 microns weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.5 and 1.0. The default value for this field is 0.75.
 
 \paragraph{Field: Saturation Volumetric Moisture Content of the Soil Layer}\label{field-saturation-volumetric-moisture-content-of-the-soil-layer}
 
@@ -3389,11 +3704,11 @@ Temperature of the Soil layer temperature in C.
 
 Temperature of the Vegetation layer temperature in C.
 
-\subsubsection{\texorpdfstring{Green Roof Soil Root Moisture Ratio {[]}}{Green Roof Soil Root Moisture Ratio }}\label{green-roof-soil-root-moisture-ratio}
+\subsubsection{Green Roof Soil Root Moisture Ratio {[]}}\label{green-roof-soil-root-moisture-ratio}
 
 Mean value of root moisture (m\(^{3}\)/m\(^{3}\))
 
-\subsubsection{\texorpdfstring{Green Roof Soil Near Surface Moisture Ratio {[]}}{Green Roof Soil Near Surface Moisture Ratio }}\label{green-roof-soil-near-surface-moisture-ratio}
+\subsubsection{Green Roof Soil Near Surface Moisture Ratio {[]}}\label{green-roof-soil-near-surface-moisture-ratio}
 
 The moisture content in the soil near the surface (m\(^{3}\)/m\(^{3}\))
 
@@ -3453,7 +3768,7 @@ MaterialProperty:GlazingSpectralData should be used for multi-pane windows when 
 
 You can input up to 450 sets of values for wavelengths covering the solar spectrum. Each set consists of~ \{wavelength (microns), transmittance, front reflectance, back reflectance\}
 
-Spectral data of this kind are routinely measured by glass manufacturers. Data sets for over 800 commercially available products are contained in an Optical Data Library maintained by the Windows Group at Lawrence Berkeley National Laboratory. This library can be downloaded from http://windows.lbl.gov/. You will have to edit entries from this library to put them in the format required by the EnergyPlus WindowGlassSpectralData object.
+Spectral data of this kind are routinely measured by glass manufacturers. Data sets for over 800 commercially available products are contained in an Optical Data Library maintained by the Windows Group at Lawrence Berkeley National Laboratory. This library can be downloaded from \url{http://windows.lbl.gov/}. You will have to edit entries from this library to put them in the format required by the EnergyPlus WindowGlassSpectralData object.
 
 An alternative to using the MaterialProperty:GlazingSpectralData object is to run the WINDOW window analysis program. This program has built-in access to the Optical Data Library and let's you easily create customized, multi-layer glazing systems that can be exported for use in EnergyPlus. For more details, see ``StormWindow''.
 
@@ -3534,91 +3849,7 @@ This field is a user specified name that will be used as a reference by other in
 
 \paragraph{Field: Outside Layer}\label{field-outside-layer}
 
-Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of the construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Zone,Average,HAMT Surface Average Water Content Ratio {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Inside Face Temperature {[}C{]}
-
-Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
-
-Zone,Average,HAMT Surface Inside Face Vapor Pressure {[}Pa{]}
-
-Zone,Average,HAMT Surface Outside Face Temperature {[}C{]}
-
-Zone,Average,HAMT Surface Outside Face Relative Humidity {[}\%{]}
-
-Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
-
-\paragraph{HAMT Surface Average Water Content Ratio {[}kg/kg{]}}\label{hamt-surface-average-water-content-ratio-kgkg-1}
-
-This output is the summed water content {[}kg/kg{]} of all cells in a surface expressed as a fraction of the mass of the water to the material mass.
-
-\paragraph{HAMT Surface Inside Face Temperature {[}C{]}}\label{hamt-surface-inside-face-temperature-c-1}
-
-This output is the temperature {[}C{]} on the internal ``surface'' of the surface.
-
-\paragraph{HAMT Surface Inside Face Relative Humidity {[}\%{]}}\label{hamt-surface-inside-face-relative-humidity-2}
-
-\paragraph{HAMT Surface Inside Face Relative Humidity {[}\%{]}}\label{hamt-surface-inside-face-relative-humidity-3}
-
-This output is the relative humidity on the internal ``surface'' of the surface expressed as a percentage.
-
-\paragraph{HAMT Surface Inside Face Vapor Pressure {[}Pa{]}}\label{hamt-surface-inside-face-vapor-pressure-pa-1}
-
-This output is the vapor pressure {[}Pa{]} on the internal ``surface'' of the surface.
-
-\paragraph{HAMT Surface Outside Face Temperature {[}C{]}}\label{hamt-surface-outside-face-temperature-c-1}
-
-This output is the temperature on the external ``surface'' of the surface.
-
-\paragraph{HAMT Surface Outside Face Relative Humidity {[}\%{]}}\label{hamt-surface-outside-face-relative-humidity-1}
-
-This output is the relative humidity on the external ``surface'' of the surface.
-
-Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
-
-Zone,Average,HAMT Surface Water Content Cell N {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Relative Humidity Cell N {[}\%{]}
-
-Detailed profile data for the variables Temperature {[}C{]}, Relative Humidity {[}\%{]} and Water Content {[}kg/kg{]} within each surface can also be reported. To calculate the heat and moisture transfer through surfaces HAMT splits up surfaces into discrete cells. Each cell is composed of a single material and has a position within the surface. HAMT automatically assigns cells to construction objects so that there are more cells closer to boundaries between materials and also at the ``surfaces'' of the surface. It is not possible for users to define their own cells.
-
-\paragraph{HAMT Surface Relative Humidity Cell \textless{}N\textgreater{} {[}\%{]}}\label{hamt-surface-relative-humidity-cell-n-1}
-
-This is the relative humidity of the cell in the surface.
-
-\paragraph{HAMT Surface Temperature Cell \textless{}N\textgreater{} {[}C{]}}\label{hamt-surface-temperature-cell-n-c-1}
-
-This is the temperature of the cell in the surface.
-
-\paragraph{HAMT Surface Water Content Cell \textless{}N\textgreater{} {[}kg/kg{]}}\label{hamt-surface-water-content-cell-n-kgkg-1}
-
-This is the relative water content of the cell in the surface.
-
-Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format.
-
-! \textless{}HAMT cells\textgreater{}, Surface Name, Construction Name, Cell Numbers
-
-! \textless{}HAMT origins\textgreater{}, Surface Name, Construction Name, Cell origins (m)
-
-The output also contains the HAMT cell origins and cell number for each construction -- surface combination. The coordinate system origin is defined as the exterior surface of the construction. Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
-
-HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell\#\textgreater{}
-
-It is better to specify the ``key'' or Surface Name in this output.
-
-So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
-
-\begin{lstlisting}
-
-Output:Variable,
-      East Wall,               !- Key Value
-      HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-      Hourly;                  !- Reporting Frequency
-\end{lstlisting}
-
-By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
-
-Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate outside convection and radiation heat transfer more precisely.
+Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of the construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate outside convection and radiation heat transfer more precisely.
 
 \paragraph{Field(s) 2-10: Layers}\label{fields-2-10-layers}
 
@@ -3810,95 +4041,27 @@ This field defines how far apart in meters the hydronic tubing or electrical res
 
 \paragraph{Field: Outside Layer}\label{field-outside-layer-1}
 
-Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of this construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Zone,Average,HAMT Surface Average Water Content Ratio {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Inside Face Temperature {[}C{]}
-
-Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
-
-Zone,Average,HAMT Surface Inside Face Vapor Pressure {[}Pa{]}
-
-Zone,Average,HAMT Surface Outside Face Temperature {[}C{]}
-
-Zone,Average,HAMT Surface Outside Face Relative Humidity {[}\%{]}
-
-Zone,Average,HAMT Surface Inside Face Relative Humidity {[}\%{]}
-
-\paragraph{HAMT Surface Average Water Content Ratio {[}kg/kg{]}}\label{hamt-surface-average-water-content-ratio-kgkg-2}
-
-This output is the summed water content {[}kg/kg{]} of all cells in a surface expressed as a fraction of the mass of the water to the material mass.
-
-\paragraph{HAMT Surface Inside Face Temperature {[}C{]}}\label{hamt-surface-inside-face-temperature-c-2}
-
-This output is the temperature {[}C{]} on the internal ``surface'' of the surface.
-
-\paragraph{HAMT Surface Inside Face Relative Humidity {[}\%{]}}\label{hamt-surface-inside-face-relative-humidity-4}
-
-\paragraph{HAMT Surface Inside Face Relative Humidity {[}\%{]}}\label{hamt-surface-inside-face-relative-humidity-5}
-
-This output is the relative humidity on the internal ``surface'' of the surface expressed as a percentage.
-
-\paragraph{HAMT Surface Inside Face Vapor Pressure {[}Pa{]}}\label{hamt-surface-inside-face-vapor-pressure-pa-2}
-
-This output is the vapor pressure {[}Pa{]} on the internal ``surface'' of the surface.
-
-\paragraph{HAMT Surface Outside Face Temperature {[}C{]}}\label{hamt-surface-outside-face-temperature-c-2}
-
-This output is the temperature on the external ``surface'' of the surface.
-
-\paragraph{HAMT Surface Outside Face Relative Humidity {[}\%{]}}\label{hamt-surface-outside-face-relative-humidity-2}
-
-This output is the relative humidity on the external ``surface'' of the surface.
-
-Zone,Average,HAMT Surface Temperature Cell N {[}C{]}
-
-Zone,Average,HAMT Surface Water Content Cell N {[}kg/kg{]}
-
-Zone,Average,HAMT Surface Relative Humidity Cell N {[}\%{]}
-
-Detailed profile data for the variables Temperature {[}C{]}, Relative Humidity {[}\%{]} and Water Content {[}kg/kg{]} within each surface can also be reported. To calculate the heat and moisture transfer through surfaces HAMT splits up surfaces into discrete cells. Each cell is composed of a single material and has a position within the surface. HAMT automatically assigns cells to construction objects so that there are more cells closer to boundaries between materials and also at the ``surfaces'' of the surface. It is not possible for users to define their own cells.
-
-\paragraph{HAMT Surface Relative Humidity Cell \textless{}N\textgreater{} {[}\%{]}}\label{hamt-surface-relative-humidity-cell-n-2}
-
-This is the relative humidity of the cell in the surface.
-
-\paragraph{HAMT Surface Temperature Cell \textless{}N\textgreater{} {[}C{]}}\label{hamt-surface-temperature-cell-n-c-2}
-
-This is the temperature of the cell in the surface.
-
-\paragraph{HAMT Surface Water Content Cell \textless{}N\textgreater{} {[}kg/kg{]}}\label{hamt-surface-water-content-cell-n-kgkg-2}
-
-This is the relative water content of the cell in the surface.
-
-Each surface is made from a particular construction. The construction-surface relationship is output by HAMT to the eplusout.eio file with the following format.
-
-! \textless{}HAMT cells\textgreater{}, Surface Name, Construction Name, Cell Numbers
-
-! \textless{}HAMT origins\textgreater{}, Surface Name, Construction Name, Cell origins (m)
-
-The output also contains the HAMT cell origins and cell number for each construction -- surface combination. The coordinate system origin is defined as the exterior surface of the construction. Users can select any one of the Temperature, Relative Humidity or Water Content variables for any cell to be reported, using the following naming scheme for the output variable.
-
-HAMT Profile Construction \textless{}Variable\textgreater{} Cell \textless{}Cell\#\textgreater{}
-
-It is better to specify the ``key'' or Surface Name in this output.
-
-So for example to output the temperature of the 10\(^{th}\) cell in a surface, eg ``East Wall'' would require the following output variable.
-
-\begin{lstlisting}
-
-Output:Variable,
-      East Wall,               !- Key Value
-      HAMT Profile Construction Temperature Cell 10,  !- Variable Name
-      Hourly;                  !- Reporting Frequency
-\end{lstlisting}
-
-By selecting a whole range of these reports and using the information in the eplusout.eio file it is possible to build up a temperature profile of the surface.
-
-Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
+Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of this construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
 
 \paragraph{Field(s) 2-10: Layers}\label{fields-2-10-layers-1}
 
 The next fields are optional and the number of them showing up in a particular Construction definition depends solely on the number of material layers present in that particular construction. The data expected is identical to the outside layer field (see previous field description). The order of the remaining layers is important and should be listed in order of occurrence from the one just inside the outside layer until the inside layer is reached. As noted above, the inside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
+
+\subsubsection{Outputs}\label{outputs-36-1}
+
+\begin{itemize}
+\item  Zone,Average,Surface Internal Source Location Temperature [C]
+\item  Zone,Average,Surface Internal User Specified Location Temperature [C]
+\end{itemize}
+
+\paragraph{Surface Internal Source Location Temperature {[}C{]}}\label{surface-internal-source-location-temperature-c}
+
+This output is the temperature within the surface at the location of the source/sink.
+
+\paragraph{Surface Internal User Specified Location Temperature {[}C{]}}\label{surface-internal-user—specified-location-temperature-c}
+
+This output is the temperature within the surface at the location requested by the user.
+
 
 \subsection{Composite Wall Constructions}\label{composite-wall-constructions}
 
@@ -4137,7 +4300,7 @@ WindowThermalModel:Params,
   13.238;                                             !- vacuum pressure limit
 \end{lstlisting}
 
-\subsection{Matix:TwoDimension}\label{matixtwodimension}
+\subsection{Matrix:TwoDimension}\label{matrixtwodimension}
 
 This is input object is only used with Construction:ComplexFenestrationState object to enter a two-dimensional matrix of values.
 
@@ -4192,7 +4355,7 @@ Matrix:TwoDimension,       !- matrix for basis definition
 
 \subsection{Construction:WindowEquivalentLayer}\label{constructionwindowequivalentlayer}
 
-This object defines the construction for equivalent layer window (ASHWAT) model. This window can model various mix of glazing and shading layers combination. Shadings are defined as an integral part of the construction. The construction is defined by listing the layers name starting with outside layer and work your way to the inside Layer. Up to six solid layers (glazing and shade) and up to five gaps, i.e., a total of up to 11 layers maximum are allowed in equivalent layer window object. The solid layer types allowed are: Glazing, Insect Screen, Roller Blinds, Venetian Blind, and Drape Fabrics. This window model requires optical data of the individual glazing and shading layers to calculate the effective optical properties of the composite fenestration construction. Venetian blinds in equivalent layer window model can be in a fixed slat angle or has the option to control the slat angle in order to maximize visibility, or maximize solar gains. An equivalent-layer concept can simulate wide range of multiple glazing and shading layers combination and provides unlimited flexibility to combine different types of shading layers in a fenestration. For the gap layer object any one of the five different Gas types can be specified: AIR, ARGON, XENON, KRYPTON, or CUSTOM.This window object is referenced by fenestration surfaces. For details of the model description refer to Equivalent Layer Fenestration Model section in Engineering Reference. The various layer objects that can be referenced in Equivalent Layer window model are:
+This object defines the construction for equivalent layer window (ASHWAT) model. This window can model various mix of glazing and shading layers combination. Shadings are defined as an integral part of the construction. The construction is defined by listing the layers name starting with outside layer and work your way to the inside Layer. Up to six solid layers (glazing and shade) and up to five gaps, i.e., a total of up to 11 layers maximum are allowed in equivalent layer window object. The solid layer types allowed are: Glazing, Insect Screen, Roller Blinds, Venetian Blind, and Drape Fabrics. This window model requires optical data of the individual glazing and shading layers to calculate the effective optical properties of the composite fenestration construction. Venetian blinds in equivalent layer window model can be in a fixed slat angle or has the option to control the slat angle in order to maximize visibility, or maximize solar gains. An equivalent-layer concept can simulate wide range of multiple glazing and shading layers combination and provides unlimited flexibility to combine different types of shading layers in a fenestration. The equivalent-layer window model does not support daylighting control. For the gap layer object any one of the five different Gas types can be specified: AIR, ARGON, XENON, KRYPTON, or CUSTOM. This window object is referenced by fenestration surfaces. For details of the model description refer to Equivalent Layer Fenestration Model section in Engineering Reference. The various layer objects that can be referenced in Equivalent Layer window model are:
 
 \begin{lstlisting}
 WindowMaterial:Glass:EquivalentLayer

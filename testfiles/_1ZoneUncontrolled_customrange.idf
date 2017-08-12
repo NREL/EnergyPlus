@@ -89,7 +89,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,4;
 
@@ -490,6 +490,7 @@
 
   OtherEquipment,
     Test 352a,               !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -502,6 +503,7 @@
 
   OtherEquipment,
     Test 352 minus,          !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

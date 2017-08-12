@@ -75,7 +75,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -2068,6 +2068,7 @@
 
   OtherEquipment,
     BASE-1 OthEq 1,          !- Name
+    None,                    !- Fuel Type
     BASE-1,                  !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -2406,103 +2407,83 @@
 
   Branch,
     Air Loop 1 Main Branch,  !- Name
-    0.71,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Air Loop 1 Inlet Node,   !- Component 1 Inlet Node Name
     Mixed Air 1 Node,        !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 1,!- Component 2 Name
     Mixed Air 1 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 1,     !- Component 3 Name
     DX Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 1 Air Outlet Node,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan 1,            !- Component 4 Name
     Main Heating Coil 1 Air Outlet Node,  !- Component 4 Inlet Node Name
-    Air Loop 1 Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    Air Loop 1 Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     Air Loop 2 Main Branch,  !- Name
-    0.67,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 2,                !- Component 1 Name
     Air Loop 2 Inlet Node,   !- Component 1 Inlet Node Name
     Mixed Air 2 Node,        !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 2,!- Component 2 Name
     Mixed Air 2 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 2 Outlet Node,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 2,     !- Component 3 Name
     DX Cooling Coil 2 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 2 Air Outlet Node,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan 2,            !- Component 4 Name
     Main Heating Coil 2 Air Outlet Node,  !- Component 4 Inlet Node Name
-    Air Loop 2 Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    Air Loop 2 Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     Air Loop 3 Main Branch,  !- Name
-    0.79,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 3,                !- Component 1 Name
     Air Loop 3 Inlet Node,   !- Component 1 Inlet Node Name
     Mixed Air 3 Node,        !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 3,!- Component 2 Name
     Mixed Air 3 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 3 Outlet Node,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 3,     !- Component 3 Name
     DX Cooling Coil 3 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 3 Air Outlet Node,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan 3,            !- Component 4 Name
     Main Heating Coil 3 Air Outlet Node,  !- Component 4 Inlet Node Name
-    Air Loop 3 Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    Air Loop 3 Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     Air Loop 4 Main Branch,  !- Name
-    0.75,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 4,                !- Component 1 Name
     Air Loop 4 Inlet Node,   !- Component 1 Inlet Node Name
     Mixed Air 4 Node,        !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 4,!- Component 2 Name
     Mixed Air 4 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 4 Outlet Node,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 4,     !- Component 3 Name
     DX Cooling Coil 4 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 4 Air Outlet Node,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan 4,            !- Component 4 Name
     Main Heating Coil 4 Air Outlet Node,  !- Component 4 Inlet Node Name
-    Air Loop 4 Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    Air Loop 4 Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Air Loop 1,              !- Name
@@ -2894,37 +2875,41 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 4;              !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 1,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 1 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 1 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 2,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 2 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 2 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 2 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 3,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 3 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 3 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 3 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 4,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 4 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 4 Air Outlet Node,  !- Air Outlet Node Name

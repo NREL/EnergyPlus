@@ -69,7 +69,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     NONE,                    !- Name
@@ -549,7 +549,6 @@
     VENT,                    !- Name
     MultizoneWithoutDistribution,  !- AirflowNetwork Control
     INPUT,                   !- Wind Pressure Coefficient Type
-    CPNAME,                  !- AirflowNetwork Wind Pressure Coefficient Array Name
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}

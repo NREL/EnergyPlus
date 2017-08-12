@@ -78,7 +78,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  VERSION,8.4;
+  VERSION,8.6;
 
 !
 !- Run Controls sections
@@ -2130,7 +2130,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ER_Exam1_Mult4_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ER_Exam1_Mult4_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -2531,7 +2533,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ER_Exam2_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ER_Exam2_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -2932,7 +2936,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ER_Exam3_Mult4_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ER_Exam3_Mult4_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -3333,7 +3339,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ER_Exam4_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ER_Exam4_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -3734,7 +3742,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ER_Exam5_Mult4_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ER_Exam5_Mult4_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -4151,7 +4161,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Office1_Mult4_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Office1_Mult4_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -4601,7 +4613,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Lobby_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Lobby_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -4935,7 +4949,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Corridor_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Corridor_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -5369,7 +5385,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ER_NurseStat_Flr_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ER_NurseStat_Flr_1 VAV Box Reheat Coil,  !- Name
@@ -5715,7 +5733,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     OR1_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     OR1_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -6116,7 +6136,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     OR2_Mult5_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     OR2_Mult5_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -6517,7 +6539,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     OR3_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     OR3_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -6918,7 +6942,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     OR4_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     OR4_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -7335,7 +7361,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     IC_PatRoom1_Mult5_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     IC_PatRoom1_Mult5_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -7713,7 +7741,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     IC_PatRoom2_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     IC_PatRoom2_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -8075,7 +8105,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     IC_PatRoom3_Mult6_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     IC_PatRoom3_Mult6_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -8437,7 +8469,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ICU_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ICU_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -8783,7 +8817,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ICU_NurseSat_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ICU_NurseSat_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -9101,7 +9137,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Corridor_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Corridor_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -9535,7 +9573,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     OR_NurseSat_Flr_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     OR_NurseSat_Flr_2 VAV Box Reheat Coil,  !- Name
@@ -9897,7 +9937,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom1_Mult10_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom1_Mult10_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -10330,7 +10372,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom2_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom2_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -10747,7 +10791,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom3_Mult10_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom3_Mult10_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -11180,7 +11226,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom4_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom4_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -11597,7 +11645,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom5_Mult10_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom5_Mult10_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -11998,7 +12048,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PhysTherapy_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PhysTherapy_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -12431,7 +12483,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom6_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom6_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -12848,7 +12902,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom7_Mult10_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom7_Mult10_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -13281,7 +13337,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom8_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom8_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -13790,7 +13848,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     NurseSat_Lobby_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     NurseSat_Lobby_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -14172,7 +14232,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Lab_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Lab_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -14701,7 +14763,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Corridor_SE_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Corridor_SE_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -15175,7 +15239,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Corridor_NW_Flr_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Corridor_NW_Flr_3 VAV Box Reheat Coil,  !- Name
@@ -15537,7 +15603,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom1_Mult10_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom1_Mult10_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -15970,7 +16038,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom2_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom2_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -16387,7 +16457,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom3_Mult10_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom3_Mult10_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -16820,7 +16892,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom4_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom4_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -17237,7 +17311,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom5_Mult10_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom5_Mult10_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -17638,7 +17714,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Radiology_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Radiology_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -18071,7 +18149,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom6_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom6_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -18488,7 +18568,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom7_Mult10_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom7_Mult10_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -18921,7 +19003,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     PatRoom8_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     PatRoom8_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -19430,7 +19514,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     NurseSat_Lobby_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     NurseSat_Lobby_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -19812,7 +19898,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Lab_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Lab_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -20341,7 +20429,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Corridor_SE_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Corridor_SE_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -20815,7 +20905,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Corridor_NW_Flr_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Corridor_NW_Flr_4 VAV Box Reheat Coil,  !- Name
@@ -21194,7 +21286,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Dining_Flr_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Dining_Flr_5 VAV Box Reheat Coil,  !- Name
@@ -21556,7 +21650,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     NurseSat_Flr_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     NurseSat_Flr_5 VAV Box Reheat Coil,  !- Name
@@ -21976,7 +22072,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Kitchen_Flr_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Kitchen_Flr_5 VAV Box Reheat Coil,  !- Name
@@ -22659,7 +22757,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Office1_Flr_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Office1_Flr_5 VAV Box Reheat Coil,  !- Name
@@ -23021,7 +23121,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Office2_Mult5_Flr_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Office2_Mult5_Flr_5 VAV Box Reheat Coil,  !- Name
@@ -23399,7 +23501,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Office3_Flr_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Office3_Flr_5 VAV Box Reheat Coil,  !- Name
@@ -23761,7 +23865,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Office4_Mult6_Flr_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Office4_Mult6_Flr_5 VAV Box Reheat Coil,  !- Name
@@ -24151,7 +24257,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Corridor_Flr_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    autosize,                !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    autosize;                !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     Corridor_Flr_5 VAV Box Reheat Coil,  !- Name
@@ -24291,6 +24399,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -24299,28 +24408,23 @@
 
   Branch,
     VAV_1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     VAV_1_OA,                !- Component 1 Name
     VAV_1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     VAV_1_OA-VAV_1_CoolCNode,!- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water,      !- Component 2 Object Type
     VAV_1_CoolC,             !- Component 2 Name
     VAV_1_OA-VAV_1_CoolCNode,!- Component 2 Inlet Node Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Water,      !- Component 3 Object Type
     VAV_1_HeatC,             !- Component 3 Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_1_HeatC-VAV_1 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     VAV_1 Fan,               !- Component 4 Name
     VAV_1_HeatC-VAV_1 FanNode,  !- Component 4 Inlet Node Name
-    VAV_1 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    VAV_1 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     VAV_1_OA_Controllers,    !- Name
@@ -24613,6 +24717,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -24621,28 +24726,23 @@
 
   Branch,
     VAV_2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     VAV_2_OA,                !- Component 1 Name
     VAV_2 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     VAV_2_OA-VAV_2_CoolCNode,!- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water,      !- Component 2 Object Type
     VAV_2_CoolC,             !- Component 2 Name
     VAV_2_OA-VAV_2_CoolCNode,!- Component 2 Inlet Node Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Water,      !- Component 3 Object Type
     VAV_2_HeatC,             !- Component 3 Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_2_HeatC-VAV_2 FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     VAV_2 Fan,               !- Component 4 Name
     VAV_2_HeatC-VAV_2 FanNode,  !- Component 4 Inlet Node Name
-    VAV_2 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    VAV_2 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     VAV_2_OA_Controllers,    !- Name
@@ -24929,38 +25029,34 @@
 
   Branch,
     SHWSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SHWSys1 Pump,            !- Component 1 Name
     SHWSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SHWSys1 Water Heater,    !- Component 1 Name
     SHWSys1 Pump-SHWSys1 Water HeaterNode,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SHWSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     SHWSys1 Pump,            !- Name
     SHWSys1 Supply Inlet Node,  !- Inlet Node Name
     SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
   WaterHeater:Mixed,
@@ -25020,13 +25116,11 @@
 
   Branch,
     SHWSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     SHWSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SHWSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -25035,13 +25129,11 @@
 
   Branch,
     SHWSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Outlet Pipe,  !- Component 1 Name
     SHWSys1 Supply Mixer-SHWSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SHWSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Supply Outlet Pipe,  !- Name
@@ -25163,13 +25255,11 @@
 
   Branch,
     SHWSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Inlet Pipe,  !- Component 1 Name
     SHWSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Inlet Pipe,  !- Name
@@ -25178,313 +25268,251 @@
 
   Branch,
     SHWSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ER_Exam1_Mult4_Flr_1 sub cat,  !- Component 1 Name
     ER_Exam1_Mult4_Flr_1 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam1_Mult4_Flr_1 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam1_Mult4_Flr_1 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ER_Exam2_Flr_1 sub cat,  !- Component 1 Name
     ER_Exam2_Flr_1 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam2_Flr_1 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam2_Flr_1 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ER_Exam3_Mult4_Flr_1 sub cat,  !- Component 1 Name
     ER_Exam3_Mult4_Flr_1 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam3_Mult4_Flr_1 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam3_Mult4_Flr_1 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ER_Exam4_Flr_1 sub cat,  !- Component 1 Name
     ER_Exam4_Flr_1 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam4_Flr_1 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam4_Flr_1 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ER_Exam5_Mult4_Flr_1 sub cat,  !- Component 1 Name
     ER_Exam5_Mult4_Flr_1 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam5_Mult4_Flr_1 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam5_Mult4_Flr_1 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     OR1_Flr_2 sub cat,       !- Component 1 Name
     OR1_Flr_2 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    OR1_Flr_2 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR1_Flr_2 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     OR2_Mult5_Flr_2 sub cat, !- Component 1 Name
     OR2_Mult5_Flr_2 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    OR2_Mult5_Flr_2 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR2_Mult5_Flr_2 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     OR3_Flr_2 sub cat,       !- Component 1 Name
     OR3_Flr_2 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    OR3_Flr_2 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR3_Flr_2 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     OR4_Flr_2 sub cat,       !- Component 1 Name
     OR4_Flr_2 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    OR4_Flr_2 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR4_Flr_2 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom1_Mult10_Flr_3 sub cat,  !- Component 1 Name
     PatRoom1_Mult10_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom1_Mult10_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom1_Mult10_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom2_Flr_3 sub cat,  !- Component 1 Name
     PatRoom2_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom2_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom2_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom3_Mult10_Flr_3 sub cat,  !- Component 1 Name
     PatRoom3_Mult10_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom3_Mult10_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom3_Mult10_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom4_Flr_3 sub cat,  !- Component 1 Name
     PatRoom4_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom4_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom4_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom5_Mult10_Flr_3 sub cat,  !- Component 1 Name
     PatRoom5_Mult10_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom5_Mult10_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom5_Mult10_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PhysTherapy_Flr_3 sub cat,  !- Component 1 Name
     PhysTherapy_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PhysTherapy_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PhysTherapy_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 16,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom6_Flr_3 sub cat,  !- Component 1 Name
     PatRoom6_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom6_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom6_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 17,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom7_Mult10_Flr_3 sub cat,  !- Component 1 Name
     PatRoom7_Mult10_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom7_Mult10_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom7_Mult10_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 18,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom8_Flr_3 sub cat,  !- Component 1 Name
     PatRoom8_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom8_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom8_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 19,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Lab_Flr_3 sub cat,       !- Component 1 Name
     Lab_Flr_3 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    Lab_Flr_3 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Lab_Flr_3 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 20,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom1_Mult10_Flr_4 sub cat,  !- Component 1 Name
     PatRoom1_Mult10_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom1_Mult10_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom1_Mult10_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 21,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom2_Flr_4 sub cat,  !- Component 1 Name
     PatRoom2_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom2_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom2_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 22,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom3_Mult10_Flr_4 sub cat,  !- Component 1 Name
     PatRoom3_Mult10_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom3_Mult10_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom3_Mult10_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 23,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom4_Flr_4 sub cat,  !- Component 1 Name
     PatRoom4_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom4_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom4_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 24,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom5_Mult10_Flr_4 sub cat,  !- Component 1 Name
     PatRoom5_Mult10_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom5_Mult10_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom5_Mult10_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 25,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Radiology_Flr_4 sub cat, !- Component 1 Name
     Radiology_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    Radiology_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Radiology_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 26,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom6_Flr_4 sub cat,  !- Component 1 Name
     PatRoom6_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom6_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom6_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 27,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom7_Mult10_Flr_4 sub cat,  !- Component 1 Name
     PatRoom7_Mult10_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom7_Mult10_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom7_Mult10_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 28,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     PatRoom8_Flr_4 sub cat,  !- Component 1 Name
     PatRoom8_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom8_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom8_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 29,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Lab_Flr_4 sub cat,       !- Component 1 Name
     Lab_Flr_4 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    Lab_Flr_4 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Lab_Flr_4 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 30,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     Kitchen_Flr_5 sub cat,   !- Component 1 Name
     Kitchen_Flr_5 sub cat Water Inlet Node,  !- Component 1 Inlet Node Name
-    Kitchen_Flr_5 sub cat Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Kitchen_Flr_5 sub cat Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Bypass Pipe,  !- Component 1 Name
     SHWSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SHWSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Bypass Pipe,  !- Name
@@ -25493,13 +25521,11 @@
 
   Branch,
     SHWSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Outlet Pipe,  !- Component 1 Name
     SHWSys1 Demand Mixer-SHWSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SHWSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Outlet Pipe,  !- Name
@@ -25586,38 +25612,34 @@
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
     HeatSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
     HeatSys1 Pump-HeatSys1 BoilerNode,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
     HeatSys1 Supply Inlet Node,  !- Inlet Node Name
     HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
   Output:PreprocessorMessage,
@@ -25660,13 +25682,11 @@
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -25675,13 +25695,11 @@
 
   Branch,
     HeatSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
     HeatSys1 Supply Mixer-HeatSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Outlet Pipe,  !- Name
@@ -25881,13 +25899,11 @@
 
   Branch,
     HeatSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Inlet Pipe,  !- Name
@@ -25896,573 +25912,459 @@
 
   Branch,
     HeatSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ER_Exam1_Mult4_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     ER_Exam1_Mult4_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam1_Mult4_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam1_Mult4_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ER_Exam2_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     ER_Exam2_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam2_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam2_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ER_Exam3_Mult4_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     ER_Exam3_Mult4_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam3_Mult4_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam3_Mult4_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ER_Exam4_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     ER_Exam4_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam4_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam4_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ER_Exam5_Mult4_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     ER_Exam5_Mult4_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ER_Exam5_Mult4_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_Exam5_Mult4_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Office1_Mult4_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     Office1_Mult4_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Office1_Mult4_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Office1_Mult4_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Lobby_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     Lobby_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Lobby_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Lobby_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corridor_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     Corridor_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ER_NurseStat_Flr_1 VAV Box Reheat Coil,  !- Component 1 Name
     ER_NurseStat_Flr_1 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ER_NurseStat_Flr_1 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ER_NurseStat_Flr_1 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     OR1_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     OR1_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    OR1_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR1_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     OR2_Mult5_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     OR2_Mult5_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    OR2_Mult5_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR2_Mult5_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     OR3_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     OR3_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    OR3_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR3_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     OR4_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     OR4_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    OR4_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR4_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     IC_PatRoom1_Mult5_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     IC_PatRoom1_Mult5_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    IC_PatRoom1_Mult5_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    IC_PatRoom1_Mult5_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     IC_PatRoom2_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     IC_PatRoom2_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    IC_PatRoom2_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    IC_PatRoom2_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 16,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     IC_PatRoom3_Mult6_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     IC_PatRoom3_Mult6_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    IC_PatRoom3_Mult6_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    IC_PatRoom3_Mult6_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 17,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ICU_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     ICU_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ICU_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ICU_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 18,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ICU_NurseSat_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     ICU_NurseSat_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ICU_NurseSat_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ICU_NurseSat_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 19,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corridor_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     Corridor_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 20,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     OR_NurseSat_Flr_2 VAV Box Reheat Coil,  !- Component 1 Name
     OR_NurseSat_Flr_2 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    OR_NurseSat_Flr_2 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    OR_NurseSat_Flr_2 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 21,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom1_Mult10_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom1_Mult10_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom1_Mult10_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom1_Mult10_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 22,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom2_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom2_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom2_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom2_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 23,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom3_Mult10_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom3_Mult10_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom3_Mult10_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom3_Mult10_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 24,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom4_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom4_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom4_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom4_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 25,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom5_Mult10_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom5_Mult10_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom5_Mult10_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom5_Mult10_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 26,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PhysTherapy_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PhysTherapy_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PhysTherapy_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PhysTherapy_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 27,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom6_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom6_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom6_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom6_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 28,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom7_Mult10_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom7_Mult10_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom7_Mult10_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom7_Mult10_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 29,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom8_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom8_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom8_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom8_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 30,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     NurseSat_Lobby_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     NurseSat_Lobby_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    NurseSat_Lobby_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    NurseSat_Lobby_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 31,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Lab_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     Lab_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Lab_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Lab_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 32,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corridor_SE_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     Corridor_SE_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_SE_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_SE_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 33,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corridor_NW_Flr_3 VAV Box Reheat Coil,  !- Component 1 Name
     Corridor_NW_Flr_3 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_NW_Flr_3 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_NW_Flr_3 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 34,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom1_Mult10_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom1_Mult10_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom1_Mult10_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom1_Mult10_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 35,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom2_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom2_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom2_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom2_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 36,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom3_Mult10_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom3_Mult10_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom3_Mult10_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom3_Mult10_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 37,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom4_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom4_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom4_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom4_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 38,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom5_Mult10_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom5_Mult10_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom5_Mult10_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom5_Mult10_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 39,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Radiology_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     Radiology_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Radiology_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Radiology_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 40,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom6_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom6_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom6_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom6_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 41,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom7_Mult10_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom7_Mult10_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom7_Mult10_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom7_Mult10_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 42,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     PatRoom8_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     PatRoom8_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    PatRoom8_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PatRoom8_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 43,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     NurseSat_Lobby_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     NurseSat_Lobby_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    NurseSat_Lobby_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    NurseSat_Lobby_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 44,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Lab_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     Lab_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Lab_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Lab_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 45,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corridor_SE_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     Corridor_SE_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_SE_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_SE_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 46,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corridor_NW_Flr_4 VAV Box Reheat Coil,  !- Component 1 Name
     Corridor_NW_Flr_4 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_NW_Flr_4 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_NW_Flr_4 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 47,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Dining_Flr_5 VAV Box Reheat Coil,  !- Component 1 Name
     Dining_Flr_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Dining_Flr_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Dining_Flr_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 48,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     NurseSat_Flr_5 VAV Box Reheat Coil,  !- Component 1 Name
     NurseSat_Flr_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    NurseSat_Flr_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    NurseSat_Flr_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 49,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Kitchen_Flr_5 VAV Box Reheat Coil,  !- Component 1 Name
     Kitchen_Flr_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Kitchen_Flr_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Kitchen_Flr_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 50,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Office1_Flr_5 VAV Box Reheat Coil,  !- Component 1 Name
     Office1_Flr_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Office1_Flr_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Office1_Flr_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 51,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Office2_Mult5_Flr_5 VAV Box Reheat Coil,  !- Component 1 Name
     Office2_Mult5_Flr_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Office2_Mult5_Flr_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Office2_Mult5_Flr_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 52,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Office3_Flr_5 VAV Box Reheat Coil,  !- Component 1 Name
     Office3_Flr_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Office3_Flr_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Office3_Flr_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 53,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Office4_Mult6_Flr_5 VAV Box Reheat Coil,  !- Component 1 Name
     Office4_Mult6_Flr_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Office4_Mult6_Flr_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Office4_Mult6_Flr_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 54,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Corridor_Flr_5 VAV Box Reheat Coil,  !- Component 1 Name
     Corridor_Flr_5 VAV Box Reheat CoilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    Corridor_Flr_5 VAV Box Reheat CoilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Corridor_Flr_5 VAV Box Reheat CoilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 55,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     VAV_1_HeatC,             !- Component 1 Name
     VAV_1_HeatCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    VAV_1_HeatCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV_1_HeatCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 56,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     VAV_2_HeatC,             !- Component 1 Name
     VAV_2_HeatCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    VAV_2_HeatCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV_2_HeatCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
     HeatSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Bypass Pipe,  !- Name
@@ -26471,13 +26373,11 @@
 
   Branch,
     HeatSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Mixer-HeatSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Outlet Pipe,  !- Name
@@ -26564,38 +26464,34 @@
 
   Branch,
     CoolSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CoolSys1 Pump,           !- Component 1 Name
     CoolSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     CoolSys1 Chiller,        !- Component 1 Name
     CoolSys1 Pump-CoolSys1 ChillerNode,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CoolSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     CoolSys1 Pump,           !- Name
     CoolSys1 Supply Inlet Node,  !- Inlet Node Name
     CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
   Chiller:Electric:EIR,
@@ -26668,13 +26564,11 @@
 
   Branch,
     CoolSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     CoolSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    CoolSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -26683,13 +26577,11 @@
 
   Branch,
     CoolSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Supply Outlet Pipe,  !- Component 1 Name
     CoolSys1 Supply Mixer-CoolSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Supply Outlet Pipe,  !- Name
@@ -26727,13 +26619,11 @@
 
   Branch,
     CoolSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Inlet Pipe,  !- Component 1 Name
     CoolSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Inlet Pipe,  !- Name
@@ -26742,33 +26632,27 @@
 
   Branch,
     CoolSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     VAV_1_CoolC,             !- Component 1 Name
     VAV_1_CoolCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    VAV_1_CoolCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV_1_CoolCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     VAV_2_CoolC,             !- Component 1 Name
     VAV_2_CoolCDemand Inlet Node,  !- Component 1 Inlet Node Name
-    VAV_2_CoolCDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV_2_CoolCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Bypass Pipe,  !- Component 1 Name
     CoolSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    CoolSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Bypass Pipe,  !- Name
@@ -26777,13 +26661,11 @@
 
   Branch,
     CoolSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CoolSys1 Demand Outlet Pipe,  !- Component 1 Name
     CoolSys1 Demand Mixer-CoolSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    CoolSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CoolSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Outlet Pipe,  !- Name
@@ -26873,31 +26755,27 @@
 
   Branch,
     TowerWaterSys Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     TowerWaterSys Pump,      !- Component 1 Name
     TowerWaterSys Supply Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     TowerWaterSys Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     TowerWaterSys CoolTower, !- Component 1 Name
     TowerWaterSys Pump-TowerWaterSys CoolTowerNode,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    TowerWaterSys Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:ConstantSpeed,
     TowerWaterSys Pump,      !- Name
     TowerWaterSys Supply Inlet Node,  !- Inlet Node Name
     TowerWaterSys Pump-TowerWaterSys CoolTowerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent;            !- Pump Control Type
@@ -26922,13 +26800,11 @@
 
   Branch,
     TowerWaterSys Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Supply Equipment Bypass Pipe,  !- Component 1 Name
     TowerWaterSys Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    TowerWaterSys Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Supply Equipment Bypass Pipe,  !- Name
@@ -26937,13 +26813,11 @@
 
   Branch,
     TowerWaterSys Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Supply Outlet Pipe,  !- Component 1 Name
     TowerWaterSys Supply Mixer-TowerWaterSys Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    TowerWaterSys Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    TowerWaterSys Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Supply Outlet Pipe,  !- Name
@@ -26978,13 +26852,11 @@
 
   Branch,
     TowerWaterSys Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Inlet Pipe,  !- Component 1 Name
     TowerWaterSys Demand Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Inlet Pipe-TowerWaterSys Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    TowerWaterSys Demand Inlet Pipe-TowerWaterSys Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Inlet Pipe,  !- Name
@@ -26993,23 +26865,19 @@
 
   Branch,
     TowerWaterSys Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     CoolSys1 Chiller,        !- Component 1 Name
     CoolSys1 Chiller Water Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Chiller Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CoolSys1 Chiller Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     TowerWaterSys Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Bypass Pipe,  !- Component 1 Name
     TowerWaterSys Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    TowerWaterSys Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Bypass Pipe,  !- Name
@@ -27018,13 +26886,11 @@
 
   Branch,
     TowerWaterSys Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     TowerWaterSys Demand Outlet Pipe,  !- Component 1 Name
     TowerWaterSys Demand Mixer-TowerWaterSys Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    TowerWaterSys Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    TowerWaterSys Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     TowerWaterSys Demand Outlet Pipe,  !- Name

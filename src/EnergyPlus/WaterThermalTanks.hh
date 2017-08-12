@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,33 +43,23 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
+
 
 #ifndef WaterThermalTanks_hh_INCLUDED
 #define WaterThermalTanks_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1D.fwd.hh>
+#include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <DataGlobals.hh>
-#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
 namespace WaterThermalTanks {
 
 	// Using/Aliasing
-	using VariableSpeedCoils::MaxSpedLevels;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -122,6 +109,7 @@ namespace WaterThermalTanks {
 	extern int const COIL_DX_MULTISPEED; // reclaim heating source is DX multispeed coil
 	extern int const COIL_DX_MULTIMODE; // reclaim heating source is DX multimode coil
 	extern int const CONDENSER_REFRIGERATION; // reclaim heating source is detailed refrigeration system condenser
+	extern int const COIL_DX_VARIABLE_COOLING; // reclaim heating source is Variable Speed DX cooling coil
 
 	extern int const UseSide; // Indicates Use side of water heater
 	extern int const SourceSide; // Indicates Source side of water heater
@@ -175,8 +163,7 @@ namespace WaterThermalTanks {
 
 	// Types
 
-	struct StratifiedNodeData
-	{
+	struct StratifiedNodeData {
 		// Members
 		Real64 Mass; // All nodes have the same mass (kg)
 		Real64 OnCycLossCoeff;
@@ -229,13 +216,12 @@ namespace WaterThermalTanks {
 			MaxCapacity( 0.0 ),
 			Inlets( 0 ),
 			Outlets( 0 ),
-			HPWHWrappedCondenserHeatingFrac(0.0)
-		{}
+			HPWHWrappedCondenserHeatingFrac( 0.0 ) {}
+
 
 	};
 
-	struct WaterHeaterSizingData
-	{
+	struct WaterHeaterSizingData {
 		// Members
 		// input data
 		int DesignMode; // what sizing method to use
@@ -279,13 +265,12 @@ namespace WaterThermalTanks {
 			PeakDemand( 0.0 ),
 			PeakNumberOfPeople( 0.0 ),
 			TotalFloorArea( 0.0 ),
-			TotalSolarCollectorArea( 0.0 )
-		{}
+			TotalSolarCollectorArea( 0.0 ) {}
+
 
 	};
 
-	struct WaterThermalTankData
-	{
+	struct WaterThermalTankData {
 		// Members
 		std::string Name; // Name of water heater
 		std::string Type; // Type of water heater (MIXED or STRATIFIED)
@@ -647,16 +632,14 @@ namespace WaterThermalTanks {
 			HeatPumpNum( 0 ),
 			DesuperheaterNum( 0 ),
 			ShowSetPointWarning( true ),
-			MaxCycleErrorIndex( 0 )
-		{}
+			MaxCycleErrorIndex( 0 ) {}
 
 		Real64
 		getDeadBandTemp();
 
 	};
 
-	struct HeatPumpWaterHeaterData
-	{
+	struct HeatPumpWaterHeaterData {
 		// Members
 		std::string Name; // Name of heat pump water heater
 		std::string Type; // Type of water heater (HEAT PUMP:WATER HEATER)
@@ -769,118 +752,15 @@ namespace WaterThermalTanks {
 		Array1D< Real64 > HPWHWaterMassFlowRate; // water mass flow rate during heating operation
 		Array1D< Real64 > MSAirSpeedRatio; // air speed ratio in heating mode
 		Array1D< Real64 > MSWaterSpeedRatio; // water speed ratio in heating mode
+		bool bIsIHP; //whether the HP is a part of Integrated Heat Pump
 		//end of variables for variable-speed HPWH
 
 		// Default Constructor
-		HeatPumpWaterHeaterData() :
-			TypeNum( 0 ),
-			TankTypeNum( 0 ),
-			StandAlone( false ),
-			AvailSchedPtr( 0 ),
-			SetPointTempSchedule( 0 ),
-			DeadBandTempDiff( 0.0 ),
-			Capacity( 0.0 ),
-			BackupElementCapacity( 0.0 ),
-			BackupElementEfficiency( 0.0 ),
-			WHOnCycParaLoad( 0.0 ),
-			WHOffCycParaLoad( 0.0 ),
-			WHOnCycParaFracToTank( 0.0 ),
-			WHOffCycParaFracToTank( 0.0 ),
-			WHPLFCurve( 0 ),
-			OperatingAirFlowRate( 0.0 ),
-			OperatingWaterFlowRate( 0.0 ),
-			COP( 0.0 ),
-			SHR( 0.0 ),
-			RatedInletDBTemp( 0.0 ),
-			RatedInletWBTemp( 0.0 ),
-			RatedInletWaterTemp( 0.0 ),
-			FoundTank( false ),
-			HeatPumpAirInletNode( 0 ),
-			HeatPumpAirOutletNode( 0 ),
-			OutsideAirNode( 0 ),
-			ExhaustAirNode( 0 ),
-			CondWaterInletNode( 0 ),
-			CondWaterOutletNode( 0 ),
-			WHUseInletNode( 0 ),
-			WHUseOutletNode( 0 ),
-			WHUseSidePlantLoopNum( 0 ),
-			DXCoilNum( 0 ),
-			DXCoilTypeNum( 0 ),
-			DXCoilAirInletNode( 0 ),
-			DXCoilPLFFPLR( 0 ),
-			FanType_Num( 0 ),
-			FanNum( 0 ),
-			FanPlacement( 0 ),
-			FanOutletNode( 0 ),
-			WaterHeaterTankNum( 0 ),
-			OutletAirSplitterSchPtr( 0 ),
-			InletAirMixerSchPtr( 0 ),
-			Mode( 0 ),
-			SaveMode( 0 ),
-			SaveWHMode( 0 ),
-			Power( 0.0 ),
-			Energy( 0.0 ),
-			HeatingPLR( 0.0 ),
-			SetPointTemp( 0.0 ),
-			MinAirTempForHPOperation( 5.0 ),
-			MaxAirTempForHPOperation( 48.8888888889 ),
-			InletAirMixerNode( 0 ),
-			OutletAirSplitterNode( 0 ),
-			SourceMassFlowRate( 0.0 ),
-			InletAirConfiguration( 0 ),
-			AmbientTempSchedule( 0 ),
-			AmbientRHSchedule( 0 ),
-			AmbientTempZone( 0 ),
-			CrankcaseTempIndicator( 0 ),
-			CrankcaseTempSchedule( 0 ),
-			CrankcaseTempZone( 0 ),
-			OffCycParaLoad( 0.0 ),
-			OnCycParaLoad( 0.0 ),
-			ParasiticTempIndicator( 0 ),
-			OffCycParaFuelRate( 0.0 ),
-			OnCycParaFuelRate( 0.0 ),
-			OffCycParaFuelEnergy( 0.0 ),
-			OnCycParaFuelEnergy( 0.0 ),
-			AirFlowRateAutoSized( false ),
-			WaterFlowRateAutoSized( false ),
-			HPSetPointError( 0 ),
-			HPSetPointErrIndex1( 0 ),
-			IterLimitErrIndex1( 0 ),
-			IterLimitExceededNum1( 0 ),
-			RegulaFalsiFailedIndex1( 0 ),
-			RegulaFalsiFailedNum1( 0 ),
-			IterLimitErrIndex2( 0 ),
-			IterLimitExceededNum2( 0 ),
-			RegulaFalsiFailedIndex2( 0 ),
-			RegulaFalsiFailedNum2( 0 ),
-			FirstTimeThroughFlag( true ),
-			ShowSetPointWarning( true ),
-			HPWaterHeaterSensibleCapacity( 0.0 ),
-			HPWaterHeaterLatentCapacity( 0.0 ),
-			WrappedCondenserBottomLocation( 0.0 ),
-			WrappedCondenserTopLocation( 0.0 ),
-			ControlSensor1Height( -1.0 ),
-			ControlSensor1Node( 1 ),
-			ControlSensor1Weight( 1.0 ),
-			ControlSensor2Height( -1.0 ),
-			ControlSensor2Node( 2 ),
-			ControlSensor2Weight( 0.0 ),
-			ControlTempAvg( 0.0 ),
-			ControlTempFinal( 0.0 ),
-			AllowHeatingElementAndHeatPumpToRunAtSameTime( true ),
-			NumofSpeed( 0 ),
-			HPWHAirVolFlowRate( MaxSpedLevels, 0.0 ),
-			HPWHAirMassFlowRate( MaxSpedLevels, 0.0 ),
-			HPWHWaterVolFlowRate( MaxSpedLevels, 0.0 ),
-			HPWHWaterMassFlowRate( MaxSpedLevels, 0.0 ),
-			MSAirSpeedRatio( MaxSpedLevels, 0.0 ),
-			MSWaterSpeedRatio( MaxSpedLevels, 0.0 )
-		{}
+		HeatPumpWaterHeaterData();
 
 	};
 
-	struct WaterHeaterDesuperheaterData
-	{
+	struct WaterHeaterDesuperheaterData {
 		// Members
 		std::string Name; // Name of heat pump water heater desuperheater
 		std::string Type; // Type of water heater desuperheating coil
@@ -991,8 +871,7 @@ namespace WaterThermalTanks {
 			IterLimitErrIndex2( 0 ),
 			IterLimitExceededNum2( 0 ),
 			RegulaFalsiFailedIndex2( 0 ),
-			RegulaFalsiFailedNum2( 0 )
-		{}
+			RegulaFalsiFailedNum2( 0 ) {}
 
 	};
 

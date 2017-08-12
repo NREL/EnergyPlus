@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::WaterToAirHeatPumpSimple Unit Tests
 
@@ -64,9 +52,10 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -76,6 +65,8 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;
+using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::WaterToAirHeatPumpSimple;
@@ -150,10 +141,228 @@ TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir )
 		ShowMessage( "SizeHVACWaterToAir: Rated Sensible Heat Ratio = " + RoundSigDigits( SimpleWatertoAirHP( HPNum ).RatedCapCoolSens / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal, 2 ) + " [-]" );
 	} 
 
-	// clean up
-	SimpleWatertoAirHP.deallocate();
-	FinalZoneSizing.deallocate();
-	ZoneEqSizing.deallocate();
-	DesDayWeath( 1 ).Temp.deallocate();
-	DesDayWeath.deallocate();
+}
+
+TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl )
+{
+
+	std::string const idf_objects = delimited_string( {
+
+	" Coil:Cooling:WaterToAirHeatPump:EquationFit,",
+	"   Sys 5 Heat Pump Cooling Mode,  !- Name",
+	"   Sys 5 Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name",
+	"   Sys 5 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name",
+	"   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
+	"   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
+	"   1.0,                     !- Rated Air Flow Rate {m3/s}",
+	"   0.0033,                  !- Rated Water Flow Rate {m3/s}",
+	"   23125.59,                !- Gross Rated Total Cooling Capacity {W}",
+	"   16267,                   !- Gross Rated Sensible Cooling Capacity {W}",
+	"   7.007757577,             !- Gross Rated Cooling COP",
+	"   -0.68126221,             !- Total Cooling Capacity Coefficient 1",
+	"   1.99529297,              !- Total Cooling Capacity Coefficient 2",
+	"   -0.93611888,             !- Total Cooling Capacity Coefficient 3",
+	"   0.02081177,              !- Total Cooling Capacity Coefficient 4",
+	"   0.008438868,             !- Total Cooling Capacity Coefficient 5",
+	"   2.24209455,              !- Sensible Cooling Capacity Coefficient 1",
+	"   7.28913391,              !- Sensible Cooling Capacity Coefficient 2",
+	"   -9.06079896,             !- Sensible Cooling Capacity Coefficient 3",
+	"   -0.36729404,             !- Sensible Cooling Capacity Coefficient 4",
+	"   0.218826161,             !- Sensible Cooling Capacity Coefficient 5",
+	"   0.00901534,              !- Sensible Cooling Capacity Coefficient 6",
+	"   -3.20456384,             !- Cooling Power Consumption Coefficient 1",
+	"   0.47656454,              !- Cooling Power Consumption Coefficient 2",
+	"   3.16734236,              !- Cooling Power Consumption Coefficient 3",
+	"   0.10244637,              !- Cooling Power Consumption Coefficient 4",
+	"   -0.038132556,            !- Cooling Power Consumption Coefficient 5",
+	"   0,                       !- Nominal Time for Condensate Removal to Begin {s}",
+	"   0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+
+	" Coil:Heating:WaterToAirHeatPump:EquationFit,",
+	"  Sys 5 Heat Pump Heating Mode,  !- Name",
+	"  Sys 5 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name",
+	"  Sys 5 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name",
+	"  Sys 5 Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+	"  Sys 5 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name",
+	"  1.0,                     !- Rated Air Flow Rate {m3/s}",
+	"  0.0033,                  !- Rated Water Flow Rate {m3/s}",
+	"  19156.73,                !- Gross Rated Heating Capacity {W}",
+	"  3.167053691,             !- Gross Rated Heating COP",
+	"  -5.50102734,             !- Heating Capacity Coefficient 1",
+	"  -0.96688754,             !- Heating Capacity Coefficient 2",
+	"  7.70755007,              !- Heating Capacity Coefficient 3",
+	"  0.031928881,             !- Heating Capacity Coefficient 4",
+	"  0.028112522,             !- Heating Capacity Coefficient 5",
+	"  -7.47517858,             !- Heating Power Consumption Coefficient 1",
+	"  6.40876653,              !- Heating Power Consumption Coefficient 2",
+	"  1.99711665,              !- Heating Power Consumption Coefficient 3",
+	"  -0.050682973,            !- Heating Power Consumption Coefficient 4",
+	"  0.011385145;             !- Heating Power Consumption Coefficient 5",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	GetSimpleWatertoAirHPInput();
+
+	int HPNum( 1 );
+	Real64 DesignAirflow( 2.0 );
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).Temp = 5.0;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).Enthalpy = 44650.0;
+
+	SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate = 15.0;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRateMax = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRateMaxAvail = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).AirInletNodeNum ).MassFlowRate = DesignAirflow;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).AirInletNodeNum ).Temp = 26.0;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).AirInletNodeNum ).HumRat = 0.007;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).AirInletNodeNum ).Enthalpy = 43970.75;
+
+	TotNumLoops = 2;
+	PlantLoop.allocate( TotNumLoops );
+
+	for( int l = 1; l <= TotNumLoops; ++l ) {
+		auto & loop( PlantLoop( l ) );
+		loop.LoopSide.allocate( 2 );
+		auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
+		loopside.TotalBranches = 1;
+		loopside.Branch.allocate( 1 );
+		auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+		loopsidebranch.TotalComponents = 1;
+		loopsidebranch.Comp.allocate( 1 );
+	}
+
+	PlantLoop( 1 ).Name = "ChilledWaterLoop";
+	PlantLoop( 1 ).FluidName = "ChilledWater";
+	PlantLoop( 1 ).FluidIndex = 1;
+	PlantLoop( 1 ).FluidName = "WATER";
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = SimpleWatertoAirHP( HPNum ).Name;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = SimpleWatertoAirHP( HPNum ).WAHPPlantTypeOfNum;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = SimpleWatertoAirHP( HPNum ).WaterInletNodeNum;
+
+	int CompOp( 1 );
+	int CyclingScheme( 1 );
+	bool FirstHVACIteration( true );
+	Real64 MaxONOFFCyclesperHour( 4.0 );
+	Real64 HPTimeConstant( 0.1 );
+	Real64 FanDelayTime( 60.0 );
+	Real64 SensLoad( 38000.0 );
+	Real64 LatentLoad( 0.0 );
+	Real64 PartLoadRatio( 1.0 );
+	Real64 RuntimeFrac( 1.0 );
+	Real64 OnOffAirFlowRatio( 1.0 );
+	SimpleWatertoAirHP( HPNum ).LoopNum = 1;
+
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPCoolingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 15.0 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 5.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 5.221888, 0.00001 );
+
+	PartLoadRatio = 0.5;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPCoolingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 15.0 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 5.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 5.110941, 0.00001 );
+
+	SimpleWatertoAirHP( HPNum ).WaterCyclingMode = WaterCycling;
+	PartLoadRatio = 1.0;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPCoolingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 15.0 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 5.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 5.221888, 0.00001 );
+
+	PartLoadRatio = 0.5;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPCoolingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 7.5 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 5.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 5.221888, 0.00001 );
+
+	// test reduced flow at coil water inlet node
+	PartLoadRatio = 0.25;
+	Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate = 3.75;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPCoolingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 3.75 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 5.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 5.221888, 0.00001 );
+	UpdateSimpleWatertoAirHP( HPNum );
+	EXPECT_EQ( Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate, 3.75 );
+	EXPECT_EQ( Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).MassFlowRate, 3.75 );
+	EXPECT_NEAR( Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Temp, 5.221888, 0.00001 );
+
+	HPNum = 2;
+	SimpleWatertoAirHP( HPNum ).LoopNum = 2;
+	PlantLoop( 2 ).Name = "HotWaterLoop";
+	PlantLoop( 2 ).FluidName = "HotWater";
+	PlantLoop( 2 ).FluidIndex = 1;
+	PlantLoop( 2 ).FluidName = "WATER";
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = SimpleWatertoAirHP( HPNum ).Name;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = SimpleWatertoAirHP( HPNum ).WAHPPlantTypeOfNum;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = SimpleWatertoAirHP( HPNum ).WaterInletNodeNum;
+
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).Temp = 35.0;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).Enthalpy = 43950.0;
+
+	SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate = 15.0;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRateMax = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRateMaxAvail = SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate;
+
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).AirInletNodeNum ).MassFlowRate = DesignAirflow;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).AirInletNodeNum ).Temp = 15.0;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).AirInletNodeNum ).HumRat = 0.004;
+	DataLoopNode::Node( SimpleWatertoAirHP( HPNum ).AirInletNodeNum ).Enthalpy = PsyHFnTdbW( 15.0, 0.004 );
+
+	SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate = 15.0;
+
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+
+	PartLoadRatio = 1.0;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPHeatingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 15.0 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 35.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 34.514131, 0.00001 );
+
+	PartLoadRatio = 0.5;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPHeatingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 15.0 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 35.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 34.757065, 0.00001 );
+
+	SimpleWatertoAirHP( HPNum ).WaterCyclingMode = WaterCycling;
+	PartLoadRatio = 1.0;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPHeatingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 15.0 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 35.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 34.514131, 0.00001 );
+
+	PartLoadRatio = 0.5;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPHeatingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 7.5 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 35.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 34.514131, 0.00001 );
+
+	// test reduced flow at coil water inlet node
+	PartLoadRatio = 0.25;
+	Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate = 3.75;
+	InitSimpleWatertoAirHP( HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration );
+	CalcHPHeatingSimple( HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).WaterMassFlowRate, 3.75 );
+	EXPECT_EQ( SimpleWatertoAirHP( HPNum ).InletWaterTemp, 35.0 );
+	EXPECT_NEAR( SimpleWatertoAirHP( HPNum ).OutletWaterTemp, 34.514131, 0.00001 );
+	UpdateSimpleWatertoAirHP( HPNum );
+	EXPECT_EQ( Node( SimpleWatertoAirHP( HPNum ).WaterInletNodeNum ).MassFlowRate, 3.75 );
+	EXPECT_EQ( Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).MassFlowRate, 3.75 );
+	EXPECT_NEAR( Node( SimpleWatertoAirHP( HPNum ).WaterOutletNodeNum ).Temp, 34.514131, 0.00001 );
+
 }

@@ -8,6 +8,9 @@ The only numeric input is the design primary air flow rate. This item is input j
 
 The next series of names refer to nodes for the various inlet and outlet points of the air loop. The air loop starts where the zone equipment ends. This is a single point consisting of the return air duct once all of the zone return air streams have been collected. While in reality, there is really only one point, for clarity within the simulation components and consistency with the other HVAC loop sections, this point in the systems is defined as two points: one that resides with the zone equipment simulation and one that is acted upon by the air loop simulation. Both node names must be entered into the input file, and both nodes must have unique names. Similarly, the end points of the air loop that also correspond to the beginning points of the zone equipment loop must also be defined. These consist of names referencing lists of up to three pairs of node names as shown below. Up to three air loop outlets are allowed to accommodate the simulation of three deck systems.
 
+\paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
+Regarding component schedules, the general rule is don't schedule any components except the supply fan and the corresponding availability manager(s). Beyond that, every component should always be available and let the controls determine what runs or doesn't run. If a component other than the supply fan is scheduled off, then it will remain off even if the night cycle manager turns on the system.
+
 \subsubsection{Inputs}\label{inputs-002}
 
 \paragraph{Field: Name}\label{field-name-002}
@@ -88,15 +91,15 @@ AirLoopHVAC,
 
 This field is the availability status of an AirLoopHVAC. This status flag is a result of the calculations made by the System Availability Manager(s) listed in a System Availability Manager List. When a single availability manager is used in a System Availability Manager List, this is also the availability status reported by the specific availability manager (Ref. System Availability Manager Outputs). When multiple availability managers are used in a System Availability Manager List, the loop availability status is determine by the rules associated with AirLoopHVACs (see rules described for Group -- System Availability Managers). The control status outputs are represented using integers 0 through 3.. These integers represent \emph{NoAction} (0), \emph{ForceOff} (1), \emph{CycleOn} (2), and \emph{CycleOnZoneFansOnly} (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-\paragraph{\texorpdfstring{HVAC System Solver Iteration Count {[]}}{HVAC System Solver Iteration Count }}\label{hvac-system-solver-iteration-count}
+\paragraph{HVAC System Solver Iteration Count {[]}}\label{hvac-system-solver-iteration-count}
 
-\paragraph{\texorpdfstring{Air System Solver Iteration Count {[]}}{Air System Solver Iteration Count }}\label{air-system-solver-iteration-count}
+\paragraph{Air System Solver Iteration Count {[]}}\label{air-system-solver-iteration-count}
 
-\paragraph{\texorpdfstring{Air System Simulation Maximum Iteration Count {[]}}{Air System Simulation Maximum Iteration Count }}\label{air-system-simulation-maximum-iteration-count}
+\paragraph{Air System Simulation Maximum Iteration Count {[]}}\label{air-system-simulation-maximum-iteration-count}
 
-\paragraph{\texorpdfstring{Air System Simulation Iteration Count {[]}}{Air System Simulation Iteration Count }}\label{air-system-simulation-iteration-count}
+\paragraph{Air System Simulation Iteration Count {[]}}\label{air-system-simulation-iteration-count}
 
-\paragraph{\texorpdfstring{Air System Component Model Simulation Calls {[]}}{Air System Component Model Simulation Calls }}\label{air-system-component-model-simulation-calls}
+\paragraph{Air System Component Model Simulation Calls {[]}}\label{air-system-component-model-simulation-calls}
 
 These variables are simply counters of how many iterations were executed. The count for any given HVAC time step will be the iterations executed before convergence was achieved, or the max allowed in which case the simulation throws a warning and proceeds to the next time step.
 
@@ -661,13 +664,12 @@ AirLoopHVAC,Typical Terminal Reheat 1,
 
   Branch, Air Loop Main Branch,
              1.3,
-             ,
              AirLoopHVAC:OutdoorAirSystem, OA Sys 1,
              Air Loop Inlet Node, Mixed Air Node,PASSIVE
              Fan:ConstantVolume, Supply Fan 1,
              Mixed Air Node, Cooling Coil Air Inlet Node, ACTIVE,
              Coil:Cooling:Water:DetailedGeometry, Detailed Cooling Coil,
-             Cooling Coil Air Inlet Node, Air Loop Outlet Node, PASSIVE;
+             Cooling Coil Air Inlet Node, Air Loop Outlet Node;
 
   AvailabilityManagerAssignmentList, Reheat System 1 Avail List,
              AvailabilityManager:Scheduled, Reheat System 1 Avail;

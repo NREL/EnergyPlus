@@ -4,9 +4,11 @@
 
 The main elements of the PlantLoop syntax are described in further detail below. A map of how the input for this portion of the HVAC input fits together is provided in the following diagram.
 
-!{[}PlantLoopSyntax (media/image135.png)
-
-Figure 73. Plant Loop Input Syntax Map
+\begin{figure}[hbtp] % fig 73
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image135.png}
+\caption{Plant Loop Input Syntax Map \protect \label{fig:plant-loop-input-syntax-map}}
+\end{figure}
 
 \subsubsection{Inputs}\label{inputs-035}
 
@@ -48,7 +50,7 @@ This numeric field contains the minimum loop flow rate in cubic meters per secon
 
 \paragraph{Field: Plant Loop Volume}\label{field-plant-loop-volume}
 
-Volume of the plant loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e.~both the demand side and the supply side. This is used for the loop capacitance calculation.. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The loop capacitance \textbf{autocalculate} option gives reasonable values for most system sizes. This calculation is described in the Engineering Reference manual.
+Volume of the plant loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e.~both the demand side and the supply side. This is used for the loop capacitance calculation. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The \textbf{autocalculate} option sets the loop volume to the product of the Maximum Loop Flow Rate and the user input for Loop Circulation Time which defaults to 2 minutes (see below). This calculation is described in the Engineering Reference manual.
 
 \paragraph{Field: Plant Side Inlet Node Name}\label{field-plant-side-inlet-node-name}
 
@@ -93,8 +95,11 @@ Note: For all schemes, if the load for any individual component is less than the
 This alpha field contains the identifying name given to the System Availability Manager List.
 
 \paragraph{Field: Plant Loop Demand Calculation Scheme}\label{field-plant-loop-demand-calculation-scheme}
+There are two choices for plant loop demand calculations schemes in EnergyPlus: SingleSetpoint and DualSetpointDeadband. 
 
-There are two plant loop demand calculations schemes in EnergyPlus. There is a SingleSetpoint and a DualSetpointDeadband; the SingleSetpoint is the default if this field is left blank. In the SingleSetpoint scheme the Plant Loop requires that a Setpoint Manager set a single setpoint value (on Node\%TempSetpoint). Examples of this setpoint manager would be: SetpointManager:Scheduled, SetpointManager:OutsideAir, etc. For the DualSetPointDeadband scheme the Plant Loop requires that a Setpoint Manager set the high and low setpoint values (for Node\%TempSetPointHi and Node\%TempSetPointLo). Examples of this Setpoint manager would be: SetpointManager:Scheduled:DualSetpoint.
+SingleSetpoint - For the SingleSetpoint scheme, the plant loop is controlled to a single temperature setpoint. This requires a setpoint manager with Control Variable = Temperature to place a setpoint on the Loop Temperature Setpoint Node. The setpoint will be stored in the Node\%TempSetpoint variable which may be reported using Output:Variable "System Node Setpoint Temperature." Examples of applicable setpoint managers include: SetpointManager:Scheduled, SetpointManager:OutdoorAirReset, SetpointManager:FollowOutdoorAirTemperature, etc. SingleSetpoint is the default.
+
+DualSetpoint - For the DualSetpoint scheme, the plant loop is controlled to stay between a pair of high and low temperature setpoints. This requires one or two setpoint managers to place two setpoints on the Loop Temperature Setpoint Node. The setpoints will be stored in the Node\%TempSetPointHi and Node\%TempSetPointLo variables which may be reported using Output:Variable "System Node Setpoint High Temperature" and "System Node Setpoint Low Temperature." There is special setpoint manager, SetpointManager:Scheduled:DualSetpoint, which will place both the high and low setpoints with Control Variable = Temperature. Otherwise, two setpoint managers are required, one with Control Variable = MaximumTemperature and another with Control Variable = MinimumTemperature. The two setpoint managers may be the same kind or different, but care should be taken so that the MinimumTemperature is not set higher than the MaximumTemperature. Examples of applicable setpoint managers include: SetpointManager:Scheduled, SetpointManager:OutdoorAirReset, SetpointManager:FollowOutdoorAirTemperature, etc. Note that DualSetpoint is used only for plant loops with both heating and cooling supply equipment, such as a water loop heat pump system. When the loop temperature rises above the MaximumTemperature setpoint, then the loop will request cooling, and when the loop temperature is below the MinimumTemperature setpoint it will request heating. DualSetpoint cannot be used to control a single-mode loop, such as a hot water heating loop between operating between high and low boiler setpoints.
 
 The plant loop demand calculation scheme determines the amount of heating or cooling necessary to bring the temperature of the Plant Loop to its setpoint(s). When this value is determined then the load distribution scheme explained in the previous section takes this value and distributes the load to the appropriate equipment. The demand calculation scheme determines how the load is calculated. See more information in the Engineering Document.
 
@@ -105,6 +110,10 @@ This field specifies a primary-secondary plant loop simulation. When a common pi
 \paragraph{Field: Pressure Simulation Type}\label{field-pressure-simulation-type}
 
 This field lets user to choose if this plant loop will be involved in a pressure drop calculation.~ This requires that at least one branch on the loop have pressure drop data.~ If not, an error will be thrown due to the input mismatch.~ Currently there are two pressure drop simulation types: ``PumpPowerCorrection'' and ``LoopFlowCorrection''.~ In both of these methods, branch pressure drop data is used to calculate a dynamic loop pressure drop and is used to update pumping power accordingly.~ The flow correction method allows the user to enter information regarding the pressure curve of a constant speed pump so that the simulation can dynamically resolve the pressure vs.~flow relationship in the plant loop.~ This is limited to constant speed pumps, as the variable speed pumps are expected to resolve as if it were controlled by a variable drive, so that they can inherently meet any pressure and flow demand required by the loop.~ This is also limited to ``loop pumps'', where there is a single pump on the plant loop. Common pipe simulations and ``branch pump'' simulations are not compatible with this level of pressure simulation.~ See the documentation for the Pump:ConstantSpeed in order to determine required inputs for this pressure simulation method to be performed.~ In the pressure drop system, parallel flow rates are not resolved (to match the pressure drop for the parallel system).~ Enhancements to this calculation are planned which will allow parallel branch flow resolution.~ See the Engineering Reference document for more information on how this works.
+
+\paragraph{Field: Loop Circulation Time}\label{field-pressure-simulation-type}
+
+This field specifies the time it takes the fluid to circulate through the entire loop. It is only used when Plant Loop Volume is set to autocalculate. The default is 2 minutes. 
 
 An example of this statement used in an IDF is:
 
@@ -221,7 +230,7 @@ This is the value of the demand that could not be distributed to the plant equip
 
 This is the value of the demand NOT provided by the plant equipment to meet the heating or cooling setpoint of the loop. The value is positive when the plant equipment cannot meet the setpoint, and the value is negative when the plant equipment provides more than enough heating or cooling to meet the setpoint. A negative value can happen when the amount of demand is smaller than the minimum capacity of the equipment using the minimum part load ratio.
 
-\paragraph{\texorpdfstring{Plant Solver Sub Iteration Count {[]}}{Plant Solver Sub Iteration Count }}\label{plant-solver-sub-iteration-count}
+\paragraph{Plant Solver Sub Iteration Count {[]}}\label{plant-solver-sub-iteration-count}
 
 This is the count of iterations that the overall plant simulation used over the period of time being reported.~ This high-level output is from the plant solver used for all the plant loops and condenser loops in the model.
 
@@ -237,7 +246,7 @@ This output gives the magnitude of the flow through common pipe. The value is av
 
 This output gives the value of the temperature of the fluid flowing through common pipe. This value is averaged over the reporting interval.
 
-\paragraph{\texorpdfstring{Plant Common Pipe Flow Direction Status {[]}}{Plant Common Pipe Flow Direction Status }}\label{plant-common-pipe-flow-direction-status}
+\paragraph{Plant Common Pipe Flow Direction Status {[]}}\label{plant-common-pipe-flow-direction-status}
 
 This output gives the direction of flow in common pipe. The value is an integer and can be 0, 1 or 2. Since the output value is averaged over reporting interval, a non-integer value may be shown as an output when the reporting interval is not detailed. An output value of 0 means that there was no flow in common pipe. An output value of 1 means that the secondary flow is greater than primary flow, whereas a value of 2 means that primary flow is greater than secondary flow.
 
@@ -249,11 +258,11 @@ This output variable gives the mass flow in the primary side common pipe leg in 
 
 This output variable gives the mass flow in the secondary side common pipe leg in a Two-Way common pipe simulation. Value is averaged over the reporting interval.
 
-\paragraph{\texorpdfstring{Primary Side Common Pipe Flow Direction {[]}}{Primary Side Common Pipe Flow Direction }}\label{primary-side-common-pipe-flow-direction}
+\paragraph{Primary Side Common Pipe Flow Direction {[]}}\label{primary-side-common-pipe-flow-direction}
 
 This output variable gives the direction of flow in a primary side common pipe leg in a Two-Way Common Pipe Simulation. A value of zero means there was no flow in the pipe. A value of 1 means the flow was from top to bottom in EnergyPlus loop schematic. So for primary side, a value of 1 means the flow is from Primary side inlet to Primary side outlet and a value of 2 means flow is from Primary side outlet to Primary side inlet.
 
-\paragraph{\texorpdfstring{Secondary Side Common Pipe Flow Direction {[]}}{Secondary Side Common Pipe Flow Direction }}\label{secondary-side-common-pipe-flow-direction}
+\paragraph{Secondary Side Common Pipe Flow Direction {[]}}\label{secondary-side-common-pipe-flow-direction}
 
 This output variable gives the direction of flow in a Secondary side common pipe leg in a Two-Way Common Pipe Simulation. A value of zero means there was no flow in the pipe. A value of 1 means the flow was from top to bottom in EnergyPlus loop schematic. So for Secondary side, a value of 1 means the flow is from Secondary side outlet to Secondary side inlet and a value of 2 means flow is from Secondary side inlet to Secondary side outlet. Note that this is opposite to the primary side common pipe.
 
@@ -288,6 +297,22 @@ The following advanced output variables are also available for plant loops (and 
   HVAC,Average,Plant Demand Side Lumped Capacitance Temperature {[}C{]}
 \item
   HVAC,Average,Plant Supply Side Lumped Capacitance Temperature {[}C{]}
+
+
+\item
+  HVAC,Average,Plant Demand Side Lumped Capacitance Heat Transport Rate {[}W{]}
+\item
+  HVAC,Average,Plant Supply Side Lumped Capacitance Heat Transport Rate {[}W{]}
+\item
+  HVAC,Average,Plant Demand Side Lumped Capacitance Heat Storage Rate {[}W{]}
+\item
+  HVAC,Average,Plant Supply Side Lumped Capacitance Heat Storage Rate {[}W{]}
+\item
+  HVAC,Sum,Plant Demand Side Lumped Capacitance Excessive Storage Time {[}hr{]}
+\item
+  HVAC,Sum,Plant Supply Side Lumped Capacitance Excessive Storage Time {[}hrW{]}
+
+  
 \item
   HVAC,Average,Plant Component Distributed Demand Rate {[}W{]}
 \end{itemize}
@@ -298,6 +323,24 @@ The following advanced output variables are also available for plant loops (and 
 
 These two outputs are the temperature of the plant (or condenser) loop's working fluid where the two half-loops interface together.~ The program models heat capacitance in the volume of fluid inside the plant loop itself using two simple models for ``well-stirred'' tanks located at each of the half-loop inlet and outlet pairs.~ These tank models also receive the heat transferred to the fluid by the work done by pumping and resulting friction heating.~ One output is for the point where the fluid leaves the supply side and enters the demand side.~ The other output is for the point where the fluid leaves the demand side and enters the supply side.
 
+\paragraph{Plant Demand Side Lumped Capacitance Heat Transport Rate {[}C{]}}\label{plant-demand-side-lumped-capacitance-heat-transport-rate-w}
+
+\paragraph{Plant Supply Side Lumped Capacitance Heat Transport Rate {[}C{]}}\label{plant-supply-side-lumped-capacitance-heat-transport-rate-w}
+
+These two outputs are the heat transfer rate to the the plant (or condenser) loop's working fluid in the two half-loops.~ The program models heat capacitance in the volume of fluid inside the plant loop itself using two simple models for \textit{well-stirred} tanks located at each of the half-loop inlet and outlet pairs.~ These tank models also receive the heat transferred to the fluid by the work done by pumping and resulting friction heating.~ One output is for the point where the fluid leaves the supply side and enters the demand side.~ The other output is for the point where the fluid leaves the demand side and enters the supply side.
+
+\paragraph{Plant Demand Side Lumped Capacitance Heat Storage Rate {[}C{]}}\label{plant-demand-side-lumped-capacitance-heat-storage-rate-w}
+
+\paragraph{Plant Supply Side Lumped Capacitance Heat Storage Rate {[}C{]}}\label{plant-supply-side-lumped-capacitance-heat-storage-rate-w}
+
+These two outputs are the heat storage rate of the plant (or condenser) loop's working fluid in the two half-loops.~ The program models heat capacitance in the volume of fluid inside the plant loop itself using two simple models for \textit{well-stirred} tanks located at each of the half-loop inlet and outlet pairs.~ These tank models also receive the heat transferred to the fluid by the work done by pumping and resulting friction heating.~ One output is for the point where the fluid leaves the supply side and enters the demand side.~ The other output is for the point where the fluid leaves the demand side and enters the supply side.
+
+\paragraph{Plant Demand Side Lumped Capacitance Excessive Storage Time {[}C{]}}\label{plant-demand-side-lumped-capacitance-excess-storage-time-hr}
+
+\paragraph{Plant Supply Side Lumped Capacitance Excessive Storage Time {[}C{]}}\label{plant-supply-side-lumped-capacitance-excess-storage-time-hr}
+
+These two outputs are the excess storage time of the plant (or condenser) loop's working fluid in the two half-loops.~ The excess storage time is determined by adding the time when the heat storage rate exceeds the heat transfer rate into the two half-loops at each time step.~ The program models heat capacitance in the volume of fluid inside the plant loop itself using two simple models for \textit{well-stirred} tanks located at each of the half-loop inlet and outlet pairs.~ These tank models also receive the heat transferred to the fluid by the work done by pumping and resulting friction heating.~ One output is for the point where the fluid leaves the supply side and enters the demand side.~ The other output is for the point where the fluid leaves the demand side and enters the supply side.
+
 \paragraph{Plant Component Distributed Demand Rate {[}W{]}}\label{plant-component-distributed-demand-rate-w}
 
 This output is available for every component on every branch in a plant (or condenser) loop and shows the outcome of the load dispatch performed by the operation schemes.~ This the load in watts passed from the supervisor routines to the equipment component models.~ This provides a record of what a particular component was asked to do by the supervisory routines. This can be useful for diagnosing issues in operation schemes when a component or loop is failing to meet the load.
@@ -306,9 +349,11 @@ This output is available for every component on every branch in a plant (or cond
 
 The condenser loop input is very similar to that for the plant loop. As of version 7, the two loops are modeled the same way and inside the program all condenser loops are just plant loops. (In future versions of the program, this CondenserLoop object might be deprecated and these loops will be described using the PlantLoop object.)~ The main differences are the applicable components and operation schemes. This is depicted in the following diagram.
 
-!{[}CondenserLoopSyntax (media/image136.png)
-
-Figure 74. Condenser Loop Input Syntax Map
+\begin{figure}[hbtp] % fig 74
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image136.png}
+\caption{Condenser Loop Input Syntax Map \protect \label{fig:condenser-loop-input-syntax-map}}
+\end{figure}
 
 \subsubsection{Inputs}\label{inputs-1-032}
 
@@ -350,7 +395,7 @@ This numeric field contains the minimum loop flow rate in cubic meters per secon
 
 \paragraph{Field: Condenser Loop Volume}\label{field-condenser-loop-volume}
 
-Volume of the condenser loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e., both the demand side and the supply side. This is used for the loop capacitance calculation. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The loop capacitance \textbf{autocalculate} option gives reasonable values for most system sizes. This calculation is described in the Engineering Reference manual.
+Volume of the condenser loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e., both the demand side and the supply side. This is used for the loop capacitance calculation. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The \textbf{autocalculate} option sets the loop volume to the product of the Maximum Loop Flow Rate and the user input for Loop Circulation Time which defaults to 2 minutes (see below). This calculation is described in the Engineering Reference manual.
 
 \paragraph{Field: Condenser Side Inlet Node Name}\label{field-condenser-side-inlet-node-name}
 
@@ -393,6 +438,10 @@ Note: For all schemes, if the load for any individual component is less than the
 \paragraph{Field: Pressure Simulation Type}\label{field-pressure-simulation-type-1}
 
 This field lets user to choose if this plant loop will be involved in a pressure drop calculation.~ This requires that at least one branch on the loop have pressure drop data.~ If not, an error will be thrown due to the input mismatch.~ Currently there are two pressure drop simulation types: ``PumpPowerCorrection'' and ``LoopFlowCorrection''.~ In both of these methods, branch pressure drop data is used to calculate a dynamic loop pressure drop and is used to update pumping power accordingly.~ The flow correction method allows the user to enter information regarding the pressure curve of a constant speed pump so that the simulation can dynamically resolve the pressure vs.~flow relationship in the plant loop.~ This is limited to constant speed pumps, as the variable speed pumps are expected to resolve as if it were controlled by a variable drive, so that they can inherently meet any pressure and flow demand required by the loop.~ This is also limited to ``loop pumps'', where there is a single pump on the plant loop.~ Common pipe simulations and ``branch pump'' simulations are not compatible with this level of pressure simulation.~ See the documentation for the Pump:ConstantSpeed in order to determine required inputs for this pressure simulation method to be performed.~ In the pressure drop system, parallel flow rates are not resolved (to match the pressure drop for the parallel system).~ Enhancements to this calculation are planned which will allow parallel branch flow resolution.~ See the Engineering Reference document for more information on how this works.
+
+\paragraph{Field: Loop Circulation Time}\label{field-pressure-simulation-type}
+
+This field specifies the time it takes the fluid to circulate through the entire loop. It is only used when Condenser Loop Volume is set to autocalculate. The default is 2 minutes. 
 
 An example of this statement used in an IDF is:
 

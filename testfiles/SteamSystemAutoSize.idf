@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -841,6 +841,38 @@
     3.7,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
+    Sp01-RIGHT,                 !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    SPACE1-1,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.5,0.0,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    30.5,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    30.5,3.7,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    30.5,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Sp01-LEFT,                 !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    SPACE1-1,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.0,3.7,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,3.7,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,0.0,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
     RIGHT-1,                 !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
@@ -851,10 +883,10 @@
     WindExposed,             !- Wind Exposure
     0.50000,                 !- View Factor to Ground
     4,                       !- Number of Vertices
-    30.5,0.0,2.4,  !- X,Y,Z ==> Vertex 1 {m}
-    30.5,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
-    30.5,15.2,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-    30.5,15.2,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+    30.5,3.7,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    30.5,3.7,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    30.5,11.6,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    30.5,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     C2-1,                    !- Name
@@ -1033,6 +1065,39 @@
     26.8,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
+    Sp03-RIGHT,                 !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    SPACE3-1,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.5,11.6,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    30.5,11.6,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    30.5,15.2,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    30.5,15.2,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Sp03-LEFT,                 !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    SPACE3-1,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.0,15.2,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,15.2,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,11.6,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+
+
+  BuildingSurface:Detailed,
     LEFT-1,                  !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
@@ -1043,10 +1108,10 @@
     WindExposed,             !- Wind Exposure
     0.50000,                 !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0,15.2,2.4,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0,15.2,0.0,  !- X,Y,Z ==> Vertex 2 {m}
-    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-    0.0,0.0,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,11.6,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,11.6,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,3.7,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     C4-1,                    !- Name
@@ -2155,17 +2220,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2293,228 +2358,183 @@
 
   Branch,
     SPACE1-1 Steam-Branch,   !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Steam,      !- Component 1 Object Type
     SPACE1-1 Reheat Coil,    !- Component 1 Name
     SPACE1-1 Reheat Coil Steam Inlet,  !- Component 1 Inlet Node Name
-    SPACE1-1 Reheat Coil Steam Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SPACE1-1 Reheat Coil Steam Outlet;  !- Component 1 Outlet Node Name
 
   Branch,
     SPACE2-1 Steam-Branch,   !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Steam,      !- Component 1 Object Type
     SPACE2-1 Reheat Coil,    !- Component 1 Name
     SPACE2-1 Reheat Coil Steam Inlet,  !- Component 1 Inlet Node Name
-    SPACE2-1 Reheat Coil Steam Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SPACE2-1 Reheat Coil Steam Outlet;  !- Component 1 Outlet Node Name
 
   Branch,
     SPACE3-1 Steam-Branch,   !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Steam,      !- Component 1 Object Type
     SPACE3-1 Reheat Coil,    !- Component 1 Name
     SPACE3-1 Reheat Coil Steam Inlet,  !- Component 1 Inlet Node Name
-    SPACE3-1 Reheat Coil Steam Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SPACE3-1 Reheat Coil Steam Outlet;  !- Component 1 Outlet Node Name
 
   Branch,
     SPACE4-1 Steam-Branch,   !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Steam,      !- Component 1 Object Type
     SPACE4-1 Reheat Coil,    !- Component 1 Name
     SPACE4-1 Reheat Coil Steam Inlet,  !- Component 1 Inlet Node Name
-    SPACE4-1 Reheat Coil Steam Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SPACE4-1 Reheat Coil Steam Outlet;  !- Component 1 Outlet Node Name
 
   Branch,
     SPACE5-1 Steam-Branch,   !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Steam,      !- Component 1 Object Type
     SPACE5-1 Reheat Coil,    !- Component 1 Name
     SPACE5-1 Reheat Coil Steam Inlet,  !- Component 1 Inlet Node Name
-    SPACE5-1 Reheat Coil Steam Outlet,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SPACE5-1 Reheat Coil Steam Outlet;  !- Component 1 Outlet Node Name
 
   Branch,
     Heating Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Heating Demand Bypass,   !- Component 1 Name
     Heating Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Heating Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Heating Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     VAV SYS 1 Main Branch,   !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     VAV SYS 1 OA System,     !- Component 1 Name
     VAV SYS 1 Air Loop Inlet,!- Component 1 Inlet Node Name
     VAV SYS 1 Mixed Air Outlet,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water:DetailedGeometry,  !- Component 2 Object Type
     VAV SYS 1 Cooling Coil,  !- Component 2 Name
     VAV SYS 1 Mixed Air Outlet,  !- Component 2 Inlet Node Name
     VAV SYS 1 Cooling Coil Outlet,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Steam,      !- Component 3 Object Type
     VAV SYS 1 Heating Coil,  !- Component 3 Name
     VAV SYS 1 Cooling Coil Outlet,  !- Component 3 Inlet Node Name
     VAV SYS 1 Heating Coil Outlet,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     VAV SYS 1 Supply Fan,    !- Component 4 Name
     VAV SYS 1 Heating Coil Outlet,  !- Component 4 Inlet Node Name
-    VAV SYS 1 Air Loop Outlet,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    VAV SYS 1 Air Loop Outlet;  !- Component 4 Outlet Node Name
 
   Branch,
     VAV SYS 1 ChW-Branch,    !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water:DetailedGeometry,  !- Component 1 Object Type
     VAV SYS 1 Cooling Coil,  !- Component 1 Name
     VAV SYS 1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name
-    VAV SYS 1 Cooling Coil ChW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV SYS 1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name
 
   Branch,
     VAV SYS 1 Steam-Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Steam,      !- Component 1 Object Type
     VAV SYS 1 Heating Coil,  !- Component 1 Name
     VAV SYS 1 Heating Coil Steam Inlet,  !- Component 1 Inlet Node Name
-    VAV SYS 1 Heating Coil Steam Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    VAV SYS 1 Heating Coil Steam Outlet;  !- Component 1 Outlet Node Name
 
   Branch,
     CHW Demand 1 ChW Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHW Demand 1 ChW Inlet Pipe,  !- Component 1 Name
     CHW Demand 1 ChW Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CHW Demand 1 ChW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CHW Demand 1 ChW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CHW Demand 1 ChW Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHW Demand 1 ChW Outlet Pipe,  !- Component 1 Name
     CHW Demand 1 ChW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CHW Demand 1 ChW Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CHW Demand 1 ChW Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CHW Demand 1 ChW Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHW Demand 1 ChW Bypass Pipe,  !- Component 1 Name
     CHW Demand 1 ChW Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CHW Demand 1 ChW Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CHW Demand 1 ChW Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Demand 1 Steam Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Demand 1 Steam Inlet Pipe,  !- Component 1 Name
     Steam Demand 1 Steam Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Demand 1 Steam Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Steam Demand 1 Steam Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Demand 1 Steam Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Demand 1 Steam Outlet Pipe,  !- Component 1 Name
     Steam Demand 1 Steam Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Demand 1 Steam Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Steam Demand 1 Steam Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Purchased CHW Plant Chiller Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictCooling,         !- Component 1 Object Type
     Purchased CHW Plant Chiller,  !- Component 1 Name
     Purchased CHW Plant Chiller Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased CHW Plant Chiller Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Purchased CHW Plant Chiller Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Purchased CHW Plant ChW Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Purchased CHW Plant ChW Supply Side Bypass,  !- Component 1 Name
     Purchased CHW Plant ChW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased CHW Plant ChW Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Purchased CHW Plant ChW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Purchased CHW Plant ChW Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Purchased CHW Plant ChW Supply Outlet,  !- Component 1 Name
     Purchased CHW Plant ChW Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased CHW Plant ChW Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Purchased CHW Plant ChW Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Purchased CHW Plant ChW Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Purchased CHW Plant ChW Circ Pump,  !- Component 1 Name
     Purchased CHW Plant ChW Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased CHW Plant ChW Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Purchased CHW Plant ChW Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Boiler Plant Boiler Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:Steam,            !- Component 1 Object Type
     Steam Boiler Plant Boiler,  !- Component 1 Name
     Steam Boiler Plant Boiler Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Boiler Plant Boiler Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Steam Boiler Plant Boiler Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Boiler Plant Steam Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic:Steam,    !- Component 1 Object Type
     Steam Boiler Plant Steam Supply Outlet,  !- Component 1 Name
     Steam Boiler Plant Steam Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Boiler Plant Steam Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Steam Boiler Plant Steam Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Steam Boiler Plant Steam Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed:Condensate,  !- Component 1 Object Type
     Steam Boiler Plant Steam Circ Pump,  !- Component 1 Name
     Steam Boiler Plant Steam Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Steam Boiler Plant Steam Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Steam Boiler Plant Steam Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CHW Demand 1 ChW Inlet Pipe,  !- Name
@@ -3215,25 +3235,25 @@
     Purchased CHW Plant ChW Circ Pump,  !- Name
     Purchased CHW Plant ChW Supply Inlet Node,  !- Inlet Node Name
     Purchased CHW Plant ChW Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Pump:VariableSpeed:Condensate,
     Steam Boiler Plant Steam Circ Pump,  !- Name
     Steam Boiler Plant Steam Supply Inlet Node,  !- Inlet Node Name
     Steam Boiler Plant Steam Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Steam Volume Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
@@ -3419,5 +3439,5 @@
     AllSummary;              !- Report 1 Name
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 

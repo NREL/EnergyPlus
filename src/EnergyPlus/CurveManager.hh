@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef CurveManager_hh_INCLUDED
 #define CurveManager_hh_INCLUDED
@@ -66,6 +54,7 @@
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array5D.hh>
 #include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -304,6 +293,7 @@ namespace CurveManager {
 		Array1D< TriQuadraticCurveDataStruct > Tri2ndOrder; // structure for triquadratic curve data
 		bool EMSOverrideOn; // if TRUE, then EMS is calling to override curve value
 		Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
+		bool OpticalProperty; // if TRUE, this table is used to store optical property
 		// report variables
 		Real64 CurveOutput; // curve output or result
 		Real64 CurveInput1; // curve input #1 (e.g., x or X1 variable)
@@ -362,6 +352,7 @@ namespace CurveManager {
 			Var5MaxPresent( false ),
 			EMSOverrideOn( false ),
 			EMSOverrideCurveValue( 0.0 ),
+			OpticalProperty( false ),
 			CurveOutput( 0.0 ),
 			CurveInput1( 0.0 ),
 			CurveInput2( 0.0 ),
@@ -582,6 +573,45 @@ namespace CurveManager {
 
 	int
 	GetCurveObjectTypeNum( int const CurveIndex ); // index of curve in curve array
+
+	void
+	checkCurveIsNormalizedToOne(
+		std::string const callingRoutineObj,  // calling routine with object type
+		std::string const objectName,         // parent object where curve is used
+		int const curveIndex,                 // index to curve object
+		std::string const cFieldName,         // object field name
+		std::string const cFieldValue,        // user input curve name
+		Real64 const Var1,                    // required 1st independent variable
+		Optional <Real64 const > Var2 = _,    // 2nd independent variable
+		Optional< Real64 const > Var3 = _,    // 3rd independent variable
+		Optional< Real64 const > Var4 = _,    // 4th independent variable
+		Optional< Real64 const > Var5 = _     // 5th independent variable
+	);
+
+	int
+	GetCurveInterpolationMethodNum( int const CurveIndex ); // index of curve in curve array
+
+	void
+	ReadTwoVarTableDataFromFile(
+		int const CurveNum,
+		std::string & FileName,
+		int & lineNum
+	);
+
+	void
+	SetSameIndeVariableValues(
+		int const TransCurveIndex,
+		int const FRefleCurveIndex,
+		int const BRefleCurveIndex
+	);
+
+	void
+	SetCommonIncidentAngles(
+		int const ConstrNum,  // Construction number
+		int const NGlass,     // The number of glass layers in the construction with index = ConstrNum
+		int & TotalIPhi,      // The number of incident angles
+		Array1A_int const Tables // Store construction layer number for SpectralAndAngleGlassLayer glass only. Otherwise = 0 for other layers.
+	);
 
 	//=================================================================================================!
 

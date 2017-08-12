@@ -124,7 +124,7 @@
 !
 !
 
-  Version,8.5;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1117,6 +1117,7 @@
 
   OtherEquipment,
     latent,                  !- Name
+    None,                    !- Fuel Type
     Test room,               !- Zone or ZoneList Name
     Moisture on,             !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -1129,6 +1130,7 @@
 
   OtherEquipment,
     Other,                   !- Name
+    None,                    !- Fuel Type
     Test room,               !- Zone or ZoneList Name
     On,                      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

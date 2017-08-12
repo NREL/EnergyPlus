@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -2055,13 +2055,11 @@
 
   Branch,
     AHU 1 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 1 DXAC Heat Pump,    !- Component 1 Name
     AHU 1 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 1 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 1 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 1 Supply Path,       !- Name
@@ -2113,7 +2111,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2190,10 +2188,11 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU1,  !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU1,  !- Air Inlet Node Name
     AHU 1 Air Loop Outlet;   !- Air Outlet Node Name
@@ -2243,13 +2242,11 @@
 
   Branch,
     AHU 2 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 2 DXAC Heat Pump,    !- Component 1 Name
     AHU 2 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 2 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 2 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 2 Supply Path,       !- Name
@@ -2301,7 +2298,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU2,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2375,10 +2372,11 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU2,  !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU2,  !- Air Inlet Node Name
     AHU 2 Air Loop Outlet;   !- Air Outlet Node Name
@@ -2428,13 +2426,11 @@
 
   Branch,
     AHU 3 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 3 DXAC Heat Pump,    !- Component 1 Name
     AHU 3 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 3 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 3 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 3 Supply Path,       !- Name
@@ -2486,7 +2482,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU3,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2560,10 +2556,11 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU3,  !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU3,  !- Air Inlet Node Name
     AHU 3 Air Loop Outlet;   !- Air Outlet Node Name
@@ -2613,13 +2610,11 @@
 
   Branch,
     AHU 4 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 4 DXAC Heat Pump,    !- Component 1 Name
     AHU 4 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 4 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 4 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 4 Supply Path,       !- Name
@@ -2671,7 +2666,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU4,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2745,10 +2740,11 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU4,  !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU4,  !- Air Inlet Node Name
     AHU 4 Air Loop Outlet;   !- Air Outlet Node Name
@@ -2798,13 +2794,11 @@
 
   Branch,
     AHU 5 Main Branch,       !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 1 Object Type
     AHU 5 DXAC Heat Pump,    !- Component 1 Name
     AHU 5 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 5 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU 5 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     AHU 5 Supply Path,       !- Name
@@ -2856,7 +2850,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU5,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2930,10 +2924,11 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU5,  !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU5,  !- Air Inlet Node Name
     AHU 5 Air Loop Outlet;   !- Air Outlet Node Name
@@ -3011,43 +3006,35 @@
 
   Branch,
     Plant Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Plant Circ Pump,         !- Component 1 Name
     Plant Supply Inlet Node, !- Component 1 Inlet Node Name
-    Plant Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Plant Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Plant Supply Tower Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     Big Tower1,              !- Component 1 Name
     Central Tower Inlet Node,!- Component 1 Inlet Node Name
-    Central Tower Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Central Tower Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Central Boiler Branch,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     Central Boiler,          !- Component 1 Name
     Central Boiler Inlet Node,  !- Component 1 Inlet Node Name
-    Central Boiler Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Central Boiler Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Plant Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Supply Side Bypass,!- Component 1 Name
     Plant Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Plant Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Plant Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Supply Side Bypass,!- Name
@@ -3056,13 +3043,11 @@
 
   Branch,
     Plant Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Supply Outlet,     !- Component 1 Name
     Plant Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Plant Supply Outlet Node,!- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Plant Supply Outlet Node;!- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Supply Outlet,     !- Name
@@ -3094,13 +3079,11 @@
 
   Branch,
     Plant Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Inlet Pipe, !- Component 1 Name
     Plant Demand Inlet Node, !- Component 1 Inlet Node Name
-    Plant Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Plant Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Demand Inlet Pipe, !- Name
@@ -3109,113 +3092,91 @@
 
   Branch,
     Gshp Cooling Plant Branch AHU1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU1,  !- Component 1 Name
     AHU1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU1 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU1 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU1,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU1,  !- Component 1 Name
     AHU1 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU1 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Cooling Plant Branch AHU2,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU2,  !- Component 1 Name
     AHU2 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU2 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU2 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU2,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU2,  !- Component 1 Name
     AHU2 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU2 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU2 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Cooling Plant Branch AHU3,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU3,  !- Component 1 Name
     AHU3 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU3 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU3 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU3,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU3,  !- Component 1 Name
     AHU3 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU3 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU3 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Cooling Plant Branch AHU4,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU4,  !- Component 1 Name
     AHU4 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU4 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU4 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU4,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU4,  !- Component 1 Name
     AHU4 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU4 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU4 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Cooling Plant Branch AHU5,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Cooling Mode AHU5,  !- Component 1 Name
     AHU5 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU5 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU5 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Gshp Heating Plant Branch AHU5,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:ParameterEstimation,  !- Component 1 Object Type
     Heat Pump Heating Mode AHU5,  !- Component 1 Name
     AHU5 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    AHU5 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    AHU5 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Plant Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Side Bypass,!- Component 1 Name
     Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Demand Side Bypass,!- Name
@@ -3224,13 +3185,11 @@
 
   Branch,
     Plant Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Plant Demand Outlet Pipe,!- Component 1 Name
     Plant Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Plant Demand Outlet Node,!- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Plant Demand Outlet Node;!- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Plant Demand Outlet Pipe,!- Name
@@ -3334,9 +3293,9 @@
     Plant Circ Pump,         !- Name
     Plant Supply Inlet Node, !- Inlet Node Name
     Plant Pump Outlet Node,  !- Outlet Node Name
-    0.007,                   !- Rated Flow Rate {m3/s}
-    5000,                    !- Rated Pump Head {Pa}
-    50,                      !- Rated Power Consumption {W}
+    0.007,                   !- Design Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    50,                      !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     CONTINUOUS;              !- Pump Control Type

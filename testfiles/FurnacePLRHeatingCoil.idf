@@ -83,7 +83,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatOnly, AirLoopHVAC:UnitaryHeatOnly
-! Coils:                          Coil:Heating:Gas
+! Coils:                          Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -98,7 +98,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     NONE,                    !- Name
@@ -1144,23 +1144,19 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    0.83,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:Unitary:Furnace:HeatOnly,  !- Component 1 Object Type
     Gas Furnace 1,           !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Air Loop Outlet Node;    !- Component 1 Outlet Node Name
 
   Branch,
     Air Loop Main Branch 2,  !- Name
-    0.47,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatOnly,  !- Component 1 Object Type
     Gas Furnace 2,           !- Component 1 Name
     Air Loop Inlet Node 2,   !- Component 1 Inlet Node Name
-    Air Loop Outlet Node 2,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Air Loop Outlet Node 2;  !- Component 1 Outlet Node Name
 
 ! Primary air loop serving EAST (zone 2) and WEST ZONE (zone 1)
 
@@ -1260,12 +1256,12 @@
     Air Loop Outlet Node,    !- Furnace Air Outlet Node Name
     CyclingFanSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    0.83,                    !- Supply Air Flow Rate {m3/s}
+    0.83,                    !- Heating Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Coil;            !- Heating Coil Name
 
   AirLoopHVAC:UnitaryHeatOnly,
@@ -1275,12 +1271,12 @@
     Air Loop Outlet Node 2,  !- Unitary System Air Outlet Node Name
     CyclingFanSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    0.47,                    !- Supply Air Flow Rate {m3/s}
+    0.47,                    !- Heating Supply Air Flow Rate {m3/s}
     North Zone,              !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 2,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Coil 2;          !- Heating Coil Name
 
   AirTerminal:SingleDuct:Uncontrolled,
@@ -1373,29 +1369,31 @@
     Return Air Mixer Outlet 2,  !- Outlet Node Name
     Zone 3 Outlet Node;      !- Inlet 1 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Coil,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
     100,                     !- Parasitic Electric Load {W}
     PLFCurveforGasFurnace,   !- Part Load Fraction Correlation Curve Name
-    10;                      !- Parasitic Gas Load {W}
+    10;                      !- Parasitic Fuel Load {W}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Coil 2,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node 2,  !- Air Inlet Node Name
     Air Loop Outlet Node 2,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
     100,                     !- Parasitic Electric Load {W}
     PLFCurveforGasFurnace 2, !- Part Load Fraction Correlation Curve Name
-    10;                      !- Parasitic Gas Load {W}
+    10;                      !- Parasitic Fuel Load {W}
 
   Fan:OnOff,
     Supply Fan 1,            !- Name

@@ -114,7 +114,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Heating:Gas
+! Coils:                          Coil:Heating:Fuel
 !                                 Coil:Cooling:DX:SingleSpeed as a coil component of CoilSystem:Cooling:DX
 ! Pumps:                          None
 ! Boilers:                        None
@@ -129,7 +129,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -1605,25 +1605,29 @@
     0;                       !- Fraction Lost
 
   Daylighting:Controls,
+    West Zone_DaylCtrl,      !- Name
     West Zone,               !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    3.048,                   !- X-Coordinate of First Reference Point {m}
-    3.048,                   !- Y-Coordinate of First Reference Point {m}
-    0.9,                     !- Z-Coordinate of First Reference Point {m}
-    0.0,                     !- X-Coordinate of Second Reference Point {m}
-    0.0,                     !- Y-Coordinate of Second Reference Point {m}
-    0.0,                     !- Z-Coordinate of Second Reference Point {m}
-    1.0,                     !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    500.,                    !- Illuminance Setpoint at First Reference Point {lux}
-    500.,                    !- Illuminance Setpoint at Second Reference Point {lux}
-    1,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Continuous,              !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    ,                        !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    West Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name
     180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.0,                    !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    0,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name
+    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    West Zone_DaylRefPt1,    !- Name
+    West Zone,               !- Zone Name
+    3.048,                   !- X-Coordinate of Reference Point {m}
+    3.048,                   !- Y-Coordinate of Reference Point {m}
+    0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Curve:Biquadratic,
     WindACCoolCapFT,         !- Name
@@ -1716,28 +1720,23 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.9,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan 1,            !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
     Cooling Coil Air Inlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                  !- Component 2 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 3 Object Type
     DX Cooling Coil System 1,!- Component 3 Name
     Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil 1,     !- Component 4 Name
     Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 4 Outlet Node Name
-    PASSIVE;                 !- Component 4 Branch Control Type
+    Air Loop Outlet Node;    !- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Typical Terminal Reheat 1,  !- Name
@@ -1808,10 +1807,9 @@
     Heat Exchanger Supply Air Nodes;  !- Setpoint Node or NodeList Name
 
   AirflowNetwork:SimulationControl,
-    AriflowNetwork_All,      !- Name
+    AirflowNetwork_All,      !- Name
     MultizoneWithDistribution,  !- AirflowNetwork Control
     INPUT,                   !- Wind Pressure Coefficient Type
-    Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
@@ -2381,8 +2379,10 @@
     0.2827,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     MainTruck2,              !- Name
@@ -2391,8 +2391,10 @@
     0.2827,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     Zone1Supply,             !- Name
@@ -2401,8 +2403,10 @@
     0.1256,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     Zone2Supply,             !- Name
@@ -2411,8 +2415,10 @@
     0.1195,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     2.5,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     Zone3Supply,             !- Name
@@ -2421,8 +2427,10 @@
     0.1521,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     Zone1Return,             !- Name
@@ -2431,8 +2439,10 @@
     0.1963,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     Zone2Return,             !- Name
@@ -2441,8 +2451,10 @@
     0.1809,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     Zone3Return,             !- Name
@@ -2451,8 +2463,10 @@
     0.2376,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     ZoneConnectionDuct,      !- Name
@@ -2461,8 +2475,10 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     30.00,                   !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     MixerConnectionDuct,     !- Name
@@ -2471,8 +2487,10 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Duct,
     OA Entrance duct,        !- Name
@@ -2481,8 +2499,10 @@
     0.1256,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     12.00,                   !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
 ! RETURN CONNECTION
 
@@ -2493,8 +2513,10 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
 ! SUPPLY CONNECTION
 
@@ -2505,8 +2527,10 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
-    0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0001,                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    0.006500,                !- Outside Convection Coefficient {W/m2-K}
+    0.032500;                !- Inside Convection Coefficient {W/m2-K}
 
   AirflowNetwork:Distribution:Component:Fan,
     Supply Fan 1,            !- Fan Name
@@ -2520,7 +2544,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Main Heating Coil 1,     !- Coil Name
-    Coil:Heating:Gas,        !- Coil Object Type
+    Coil:Heating:Fuel,       !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2908,7 +2932,7 @@
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.64,                    !- Maximum Air Flow Rate {m3/s}
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2920,7 +2944,7 @@
     Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.52,                    !- Maximum Air Flow Rate {m3/s}
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 2,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2978,27 +3002,30 @@
     Zone 2 Outlet Node,      !- Inlet 2 Node Name
     Zone 3 Outlet Node;      !- Inlet 3 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 1,     !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     60000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
     Air Loop Outlet Node;    !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Reheat Coil Zone 1,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     1000,                    !- Nominal Capacity {W}
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 1 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Reheat Coil Zone 2,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    1.0,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    1.0,                     !- Burner Efficiency
     1000,                    !- Nominal Capacity {W}
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name

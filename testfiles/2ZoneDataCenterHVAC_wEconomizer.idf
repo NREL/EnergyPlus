@@ -1,10 +1,10 @@
 ! 2ZoneDataCenterHVAC_wEconomizer.idf
 ! Basic file description:  Basic test for Single Zone Air Loop System For Data Center Application.
 !                          HVAC Components include:  Air Economizer, Direct Evaporative Cooler,
-!                          Indirect Evaporative Coolers, Single Speed DX Cooling Coil, 
-!                          Chilled Water Coil and VAV with No Reheat Air Terminal Unit.  
+!                          Indirect Evaporative Coolers, Single Speed DX Cooling Coil,
+!                          Chilled Water Coil and VAV with No Reheat Air Terminal Unit.
 !
-!                          Mass walls.  Regular slab floor. 2 Thermal Zones, and 2 supply plenum 
+!                          Mass walls.  Regular slab floor. 2 Thermal Zones, and 2 supply plenum
 !                          Regular roof.  No Windows. Air cooled IT equipment (ITE).
 !
 ! Highlights:              Example of single zone Airloop HVAC system for Data Center Application
@@ -77,17 +77,17 @@
 ! HVAC:                           AirLoopHVAC serving a single thermal zone as a Data Center
 !                                 There are two data centers, and each data center is served
 !                                 by its own airloopHVAC.  The air loops has a DX cooling coil
-!                                 and a chilled water cooling coil. 
-!                                 
-!                                 For west zone (West data Center) the chilled water coil is 
-!                                 always scheduled off.  For East zone (East data Center) the 
+!                                 and a chilled water cooling coil.
+!
+!                                 For west zone (West data Center) the chilled water coil is
+!                                 always scheduled off.  For East zone (East data Center) the
 !                                 DX cooling coil is always scheduled off. But the schedules
-!                                 can be modified to allow to the DX and Chilled water coils 
+!                                 can be modified to allow to the DX and Chilled water coils
 !                                 to run alternately during the day and night or during week
 !                                 days and week ends.
 !
 ! Zonal Equipment:                none
-!                                 
+!
 !
 ! Central Air Handling Equipment: Yes (Serving single zone)
 ! System Equipment Autosize:      Yes
@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,4;
 
@@ -197,7 +197,6 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
   SizingPeriod:DesignDay,
@@ -259,9 +258,10 @@
     1.0;                     !- Sky Clearness
 
   Site:GroundTemperature:Shallow,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
+
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
+
   Site:GroundTemperature:Deep,16.1,16.1,16.1,16.1,16.1,16.1,16.1,16.1,16.1,16.1,16.1,16.1;
-  
 
 !  ******************* Materials and Constructions ******************************************
 
@@ -361,7 +361,6 @@
     0.8200000,               !- Solar Absorptance
     0.8200000;               !- Visible Absorptance
 
-
   Construction,
     ext-walls,               !- Name
     1IN Stucco,              !- Outside Layer
@@ -388,7 +387,7 @@
     C19 - 2 IN LIGHT WEIGHT CONCRETE;  !- Outside Layer
 
   Zone,
-    West Zone,                !- Name
+    West Zone,               !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
     0.0000000E+00,           !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
@@ -399,7 +398,7 @@
     autocalculate;           !- Volume {m3}
 
   Zone,
-    East Zone,                !- Name
+    East Zone,               !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
     0.0000000E+00,           !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
@@ -410,7 +409,7 @@
     autocalculate;           !- Volume {m3}
 
   Zone,
-    West Plenum,            !- Name
+    West Plenum,             !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
     0.0000000E+00,           !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
@@ -440,7 +439,7 @@
     Zn001:Wall001W,          !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    West Zone,                !- Zone Name
+    West Zone,               !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -456,7 +455,7 @@
     Zn001:Wall001E,          !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    East Zone,                !- Zone Name
+    East Zone,               !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -469,60 +468,58 @@
     32.24000,0.0E+00,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    PZn001:Wall001W,          !- Name
+    PZn001:Wall001W,         !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    West Plenum,            !- Zone Name
+    West Plenum,             !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.00E+00,0.000E+00,0.50, !- X,Y,Z ==> Vertex 1 {m}
-    0.00E+00,0.000E+00,0.00, !- X,Y,Z ==> Vertex 2 {m}
-    15.24000,0.000E+00,0.00, !- X,Y,Z ==> Vertex 3 {m}
-    15.24000,0.000E+00,0.50; !- X,Y,Z ==> Vertex 4 {m}
+    0.00E+00,0.000E+00,0.50,  !- X,Y,Z ==> Vertex 1 {m}
+    0.00E+00,0.000E+00,0.00,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,0.000E+00,0.00,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,0.000E+00,0.50;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     PZn001:Wall001E,         !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    East Plenum,           !- Zone Name
+    East Plenum,             !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.24000,0.000E+00,0.50, !- X,Y,Z ==> Vertex 1 {m}
-    15.24000,0.000E+00,0.00, !- X,Y,Z ==> Vertex 2 {m}
-    32.24000,0.000E+00,0.00, !- X,Y,Z ==> Vertex 3 {m}
-    32.24000,0.000E+00,0.50; !- X,Y,Z ==> Vertex 4 {m}
-
+    15.24000,0.000E+00,0.50,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,0.000E+00,0.00,  !- X,Y,Z ==> Vertex 2 {m}
+    32.24000,0.000E+00,0.00,  !- X,Y,Z ==> Vertex 3 {m}
+    32.24000,0.000E+00,0.50;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn001:Wall002,           !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    East Zone,                !- Zone Name
+    East Zone,               !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    32.24000,0.00E+00,4.5720,    !- X,Y,Z ==> Vertex 1 {m}
+    32.24000,0.00E+00,4.5720,  !- X,Y,Z ==> Vertex 1 {m}
     32.24000,0.00E+00,0.50E+00,  !- X,Y,Z ==> Vertex 2 {m}
     32.24000,15.24000,0.50E+00,  !- X,Y,Z ==> Vertex 3 {m}
     32.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   BuildingSurface:Detailed,
     PZn001:Wall002,          !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    East Plenum,            !- Zone Name
+    East Plenum,             !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -534,25 +531,24 @@
     32.24000,15.24000,0.0E+00,  !- X,Y,Z ==> Vertex 3 {m}
     32.24000,15.24000,0.50;  !- X,Y,Z ==> Vertex 4 {m}
 
-
   BuildingSurface:Detailed,
-    Zn001:Wall003W,           !- Name
+    Zn001:Wall003W,          !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    West Zone,                !- Zone Name
+    West Zone,               !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2400,15.240,4.572000, !- X,Y,Z ==> Vertex 1 {m}
-    15.2400,15.240,0.50E+00, !- X,Y,Z ==> Vertex 2 {m}
-    0.0E+00,15.240,0.50E+00, !- X,Y,Z ==> Vertex 3 {m}
-    0.0E+00,15.240,4.572000; !- X,Y,Z ==> Vertex 4 {m}
+    15.2400,15.240,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2400,15.240,0.50E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0E+00,15.240,0.50E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0E+00,15.240,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Zn001:Wall003E,           !- Name
+    Zn001:Wall003E,          !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     East Zone,               !- Zone Name
@@ -562,16 +558,16 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    32.2400,15.240,4.572000, !- X,Y,Z ==> Vertex 1 {m}
-    32.2400,15.240,0.50E+00, !- X,Y,Z ==> Vertex 2 {m}
-    15.2400,15.240,0.50E+00, !- X,Y,Z ==> Vertex 3 {m}
-    15.2400,15.240,4.572000; !- X,Y,Z ==> Vertex 4 {m}
+    32.2400,15.240,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    32.2400,15.240,0.50E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2400,15.240,0.50E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2400,15.240,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    PZn001:Wall003W,          !- Name
+    PZn001:Wall003W,         !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    West Plenum,            !- Zone Name
+    West Plenum,             !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -584,10 +580,10 @@
     0.0E+00,15.240,0.50000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    PZn001:Wall003E,          !- Name
+    PZn001:Wall003E,         !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    East Plenum,            !- Zone Name
+    East Plenum,             !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -603,136 +599,135 @@
     Zn001:Wall004,           !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    West Zone,                !- Zone Name
+    West Zone,               !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.00E+00,15.240,4.572000, !- X,Y,Z ==> Vertex 1 {m}
-    0.00E+00,15.240,0.50E+00, !- X,Y,Z ==> Vertex 2 {m}
-    0.00E+00,0.0E+0,0.50E+00, !- X,Y,Z ==> Vertex 3 {m}
-    0.00E+00,0.0E+0,4.572000; !- X,Y,Z ==> Vertex 4 {m}
+    0.00E+00,15.240,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.00E+00,15.240,0.50E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    0.00E+00,0.0E+0,0.50E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    0.00E+00,0.0E+0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     PZn001:Wall004,          !- Name
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
-    West Plenum,            !- Zone Name
+    West Plenum,             !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0E+00,15.240,0.5000,   !- X,Y,Z ==> Vertex 1 {m}
+    0.0E+00,15.240,0.5000,  !- X,Y,Z ==> Vertex 1 {m}
     0.0E+00,15.240,0.0E+00,  !- X,Y,Z ==> Vertex 2 {m}
     0.0E+00,0.0E+0,0.0E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    0.0E+00,0.0E+0,0.5000;   !- X,Y,Z ==> Vertex 4 {m}
-
+    0.0E+00,0.0E+0,0.5000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Zn001:Flr001W,            !- Name
+    Zn001:Flr001W,           !- Name
     Floor,                   !- Surface Type
     Plenum Floor,            !- Construction Name
-    West Zone,                !- Zone Name
+    West Zone,               !- Zone Name
     Surface,                 !- Outside Boundary Condition
-    PZn001:CeilingW,          !- Outside Boundary Condition Object
+    PZn001:CeilingW,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.240, 0.000000, 0.50,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000, 0.000000, 0.50,  !- X,Y,Z ==> Vertex 2 {m}
-    0.0000, 15.24000, 0.50,  !- X,Y,Z ==> Vertex 3 {m}
-    15.240, 15.24000, 0.50;  !- X,Y,Z ==> Vertex 4 {m}
+    15.240,0.000000,0.50,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,0.000000,0.50,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,15.24000,0.50,  !- X,Y,Z ==> Vertex 3 {m}
+    15.240,15.24000,0.50;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Zn001:Flr001E,            !- Name
+    Zn001:Flr001E,           !- Name
     Floor,                   !- Surface Type
     Plenum Floor,            !- Construction Name
-    East Zone,                !- Zone Name
+    East Zone,               !- Zone Name
     Surface,                 !- Outside Boundary Condition
-    PZn001:CeilingE,          !- Outside Boundary Condition Object
+    PZn001:CeilingE,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    32.240, 0.000000, 0.50,  !- X,Y,Z ==> Vertex 1 {m}
-    15.240, 0.000000, 0.50,  !- X,Y,Z ==> Vertex 2 {m}
-    15.240, 15.24000, 0.50,  !- X,Y,Z ==> Vertex 3 {m}
-    32.240, 15.24000, 0.50;  !- X,Y,Z ==> Vertex 4 {m}
+    32.240,0.000000,0.50,  !- X,Y,Z ==> Vertex 1 {m}
+    15.240,0.000000,0.50,  !- X,Y,Z ==> Vertex 2 {m}
+    15.240,15.24000,0.50,  !- X,Y,Z ==> Vertex 3 {m}
+    32.240,15.24000,0.50;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     PZn001:CeilingW,         !- Name
     Roof,                    !- Surface Type
     Plenum Floor,            !- Construction Name
-    West Plenum,            !- Zone Name
+    West Plenum,             !- Zone Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001W,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.240, 0.000000, 0.50,  !- X,Y,Z ==> Vertex 1 {m}
-    15.240, 15.24000, 0.50,  !- X,Y,Z ==> Vertex 4 {m}
-    0.0000, 15.24000, 0.50,  !- X,Y,Z ==> Vertex 3 {m}
-    0.0000, 0.000000, 0.50;  !- X,Y,Z ==> Vertex 2 {m}
+    15.240,0.000000,0.50,  !- X,Y,Z ==> Vertex 1 {m}
+    15.240,15.24000,0.50,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,15.24000,0.50,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000,0.000000,0.50;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     PZn001:CeilingE,         !- Name
     Roof,                    !- Surface Type
     Plenum Floor,            !- Construction Name
-    East Plenum,            !- Zone Name
+    East Plenum,             !- Zone Name
     Surface,                 !- Outside Boundary Condition
-    Zn001:Flr001E,            !- Outside Boundary Condition Object
+    Zn001:Flr001E,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    32.240, 0.000000, 0.50,  !- X,Y,Z ==> Vertex 1 {m}
-    32.240, 15.24000, 0.50,  !- X,Y,Z ==> Vertex 4 {m}
-    15.240, 15.24000, 0.50,  !- X,Y,Z ==> Vertex 3 {m}
-    15.240, 0.000000, 0.50;  !- X,Y,Z ==> Vertex 2 {m}
+    32.240,0.000000,0.50,  !- X,Y,Z ==> Vertex 1 {m}
+    32.240,15.24000,0.50,  !- X,Y,Z ==> Vertex 2 {m}
+    15.240,15.24000,0.50,  !- X,Y,Z ==> Vertex 3 {m}
+    15.240,0.000000,0.50;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     PZn001:Flr001W,          !- Name
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
-    West Plenum,            !- Zone Name
+    West Plenum,             !- Zone Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.240, 0.000000, 0.00,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000, 0.000000, 0.00,  !- X,Y,Z ==> Vertex 2 {m}
-    0.0000, 15.24000, 0.00,  !- X,Y,Z ==> Vertex 3 {m}
-    15.240, 15.24000, 0.00;  !- X,Y,Z ==> Vertex 4 {m}
+    15.240,0.000000,0.00,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,0.000000,0.00,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,15.24000,0.00,  !- X,Y,Z ==> Vertex 3 {m}
+    15.240,15.24000,0.00;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     PZn001:Flr001E,          !- Name
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
-    East Plenum,            !- Zone Name
+    East Plenum,             !- Zone Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    32.240, 0.000000, 0.00,  !- X,Y,Z ==> Vertex 1 {m}
-    15.240, 0.000000, 0.00,  !- X,Y,Z ==> Vertex 2 {m}
-    15.240, 15.24000, 0.00,  !- X,Y,Z ==> Vertex 3 {m}
-    32.240, 15.24000, 0.00;  !- X,Y,Z ==> Vertex 4 {m}
+    32.240,0.000000,0.00,  !- X,Y,Z ==> Vertex 1 {m}
+    15.240,0.000000,0.00,  !- X,Y,Z ==> Vertex 2 {m}
+    15.240,15.24000,0.00,  !- X,Y,Z ==> Vertex 3 {m}
+    32.240,15.24000,0.00;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Zn001:Roof001W,           !- Name
+    Zn001:Roof001W,          !- Name
     Roof,                    !- Surface Type
     ROOF19,                  !- Construction Name
-    West Zone,                !- Zone Name
+    West Zone,               !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -745,10 +740,10 @@
     15.24000,15.2400,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Zn001:Roof001E,           !- Name
+    Zn001:Roof001E,          !- Name
     Roof,                    !- Surface Type
     ROOF19,                  !- Construction Name
-    East Zone,                !- Zone Name
+    East Zone,               !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -764,14 +759,14 @@
     Zn001:Partiton001,       !- Name
     Wall,                    !- Surface Type
     PARTITION,               !- Construction Name
-    West Zone,                !- Zone Name
+    West Zone,               !- Zone Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Partiton001,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.24000,0.00E+00,4.5720,    !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,0.00E+00,4.5720,  !- X,Y,Z ==> Vertex 1 {m}
     15.24000,0.00E+00,0.50E+00,  !- X,Y,Z ==> Vertex 2 {m}
     15.24000,15.24000,0.50E+00,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
@@ -780,7 +775,7 @@
     PZn001:Partiton001,      !- Name
     Wall,                    !- Surface Type
     PARTITION,               !- Construction Name
-    West Plenum,            !- Zone Name
+    West Plenum,             !- Zone Name
     Surface,                 !- Outside Boundary Condition
     PZn001:Partiton001,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -796,38 +791,36 @@
     Zn002:Partiton001,       !- Name
     Wall,                    !- Surface Type
     PARTITION,               !- Construction Name
-    East Zone,                !- Zone Name
+    East Zone,               !- Zone Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Partiton001,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.240,0.00E+0,4.5720,   !- X,Y,Z ==> Vertex 1 {m}
-    15.240,15.2400,4.572000, !- X,Y,Z ==> Vertex 4 {m}
-    15.240,15.2400,0.50E+00, !- X,Y,Z ==> Vertex 3 {m}
-    15.240,0.00E+0,0.50E+00; !- X,Y,Z ==> Vertex 2 {m}
+    15.240,0.00E+0,4.5720,  !- X,Y,Z ==> Vertex 1 {m}
+    15.240,15.2400,4.572000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.240,15.2400,0.50E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    15.240,0.00E+0,0.50E+00;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     PZn002:Partiton001,      !- Name
     Wall,                    !- Surface Type
     PARTITION,               !- Construction Name
-    East Plenum,            !- Zone Name
+    East Plenum,             !- Zone Name
     Surface,                 !- Outside Boundary Condition
     PZn001:Partiton001,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2400,0.00E+00,0.50,   !- X,Y,Z ==> Vertex 1 {m}
-    15.2400,15.24000,0.50,   !- X,Y,Z ==> Vertex 4 {m}
-    15.2400,15.24000,0.0E+0, !- X,Y,Z ==> Vertex 3 {m}
-    15.2400,0.00E+00,0.0E+0; !- X,Y,Z ==> Vertex 2 {m}
-
+    15.2400,0.00E+00,0.50,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2400,15.24000,0.50,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2400,15.24000,0.0E+0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2400,0.00E+00,0.0E+0;  !- X,Y,Z ==> Vertex 4 {m}
 
 !  ******************** End of materials and construction ***********************************
 !********************************************************************************************
-
 ! *******************************************************************************************
 ! * *********************  Beginning HVAC Air Loop Serving West Zone ************************
 
@@ -851,196 +844,189 @@
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
   ZoneHVAC:AirDistributionUnit,
-    West Zone ATU,             !- Name
-    West Zone Inlet Node,      !- Air Distribution Unit Outlet Node Name
+    West Zone ATU,           !- Name
+    West Zone Inlet Node,    !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type
-    West Zone VAV System;      !- Air Terminal Name
+    West Zone VAV System;    !- Air Terminal Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT ===========
 
   AirTerminal:SingleDuct:VAV:NoReheat,
     West Zone VAV System,    !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    West Zone Inlet Node,       !- Air Outlet Node Name
-    West Zone ATU Inlet Node, !- Air Inlet Node Name
+    West Zone Inlet Node,    !- Air Outlet Node Name
+    West Zone ATU Inlet Node,!- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     Constant,                !- Zone Minimum Air Flow Input Method
     0.40;                    !- Constant Minimum Air Flow Fraction
 
   BranchList,
-    West Zone Air Loop Branches,       !- Name
-    West Zone Air Loop Main Branch;    !- Branch 1 Name
+    West Zone Air Loop Branches,  !- Name
+    West Zone Air Loop Main Branch;  !- Branch 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCH ===========
 
   Branch,
-    West Zone Air Loop Main Branch, !- Name
-    autosize,                 !- Maximum Flow Rate {m3/s}
-    ,                         !- Pressure Drop Curve Name
+    West Zone Air Loop Main Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
-    West Zone OA System,      !- Component 1 Name
-    West Zone Return Air Node,    !- Component 1 Inlet Node Name
-    West Zone Mixed Air Node, !- Component 1 Outlet Node Name
-    ACTIVE,                   !- Component 1 Branch Control Type
-    Fan:VariableVolume,       !- Component 2 Object Type
-    West Zone Supply Fan,     !- Component 2 Name
-    West Zone Mixed Air Node, !- Component 2 Inlet Node Name
+    West Zone OA System,     !- Component 1 Name
+    West Zone Return Air Node,  !- Component 1 Inlet Node Name
+    West Zone Mixed Air Node,!- Component 1 Outlet Node Name
+    Fan:VariableVolume,      !- Component 2 Object Type
+    West Zone Supply Fan,    !- Component 2 Name
+    West Zone Mixed Air Node,!- Component 2 Inlet Node Name
     West Zone Supply Fan Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                   !- Component 2 Branch Control Type
     EvaporativeCooler:Direct:ResearchSpecial,  !- Component 3 Object Type
-    West Data Center DEC ,  !- Component 3 Name
+    West Data Center DEC,    !- Component 3 Name
     West Zone Supply Fan Outlet Node,  !- Component 3 Inlet Node Name
-    West Zone DEC Outlet Node,         !- Component 3 Outlet Node Name
-    ACTIVE,                   !- Component 3 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial, !- Component 4 Object Type
-    West Data Center IEC,        !- Component 4 Name
-    West Zone DEC Outlet Node,   !- Component 4 Inlet Node Name
-    West Zone IEC Outlet Node,   !- Component 4 Outlet Node Name
-    ACTIVE,                      !- Component 4 Branch Control Type
-    CoilSystem:Cooling:DX,    !- Component 5 Object Type
-    West Zone DX Cooling Coil,!- Component 5 Name
-    West Zone IEC Outlet Node, !- Component 5 Inlet Node Name
-    West Zone CCoil Air Outlet Node,    !- Component 5 Outlet Node Name
-    PASSIVE,                  !- Component 5 Branch Control Type
-    Coil:Cooling:Water,       !- Component 6 Object Type
-    West Zone CW Cooling Coil,         !- Component 6 Name
-    West Zone CCoil Air Outlet Node,   !- Component 6 Inlet Node Name
-    West Air Loop Outlet Node,    !- Component 6 Outlet Node Name
-    PASSIVE;                  !- Component 6 Branch Control Type
+    West Zone DEC Outlet Node,  !- Component 3 Outlet Node Name
+    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 4 Object Type
+    West Data Center IEC,    !- Component 4 Name
+    West Zone DEC Outlet Node,  !- Component 4 Inlet Node Name
+    West Zone IEC Outlet Node,  !- Component 4 Outlet Node Name
+    CoilSystem:Cooling:DX,   !- Component 5 Object Type
+    West Zone DX Cooling Coil,  !- Component 5 Name
+    West Zone IEC Outlet Node,  !- Component 5 Inlet Node Name
+    West Zone CCoil Air Outlet Node,  !- Component 5 Outlet Node Name
+    Coil:Cooling:Water,      !- Component 6 Object Type
+    West Zone CW Cooling Coil,  !- Component 6 Name
+    West Zone CCoil Air Outlet Node,  !- Component 6 Inlet Node Name
+    West Air Loop Outlet Node;  !- Component 6 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR PRIMARY LOOP ===========
 
   AirLoopHVAC,
-    West Zone Air System,        !- Name
-    West Data Center Sys Controllers, !- Controller List Name
-    West Data Center Avail List,    !- Availability Manager List Name
+    West Zone Air System,    !- Name
+    West Data Center Sys Controllers,  !- Controller List Name
+    West Data Center Avail List,  !- Availability Manager List Name
     autosize,                !- Design Supply Air Flow Rate {m3/s}
-    West Zone Air Loop Branches,       !- Branch List Name
+    West Zone Air Loop Branches,  !- Branch List Name
     ,                        !- Connector List Name
-    West Zone Return Air Node,      !- Supply Side Inlet Node Name
-    West Return Air Mixer Outlet,    !- Demand Side Outlet Node Name
-    West Zone Equipment Inlet Node, !- Demand Side Inlet Node Names
-    West Air Loop Outlet Node; !- Supply Side Outlet Node Names
+    West Zone Return Air Node,  !- Supply Side Inlet Node Name
+    West Return Air Mixer Outlet,  !- Demand Side Outlet Node Name
+    West Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
+    West Air Loop Outlet Node;  !- Supply Side Outlet Node Names
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE SUPPLY AIR PATH ===========
 
   AirLoopHVAC:SupplyPath,
-    WestSysSupplyPath,        !- Name
+    WestSysSupplyPath,       !- Name
     West Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name
-    AirLoopHVAC:SupplyPlenum, !- Component 1 Object Type
-    West Supply Plenum,       !- Component 1 Name
-    AirLoopHVAC:ZoneSplitter, !- Component 2 Object Type
-    West Supply Air Splitter; !- Component 2 Name
+    AirLoopHVAC:SupplyPlenum,!- Component 1 Object Type
+    West Supply Plenum,      !- Component 1 Name
+    AirLoopHVAC:ZoneSplitter,!- Component 2 Object Type
+    West Supply Air Splitter;!- Component 2 Name
 
   AirLoopHVAC:SupplyPlenum,
-    West Supply Plenum,         !- Name
-    West Plenum,                !- Zone Name
-    West Plenum Zone Node,      !- Zone Node Name
-    West Zone Equipment Inlet Node, !- Inlet Node Name
-    West Plenum Outlet Node;    !- Outlet 1 Node Name
+    West Supply Plenum,      !- Name
+    West Plenum,             !- Zone Name
+    West Plenum Zone Node,   !- Zone Node Name
+    West Zone Equipment Inlet Node,  !- Inlet Node Name
+    West Plenum Outlet Node; !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE RETURN AIR PATH ===========
 
   AirLoopHVAC:ReturnPath,
     WestSysReturnPath,       !- Name
-    West Return Air Mixer Outlet, !- Return Air Path Outlet Node Name
+    West Return Air Mixer Outlet,  !- Return Air Path Outlet Node Name
     AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
     Zone Return Air Mixer;   !- Component 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE SPLITTER ===========
 
   AirLoopHVAC:ZoneSplitter,
-    West Supply Air Splitter,   !- Name
-    West Plenum Outlet Node,    !- Inlet Node Name
-    West Zone ATU Inlet Node;   !- Outlet 1 Node Name
+    West Supply Air Splitter,!- Name
+    West Plenum Outlet Node, !- Inlet Node Name
+    West Zone ATU Inlet Node;!- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE MIXER ===========
 
   AirLoopHVAC:ZoneMixer,
     Zone Return Air Mixer,   !- Name
-    West Return Air Mixer Outlet, !- Outlet Node Name
+    West Return Air Mixer Outlet,  !- Outlet Node Name
     West Zone Return Node;   !- Inlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER LIST ===========
 
   AirLoopHVAC:ControllerList,
-    West Data Center OA Controllers, !- Name
-    Controller:OutdoorAir,      !- Controller 1 Object Type
+    West Data Center OA Controllers,  !- Name
+    Controller:OutdoorAir,   !- Controller 1 Object Type
     West Data Center OA Controller;  !- Controller 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR LOOP EQUIPMENT LIST ===========
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     West Data Center OA Equipment,  !- Name
-    OutdoorAir:Mixer,               !- Component 1 Object Type
-    West Data Center OAM Box;       !- Component 1 Name
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    West Data Center OAM Box;!- Component 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR SYSTEM ===========
 
   AirLoopHVAC:OutdoorAirSystem,
-    West Zone OA System,             !- Name
-    West Data Center OA Controllers, !- Controller List Name
-    West Data Center OA Equipment,   !- Outdoor Air Equipment List Name
-    West Data Center Avail List;     !- Availability Manager List Name
+    West Zone OA System,     !- Name
+    West Data Center OA Controllers,  !- Controller List Name
+    West Data Center OA Equipment,  !- Outdoor Air Equipment List Name
+    West Data Center Avail List;  !- Availability Manager List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 
   OutdoorAir:NodeList,
-    OutsideAirInletNodes;      !- Node or NodeList Name 1
+    OutsideAirInletNodes;    !- Node or NodeList Name 1
 
   NodeList,
-    OutsideAirInletNodes,      !- Name
+    OutsideAirInletNodes,    !- Name
     West Outside Air Inlet Node;  !- Node 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 
   OutdoorAir:NodeList,
-    IECOutsideAirInletNodes;      !- Node or NodeList Name 1
+    IECOutsideAirInletNodes; !- Node or NodeList Name 1
 
   NodeList,
-    IECOutsideAirInletNodes,      !- Name
+    IECOutsideAirInletNodes, !- Name
     West IEC Secondary Air Inlet Node;  !- Node 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR MIXER ===========
 
   OutdoorAir:Mixer,
-    West Data Center OAM Box,     !- Name
-    West Zone Mixed Air Node,     !- Mixed Air Node Name
+    West Data Center OAM Box,!- Name
+    West Zone Mixed Air Node,!- Mixed Air Node Name
     West Outside Air Inlet Node,  !- Outdoor Air Stream Node Name
     West Relief Air Outlet Node,  !- Relief Air Stream Node Name
-    West Zone Return Air Node;    !- Return Air Stream Node Name
+    West Zone Return Air Node;  !- Return Air Stream Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SYSTEM AVAILABILITY MANAGER LIST ===========
 
   AvailabilityManagerAssignmentList,
-    West Data Center Avail List,          !- Name
-    AvailabilityManager:Scheduled, !- Availability Manager 1 Object Type
-    West Data Center Avail;   !- Availability Manager 1 Name
+    West Data Center Avail List,  !- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    West Data Center Avail;  !- Availability Manager 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SYSTEM AVAILABILITY MANAGER:SCHEDULED ===========
 
   AvailabilityManager:Scheduled,
     West Data Center Avail,  !- Name
-    FanAndCoilAvailSched;         !- Schedule Name
+    FanAndCoilAvailSched;    !- Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SET POINT MANAGER:MIXED AIR ===========
 
   SetpointManager:MixedAir,
     West Zone Mixed Air Temp Manager,  !- Name
-    Temperature,                       !- Control Variable
-    West Air Loop Outlet Node,    !- Reference Setpoint Node Name
-    West Zone Mixed Air Node,          !- Fan Inlet Node Name
+    Temperature,             !- Control Variable
+    West Air Loop Outlet Node,  !- Reference Setpoint Node Name
+    West Zone Mixed Air Node,!- Fan Inlet Node Name
     West Zone Supply Fan Outlet Node,  !- Fan Outlet Node Name
-    West Zone Mixed Air Node;          !- Setpoint Node or NodeList Name
+    West Zone Mixed Air Node;!- Setpoint Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTSIDE AIR ===========
 
   Controller:OutdoorAir,
     West Data Center OA Controller,  !- Name
-    West Relief Air Outlet Node,!- Relief Air Outlet Node Name
+    West Relief Air Outlet Node,  !- Relief Air Outlet Node Name
     West Zone Return Air Node,  !- Return Air Node Name
-    West Zone Mixed Air Node,   !- Mixed Air Node Name
-    West Outside Air Inlet Node,!- Actuator Node Name
+    West Zone Mixed Air Node,!- Mixed Air Node Name
+    West Outside Air Inlet Node,  !- Actuator Node Name
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     FixedDryBulb,            !- Economizer Control Type
@@ -1049,7 +1035,7 @@
     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
     13.5,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
     ,                        !- Electronic Enthalpy Limit Curve Name
-   -20.0,                    !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    -20.0,                   !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
     OAFractionSched,         !- Minimum Outdoor Air Schedule Name
@@ -1062,176 +1048,227 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
-    autosize,                !- Primary Design Air Flow Rate  
-    30.0,                    !- Recirculating Water Pump Design Power
-    ,                        !- Water Pump Power Sizing Factor
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
     West Zone Supply Fan Outlet Node,  !- Air Inlet Node Name
-    West Zone DEC Outlet Node,         !- Air Outlet Node Name
-    West Zone DEC Outlet Node,         !- Sensor Node Name
+    West Zone DEC Outlet Node,  !- Air Outlet Node Name
+    West Zone DEC Outlet Node,  !- Sensor Node Name
     ,                        !- Water Supply Storage Tank Name
     0.0,                     !- Drift Loss Fraction
     3.0,                     !- Blowdown Concentration Ratio
-    16.0,                    !- Evaporative Operation Minimum Limit DryBulb Temperature 
+    16.0,                    !- Evaporative Operation Minimum Drybulb Temperature
     18.0,                    !- Evaporative Operation Maximum Limit Wetbulb Temperature
     20.0;                    !- Evaporative Operation Maximum Limit Drybulb Temperature
 
   EvaporativeCooler:Indirect:ResearchSpecial,
-    West Data Center IEC,         !- Name
-    ALWAYS_ON,                    !- Availability Schedule Name
-    0.70,                         !- Cooler Wetbulb Design Effectiveness
-    IECEffWBFlowMod,              !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
-    0.72,                         !- Cooler Drybulb Design Effectiveness
-    IECEffDBFlowMod,              !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    autosize,                     !- Recirculating Water Design Pump Power
-    150.0,                        !- Water Pump Power Sizing Factor W /(m3/s)air
-    IECPumpPowerMod,              !- Water Pump Power Modifier Curve Name
-    autosize,                     !- Secondary Design Air Flow Rate  
-    1.4,                          !- Secondary Air Flow Sizing Factor
-    autosize,                     !- Secondary Fan Design Power
-    200.0,                        !- Secondary Fan Sizing Specific Power W /(m3/s)
-    IECFanPowerMod,               !- Secondary Fan Power Modifier Curve Name
-    West Zone DEC Outlet Node,    !- Primary Air Inlet Node Name
-    West Zone IEC Outlet Node,    !- Primary Air Outlet Node Name
-    autosize,                     !- Primary Design Air Flow Rate  
-    0.9 ,                         !- Dewpoint Effectiveness Factor
+    West Data Center IEC,    !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    0.70,                    !- Cooler Wetbulb Design Effectiveness
+    IECEffWBFlowMod,         !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    0.72,                    !- Cooler Drybulb Design Effectiveness
+    IECEffDBFlowMod,         !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Recirculating Water Pump Design Power {W}
+    150.0,                   !- Water Pump Power Sizing Factor {W/(m3/s)}
+    IECPumpPowerMod,         !- Water Pump Power Modifier Curve Name
+    autosize,                !- Secondary Air Design Flow Rate {m3/s}
+    1.4,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    200.0,                   !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    IECFanPowerMod,          !- Secondary Air Fan Power Modifier Curve Name
+    West Zone DEC Outlet Node,  !- Primary Air Inlet Node Name
+    West Zone IEC Outlet Node,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
+    0.9,                     !- Dewpoint Effectiveness Factor
     West IEC Secondary Air Inlet Node,  !- Secondary Air Inlet Node Name
-    West IEC Secondary Air Outlet Node, !- Secondary Air Outlet Node Name
-    West Zone IEC Outlet Node,    !- Sensor Node Name
-    ,                             !- Relief Air Inlet Node Name
-    ,                             !- Water Supply Storage Tank Name
-    0.0,                          !- Drift Loss Fraction
-    ,                             !- Blowdown Concentration Ratio
-    20.0,                         !- Evaporative Operation Minimum Limit DryBulb Temperature 
-    24.0,                         !- Evaporative Operation Maximum Limit Wetbulb Temperature
-    50.0;                         !- Evaporative Operation Maximum Limit Drybulb Temperature
+    West IEC Secondary Air Outlet Node,  !- Secondary Air Outlet Node Name
+    West Zone IEC Outlet Node,  !- Sensor Node Name
+    ,                        !- Relief Air Inlet Node Name
+    ,                        !- Water Supply Storage Tank Name
+    0.0,                     !- Drift Loss Fraction
+    ,                        !- Blowdown Concentration Ratio
+    20.0,                    !- Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature
+    24.0,                    !- Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
+    50.0;                    !- Dry Operation Maximum Limit Outdoor Drybulb Temperature
 
- 
-  Table:OneIndependentVariable,
-   IECEffWBFlowMod,
-   !Munters Oasis Wet Op Eff Mod Fac,  
-   Cubic,                     !- Curve Type
-   LagrangeInterpolationLinearExtrapolation,   !- Interpolation Method
-   0.0,                       !- Minimum Value of X
-   1.875,                     !- Maximum Value of X 
-   0.0,                       !- Minimum Table Output
-   1.15,                      !- Maximum Table Output
-   Dimensionless,             !- Input Unit Type for X
-   Dimensionless,             !- Output Unit Type
-   ,                          !- Normalization Reference
-   0.0,    0.0,
-   0.125,  0.503563817,
-   0.250,  0.669042545,
-   0.375,  0.765841395,
-   0.500,  0.834521272,
-   0.625,  0.887793524,
-   0.750,  0.931320123,
-   0.875,  0.968121338,
-   1.000,  1.0,
-   1.125,  1.028118973,
-   1.25 ,  1.053272252,
-   1.375,  1.07602616,
-   1.500,  1.09679885,
-   1.625,  1.115907873,
-   1.750,  1.133600065,
-   1.875,  1.150071102;
-  
-  Table:OneIndependentVariable,
-   ! Munters Oasis Dry Op Eff Mod Fac,  ! formulated no mass capacitance flux ratio, flow ratio = sec/sys 
-   IECEffDBFlowMod,
-   Cubic,                   !- Curve Type
-   LagrangeInterpolationLinearExtrapolation,   !- Interpolation Method
-   0.0,
-   1.1,
-   0.0, 
-   1.0,
-   Dimensionless,
-   Dimensionless,
-   ,
-   0.0,     0.0,
-   0.156016442,  0.251901141,
-   0.224969531,  0.272633745,
-   0.245292433,  0.297085202,
-   0.269624525,  0.32635468,
-   0.299327692,  0.362021858,
-   0.33698954,   0.406441718,
-   0.385709241,  0.463286713,
-   0.453044107,  0.538617886,
-   0.553875806,  0.643203883,
-   0.732741489,  0.798192771,
-   0.899289342,  0.907534247,
-   1.047473735,  0.989130435,
-   1.074970273,  0.994186047,
-   1.104173513,  1.0;
-  
-  Table:OneIndependentVariable,
-    IECFanPowerMod,           !- Name
-    !Fan Power Mod Fac x raised to 2_6 ,  ! fan power following x^2.6  
-   Cubic,                   !- Curve Type
-   LagrangeInterpolationLinearExtrapolation,   !- Interpolation Method
-   0.0,
-   1.0,
-   0.0, 
-   1.0,
-   Dimensionless,
-   Dimensionless,
-   ,
-   0 ,   0,
-   0.125 ,   0.004487103,
-   0.25  ,   0.027204705,
-   0.375 ,   0.078069482,
-   0.5   ,   0.164938489,
-   0.625 ,   0.294637516,
-   0.75  ,   0.473324827,
-   0.875 ,   0.706676969,
-   1 ,       1;
-
+   !Munters Oasis Wet Op Eff Mod Fac,
 
   Table:OneIndependentVariable,
-   !Pump Power Mod Fac two speed spray pump ,  ! 
-   IECPumpPowerMod,          !- Name
-   Cubic,                   !- Curve Type
-   LagrangeInterpolationLinearExtrapolation,   !- Interpolation Method
-   0.0,
-   1.0,
-   0.0, 
-   1.0,
-   Dimensionless,
-   Dimensionless,
-   ,
-   0,     0.4,
-   0.125, 0.4,
-   0.25,  0.4,
-   0.375, 0.4,
-   0.5,     1,
-   0.625 ,  1,
-   0.75,    1,
-   0.875,   1,
-   1,       1;
-    
+    IECEffWBFlowMod,         !- Name
+    Cubic,                   !- Curve Type
+    LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
+    0.0,                     !- Minimum Value of X
+    1.875,                   !- Maximum Value of X
+    0.0,                     !- Minimum Table Output
+    1.15,                    !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless,           !- Output Unit Type
+    ,                        !- Normalization Reference
+    0.0,                     !- X Value #1
+    0.0,                     !- Output Value #1
+    0.125,                   !- X Value #2
+    0.503563817,             !- Output Value #2
+    0.250,                   !- X Value #3
+    0.669042545,             !- Output Value #3
+    0.375,                   !- X Value #4
+    0.765841395,             !- Output Value #4
+    0.500,                   !- X Value #5
+    0.834521272,             !- Output Value #5
+    0.625,                   !- X Value #6
+    0.887793524,             !- Output Value #6
+    0.750,                   !- X Value #7
+    0.931320123,             !- Output Value #7
+    0.875,                   !- <none>
+    0.968121338,             !- <none>
+    1.000,                   !- <none>
+    1.0,                     !- <none>
+    1.125,                   !- <none>
+    1.028118973,             !- <none>
+    1.25,                    !- <none>
+    1.053272252,             !- <none>
+    1.375,                   !- <none>
+    1.07602616,              !- <none>
+    1.500,                   !- <none>
+    1.09679885,              !- <none>
+    1.625,                   !- <none>
+    1.115907873,             !- <none>
+    1.750,                   !- <none>
+    1.133600065,             !- <none>
+    1.875,                   !- <none>
+    1.150071102;             !- <none>
+
+   ! Munters Oasis Dry Op Eff Mod Fac,  ! formulated no mass capacitance flux ratio, flow ratio = sec/sys
+
+  Table:OneIndependentVariable,
+    IECEffDBFlowMod,         !- Name
+    Cubic,                   !- Curve Type
+    LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
+    0.0,                     !- Minimum Value of X
+    1.1,                     !- Maximum Value of X
+    0.0,                     !- Minimum Table Output
+    1.0,                     !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless,           !- Output Unit Type
+    ,                        !- Normalization Reference
+    0.0,                     !- X Value #1
+    0.0,                     !- Output Value #1
+    0.156016442,             !- X Value #2
+    0.251901141,             !- Output Value #2
+    0.224969531,             !- X Value #3
+    0.272633745,             !- Output Value #3
+    0.245292433,             !- X Value #4
+    0.297085202,             !- Output Value #4
+    0.269624525,             !- X Value #5
+    0.32635468,              !- Output Value #5
+    0.299327692,             !- X Value #6
+    0.362021858,             !- Output Value #6
+    0.33698954,              !- X Value #7
+    0.406441718,             !- Output Value #7
+    0.385709241,             !- <none>
+    0.463286713,             !- <none>
+    0.453044107,             !- <none>
+    0.538617886,             !- <none>
+    0.553875806,             !- <none>
+    0.643203883,             !- <none>
+    0.732741489,             !- <none>
+    0.798192771,             !- <none>
+    0.899289342,             !- <none>
+    0.907534247,             !- <none>
+    1.047473735,             !- <none>
+    0.989130435,             !- <none>
+    1.074970273,             !- <none>
+    0.994186047,             !- <none>
+    1.104173513,             !- <none>
+    1.0;                     !- <none>
+
+    !Fan Power Mod Fac x raised to 2_6 ,  ! fan power following x^2.6
+
+  Table:OneIndependentVariable,
+    IECFanPowerMod,          !- Name
+    Cubic,                   !- Curve Type
+    LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
+    0.0,                     !- Minimum Value of X
+    1.0,                     !- Maximum Value of X
+    0.0,                     !- Minimum Table Output
+    1.0,                     !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless,           !- Output Unit Type
+    ,                        !- Normalization Reference
+    0,                       !- X Value #1
+    0,                       !- Output Value #1
+    0.125,                   !- X Value #2
+    0.004487103,             !- Output Value #2
+    0.25,                    !- X Value #3
+    0.027204705,             !- Output Value #3
+    0.375,                   !- X Value #4
+    0.078069482,             !- Output Value #4
+    0.5,                     !- X Value #5
+    0.164938489,             !- Output Value #5
+    0.625,                   !- X Value #6
+    0.294637516,             !- Output Value #6
+    0.75,                    !- X Value #7
+    0.473324827,             !- Output Value #7
+    0.875,                   !- <none>
+    0.706676969,             !- <none>
+    1,                       !- <none>
+    1;                       !- <none>
+
+   !Pump Power Mod Fac two speed spray pump ,  !
+
+  Table:OneIndependentVariable,
+    IECPumpPowerMod,         !- Name
+    Cubic,                   !- Curve Type
+    LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
+    0.0,                     !- Minimum Value of X
+    1.0,                     !- Maximum Value of X
+    0.0,                     !- Minimum Table Output
+    1.0,                     !- Maximum Table Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless,           !- Output Unit Type
+    ,                        !- Normalization Reference
+    0,                       !- X Value #1
+    0.4,                     !- Output Value #1
+    0.125,                   !- X Value #2
+    0.4,                     !- Output Value #2
+    0.25,                    !- X Value #3
+    0.4,                     !- Output Value #3
+    0.375,                   !- X Value #4
+    0.4,                     !- Output Value #4
+    0.5,                     !- X Value #5
+    1,                       !- Output Value #5
+    0.625,                   !- X Value #6
+    1,                       !- Output Value #6
+    0.75,                    !- X Value #7
+    1,                       !- Output Value #7
+    0.875,                   !- <none>
+    1,                       !- <none>
+    1,                       !- <none>
+    1;                       !- <none>
+
   SetpointManager:SingleZone:Cooling,
     System Setpoint manager, !- Name
     Temperature,             !- Control Variable
-   -99.0,                    !- Minimum Supply Air Temperature {C}
+    -99.0,                   !- Minimum Supply Air Temperature {C}
     99.0,                    !- Maximum Supply Air Temperature {C}
     West Zone,               !- Control Zone Name
     West Zone Air Node,      !- Zone Node Name
-    West Zone Inlets,             !- Zone Inlet Node Name
+    West Zone Inlets,        !- Zone Inlet Node Name
     West Sys Setpoint nodes; !- Setpoint Node or NodeList Name
 
   NodeList,
-    West Sys Setpoint nodes,   !- Name
-    West Zone DEC Outlet Node, !- Node 1 Name
-    West Zone IEC Outlet Node, !- Node 2 Name
-    West Zone CCoil Air Outlet Node,   !- Node 3 Name
-    West Air Loop Outlet Node; !- Node 4 Name
+    West Sys Setpoint nodes, !- Name
+    West Zone DEC Outlet Node,  !- Node 1 Name
+    West Zone IEC Outlet Node,  !- Node 2 Name
+    West Zone CCoil Air Outlet Node,  !- Node 3 Name
+    West Air Loop Outlet Node;  !- Node 4 Name
 
   CoilSystem:Cooling:DX,
-    West Zone DX Cooling Coil,    !- Name
-    WestDXCCoilAvailSched,        !- Availability Schedule Name
-    West Zone IEC Outlet Node,         !- DX Cooling Coil System Inlet Node Name
-    West Zone CCoil Air Outlet Node,   !- DX Cooling Coil System Outlet Node Name
-    West Zone CCoil Air Outlet Node,   !- DX Cooling Coil System Sensor Node Name
+    West Zone DX Cooling Coil,  !- Name
+    WestDXCCoilAvailSched,   !- Availability Schedule Name
+    West Zone IEC Outlet Node,  !- DX Cooling Coil System Inlet Node Name
+    West Zone CCoil Air Outlet Node,  !- DX Cooling Coil System Outlet Node Name
+    West Zone CCoil Air Outlet Node,  !- DX Cooling Coil System Sensor Node Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     West DX Cooling Coil,    !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
@@ -1242,31 +1279,40 @@
     West Zone Air System,    !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    0.4,                     !- Minimum System Air Flow Ratio
+    0.4,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.0085,                  !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.0085,                  !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8,                    !- Central Cooling Design Supply Air Temperature {C}
     16.7,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     Yes,                     !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0085,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
-
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    ;                        !- Central Cooling Capacity Control Method
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:SIMPLE:VARIABLEVOLUME ===========
 
@@ -1286,7 +1332,7 @@
     -0.54137364,             !- Fan Power Coefficient 3
     0.87198823,              !- Fan Power Coefficient 4
     0.000,                   !- Fan Power Coefficient 5
-    West Zone Mixed Air Node,          !- Air Inlet Node Name
+    West Zone Mixed Air Node,!- Air Inlet Node Name
     West Zone Supply Fan Outlet Node;  !- Air Outlet Node Name
 
   Schedule:Compact,
@@ -1306,28 +1352,29 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    West Zone IEC Outlet Node,         !- Air Inlet Node Name
-    West Zone CCoil Air Outlet Node,   !- Air Outlet Node Name
+    West Zone IEC Outlet Node,  !- Air Inlet Node Name
+    West Zone CCoil Air Outlet Node,  !- Air Outlet Node Name
     DXSysACCoolCapFT,        !- Total Cooling Capacity Function of Temperature Curve Name
     DXSysACCoolCapFFF,       !- Total Cooling Capacity Function of Flow Fraction Curve Name
     DXSysACCoolEIRFT,        !- Energy Input Ratio Function of Temperature Curve Name
     DXSysACCoolEIRFFF,       !- Energy Input Ratio Function of Flow Fraction Curve Name
     DXSysACCoolPLFFPLR,      !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Latent Capacity Time Constant {s}
     ,                        !- Condenser Air Inlet Node Name
     ,                        !- Condenser Type
-    ,                        !- Evaporative Condenser Effectiveness
-    ,                        !- Evaporative Condenser Air Flow Rate
-    ,                        !- Evaporative Condenser Pump Rated Power Consumption
-    ,                        !- Crankcase Heater Capacity
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
-    ,                        !- Basin Heater Capacity
-    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
     ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
@@ -1392,15 +1439,14 @@
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
-! ***************End of HVAC Air Loop Serving West Zone *************************************
 
+! ***************End of HVAC Air Loop Serving West Zone *************************************
 ! *******************************************************************************************
 ! * *********************  Beginning HVAC Air Loop Serving East Zone ************************
 
-
   ZoneHVAC:EquipmentConnections,
     East Zone,               !- Zone Name
-    East Zone Equipment,          !- Zone Conditioning Equipment List Name
+    East Zone Equipment,     !- Zone Conditioning Equipment List Name
     East Zone Inlets,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     East Zone Air Node,      !- Zone Air Node Name
@@ -1411,202 +1457,194 @@
     East Zone Inlet Node;    !- Node 1 Name
 
   ZoneHVAC:EquipmentList,
-    East Zone Equipment,          !- Name
+    East Zone Equipment,     !- Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     East Zone ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
   ZoneHVAC:AirDistributionUnit,
-    East Zone ATU,             !- Name
-    East Zone Inlet Node,        !- Air Distribution Unit Outlet Node Name
+    East Zone ATU,           !- Name
+    East Zone Inlet Node,    !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type
-    East Zone VAV System;     !- Air Terminal Name
+    East Zone VAV System;    !- Air Terminal Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT ===========
 
   AirTerminal:SingleDuct:VAV:NoReheat,
     East Zone VAV System,    !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    East Zone Inlet Node,       !- Air Outlet Node Name
-    East Zone ATU Inlet Node, !- Air Inlet Node Name
+    East Zone Inlet Node,    !- Air Outlet Node Name
+    East Zone ATU Inlet Node,!- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     Constant,                !- Zone Minimum Air Flow Input Method
     0.40;                    !- Constant Minimum Air Flow Fraction
 
-
   BranchList,
-    East Zone Air Loop Branches,       !- Name
-    East Zone Air Loop Main Branch;    !- Branch 1 Name
+    East Zone Air Loop Branches,  !- Name
+    East Zone Air Loop Main Branch;  !- Branch 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCH ===========
 
   Branch,
-    East Zone Air Loop Main Branch, !- Name
-    autosize,                 !- Maximum Flow Rate {m3/s}
-    ,                         !- Pressure Drop Curve Name
+    East Zone Air Loop Main Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
-    East Zone OA System,      !- Component 1 Name
-    East Zone Return Air Node,    !- Component 1 Inlet Node Name
-    East Zone Mixed Air Node, !- Component 1 Outlet Node Name
-    ACTIVE,                   !- Component 1 Branch Control Type
-    Fan:VariableVolume,       !- Component 2 Object Type
-    East Zone Supply Fan,     !- Component 2 Name
-    East Zone Mixed Air Node, !- Component 2 Inlet Node Name
+    East Zone OA System,     !- Component 1 Name
+    East Zone Return Air Node,  !- Component 1 Inlet Node Name
+    East Zone Mixed Air Node,!- Component 1 Outlet Node Name
+    Fan:VariableVolume,      !- Component 2 Object Type
+    East Zone Supply Fan,    !- Component 2 Name
+    East Zone Mixed Air Node,!- Component 2 Inlet Node Name
     East Zone Supply Fan Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                   !- Component 2 Branch Control Type
     EvaporativeCooler:Direct:ResearchSpecial,  !- Component 3 Object Type
-    East Data Center DEC ,  !- Component 3 Name
+    East Data Center DEC,    !- Component 3 Name
     East Zone Supply Fan Outlet Node,  !- Component 3 Inlet Node Name
-    East Zone DEC Outlet Node,         !- Component 3 Outlet Node Name
-    ACTIVE,                   !- Component 3 Branch Control Type
-    EvaporativeCooler:Indirect:ResearchSpecial, !- Component 4 Object Type
-    East Data Center IEC,        !- Component 4 Name
-    East Zone DEC Outlet Node,   !- Component 4 Inlet Node Name
-    East Zone IEC Outlet Node,   !- Component 4 Outlet Node Name
-    ACTIVE,                      !- Component 4 Branch Control Type
-    CoilSystem:Cooling:DX,       !- Component 5 Object Type
-    East Zone DX Cooling Coil,   !- Component 5 Name
-    East Zone IEC Outlet Node,   !- Component 5 Inlet Node Name
-    East Zone CCoil Air Outlet Node,   !- Component 5 Outlet Node Name
-    PASSIVE,                  !- Component 5 Branch Control Type
-    Coil:Cooling:Water,       !- Component 6 Object Type
-    East Zone CW Cooling Coil,         !- Component 6 Name
-    East Zone CCoil Air Outlet Node,   !- Component 6 Inlet Node Name
-    East Air Loop Outlet Node, !- Component 6 Outlet Node Name
-    PASSIVE;                   !- Component 6 Branch Control Type
+    East Zone DEC Outlet Node,  !- Component 3 Outlet Node Name
+    EvaporativeCooler:Indirect:ResearchSpecial,  !- Component 4 Object Type
+    East Data Center IEC,    !- Component 4 Name
+    East Zone DEC Outlet Node,  !- Component 4 Inlet Node Name
+    East Zone IEC Outlet Node,  !- Component 4 Outlet Node Name
+    CoilSystem:Cooling:DX,   !- Component 5 Object Type
+    East Zone DX Cooling Coil,  !- Component 5 Name
+    East Zone IEC Outlet Node,  !- Component 5 Inlet Node Name
+    East Zone CCoil Air Outlet Node,  !- Component 5 Outlet Node Name
+    Coil:Cooling:Water,      !- Component 6 Object Type
+    East Zone CW Cooling Coil,  !- Component 6 Name
+    East Zone CCoil Air Outlet Node,  !- Component 6 Inlet Node Name
+    East Air Loop Outlet Node;  !- Component 6 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR PRIMARY LOOP ===========
 
   AirLoopHVAC,
-    East Zone Air System,        !- Name
-    East Data Center Sys Controllers, !- Controller List Name
-    East Data Center Avail List,    !- Availability Manager List Name
+    East Zone Air System,    !- Name
+    East Data Center Sys Controllers,  !- Controller List Name
+    East Data Center Avail List,  !- Availability Manager List Name
     autosize,                !- Design Supply Air Flow Rate {m3/s}
-    East Zone Air Loop Branches,       !- Branch List Name
+    East Zone Air Loop Branches,  !- Branch List Name
     ,                        !- Connector List Name
-    East Zone Return Air Node,      !- Supply Side Inlet Node Name
-    East Return Air Mixer Outlet,   !- Demand Side Outlet Node Name
-    East Zone Equipment Inlet Node, !- Demand Side Inlet Node Names
-    East Air Loop Outlet Node; !- Supply Side Outlet Node Names
+    East Zone Return Air Node,  !- Supply Side Inlet Node Name
+    East Return Air Mixer Outlet,  !- Demand Side Outlet Node Name
+    East Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
+    East Air Loop Outlet Node;  !- Supply Side Outlet Node Names
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE SUPPLY AIR PATH ===========
 
   AirLoopHVAC:SupplyPath,
-    EastSysSupplyPath,               !- Name
+    EastSysSupplyPath,       !- Name
     East Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name
-    AirLoopHVAC:SupplyPlenum, !- Component 1 Object Type
-    East Supply Plenum,       !- Component 1 Name
-    AirLoopHVAC:ZoneSplitter, !- Component 2 Object Type
-    East Supply Air Splitter; !- Component 2 Name
+    AirLoopHVAC:SupplyPlenum,!- Component 1 Object Type
+    East Supply Plenum,      !- Component 1 Name
+    AirLoopHVAC:ZoneSplitter,!- Component 2 Object Type
+    East Supply Air Splitter;!- Component 2 Name
 
   AirLoopHVAC:SupplyPlenum,
-    East Supply Plenum,         !- Name
-    East Plenum,                !- Zone Name
-    East Plenum Zone Node,      !- Zone Node Name
-    East Zone Equipment Inlet Node, !- Inlet Node Name
-    East Plenum Outlet Node;    !- Outlet 1 Node Name
+    East Supply Plenum,      !- Name
+    East Plenum,             !- Zone Name
+    East Plenum Zone Node,   !- Zone Node Name
+    East Zone Equipment Inlet Node,  !- Inlet Node Name
+    East Plenum Outlet Node; !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE RETURN AIR PATH ===========
 
   AirLoopHVAC:ReturnPath,
     EastSysReturnPath,       !- Name
-    East Return Air Mixer Outlet, !- Return Air Path Outlet Node Name
+    East Return Air Mixer Outlet,  !- Return Air Path Outlet Node Name
     AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
     East Return Air Mixer;   !- Component 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE SPLITTER ===========
 
   AirLoopHVAC:ZoneSplitter,
-    East Supply Air Splitter,   !- Name
-    East Plenum Outlet Node,    !- Inlet Node Name
-    East Zone ATU Inlet Node;   !- Outlet 1 Node Name
+    East Supply Air Splitter,!- Name
+    East Plenum Outlet Node, !- Inlet Node Name
+    East Zone ATU Inlet Node;!- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE MIXER ===========
 
   AirLoopHVAC:ZoneMixer,
     East Return Air Mixer,   !- Name
-    East Return Air Mixer Outlet, !- Outlet Node Name
+    East Return Air Mixer Outlet,  !- Outlet Node Name
     East Zone Return Node;   !- Inlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER LIST ===========
 
   AirLoopHVAC:ControllerList,
-    East Data Center OA Controllers, !- Name
-    Controller:OutdoorAir,      !- Controller 1 Object Type
+    East Data Center OA Controllers,  !- Name
+    Controller:OutdoorAir,   !- Controller 1 Object Type
     East Data Center OA Controller;  !- Controller 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR LOOP EQUIPMENT LIST ===========
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     East Data Center OA Equipment,  !- Name
-    OutdoorAir:Mixer,               !- Component 1 Object Type
-    East Data Center OAM Box;       !- Component 1 Name
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    East Data Center OAM Box;!- Component 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR SYSTEM ===========
 
   AirLoopHVAC:OutdoorAirSystem,
-    East Zone OA System,             !- Name
-    East Data Center OA Controllers, !- Controller List Name
-    East Data Center OA Equipment,   !- Outdoor Air Equipment List Name
-    East Data Center Avail List;     !- Availability Manager List Name
+    East Zone OA System,     !- Name
+    East Data Center OA Controllers,  !- Controller List Name
+    East Data Center OA Equipment,  !- Outdoor Air Equipment List Name
+    East Data Center Avail List;  !- Availability Manager List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
 
   OutdoorAir:NodeList,
-    EastOutsideAirInletNodes;    !- Node or NodeList Name 1
+    EastOutsideAirInletNodes;!- Node or NodeList Name 1
 
   NodeList,
-    EastOutsideAirInletNodes,     !- Name
+    EastOutsideAirInletNodes,!- Name
     East Outside Air Inlet Node;  !- Node 1 Name
 
   OutdoorAir:NodeList,
-    EastIECOutsideAirInletNodes;      !- Node or NodeList Name 1
+    EastIECOutsideAirInletNodes;  !- Node or NodeList Name 1
 
   NodeList,
-    EastIECOutsideAirInletNodes,      !- Name
+    EastIECOutsideAirInletNodes,  !- Name
     East IEC Secondary Air Inlet Node;  !- Node 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR MIXER ===========
 
   OutdoorAir:Mixer,
-    East Data Center OAM Box,     !- Name
-    East Zone Mixed Air Node,     !- Mixed Air Node Name
+    East Data Center OAM Box,!- Name
+    East Zone Mixed Air Node,!- Mixed Air Node Name
     East Outside Air Inlet Node,  !- Outdoor Air Stream Node Name
     East Relief Air Outlet Node,  !- Relief Air Stream Node Name
-    East Zone Return Air Node;    !- Return Air Stream Node Name
+    East Zone Return Air Node;  !- Return Air Stream Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SYSTEM AVAILABILITY MANAGER LIST ===========
 
   AvailabilityManagerAssignmentList,
-    East Data Center Avail List,   !- Name
-    AvailabilityManager:Scheduled, !- Availability Manager 1 Object Type
-    East Data Center Avail;        !- Availability Manager 1 Name
+    East Data Center Avail List,  !- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    East Data Center Avail;  !- Availability Manager 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SYSTEM AVAILABILITY MANAGER:SCHEDULED ===========
 
   AvailabilityManager:Scheduled,
-    East Data Center Avail,        !- Name
-    FanAndCoilAvailSched;          !- Schedule Name
+    East Data Center Avail,  !- Name
+    FanAndCoilAvailSched;    !- Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SET POINT MANAGER:MIXED AIR ===========
 
   SetpointManager:MixedAir,
-    East Zone Mixed Air Temp Manager, !- Name
-    Temperature,                      !- Control Variable
-    East Air Loop Outlet Node,        !- Reference Setpoint Node Name
-    East Zone Mixed Air Node,         !- Fan Inlet Node Name
-    East Zone Supply Fan Outlet Node, !- Fan Outlet Node Name
-    East Zone Mixed Air Node;         !- Setpoint Node or NodeList Name
+    East Zone Mixed Air Temp Manager,  !- Name
+    Temperature,             !- Control Variable
+    East Air Loop Outlet Node,  !- Reference Setpoint Node Name
+    East Zone Mixed Air Node,!- Fan Inlet Node Name
+    East Zone Supply Fan Outlet Node,  !- Fan Outlet Node Name
+    East Zone Mixed Air Node;!- Setpoint Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTSIDE AIR ===========
 
   Controller:OutdoorAir,
     East Data Center OA Controller,  !- Name
-    East Relief Air Outlet Node,!- Relief Air Outlet Node Name
+    East Relief Air Outlet Node,  !- Relief Air Outlet Node Name
     East Zone Return Air Node,  !- Return Air Node Name
-    East Zone Mixed Air Node,   !- Mixed Air Node Name
-    East Outside Air Inlet Node,!- Actuator Node Name
+    East Zone Mixed Air Node,!- Mixed Air Node Name
+    East Outside Air Inlet Node,  !- Actuator Node Name
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     FixedDryBulb,            !- Economizer Control Type
@@ -1615,7 +1653,7 @@
     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
     13.5,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
     ,                        !- Electronic Enthalpy Limit Curve Name
-   -20.0,                    !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    -20.0,                   !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
     OAFractionSched,         !- Minimum Outdoor Air Schedule Name
@@ -1628,73 +1666,73 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
-    autosize,                !- Primary Design Air Flow Rate  
-    30.0,                    !- Recirculating Water Pump Design Power
-    ,                        !- Water Pump Power Sizing Factor
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
     East Zone Supply Fan Outlet Node,  !- Air Inlet Node Name
-    East Zone DEC Outlet Node,         !- Air Outlet Node Name
-    East Zone DEC Outlet Node,         !- Sensor Node Name
+    East Zone DEC Outlet Node,  !- Air Outlet Node Name
+    East Zone DEC Outlet Node,  !- Sensor Node Name
     ,                        !- Water Supply Storage Tank Name
     0.0,                     !- Drift Loss Fraction
     3.0,                     !- Blowdown Concentration Ratio
-    16.0,                    !- Evaporative Operation Minimum Limit DryBulb Temperature 
+    16.0,                    !- Evaporative Operation Minimum Drybulb Temperature
     20.0,                    !- Evaporative Operation Maximum Limit Wetbulb Temperature
     22.0;                    !- Evaporative Operation Maximum Limit Drybulb Temperature
 
   EvaporativeCooler:Indirect:ResearchSpecial,
-    East Data Center IEC,         !- Name
-    ALWAYS_ON,                    !- Availability Schedule Name
-    0.70,                         !- Cooler Wetbulb Design Effectiveness
-    IECEffWBFlowMod,              !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
-    0.72,                         !- Cooler Drybulb Design Effectiveness
-    IECEffDBFlowMod,              !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    autosize,                     !- Recirculating Water Design Pump Power
-    150.0,                        !- Water Pump Power Sizing Factor W /(m3/s)air
-    IECPumpPowerMod,              !- Water Pump Power Modifier Curve Name
-    autosize,                     !- Secondary Design Air Flow Rate  
-    1.4,                          !- Secondary Air Flow Sizing Factor
-    autosize,                     !- Secondary Fan Design Power
-    200.0,                        !- Secondary Fan Sizing Specific Power W /(m3/s)
-    IECFanPowerMod,               !- Secondary Fan Power Modifier Curve Name
-    East Zone DEC Outlet Node,    !- Primary Air Inlet Node Name
-    East Zone IEC Outlet Node,    !- Primary Air Outlet Node Name
-    autosize,                     !- Primary Design Air Flow Rate  
-    0.9 ,                         !- Dewpoint Effectiveness Factor
+    East Data Center IEC,    !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    0.70,                    !- Cooler Wetbulb Design Effectiveness
+    IECEffWBFlowMod,         !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    0.72,                    !- Cooler Drybulb Design Effectiveness
+    IECEffDBFlowMod,         !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Recirculating Water Pump Design Power {W}
+    150.0,                   !- Water Pump Power Sizing Factor {W/(m3/s)}
+    IECPumpPowerMod,         !- Water Pump Power Modifier Curve Name
+    autosize,                !- Secondary Air Design Flow Rate {m3/s}
+    1.4,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    200.0,                   !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    IECFanPowerMod,          !- Secondary Air Fan Power Modifier Curve Name
+    East Zone DEC Outlet Node,  !- Primary Air Inlet Node Name
+    East Zone IEC Outlet Node,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
+    0.9,                     !- Dewpoint Effectiveness Factor
     East IEC Secondary Air Inlet Node,  !- Secondary Air Inlet Node Name
-    East IEC Secondary Air Outlet Node, !- Secondary Air Outlet Node Name
-    East Zone IEC Outlet Node,    !- Sensor Node Name
-    ,                             !- Relief Air Inlet Node Name
-    ,                             !- Water Supply Storage Tank Name
-    0.0,                          !- Drift Loss Fraction
-    ,                             !- Blowdown Concentration Ratio
-    22.0,                         !- Evaporative Operation Minimum Limit DryBulb Temperature 
-    24.0,                         !- Evaporative Operation Maximum Limit Wetbulb Temperature
-    35.0;                         !- Evaporative Operation Maximum Limit Drybulb Temperature
+    East IEC Secondary Air Outlet Node,  !- Secondary Air Outlet Node Name
+    East Zone IEC Outlet Node,  !- Sensor Node Name
+    ,                        !- Relief Air Inlet Node Name
+    ,                        !- Water Supply Storage Tank Name
+    0.0,                     !- Drift Loss Fraction
+    ,                        !- Blowdown Concentration Ratio
+    22.0,                    !- Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature
+    24.0,                    !- Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
+    35.0;                    !- Dry Operation Maximum Limit Outdoor Drybulb Temperature
 
   SetpointManager:SingleZone:Cooling,
-    East System Setpoint manager, !- Name
+    East System Setpoint manager,  !- Name
     Temperature,             !- Control Variable
-   -99.0,                    !- Minimum Supply Air Temperature {C}
+    -99.0,                   !- Minimum Supply Air Temperature {C}
     99.0,                    !- Maximum Supply Air Temperature {C}
     East Zone,               !- Control Zone Name
     East Zone Air Node,      !- Zone Node Name
-    West Zone Inlets,             !- Zone Inlet Node Name
+    West Zone Inlets,        !- Zone Inlet Node Name
     East Sys Setpoint nodes; !- Setpoint Node or NodeList Name
 
   NodeList,
-    East Sys Setpoint nodes,    !- Name
+    East Sys Setpoint nodes, !- Name
     East Zone DEC Outlet Node,  !- Node 1 Name
-    East Zone IEC Outlet Node,  !- Node 1 Name
-    East Zone CCoil Air Outlet Node, !- Node 2 Name
-    East Air Loop Outlet Node;  !- Node 3 Name
+    East Zone IEC Outlet Node,  !- Node 2 Name
+    East Zone CCoil Air Outlet Node,  !- Node 3 Name
+    East Air Loop Outlet Node;  !- Node 4 Name
 
   CoilSystem:Cooling:DX,
-    East Zone DX Cooling Coil,    !- Name
-    EastDXCCoilAvailSched,        !- Availability Schedule Name
-    East Zone IEC Outlet Node,         !- DX Cooling Coil System Inlet Node Name
-    East Zone CCoil Air Outlet Node,   !- DX Cooling Coil System Outlet Node Name
-    East Zone CCoil Air Outlet Node,   !- DX Cooling Coil System Sensor Node Name
+    East Zone DX Cooling Coil,  !- Name
+    EastDXCCoilAvailSched,   !- Availability Schedule Name
+    East Zone IEC Outlet Node,  !- DX Cooling Coil System Inlet Node Name
+    East Zone CCoil Air Outlet Node,  !- DX Cooling Coil System Outlet Node Name
+    East Zone CCoil Air Outlet Node,  !- DX Cooling Coil System Sensor Node Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     East DX Cooling Coil,    !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
@@ -1705,31 +1743,40 @@
     East Zone Air System,    !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    0.4,                     !- Minimum System Air Flow Ratio
+    0.4,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.009,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.009,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     30.0,                    !- Central Heating Design Supply Air Temperature {C}
-    NonCoincident,           !- Sizing Option
+    NonCoincident,           !- Type of Zone Sum to Use
     Yes,                     !- 100% Outdoor Air in Cooling
     No,                      !- 100% Outdoor Air in Heating
     0.0090,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0090,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
-
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    ;                        !- Central Cooling Capacity Control Method
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:SIMPLE:VARIABLEVOLUME ===========
 
@@ -1749,9 +1796,8 @@
     -0.54137364,             !- Fan Power Coefficient 3
     0.87198823,              !- Fan Power Coefficient 4
     0.000,                   !- Fan Power Coefficient 5
-    East Zone Mixed Air Node,          !- Air Inlet Node Name
+    East Zone Mixed Air Node,!- Air Inlet Node Name
     East Zone Supply Fan Outlet Node;  !- Air Outlet Node Name
-
 
   Coil:Cooling:DX:SingleSpeed,
     East DX Cooling Coil,    !- Name
@@ -1761,37 +1807,36 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    East Zone IEC Outlet Node,         !- Air Inlet Node Name
-    East Zone CCoil Air Outlet Node,   !- Air Outlet Node Name
+    East Zone IEC Outlet Node,  !- Air Inlet Node Name
+    East Zone CCoil Air Outlet Node,  !- Air Outlet Node Name
     DXSysACCoolCapFT,        !- Total Cooling Capacity Function of Temperature Curve Name
     DXSysACCoolCapFFF,       !- Total Cooling Capacity Function of Flow Fraction Curve Name
     DXSysACCoolEIRFT,        !- Energy Input Ratio Function of Temperature Curve Name
     DXSysACCoolEIRFFF,       !- Energy Input Ratio Function of Flow Fraction Curve Name
     DXSysACCoolPLFFPLR,      !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Latent Capacity Time Constant {s}
     ,                        !- Condenser Air Inlet Node Name
     ,                        !- Condenser Type
-    ,                        !- Evaporative Condenser Effectiveness
-    ,                        !- Evaporative Condenser Air Flow Rate
-    ,                        !- Evaporative Condenser Pump Rated Power Consumption
-    ,                        !- Crankcase Heater Capacity
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
-    ,                        !- Basin Heater Capacity
-    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
     ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
     Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
-  
 
 ! ***************End of HVAC Air Loop Serving East Zone *************************************
 !********************************************************************************************
-
 !  ************** Chilled Water Cooling Coil And Chilled Water Plant System *****************
 ! ********************************DEFINE THE CHILLED WATER(CW) LOOP***************************
 
@@ -1803,7 +1848,7 @@
     CW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     3,                       !- Minimum Loop Temperature {C}
-    autosize,                   !- Maximum Loop Flow Rate {m3/s}
+    autosize,                !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     CW Supply Inlet Node,    !- Plant Side Inlet Node Name
@@ -1828,45 +1873,38 @@
 
   Branch,
     CW Supply Pump Branch,   !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CW Circ Pump,            !- Component 1 Name
     CW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    CW Pump Outlet Node,     !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     CW Supply Chiller Branch,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     Chiller,                 !- Component 1 Name
     Chiller Inlet Node,      !- Component 1 Inlet Node Name
-    Chiller Outlet Node,     !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Chiller Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     CW Supply Bypass Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Supply Side Bypass Pipe,  !- Component 1 Name
     CW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Supply Outlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Supply Side Outlet Pipe,  !- Component 1 Name
     CW Supply Side Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
 ! ---Listing and Modeling all connectors on the supply side of the CW loop--
+
   ConnectorList,
     Cooling Supply Side Connectors,  !- Name
     Connector:Splitter,      !- Connector 1 Object Type
@@ -1888,6 +1926,7 @@
 
 ! ===INPUTTING THE DEMAND SIDE OF CHILLED WATER LOOP======
 ! ---Listing and Modeling all the branches on the demand side of the CW loop----------
+
   BranchList,
     Cooling Demand Side Branches,  !- Name
     CW Demand Inlet Branch,  !- Branch 1 Name
@@ -1898,55 +1937,46 @@
 
   Branch,
     CW Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Demand Side Inlet Pipe,  !- Component 1 Name
     CW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    CW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     West CW Cooling Coil Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
-    West Zone CW Cooling Coil,         !- Component 1 Name
-    West CWCoil Water Inlet Node, !- Component 1 Inlet Node Name
-    West CWCoil Water Outlet Node, !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    West Zone CW Cooling Coil,  !- Component 1 Name
+    West CWCoil Water Inlet Node,  !- Component 1 Inlet Node Name
+    West CWCoil Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     East CW Cooling Coil Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
-    East Zone CW Cooling Coil,         !- Component 1 Name
-    East CWCoil Water Inlet Node, !- Component 1 Inlet Node Name
-    East CWCoil Water Outlet Node, !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    East Zone CW Cooling Coil,  !- Component 1 Name
+    East CWCoil Water Inlet Node,  !- Component 1 Inlet Node Name
+    East CWCoil Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Demand Bypass Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Demand Side Bypass Pipe,  !- Component 1 Name
     CW Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Demand Outlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Demand Side Outlet Pipe,  !- Component 1 Name
     CW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
 ! --Listing and Modeling all the connectors on the demand side of the CW loop--
+
   ConnectorList,
     Cooling Demand Side Connectors,  !- Name
     Connector:Splitter,      !- Connector 1 Object Type
@@ -1968,8 +1998,8 @@
     East CW Cooling Coil Branch,  !- Inlet Branch 2 Name
     CW Demand Bypass Branch; !- Inlet Branch 3 Name
 
-
 !=============ELECTRIC CHILLER=========================
+
   Chiller:Electric,
     Chiller,                 !- Name
     WaterCooled,             !- Condenser Type
@@ -1985,8 +2015,8 @@
     29.44,                   !- Design Condenser Inlet Temperature {C}
     2.682759,                !- Temperature Rise Coefficient
     6.667,                   !- Design Chilled Water Outlet Temperature {C}
-    autosize,                    !- Design Chilled Water Flow Rate {m3/s}
-    autosize,                    !- Design Condenser Fluid Flow Rate {m3/s}
+    autosize,                !- Design Chilled Water Flow Rate {m3/s}
+    autosize,                !- Design Condenser Fluid Flow Rate {m3/s}
     0.94483600,              !- Coefficient 1 of Capacity Ratio Curve
     -.05700880,              !- Coefficient 2 of Capacity Ratio Curve
     -.00185486,              !- Coefficient 3 of Capacity Ratio Curve
@@ -2000,6 +2030,7 @@
     NotModulated;            !- Chiller Flow Mode
 
 !====Setpoint Manager for the Electric chiller=======
+
   SetpointManager:Scheduled,
     Chilled Water Loop Setpoint Manager,  !- Name
     Temperature,             !- Control Variable
@@ -2007,23 +2038,25 @@
     CW Supply Outlet Node;   !- Setpoint Node or NodeList Name
 
 !====CW loop Circulation pump===================
+
   Pump:VariableSpeed,
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                   !- Rated Flow Rate {m3/s}
-    160000,                  !- Rated Pump Head {Pa}
-    autosize,                    !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    160000,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
 !===Modeling the various pipes used in the transport branches====
+
   Pipe:Adiabatic,
     CW Supply Side Bypass Pipe,  !- Name
     CW Supply Bypass Inlet Node,  !- Inlet Node Name
@@ -2053,8 +2086,8 @@
 !-   ======  ALL OBJECTS IN CLASS: COIL:COOLING:WATER ===========
 
   Coil:Cooling:Water,
-    West Zone CW Cooling Coil,         !- Name
-    WestChWaterCoilAvailSched,   !- Availability Schedule Name
+    West Zone CW Cooling Coil,  !- Name
+    WestChWaterCoilAvailSched,  !- Availability Schedule Name
     autosize,                !- Design Water Flow Rate {m3/s}
     autosize,                !- Design Air Flow Rate {m3/s}
     autosize,                !- Design Inlet Water Temperature {C}
@@ -2063,33 +2096,33 @@
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     West CWCoil Water Inlet Node,  !- Water Inlet Node Name
-    West CWCoil Water Outlet Node, !- Water Outlet Node Name
-    West Zone CCoil Air Outlet Node,   !- Air Inlet Node Name
-    West Air Loop Outlet Node,    !- Air Outlet Node Name
+    West CWCoil Water Outlet Node,  !- Water Outlet Node Name
+    West Zone CCoil Air Outlet Node,  !- Air Inlet Node Name
+    West Air Loop Outlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow;               !- Heat Exchanger Configuration
 
 !-   ========  ALL OBJECTS IN CLASS: CONTROLLER:WATERCOIL =======
 
   Controller:WaterCoil,
-    West CW Coil Controller,      !- Name
+    West CW Coil Controller, !- Name
     Temperature,             !- Control Variable
     Reverse,                 !- Action
     FLOW,                    !- Actuator Variable
-    West Air Loop Outlet Node,    !- Sensor Node Name
-    West CWCoil Water Inlet Node, !- Actuator Node Name
+    West Air Loop Outlet Node,  !- Sensor Node Name
+    West CWCoil Water Inlet Node,  !- Actuator Node Name
     autosize,                !- Controller Convergence Tolerance {deltaC}
     autosize,                !- Maximum Actuated Flow {m3/s}
     0.0;                     !- Minimum Actuated Flow {m3/s}
 
   AirLoopHVAC:ControllerList,
-    West Data Center Sys Controllers, !- Name
-    Controller:WaterCoil,        !- Controller 1 Object Type
-    West CW Coil Controller;     !- Controller 1 Name
+    West Data Center Sys Controllers,  !- Name
+    Controller:WaterCoil,    !- Controller 1 Object Type
+    West CW Coil Controller; !- Controller 1 Name
 
   Coil:Cooling:Water,
-    East Zone CW Cooling Coil,   !- Name
-    EastChWaterCoilAvailSched,   !- Availability Schedule Name
+    East Zone CW Cooling Coil,  !- Name
+    EastChWaterCoilAvailSched,  !- Availability Schedule Name
     autosize,                !- Design Water Flow Rate {m3/s}
     autosize,                !- Design Air Flow Rate {m3/s}
     autosize,                !- Design Inlet Water Temperature {C}
@@ -2098,30 +2131,29 @@
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     East CWCoil Water Inlet Node,  !- Water Inlet Node Name
-    East CWCoil Water Outlet Node, !- Water Outlet Node Name
-    East Zone CCoil Air Outlet Node,   !- Air Inlet Node Name
-    East Air Loop Outlet Node,    !- Air Outlet Node Name
+    East CWCoil Water Outlet Node,  !- Water Outlet Node Name
+    East Zone CCoil Air Outlet Node,  !- Air Inlet Node Name
+    East Air Loop Outlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow;               !- Heat Exchanger Configuration
-
 
 !-   ========  ALL OBJECTS IN CLASS: CONTROLLER:WATERCOIL =======
 
   Controller:WaterCoil,
-    East CW Coil Controller,      !- Name
+    East CW Coil Controller, !- Name
     Temperature,             !- Control Variable
     Reverse,                 !- Action
     FLOW,                    !- Actuator Variable
-    East Air Loop Outlet Node,    !- Sensor Node Name
-    East CWCoil Water Inlet Node, !- Actuator Node Name
+    East Air Loop Outlet Node,  !- Sensor Node Name
+    East CWCoil Water Inlet Node,  !- Actuator Node Name
     autosize,                !- Controller Convergence Tolerance {deltaC}
     autosize,                !- Maximum Actuated Flow {m3/s}
     0.0;                     !- Minimum Actuated Flow {m3/s}
 
   AirLoopHVAC:ControllerList,
-    East Data Center Sys Controllers, !- Name
-    Controller:WaterCoil,        !- Controller 1 Object Type
-    East CW Coil Controller;     !- Controller 1 Name
+    East Data Center Sys Controllers,  !- Name
+    Controller:WaterCoil,    !- Controller 1 Object Type
+    East CW Coil Controller; !- Controller 1 Name
 
 !--------------------------------------------------------------
 !----Plant Equipment Operation Schemes for the CW Loop---------
@@ -2192,7 +2224,7 @@
     Condenser Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     3,                       !- Minimum Loop Temperature {C}
-    autosize,                     !- Maximum Loop Flow Rate {m3/s}
+    autosize,                !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     Condenser Supply Inlet Node,  !- Plant Side Inlet Node Name
@@ -2206,6 +2238,7 @@
     Optimal;                 !- Load Distribution Scheme
 
 ! ----Listing and Modeling the supply side branches of the condenser loop----
+
   BranchList,
     Condenser Supply Side Branches,  !- Name
     Condenser Supply Pump Branch,  !- Branch 1 Name
@@ -2215,43 +2248,35 @@
 
   Branch,
     Condenser Supply Pump Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
     Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Tower Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:VariableSpeed,  !- Component 1 Object Type
     Cooling Tower,           !- Component 1 Name
     Condenser Tower Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Tower Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Tower Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Bypass Pipe,  !- Component 1 Name
     Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Outlet Pipe,  !- Component 1 Name
     Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
 
 ! ----Listing and Modeling the supply side connectors of the condenser loop----
 
@@ -2285,43 +2310,35 @@
 
   Branch,
     Condenser Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Inlet Pipe,  !- Component 1 Name
     Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Demand Chiller Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     Chiller,                 !- Component 1 Name
     Chiller Condenser Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Condenser Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Chiller Condenser Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Bypass Pipe,  !- Component 1 Name
     Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Outlet Pipe,  !- Component 1 Name
     Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
 
 ! ---Listing and Modeling the demand side connectors of the condenser loop---
 
@@ -2420,7 +2437,7 @@
     -0.000001516821552;      !- Coefficient 27
 
 !========Setpoint Manager for the Cooling tower===========
- 
+
   SetpointManager:FollowOutdoorAirTemperature,
     CondenserControl SetpointManager,  !- Name
     Temperature,             !- Control Variable
@@ -2431,23 +2448,25 @@
     Condenser Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
 !=======Circulation pump for the condenser loop===========
+
   Pump:VariableSpeed,
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    140000,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    140000,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
 !=====Modeling all the major pipes in the system============
+
   Pipe:Adiabatic,
     Condenser Supply Bypass Pipe,  !- Name
     Cond Supply Bypass Inlet Node,  !- Inlet Node Name
@@ -2513,7 +2532,6 @@
     20.0,                    !- Design Loop Exit Temperature {C}
     5.0;                     !- Loop Design Temperature Difference {deltaC}
 
-
 ! End of chilled water plant definitions
 ! end of Data Center Air System serving a single zone
 !**********************************************************
@@ -2533,7 +2551,7 @@
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
     0.0075,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA West Zone,        !- Design Specification Outdoor Air Object Name
+    SZ DSOA West Zone,       !- Design Specification Outdoor Air Object Name
     0.0,                     !- Zone Heating Sizing Factor
     0.0,                     !- Zone Cooling Sizing Factor
     DesignDay,               !- Cooling Design Air Flow Method
@@ -2548,15 +2566,15 @@
     ;                        !- Heating Maximum Air Flow Fraction
 
   DesignSpecification:OutdoorAir,
-    SZ DSOA West Zone,        !- Name
+    SZ DSOA West Zone,       !- Name
     flow/person,             !- Outdoor Air Method
     0.0125,                  !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   People,
-    West Zone PEOPLE,         !- Name
-    West Zone,                !- Zone or ZoneList Name
+    West Zone PEOPLE,        !- Name
+    West Zone,               !- Zone or ZoneList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     0,                       !- Number of People
@@ -2601,15 +2619,15 @@
     ;                        !- Heating Maximum Air Flow Fraction
 
   DesignSpecification:OutdoorAir,
-    SZ DSOA East Zone,        !- Name
+    SZ DSOA East Zone,       !- Name
     flow/person,             !- Outdoor Air Method
     0.0125,                  !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   People,
-    East Zone PEOPLE,         !- Name
-    East Zone,                !- Zone or ZoneList Name
+    East Zone PEOPLE,        !- Name
+    East Zone,               !- Zone or ZoneList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     0,                       !- Number of People
@@ -2702,8 +2720,8 @@
     Any Number;              !- Name
 
   Lights,
-    West Zone Lights,         !- Name
-    West Zone,                !- Zone or ZoneList Name
+    West Zone Lights,        !- Name
+    West Zone,               !- Zone or ZoneList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     284,                     !- Lighting Level {W}
@@ -2716,8 +2734,8 @@
     GeneralLights;           !- End-Use Subcategory
 
   ElectricEquipment,
-    West Zone_MiscPlug_Equip, !- Name
-    West Zone,                !- Zone or ZoneList Name
+    West Zone_MiscPlug_Equip,!- Name
+    West Zone,               !- Zone or ZoneList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0.,                      !- Design Level {W}
@@ -2728,14 +2746,14 @@
     0.0000,                  !- Fraction Lost
     MiscPlug;                !- End-Use Subcategory
 
- ElectricEquipment:ITE:AirCooled,
-    WestDataCenter_Equip,     !- Name
+  ElectricEquipment:ITE:AirCooled,
+    WestDataCenter_Equip,    !- Name
     West Zone,               !- Zone Name
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
     200,                     !- Watts per Zone Floor Area {W/m2}
-    Data Center Operation Schedule, !- Design Power Input Schedule Name
+    Data Center Operation Schedule,  !- Design Power Input Schedule Name
     Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name
     Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
     0.4,                     !- Design Fan Power Input Fraction
@@ -2758,20 +2776,20 @@
     ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
 
   Curve:Quadratic,
-    ECM FanPower fFlow,          !- Name
+    ECM FanPower fFlow,      !- Name
     0.0,                     !- Coefficient1 Constant
     1.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
-    99.0;                     !- Maximum Value of x
+    99.0;                    !- Maximum Value of x
 
   Curve:Quadratic,
-    UPS Efficiency fPLR,          !- Name
+    UPS Efficiency fPLR,     !- Name
     1.0,                     !- Coefficient1 Constant
     0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
-    99.0;                     !- Maximum Value of x
+    99.0;                    !- Maximum Value of x
 
   Curve:Biquadratic,
     Data Center Servers Power fLoadTemp,  !- Name
@@ -2787,7 +2805,7 @@
     99.0,                    !- Maximum Value of y
     0.0,                     !- Minimum Curve Output
     99.0,                    !- Maximum Curve Output
-    Dimensionless,             !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
@@ -2805,7 +2823,7 @@
     99.0,                    !- Maximum Value of y
     0.0,                     !- Minimum Curve Output
     99.0,                    !- Maximum Curve Output
-    Dimensionless,             !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
@@ -2823,11 +2841,11 @@
     99.0,                    !- Maximum Value of y
     0.0,                     !- Minimum Curve Output
     99.0,                    !- Maximum Curve Output
-    Dimensionless,             !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Schedule:Constant, Data Center Operation Schedule, Any Number, 1.0;
+  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;
 
   Schedule:Compact,
     Data Center CPU Loading Schedule,  !- Name
@@ -2835,15 +2853,15 @@
     Through: 12/31,          !- Field 1
     For: SummerDesignDay,    !- Field 2
     Until: 24:00,1.00,       !- Field 3
-    For: AllOtherDays,       !- Field 4
-    Until: 6:00,0.50,        !- Field 5
-    Until: 8:00,0.75,        !- Field 6
-    Until: 18:00,1.00,       !- Field 7
-    Until: 24:00,0.80;       !- Field 8
+    For: AllOtherDays,       !- Field 5
+    Until: 6:00,0.50,        !- Field 6
+    Until: 8:00,0.75,        !- Field 8
+    Until: 18:00,1.00,       !- Field 10
+    Until: 24:00,0.80;       !- Field 12
 
- Lights,
-    East Zone Lights,         !- Name
-    East Zone,                !- Zone or ZoneList Name
+  Lights,
+    East Zone Lights,        !- Name
+    East Zone,               !- Zone or ZoneList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     284,                     !- Lighting Level {W}
@@ -2856,8 +2874,8 @@
     GeneralLights;           !- End-Use Subcategory
 
   ElectricEquipment,
-    East Zone_MiscPlug_Equip, !- Name
-    East Zone,                !- Zone or ZoneList Name
+    East Zone_MiscPlug_Equip,!- Name
+    East Zone,               !- Zone or ZoneList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0.,                      !- Design Level {W}
@@ -2868,14 +2886,14 @@
     0.0000,                  !- Fraction Lost
     MiscPlug;                !- End-Use Subcategory
 
- ElectricEquipment:ITE:AirCooled,
+  ElectricEquipment:ITE:AirCooled,
     EastDataCenter_Equip,    !- Name
     East Zone,               !- Zone Name
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
     200,                     !- Watts per Zone Floor Area {W/m2}
-    Data Center Operation Schedule, !- Design Power Input Schedule Name
+    Data Center Operation Schedule,  !- Design Power Input Schedule Name
     Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name
     Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
     0.4,                     !- Design Fan Power Input Fraction
@@ -2915,15 +2933,15 @@
     Until: 24:00,0.05;       !- Field 22
 
   ZoneControl:Thermostat,
-    West Zone Thermostat,       !- Name
-    West Zone,                !- Zone or ZoneList Name
+    West Zone Thermostat,    !- Name
+    West Zone,               !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     Temperature Setpoints;   !- Control 1 Name
 
   ZoneControl:Thermostat,
-    East Zone Thermostat,       !- Name
-    East Zone,                !- Zone or ZoneList Name
+    East Zone Thermostat,    !- Name
+    East Zone,               !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     Temperature Setpoints;   !- Control 1 Name
@@ -2999,188 +3017,254 @@
     Until: 24:00,1.0;        !- Field 3
 
   Schedule:Compact,
-    WestChWaterCoilAvailSched,   !- Name
+    WestChWaterCoilAvailSched,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 0.0;       !- Field 3
+    Until: 24:00,0.0;        !- Field 3
 
   Schedule:Compact,
     WestDXCCoilAvailSched,   !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until:  7:00, 1.0,       !- Field 3
-    Until: 17:00, 1.0,       !- Field 4
-    Until: 24:00, 1.0;       !- Field 5
+    Until:  7:00,1.0,        !- Field 3
+    Until: 17:00,1.0,        !- Field 5
+    Until: 24:00,1.0;        !- Field 7
 
   Schedule:Compact,
-    EastChWaterCoilAvailSched,   !- Name
+    EastChWaterCoilAvailSched,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until:  7:00, 1.0,       !- Field 3
-    Until: 17:00, 1.0,       !- Field 4
-    Until: 24:00, 1.0;       !- Field 5
+    Until:  7:00,1.0,        !- Field 3
+    Until: 17:00,1.0,        !- Field 5
+    Until: 24:00,1.0;        !- Field 7
 
   Schedule:Compact,
     EastDXCCoilAvailSched,   !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 0.0;       !- Field 3
+    Until: 24:00,0.0;        !- Field 3
 
   !****************************************************************
   ! Power Utilization Effectiveness (PUE) Calculation EMS Procedure
-  
+
   EnergyManagementSystem:ProgramCallingManager,
-    Calculate Power Utilization Effectiveness, !- Name
-    EndOfZoneTimestepBeforeZoneReporting,      !- EnergyPlus Model Calling Point
-    CalculatePUE;                              !- Program Name 1
- 
+    Calculate Power Utilization Effectiveness,  !- Name
+    EndOfZoneTimestepBeforeZoneReporting,  !- EnergyPlus Model Calling Point
+    CalculatePUE;            !- Program Name 1
+
   Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting
     Verbose,                 !- Internal Variable Availability Dictionary Reporting
     Verbose;                 !- EMS Runtime Language Debug Output Level
-    
+
   ! The variable "Facility Total Building Electric Demand Power" includes: lighting and IT Equipment.
   ! Other internal electric loads, electric equipment other than IT is set to zero.
+
   EnergyManagementSystem:Sensor,
     IT_Equip_Power,          !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
     Facility Total Building Electric Demand Power;  !- Output:Variable or Output:Meter Name
-    
-  ! "Facility Total Electric Demand Power" is the total of the whole Building and HVAC electric demands. 
+
+  ! "Facility Total Electric Demand Power" is the total of the whole Building and HVAC electric demands.
+
   EnergyManagementSystem:Sensor,
     Whole_Building_Power,    !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
     Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
 
-  ! "Facility Total HVAC Electric Demand Power" is the total of the whole Building HVAC electric demands.   
+  ! "Facility Total HVAC Electric Demand Power" is the total of the whole Building HVAC electric demands.
+
   EnergyManagementSystem:Sensor,
     Whole_HVAC_Power,        !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
     Facility Total HVAC Electric Demand Power;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:OutputVariable,
-    Power Utilization Effectiveness, !- Name
-    PUE_Value,                       !- EMS Variable Name
-    Averaged,                        !- Type of Data in Variable
-    SystemTimeStep,                  !- Update Frequency
-    ,                                !- EMS Program or Subroutine Name
-    ;                                !- Units
+    Power Utilization Effectiveness,  !- Name
+    PUE_Value,               !- EMS Variable Name
+    Averaged,                !- Type of Data in Variable
+    SystemTimeStep,          !- Update Frequency
+    ,                        !- EMS Program or Subroutine Name
+    ;                        !- Units
 
- EnergyManagementSystem:GlobalVariable,PUE_Value;
- 
- EnergyManagementSystem:Program,
-   CalculatePUE,
-   set PUE_Value = Whole_Building_Power / IT_Equip_Power;
-  
+  EnergyManagementSystem:GlobalVariable,
+    PUE_Value;               !- Erl Variable 1 Name
+
+  EnergyManagementSystem:Program,
+    CalculatePUE,            !- Name
+    set PUE_Value = Whole_Building_Power / IT_Equip_Power;  !- Program Line 1
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-  
+
   Output:Variable,*,Power Utilization Effectiveness,timestep;
- 
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
   Output:Variable,West Zone,Zone Air Temperature,timestep;
+
   Output:Variable,East Zone,Zone Air Temperature,timestep;
-  
+
   Output:Variable,West Zone,Zone Air Relative Humidity,timestep;
+
   Output:Variable,East Zone,Zone Air Relative Humidity,timestep;
-  
+
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
+
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,timestep;
 
   Output:Variable,West Outside Air Inlet Node,System Node Mass Flow Rate,timestep;
+
   Output:Variable,East Outside Air Inlet Node,System Node Mass Flow Rate,timestep;
+
   Output:Variable,West Outside Air Inlet Node,System Node Temperature,timestep;
+
   Output:Variable,East Outside Air Inlet Node,System Node Temperature,timestep;
-  
+
   Output:Variable,West IEC Secondary Air Inlet Node,System Node Mass Flow Rate,timestep;
+
   Output:Variable,West IEC Secondary Air Inlet Node,System Node Temperature,timestep;
+
   Output:Variable,East IEC Secondary Air Inlet Node,System Node Mass Flow Rate,timestep;
+
   Output:Variable,East IEC Secondary Air Inlet Node,System Node Temperature,timestep;
-  
+
   Output:Variable,West IEC Secondary Air Outlet Node,System Node Temperature,timestep;
+
   Output:Variable,West IEC Secondary Air Outlet Node,System Node Mass Flow Rate,timestep;
 
   Output:Variable,West Zone Return Air Node,System Node Mass Flow Rate,timestep;
+
   Output:Variable,West Zone Return Air Node,System Node Temperature,timestep;
 
   Output:Variable,West Zone Mixed Air Node,System Node Mass Flow Rate,timestep;
+
   Output:Variable,West Zone Mixed Air Node,System Node Temperature,timestep;
 
-  Output:Variable, West Zone Supply Fan Outlet Node, System Node Temperature,timestep;
-  Output:Variable, East Zone Supply Fan Outlet Node, System Node Temperature,timestep;
-  
-  Output:Variable, West Zone DEC Outlet Node, System Node Temperature,timestep;
-  Output:Variable, West Zone IEC Outlet Node, System Node Temperature,timestep;
-  Output:Variable, West Zone IEC Outlet Node, System Node Setpoint Temperature,timestep;
+  Output:Variable,West Zone Supply Fan Outlet Node,System Node Temperature,timestep;
 
-  Output:Variable, East Zone DEC Outlet Node, System Node Temperature,timestep;
-  Output:Variable, East Zone IEC Outlet Node, System Node Temperature,timestep;
-  
-  Output:Variable, West Zone CCoil Air Outlet Node, System Node Temperature,timestep;
-  Output:Variable, East Zone CCoil Air Outlet Node, System Node Temperature,timestep;
-  
-  Output:Variable, West Air Loop Outlet Node, System Node Temperature,timestep;
-  Output:Variable, East Air Loop Outlet Node, System Node Temperature,timestep;
-   
+  Output:Variable,East Zone Supply Fan Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,West Zone DEC Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,West Zone IEC Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,West Zone IEC Outlet Node,System Node Setpoint Temperature,timestep;
+
+  Output:Variable,East Zone DEC Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,East Zone IEC Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,West Zone CCoil Air Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,East Zone CCoil Air Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,West Air Loop Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,East Air Loop Outlet Node,System Node Temperature,timestep;
+
   Output:Variable,West Zone Inlet Node,System Node Mass Flow Rate,timestep;
+
   Output:Variable,West Zone Inlet Node,System Node Temperature,timestep;
+
   Output:Variable,East Zone Inlet Node,System Node Mass Flow Rate,timestep;
+
   Output:Variable,East Zone Inlet Node,System Node Temperature,timestep;
 
   Output:Variable,*,Evaporative Cooler Stage Effectiveness,timestep;
+
   Output:Variable,*,Evaporative Cooler Total Stage Effectiveness,timestep;
-  Output:Variable, *,Evaporative Cooler Operating Mode Status, timestep;
-  Output:Variable,*,Evaporative Cooler Electric Power,timestep; 
+
+  Output:Variable,*,Evaporative Cooler Operating Mode Status,timestep;
+
+  Output:Variable,*,Evaporative Cooler Electric Power,timestep;
+
   Output:Variable,*,Evaporative Cooler Water Volume,timestep;
 
-  Output:Variable,*,ITE CPU Electric Power,hourly; !- Zone Average [W]
-  Output:Variable,*,ITE Fan Electric Power,hourly; !- Zone Average [W]
-  Output:Variable,*,ITE UPS Electric Power,hourly; !- Zone Average [W]
-  Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,hourly; !- Zone Average [W]
-  Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,hourly; !- Zone Average [W]
-  Output:Variable,*,ITE UPS Heat Gain to Zone Rate,hourly; !- Zone Average [W]
-  Output:Variable,*,ITE Total Heat Gain to Zone Rate,hourly; !- Zone Average [W]
-  Output:Variable,*,ITE Standard Density Air Volume Flow Rate,hourly; !- Zone Average [m3/s]
-  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature,hourly; !- Zone Average [C]
-  Output:Variable,*,ITE Air Inlet Dewpoint Temperature,hourly; !- Zone Average [C]
-  Output:Variable,*,ITE Air Inlet Relative Humidity,hourly; !- Zone Average [%]
-  Output:Variable,*,ITE Air Outlet Dry-Bulb Temperature,hourly; !- Zone Average [C]
-  Output:Variable,*,ITE Supply Heat Index,hourly; !- Zone Average []
-  Output:Variable,*,ITE Air Inlet Operating Range Exceeded Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Above Operating Range Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Below Operating Range Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,ITE Air Inlet Relative Humidity Above Operating Range Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,ITE Air Inlet Relative Humidity Below Operating Range Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range,hourly; !- Zone Average [deltaC]
-  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range,hourly; !- Zone Average [deltaC]
-  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Above Operating Range,hourly; !- Zone Average [deltaC]
-  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Below Operating Range,hourly; !- Zone Average [deltaC]
-  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,hourly; !- Zone Average [%]
-  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,hourly; !- Zone Average [%]
-  Output:Variable,*,Zone ITE CPU Electric Power,hourly; !- Zone Average [W]
-  Output:Variable,*,Zone ITE Fan Electric Power,hourly; !- Zone Average [W]
-  Output:Variable,*,Zone ITE UPS Electric Power,hourly; !- Zone Average [W]
-  Output:Variable,*,Zone ITE CPU Electric Power at Design Inlet Conditions,hourly; !- Zone Average [W]
-  Output:Variable,*,Zone ITE Fan Electric Power at Design Inlet Conditions,hourly; !- Zone Average [W]
-  Output:Variable,*,Zone ITE UPS Heat Gain to Zone Rate,hourly; !- Zone Average [W]
-  Output:Variable,*,Zone ITE Total Heat Gain to Zone Rate,hourly; !- Zone Average [W]
-  Output:Variable,*,Chiller Evaporator Cooling Rate,hourly; !- HVAC Average [W]
-  Output:Variable,*,Chiller Evaporator Inlet Temperature,hourly; !- HVAC Average [C]
-  Output:Variable,*,Chiller Evaporator Outlet Temperature,hourly; !- HVAC Average [C]
-  Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly; !- HVAC Average [W]
-  Output:Variable,*,Chiller Condenser Inlet Temperature,hourly; !- HVAC Average [C]
-  Output:Variable,*,Chiller Condenser Outlet Temperature,hourly; !- HVAC Average [C]
+  Output:Variable,*,ITE CPU Electric Power,hourly;
+
+  Output:Variable,*,ITE Fan Electric Power,hourly;
+
+  Output:Variable,*,ITE UPS Electric Power,hourly;
+
+  Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,hourly;
+
+  Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,hourly;
+
+  Output:Variable,*,ITE UPS Heat Gain to Zone Rate,hourly;
+
+  Output:Variable,*,ITE Total Heat Gain to Zone Rate,hourly;
+
+  Output:Variable,*,ITE Standard Density Air Volume Flow Rate,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature,hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity,hourly;
+
+  Output:Variable,*,ITE Air Outlet Dry-Bulb Temperature,hourly;
+
+  Output:Variable,*,ITE Supply Heat Index,hourly;
+
+  Output:Variable,*,ITE Air Inlet Operating Range Exceeded Time,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Above Operating Range Time,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Below Operating Range Time,hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Above Operating Range Time,hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Below Operating Range Time,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Above Operating Range,hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Below Operating Range,hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,hourly;
+
+  Output:Variable,*,Zone ITE CPU Electric Power,hourly;
+
+  Output:Variable,*,Zone ITE Fan Electric Power,hourly;
+
+  Output:Variable,*,Zone ITE UPS Electric Power,hourly;
+
+  Output:Variable,*,Zone ITE CPU Electric Power at Design Inlet Conditions,hourly;
+
+  Output:Variable,*,Zone ITE Fan Electric Power at Design Inlet Conditions,hourly;
+
+  Output:Variable,*,Zone ITE UPS Heat Gain to Zone Rate,hourly;
+
+  Output:Variable,*,Zone ITE Total Heat Gain to Zone Rate,hourly;
+
+  Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
+
+  Output:Variable,*,Chiller Evaporator Inlet Temperature,hourly;
+
+  Output:Variable,*,Chiller Evaporator Outlet Temperature,hourly;
+
+  Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Chiller Condenser Inlet Temperature,hourly;
+
+  Output:Variable,*,Chiller Condenser Outlet Temperature,hourly;
 
   Output:VariableDictionary,IDF;
 

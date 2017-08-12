@@ -4,10 +4,10 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 ! HeatPumpSecondaryCoil.idf
 ! Basic file description:  Heat pump with DX coil for cooling (w/ 10% outdoor air max.)
-!                          1 story building divided into 2 interior conditioned zones and 1 unconditioned zone. 
+!                          1 story building divided into 2 interior conditioned zones and 1 unconditioned zone.
 !                          The condenser of the heat pump in cooling mode and evaporator of the heat pump in heating
 !                          mode is placed in the unconditioned zone. In cooling mode heat is dumped into the unconditioned
-!                          zone and in heating mode heat is removed (extracted) from the unconditioned zone.  
+!                          zone and in heating mode heat is removed (extracted) from the unconditioned zone.
 !                          Roof with no plenum. Ground contact with floor.
 !
 ! Highlights:              Heat pump air conditioner with secondary coil (condenser) in an unconditioned zone.
@@ -26,8 +26,8 @@
 ! Run Control:             No zone or system sizing, design day run control (no weather file simulation)
 !
 ! Building: Single floor square shaped building 40 ft south wall, 40 ft west wall, zone height 10 feet.
-!           There is a single window in West Zone's south wall. The walls are 1 in stucco over 4 in common brick, composite 
-!           wood stud and insulation, and gypsum board. The roof is a built up roof with 1/2 in stone over 3/8 in felt 
+!           There is a single window in West Zone's south wall. The walls are 1 in stucco over 4 in common brick, composite
+!           wood stud and insulation, and gypsum board. The roof is a built up roof with 1/2 in stone over 3/8 in felt
 !           over 1 in dense insulation supported by 2 in heavy weight concrete. The window is double pane 3 mm clear glass.
 !           The window to wall ratio is approximately 0.072.
 !
@@ -82,8 +82,8 @@
 !                                 Heat pump configured with a blow through fan, heat pump defrost is timed using a resistive
 !                                 heating element. Heating set point during winter months is 20 C during occupied hours,
 !                                 15 C set-back otherwise. Cooling set point at 24 C during occupied hours only.
-!                                 Cooling coil off all winter. Heat Pump has a gas supplemental heater.  The condenser of the 
-!                                 is placed in the unconditioned zone.  Thus the condenser rejects heat to the unconditioned 
+!                                 Cooling coil off all winter. Heat Pump has a gas supplemental heater.  The condenser of the
+!                                 is placed in the unconditioned zone.  Thus the condenser rejects heat to the unconditioned
 !                                 zone and extracts heat from the unconditioned zone when the heat pump is in heating mode.
 !
 ! Zonal Equipment:                DIRECT AIR
@@ -93,7 +93,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:SingleSpeed, COIL:DX:HeatingEmpirical, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, COIL:DX:HeatingEmpirical, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -107,7 +107,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     NONE,                    !- Name
@@ -231,7 +231,6 @@
 
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
-   
   Material,
     A1 - 1 IN STUCCO,        !- Name
     Smooth,                  !- Roughness
@@ -363,7 +362,6 @@
     AIR,                     !- Gas Type
     1.3000000E-02;           !- Thickness {m}
 
-
   Construction,
     EXTWALL80,               !- Name
     A1 - 1 IN STUCCO,        !- Outside Layer
@@ -374,22 +372,22 @@
     EXTWALL802,              !- Name
     A1 - 1 IN STUCCO,        !- Outside Layer
     C4 - 4 IN COMMON BRICK,  !- Layer 2
-    Composite 2x6 Wood Stud R19 #2,  !- Name
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
+    Composite 2x6 Wood Stud R19 #2,  !- Layer 3
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
 
   Construction,
-    PARTITION066,             !- Name
+    PARTITION066,            !- Name
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
     C6 - 8 IN CLAY TILE,     !- Layer 2
-    Composite 2x6 Wood Stud R19 #2,  !- Name
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
+    Composite 2x6 Wood Stud R19 #2,  !- Layer 3
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
 
   Construction,
-    PARTITION06reversed,             !- Name
+    PARTITION06reversed,     !- Name
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
-    Composite 2x6 Wood Stud R19 #2,  !- Name
-    C6 - 8 IN CLAY TILE,     !- Layer 2
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
+    Composite 2x6 Wood Stud R19 #2,  !- Layer 2
+    C6 - 8 IN CLAY TILE,     !- Layer 3
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
 
   Construction,
     PARTITION06,             !- Name
@@ -409,9 +407,9 @@
     C12 - 2 IN HW CONCRETE;  !- Layer 4
 
   Construction,
-    Double Pane Glass,             !- Name
+    Double Pane Glass,       !- Name
     GLASS - CLEAR PLATE 1 / 4 IN,  !- Outside Layer
-    WinAirB1 - AIRSPACE RESISTANCE,!- Layer 2
+    WinAirB1 - AIRSPACE RESISTANCE,  !- Layer 2
     GLASS - CLEAR PLATE 1 / 4 IN;  !- Layer 3
 
   Zone,
@@ -559,10 +557,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19200,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    12.19200,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn002:Wall003,           !- Name
@@ -1171,30 +1169,40 @@
     Typical Terminal Reheat 1,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    0.0,                     !- Minimum System Air Flow Ratio
+    0.0,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.,                     !- Central Cooling Design Supply Air Temperature {C}
     50.,                     !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    ;                        !- Central Cooling Capacity Control Method
 
   Curve:Biquadratic,
     HPACCoolCapFT,           !- Name
@@ -1333,18 +1341,15 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:AirToAir,  !- Component 2 Object Type
     DXAC Heat Pump 1,        !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node;    !- Component 2 Outlet Node Name
 
   AirLoopHVAC,
     Typical Terminal Reheat 1,  !- Name
@@ -1456,9 +1461,9 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    0.0,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    0.0,                     !- No Load Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Air Fan Object Type
     Supply Fan 1,            !- Supply Air Fan Name
@@ -1466,7 +1471,7 @@
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Heat Pump ACDXCoil 1,    !- Cooling Coil Name
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -1535,10 +1540,11 @@
     Zone 1 Outlet Node,      !- Inlet 1 Node Name
     Zone 2 Outlet Node;      !- Inlet 2 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
@@ -1558,6 +1564,7 @@
     HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name
     HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Maximum Cycling Rate {cycles/hr}
@@ -1572,7 +1579,7 @@
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     200,                     !- Basin Heater Capacity {W/K}
-    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
     ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
@@ -1594,7 +1601,7 @@
     HPACHeatEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
-   -5.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     200.0,                   !- Crankcase Heater Capacity {W}
@@ -1606,11 +1613,11 @@
     4,                       !- Region number for calculating HSPF
     ,                        !- Evaporator Air Inlet Node Name
     NORTH ZONE,              !- Zone Name for Evaporator Placement
-    autosize,                !- Secondary Coil Air Flow Rate
-    1.5,                     !- Secondary Coil Fan Flow Scaling Factor
-    0.9,                     !- Nominal Sensible Heat Ratio of Secondary Coil
+    autosize,                !- Secondary Coil Air Flow Rate {m3/s}
+    1.5,                     !- Secondary Coil Fan Flow Scaling Factor {m3/s}
+    0.9,                     !- Nominal Sensible Heat Ratio of Secondary Coil {m3/s}
     DXSecondaryCoilSHRFT,    !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    DXSecondaryCoilSHRFFF;   !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+    DXSecondaryCoilSHRFFF;   !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   Curve:Biquadratic,
     DXSecondaryCoilSHRFT,    !- Name
@@ -1650,7 +1657,7 @@
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
-  
+
   Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
 
   Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;
@@ -1666,7 +1673,7 @@
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
   Output:Variable,*,Fan Electric Power,timestep;
-  
+
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,timestep;
@@ -1674,9 +1681,9 @@
   Output:Variable,*,Cooling Coil Latent Cooling Rate,timestep;
 
   Output:Variable,*,Cooling Coil Electric Power,timestep;
-  
+
   Output:Variable,*,Heating Coil Total Heating Rate,timestep;
-  
+
   Output:Variable,*,Heating Coil Electric Power,timestep;
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
@@ -1689,20 +1696,20 @@
 
   Output:Variable,MIXED AIR NODE,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,*,Secondary Coil Sensible Heat Ratio, timestep;
-  
-  Output:Variable,*,Secondary Coil Heat Rejection Rate, timestep;
-  
-  Output:Variable,*,Secondary Coil Total Heat Removal Rate, timestep;
-  
-  Output:Variable,*,Secondary Coil Sensible Heat Removal Rate, timestep;
-  
-  Output:Variable,*,Secondary Coil Latent Heat Removal Rate, timestep; 
+  Output:Variable,*,Secondary Coil Sensible Heat Ratio,timestep;
+
+  Output:Variable,*,Secondary Coil Heat Rejection Rate,timestep;
+
+  Output:Variable,*,Secondary Coil Total Heat Removal Rate,timestep;
+
+  Output:Variable,*,Secondary Coil Sensible Heat Removal Rate,timestep;
+
+  Output:Variable,*,Secondary Coil Latent Heat Removal Rate,timestep;
 
   Output:Variable,*,Heating Coil Total Heating Rate,timestep;
-  
+
   Output:Variable,*,Heating Coil Electric Power,timestep;
-  
+
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Building,monthly;

@@ -106,7 +106,7 @@
 ! Purchase Heating:            No
 ! Purchased Chilled Water:     No
 ! Purchased Hot Water:         No
-! Coils:                       Coil:Heating:Gas (heating and reheat), Coil:Cooling:DX:SingleSpeed
+! Coils:                       Coil:Heating:Fuel (heating and reheat), Coil:Cooling:DX:SingleSpeed
 ! Pumps:                       None
 ! Boilers:                     None
 ! Chillers:                    None
@@ -126,7 +126,7 @@
 ! Report Variables:            All available in RDD (442 requested, monthly and annual results)
 !
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Small Office 2 Story 4 zone 550 m2,  !- Name
@@ -1002,7 +1002,7 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.4;                     !- Ceiling Height {m}
+    autocalculate;           !- Ceiling Height {m}
 
   Zone,
     NorthZone_1stFloor,      !- Name
@@ -1012,7 +1012,7 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.4;                     !- Ceiling Height {m}
+    autocalculate;           !- Ceiling Height {m}
 
   Zone,
     SouthZone_2ndFloor,      !- Name
@@ -1022,7 +1022,7 @@
     3.7,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.4;                     !- Ceiling Height {m}
+    autocalculate;           !- Ceiling Height {m}
 
   Zone,
     NorthZone_2ndFloor,      !- Name
@@ -1032,7 +1032,7 @@
     3.7,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.4;                     !- Ceiling Height {m}
+    autocalculate;           !- Ceiling Height {m}
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
@@ -1184,10 +1184,10 @@
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,7.1,  !- X,Y,Z ==> Vertex 1 {m}
-    25,0,7.1,  !- X,Y,Z ==> Vertex 2 {m}
-    25,5.5,7.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,5.5,7.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,7.4,  !- X,Y,Z ==> Vertex 1 {m}
+    25,0,7.4,  !- X,Y,Z ==> Vertex 2 {m}
+    25,5.5,7.4,  !- X,Y,Z ==> Vertex 3 {m}
+    0,5.5,7.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   Wall:Detailed,
     EastWall_NorthZone_2ndFloor,  !- Name
@@ -1244,10 +1244,10 @@
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,5.5,7.1,  !- X,Y,Z ==> Vertex 1 {m}
-    25,5.5,7.1,  !- X,Y,Z ==> Vertex 2 {m}
-    25,11,7.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,11,7.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0,5.5,7.4,  !- X,Y,Z ==> Vertex 1 {m}
+    25,5.5,7.4,  !- X,Y,Z ==> Vertex 2 {m}
+    25,11,7.4,  !- X,Y,Z ==> Vertex 3 {m}
+    0,11,7.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   Floor:Detailed,
     Floor_SouthZone_1stFloor,!- Name
@@ -1289,10 +1289,10 @@
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,3.4,  !- X,Y,Z ==> Vertex 1 {m}
-    25,0,3.4,  !- X,Y,Z ==> Vertex 2 {m}
-    25,5.5,3.4,  !- X,Y,Z ==> Vertex 3 {m}
-    0,5.5,3.4;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,3.7,  !- X,Y,Z ==> Vertex 1 {m}
+    25,0,3.7,  !- X,Y,Z ==> Vertex 2 {m}
+    25,5.5,3.7,  !- X,Y,Z ==> Vertex 3 {m}
+    0,5.5,3.7;  !- X,Y,Z ==> Vertex 4 {m}
 
   RoofCeiling:Detailed,
     Ceiling_NorthZone_1stFloor,  !- Name
@@ -1304,10 +1304,10 @@
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,5.5,3.4,  !- X,Y,Z ==> Vertex 1 {m}
-    25,5.5,3.4,  !- X,Y,Z ==> Vertex 2 {m}
-    25,11,3.4,  !- X,Y,Z ==> Vertex 3 {m}
-    0,11,3.4;  !- X,Y,Z ==> Vertex 4 {m}
+    0,5.5,3.7,  !- X,Y,Z ==> Vertex 1 {m}
+    25,5.5,3.7,  !- X,Y,Z ==> Vertex 2 {m}
+    25,11,3.7,  !- X,Y,Z ==> Vertex 3 {m}
+    0,11,3.7;  !- X,Y,Z ==> Vertex 4 {m}
 
   Floor:Detailed,
     Floor_SouthZone_2ndFloor,!- Name
@@ -2242,17 +2242,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2281,17 +2281,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2320,17 +2320,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2359,17 +2359,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2505,63 +2505,51 @@
 
   Branch,
     MainBranch_AirLoop_SouthZone_1stFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_SouthZone_1stFloor,  !- Component 1 Name
     InletNode_AirLoop_SouthZone_1stFloor,  !- Component 1 Inlet Node Name
     OutsideAirNode_SouthZone_1stFloor,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     UnitarySystem_SouthZone_1stFloor,  !- Component 2 Name
     OutsideAirNode_SouthZone_1stFloor,  !- Component 2 Inlet Node Name
-    OutletNode_AirLoop_SouthZone_1stFloor,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    OutletNode_AirLoop_SouthZone_1stFloor;  !- Component 2 Outlet Node Name
 
   Branch,
     MainBranch_AirLoop_NorthZone_1stFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_NorthZone_1stFloor,  !- Component 1 Name
     InletNode_AirLoop_NorthZone_1stFloor,  !- Component 1 Inlet Node Name
     OutsideAirNode_NorthZone_1stFloor,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     UnitarySystem_NorthZone_1stFloor,  !- Component 2 Name
     OutsideAirNode_NorthZone_1stFloor,  !- Component 2 Inlet Node Name
-    OutletNode_AirLoop_NorthZone_1stFloor,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    OutletNode_AirLoop_NorthZone_1stFloor;  !- Component 2 Outlet Node Name
 
   Branch,
     MainBranch_AirLoop_SouthZone_2ndFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_SouthZone_2ndFloor,  !- Component 1 Name
     InletNode_AirLoop_SouthZone_2ndFloor,  !- Component 1 Inlet Node Name
     OutsideAirNode_SouthZone_2ndFloor,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     UnitarySystem_SouthZone_2ndFloor,  !- Component 2 Name
     OutsideAirNode_SouthZone_2ndFloor,  !- Component 2 Inlet Node Name
-    OutletNode_AirLoop_SouthZone_2ndFloor,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    OutletNode_AirLoop_SouthZone_2ndFloor;  !- Component 2 Outlet Node Name
 
   Branch,
     MainBranch_AirLoop_NorthZone_2ndFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_NorthZone_2ndFloor,  !- Component 1 Name
     InletNode_AirLoop_NorthZone_2ndFloor,  !- Component 1 Inlet Node Name
     OutsideAirNode_NorthZone_2ndFloor,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     UnitarySystem_NorthZone_2ndFloor,  !- Component 2 Name
     OutsideAirNode_NorthZone_2ndFloor,  !- Component 2 Inlet Node Name
-    OutletNode_AirLoop_NorthZone_2ndFloor,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    OutletNode_AirLoop_NorthZone_2ndFloor;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC,
     AirLoop_SouthZone_1stFloor,  !- Name
@@ -2894,19 +2882,19 @@
     OutletNode_AirLoop_SouthZone_1stFloor,  !- Unitary System Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     autosize,                !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     SouthZone_1stFloor,      !- Controlling Zone or Thermostat Location
     Fan:ConstantVolume,      !- Supply Fan Object Type
     SupplyFan_SouthZone_1stFloor,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_SouthZone_1stFloor,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_SouthZone_1stFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_SouthZone_1stFloor;  !- Reheat Coil Name
 
   AirLoopHVAC:UnitaryHeatCool,
@@ -2916,19 +2904,19 @@
     OutletNode_AirLoop_NorthZone_1stFloor,  !- Unitary System Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     autosize,                !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     NorthZone_1stFloor,      !- Controlling Zone or Thermostat Location
     Fan:ConstantVolume,      !- Supply Fan Object Type
     SupplyFan_NorthZone_1stFloor,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_NorthZone_1stFloor,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_NorthZone_1stFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_NorthZone_1stFloor;  !- Reheat Coil Name
 
   AirLoopHVAC:UnitaryHeatCool,
@@ -2938,19 +2926,19 @@
     OutletNode_AirLoop_SouthZone_2ndFloor,  !- Unitary System Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     autosize,                !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     SouthZone_2ndFloor,      !- Controlling Zone or Thermostat Location
     Fan:ConstantVolume,      !- Supply Fan Object Type
     SupplyFan_SouthZone_2ndFloor,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_SouthZone_2ndFloor,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_SouthZone_2ndFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_SouthZone_2ndFloor;  !- Reheat Coil Name
 
   AirLoopHVAC:UnitaryHeatCool,
@@ -2960,19 +2948,19 @@
     OutletNode_AirLoop_NorthZone_2ndFloor,  !- Unitary System Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     autosize,                !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     NorthZone_2ndFloor,      !- Controlling Zone or Thermostat Location
     Fan:ConstantVolume,      !- Supply Fan Object Type
     SupplyFan_NorthZone_2ndFloor,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_NorthZone_2ndFloor,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_NorthZone_2ndFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_NorthZone_2ndFloor;  !- Reheat Coil Name
 
   AirTerminal:SingleDuct:Uncontrolled,
@@ -3084,66 +3072,74 @@
     Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
     Constant Mains Temp Schedule;  !- Cold Water Supply Temperature Schedule Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     HeatingCoil_SouthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_SouthZone_1stFloor,  !- Air Inlet Node Name
     InletNode_ReheatCoil_SouthZone_1stFloor;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     ReheatCoil_SouthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_SouthZone_1stFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_SouthZone_1stFloor;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     HeatingCoil_NorthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_NorthZone_1stFloor,  !- Air Inlet Node Name
     InletNode_ReheatCoil_NorthZone_1stFloor;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     ReheatCoil_NorthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_NorthZone_1stFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_NorthZone_1stFloor;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     HeatingCoil_SouthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_SouthZone_2ndFloor,  !- Air Inlet Node Name
     InletNode_ReheatCoil_SouthZone_2ndFloor;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     ReheatCoil_SouthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_SouthZone_2ndFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_SouthZone_2ndFloor;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     HeatingCoil_NorthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name
     InletNode_ReheatCoil_NorthZone_2ndFloor;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     ReheatCoil_NorthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_NorthZone_2ndFloor;  !- Air Outlet Node Name

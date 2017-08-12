@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -121,7 +109,6 @@ namespace HVACSingleDuctInduc {
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::NumOfZones;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -530,9 +517,6 @@ namespace HVACSingleDuctInduc {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
@@ -547,17 +531,8 @@ namespace HVACSingleDuctInduc {
 		using PlantUtilities::InitComponentNodes;
 		using DataGlobals::AnyPlantInModel;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitIndUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PriNode; // primary air inlet node number
@@ -651,7 +626,7 @@ namespace HVACSingleDuctInduc {
 			HotConNode = IndUnit( IUNum ).HWControlNode;
 			if ( HotConNode > 0 && ! MyPlantScanFlag( IUNum ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 				IndUnit( IUNum ).MaxHotWaterFlow = rho * IndUnit( IUNum ).MaxVolHotWaterFlow;
 				IndUnit( IUNum ).MinHotWaterFlow = rho * IndUnit( IUNum ).MinVolHotWaterFlow;
 				// get component outlet node from plant structure
@@ -661,7 +636,7 @@ namespace HVACSingleDuctInduc {
 
 			ColdConNode = IndUnit( IUNum ).CWControlNode;
 			if ( ColdConNode > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidIndex, RoutineName );
 				IndUnit( IUNum ).MaxColdWaterFlow = rho * IndUnit( IUNum ).MaxVolColdWaterFlow;
 				IndUnit( IUNum ).MinColdWaterFlow = rho * IndUnit( IUNum ).MinVolColdWaterFlow;
 
@@ -727,9 +702,6 @@ namespace HVACSingleDuctInduc {
 		// Accesses zone sizing array for air flow rates and zone and plant sizing arrays to
 		// calculate coil water flow rates.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace InputProcessor;
@@ -744,17 +716,8 @@ namespace HVACSingleDuctInduc {
 		using DataPlant::MyPlantSizingIndex;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeIndUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -852,14 +815,14 @@ namespace HVACSingleDuctInduc {
 								// the design heating coil load is the zone load minus whatever the central system does. Note that
 								// DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
 								if ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak > 0.0 ) {
-									DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak );
+									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak );
 								} else {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
 								}
 								IndUnit( IUNum ).DesHeatingLoad = DesCoilLoad;
-								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
-								rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 								MaxVolHotWaterFlowDes = max( MaxVolHotWaterFlowDes, 0.0 );
@@ -924,7 +887,7 @@ namespace HVACSingleDuctInduc {
 								// the design cooling coil load is the zone load minus whatever the central system does. Note that
 								// DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
 								if ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak > 0.0 ) {
-									DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU );
+									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU );
 								} else {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU - ZoneSizThermSetPtHi( CurZoneEqNum ) );
 								}
@@ -1021,7 +984,7 @@ namespace HVACSingleDuctInduc {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataPlant::PlantLoop;
 		using PlantUtilities::SetComponentFlowRate;
@@ -1125,7 +1088,7 @@ namespace HVACSingleDuctInduc {
 					Par( 6 ) = QPriOnly;
 					Par( 7 ) = PowerMet;
 					ErrTolerance = IndUnit( IUNum ).HotControlOffset;
-					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par );
+					SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( IndUnit( IUNum ).HWCoilFailNum1 == 0 ) {
 							ShowWarningMessage( "SimFourPipeIndUnit: Hot water coil control failed for " + IndUnit( IUNum ).UnitType + "=\"" + IndUnit( IUNum ).Name + "\"" );
@@ -1161,7 +1124,7 @@ namespace HVACSingleDuctInduc {
 					Par( 6 ) = QPriOnly;
 					Par( 7 ) = PowerMet;
 					ErrTolerance = IndUnit( IUNum ).ColdControlOffset;
-					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
+					SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						if ( IndUnit( IUNum ).CWCoilFailNum1 == 0 ) {
 							ShowWarningMessage( "SimFourPipeIndUnit: Cold water coil control failed for " + IndUnit( IUNum ).UnitType + "=\"" + IndUnit( IUNum ).Name + "\"" );

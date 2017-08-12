@@ -46,7 +46,7 @@
 ! Environmental Emissions: No
 ! Utility Tariffs: No
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Branch Pumps With Common Pipe,  !- Name
@@ -243,13 +243,11 @@
 
   Branch,
     Supply Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Inlet Pipe,       !- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
-    Supply Inlet Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Inlet Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Inlet Pipe,       !- Name
@@ -258,26 +256,23 @@
 
   Branch,
     Heating Branch 1,        !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Branch Pump 1,           !- Component 1 Name
     Branch Pump 1 Inlet Node,!- Component 1 Inlet Node Name
     Supply Heating 1 Inlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE,                  !- Component 1 Branch Control Type
     DistrictHeating,         !- Component 2 Object Type
     Purchased Heating 1,     !- Component 2 Name
     Supply Heating 1 Inlet Node,  !- Component 2 Inlet Node Name
-    Supply Heating 1 Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Supply Heating 1 Outlet Node;  !- Component 2 Outlet Node Name
 
   Pump:ConstantSpeed,
     Branch Pump 1,           !- Name
     Branch Pump 1 Inlet Node,!- Inlet Node Name
     Supply Heating 1 Inlet Node,  !- Outlet Node Name
-    0.002,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    1000,                    !- Rated Power Consumption {W}
+    0.002,                   !- Design Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1000,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type
@@ -290,26 +285,23 @@
 
   Branch,
     Heating Branch 2,        !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Branch Pump 2,           !- Component 1 Name
     Branch Pump 2 Inlet Node,!- Component 1 Inlet Node Name
     Supply Heating 2 Inlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE,                  !- Component 1 Branch Control Type
     DistrictHeating,         !- Component 2 Object Type
     Purchased Heating 2,     !- Component 2 Name
     Supply Heating 2 Inlet Node,  !- Component 2 Inlet Node Name
-    Supply Heating 2 Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Supply Heating 2 Outlet Node;  !- Component 2 Outlet Node Name
 
   Pump:ConstantSpeed,
     Branch Pump 2,           !- Name
     Branch Pump 2 Inlet Node,!- Inlet Node Name
     Supply Heating 2 Inlet Node,  !- Outlet Node Name
-    0.003,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    1200,                    !- Rated Power Consumption {W}
+    0.003,                   !- Design Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1200,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type
@@ -322,13 +314,11 @@
 
   Branch,
     Supply Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
     Supply Heating-Pipe Node,!- Component 1 Inlet Node Name
-    Supply Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Outlet Pipe,      !- Name
@@ -360,39 +350,35 @@
 
   Branch,
     Demand Inlet Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Demand Pump 1,           !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     Demand Pump 1,           !- Name
     Demand Inlet Node,       !- Inlet Node Name
     Demand Pipe-Load Profile Node,  !- Outlet Node Name
-    0.002,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    1250,                    !- Rated Power Consumption {W}
+    0.002,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1250,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     Load Profile Branch 1,   !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
     Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name
-    Demand Load Profile 1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile 1,          !- Name
@@ -404,13 +390,11 @@
 
   Branch,
     Demand Outlet Branch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name
     Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Outlet Pipe,      !- Name

@@ -93,7 +93,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            Yes
 ! HVAC System:                    ZoneHVAC:WindowAirConditioner
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -107,7 +107,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1458,71 +1458,108 @@
     Zone1WindACOAMixerOutletNode,  !- Air Inlet Node Name
     Zone1WindACFanOutletNode;!- Air Outlet Node Name
 
-  Fan:OnOff,
-    Stand Alone ERV Supply Fan,  !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    0.06,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Heat Recovery Outlet Node,  !- Air Inlet Node Name
-    Stand Alone ERV Supply Fan Outlet Node;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Stand Alone ERV Supply Fan , !- Name
+  FanAndCoilAvailSched , !- Availability Schedule Name
+  Heat Recovery Outlet Node,  !- Air Inlet Node Name
+  Stand Alone ERV Supply Fan Outlet Node , !- Air Outlet Node Name
+  0.06 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
-  Fan:OnOff,
-    Stand Alone ERV Exhaust Fan,  !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    0.06,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
-    Stand Alone ERV Exhaust Fan Outlet Node;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Stand Alone ERV Exhaust Fan , !- Name
+  FanAndCoilAvailSched , !- Availability Schedule Name
+  Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
+  Stand Alone ERV Exhaust Fan Outlet Node,  !- Air Outlet Node Name
+  0.06 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
-  Fan:OnOff,
-    Stand Alone ERV Supply Fan 2,  !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    0.05,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Heat Recovery Outlet Node 2,  !- Air Inlet Node Name
-    Stand Alone ERV Supply Fan Outlet Node 2;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Stand Alone ERV Supply Fan 2, !- Name
+  FanAndCoilAvailSched , !- Availability Schedule Name
+  Heat Recovery Outlet Node 2,  !- Air Inlet Node Name
+  Stand Alone ERV Supply Fan Outlet Node 2, !- Air Outlet Node Name
+  0.05 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
-  Fan:OnOff,
-    Stand Alone ERV Exhaust Fan 2,  !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    0.05,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Heat Recovery Secondary Outlet Node 2,  !- Air Inlet Node Name
-    Stand Alone ERV Exhaust Fan Outlet Node 2;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Stand Alone ERV Exhaust Fan 2, !- Name
+  FanAndCoilAvailSched , !- Availability Schedule Name
+  Heat Recovery Secondary Outlet Node 2,  !- Air Inlet Node Name
+  Stand Alone ERV Exhaust Fan Outlet Node 2,  !- Air Outlet Node Name
+  0.05 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
-  Fan:OnOff,
-    Stand Alone ERV Supply Fan 3,  !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    35.0,                    !- Pressure Rise {Pa}
-    0.015,                   !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Heat Recovery Outlet Node 3,  !- Air Inlet Node Name
-    Stand Alone ERV Supply Fan Outlet Node 3;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Stand Alone ERV Supply Fan 3, !- Name
+  FanAndCoilAvailSched , !- Availability Schedule Name
+  Heat Recovery Outlet Node 3,  !- Air Inlet Node Name
+  Stand Alone ERV Supply Fan Outlet Node 3, !- Air Outlet Node Name
+  0.015 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  35.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
-  Fan:OnOff,
-    Stand Alone ERV Exhaust Fan 3,  !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    35.0,                    !- Pressure Rise {Pa}
-    0.015,                   !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Heat Recovery Secondary Outlet Node 3,  !- Air Inlet Node Name
-    Stand Alone ERV Exhaust Fan Outlet Node 3;  !- Air Outlet Node Name
+
+Fan:SystemModel,
+  Stand Alone ERV Exhaust Fan 3, !- Name
+  FanAndCoilAvailSched , !- Availability Schedule Name
+  Heat Recovery Secondary Outlet Node 3,  !- Air Inlet Node Name
+  Stand Alone ERV Exhaust Fan Outlet Node 3,  !- Air Outlet Node Name
+  0.015 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  35.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
@@ -1557,6 +1594,7 @@
     WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     4,                       !- Maximum Cycling Rate {cycles/hr}
@@ -1577,6 +1615,7 @@
     WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     4,                       !- Maximum Cycling Rate {cycles/hr}
@@ -1677,103 +1716,83 @@
 
   Branch,
     Heating Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HW Circ Pump,            !- Component 1 Name
     HW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    HW Pump Outlet Node,     !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     Heating Purchased Hot Water Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictHeating,         !- Component 1 Object Type
     Purchased Heating,       !- Component 1 Name
     Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Heating Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Side Bypass,  !- Component 1 Name
     Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Heating Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Outlet,   !- Component 1 Name
     Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     ZonesHWInletBranch,      !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWInletPipe,        !- Component 1 Name
     HW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     ZonesHWOutletBranch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWOutletPipe,       !- Component 1 Name
     HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     Zone1HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Zone1Baseboard,          !- Component 1 Name
     Zone1BBHWInletNode,      !- Component 1 Inlet Node Name
-    Zone1BBHWOutletNode,     !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone1BBHWOutletNode;     !- Component 1 Outlet Node Name
 
   Branch,
     Zone2HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Zone2Baseboard,          !- Component 1 Name
     Zone2BBHWInletNode,      !- Component 1 Inlet Node Name
-    Zone2BBHWOutletNode,     !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone2BBHWOutletNode;     !- Component 1 Outlet Node Name
 
   Branch,
     Zone3HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Component 1 Object Type
     Zone3Baseboard,          !- Component 1 Name
     Zone3BBHWInletNode,      !- Component 1 Inlet Node Name
-    Zone3BBHWOutletNode,     !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone3BBHWOutletNode;     !- Component 1 Outlet Node Name
 
   Branch,
     ZonesHWBypassBranch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWBypassPipe,       !- Component 1 Name
     ZonesHWBypassInletNode,  !- Component 1 Inlet Node Name
-    ZonesHWBypassOutletNode, !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    ZonesHWBypassOutletNode; !- Component 1 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
@@ -1903,16 +1922,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    2250,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    2250,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
 !-   ===========  ALL OBJECTS IN CLASS: DISTRICTHEATING ===========

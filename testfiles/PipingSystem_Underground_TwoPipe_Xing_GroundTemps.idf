@@ -51,7 +51,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Piping System Example,   !- Name
@@ -232,8 +232,8 @@
     2576,                    !- Soil Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Volume Fraction {percent}
     50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    Site:GroundTemperature:Undisturbed:Xing,    !- Type of Undisturbed Ground Temperature Model
-    Golden-NREL-Temps,       !- Name of Undisturbed Ground Temperature Model
+    Site:GroundTemperature:Undisturbed:Xing,  !- Undisturbed Ground Temperature Model Type
+    Golden-NREL-Temps,       !- Undisturbed Ground Temperature Model Name
     No,                      !- This Domain Includes Basement Surface Interaction
     ,                        !- Width of Basement Floor in Ground Domain {m}
     ,                        !- Depth of Basement Wall In Ground Domain {m}
@@ -245,9 +245,9 @@
     0.408,                   !- Evapotranspiration Ground Cover Parameter
     1,                       !- Number of Pipe Circuits Entered for this Domain
     My Pipe Circuit;         !- Pipe Circuit 1
-    
+
   Site:GroundTemperature:Undisturbed:Xing,
-    Golden-NREL-Temps,               !- Name of object
+    Golden-NREL-Temps,       !- Name
     1.08,                    !- Soil Thermal Conductivity {W/m-K}
     962,                     !- Soil Density {kg/m3}
     2576,                    !- Soil Specific Heat {J/kg-K}
@@ -335,18 +335,15 @@
 
   Branch,
     Plant Supply Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
     Plant Supply Inlet Node, !- Component 1 Inlet Node Name
     Plant Supply Intermediate Node,  !- Component 1 Outlet Node Name
-    SERIESACTIVE,            !- Component 1 Branch Control Type
     PipingSystem:Underground:PipeCircuit,  !- Component 2 Object Type
     My Pipe Circuit,         !- Component 2 Name
     Plant Supply Intermediate Node,  !- Component 2 Inlet Node Name
-    Plant Supply Outlet Node,!- Component 2 Outlet Node Name
-    SERIESACTIVE;            !- Component 2 Branch Control Type
+    Plant Supply Outlet Node;!- Component 2 Outlet Node Name
 
   BranchList,
     Plant Demand Side Branches,  !- Name
@@ -354,13 +351,11 @@
 
   Branch,
     Plant Demand Branch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile,            !- Component 1 Name
     Plant Demand Inlet Node, !- Component 1 Inlet Node Name
-    Plant Demand Outlet Node,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Plant Demand Outlet Node;!- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile,            !- Name
@@ -389,16 +384,16 @@
     Cond Circ Pump,          !- Name
     Plant Supply Inlet Node, !- Inlet Node Name
     Plant Supply Intermediate Node,  !- Outlet Node Name
-    .004,                    !- Rated Flow Rate {m3/s}
-    5000,                    !- Rated Pump Head {Pa}
-    25,                      !- Rated Power Consumption {W}
+    .004,                    !- Design Maximum Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    25,                      !- Design Power Consumption {W}
     .87,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
 !***********************************************************

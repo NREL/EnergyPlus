@@ -46,7 +46,7 @@
 ! Environmental Emissions: No
 ! Utility Tariffs: No
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -229,28 +229,26 @@
 
   Branch,
     Supply Inlet Branch,     !- Name
-    2,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Pump,                    !- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
-    Supply Pump-Heating Node,!- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Supply Pump-Heating Node;!- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     Pump,                    !- Name
     Supply Inlet Node,       !- Inlet Node Name
     Supply Pump-Heating Node,!- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    2750,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    2750,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     ,                        !- Pump Flow Rate Schedule Name
     BGSeries60,              !- Pump Curve Name
@@ -287,13 +285,11 @@
 
   Branch,
     Heating Branch,          !- Name
-    2,                       !- Maximum Flow Rate {m3/s}
     PressureMinorAndFriction,!- Pressure Drop Curve Name
     Chiller:ConstantCOP,     !- Component 1 Object Type
     Chiller1,                !- Component 1 Name
     Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
-    Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Chiller:ConstantCOP,
     Chiller1,                !- Name
@@ -320,13 +316,11 @@
 
   Branch,
     Supply Outlet Branch,    !- Name
-    2,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Supply Outlet Pipe,      !- Component 1 Name
     Supply Heating-Pipe Node,!- Component 1 Inlet Node Name
-    Supply Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Supply Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Supply Outlet Pipe,      !- Name
@@ -358,13 +352,11 @@
 
   Branch,
     Demand Inlet Branch,     !- Name
-    2,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Inlet Pipe,       !- Component 1 Name
     Demand Inlet Node,       !- Component 1 Inlet Node Name
-    Demand Pipe-Load Profile Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Inlet Pipe,       !- Name
@@ -373,13 +365,11 @@
 
   Branch,
     Load Profile Branch 1,   !- Name
-    2,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     LoadProfile:Plant,       !- Component 1 Object Type
     Load Profile 1,          !- Component 1 Name
     Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name
-    Demand Load Profile 1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name
 
   LoadProfile:Plant,
     Load Profile 1,          !- Name
@@ -391,13 +381,11 @@
 
   Branch,
     Demand Outlet Branch,    !- Name
-    2,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Demand Outlet Pipe,      !- Component 1 Name
     Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name
-    Demand Outlet Node,      !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Demand Outlet Pipe,      !- Name
@@ -478,5 +466,5 @@
     AllSummary;              !- Report 1 Name
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 

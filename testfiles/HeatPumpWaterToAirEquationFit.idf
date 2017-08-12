@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -1982,18 +1982,15 @@
 
   Branch,
     Sys 1 Air Loop Main Branch,  !- Name
-    1.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Sys 1 Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Sys 1 Mixed Air Node,    !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 2 Object Type
     Water-To-Air Heat Pump Unit 1,  !- Component 2 Name
     Sys 1 Mixed Air Node,    !- Component 2 Inlet Node Name
-    Sys 1 Air Loop Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Sys 1 Air Loop Outlet Node;  !- Component 2 Outlet Node Name
 
   AvailabilityManagerAssignmentList,
     Heat Pump 1 Avail List,  !- Name
@@ -2137,7 +2134,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2214,10 +2211,11 @@
     Sys 1 Mixed Air Node,    !- Air Inlet Node Name
     Sys 1 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 1 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -2250,18 +2248,15 @@
 
   Branch,
     Sys 2 Air Loop Main Branch,  !- Name
-    1.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 2,                !- Component 1 Name
     Sys 2 Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Sys 2 Mixed Air Node,    !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 2 Object Type
     Water-To-Air Heat Pump Unit 2,  !- Component 2 Name
     Sys 2 Mixed Air Node,    !- Component 2 Inlet Node Name
-    Sys 2 Air Loop Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Sys 2 Air Loop Outlet Node;  !- Component 2 Outlet Node Name
 
   AvailabilityManagerAssignmentList,
     Heat Pump 2 Avail List,  !- Name
@@ -2405,7 +2400,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 2,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2475,10 +2470,11 @@
     Sys 2 Mixed Air Node,    !- Air Inlet Node Name
     Sys 2 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 2,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 2 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 2 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -2511,18 +2507,15 @@
 
   Branch,
     Sys 3 Air Loop Main Branch,  !- Name
-    1.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 3,                !- Component 1 Name
     Sys 3 Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Sys 3 Mixed Air Node,    !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 2 Object Type
     Water-To-Air Heat Pump Unit 3,  !- Component 2 Name
     Sys 3 Mixed Air Node,    !- Component 2 Inlet Node Name
-    Sys 3 Air Loop Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Sys 3 Air Loop Outlet Node;  !- Component 2 Outlet Node Name
 
   AvailabilityManagerAssignmentList,
     Heat Pump 3 Avail List,  !- Name
@@ -2666,7 +2659,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 3,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2736,10 +2729,11 @@
     Sys 3 Mixed Air Node,    !- Air Inlet Node Name
     Sys 3 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 3,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 3 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 3 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -2772,18 +2766,15 @@
 
   Branch,
     Sys 4 Air Loop Main Branch,  !- Name
-    1.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 4,                !- Component 1 Name
     Sys 4 Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Sys 4 Mixed Air Node,    !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 2 Object Type
     Water-To-Air Heat Pump Unit 4,  !- Component 2 Name
     Sys 4 Mixed Air Node,    !- Component 2 Inlet Node Name
-    Sys 4 Air Loop Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Sys 4 Air Loop Outlet Node;  !- Component 2 Outlet Node Name
 
   AvailabilityManagerAssignmentList,
     Heat Pump 4 Avail List,  !- Name
@@ -2927,7 +2918,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 4,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2997,10 +2988,11 @@
     Sys 4 Mixed Air Node,    !- Air Inlet Node Name
     Sys 4 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 4,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 4 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 4 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -3033,18 +3025,15 @@
 
   Branch,
     Sys 5 Air Loop Main Branch,  !- Name
-    1.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 5,                !- Component 1 Name
     Sys 5 Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Sys 5 Mixed Air Node,    !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatPump:WaterToAir,  !- Component 2 Object Type
     Water-To-Air Heat Pump Unit 5,  !- Component 2 Name
     Sys 5 Mixed Air Node,    !- Component 2 Inlet Node Name
-    Sys 5 Air Loop Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Sys 5 Air Loop Outlet Node;  !- Component 2 Outlet Node Name
 
   AvailabilityManagerAssignmentList,
     Heat Pump 5 Avail List,  !- Name
@@ -3188,7 +3177,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 5,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -3258,10 +3247,11 @@
     Sys 5 Mixed Air Node,    !- Air Inlet Node Name
     Sys 5 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 5,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 5 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 5 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -3314,33 +3304,27 @@
 
   Branch,
     Condenser Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
     Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply GHE Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     GroundHeatExchanger:Vertical,  !- Component 1 Object Type
     Vertical Ground Heat Exchanger,  !- Component 1 Name
     GHE Inlet Node,          !- Component 1 Inlet Node Name
-    GHE Outlet Node,         !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    GHE Outlet Node;         !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Side Bypass,  !- Component 1 Name
     Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Supply Side Bypass,  !- Name
@@ -3349,13 +3333,11 @@
 
   Branch,
     Condenser Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Outlet, !- Component 1 Name
     Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Supply Outlet, !- Name
@@ -3387,13 +3369,11 @@
 
   Branch,
     Condenser Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Inlet Pipe,  !- Component 1 Name
     Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Demand Inlet Pipe,  !- Name
@@ -3402,113 +3382,91 @@
 
   Branch,
     Sys 1 Gshp Cooling Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 1 Heat Pump Cooling Mode,  !- Component 1 Name
     Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 1 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 1 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 1 Gshp Heating Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 1 Heat Pump Heating Mode,  !- Component 1 Name
     Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 1 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 2 Gshp Cooling Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 2 Heat Pump Cooling Mode,  !- Component 1 Name
     Sys 2 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 2 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 2 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 2 Gshp Heating Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 2 Heat Pump Heating Mode,  !- Component 1 Name
     Sys 2 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 2 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 2 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 3 Gshp Cooling Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 3 Heat Pump Cooling Mode,  !- Component 1 Name
     Sys 3 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 3 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 3 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 3 Gshp Heating Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 3 Heat Pump Heating Mode,  !- Component 1 Name
     Sys 3 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 3 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 3 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 4 Gshp Cooling Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 4 Heat Pump Cooling Mode,  !- Component 1 Name
     Sys 4 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 4 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 4 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 4 Gshp Heating Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 4 Heat Pump Heating Mode,  !- Component 1 Name
     Sys 4 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 4 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 4 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 5 Gshp Cooling Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 5 Heat Pump Cooling Mode,  !- Component 1 Name
     Sys 5 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 5 Water to Air Heat Pump Source Side1 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 5 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Sys 5 Gshp Heating Condenser Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     Sys 5 Heat Pump Heating Mode,  !- Component 1 Name
     Sys 5 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
-    Sys 5 Water to Air Heat Pump Source Side2 Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Sys 5 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Side Bypass,  !- Component 1 Name
     Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Demand Side Bypass,  !- Name
@@ -3517,13 +3475,11 @@
 
   Branch,
     Condenser Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Outlet Pipe,  !- Component 1 Name
     Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     Condenser Demand Outlet Pipe,  !- Name
@@ -3603,7 +3559,7 @@
     2.66667E-02,             !- Pipe Out Diameter {m}
     2.53977E-02,             !- U-Tube Distance {m}
     2.41285E-03,             !- Pipe Thickness {m}
-    2,                       !- Maximum Length of Simulation
+    2,                       !- Maximum Length of Simulation {years}
     0.0005,                  !- G-Function Reference Ratio {dimensionless}
     35,                      !- Number of Data Pairs of the G Function
     -15.2996,                !- G-Function Ln(T/Ts) Value 1
@@ -3681,9 +3637,9 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    .0099,                   !- Rated Flow Rate {m3/s}
-    50000,                   !- Rated Pump Head {Pa}
-    600,                     !- Rated Power Consumption {W}
+    .0099,                   !- Design Flow Rate {m3/s}
+    50000,                   !- Design Pump Head {Pa}
+    600,                     !- Design Power Consumption {W}
     .87,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     CONTINUOUS;              !- Pump Control Type

@@ -60,7 +60,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,8.5;
+  Version,8.7;
 
   Timestep,6;
 
@@ -402,23 +402,19 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    2.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     Outside Air System,      !- Component 1 Name
     Supply Inlet Node,       !- Component 1 Inlet Node Name
     Fan Inlet Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan,              !- Component 2 Name
     Fan Inlet Node,          !- Component 2 Inlet Node Name
     Evap Cooler Inlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                  !- Component 2 Branch Control Type
     EvaporativeCooler:Direct:CelDekPad,  !- Component 3 Object Type
     Evaporative Cooler,      !- Component 3 Name
     Evap Cooler Inlet Node,  !- Component 3 Inlet Node Name
-    Supply Outlet Node,      !- Component 3 Outlet Node Name
-    PASSIVE;                 !- Component 3 Branch Control Type
+    Supply Outlet Node;      !- Component 3 Outlet Node Name
 
   AirLoopHVAC:OutdoorAirSystem,
     Outside Air System,      !- Name

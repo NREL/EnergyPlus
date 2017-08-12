@@ -90,9 +90,37 @@ EnergyPlus also uses a separate, outer iteration loop across all the different i
 
 Because of the iteration scheme used for CondFD,~ the node enthalpies get updated each iteration, and then they are used to develop a variable Cp if a phase change material is being simulated. This is done by including a third equation for Cp.
 
+For inputs with MaterialProperty:PhaseChange, the specific heat is calculated from the tabulated input data of temperature/enthalpy pairs:
+
 \begin{equation}
 Cp = \frac{{{h_{i,new}} - {h_{i,old}}}}{{{T_{i,new}} - {T_{i,old}}}}
 \end{equation}
+
+For inputs with MaterialProperty:PhaseChangeHysteresis, the specific heat is not only dependent on the current state, but also the previous state, as it captures the hysteresis physics present between the melting and freezing processes.
+
+\begin{equation}
+Cp = f\left(T_{i,new}, T_{i, prev}, PhaseState_{new}, PhaseState_{prev}\right)
+\end{equation}
+
+The actual formulation of the hysteresis model is captured in Figure~\ref{fig:PCMHysteresis}.  The inputs that led to those curves were as follows:
+
+\begin{itemize}
+\item
+  All temperature ``difference'' inputs were set to 1.0 as this is an example only.  Using smaller or larger temperature differences would shrink or expand the freezing or melting regions accordingly.
+\item
+  The total latent heat transferred during the phase transition process is set to 25000 J/kg
+\item
+  The peak freezing temperature is set to 23 degrees Celsius, where the freezing curve transition is centered.
+\item
+  The peak melting temperature is set to 27 degrees Celsius, where the melting curve transition is centered.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \label{fig:PCMHysteresis}
+  \includegraphics[width=0.8\textwidth]{media/PCMModel.png}
+  \caption{Hysteresis PCM Model Curves}
+\end{figure}
 
 The iteration scheme assures that the correct enthalpy, and therefore the correct Cp is used in each time step, and the enthalpy of the material is accounted for accurately. Of course, if the material is regular, the user input constant Cp is used.
 
@@ -190,6 +218,6 @@ Pedersen C.O., Enthalpy Formulation of conduction heat transfer problems involvi
 
 Versteeg, H. and Malalasekra, W. 1996. An introduction to computational fluid dynamic: the finite volume method approach. Prentice Hall.
 
-\href{../../../Documents\%20and\%20Settings/ptabares/My\%20Documents/Paulo/CV/Tabares\%20Velasco\%20CV\%20UPDATED2.doc}{Tabares-Velasco, P.C. and Griffith, B. 2012. Diagnostic Test Cases for Verifying Surface Heat Transfer Algorithms and Boundary Conditions in Building Energy Simulation Programs, Journal of Building Performance Simulation, doi:10.1080/19401493.2011.595501}
+Tabares-Velasco, P.C. and Griffith, B. 2012. Diagnostic Test Cases for Verifying Surface Heat Transfer Algorithms and Boundary Conditions in Building Energy Simulation Programs, Journal of Building Performance Simulation, doi:10.1080/19401493.2011.595501
 
 Tabares-Velasco, P.C., Christensen, C. and Bianchi, M. 2012. Verification and Validation of EnergyPlus Phase Change Material Model for Opaque Wall Assemblies, Building and Environment 54: 186-196.

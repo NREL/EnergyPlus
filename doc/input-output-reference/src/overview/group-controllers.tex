@@ -70,8 +70,6 @@ Controller:WaterCoil,
 
   SetpointManager:SingleZone:Humidity:Maximum,
   Zone Max Set Point Manager,           !- Name
-  ,                                     !- Control Variable
-  ,                                     !- Schedule name
   VAV Sys 1 Outlet Node,                !- Setpoint Node or NodeList Name
   Zone 2 Node;                          !- Control Zone Air Node Name
 
@@ -99,6 +97,22 @@ Although the mixer will commonly be connected directly to the outdoor air, other
 
 If all the limits are satisfied, the outdoor air controller does the following for cycling fan systems: the outdoor air flow rate is set to the maximum when the fan cycles on. If the limits are not satisfied, the outdoor air flow rate is at the minimum when the fan cycles on.
 
+There are various minimum and maximum limits on the outdoor air flow rate which are applied in the following order. Limits that fall later in the list can override earlier limits.
+
+\begin{itemize}
+\tightlist
+\item  OA flow rate = Minimum Outdoor Air Flow Rate * Minimum Outdoor Air Schedule
+\item  Apply economizer controls
+\item  OA flow rate \(\ge\) Controller:MechanicalVentilation OA flow rate
+\item  OA flow rate \(\ge\) System exhaust flow rate
+\item  (OA flow rate)/(Current mixed air flow rate) \(\ge\) Minimum Fraction of Outdoor Air Schedule
+\item  (OA flow rate)/(Current mixed air flow rate) \(\le\) Maximum Fraction of Outdoor Air Schedule (even if this reduces the OA flow rate, can override all minimums and economizer)
+\item  OA flow rate \(\le\) Maximum Outdoor Air Flow Rate
+\item  Apply OA flow rate specified by demand limiting
+\item  Apply OA flow rate specified by EMS
+\item  OA flow rate \(\le\) Current mixed air flow rate (system flow rate)
+\end{itemize}
+
 \subsubsection{Inputs}\label{inputs-1-007}
 
 \paragraph{Field: Name}\label{field-name-1-006}
@@ -123,7 +137,7 @@ The name of the node that is associated with the outdoor air damper. This should
 
 \paragraph{Field: Minimum Outdoor Air Flow Rate}\label{field-minimum-outdoor-air-flow-rate}
 
-Input for this field is the minimum outdoor air flow rate for the system in cubic meters per second.
+Input for this field is the minimum outdoor air flow rate for the system in cubic meters per second. This field may be autosized. If a Controller Mechanical Ventilation Name is specified, note that this value times the Minimum Outdoor Air Schedule is a hard minimum that may override DCV or other advanced outdoor air controls.
 
 \paragraph{Field: Maximum Outdoor Air Flow Rate}\label{field-maximum-outdoor-air-flow-rate}
 
@@ -228,13 +242,13 @@ The name of a schedule which uses decimal values (e.g., 0.0 or 1.0). These value
 
 \paragraph{Field: Minimum Fraction of Outdoor Air Schedule Name}\label{field-minimum-fraction-of-outdoor-air-schedule-name}
 
-The name of a schedule which uses decimal values (0.0 1.0) These values are multiplied by the total (design) air flow rate. This is an alternate method for specifying the minimum outdoor air amount. (The other method is the \textbf{\emph{Minimum Outdoor Air Schedule}} \emph{described above.) Note: This field overrides \textbf{Minimum Outdoor Air Schedule} and \textbf{Minimum Outdoor Air Flowrate.}}
+The name of a schedule with decimal values which are limited between 0.0 and 1.0. The current schedule value is multiplied by the current system mixed air flow rate to set the minimum outdoor air flow rate. If this schedule name is blank, then it is not applied.
+
+If this schedule is 1.0 (and there is no Maximum Fraction of Outdoor Air Schedule Name), then the system works at 100\% outdoor air regardless of any other condition as long as the Maximum Outdoor Air Flow Rate is \(\ge\) the system supply air flow rate.
 
 \paragraph{Field: Maximum Fraction of Outdoor Air Schedule Name}\label{field-maximum-fraction-of-outdoor-air-schedule-name}
 
-This is an optional field with the schedule values in decimal fractions (0.0-1.0). This field enables the user to limit the maximum of amount of outdoor air permissible and thus also limits the permissible maximum outdoor air into the system.
-
-If both the above schedules are given values of 1.0, the system works at 100\% outdoor air, so in a system if 100\% outdoor air is required regardless of any other condition, these fields are helpful.
+The name of a schedule with decimal values which are limited between 0.0 and 1.0. The current schedule value is multiplied by the current system mixed air flow rate to set the maximum outdoor air flow rate. This schedule is applied after all other limits (except EMS and demand-limiting overrides).  This schedule can override all minimums and economizer opearation.  For example, if this schedule is zero, then the outdoor air flow rate will be zero, regardless of any other settings in Controller:OutdoorAir or Controller:MechanicalVentilation. If this schedule name is blank, then it is not applied.
 
 \paragraph{Field: Mechanical Ventilation Controller Name}\label{field-mechanical-ventilation-controller-name}
 
@@ -252,6 +266,8 @@ If a valid name for a Controller:MechanicalVentilation object is entered in this
 \end{itemize}
 
 Leaving this input field blank will bypass the Controller:MechanicalVentilation object calculations and the minimum outdoor air flow rate will be based on the other inputs associated with this outdoor air controller object. Actual outdoor air flow rates may be higher than the minimum if free cooling is available and the object inputs are properly selected. Regardless, the maximum outdoor air flow rate is limited by the field Maximum Outdoor Air Flow Rate.
+
+Note that the Minimum Outdoor Air Flow Rate times the Minimum Outdoor Air Schedule is a hard minimum that may override DCV or other advanced outdoor air controls specified in the Controller:MechanicalVentilation object.  The Maximum Fraction of Outdoor Air Schedule (if specified) times the current system supply air flow rate may limit the outdoor air flow rate set by the Controller:MechanicalVentilation.
 
 \paragraph{Field: Time of Day Economizer Control Schedule Name}\label{field-time-of-day-economizer-control-schedule-name}
 
@@ -344,17 +360,19 @@ Note that the key value for these outputs is the AirLoopHVAC name, not the name 
   HVAC,Average,Air System Mixed Air Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Air System Outdoor Air Maximum Flow Fraction {[]}
+\item
+  HVAC,Average,Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Economizer Status {[]}}{Air System Outdoor Air Economizer Status }}\label{air-system-outdoor-air-economizer-status}
+\paragraph{Air System Outdoor Air Economizer Status {[]}}\label{air-system-outdoor-air-economizer-status}
 
 Reports the average operating status of an air economizer over the reporting interval. The economizer status is set to 1 when the conditions are favorable for the economizer to operate (i.e., none of the control limits have been exceeded). While conditions may be favorable for economizer operation, it does not guarantee that the air-side economizer has increased outdoor air flow above the minimum level since the actual outdoor air flow rate is also governed by other controls (e.g., mixed air set point tempeature, time of day economizer control, maximum humidity setpoint, etc.). This variable is set to 0 if conditions disable economizer operation or NoEconomizer (Economizer Control Type) is specified.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Heat Recovery Bypass Status {[]}}{Air System Outdoor Air Heat Recovery Bypass Status }}\label{air-system-outdoor-air-heat-recovery-bypass-status}
+\paragraph{Air System Outdoor Air Heat Recovery Bypass Status {[]}}\label{air-system-outdoor-air-heat-recovery-bypass-status}
 
 This indicates if the controls have determined if the bypass mode for heat recovery is in effect or not.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status {[]}}{Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status }}\label{air-system-outdoor-air-heat-recovery-bypass-heating-coil-activity-status}
+\paragraph{Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status {[]}}\label{air-system-outdoor-air-heat-recovery-bypass-heating-coil-activity-status}
 
 Reports the operating status of any heating coil in the air loop. If the heating coil is active, the heat exchanger will be activated (no air bypassed) and the heating energy will be reduced or eliminated. While conditions may be favorable for economizer operation, it does not guarantee that the air-side economizer has increased outdoor air flow above the minimum level since the actual outdoor air flow rate is also governed by other controls (e.g., mixed air set point temperature, time of day economizer control, maximum humidity setpoint, etc.). This variable is set to 0 if conditions disable economizer operation. This output variable is only available when using Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
 
@@ -362,15 +380,15 @@ Reports the operating status of any heating coil in the air loop. If the heating
 
 Reports the outdoor air mixer s mixed air node temperature at minimum outdoor air flow rate when the heat exchanger is disabled (off). This temperature is calculated as the return air temperature multiplied by the return air mass flow rate plus the mixer s inlet node temperature multipled by the minimum outdoor air flow rate. This quantity is then divided by the mixed air mass flow rate. If this temperature is less than the outdoor air mixer s mixed air node set point temperature, and the Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum, the outdoor air flow rate is set to the minimum. This output variable is only available when using Heat Recvoery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air High Humidity Control Status {[]}}{Air System Outdoor Air High Humidity Control Status }}\label{air-system-outdoor-air-high-humidity-control-status}
+\paragraph{Air System Outdoor Air High Humidity Control Status {[]}}\label{air-system-outdoor-air-high-humidity-control-status}
 
 Reports the average operating status of the controller s high humidity control over the reporting interval. The high humidity control status is set to 1 when the controller determines that a zone high humidity condition exists \emph{according to the settings specified in the controller}. This variable is set to 0 if conditions disable high humidity control operation or High Humidity Control is specified as No.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Flow Fraction {[]}}{Air System Outdoor Air Flow Fraction }}\label{air-system-outdoor-air-flow-fraction}
+\paragraph{Air System Outdoor Air Flow Fraction {[]}}\label{air-system-outdoor-air-flow-fraction}
 
 Reports the average actual outdoor air fraction for the outdoor air controller over the reporting interval.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Minimum Flow Fraction {[]}}{Air System Outdoor Air Minimum Flow Fraction }}\label{air-system-outdoor-air-minimum-flow-fraction}
+\paragraph{Air System Outdoor Air Minimum Flow Fraction {[]}}\label{air-system-outdoor-air-minimum-flow-fraction}
 
 Reports the average minimum limit of the outdoor air fraction for the outdoor air controller over the reporting interval.
 
@@ -382,9 +400,13 @@ Reports the average outdoor air mass flow rate introduced by the outdoor air con
 
 Reports the average mixed air mass flow rate of the HVAC air loop associated with this outdoor air controller over the reporting interval.
 
-\paragraph{\texorpdfstring{Air System Outdoor Air Maximum Flow Fraction {[]}}{Air System Outdoor Air Maximum Flow Fraction }}\label{air-system-outdoor-air-maximum-flow-fraction}
+\paragraph{Air System Outdoor Air Maximum Flow Fraction {[]}}\label{air-system-outdoor-air-maximum-flow-fraction}
 
 Reports the average maximum limit of the outdoor air fraction for the outdoor air controller over the reporting interval. The maximum flow fraction is used to prevent DX cooling coils from freezing, specified by ASHRAE Stadard 90.1. This output variable is available when a corresponding SetpointManager:MixedAir object specifies optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node.
+
+\paragraph{Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate {[}kg/s{]}}\label{air-system-mechvent-air-mass-flow-rate-kgs}
+
+Reports the average outdoor air mass flow rate requested by the Mechanical Ventilation Controller (Controller:MechanicalVentilation, if specified) over the reporting interval.
 
 \subsection{Controller:MechanicalVentilation}\label{controllermechanicalventilation}
 
@@ -410,7 +432,7 @@ This field indicates whether the air loop is capable of doing demand controlled 
 
 \paragraph{Field: System Outdoor Air Method}\label{field-system-outdoor-air-method}
 
-The method used to calculate the system minimum outdoor air flow. Several choices are allowed: \textbf{ZoneSum}, \textbf{VentilationRateProcedure,} \textbf{IndoorAirQualityProcedure, ProportionalControlBasedonOccupancySchedule,} \textbf{ProportionalControlBasedonDesignOccupancy,} and \textbf{IndoorAirQualityProcedureGenericContaminant}. ZoneSum sums the outdoor air flows across all zones served by the system. VentilationRateProcedure (VRP) uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. IndoorAirQualityProcedure (IAQP) is the other procedure defined in ASHRAE Standard 62.1-2007 for calculate the amount of outdoor air necessary to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 user's manual discusses another method for implementing CO\(_{2}\)-based DCV in a single zone system. This method (Proportional Control) calculates the required outdoor air flow rate which varies in proportion to the percentage of the CO\(_{2}\) signal range and has two choices to calculate occupancy-based outdoor air rate. The ProportionalControlBasedonOccupancySchedule choice uses the real occupancy at the current time step to calculate outdoor air rate, while the ProportionalControlBasedonDesignOccupancy uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate. However, for practical applications, the zone controller usually does not have the real time occupancy information, and the design occupancy level is assumed. The latter choice is used in the design stage. The IndoorAirQualityProcedure-GenericContaminant method calculates the amount of outdoor air necessary to maintain the levels of indoor air generic contaminant at or below the setpoint defined in the ZoneControl:ContaminantController object.
+The method used to calculate the system minimum outdoor air flow. Several choices are allowed: \textbf{ZoneSum}, \textbf{VentilationRateProcedure,} \textbf{IndoorAirQualityProcedure, ProportionalControlBasedonOccupancySchedule,} \textbf{ProportionalControlBasedonDesignOccupancy,} \textbf{ProportionalControlBasedOnDesignOARate,} and \textbf{IndoorAirQualityProcedureGenericContaminant}. ZoneSum sums the outdoor air flows across all zones served by the system. VentilationRateProcedure (VRP) uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. IndoorAirQualityProcedure (IAQP) is the other procedure defined in ASHRAE Standard 62.1-2007 for calculate the amount of outdoor air necessary to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 user's manual discusses another method for implementing CO\(_{2}\)-based DCV in a single zone system. This method (Proportional Control) calculates the required outdoor air flow rate which varies in proportion to the percentage of the CO\(_{2}\) signal range and has two choices to calculate occupancy-based outdoor air rate. The ProportionalControlBasedonOccupancySchedule choice uses the real occupancy at the current time step to calculate outdoor air rate, while the ProportionalControlBasedonDesignOccupancy uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate. However, for practical applications, the zone controller usually does not have the real time occupancy information, and the design occupancy level is assumed. The latter choice is used in the design stage. The ProportionalControlBasedOnDesignOARate uses design outdoor air flow rate to calculate demand outdoor air flow rate. The IndoorAirQualityProcedure-GenericContaminant method calculates the amount of outdoor air necessary to maintain the levels of indoor air generic contaminant at or below the setpoint defined in the ZoneControl:ContaminantController object.
 
 Note: When System Outdoor Air Method = IndoorAirQualityProcedure or IndoorAirQualityProcedureGenericContaminant is specified, only the Zone \textless{}x\textgreater{} Name fields are used. The other field inputs described below are not used.
 
@@ -428,11 +450,13 @@ The zone name or zone list to apply the ventilation rates specified in the Desig
 
 \paragraph{Field: Design Specification Outdoor Air Object Name \textless{}x\textgreater{}}\label{field-design-specification-outdoor-air-object-name-x}
 
-The name of the DesignSpecification:OutdoorAir object, defining the amount of outdoor air, that applies to the zone or zone list. If this field is blank, the corresponding DesignSpecification:OutdoorAir object for the zone will come from the DesignSpecification:OutdoorAir object referenced by the Sizing:Zone object for the same zone. If no such zone match is found, default values from the IDD will be used for the DesignSpecification:OutdoorAir object.
+The name of the DesignSpecification:OutdoorAir object, defining the amount of outdoor air, that applies to the zone or zone list. If this field is blank, the corresponding DesignSpecification:OutdoorAir object for the zone will come from the DesignSpecification:OutdoorAir object referenced by the Sizing:Zone object for the same zone. If no such zone match is found, default values from the IDD will be used for the DesignSpecification:OutdoorAir object which is 0.0094 m3/s-person. 
+
+If an Outdoor Air Schedule Name is specified in the DesignSpecification:OutdoorAir object, the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calcaulations.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name \textless{}x\textgreater{}}\label{field-design-specification-zone-air-distribution-object-name-x}
 
-The name of the DesignSpecification:ZoneAirDistribution object, defining the air distribution effectiveness and secondary recirculation air fraction, that applies to the zone or zone list. If this field is blank, the corresponding DesignSpecification:ZoneAirDistribution object for the zone will come from the DesignSpecification:ZoneAirDistribution object referenced by the Sizing:Zone object for the same zone. If no such zone match is found, default values from the IDD will be used for the DesignSpecification:ZoneAirDistribution object.
+The name of the DesignSpecification:ZoneAirDistribution object, defining the air distribution effectiveness and secondary recirculation air fraction, that applies to the zone or zone list. If this field is blank, the corresponding DesignSpecification:ZoneAirDistribution object for the zone will come from the DesignSpecification:ZoneAirDistribution object referenced by the Sizing:Zone object for the same zone. If no such zone match is found, default values from the IDD will be used for the DesignSpecification:ZoneAirDistribution object which are effectiveness = 1.0 and recirculation = 0.0.
 
 As described previously, the Controller:MechanicalVentilation object works in conjunction with Controller:OutdoorAir. As such, the minimum quantity of outdoor air delivered via the mixed air box will be the greater of:
 
@@ -440,10 +464,10 @@ As described previously, the Controller:MechanicalVentilation object works in co
 \item
   the minimum outdoor air flow rate calculated by the fields Minimum Outdoor Air Flow Rate, Minimum Limit and Minimum Outdoor Air Schedule Name in the associated Controller:OutdoorAir object, or
 \item
-  the outdoor air flow rate calculated by the VRP (details in the Engineering Reference) with inputs specified in this object and the referenced DesignSpecification:OutdoorAir and DesignSpecification:ZoneAirDistribution objects.
+  the outdoor air flow rate calculated by this object.
 \end{itemize}
 
-The actual outdoor air flow rate may be higher than the minimum if free cooling is available. Regardless, the outdoor air flow rate will not exceed the Maximum Outdoor Air Flow Rate specified in the associated Controller:OutdoorAir object.
+The actual outdoor air flow rate may be higher than the minimum if free cooling is available. Regardless, the outdoor air flow rate will not exceed the Maximum Outdoor Air Flow Rate specified in the associated Controller:OutdoorAir object or the Maximum Fraction of Outdoor Air Schedule (if specified) times the current system supply air flow rate.
 
 An example input for this object is shown below:
 

@@ -419,15 +419,15 @@ These are the rate and volume of water provided by the Water Storage Tank.
 
 These are the rate and volume of water the Storage Tank connections was not able to provide. The starved water is assumed to come from the mains. The tower's operation is not affected by a lack of storage tank water.
 
-\paragraph{\texorpdfstring{Cooling Tower Fan Cycling Ratio {[]}}{Cooling Tower Fan Cycling Ratio }}\label{cooling-tower-fan-cycling-ratio}
+\paragraph{Cooling Tower Fan Cycling Ratio {[]}}\label{cooling-tower-fan-cycling-ratio}
 
 This represents the fraction of a time-step when tower fan is on.
 
-\paragraph{\texorpdfstring{Cooling Tower Bypass Fraction {[]}}{Cooling Tower Bypass Fraction }}\label{cooling-tower-bypass-fraction}
+\paragraph{Cooling Tower Bypass Fraction {[]}}\label{cooling-tower-bypass-fraction}
 
 This represents the fraction of a fluid bypassing the tower when a mixture of the tower fluid and tower return water is able to meet the set point temperature.
 
-\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count {[]}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count}
+\paragraph{Cooling Tower Operating Cells Count {[]}}\label{cooling-tower-operating-cells-count}
 
 This represents the number of cells operating at each time step.
 
@@ -904,15 +904,15 @@ These are the rate and volume of water provided by the Water Storage Tank.
 
 These are the rate and volume of water the Storage Tank connections was not able to provide. The starved water is assumed to come from the mains. The tower's operation is not affected by a lack of storage tank water.
 
-\paragraph{\texorpdfstring{Cooling Tower Fan Cycling Ratio {[]}}{Cooling Tower Fan Cycling Ratio }}\label{cooling-tower-fan-cycling-ratio-1}
+\paragraph{Cooling Tower Fan Cycling Ratio {[]}}\label{cooling-tower-fan-cycling-ratio-1}
 
 This represents the fraction of a time-step when tower fan is on. The fan can cycle at both speeds.
 
-\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count {[]}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-1}
+\paragraph{Cooling Tower Operating Cells Count {[]}}\label{cooling-tower-operating-cells-count-1}
 
 This represents the number of cells operating at each time step.
 
-\paragraph{\texorpdfstring{Cooling Tower Fan Speed Level {[]}}{Cooling Tower Fan Speed Level }}\label{cooling-tower-fan-speed-level}
+\paragraph{Cooling Tower Fan Speed Level {[]}}\label{cooling-tower-fan-speed-level}
 
 This represents the fan speed operating at each time step: 2 for High Speed, 1 for Low Speed, and 0 when the fan is OFF.
 
@@ -1269,7 +1269,7 @@ These outputs are the tower water inlet and outlet temperatures, and mass flow r
 
 This output is the air flow ratio.~ The current air flow rate divided by the design air flow rate with values from 0.0 to 1.0.
 
-\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count {[]}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-2}
+\paragraph{Cooling Tower Operating Cells Count {[]}}\label{cooling-tower-operating-cells-count-2}
 
 This represents the number of cells operating at each time step.
 
@@ -1596,7 +1596,7 @@ IF specified:
 
 These outputs are the electric power input to the tower fan. Consumption is metered on HeatRejection:Electricity, Electricity:Plant, and Electricity:Facility.
 
-\paragraph{\texorpdfstring{Cooling Tower Fan Part Load Ratio {[]}}{Cooling Tower Fan Part Load Ratio }}\label{cooling-tower-fan-part-load-ratio}
+\paragraph{Cooling Tower Fan Part Load Ratio {[]}}\label{cooling-tower-fan-part-load-ratio}
 
 This is the on/off cycling rate of the tower fan when free convection cannot meet the set point temperature and the tower capacity at the minimum air flow rate ratio drives the tower exiting water temperature below the set point temperature. The fan part-load ratio is calculated as the ratio of the exiting water temperature in the free convection regime minus the exiting water temperature set point divided by the exiting water temperature in the free convection regime minus the exiting water temperature at the minimum air flow rate ratio. If tower air flow is at or above the minimum air flow rate ratio, then the tower fan part-load ratio is 1.0.
 
@@ -1612,7 +1612,7 @@ This is the rate at which heat is removed from the condenser water loop by the t
 
 These outputs are the tower water inlet and outlet temperatures, and mass flow rate of the circulating condenser water loop.
 
-\paragraph{\texorpdfstring{Cooling Tower Air Flow Rate Ratio {[]}}{Cooling Tower Air Flow Rate Ratio }}\label{cooling-tower-air-flow-rate-ratio}
+\paragraph{Cooling Tower Air Flow Rate Ratio {[]}}\label{cooling-tower-air-flow-rate-ratio}
 
 This is the ratio of air flow through the tower to the design air flow rate. During times when the tower can maintain the condenser loop set point temperature using free convection (when the fan in not operating), the air flow rate ratio is assumed to be equal to the field Fraction of Tower Capacity in Free Convection Regime. During times when the fan cycles on/off to maintain the outlet water set point temperature, the air flow rate ratio is calculated as the summation of Fan Part-Load Ratio multiplied by the Minimum Air Flow Rate Ratio and (1.0 - Fan Part-Load Ratio) multiplied by the fraction of Tower Capacity in Free Convection Regime.
 
@@ -1658,7 +1658,7 @@ These are the rate and volume of water provided by the Water Storage Tank.
 
 These are the rate and volume of water the Storage Tank connections was not able to provide. The starved water is assumed to come from the mains. The tower's operation is not affected by a lack of storage tank water.
 
-\paragraph{\texorpdfstring{Cooling Tower Operating Cells Count {[]}}{Cooling Tower Operating Cells Count }}\label{cooling-tower-operating-cells-count-3}
+\paragraph{Cooling Tower Operating Cells Count {[]}}\label{cooling-tower-operating-cells-count-3}
 
 This represents the number of cells operating at each time step.
 
@@ -2171,7 +2171,7 @@ The fluid temperature at the fluid cooler outlet in degrees Celsius.
 
 The average fluid mass flow rate through the fluid cooler in kg/s for the time step being reported.
 
-\paragraph{\texorpdfstring{Cooling Tower Bypass Fraction {[]}}{Cooling Tower Bypass Fraction }}\label{cooling-tower-bypass-fraction-1}
+\paragraph{Cooling Tower Bypass Fraction {[]}}\label{cooling-tower-bypass-fraction-1}
 
 This output is the average fluid bypass fraction for the time step being reported. See Capacity Control input field.
 
@@ -2912,7 +2912,7 @@ The borehole response is defined by a non-dimensional `G-function'. This is spec
 
 This numeric field contains the natural log of time/steady state time: \emph{ln(T/T\(_{s}\))}
 
-\paragraph{\texorpdfstring{Field: G-Function `G' Value \textless{}x\textgreater{}}{Field: G-Function G Value \textless{}x\textgreater{}}}\label{field-g-function-g-value-x}
+\paragraph{Field: G-Function `G' Value \textless{}x\textgreater{}}\label{field-g-function-g-value-x}
 
 This numeric field contains the G-function value of the corresponding LNTTS.
 
@@ -3447,9 +3447,9 @@ These outputs are the surface heat exchanger fluid inlet and outlet temperatures
 
 These outputs are the surface heat exchanger top and bottom surface temperatures.
 
-\paragraph{\texorpdfstring{Ground Heat Exchanger Top Surface Heat Transfer Energy per Area~ {[}J/m\(^{2}\){]}}{Ground Heat Exchanger Top Surface Heat Transfer Energy per Area~ {[}J/m\^{}\{2\}{]}}}\label{ground-heat-exchanger-top-surface-heat-transfer-energy-per-area-jm2}
+\paragraph{Ground Heat Exchanger Top Surface Heat Transfer Energy per Area~ {[}J/m\(^{2}\){]}}\label{ground-heat-exchanger-top-surface-heat-transfer-energy-per-area-jm2}
 
-\paragraph{\texorpdfstring{Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area {[}J/m\(^{2}\){]}}{Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area {[}J/m\^{}\{2\}{]}}}\label{ground-heat-exchanger-bottom-surface-heat-transfer-energy-per-area-jm2}
+\paragraph{Ground Heat Exchanger Bottom Surface Heat Transfer Energy per Area {[}J/m\(^{2}\){]}}\label{ground-heat-exchanger-bottom-surface-heat-transfer-energy-per-area-jm2}
 
 These outputs are the surface heat exchanger top and bottom surface flux.
 
@@ -3707,7 +3707,7 @@ This field is used to specify how the heat exchanger is to be controlled during 
 \item
   \textbf{CoolingDifferentialOnOff}.~ This control mode is applicable to situations where the Loop Demand Side can provide useful cooling to the Loop Supply Side.~ This mode is similar to CoolingSetpointOnOff except that it ignores any cooling setpoint and its control is based only on the temperature difference between Loop Demand Side and the Loop Supply Side.~ The inlet temperatures must differ by more than the value set in the field called Minimum Temperature Difference to Activate Heat Exchanger for the heat exchanger to operate.~ ~This control mode corresponds to that available in the HeatExchanger:WatersideEconomizer object prior to version 8.0.
 \item
-  \textbf{CoolingSetpointOnOffWithComponentOverride}.~ This control mode is applicable to situations where the heat exchanger operation is integrated with the operation of a specific chiller.~ When conditions are favorable for the heat exchanger to provide cooling to the Loop Supply Side, the heat exchanger is run and the integrated chiller is turned off.~ A cooling setpoint is obtained from a node named in the following field.~~ If it runs it will run at full capacity and may undershoot the setpoint.~ The chiller that is integrated with the heat exchanger is identified by entering the names of the chiller's inlet nodes in the input fields below.~ The control decision can be based on one of three different temperature signals selected in the field below called Component Override Cooling Control Temperature Mode.~ The setpoint and control signal temperatures must differ by more than the value set in the field called Minimum Temperature Difference to Activate Heat Exchanger for the heat exchanger to operate. This control mode corresponds to that available in the HeatExchanger:Hydronic object prior to version 8.0.
+  \textbf{CoolingSetpointOnOffWithComponentOverride}.  This control mode is applicable to situations where the heat exchanger operation is integrated with the operation of a specific chiller.  Typically the heat exchanger and chiller are in parallel on separate branches.  When conditions are favorable for the heat exchanger to provide cooling to the Loop Supply Side, the heat exchanger is run and the integrated chiller is turned off.  When conditions are not favorable, the heat exchanger is competely off and the chiller is allowed to run as usual.  A cooling setpoint is obtained from a node named in the following field.  If it runs it will run at full capacity and may undershoot the setpoint.  The chiller that is integrated with the heat exchanger is identified by entering the names of the chiller's inlet nodes in the input fields below.~ The control decision can be based on one of three different temperature signals selected in the field below called Component Override Cooling Control Temperature Mode.~ The setpoint and control signal temperatures must differ by more than the value set in the field called Minimum Temperature Difference to Activate Heat Exchanger for the heat exchanger to operate. This control mode corresponds to that available in the HeatExchanger:Hydronic object prior to version 8.0.
 \end{itemize}
 
 \paragraph{Field: Heat Exchanger Setpoint Node Name}\label{field-heat-exchanger-setpoint-node-name}
@@ -3822,6 +3822,6 @@ This is the temperature, in degrees Celsius, of the fluid leaving the heat excha
 
 This output is a numeric flag that indicates whether or not the heat exchanger was operating or not.~ If the value is 0, then the heat exchanger was not operating.~ If the value is 1, then the heat was operating.
 
-\paragraph{\texorpdfstring{Fluid Heat Exchanger Effectiveness {[]}}{Fluid Heat Exchanger Effectiveness }}\label{fluid-heat-exchanger-effectiveness}
+\paragraph{Fluid Heat Exchanger Effectiveness {[]}}\label{fluid-heat-exchanger-effectiveness}
 
 This output is the calculated heat exchanger effectiveness (non-dimensional).~ It is an intermediate value in the NTU model calculations for heat flow rate.~ Values range between 0 and 1.0.~ A value of 1.0 indicates ideal heat transfer.

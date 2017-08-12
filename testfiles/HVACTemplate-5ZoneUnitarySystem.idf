@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -1926,7 +1926,6 @@
     Plate,                   !- Heat Recovery Heat Exchanger Type
     None,                    !- Heat Recovery Frost Control Type
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
     None,                    !- Humidifier Type
@@ -2000,7 +1999,6 @@
     Plate,                   !- Heat Recovery Heat Exchanger Type
     None,                    !- Heat Recovery Frost Control Type
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
     None,                    !- Humidifier Type
@@ -2074,7 +2072,6 @@
     Plate,                   !- Heat Recovery Heat Exchanger Type
     None,                    !- Heat Recovery Frost Control Type
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
     None,                    !- Humidifier Type
@@ -2148,7 +2145,6 @@
     Plate,                   !- Heat Recovery Heat Exchanger Type
     None,                    !- Heat Recovery Frost Control Type
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
     None,                    !- Humidifier Type
@@ -2222,7 +2218,6 @@
     Plate,                   !- Heat Recovery Heat Exchanger Type
     None,                    !- Heat Recovery Frost Control Type
     None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
     None,                    !- Humidifier Type

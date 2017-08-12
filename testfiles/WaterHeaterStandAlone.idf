@@ -21,7 +21,7 @@
 !                     4.      Standard electric water heater (WATER HEATER:STRATIFIED) with typical ratings and two
 !                             electric heating elements in a master-slave configuration.
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Water Heater Stand-Alone Example,  !- Name
@@ -286,16 +286,16 @@
     ,                        !- Indirect Water Heating Recovery Time {hr}
     10,                      !- Number of Nodes
     0.1,                     !- Additional Destratification Conductivity {W/m-K}
-    0.15,                    !- Node 1 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 2 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 3 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 4 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 5 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 6 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 7 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 8 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 9 Additional Loss Coefficient {W/m2-K}
-    0.1;                     !- Node 10 Additional Loss Coefficient {W/m2-K}
+    0.15,                    !- Node 1 Additional Loss Coefficient {W/K}
+    ,                        !- Node 2 Additional Loss Coefficient {W/K}
+    ,                        !- Node 3 Additional Loss Coefficient {W/K}
+    ,                        !- Node 4 Additional Loss Coefficient {W/K}
+    ,                        !- Node 5 Additional Loss Coefficient {W/K}
+    ,                        !- Node 6 Additional Loss Coefficient {W/K}
+    ,                        !- Node 7 Additional Loss Coefficient {W/K}
+    ,                        !- Node 8 Additional Loss Coefficient {W/K}
+    ,                        !- Node 9 Additional Loss Coefficient {W/K}
+    0.1;                     !- Node 10 Additional Loss Coefficient {W/K}
 
   ScheduleTypeLimits,
     Fraction,                !- Name

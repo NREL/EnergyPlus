@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -700,8 +688,8 @@ namespace SolarShading {
 			}
 		}
 
-		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations> [Annual Simulations], Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm";
-		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
+		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm";
+		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
 
 	}
 
@@ -1397,7 +1385,8 @@ namespace SolarShading {
 			if ( CircumSolarFac > 0.0 && CosZenithAng < 0.0871557 && Surface( SurfNum ).Tilt < 2.0 ) CircumSolarFac = 1.0;
 			MultCircumSolar( SurfNum ) = F1 * CircumSolarFac;
 			MultHorizonZenith( SurfNum ) = F2 * Surface( SurfNum ).SinTilt;
-			if ( ! DetailedSkyDiffuseAlgorithm || ! ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing ) {
+
+			if ( !DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing ) {
 				AnisoSkyMult( SurfNum ) = MultIsoSky( SurfNum ) * DifShdgRatioIsoSky( SurfNum ) + MultCircumSolar( SurfNum ) * SunlitFrac( TimeStep, HourOfDay, SurfNum ) + MultHorizonZenith( SurfNum ) * DifShdgRatioHoriz( SurfNum );
 			} else {
 				AnisoSkyMult( SurfNum ) = MultIsoSky( SurfNum ) * DifShdgRatioIsoSkyHRTS( TimeStep, HourOfDay, SurfNum ) + MultCircumSolar( SurfNum ) * SunlitFrac( TimeStep, HourOfDay, SurfNum ) + MultHorizonZenith( SurfNum ) * DifShdgRatioHorizHRTS( TimeStep, HourOfDay, SurfNum );
@@ -3622,10 +3611,6 @@ namespace SolarShading {
 		int const NPhi( 6 ); // Number of altitude angle steps for sky integration
 		int const NTheta( 24 ); // Number of azimuth angle steps for sky integration
 		Real64 const Eps( 1.e-10 ); // Small number
-		Real64 const DPhi( PiOvr2 / NPhi ); // Altitude step size, 15 deg for NPhi = 6
-		Real64 const DTheta( 2.0 * Pi / NTheta ); // Azimuth step size, 15 deg for NTheta = 24
-		Real64 const DThetaDPhi( DTheta * DPhi ); // Product of DTheta and DPhi
-		Real64 const PhiMin( 0.5 * DPhi ); // Minimum altitude
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3639,9 +3624,18 @@ namespace SolarShading {
 		int SurfNum; // Surface Loop index
 		Real64 Fac1WoShdg; // Intermediate calculation factor, without shading
 		Real64 Fac1WithShdg; // Intermediate calculation factor, with shading
+		int IPhi; // Altitude step counter
+		int ITheta; // Azimuth step counter
+		Real64 DPhi; // Altitude step size
+		Real64 DTheta; // Azimuth step size
+		Real64 DThetaDPhi; // Product of DTheta and DPhi
+		Real64 PhiMin; // Minimum altitude
+		Real64 Phi; // Altitude angle
+		Real64 Theta; // Azimuth angle
+		Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
 
 		// Recover the sun direction from the array stored in previous loop
-		SUNCOS = SUNCOSTS( iTimeStep, iHour, {1,3} );
+		SUNCOS = SUNCOSTS( iTimeStep, iHour, { 1, 3 } );
 
 		CTHETA = 0.0;
 
@@ -3649,7 +3643,7 @@ namespace SolarShading {
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			CTHETA( SurfNum ) = SUNCOS( 1 ) * Surface( SurfNum ).OutNormVec( 1 ) + SUNCOS( 2 ) * Surface( SurfNum ).OutNormVec( 2 ) + SUNCOS( 3 ) * Surface( SurfNum ).OutNormVec( 3 );
-			if ( ! DetailedSolarTimestepIntegration ) {
+			if ( !DetailedSolarTimestepIntegration ) {
 				if ( iTimeStep == NumOfTimeStepInHour ) CosIncAngHR( iHour, SurfNum ) = CTHETA( SurfNum );
 			} else {
 				CosIncAngHR( iHour, SurfNum ) = CTHETA( SurfNum );
@@ -3679,25 +3673,58 @@ namespace SolarShading {
 
 		//   Note -- if not the below, values are set in SkyDifSolarShading routine (constant for simulation)
 		if ( DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
-			CosPhi = 1.0 - SUNCOS( 3 );
+			WithShdgIsoSky = 0.;
+			WoShdgIsoSky = 0.;
+			WithShdgHoriz = 0.;
+			WoShdgHoriz = 0.;
 
-			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			DPhi = PiOvr2 / NPhi; // 15 deg for NPhi = 6
+			DTheta = 2.0 * Pi / NTheta; // 15 deg for NTheta = 24
+			DThetaDPhi = DTheta * DPhi;
+			PhiMin = 0.5 * DPhi; // 7.5 deg for DPhi = 15 deg
 
-				if ( ! Surface( SurfNum ).ShadowingSurf && ( ! Surface( SurfNum ).HeatTransSurf || ! Surface( SurfNum ).ExtSolar || ( Surface( SurfNum ).ExtBoundCond != ExternalEnvironment && Surface( SurfNum ).ExtBoundCond != OtherSideCondModeledExt ) ) ) continue;
+			for ( IPhi = 1; IPhi <= NPhi; ++IPhi ) { // Loop over patch altitude values
+				Phi = PhiMin + ( IPhi - 1 ) * DPhi; // 7.5,22.5,37.5,52.5,67.5,82.5 for NPhi = 6
+				SUNCOS( 3 ) = std::sin( Phi );
+				CosPhi = std::cos(Phi);
 
-				if ( CTHETA( SurfNum ) < 0.0 ) continue;
+				for ( ITheta = 1; ITheta <= NTheta; ++ITheta ) { // Loop over patch azimuth values
+					Theta = ( ITheta - 1 ) * DTheta; // 0,15,30,....,330,345 for NTheta = 24
+					SUNCOS( 1 ) = CosPhi * std::cos( Theta );
+					SUNCOS( 2 ) = CosPhi * std::sin( Theta );
 
-				Fac1WoShdg = CosPhi * DThetaDPhi * CTHETA( SurfNum );
-				Fac1WithShdg = Fac1WoShdg * SunlitFrac( iTimeStep, iHour, SurfNum );
-				WithShdgIsoSky( SurfNum ) = Fac1WithShdg;
-				WoShdgIsoSky( SurfNum ) = Fac1WoShdg;
+					for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+						if ( !Surface( SurfNum ).ShadowingSurf && !Surface( SurfNum ).HeatTransSurf ) continue;
+						CTHETA( SurfNum ) = SUNCOS( 1 ) * Surface( SurfNum ).OutNormVec( 1 ) + SUNCOS( 2 ) * Surface( SurfNum ).OutNormVec( 2 ) + SUNCOS( 3 ) * Surface( SurfNum ).OutNormVec( 3 );
+					}
 
-				// Horizon region
-				if ( SUNCOS( 3 ) <= PhiMin ) {
-					WithShdgHoriz( SurfNum ) = Fac1WithShdg;
-					WoShdgHoriz( SurfNum ) = Fac1WoShdg;
-				}
-			} // End of surface loop
+					SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
+
+					for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+
+						if ( !Surface( SurfNum ).ShadowingSurf && ( !Surface( SurfNum ).HeatTransSurf || !Surface( SurfNum ).ExtSolar || ( Surface( SurfNum ).ExtBoundCond != ExternalEnvironment && Surface( SurfNum ).ExtBoundCond != OtherSideCondModeledExt ) ) ) continue;
+
+						if ( CTHETA( SurfNum ) < 0.0 ) continue;
+
+						Fac1WoShdg = CosPhi * DThetaDPhi * CTHETA( SurfNum );
+						SurfArea = Surface( SurfNum ).NetAreaShadowCalc;
+						if ( SurfArea > Eps ) {
+							FracIlluminated = SAREA( SurfNum ) / SurfArea;
+						} else {
+							FracIlluminated = SAREA( SurfNum ) / ( SurfArea + Eps );
+						}
+						Fac1WithShdg = Fac1WoShdg * FracIlluminated;
+						WithShdgIsoSky( SurfNum ) += Fac1WithShdg;
+						WoShdgIsoSky( SurfNum ) += Fac1WoShdg;
+
+						// Horizon region
+						if ( IPhi == 1 ) {
+							WithShdgHoriz( SurfNum ) += Fac1WithShdg;
+							WoShdgHoriz( SurfNum ) += Fac1WoShdg;
+						}
+					} // End of surface loop
+				} // End of Theta loop
+			} // End of Phi loop
 
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 
@@ -6191,7 +6218,7 @@ namespace SolarShading {
 									// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 									HMovInsul = 0.0;
 									if ( Surface( BackSurfNum ).MaterialMovInsulInt > 0 ) {
-										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulExt );
+										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulInt );
 										if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 											HMovInsul = 0.0;
 										} else { // Movable insulation present
@@ -6669,7 +6696,7 @@ namespace SolarShading {
 									// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 									HMovInsul = 0.0;
 									if ( Surface( BackSurfNum ).MaterialMovInsulInt > 0 ) {
-										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulExt );
+										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulInt );
 										if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 											HMovInsul = 0.0;
 										} else { // Movable insulation present
@@ -6822,7 +6849,7 @@ namespace SolarShading {
 
 			} // End of first loop over surfaces in zone
 
-			// It is importatnt to do this only one time
+			// It is important to do this only one time
 			//IF (ZoneNum == 1) THEN
 			BABSZoneSSG = 0.0;
 			BTOTZoneSSG = 0.0;
@@ -7798,6 +7825,8 @@ namespace SolarShading {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataDaylighting::ZoneDaylight;
 		using General::POLYF;
+		using DataWindowEquivalentLayer::CFS;
+		using WindowEquivalentLayer::lscNONE;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -7854,7 +7883,16 @@ namespace SolarShading {
 			SurfaceWindow( ISurf ).ExtIntShadePrevTS = SurfaceWindow( ISurf ).ShadingFlag;
 			SurfaceWindow( ISurf ).ShadingFlag = NoShade;
 			SurfaceWindow( ISurf ).FracTimeShadingDeviceOn = 0.0;
-
+			if ( SurfaceWindow( ISurf ).WindowModelType == WindowEQLModel ) {
+				int EQLNum = Construct( Surface( ISurf ).Construction ).EQLConsPtr;
+				if ( CFS( EQLNum ).VBLayerPtr > 0 ) {
+					if ( CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).CNTRL == lscNONE ) {
+						SurfaceWindow( ISurf ).SlatAngThisTSDeg = CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).PHI_DEG;
+					} else {
+						SurfaceWindow( ISurf ).SlatAngThisTSDeg = 0.0;
+					}
+				}				
+			}
 			if ( Surface( ISurf ).Class != SurfaceClass_Window ) continue;
 			if ( Surface( ISurf ).ExtBoundCond != ExternalEnvironment ) continue;
 			if ( Surface( ISurf ).WindowShadingControlPtr == 0 ) continue;
@@ -9807,7 +9845,7 @@ namespace SolarShading {
 						// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 						HMovInsul = 0.0;
 						if ( Surface( HeatTransSurfNum ).MaterialMovInsulInt > 0 ) {
-							MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulExt );
+							MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulInt );
 							if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 								HMovInsul = 0.0;
 							} else { // Movable insulation present
@@ -10367,7 +10405,7 @@ namespace SolarShading {
 				// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 				HMovInsul = 0.0;
 				if ( Surface( HeatTransSurfNum ).MaterialMovInsulInt > 0 ) {
-					MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulExt );
+					MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulInt );
 					if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 						HMovInsul = 0.0;
 					} else { // Movable insulation present

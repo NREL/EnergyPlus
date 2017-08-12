@@ -115,7 +115,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -130,7 +130,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.5;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1475,25 +1475,28 @@
     WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     3.0,                     !- Maximum Cycling Rate {cycles/hr}
     45.0;                    !- Latent Capacity Time Constant {s}
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Reheat Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Humidistat Reheat Coil 1,!- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
@@ -1507,19 +1510,19 @@
     Air Loop Outlet Node,    !- Furnace Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    5.5,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    5.5,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
-    5.5,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    5.5,                     !- Cooling Supply Air Flow Rate {m3/s}
+    5.5,                     !- Heating Supply Air Flow Rate {m3/s}
+    5.5,                     !- No Load Supply Air Flow Rate {m3/s}
     SalesFloor,              !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Humidistat Reheat Coil 1;!- Reheat Coil Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
@@ -1624,18 +1627,15 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    5.5,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:Unitary:Furnace:HeatCool,  !- Component 2 Object Type
     Supermarket Rooftop DX w/ Gas Heat,  !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node;    !- Component 2 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
@@ -2122,7 +2122,7 @@
   Refrigeration:Condenser:AirCooled,
     SelfContainedCondenser,  !- Name
     SelfContainedCondenserHRCurve,  !- Rated Effective Total Heat Rejection Rate Curve Name
-    0.,                      !- Rated Subcooling Temperature Difference {DeltaC}
+    0.,                      !- Rated Subcooling Temperature Difference {deltaC}
     Fixed,                   !- Condenser Fan Speed Control Type
     175.,                    !- Rated Fan Power {W}
     0.25,                    !- Minimum Fan Air Flow Ratio {dimensionless}
@@ -2132,7 +2132,7 @@
   Refrigeration:Condenser:AirCooled,
     MediumTempCondenser,     !- Name
     MediumTempCondenserHRCurve,  !- Rated Effective Total Heat Rejection Rate Curve Name
-    0.,                      !- Rated Subcooling Temperature Difference {DeltaC}
+    0.,                      !- Rated Subcooling Temperature Difference {deltaC}
     VariableSpeed,           !- Condenser Fan Speed Control Type
     4000.,                   !- Rated Fan Power {W}
     0.25,                    !- Minimum Fan Air Flow Ratio {dimensionless}
@@ -2142,7 +2142,7 @@
   Refrigeration:Condenser:AirCooled,
     LowTempCondenser,        !- Name
     LowTempCondenserHRCurve, !- Rated Effective Total Heat Rejection Rate Curve Name
-    0.,                      !- Rated Subcooling Temperature Difference {DeltaC}
+    0.,                      !- Rated Subcooling Temperature Difference {deltaC}
     TwoSpeed,                !- Condenser Fan Speed Control Type
     2600.,                   !- Rated Fan Power {W}
     0.25,                    !- Minimum Fan Air Flow Ratio {dimensionless}
@@ -5215,5 +5215,5 @@
     displayallwarnings;      !- Key 1
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 

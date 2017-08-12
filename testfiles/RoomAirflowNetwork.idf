@@ -5,8 +5,8 @@
 ! RAFN_PTAC.idf
 ! Basic file description:  2-story 6-zone building with natural ventilation modeled by AirflowNetwork.
 !
-! Highlights:              Natural ventilation through openable exterior windows, openable interior doors. 
-!                          The RoomAirflowNetwrok modol is applied to NORTH_ZONE with 6 RoomAir nodes and 
+! Highlights:              Natural ventilation through openable exterior windows, openable interior doors.
+!                          The RoomAirflowNetwrok modol is applied to NORTH_ZONE with 6 RoomAir nodes and
 !                          conditioned by a PTAC.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -28,8 +28,8 @@
 !                          south-facing window. There is a 3.28 ft x 6.56 ft (1m x 2m) door between the
 !                          NORTH_ZONE and WEST_ZONE. All vertical surfaces are also modeled with cracks for
 !                          uncontrolled infiltration. The second floor has the same floor plan as the first
-!                          floor and has a and a flat roof with no plenum. The RoomAirflowNetwork model is used in a 
-!                          large NORTH zone with 6 RoomAir nodes. 
+!                          floor and has a and a flat roof with no plenum. The RoomAirflowNetwork model is used in a
+!                          large NORTH zone with 6 RoomAir nodes.
 !
 ! Floor Area:              297.2 m2
 ! Number of Stories:       2
@@ -136,7 +136,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -168,7 +168,13 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 
-  ZoneCapacitanceMultiplier:ResearchSpecial,1.0,1.0,1.0,1.0;
+  ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier,              !- Name
+    ,                        !- Zone or ZoneList Name
+    1.0,                     !- Temperature Capacity Multiplier
+    1.0,                     !- Humidity Capacity Multiplier
+    1.0,                     !- Carbon Dioxide Capacity Multiplier
+    1.0;                     !- Generic Contaminant Capacity Multiplier
 
 !-   ===========  ALL OBJECTS IN CLASS: RUN CONTROL ===========
 
@@ -263,12 +269,12 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.0;                     !- Sky Clearness
-! 
-! 
-!-   ===========  ALL OBJECTS IN CLASS: GROUNDTEMPERATURES ===========
-! 
-!   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
+!
+!
+!-   ===========  ALL OBJECTS IN CLASS: GROUNDTEMPERATURES ===========
+!
+!   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL:REGULAR ===========
 
   Material,
@@ -1297,7 +1303,7 @@
 
   People,
     WEST_ZONE People,        !- Name
-    WEST_ZONE,               !- Zone Name
+    WEST_ZONE,               !- Zone or ZoneList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
@@ -1306,7 +1312,7 @@
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
-    3.82E-8,                 !- Carbon Dioxide Generation Rate
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     zoneaveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -1319,7 +1325,7 @@
 
   People,
     EAST_ZONE People,        !- Name
-    EAST_ZONE,               !- Zone Name
+    EAST_ZONE,               !- Zone or ZoneList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
@@ -1328,7 +1334,7 @@
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
-    3.82E-8,                 !- Carbon Dioxide Generation Rate
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     zoneaveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -1341,7 +1347,7 @@
 
   People,
     NORTH_ZONE People,       !- Name
-    NORTH_ZONE,              !- Zone Name
+    NORTH_ZONE,              !- Zone or ZoneList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     4.000000,                !- Number of People
@@ -1350,7 +1356,7 @@
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
-    3.82E-8,                 !- Carbon Dioxide Generation Rate
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     zoneaveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -1363,7 +1369,7 @@
 
   People,
     WEST_ZONE_T People,      !- Name
-    WEST_ZONE_T,             !- Zone Name
+    WEST_ZONE_T,             !- Zone or ZoneList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
@@ -1372,7 +1378,7 @@
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
-    3.82E-8,                 !- Carbon Dioxide Generation Rate
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     zoneaveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -1385,7 +1391,7 @@
 
   People,
     EAST_ZONE_T People,      !- Name
-    EAST_ZONE_T,             !- Zone Name
+    EAST_ZONE_T,             !- Zone or ZoneList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
@@ -1394,7 +1400,7 @@
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
-    3.82E-8,                 !- Carbon Dioxide Generation Rate
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     zoneaveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -1409,7 +1415,7 @@
 
   Lights,
     EAST_ZONE Lights,        !- Name
-    EAST_ZONE,               !- Zone Name
+    EAST_ZONE,               !- Zone or ZoneList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1464.375,                !- Lighting Level {W}
@@ -1423,7 +1429,7 @@
 
   Lights,
     NORTH_ZONE Lights,       !- Name
-    NORTH_ZONE,              !- Zone Name
+    NORTH_ZONE,              !- Zone or ZoneList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     878.6252,                !- Lighting Level {W}
@@ -1437,7 +1443,7 @@
 
   Lights,
     EAST_ZONE_T Lights,      !- Name
-    EAST_ZONE_T,             !- Zone Name
+    EAST_ZONE_T,             !- Zone or ZoneList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1464.375,                !- Lighting Level {W}
@@ -1453,7 +1459,7 @@
 
   ElectricEquipment,
     WEST_ZONE Equip,         !- Name
-    WEST_ZONE,               !- Zone Name
+    WEST_ZONE,               !- Zone or ZoneList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -1465,7 +1471,7 @@
 
   ElectricEquipment,
     EAST_ZONE Equip,         !- Name
-    EAST_ZONE,               !- Zone Name
+    EAST_ZONE,               !- Zone or ZoneList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1464.375,                !- Design Level {W}
@@ -1477,7 +1483,7 @@
 
   ElectricEquipment,
     NORTH_ZONE Equip,        !- Name
-    NORTH_ZONE,              !- Zone Name
+    NORTH_ZONE,              !- Zone or ZoneList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -1489,7 +1495,7 @@
 
   ElectricEquipment,
     WEST_ZONE_T Equip,       !- Name
-    WEST_ZONE_T,             !- Zone Name
+    WEST_ZONE_T,             !- Zone or ZoneList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -1501,7 +1507,7 @@
 
   ElectricEquipment,
     EAST_ZONE_T Equip,       !- Name
-    EAST_ZONE_T,             !- Zone Name
+    EAST_ZONE_T,             !- Zone or ZoneList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1464.375,                !- Design Level {W}
@@ -1512,14 +1518,13 @@
     0;                       !- Fraction Lost
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK SIMULATION ===========
+!    NoMultizoneOrDistribution,
 
   AirflowNetwork:SimulationControl,
     NaturalVentilation,      !- Name
     MultizoneWithoutDistribution,  !- AirflowNetwork Control
-!    NoMultizoneOrDistribution,
     INPUT,                   !- Wind Pressure Coefficient Type
-    Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
-    ExternalNode,            !- Height Selection for Local Wind Speed Calculation
+    ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
     ZeroNodePressures,       !- Initialization Type
@@ -1537,9 +1542,9 @@
     WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name
     0.3,                     !- Minimum Venting Open Factor {dimensionless}
     5.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    10.0,                    !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    10.0,                    !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Zone,
     EAST_ZONE,               !- Zone Name
@@ -1547,9 +1552,9 @@
     WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
     0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Zone,
     NORTH_ZONE,              !- Zone Name
@@ -1557,9 +1562,9 @@
     WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
     0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Zone,
     WEST_ZONE_T,             !- Zone Name
@@ -1567,9 +1572,9 @@
     WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name
     0.3,                     !- Minimum Venting Open Factor {dimensionless}
     5.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    10.0,                    !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    10.0,                    !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Zone,
     EAST_ZONE_T,             !- Zone Name
@@ -1577,9 +1582,9 @@
     WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
     0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
-    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor {deltaC}
+    100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
     0.0,                     !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor {deltaJ/kg}
-    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimun Venting Open Factor {deltaJ/kg}
+    300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:SURFACE ===========
 
@@ -1653,7 +1658,7 @@
     Window2,                 !- Surface Name
     WiOpen1,                 !- Leakage Component Name
     NFacade,                 !- External Node Name
-    0.01;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+    0.01;                    !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
     Surface_16,              !- Surface Name
@@ -1731,7 +1736,7 @@
     Window2_T,               !- Surface Name
     WiOpen1,                 !- Leakage Component Name
     NFacade,                 !- External Node Name
-    0.01;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+    0.01;                    !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
     Surface_16_T,            !- Surface Name
@@ -1757,7 +1762,7 @@
     WiOpen1,                 !- Name
     0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
     0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-    NonPivoted,              !- Type of Rectanguler Large Vertical Opening (LVO)
+    NonPivoted,              !- Type of Rectangular Large Vertical Opening (LVO)
     0.0,                     !- Extra Crack Length or Height of Pivoting Axis {m}
     2,                       !- Number of Sets of Opening Factor Data
     0.0,                     !- Opening Factor 1 {dimensionless}
@@ -1785,7 +1790,7 @@
     DrOpen,                  !- Name
     0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
     0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-    NonPivoted,              !- Type of Rectanguler Large Vertical Opening (LVO)
+    NonPivoted,              !- Type of Rectangular Large Vertical Opening (LVO)
     0.0,                     !- Extra Crack Length or Height of Pivoting Axis {m}
     2,                       !- Number of Sets of Opening Factor Data
     0.0,                     !- Opening Factor 1 {dimensionless}
@@ -1813,7 +1818,7 @@
     HrOpen,                  !- Name
     0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
     0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-    90.0,                    !- Sloping Plane Angle {degree}
+    90.0,                    !- Sloping Plane Angle {deg}
     0.2;                     !- Discharge Coefficient {dimensionless}
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:REFERENCE CRACK CONDITIONS ===========
@@ -1822,7 +1827,7 @@
     ReferenceCrackConditions,!- Name
     20.0,                    !- Reference Temperature {C}
     101320,                  !- Reference Barometric Pressure {Pa}
-    0.005;                   !- Reference Humidity Ratio {kg/kg}
+    0.005;                   !- Reference Humidity Ratio {kgWater/kgDryAir}
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:SURFACE CRACK DATA ===========
 
@@ -1949,36 +1954,36 @@
     LeftUpper,               !- Name
     LeftUpper,               !- RoomAir:Node:AirflowNetwork Name
     NORTH_ZONE,              !- Zone Name
-    4.572;                   !- Node Height
+    4.572;                   !- Node Height {m}
 
   AirflowNetwork:IntraZone:Node,
     CentralUpper,            !- Name
     CentralUpper,            !- RoomAir:Node:AirflowNetwork Name
     NORTH_ZONE,              !- Zone Name
-    4.572;                   !- Node Height
+    4.572;                   !- Node Height {m}
 
   AirflowNetwork:IntraZone:Node,
     LeftMiddle,              !- Name
     LeftMiddle,              !- RoomAir:Node:AirflowNetwork Name
     NORTH_ZONE,              !- Zone Name
-    3.048;                   !- Node Height
+    3.048;                   !- Node Height {m}
 
   AirflowNetwork:IntraZone:Node,
     LeftLower,               !- Name
     LeftLower,               !- RoomAir:Node:AirflowNetwork Name
     NORTH_ZONE,              !- Zone Name
-    1.524;                   !- Node Height
+    1.524;                   !- Node Height {m}
 
   AirflowNetwork:IntraZone:Node,
     CentralLower,            !- Name
     CentralLower,            !- RoomAir:Node:AirflowNetwork Name
     NORTH_ZONE,              !- Zone Name
-    1.524;                   !- Node Height
+    1.524;                   !- Node Height {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: AirflowNetwork:IntraZone:Linkage ===========
 
   AirflowNetwork:IntraZone:Linkage,
-    IntraZoneMiddleUpperLink, !- Name
+    IntraZoneMiddleUpperLink,!- Name
     LeftUpper,               !- Node 1 Name
     CentralUpper,            !- Node 2 Name
     CR-1;                    !- Component Name
@@ -1988,16 +1993,16 @@
     LeftUpper,               !- Node 1 Name
     EAST_ZONE_T,             !- Node 2 Name
     CR-1,                    !- Component Name
-    Surface_11_T;            !- Surface Name
+    Surface_11_T;            !- AirflowNetwork:MultiZone:Surface Name
 
   AirflowNetwork:IntraZone:Linkage,
-    IntraZoneLeftMiddleUpperLink, !- Name
+    IntraZoneLeftMiddleUpperLink,  !- Name
     LeftUpper,               !- Node 1 Name
     LeftMiddle,              !- Node 2 Name
     CR-1;                    !- Component Name
 
   AirflowNetwork:IntraZone:Linkage,
-    IntraZoneCentralMiddleUpperLink, !- Name
+    IntraZoneCentralMiddleUpperLink,  !- Name
     CentralUpper,            !- Node 1 Name
     NORTH_ZONE,              !- Node 2 Name
     CR-1;                    !- Component Name
@@ -2009,19 +2014,19 @@
     CR-1;                    !- Component Name
 
   AirflowNetwork:IntraZone:Linkage,
-    IntraZoneLeftMiddleLowerLink, !- Name
+    IntraZoneLeftMiddleLowerLink,  !- Name
     LeftLower,               !- Node 1 Name
     LeftMiddle,              !- Node 2 Name
     CR-1;                    !- Component Name
 
   AirflowNetwork:IntraZone:Linkage,
-    IntraZoneCentralMiddleLowerLink, !- Name
+    IntraZoneCentralMiddleLowerLink,  !- Name
     CentralLower,            !- Node 1 Name
     NORTH_ZONE,              !- Node 2 Name
     CR-1;                    !- Component Name
 
   AirflowNetwork:IntraZone:Linkage,
-    IntraZoneMiddleLowerLink, !- Name
+    IntraZoneMiddleLowerLink,!- Name
     LeftLower,               !- Node 1 Name
     CentralLower,            !- Node 2 Name
     CR-1;                    !- Component Name
@@ -2031,13 +2036,13 @@
     LeftLower,               !- Node 1 Name
     EAST_ZONE,               !- Node 2 Name
     CR-1,                    !- Component Name
-    Surface_11;              !- Surface Name
+    Surface_11;              !- AirflowNetwork:MultiZone:Surface Name
 
 !-   ===========  ALL OBJECTS IN CLASS: RoomAirModelType ===========
 
   RoomAirModelType,
-    RoomAirWithAirflowNetwork, !- Name
-    NORTH_ZONE,              !- Node 1 Name
+    RoomAirWithAirflowNetwork,  !- Name
+    NORTH_ZONE,              !- Zone Name
     AirflowNetwork,          !- Room-Air Modeling Type
     DIRECT;                  !- Air Temperature Coupling Strategy
 
@@ -2093,27 +2098,27 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: RoomAir:Node:AirflowNetwork:AdjacentSurfaceList ===========
 
-  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
     Surface_18_T_List,       !- Name
     Surface_18_T;            !- Surface 1 Name
 
-  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
     Surface_20_List,         !- Name
-    Surface_20;              !- Surface 1 Name 
+    Surface_20;              !- Surface 1 Name
 
-  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
     Surface_14_List,         !- Name
     Surface_14;              !- Surface 1 Name
 
-  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
     Surface_16_List,         !- Name
     Surface_16;              !- Surface 1 Name
 
-  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
     Surface_18_List,         !- Name
     Surface_18;              !- Surface 1 Name
 
-  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+  RoomAir:Node:AirflowNetwork:AdjacentSurfaceList,
     Surface_19_List,         !- Name
     Surface_19;              !- Surface 1 Name
 
@@ -2126,10 +2131,10 @@
     0.15,                    !- Fraction of Gains to Node 1
     Lights,                  !- Internal Gain Object 2 Type
     NORTH_ZONE Lights,       !- Internal Gain Object 2 Name
-    0.15,                    !- Fraction of Gains to Node 1
+    0.15,                    !- Fraction of Gains to Node 2
     ElectricEquipment,       !- Internal Gain Object 3 Type
     NORTH_ZONE Equip,        !- Internal Gain Object 3 Name
-    0.15;                    !- Fraction of Gains to Node 1
+    0.15;                    !- Fraction of Gains to Node 3
 
   RoomAir:Node:AirflowNetwork:InternalGains,
     CentralUpper_Gain,       !- Name
@@ -2138,10 +2143,10 @@
     0.15,                    !- Fraction of Gains to Node 1
     Lights,                  !- Internal Gain Object 2 Type
     NORTH_ZONE Lights,       !- Internal Gain Object 2 Name
-    0.15,                    !- Fraction of Gains to Node 1
+    0.15,                    !- Fraction of Gains to Node 2
     ElectricEquipment,       !- Internal Gain Object 3 Type
     NORTH_ZONE Equip,        !- Internal Gain Object 3 Name
-    0.15;                    !- Fraction of Gains to Node 1
+    0.15;                    !- Fraction of Gains to Node 3
 
   RoomAir:Node:AirflowNetwork:InternalGains,
     LeftMiddle_Gain,         !- Name
@@ -2194,59 +2199,59 @@
 !-   ===========  ALL OBJECTS IN CLASS: RoomAir:Node:AirflowNetwork:HVACEquipment ===========
 
   RoomAir:Node:AirflowNetwork:HVACEquipment,
-    LeftUpper_HVAC,         !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
-    NORTH_ZONE PTAC,        !- ZoneHVAC or Air Terminal Equipment Object Name 1
-    0.04,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
-    0.04;                   !- Fraction of Input or Return Air to HVAC Equipment 1
+    LeftUpper_HVAC,          !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1
+    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1
+    0.04,                    !- Fraction of Output or Supply Air from HVAC Equipment 1
+    0.04;                    !- Fraction of Input or Return Air to HVAC Equipment 1
 
   RoomAir:Node:AirflowNetwork:HVACEquipment,
-    CentralUpper_HVAC,      !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
-    NORTH_ZONE PTAC,        !- ZoneHVAC or Air Terminal Equipment Object Name 1
-    0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
-    0.14;                   !- Fraction of Input or Return Air to HVAC Equipment 1
+    CentralUpper_HVAC,       !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1
+    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1
+    0.14,                    !- Fraction of Output or Supply Air from HVAC Equipment 1
+    0.14;                    !- Fraction of Input or Return Air to HVAC Equipment 1
 
   RoomAir:Node:AirflowNetwork:HVACEquipment,
-    LeftMiddle_HVAC,        !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
-    NORTH_ZONE PTAC,        !- ZoneHVAC or Air Terminal Equipment Object Name 1
-    0.04,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
-    0.04;                   !- Fraction of Input or Return Air to HVAC Equipment 1
+    LeftMiddle_HVAC,         !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1
+    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1
+    0.04,                    !- Fraction of Output or Supply Air from HVAC Equipment 1
+    0.04;                    !- Fraction of Input or Return Air to HVAC Equipment 1
 
   RoomAir:Node:AirflowNetwork:HVACEquipment,
-    NORTH_ZONE_HVAC,        !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
-    NORTH_ZONE PTAC,        !- ZoneHVAC or Air Terminal Equipment Object Name 1
-    0.68,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
-    0.68;                   !- Fraction of Input or Return Air to HVAC Equipment 1
+    NORTH_ZONE_HVAC,         !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1
+    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1
+    0.68,                    !- Fraction of Output or Supply Air from HVAC Equipment 1
+    0.68;                    !- Fraction of Input or Return Air to HVAC Equipment 1
 
   RoomAir:Node:AirflowNetwork:HVACEquipment,
-    LeftLower_HVAC,         !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
-    NORTH_ZONE PTAC,        !- ZoneHVAC or Air Terminal Equipment Object Name 1
-    0.06,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
-    0.06;                   !- Fraction of Input or Return Air to HVAC Equipment 1
+    LeftLower_HVAC,          !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1
+    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1
+    0.06,                    !- Fraction of Output or Supply Air from HVAC Equipment 1
+    0.06;                    !- Fraction of Input or Return Air to HVAC Equipment 1
 
   RoomAir:Node:AirflowNetwork:HVACEquipment,
-    CentralLower_HVAC,      !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
-    NORTH_ZONE PTAC,        !- ZoneHVAC or Air Terminal Equipment Object Name 1
-    0.04,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
-    0.04;                   !- Fraction of Input or Return Air to HVAC Equipment 1
+    CentralLower_HVAC,       !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC or Air Terminal Equipment Object Type 1
+    NORTH_ZONE PTAC,         !- ZoneHVAC or Air Terminal Equipment Object Name 1
+    0.04,                    !- Fraction of Output or Supply Air from HVAC Equipment 1
+    0.04;                    !- Fraction of Input or Return Air to HVAC Equipment 1
 
 !-   ===========  ALL OBJECTS IN CLASS: RoomAirSettings:AirflowNetwork ===========
 
   RoomAirSettings:AirflowNetwork,
-    NORTH_ZONE,             !- Name
-    NORTH_ZONE,             !- Zone Name
-    NORTH_ZONE,             !- Control Point RoomAir:Node Name
-    LeftUpper,              !- RoomAir:Node:AirflowNetwork 1 Name
-    CentralUpper,           !- RoomAir:Node:AirflowNetwork 2 Name
-    NORTH_ZONE,             !- RoomAir:Node:AirflowNetwork 3 Name
-    LeftMiddle,             !- RoomAir:Node:AirflowNetwork 4 Name
-    LeftLower,              !- RoomAir:Node:AirflowNetwork 5 Name
-    CentralLower;           !- RoomAir:Node:AirflowNetwork 6 Name
+    NORTH_ZONE,              !- Name
+    NORTH_ZONE,              !- Zone Name
+    NORTH_ZONE,              !- Control Point RoomAirflowNetwork:Node Name
+    LeftUpper,               !- RoomAirflowNetwork:Node Name 1
+    CentralUpper,            !- RoomAirflowNetwork:Node Name 2
+    NORTH_ZONE,              !- RoomAirflowNetwork:Node Name 3
+    LeftMiddle,              !- RoomAirflowNetwork:Node Name 4
+    LeftLower,               !- RoomAirflowNetwork:Node Name 5
+    CentralLower;            !- RoomAirflowNetwork:Node Name 6
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT VARIABLE ===========
 
@@ -2331,14 +2336,15 @@
   Sizing:Parameters,
     1.2,                     !- Heating Sizing Factor
     1.2;                     !- Cooling Sizing Factor
-! 
+
+!
 !   HVACTemplate:Thermostat,
 !     All Zones,               !- Name
 !     Htg-SetP-Sch,            !- Heating Setpoint Schedule Name
 !     ,                        !- Constant Heating Setpoint {C}
 !     Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name
 !     ;                        !- Constant Cooling Setpoint {C}
-! 
+!
 !   HVACTemplate:Zone:PTAC,
 !     NORTH ZONE,                !- Zone Name
 !     All Zones,               !- Template Thermostat Name
@@ -2379,7 +2385,6 @@
 !     ,                        !- Baseboard Heating Type
 !     ,                        !- Baseboard Heating Availability Schedule Name
 !     ;                        !- Baseboard Heating Capacity {W}
-
 ! For heating, recover 2 hrs early
 
   Schedule:Compact,
@@ -2414,248 +2419,237 @@
     Until: 24:00,24.0,       !- Field 13
     For: WinterDesignDay,    !- Field 15
     Until: 24:00,32.0;       !- Field 16
-! 
+
+!
 ! -------------------------------------------------------------
 ! New objects created from ExpandObjects
 ! -------------------------------------------------------------
-! 
+!
 
-ScheduleTypeLimits,
-  HVACTemplate Any Number;                                 !- Name
+  ScheduleTypeLimits,
+    HVACTemplate Any Number; !- Name
 
-ThermostatSetpoint:DualSetpoint,
-  All Zones Dual SP Control,                               !- Name
-  Htg-SetP-Sch,                                            !- Heating Setpoint Temperature Schedule Name
-  Clg-SetP-Sch;                                            !- Cooling Setpoint Temperature Schedule Name
+  ThermostatSetpoint:DualSetpoint,
+    All Zones Dual SP Control,  !- Name
+    Htg-SetP-Sch,            !- Heating Setpoint Temperature Schedule Name
+    Clg-SetP-Sch;            !- Cooling Setpoint Temperature Schedule Name
 
-Schedule:Compact,
-  HVACTemplate-Always 1,                                   !- Name
-  HVACTemplate Any Number,                                 !- Schedule Type Limits Name
-  Through: 12/31,                                          !- Field 1
-  For: AllDays,                                            !- Field 2
-  Until: 24:00,                                            !- Field 3
-  1;                                                       !- Field 4
+  Schedule:Compact,
+    HVACTemplate-Always 1,   !- Name
+    HVACTemplate Any Number, !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1;          !- Field 3
 
-Schedule:Compact,
-  HVACTemplate-Always 4,                                   !- Name
-  HVACTemplate Any Number,                                 !- Schedule Type Limits Name
-  Through: 12/31,                                          !- Field 1
-  For: AllDays,                                            !- Field 2
-  Until: 24:00,                                            !- Field 3
-  4;                                                       !- Field 4
+  Schedule:Compact,
+    HVACTemplate-Always 4,   !- Name
+    HVACTemplate Any Number, !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4;          !- Field 3
 
-ZoneControl:Thermostat,
-  NORTH_ZONE Thermostat,                                   !- Name
-  NORTH_ZONE,                                              !- Zone or ZoneList Name
-  HVACTemplate-Always 4,                                   !- Control Type Schedule Name
-  ThermostatSetpoint:DualSetpoint,                         !- Control Object Type
-  All Zones Dual SP Control;                               !- Control Name
+  ZoneControl:Thermostat,
+    NORTH_ZONE Thermostat,   !- Name
+    NORTH_ZONE,              !- Zone or ZoneList Name
+    HVACTemplate-Always 4,   !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    All Zones Dual SP Control;  !- Control 1 Name
 
-DesignSpecification:OutdoorAir,
-  SZ DSOA NORTH_ZONE,                                      !- Name
-  flow/person,                                             !- Outdoor Air Method
-  0.00944,                                                 !- Outdoor Air Flow per Person {m3/s}
-  0.0,                                                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-  0.0;                                                     !- Outdoor Air Flow per Zone {m3/s}
+  DesignSpecification:OutdoorAir,
+    SZ DSOA NORTH_ZONE,      !- Name
+    flow/person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
+    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
-Sizing:Zone,
-  NORTH_ZONE,                                              !- Zone or ZoneList Name
-  SupplyAirTemperature,                                    !- Zone Cooling Design Supply Air Temperature Input Method
-  14.0,                                                    !- Zone Cooling Design Supply Air Temperature {C}
-  11.11,                                                   !- Zone Cooling Design Supply Air Temperature Difference {delta C}
-  SupplyAirTemperature,                                    !- Zone Heating Design Supply Air Temperature Input Method
-  50.0,                                                    !- Zone Heating Design Supply Air Temperature {C}
-  ,                                                        !- Zone Heating Design Supply Air Temperature Difference {delta C}
-  0.008,                                                   !- Zone Cooling Design Supply Air Humidity Ratio {kg-H20/kg-air}
-  0.008,                                                   !- Zone Heating Design Supply Air Humidity Ratio {kg-H2O/kg-air}
-  SZ DSOA NORTH_ZONE,                                      !- Design Specification Outdoor Air Object Name
-  ,                                                        !- Zone Heating Sizing Factor
-  ,                                                        !- Zone Cooling Sizing Factor
-  DesignDay,                                               !- Cooling Design Air Flow Method
-  0,                                                       !- Cooling Design Air Flow Rate {m3/s}
-  ,                                                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-  ,                                                        !- Cooling Minimum Air Flow {m3/s}
-  0,                                                       !- Cooling Minimum Air Flow Fraction {}
-  DesignDay,                                               !- Heating Design Air Flow Method
-  0,                                                       !- Heating Design Air Flow Rate {m3/s}
-  ,                                                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-  ,                                                        !- Heating Maximum Air Flow {m3/s}
-  0,                                                       !- Heating Maximum Air Flow Fraction {}
-  SZ DSZAD NORTH_ZONE;                                     !- Design Specification Zone Air Distribution Object Name
+  Sizing:Zone,
+    NORTH_ZONE,              !- Zone or ZoneList Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    14.0,                    !- Zone Cooling Design Supply Air Temperature {C}
+    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
+    50.0,                    !- Zone Heating Design Supply Air Temperature {C}
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    SZ DSOA NORTH_ZONE,      !- Design Specification Outdoor Air Object Name
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    DesignDay,               !- Cooling Design Air Flow Method
+    0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Cooling Minimum Air Flow {m3/s}
+    0,                       !- Cooling Minimum Air Flow Fraction
+    DesignDay,               !- Heating Design Air Flow Method
+    0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Heating Maximum Air Flow {m3/s}
+    0,                       !- Heating Maximum Air Flow Fraction
+    SZ DSZAD NORTH_ZONE;     !- Design Specification Zone Air Distribution Object Name
 
-DesignSpecification:ZoneAirDistribution,
-  SZ DSZAD NORTH_ZONE,                                     !- Name
-  1,                                                       !- Zone Air Distribution Effectiveness in Cooling Mode {}
-  1;                                                       !- Zone Air Distribution Effectiveness in Heating Mode {}
+  DesignSpecification:ZoneAirDistribution,
+    SZ DSZAD NORTH_ZONE,     !- Name
+    1,                       !- Zone Air Distribution Effectiveness in Cooling Mode {dimensionless}
+    1;                       !- Zone Air Distribution Effectiveness in Heating Mode {dimensionless}
 
-ZoneHVAC:EquipmentConnections,
-  NORTH_ZONE,                                              !- Zone Name
-  NORTH_ZONE Equipment,                                    !- Zone Conditioning Equipment List Name
-  NORTH_ZONE PTAC Supply Inlet,                            !- Zone Air Inlet Node or NodeList Name
-  NORTH_ZONE PTAC Return,                                  !- Zone Air Exhaust Node or NodeList Name
-  NORTH_ZONE Zone Air Node,                                !- Zone Air Node Name
-  NORTH_ZONE Return Outlet;                                !- Zone Return Air Node Name
+  ZoneHVAC:EquipmentConnections,
+    NORTH_ZONE,              !- Zone Name
+    NORTH_ZONE Equipment,    !- Zone Conditioning Equipment List Name
+    NORTH_ZONE PTAC Supply Inlet,  !- Zone Air Inlet Node or NodeList Name
+    NORTH_ZONE PTAC Return,  !- Zone Air Exhaust Node or NodeList Name
+    NORTH_ZONE Zone Air Node,!- Zone Air Node Name
+    NORTH_ZONE Return Outlet;!- Zone Return Air Node Name
 
-ZoneHVAC:EquipmentList,
-  NORTH_ZONE Equipment,                                    !- Name
-  ZoneHVAC:PackagedTerminalAirConditioner,                 !- Zone Equipment Object Type
-  NORTH_ZONE PTAC,                                         !- Zone Equipment Name
-  1,                                                       !- Zone Equipment Cooling Sequence
-  1;                                                       !- Zone Equipment Heating or No-Load Sequence
+  ZoneHVAC:EquipmentList,
+    NORTH_ZONE Equipment,    !- Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
+    NORTH_ZONE PTAC,         !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+
 ! Set PTAC outdoor air to zero, because zone is served by dedicated outdoor air system (DOAS)
 
-ZoneHVAC:PackagedTerminalAirConditioner,
-  NORTH_ZONE PTAC,                                         !- Name
-  HVACTemplate-Always 1,                                   !- Availability Schedule Name
-  NORTH_ZONE PTAC Return,                                  !- Air Inlet Node Name
-  NORTH_ZONE PTAC Supply Inlet,                            !- Air Outlet Node Name
-  OutdoorAir:Mixer,                                        !- Outdoor Air Mixer Object Type
-  NORTH_ZONE PTAC OA Mixing Box,                           !- Outdoor Air Mixer Name
-  autosize,                                                !- Supply air volumetric flow rate during cooling operation {m3/s}
-  autosize,                                                !- Supply air volumetric flow rate during heating operation {m3/s}
-  ,                                                        !- Supply air volumetric flow rate when no cooling or heating is needed {m3/s}
-  autosize,                                                !- Outside air volumetric flow rate during cooling operation {m3/s}
-  autosize,                                                !- Outside air volumetric flow rate during heating operation {m3/s}
-  autosize,                                                !- Outside air volumetric flow rate when no cooling or heating is needed {m3/s}
-  Fan:OnOff,                                               !- Supply Air Fan Object Type
-  NORTH_ZONE PTAC Supply Fan,                              !- Supply Air Fan Name
-  Coil:Heating:Electric,                                   !- Supplemental Heating Coil Object Type
-  NORTH_ZONE PTAC Heating Coil,                            !- Heating Coil Name
-  Coil:Cooling:DX:SingleSpeed,                             !- Cooling Coil Object Type
-  NORTH_ZONE PTAC Cooling Coil,                            !- Cooling Coil Name
-  DrawThrough,                                             !- Fan Placement
-  HVACTemplate-Always 0;                                   !- Supply Air Fan Operating Mode Schedule Name
+  ZoneHVAC:PackagedTerminalAirConditioner,
+    NORTH_ZONE PTAC,         !- Name
+    HVACTemplate-Always 1,   !- Availability Schedule Name
+    NORTH_ZONE PTAC Return,  !- Air Inlet Node Name
+    NORTH_ZONE PTAC Supply Inlet,  !- Air Outlet Node Name
+    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
+    NORTH_ZONE PTAC OA Mixing Box,  !- Outdoor Air Mixer Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
+    Fan:OnOff,               !- Supply Air Fan Object Type
+    NORTH_ZONE PTAC Supply Fan,  !- Supply Air Fan Name
+    Coil:Heating:Electric,   !- Heating Coil Object Type
+    NORTH_ZONE PTAC Heating Coil,  !- Heating Coil Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    NORTH_ZONE PTAC Cooling Coil,  !- Cooling Coil Name
+    DrawThrough,             !- Fan Placement
+    HVACTemplate-Always 0;   !- Supply Air Fan Operating Mode Schedule Name
 
-Schedule:Compact,
-  HVACTemplate-Always 0,                                   !- Name
-  HVACTemplate Any Number,                                 !- Schedule Type Limits Name
-  Through: 12/31,                                          !- Field 1
-  For: AllDays,                                            !- Field 2
-  Until: 24:00,                                            !- Field 3
-  0;                                                       !- Field 4
+  Schedule:Compact,
+    HVACTemplate-Always 0,   !- Name
+    HVACTemplate Any Number, !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0;          !- Field 3
 
-Fan:OnOff,
-  NORTH_ZONE PTAC Supply Fan,                              !- Name
-  HVACTemplate-Always 1,                                   !- Availability Schedule Name
-  0.7,                                                     !- Fan Efficiency
-  75,                                                      !- Pressure Rise {Pa}
-  autosize,                                                !- Maximum Flow Rate {m3/s}
-  0.9,                                                     !- Motor Efficiency
-  1,                                                       !- Motor in Airstream Fraction
-  NORTH_ZONE PTAC Heating Coil Outlet,                     !- Air Inlet Node Name
-  NORTH_ZONE PTAC Supply Inlet;                            !- Air Outlet Node Name
+  Fan:OnOff,
+    NORTH_ZONE PTAC Supply Fan,  !- Name
+    HVACTemplate-Always 1,   !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    75,                      !- Pressure Rise {Pa}
+    autosize,                !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Airstream Fraction
+    NORTH_ZONE PTAC Heating Coil Outlet,  !- Air Inlet Node Name
+    NORTH_ZONE PTAC Supply Inlet;  !- Air Outlet Node Name
 
-OutdoorAir:Mixer,
-  NORTH_ZONE PTAC OA Mixing Box,                           !- Name
-  NORTH_ZONE PTAC Mixed Air Outlet,                        !- Mixed Air Node Name
-  NORTH_ZONE PTAC Outside Air Inlet,                       !- Outside Air Stream Node Name
-  NORTH_ZONE PTAC Relief Air Outlet,                       !- Relief Air Stream Node Name
-  NORTH_ZONE PTAC Return;                                  !- Return Air Stream Node Name
+  OutdoorAir:Mixer,
+    NORTH_ZONE PTAC OA Mixing Box,  !- Name
+    NORTH_ZONE PTAC Mixed Air Outlet,  !- Mixed Air Node Name
+    NORTH_ZONE PTAC Outside Air Inlet,  !- Outdoor Air Stream Node Name
+    NORTH_ZONE PTAC Relief Air Outlet,  !- Relief Air Stream Node Name
+    NORTH_ZONE PTAC Return;  !- Return Air Stream Node Name
 
-OutdoorAir:Node,
-  NORTH_ZONE PTAC Outside Air Inlet,                       !- Name
-  -1;                                                      !- Height Above Ground
+  OutdoorAir:Node,
+    NORTH_ZONE PTAC Outside Air Inlet,  !- Name
+    -1;                      !- Height Above Ground {m}
 
-Coil:Cooling:DX:SingleSpeed,
-  NORTH_ZONE PTAC Cooling Coil,                            !- Name
-  HVACTemplate-Always 1,                                   !- Availability Schedule Name
-  autosize,                                                !- Gross Rated Total Cooling Capacity {W}
-  autosize,                                                !- Gross Rated Sensible Heat Ratio
-  3,                                                       !- Rated COP
-  autosize,                                                !- Rated Air Volume Flow Rate {m3/s}
-  ,                                                        !- Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}
-  NORTH_ZONE PTAC Mixed Air Outlet,                        !- Air Inlet Node Name
-  NORTH_ZONE PTAC Cooling Coil Outlet,                     !- Air Outlet Node Name
-  NORTH_ZONE PTAC Cooling Coil Cap-FT,                     !- Total Cooling Capacity Modifier Curve (function of temperature)
-  NORTH_ZONE PTAC Cooling Coil Cap-FF,                     !- Total Cooling Capacity Modifier Curve (function of flow fraction)
-  NORTH_ZONE PTAC Cooling Coil EIR-FT,                     !- Energy Input Ratio Modifier Curve (function of temperature)
-  NORTH_ZONE PTAC Cooling Coil EIR-FF,                     !- Energy Input Ratio Modifier Curve (function of flow fraction)
-  NORTH_ZONE PTAC Cooling Coil Coil PLF,                   !- Part Load Fraction Correlation (function of part load ratio)
-  0,                                                       !- Nominal Time for Condensate Removal to Begin
-  0,                                                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-  0,                                                       !- Maximum Cycling Rate
-  0,                                                       !- Latent Capacity Time Constant
-  NORTH_ZONE PTAC Cooling Coil Condenser Inlet,            !- Condenser Air Inlet Node Name
-  AirCooled,                                               !- Condenser Type
-  0,                                                       !- Evaporative Condenser Effectiveness
-  ,                                                        !- Evaporative Condenser Air Flow Rate
-  0,                                                       !- Evaporative Condenser Pump Rated Power Consumption
-  0,                                                       !- Crankcase Heater Capacity
-  10;                                                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+  Coil:Cooling:DX:SingleSpeed,
+    NORTH_ZONE PTAC Cooling Coil,  !- Name
+    HVACTemplate-Always 1,   !- Availability Schedule Name
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3,                       !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    NORTH_ZONE PTAC Mixed Air Outlet,  !- Air Inlet Node Name
+    NORTH_ZONE PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
+    NORTH_ZONE PTAC Cooling Coil Cap-FT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    NORTH_ZONE PTAC Cooling Coil Cap-FF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    NORTH_ZONE PTAC Cooling Coil EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name
+    NORTH_ZONE PTAC Cooling Coil EIR-FF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    NORTH_ZONE PTAC Cooling Coil Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    NORTH_ZONE PTAC Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-Curve:Biquadratic,
-  NORTH_ZONE PTAC Cooling Coil Cap-FT,                     !- Name
-  0.942587793,                                             !- Coefficient1 Constant
-  0.009543347,                                             !- Coefficient2 x
-  0.00068377,                                              !- Coefficient3 x**2
-  -0.011042676,                                            !- Coefficient4 y
-  0.000005249,                                             !- Coefficient5 y**2
-  -0.00000972,                                             !- Coefficient6 x*y
-  12.77778,                                                !- Minimum Value of x
-  23.88889,                                                !- Maximum Value of x
-  18.0,                                                    !- Minimum Value of y
-  46.11111;                                                !- Maximum Value of y
+  Curve:Biquadratic,
+    NORTH_ZONE PTAC Cooling Coil Cap-FT,  !- Name
+    0.942587793,             !- Coefficient1 Constant
+    0.009543347,             !- Coefficient2 x
+    0.00068377,              !- Coefficient3 x**2
+    -0.011042676,            !- Coefficient4 y
+    0.000005249,             !- Coefficient5 y**2
+    -0.00000972,             !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    18.0,                    !- Minimum Value of y
+    46.11111;                !- Maximum Value of y
 
-Curve:Quadratic,
-  NORTH_ZONE PTAC Cooling Coil Cap-FF,                     !- Name
-  0.8,                                                     !- Coefficient1 Constant
-  0.2,                                                     !- Coefficient2 x
-  0,                                                       !- Coefficient3 x**2
-  0.5,                                                     !- Minimum Value of x
-  1.5;                                                     !- Maximum Value of x
+  Curve:Quadratic,
+    NORTH_ZONE PTAC Cooling Coil Cap-FF,  !- Name
+    0.8,                     !- Coefficient1 Constant
+    0.2,                     !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
 
-Curve:Biquadratic,
-  NORTH_ZONE PTAC Cooling Coil EIR-FT,                     !- Name
-  0.342414409,                                             !- Coefficient1 Constant
-  0.034885008,                                             !- Coefficient2 x
-  -0.0006237,                                              !- Coefficient3 x**2
-  0.004977216,                                             !- Coefficient4 y
-  0.000437951,                                             !- Coefficient5 y**2
-  -0.000728028,                                            !- Coefficient6 x*y
-  12.77778,                                                !- Minimum Value of x
-  23.88889,                                                !- Maximum Value of x
-  18.0,                                                    !- Minimum Value of y
-  46.11111;                                                !- Maximum Value of y
+  Curve:Biquadratic,
+    NORTH_ZONE PTAC Cooling Coil EIR-FT,  !- Name
+    0.342414409,             !- Coefficient1 Constant
+    0.034885008,             !- Coefficient2 x
+    -0.0006237,              !- Coefficient3 x**2
+    0.004977216,             !- Coefficient4 y
+    0.000437951,             !- Coefficient5 y**2
+    -0.000728028,            !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    18.0,                    !- Minimum Value of y
+    46.11111;                !- Maximum Value of y
 
-Curve:Quadratic,
-  NORTH_ZONE PTAC Cooling Coil EIR-FF,                     !- Name
-  1.1552,                                                  !- Coefficient1 Constant
-  -0.1808,                                                 !- Coefficient2 x
-  0.0256,                                                  !- Coefficient3 x**2
-  0.5,                                                     !- Minimum Value of x
-  1.5;                                                     !- Maximum Value of x
+  Curve:Quadratic,
+    NORTH_ZONE PTAC Cooling Coil EIR-FF,  !- Name
+    1.1552,                  !- Coefficient1 Constant
+    -0.1808,                 !- Coefficient2 x
+    0.0256,                  !- Coefficient3 x**2
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
 
-Curve:Quadratic,
-  NORTH_ZONE PTAC Cooling Coil Coil PLF,                   !- Name
-  0.85,                                                    !- Coefficient1 Constant
-  0.15,                                                    !- Coefficient2 x
-  0,                                                       !- Coefficient3 x**2
-  0,                                                       !- Minimum Value of x
-  1;                                                       !- Maximum Value of x
+  Curve:Quadratic,
+    NORTH_ZONE PTAC Cooling Coil Coil PLF,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1;                       !- Maximum Value of x
 
-OutdoorAir:Node,
-  NORTH_ZONE PTAC Cooling Coil Condenser Inlet,            !- Name
-  -1;                                                      !- Height Above Ground
+  OutdoorAir:Node,
+    NORTH_ZONE PTAC Cooling Coil Condenser Inlet,  !- Name
+    -1;                      !- Height Above Ground {m}
 
-Coil:Heating:Electric,
-  NORTH_ZONE PTAC Heating Coil,                            !- Name
-  HVACTemplate-Always 1,                                   !- Availability Schedule Name
-  1,                                                       !- Efficiency
-  autosize,                                                !- Nominal Capacity of the Coil {W}
-  NORTH_ZONE PTAC Cooling Coil Outlet,                     !- Air Inlet Node Name
-  NORTH_ZONE PTAC Heating Coil Outlet,                     !- Air Outlet Node Name
-  ;                                                        !- Coil Temp Setpoint Node
+  Coil:Heating:Electric,
+    NORTH_ZONE PTAC Heating Coil,  !- Name
+    HVACTemplate-Always 1,   !- Availability Schedule Name
+    1,                       !- Efficiency
+    autosize,                !- Nominal Capacity {W}
+    NORTH_ZONE PTAC Cooling Coil Outlet,  !- Air Inlet Node Name
+    NORTH_ZONE PTAC Heating Coil Outlet,  !- Air Outlet Node Name
+    ;                        !- Temperature Setpoint Node Name
 
-Site:GroundTemperature:BuildingSurface,
-  20.03,                                                   !- January Ground Temperature
-  20.03,                                                   !- February Ground Temperature
-  20.13,                                                   !- March Ground Temperature
-  20.30,                                                   !- April Ground Temperature
-  20.43,                                                   !- May Ground Temperature
-  20.52,                                                   !- June Ground Temperature
-  20.62,                                                   !- July Ground Temperature
-  20.77,                                                   !- August Ground Temperature
-  20.78,                                                   !- September Ground Temperature
-  20.55,                                                   !- October Ground Temperature
-  20.44,                                                   !- November Ground Temperature
-  20.20;                                                   !- December Ground Temperature
+  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
+

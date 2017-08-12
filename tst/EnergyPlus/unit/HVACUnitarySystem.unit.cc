@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,29 +43,16 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HVACUnitarySystem Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <General.hh>
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -85,8 +69,10 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -137,6 +123,971 @@ using WaterCoils::WaterCoil_SimpleHeating;
 using WaterCoils::WaterCoil_Cooling;
 using WaterCoils::SimpleAnalysis;
 using General::TrimSigDigits;
+
+class ZoneUnitarySystemTest: public EnergyPlusFixture {
+public:
+	int UnitarySysNum = 1;
+	int NumNodes = 1; // number of zone inlet and zone exhaust nodes
+	bool ErrorsFound = false;
+	Real64 const CpWater = 4180.0; // For estimating the expected result
+	Real64 const RhoWater = 1000.0; // For estimating the expected result
+
+protected:
+	virtual void SetUp() {
+		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+
+		DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize StdRhoAir
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataGlobals::NumOfZones = 1;
+		Zone.allocate( NumOfZones );
+		DataZoneEquipment::ZoneEquipConfig.allocate( NumOfZones );
+		DataZoneEquipment::ZoneEquipList.allocate( NumOfZones );
+		DataZoneEquipment::ZoneEquipAvail.dimension( NumOfZones, DataHVACGlobals::NoAction );
+		Zone( 1 ).Name = "EAST ZONE";
+		DataZoneEquipment::NumOfZoneEquipLists = 1;
+		Zone( 1 ).IsControlled = true;
+		ZoneEquipConfig( 1 ).IsControlled = true;
+		ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+		ZoneEquipConfig( 1 ).ZoneName = "EAST ZONE";
+		ZoneEquipConfig( 1 ).EquipListName = "ZONE2EQUIPMENT";
+		ZoneEquipConfig( 1 ).ZoneNode = 20;
+		ZoneEquipConfig( 1 ).ReturnAirNode = 21;
+		Zone( ZoneEquipConfig( 1 ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( 1 ).ZoneNode;
+		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
+		ZoneEquipList( 1 ).Name = "ZONE2EQUIPMENT";
+		int maxEquipCount = 1;
+		ZoneEquipList( 1 ).NumOfEquipTypes = maxEquipCount;
+		ZoneEquipList( 1 ).EquipType.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipType_Num.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipName.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipIndex.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipIndex = 1;
+		ZoneEquipList( 1 ).EquipData.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).CoolingPriority.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).HeatingPriority.allocate( ZoneEquipList( 1 ).NumOfEquipTypes );
+		ZoneEquipList( 1 ).EquipType( 1 ) = "AIRLOOPHVAC:UNITARYSYSTEM";
+		ZoneEquipList( 1 ).EquipName( 1 ) = "UNITARY SYSTEM MODEL";
+		ZoneEquipList( 1 ).CoolingPriority( 1 ) = 1;
+		ZoneEquipList( 1 ).HeatingPriority( 1 ) = 1;
+		ZoneEquipList( 1 ).EquipType_Num( 1 ) = DataZoneEquipment::ZoneUnitarySystem_Num;
+		ZoneEquipConfig( 1 ).NumInletNodes = NumNodes;
+		ZoneEquipConfig( 1 ).InletNode.allocate( NumNodes );
+		ZoneEquipConfig( 1 ).AirDistUnitCool.allocate( NumNodes );
+		ZoneEquipConfig( 1 ).AirDistUnitHeat.allocate( NumNodes );
+		ZoneEquipConfig( 1 ).InletNode( 1 ) = 2;
+		ZoneEquipConfig( 1 ).NumExhaustNodes = NumNodes;
+		ZoneEquipConfig( 1 ).ExhaustNode.allocate( NumNodes );
+		ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 1;
+		ZoneEquipConfig( 1 ).EquipListIndex = 1;
+
+		CurSysNum = 0;
+		CurZoneEqNum = 1;
+
+		FinalZoneSizing.allocate( 1 );
+		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.5;
+		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.2;
+		FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp = 25.0;
+		FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat = 0.009;
+		FinalZoneSizing( CurZoneEqNum ).CoolDesTemp = 15.0;
+		FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = 0.006;
+
+		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp = 20.0;
+		FinalZoneSizing( CurZoneEqNum ).HeatDesTemp = 30.0;
+		FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat = 0.007;
+		FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * StdRhoAir;
+
+		FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax = 1;
+		FinalZoneSizing( CurZoneEqNum ).CoolDDNum = 1;
+		DesDayWeath.allocate( 1 );
+		DesDayWeath( 1 ).Temp.allocate( 1 );
+		DesDayWeath( 1 ).Temp( 1 ) = 35.0;
+
+		ZoneEqSizing.allocate( 1 );
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
+		ZoneSizingRunDone = true;
+
+		// set up plant loop
+		TotNumLoops = 2;
+		PlantLoop.allocate( TotNumLoops );
+		PlantSizData.allocate( TotNumLoops );
+		NumPltSizInput = TotNumLoops;
+
+		for( int loopindex = 1; loopindex <= TotNumLoops; ++loopindex ) {
+			auto & loop( PlantLoop( loopindex ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( PlantLoop( loopindex ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( PlantLoop( loopindex ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 2;
+			loopsidebranch.Comp.allocate( 2 );
+		}
+		PlantLoop( 1 ).Name = "Hot Water Loop";
+		PlantLoop( 1 ).FluidName = "WATER";
+		PlantLoop( 1 ).FluidIndex = 1;
+
+		PlantLoop( 2 ).Name = "Chilled Water Loop";
+		PlantLoop( 2 ).FluidName = "WATER";
+		PlantLoop( 2 ).FluidIndex = 1;
+
+		PlantSizData( 1 ).PlantLoopName = "Hot Water Loop";
+		PlantSizData( 1 ).ExitTemp = 80.0;
+		PlantSizData( 1 ).DeltaT = 10.0;
+
+		PlantSizData( 2 ).PlantLoopName = "Chilled Water Loop";
+		PlantSizData( 2 ).ExitTemp = 6.0;
+		PlantSizData( 2 ).DeltaT = 5.0;
+
+	}
+
+	virtual void TearDown() {
+		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+	}
+};
+
+TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance ) {
+
+	std::string const idf_objects = delimited_string( {
+
+		"AirLoopHVAC:UnitarySystem,",
+		"  Unitary System Model,           !- Name",
+		"  Setpoint,                       !- Control Type",
+		"  East Zone,                      !- Controlling Zone or Thermostat Location",
+		"  None,                           !- Dehumidification Control Type",
+		"  AlwaysOne,                      !- Availability Schedule Name",
+		"  Zone Exhaust Node,              !- Air Inlet Node Name",
+		"  Zone 2 Inlet Node,              !- Air Outlet Node Name",
+		"  Fan:OnOff,                      !- Supply Fan Object Type",
+		"  Supply Fan 1,                   !- Supply Fan Name",
+		"  BlowThrough,                    !- Fan Placement",
+		"  AlwaysOne,                      !- Supply Air Fan Operating Mode Schedule Name",
+		"  Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type",
+		"  DX Heating Coil,                !- Heating Coil Name",
+		"  ,                               !- DX Heating Coil Sizing Ratio",
+		"  Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type",
+		"  DX Cooling Coil,                !- Cooling Coil Name",
+		"  ,                               !- Use DOAS DX Cooling Coil",
+		"  15.0,                           !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+		"  ,                               !- Latent Load Control",
+		"  ,                               !- Supplemental Heating Coil Object Type",
+		"  ,                               !- Supplemental Heating Coil Name",
+		"  SupplyAirFlowRate,              !- Supply Air Flow Rate Method During Cooling Operation",
+		"  autosize,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+		"  ,                               !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+		"  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+		"  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+		"  SupplyAirFlowRate,              !- Supply air Flow Rate Method During Heating Operation",
+		"  autosize,                       !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+		"  ,                               !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+		"  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+		"  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+		"  SupplyAirFlowRate,              !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+		"  autosize,                       !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+		"  ,                               !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+		"  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+		"  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+		"  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+		"  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+		"  35.0,                           !- Maximum Supply Air Temperature{ C }",
+		"  ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
+		"  ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name",
+		"  ,                               !- Maximum Cycling Rate",
+		"  ,                               !- Heat Pump Time Constant",
+		"  ,                               !- Fraction of On-Cycle Power Use",
+		"  ,                               !- Heat Pump Fan Delay Time",
+		"  ,                               !- Ancilliary On-Cycle Electric Power",
+		"  ,                               !- Ancilliary Off-Cycle Electric Power",
+		"  ,                               !- Design Heat Recovery Water Flow Rate",
+		"  ,                               !- Maximum Temperature for Heat Recovery",
+		"  ,                               !- Heat Recovery Water Inlet Node Name",
+		"  ,                               !- Heat Recovery Water Outlet Node Name",
+		"  UnitarySystemPerformance:Multispeed,                     !- Design Specification Multispeed Object Type",
+		"  DX Cool MultiSpd Unitary System MultiSpeed Performance;  !- Design Specification Multispeed Object Name",
+
+		"UnitarySystemPerformance:Multispeed,",
+		"  DX Cool MultiSpd Unitary System MultiSpeed Performance,  !- Name",
+		"  10,                             !- Number of Speeds for Heating",
+		"  10,                             !- Number of Speeds for Cooling",
+		"  No,                             !- Single Mode Operation",
+		"  0.05,                           !- No Load Supply Air Flow Rate Ratio",
+		"  0.101,                          !- Heating Speed 1 Supply Air Flow Ratio",
+		"  0.1,                            !- Cooling Speed 1 Supply Air Flow Ratio",
+		"  0.201,                          !- Heating Speed 2 Supply Air Flow Ratio",
+		"  0.2,                            !- Cooling Speed 2 Supply Air Flow Ratio",
+		"  0.301,                          !- Heating Speed 3 Supply Air Flow Ratio",
+		"  0.3,                            !- Cooling Speed 3 Supply Air Flow Ratio",
+		"  0.401,                          !- Heating Speed 4 Supply Air Flow Ratio",
+		"  0.4,                            !- Cooling Speed 4 Supply Air Flow Ratio",
+		"  0.501,                          !- Heating Speed 5 Supply Air Flow Ratio",
+		"  0.5,                            !- Cooling Speed 5 Supply Air Flow Ratio",
+		"  0.601,                          !- Heating Speed 6 Supply Air Flow Ratio",
+		"  0.6,                            !- Cooling Speed 6 Supply Air Flow Ratio",
+		"  0.701,                          !- Heating Speed 7 Supply Air Flow Ratio",
+		"  0.7,                            !- Cooling Speed 7 Supply Air Flow Ratio",
+		"  0.801,                          !- Heating Speed 8 Supply Air Flow Ratio",
+		"  0.8,                            !- Cooling Speed 8 Supply Air Flow Ratio",
+		"  0.901,                          !- Heating Speed 9 Supply Air Flow Ratio",
+		"  0.9,                            !- Cooling Speed 9 Supply Air Flow Ratio",
+		"  1.0,                            !- Heating Speed 10 Supply Air Flow Ratio",
+		"  1.0;                            !- Cooling Speed 10 Supply Air Flow Ratio",
+
+		"Fan:OnOff,",
+		"  Supply Fan 1,                   !- Name",
+		"  AlwaysOne,                      !- Availability Schedule Name",
+		"  0.7,                            !- Fan Total Efficiency",
+		"  600.0,                          !- Pressure Rise{ Pa }",
+		"  autosize,                       !- Maximum Flow Rate{ m3 / s }",
+		"  0.9,                            !- Motor Efficiency",
+		"  1.0,                            !- Motor In Airstream Fraction",
+		"  Zone Exhaust Node,              !- Air Inlet Node Name",
+		"  Cooling Coil Air Inlet Node;    !- Air Outlet Node Name",
+
+		"Coil:Cooling:DX:VariableSpeed,",
+		"  DX Cooling Coil,                !- Name",
+		"  Cooling Coil Air Inlet Node,    !- Air Inlet Node Name",
+		"  Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
+		"  10.0,                           !- Number of Speeds{ dimensionless }",
+		"  10.0,                           !- Nominal Speed Level{ dimensionless }",
+		"  autosize,                       !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level{ w }",
+		"  autosize,                       !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }",
+		"  0.0,                            !- Nominal Time for Condensate to Begin Leaving the Coil{ s }",
+		"  0.0,                            !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }",
+		"  Quadratic,                      !- Energy Part Load Fraction Curve Name",
+		"  ,                               !- Condenser Air Inlet Node Name",
+		"  AirCooled,                      !- Condenser Type",
+		"  ,                               !- Evaporative Condenser Pump Rated Power Consumption{ W }",
+		"  200.0,                          !- Crankcase Heater Capacity{ W }",
+		"  10.0,                           !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+		"  ,                               !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+		"  ,                               !- Supply Water Storage Tank Name",
+		"  ,                               !- Condensate Collection Water Storage Tank Name",
+		"  ,                               !- Basin Heater Capacity{ W / K }",
+		"  ,                               !- Basin Heater Setpoint Temperature{ C }",
+		"  ,                               !- Basin Heater Operating Schedule Name",
+		"  1524.1,                         !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.1359072,                      !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.26,                           !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  1877.9,                         !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.151008,                       !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.30,                           !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  2226.6,                         !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.1661088,                      !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.33,                           !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  2911.3,                         !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.1963104,                      !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.38,                           !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  3581.7,                         !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.226512,                       !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.44,                           !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  4239.5,                         !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.2567136,                      !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.50,                           !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  4885.7,                         !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.2869152,                      !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.57,                           !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  5520.7,                         !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.3171168,                      !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.63,                           !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  6144.8,                         !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.3473184,                      !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.69,                           !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  6758.0,                         !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+		"  0.75,                           !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+		"  4.0,                            !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+		"  0.37752,                        !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }",
+		"  0.74,                           !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+		"  ,                               !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+		"  Biquadratic,                    !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic;                      !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+		"Coil:Heating:DX:VariableSpeed, ",
+		"  DX Heating Coil,                !- Name",
+		"  Heating Coil Air Inlet Node,    !- Indoor Air Inlet Node Name",
+		"  Zone 2 Inlet Node,              !- Indoor Air Outlet Node Name",
+		"  10.0,                           !- Number of Speeds {dimensionless}",
+		"  10.0,                           !- Nominal Speed Level {dimensionless}",
+		"  autosize,                       !- Rated Heating Capacity At Selected Nominal Speed Level {w}",
+		"  1.7,                            !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+		"  Quadratic,                      !- Energy Part Load Fraction Curve Name",
+		"      ,                           !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+		"  -5.0,                           !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+		"  ,                               !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+		"  5.0,                            !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+		"  200.0,                          !- Crankcase Heater Capacity {W}",
+		"  10.0,                           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+		"  Resistive,                      !- Defrost Strategy",
+		"  TIMED,                          !- Defrost Control",
+		"  0.166667,                       !- Defrost Time Period Fraction",
+		"  20000,                          !- Resistive Defrost Heater Capacity {W}",
+		"  1838.7,                         !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.1661088,                      !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  2295.5,                         !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.179322,                       !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  2751.3,                         !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.1925352,                      !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  3659.6,                         !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.2189616,                      !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  4563.7,                         !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"   0.245388,                      !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  5463.3,                         !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.2718144,                      !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  6358.4,                         !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.2982408,                      !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  7248.5,                         !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.3246672,                      !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  8133.6,                         !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.3510936,                      !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+		"  9013.2,                         !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}",
+		"  5.0,                            !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}",
+		"  0.37752,                        !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}",
+		"  Biquadratic,                    !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Quadratic,                      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+		"  Biquadratic,                    !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
+		"  Quadratic;                      !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+		"ScheduleTypeLimits,",
+		"  Any Number;                     !- Name",
+
+		"Schedule:Compact,",
+		"  AlwaysOne,                      !- Name",
+		"  Any Number,                     !- Schedule Type Limits Name",
+		"  Through: 12/31,                 !- Field 1",
+		"  For: AllDays,                   !- Field 2",
+		"  Until: 24:00, 1.0;              !- Field 3",
+
+		"Schedule:Compact,",
+		"  Always 16C,                     !- Name",
+		"  Any Number,                     !- Schedule Type Limits Name",
+		"  Through: 12/31,                 !- Field 1",
+		"  For: AllDays,                   !- Field 2",
+		"  Until: 24:00, 16.0;             !- Field 3",
+
+		"Schedule:Compact,",
+		"  Always 18C,                     !- Name",
+		"  Any Number,                     !- Schedule Type Limits Name",
+		"  Through: 12/31,                 !- Field 1",
+		"  For: AllDays,                   !- Field 2",
+		"  Until: 24:00, 18.0;             !- Field 3",
+
+		"Schedule:Compact,",
+		"  Always 20C,                     !- Name",
+		"  Any Number,                     !- Schedule Type Limits Name",
+		"  Through: 12/31,                 !- Field 1",
+		"  For: AllDays,                   !- Field 2",
+		"  Until: 24:00, 20.0;             !- Field 3",
+
+		"SetpointManager:Scheduled,",
+		"  Cooling Coil Setpoint Manager,  !- Name",
+		"  Temperature,                    !- Control Variable",
+		"  Always 20C,                     !- Schedule Name",
+		"  Heating Coil Air Inlet Node;    !- Setpoint Node or NodeList Name",
+
+		"SetpointManager:Scheduled,",
+		"  Heating Coil Setpoint Manager,  !- Name",
+		"  Temperature,                    !- Control Variable",
+		"  Always 18C,                     !- Schedule Name",
+		"  Zone 2 Inlet Node;              !- Setpoint Node or NodeList Name",
+
+		"Curve:Quadratic,",
+		"  Quadratic,                      !- Name",
+		"  0.8,                            !- Coefficient1 Constant",
+		"  0.2,                            !- Coefficient2 x",
+		"  0.0,                            !- Coefficient3 x**2",
+		"  0.5,                            !- Minimum Value of x",
+		"  1.5;                            !- Maximum Value of x",
+
+		"Curve:Biquadratic,",
+		"  Biquadratic,                    !- Name",
+		"  0.942587793,                    !- Coefficient1 Constant",
+		"  0.009543347,                    !- Coefficient2 x",
+		"  0.000683770,                    !- Coefficient3 x**2",
+		"  -0.011042676,                   !- Coefficient4 y",
+		"  0.000005249,                    !- Coefficient5 y**2",
+		"  -0.000009720,                   !- Coefficient6 x*y",
+		"  12.77778,                       !- Minimum Value of x",
+		"  23.88889,                       !- Maximum Value of x",
+		"  18.0,                           !- Minimum Value of y",
+		"  46.11111,                       !- Maximum Value of y",
+		"  ,                               !- Minimum Curve Output",
+		"  ,                               !- Maximum Curve Output",
+		"  Temperature,                    !- Input Unit Type for X",
+		"  Temperature,                    !- Input Unit Type for Y",
+		"  Dimensionless;                  !- Output Unit Type",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+
+	GetUnitarySystemInputData( ErrorsFound ); // get UnitarySystem input from object above
+	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	SetPredefinedTables();
+
+	// UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable the 'return' on FirstHVACIteration = true
+	// set FirstHVACIteration to false for unit testing to size water coils
+	bool FirstHVACIteration = false;
+	DataGlobals::BeginEnvrnFlag = false;
+
+	// overwrite outdoor weather temp to variable speed coil rated water temp until this gets fixed
+	DesDayWeath( 1 ).Temp( 1 ) = 29.4;
+
+	// sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	// set up node conditions to test UnitarySystem set point based control
+	// Unitary system air inlet node = 1
+	Node( 1 ).MassFlowRate = UnitarySystem( 1 ).DesignMassFlowRate;
+	Node( 1 ).MassFlowRateMaxAvail = UnitarySystem( 1 ).DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+
+	// test COOLING condition
+	Node( 1 ).Temp = 24.0; // 24C db
+	Node( 1 ).HumRat = 0.00922; // 17C wb
+	Node( 1 ).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+
+	// Cooling coil air inlet node = 3
+	Node( 3 ).MassFlowRateMax = UnitarySystem( 1 ).DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+	// Cooling coil air outlet node = 4
+	Node( 4 ).TempSetPoint = 20.0;
+	// Heating coil air inlet node = 4
+	// Heating coil air outlet node = 2
+	Node( 2 ).TempSetPoint = 16.0;
+
+	Schedule( 1 ).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+
+	DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+
+	// COOLING mode
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	// check that cooling coil air outlet node is at set point
+	EXPECT_NEAR( Node( 4 ).Temp, Node( 4 ).TempSetPoint, 0.001 );
+	// cooling coil air inlet node temp is greater than cooling coil air outlet node temp
+	EXPECT_GT( Node( 3 ).Temp, Node( 4 ).Temp );
+	// heating coil air inlet and outlet nodes are at same temp since the heating coil is off
+	EXPECT_EQ( Node( 4 ).MassFlowRate, Node( 2 ).MassFlowRate );
+	// expect heating coil outlet air temp to be greater than heating coil outlet air temp set point
+	EXPECT_GT( Node( 2 ).Temp, Node( 2 ).TempSetPoint );
+
+	// HEATING mode
+	// Unitary system air inlet node = 1
+	Node( 1 ).Temp = 14.0; // 14C db
+	Node( 1 ).HumRat = 0.00693; // 11C wb
+	Node( 1 ).Enthalpy = 31598.76;
+
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	// cooling coil air inlet node temp is equal to cooling coil air outlet node temp since cooling coil is off
+	EXPECT_EQ( Node( 3 ).Temp, Node( 4 ).Temp );
+	// check that heating coil outlet node is at set point
+	EXPECT_NEAR( Node( 2 ).Temp, Node( 2 ).TempSetPoint, 0.001 );
+	EXPECT_NEAR( Node( 2 ).Temp, 16.0, 0.001 );
+
+	// expect design spec data to match inputs
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 1 ), 0.1000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 1 ), 0.1010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 2 ), 0.2000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 2 ), 0.2010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 3 ), 0.3000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 3 ), 0.3010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 4 ), 0.4000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 4 ), 0.4010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 5 ), 0.5000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 5 ), 0.5010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 6 ), 0.6000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 6 ), 0.6010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 7 ), 0.7000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 7 ), 0.7010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 8 ), 0.8000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 8 ), 0.8010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 9 ), 0.9000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 9 ), 0.9010, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 10 ), 1.0000, 0.00001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 10 ), 1.0000, 0.00001 );
+
+	// autosized air flow and capacity, unitary sytsem capacity matches coils
+	EXPECT_EQ( UnitarySystem( 1 ).MaxCoolAirVolFlow, 1.5 );
+	EXPECT_EQ( UnitarySystem( 1 ).MaxHeatAirVolFlow, 1.5 );
+	EXPECT_NEAR( UnitarySystem( 1 ).DesignCoolingCapacity, 31732.204, 0.001 );
+	EXPECT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, VarSpeedCoil( 1 ).RatedCapCoolTotal );
+	EXPECT_NEAR( UnitarySystem( 1 ).DesignHeatingCapacity, 31732.204, 0.001 );
+	EXPECT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity, VarSpeedCoil( 2 ).RatedCapHeat );
+	// variable speed coils size air flow differently than other models. The design air volume flow rate is back calculated from design capacity
+	EXPECT_EQ( VarSpeedCoil( 1 ).RatedAirVolFlowRate, VarSpeedCoil( 1 ).RatedCapCoolTotal * VarSpeedCoil( 1 ).MSRatedAirVolFlowPerRatedTotCap( 10 ) );
+	EXPECT_NEAR( VarSpeedCoil( 1 ).RatedAirVolFlowRate, 1.77264, 0.00001 ); // different than unitary system air volume flow rate
+	EXPECT_NEAR( VarSpeedCoil( 2 ).RatedAirVolFlowRate, 1.70, 0.01 ); // VS DX heating coil was not autosized
+
+	// checks on autosized cooling air flow rates
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 1 ), 0.177264, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 1 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 2 ), 0.354529, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 2 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 2 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 3 ), 0.531793, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 3 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 3 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 4 ), 0.709058, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 4 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 4 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 5 ), 0.886323, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 5 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 5 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 6 ), 1.063587, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 6 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 6 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 7 ), 1.240852, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 7 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 7 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 8 ), 1.418116, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 8 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 8 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 9 ), 1.595381, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 9 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 9 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 10 ), 1.772646, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 10 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 10 ) );
+
+	// checks on autosized heating air flow rates
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ), 0.171700, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ), 0.341700, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 2 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 3 ), 0.511699, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 3 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 3 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 4 ), 0.681699, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 4 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 4 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 5 ), 0.851700, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 5 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 5 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 6 ), 1.021699, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 6 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 6 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 7 ), 1.191700, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 7 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 7 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 8 ), 1.361700, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 8 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 8 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 9 ), 1.531700, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 9 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 9 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 10 ), 1.700000, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 2 ).MSRatedAirVolFlowRate( 10 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 10 ) );
+
+	// spot check MSHP volume flow rate data
+	EXPECT_EQ( UnitarySystem( 1 ).CoolVolumeFlowRate( 7 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 10 ) * HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 7 ) );
+	EXPECT_EQ( UnitarySystem( 1 ).HeatVolumeFlowRate( 7 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 10 ) * HVACUnitarySystem::DesignSpecMSHP( 1 ).HeatingVolFlowRatio( 7 ) );
+
+}
+
+TEST_F( ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl ) {
+
+	std::string const idf_objects = delimited_string( {
+
+		"AirLoopHVAC:UnitarySystem,",
+		"  Unitary System Model,    !- Name",
+		"  Setpoint,                !- Control Type",
+		"  East Zone,               !- Controlling Zone or Thermostat Location",
+		"  None,                    !- Dehumidification Control Type",
+		"  AlwaysOne,               !- Availability Schedule Name",
+		"  Zone Exhaust Node,       !- Air Inlet Node Name",
+		"  Zone 2 Inlet Node,       !- Air Outlet Node Name",
+		"  Fan:OnOff,               !- Supply Fan Object Type",
+		"  Supply Fan 1,            !- Supply Fan Name",
+		"  BlowThrough,             !- Fan Placement",
+		"  AlwaysOne,               !- Supply Air Fan Operating Mode Schedule Name",
+		"  Coil:Heating:Water,      !- Heating Coil Object Type",
+		"  Water Heating Coil,      !- Heating Coil Name",
+		"  ,                        !- DX Heating Coil Sizing Ratio",
+		"  Coil:Cooling:Water,      !- Cooling Coil Object Type",
+		"  Water Cooling Coil,      !- Cooling Coil Name",
+		"  ,                        !- Use DOAS DX Cooling Coil",
+		"  15.0,                    !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+		"  ,                        !- Latent Load Control",
+		"  Coil:Heating:Water,      !- Supplemental Heating Coil Object Type",
+		"  Supp Water Heating Coil, !- Supplemental Heating Coil Name",
+		"  SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation",
+		"  1.6,                     !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+		"  ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+		"  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+		"  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+		"  SupplyAirFlowRate,       !- Supply air Flow Rate Method During Heating Operation",
+		"  1.6,                     !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+		"  ,                        !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+		"  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+		"  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+		"  SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+		"  0.8,                     !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+		"  ,                        !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+		"  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+		"  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+		"  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+		"  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+		"  25.0;                    !- Maximum Supply Air Temperature{ C }",
+
+		"Fan:OnOff,",
+		"  Supply Fan 1,            !- Name",
+		"  AlwaysOne,               !- Availability Schedule Name",
+		"  0.7,                     !- Fan Total Efficiency",
+		"  600.0,                   !- Pressure Rise{ Pa }",
+		"  1.6,                     !- Maximum Flow Rate{ m3 / s }",
+		"  0.9,                     !- Motor Efficiency",
+		"  1.0,                     !- Motor In Airstream Fraction",
+		"  Zone Exhaust Node,       !- Air Inlet Node Name",
+		"  Water Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
+
+		"Coil:Cooling:Water,",
+		"  Water Cooling Coil,      !- Name",
+		"  AlwaysOne,               !- Availability Schedule Namev",
+		"  0.0004,                  !- Design Water Flow Rate { m3 / s }",
+		"  1.6000,                  !- Design Air Flow Rate { m3 / s }",
+		"  7.22,                    !- Design Inlet Water Temperature { Cv }",
+		"  24.340,                  !- Design Inlet Air Temperature { C }",
+		"  14.000,                  !- Design Outlet Air Temperature { C }",
+		"  0.0095,                  !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+		"  0.0090,                  !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+		"  ChWInletNode,            !- Water Inlet Node Name",
+		"  ChWOutletNode,           !- Water Outlet Node Name",
+		"  Water Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+		"  Water Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+		"  SimpleAnalysis,          !- Type of Analysis",
+		"  CrossFlow;               !- Heat Exchanger Configuration",
+
+		"Coil:Heating:Water,",
+		"  Water Heating Coil,      !- Name",
+		"  AlwaysOne,               !- Availability Schedule Name",
+		"  300.0,                   !- U - Factor Times Area Value { W / K }",
+		"  0.0006,                  !- Maximum Water Flow Rate { m3 / s }",
+		"  HWInletNode,             !- Water Inlet Node Name",
+		"  HWOutletNode,            !- Water Outlet Node Name",
+		"  Water Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+		"  Water Heating Coil Air Outlet Node, !- Air Outlet Node Name",
+		"  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+		"  5000.0,                  !- Rated Capacity { W }",
+		"  82.2,                    !- Rated Inlet Water Temperature { C }",
+		"  16.6,                    !- Rated Inlet Air Temperature { C }",
+		"  71.1,                    !- Rated Outlet Water Temperature { C }",
+		"  32.2,                    !- Rated Outlet Air Temperature { C }",
+		"  ;                        !- Rated Ratio for Air and Water Convection",
+
+		"Coil:Heating:Water,",
+		"  Supp Water Heating Coil, !- Name",
+		"  AlwaysOne,               !- Availability Schedule Name",
+		"  300.0,                   !- U - Factor Times Area Value { W / K }",
+		"  0.0006,                  !- Maximum Water Flow Rate { m3 / s }",
+		"  SuppHWInletNode,         !- Water Inlet Node Name",
+		"  SuppHWOutletNode,        !- Water Outlet Node Name",
+		"  Water Heating Coil Air Outlet Node, !- Air Inlet Node Name",
+		"  Zone 2 Inlet Node,       !- Air Outlet Node Name",
+		"  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+		"  5000.0,                  !- Rated Capacity { W }",
+		"  82.2,                    !- Rated Inlet Water Temperature { C }",
+		"  16.6,                    !- Rated Inlet Air Temperature { C }",
+		"  71.1,                    !- Rated Outlet Water Temperature { C }",
+		"  32.2,                    !- Rated Outlet Air Temperature { C }",
+		"  ;                        !- Rated Ratio for Air and Water Convection",
+
+		"ScheduleTypeLimits,",
+		"  Any Number;              !- Name",
+
+		"Schedule:Compact,",
+		"  AlwaysOne,               !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 24:00, 1.0;       !- Field 3",
+
+		"Schedule:Compact,",
+		"  Always 16C,              !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 24:00, 16.0;      !- Field 3",
+
+		"Schedule:Compact,",
+		"  Always 18C,              !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 24:00, 18.0;      !- Field 3",
+
+		"Schedule:Compact,",
+		"  Always 20C,              !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 24:00, 20.0;      !- Field 3",
+
+		"SetpointManager:Scheduled,",
+		"  CW Coil Setpoint Manager, !- Name",
+		"  Temperature, !- Control Variable",
+		"  Always 20C, !- Schedule Name",
+		"  Water Heating Coil Air Inlet Node;  !- Setpoint Node or NodeList Name",
+
+		"SetpointManager:Scheduled,",
+		"  HW Coil Setpoint Manager, !- Name",
+		"  Temperature, !- Control Variable",
+		"  Always 16C, !- Schedule Name",
+		"  Water Heating Coil Air Outlet Node;  !- Setpoint Node or NodeList Name",
+
+		"SetpointManager:Scheduled,",
+		"  Supp HW Coil Setpoint Manager, !- Name",
+		"  Temperature, !- Control Variable",
+		"  Always 18C, !- Schedule Name",
+		"  Zone 2 Inlet Node;  !- Setpoint Node or NodeList Name",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+
+	GetUnitarySystemInputData( ErrorsFound ); // get UnitarySystem input from object above
+	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "WATER COOLING COIL";
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = TypeOf_CoilWaterCooling;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 10;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 11;
+
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "WATER HEATING COIL";
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 4;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 5;
+
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).Name = "SUPP WATER HEATING COIL";
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumIn = 8;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 2 ).NodeNumOut = 9;
+
+	SetPredefinedTables();
+
+	// UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable the 'return' on FirstHVACIteration = true
+	// set FirstHVACIteration to false for unit testing to size water coils
+	bool FirstHVACIteration = false;
+	DataGlobals::BeginEnvrnFlag = false;
+
+	// sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	// set up node conditions to test UnitarySystem set point based control
+	// Unitary system air inlet node = 1
+	Node( 1 ).MassFlowRate = 1.9;
+	Node( 1 ).MassFlowRateMaxAvail = 1.9; // max avail at fan inlet so fan won't limit flow
+
+	// test COOLING condition
+	Node( 1 ).Temp = 24.0; // 24C db
+	Node( 1 ).HumRat = 0.00922; // 17C wb
+	Node( 1 ).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+
+	// Cooling coil air inlet node = 3
+	Node( 3 ).MassFlowRateMax = 1.9; // max at fan outlet so fan won't limit flow
+	// Cooling coil air outlet node = 6
+	Node( 6 ).TempSetPoint = 20.0;
+	// Heating coil air inlet node = 6
+	// Heating coil air outlet node = 7
+	Node( 7 ).TempSetPoint = 16.0;
+	// Supp heating coil air inlet node = 7
+	// Supp heating coil air outlet node = 2
+	Node( 2 ).TempSetPoint = 18.0;
+
+	// Cooling coil water inlet node = 10
+	Node( 10 ).Temp = 6.0;
+	Node( 10 ).Enthalpy = 25321.8; // www.peacesoftware.de/einigewerte/calc_dampf.php5
+
+	// Heating coil water inlet node = 4
+	Node( 4 ).Temp = 60.0;
+	Node( 4 ).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
+
+	// Supp heating coil water inlet node = 8
+	Node( 8 ).Temp = 60.0;
+	Node( 8 ).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
+
+	Schedule( 1 ).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+
+	DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+
+	// COOLING mode
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	// check that CW coil air outlet node is at set point
+	EXPECT_NEAR( Node( 6 ).Temp, Node( 6 ).TempSetPoint, 0.001 );
+	// CW air inlet node temp is greater than CW air outlet node temp
+	EXPECT_GT( Node( 3 ).Temp, Node( 6 ).Temp );
+	// CW water inlet node flow is greater than 0
+	EXPECT_GT( Node( 10 ).MassFlowRate, 0.0 );
+	// CW water node flow is the same at inlet and outlet
+	EXPECT_EQ( Node( 10 ).MassFlowRate, Node( 11 ).MassFlowRate );
+	// CW water outlet node temp is greater than CW inlet node temp
+	EXPECT_GT( Node( 11 ).Temp, Node( 10 ).Temp );
+	// HW air inlet and outlet nodes are at same temp
+	EXPECT_EQ( Node( 6 ).MassFlowRate, Node( 7 ).MassFlowRate );
+	// Supp HW air inlet and outlet nodes are at same temp
+	EXPECT_EQ( Node( 7 ).MassFlowRate, Node( 2 ).MassFlowRate );
+	// HW water node flow is 0
+	EXPECT_EQ( Node( 4 ).MassFlowRate, 0.0 );
+	// HW water node flow is the same at inlet and outlet
+	EXPECT_EQ( Node( 4 ).MassFlowRate, Node( 5 ).MassFlowRate );
+	// HW water outlet node temp is equal to water inlet node temp
+	EXPECT_EQ( Node( 4 ).Temp, Node( 5 ).Temp );
+	// Supp HW water inlet node flow is equal to 0
+	EXPECT_EQ( Node( 8 ).MassFlowRate, 0.0 );
+	// Supp HW water node flow is the same at inlet and outlet
+	EXPECT_EQ( Node( 8 ).MassFlowRate, Node( 9 ).MassFlowRate );
+	// Supp HW water outlet node temp is equal to water inlet node temp
+	EXPECT_EQ( Node( 8 ).Temp, Node( 9 ).Temp );
+
+	// if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
+	EXPECT_LT( Node( 10 ).MassFlowRate, Node( 10 ).MassFlowRateMax );
+	EXPECT_LT( Node( 10 ).MassFlowRate, Node( 10 ).MassFlowRateMaxAvail );
+	// expect cooling coil outlet air temp to be less than cooling coil inlet air temp
+	EXPECT_LT( Node( 6 ).Temp, Node( 3 ).Temp );
+	// expect heating coil outlet air temp to be greater than heating coil outlet air temp set point
+	EXPECT_GT( Node( 7 ).Temp, Node( 7 ).TempSetPoint );
+	// expect supp heating coil outlet air temp to be greater than supp heating coil outlet air temp set point
+	EXPECT_GT( Node( 2 ).Temp, Node( 2 ).TempSetPoint );
+
+	// HEATING mode
+	// Unitary system AIR inlet node = 1
+	Node( 1 ).Temp = 14.0; // 14C db
+	Node( 1 ).HumRat = 0.00693; // 11C wb
+	Node( 1 ).Enthalpy = 31598.76;
+
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	// CW air inlet node temp is equal to CW air outlet node temp
+	EXPECT_EQ( Node( 3 ).Temp, Node( 6 ).Temp );
+	// check that heating coil outlet node is at set point
+	EXPECT_NEAR( Node( 7 ).Temp, Node( 7 ).TempSetPoint, 0.001 );
+	EXPECT_NEAR( Node( 7 ).Temp, 16.0, 0.001 );
+	// check that supp heating coil outlet node is at set point
+	EXPECT_NEAR( Node( 2 ).Temp, Node( 2 ).TempSetPoint, 0.001 );
+	EXPECT_NEAR( Node( 2 ).Temp, 18.0, 0.001 );
+
+	// CW water inlet node flow is equal to 0
+	EXPECT_EQ( Node( 10 ).MassFlowRate, 0.0 );
+	// CW water node flow is the same at inlet and outlet
+	EXPECT_EQ( Node( 10 ).MassFlowRate, Node( 11 ).MassFlowRate );
+	// CW water outlet node temp is equal to CW inlet node temp
+	EXPECT_EQ( Node( 11 ).Temp, Node( 10 ).Temp );
+	// HW water node flow is greater than 0
+	EXPECT_GT( Node( 4 ).MassFlowRate, 0.0 );
+	// HW water node flow is the same at inlet and outlet
+	EXPECT_EQ( Node( 4 ).MassFlowRate, Node( 5 ).MassFlowRate );
+	// HW water outlet node temp is lower than water inlet node temp
+	EXPECT_LT( Node( 5 ).Temp, Node( 4 ).Temp );
+	// Supp HW water node flow is greater than 0 (since supp outlet SP is higher than HW coil outlet SP)
+	EXPECT_GT( Node( 8 ).MassFlowRate, 0.0 );
+	// HW water node flow is the same at inlet and outlet
+	EXPECT_EQ( Node( 8 ).MassFlowRate, Node( 9 ).MassFlowRate );
+	// HW water outlet node temp is lower than water inlet node temp
+	EXPECT_LT( Node( 9 ).Temp, Node( 8 ).Temp );
+
+	// if heating coil meets set point temperature expect heating coil water flow to be less than max water flow
+	EXPECT_LT( Node( 4 ).MassFlowRate, Node( 4 ).MassFlowRateMax );
+	EXPECT_LT( Node( 4 ).MassFlowRate, Node( 4 ).MassFlowRateMaxAvail );
+
+	// if supp heating coil meets set point temperature expect supp heating coil water flow to be less than max water flow
+	EXPECT_LT( Node( 8 ).MassFlowRate, Node( 8 ).MassFlowRateMax );
+	EXPECT_LT( Node( 8 ).MassFlowRate, Node( 8 ).MassFlowRateMaxAvail );
+
+}
 
 TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 {
@@ -207,6 +1158,20 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.5, MSHPMassFlowRateLow );
 	EXPECT_EQ( 1.0, MSHPMassFlowRateHigh );
 
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.5, MSHPMassFlowRateLow );
+	EXPECT_EQ( 1.0, MSHPMassFlowRateHigh );
+
+	PartLoadRatio = 0.7; // PLR should have no affect for constant fan operating mode
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.5, MSHPMassFlowRateLow );
+	EXPECT_EQ( 1.0, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.5, MSHPMassFlowRateLow );
+	EXPECT_EQ( 1.0, MSHPMassFlowRateHigh );
+
+	PartLoadRatio = 1.0;
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 2;
 	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
 	HeatingLoad = true;
@@ -226,6 +1191,16 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
 
+	PartLoadRatio = 0.7;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	PartLoadRatio = 1.0;
 	// heating load with moisture load (cooling coil operates)
 	MoistureLoad = -0.001;
 	UnitarySystem( UnitarySysNum ).Humidistat = true;
@@ -315,6 +1290,54 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.2, CompOnMassFlow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateHigh );
+
+	UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil = true;
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
+	HeatingLoad = true;
+	PartLoadRatio = 0.7;
+	// PLR has no impact for constant fan flow case
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	// test for cycling fan flow case where MSHPMassFlowRateLow variable is proportional to PLR (flow @ 0.25 * PLR @ 0.7 = 0.175)
+	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.175, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.175, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	// same test for cooling mode (flow @ 0.3 * PLR @ 0.7 = 0.21)
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 1;
+	UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil = true;
+	HeatingLoad = false;
+	CoolingLoad = true;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.21, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, CoolingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.21, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
+	// and flip back to constant fan and both variables should be the same
+	UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, CoolingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
 
 }
 
@@ -786,7 +1809,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_CalcUnitaryCoolingSystem ) {
 
 	WaterCoil( 1 ).TotWaterCoolingCoilRate = 0.0;
 
-	CalcUnitaryCoolingSystem( UnitarySysNum, FirstHVACIteration, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolingCycRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat );
+	CalcUnitaryCoolingSystem( UnitarySysNum, FirstHVACIteration, AirLoopNum, UnitarySystem( UnitarySysNum ).CoolingCycRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false );
 
 	EXPECT_NEAR( 27530.0, WaterCoil( 1 ).TotWaterCoolingCoilRate, 2.0 );
 
@@ -845,7 +1868,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  Supply Fan 1,           !- Supply Fan Name",
 		"  BlowThrough,            !- Fan Placement",
 		"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
-		"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Heating Coil Object Type",
 		"  Furnace Heating Coil 1, !- Heating Coil Name",
 		"  ,                       !- DX Heating Coil Sizing Ratio",
 		"  Coil:Cooling:DX:SingleSpeed, !- Cooling Coil Object Type",
@@ -853,7 +1876,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -900,22 +1923,25 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name",
 		"  WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"  WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name",
+		"   ,                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 		"  0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 		"  4,                       !- Maximum Cycling Rate {cycles/hr}",
 		"  45;                      !- Latent Capacity Time Constant {s}",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Furnace Heating Coil 1, !- Name",
 		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8,                    !- Gas Burner Efficiency",
 		"  32000,                  !- Nominal Capacity{ W }",
 		"  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
 		"  Reheat Coil Air Inlet Node;  !- Air Outlet Node Name",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -1113,6 +2139,19 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	EXPECT_TRUE( UnitarySystem( 1 ).FanIndex > 0 ); // ZoneHVAC must contain a fan object to provide flow
 	EXPECT_EQ( UnitarySystem( 1 ).FanType_Num, DataHVACGlobals::FanType_SimpleOnOff ); // fan must be FanOnOff when used with cycling fan
 
+	// switch to SingleZoneVAV control type and test that answer does not change since cycling fan is allowed but will not call the ASHRAE model
+	// note that the input objects above show a constant fan operating mode, but since the schedules were never handled the schedule value = 0 which means cycling fan
+	UnitarySystem( 1 ).ControlType = CCM_ASHRAE; // control type = 3
+	UnitarySystem( 1 ).validASHRAECoolCoil = true;
+	UnitarySystem( 1 ).validASHRAEHeatCoil = true;
+
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+	// test model performance
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 0.025 ); // Watts
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow * UnitarySystem( 1 ).PartLoadFrac ); // cycling fan
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
+
 }
 
 TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
@@ -1169,7 +2208,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -1216,6 +2255,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 		"  WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name",
 		"  WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"  WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name",
+		"   ,                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 		"  0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 		"  4,                       !- Maximum Cycling Rate {cycles/hr}",
@@ -1374,9 +2414,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 		"      Temperature,             !- Input Unit Type for Y",
 		"      Dimensionless;           !- Output Unit Type",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1,    !- Name",
 		"  FanAndCoilAvailSched,        !- Availability Schedule Name",
+		"  Gas,                         !- Fuel Type",
 		"  0.8,                         !- Gas Burner Efficiency",
 		"  32000,                       !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node,  !- Air Inlet Node Name",
@@ -1533,7 +2574,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  Supply Fan 1,           !- Supply Fan Name",
 		"  BlowThrough,            !- Fan Placement",
 		"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
-		"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Heating Coil Object Type",
 		"  Furnace Heating Coil 1, !- Heating Coil Name",
 		"  ,                       !- DX Heating Coil Sizing Ratio",
 		"  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
@@ -1541,7 +2582,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -1589,6 +2630,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  , !- Evaporative Condenser Pump Rated Power Consumption{ W }",
 		"  200.0, !- Crankcase Heater Capacity{ W }",
 		"  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+		"  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  , !- Supply Water Storage Tank Name",
 		"  , !- Condensate Collection Water Storage Tank Name",
 		"  , !- Basin Heater Capacity{ W / K }",
@@ -1695,17 +2737,19 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  COOLEIRFT, !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
 		"  COOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
 		 "  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Furnace Heating Coil 1, !- Name",
 		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8,                    !- Gas Burner Efficiency",
 		"  32000,                  !- Nominal Capacity{ W }",
 		"  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
 		"  Reheat Coil Air Inlet Node;  !- Air Outlet Node Name",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -1948,7 +2992,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  Supply Fan 1,           !- Supply Fan Name",
 		"  BlowThrough,            !- Fan Placement",
 		"  FanAndCoilAvailSched,   !- Supply Air Fan Operating Mode Schedule Name",
-		"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Heating Coil Object Type",
 		"  Furnace Heating Coil 1, !- Heating Coil Name",
 		"  1,                      !- DX Heating Coil Sizing Ratio",
 		"  Coil:Cooling:DX:SingleSpeed, !- Cooling Coil Object Type",
@@ -2013,14 +3057,16 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  Biquadratic,             !- Energy Input Ratio Function of Temperature Curve Name",
 		"  Quadratic,               !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"  Quadratic,               !- Part Load Fraction Correlation Curve Name",
+		"  ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 		"  0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 		"  4,                       !- Maximum Cycling Rate {cycles/hr}",
 		"  45;                      !- Latent Capacity Time Constant {s}",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Furnace Heating Coil 1, !- Name",
 		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8,                    !- Gas Burner Efficiency",
 		"  32000,                  !- Nominal Capacity{ W }",
 		"  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -2285,12 +3331,13 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 		"  1,                                                       !- Number of Speeds for Heating",
 		"  3,                                                       !- Number of Speeds for Cooling",
 		"  No,                                                      !- Single Mode Operation",
+		"  ,                                                        !- No Load Supply Air Flow Rate Ratio",
 		"  1.0,                                                     !- Heating Speed 1 Supply Air Flow Ratio",
 		"  0.333,                                                   !- Cooling Speed 1 Supply Air Flow Ratio",
 		"  1.0,                                                     !- Heating Speed 2 Supply Air Flow Ratio",
 		"  0.666,                                                   !- Cooling Speed 2 Supply Air Flow Ratio",
 		"  1.0,                                                     !- Heating Speed 3 Supply Air Flow Ratio",
-		"  1.0;,                                                    !- Cooling Speed 3 Supply Air Flow Ratio",
+		"  1.0;                                                     !- Cooling Speed 3 Supply Air Flow Ratio",
 
 		"Coil:Cooling:DX:MultiSpeed,",
 		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil,             !- Name",
@@ -2299,6 +3346,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil Outlet,      !- Air Outlet Node Name",
 		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name",
 		"  AirCooled,                                               !- Condenser Type",
+		"  ,                                                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  ,                                                        !- Supply Water Storage Tank Name",
 		"  ,                                                        !- Condensate Collection Water Storage Tank Name",
 		"  No,                                                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -2510,7 +3558,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	CoolingLoad = false;
 
 	// zone predicted load is assume to be heating and the unitary system zone equipment
-	// inlet and outlet air conditions were set for heating 
+	// inlet and outlet air conditions were set for heating
 	HeatingLoad = true;
 	// set up zone equipment inlet node condtions
 	Node( InletNode ).Temp = 17.57;
@@ -2534,7 +3582,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 
 }
 
-	
+
 TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 	std::string const idf_objects = delimited_string( {
@@ -2625,7 +3673,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  FlowPerCoolingCapacity, !- Supply Air Flow Rate Method During Cooling Operation",
 		"  ,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -2662,17 +3710,30 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
         "UnitarySystemPerformance:Multispeed,",
         "  MultiSpeed Performance,  !- Name",
-        "  1,                       !- Number of Speeds for Heating",
+        "  10,                      !- Number of Speeds for Heating",
         "  3,                       !- Number of Speeds for Cooling",
 		"  No,                      !- Single Mode Operation",
-        "  autosize,                !- Heating Speed 1 Supply Air Flow Ratio",
+		"  ,                        !- No Load Supply Air Flow Rate Ratio",
+		"  autosize,                !- Heating Speed 1 Supply Air Flow Ratio",
         "  autosize,                !- Cooling Speed 1 Supply Air Flow Ratio",
         "  autosize,                !- Heating Speed 2 Supply Air Flow Ratio",
         "  autosize,                !- Cooling Speed 2 Supply Air Flow Ratio",
         "  autosize,                !- Heating Speed 3 Supply Air Flow Ratio",
         "  autosize,                !- Cooling Speed 3 Supply Air Flow Ratio",
         "  autosize,                !- Heating Speed 4 Supply Air Flow Ratio",
-        "  autosize;                !- Cooling Speed 4 Supply Air Flow Ratio",
+        "  autosize,                !- Cooling Speed 4 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 5 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 5 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 6 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 6 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 7 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 7 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 8 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 8 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 9 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 9 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 10 Supply Air Flow Ratio",
+		"  autosize;                !- Cooling Speed 10 Supply Air Flow Ratio",
 
 		"Fan:OnOff,",
 		"  Supply Fan 1,           !- Name",
@@ -2692,6 +3753,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
         "  Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "  ,                        !- Condenser Air Inlet Node Name",
         "  AirCooled,               !- Condenser Type",
+        "  ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -2768,7 +3830,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"  10.0,                    !- Number of Speeds {dimensionless}",
 		"  10.0,                    !- Nominal Speed Level {dimensionless}",
 		"  autosize,                !- Rated Heating Capacity At Selected Nominal Speed Level {w}",
-		"  1.7,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+		"  autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
 		"  HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name",
 		"      ,                    !- Defrost Energy Input Ratio Function of Temperature Curve Name",
 		"  -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
@@ -2914,9 +3976,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"      Temperature,             !- Input Unit Type for Y",
 		"      Dimensionless;           !- Output Unit Type",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -2997,7 +4060,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"  ,                       !- Maximum Curve Output",
 		"  Temperature,            !- Input Unit Type for X",
 		"  Temperature,            !- Input Unit Type for Y",
-		"  Dimensionless;          !- Output Unit Type",	
+		"  Dimensionless;          !- Output Unit Type",
 
 		"  Sizing:Zone,",
 		"    EAST ZONE,      !- Zone or ZoneList Name",
@@ -3221,11 +4284,51 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 	SizeUnitarySystem( NumUnitarySystem, true, 0 );
 
-	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
+	EXPECT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
 
-	ASSERT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity * 0.00005, UnitarySystem( 1 ).MaxHeatAirVolFlow );
-	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity * 0.00005, UnitarySystem( 1 ).MaxCoolAirVolFlow );
-	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, DXCoil( UnitarySystem( 1 ).CoolingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedCooling ) );
+	EXPECT_EQ( UnitarySystem( 1 ).DesignHeatingCapacity * 0.00005, UnitarySystem( 1 ).MaxHeatAirVolFlow );
+	EXPECT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity * 0.00005, UnitarySystem( 1 ).MaxCoolAirVolFlow );
+	EXPECT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, DXCoil( UnitarySystem( 1 ).CoolingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedCooling ) );
+	// 64-bit MSVS shows these next variables as identical yet other compilers show diff's, changing ASSERT_EQ to EXPECT_NEAR
+	EXPECT_NEAR( UnitarySystem( 1 ).DesignHeatingCapacity, VarSpeedCoil( UnitarySystem( 1 ).HeatingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedHeating ), 0.001 );
+
+	// 3 cooling speeds with autosized MSHP design spec yielding equally distributed air flow at 1/3 per speed
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 1 ), 0.031373, 0.000001 );
+	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 1 ), 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 2 ), 0.062747, 0.000001 );
+	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 2 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 2 ), 0.000001 );
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolVolumeFlowRate( 3 ), 0.094120, 0.000001 );
+	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 3 ), UnitarySystem( 1 ).CoolVolumeFlowRate( 3 ), 0.000001 );
+
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 1 ), 0.333333, 0.000001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 2 ), 0.666666, 0.000001 );
+	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 3 ), 1.000000, 0.000001 );
+
+	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 1 ), 0.000001 );
+	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 2 ), UnitarySystem( 1 ).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 2 ), 0.000001 );
+	EXPECT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 3 ), UnitarySystem( 1 ).MaxCoolAirVolFlow * HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 3 ), 0.000001 );
+
+	// 10 heating speeds with autosized MSHP design spec yielding equally distributed air flow at 1/10 per speed
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ), 0.007884, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 1 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ), 0.015769, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 2 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 3 ), 0.023653, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 3 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 3 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 4 ), 0.031538, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 4 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 4 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 5 ), 0.039422, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 5 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 5 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 6 ), 0.047307, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 6 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 6 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 7 ), 0.055191, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 7 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 7 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 8 ), 0.063076, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 8 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 8 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 9 ), 0.070960, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 9 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 9 ) );
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 10 ), 0.078845, 0.000001 );
+	EXPECT_EQ( VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 10 ), UnitarySystem( 1 ).HeatVolumeFlowRate( 10 ) );
 
 }
 
@@ -3279,13 +4382,11 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 		"Branch,",
 		"  Air Loop Main Branch, !- Name",
-		"  1.7, !- Maximum Flow Rate{ m3 / s }",
 		"  , !- Pressure Drop Curve Name",
 		"  AirLoopHVAC:UnitarySystem, !- Component 2 Object Type",
 		"  DXAC Heat Pump 1, !- Component 2 Name",
 		"  	Mixed Air Node, !- Component 2 Inlet Node Name",
-		"  Air Loop Outlet Node, !- Component 2 Outlet Node Name",
-		"  ACTIVE;                  !- Component 2 Branch Control Type",
+		"  Air Loop Outlet Node; !- Component 2 Outlet Node Name",
 		"  ",
 		"AirLoopHVAC,",
 		"  Heat Pump Sys 1, !- Name",
@@ -3319,7 +4420,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.7,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -3359,6 +4460,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"   4, !- Number of Speeds for Heating",
 		"   4, !- Number of Speeds for Cooling",
 		"   Yes, !- Single Mode Operation",
+		"   ,     !- No Load Supply Air Flow Rate Ratio",
 		"   0.24, !- Heating Speed 1 Supply Air Flow Ratio",
 		"   0.24, !- Cooling Speed 1 Supply Air Flow Ratio",
 		"   0.47, !- Heating Speed 2 Supply Air Flow Ratio",
@@ -3379,9 +4481,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  Mixed Air Node,      !- Air Inlet Node Name",
 		"  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
 		"  ",
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Heat Pump DX Supp Heating Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  45000, !- Nominal Capacity{ W }",
 		"  SuppHeating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -3752,6 +4855,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
 		"  Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name",
 		"  AirCooled, !- Condenser Type",
+		"  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  , !- Supply Water Storage Tank Name",
 		"  , !- Condensate Collection Water Storage Tank Name",
 		"  No, !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -3976,7 +5080,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
 	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
 
-	HVACUnitarySystem::GetInputFlag = true; 
+	HVACUnitarySystem::GetInputFlag = true;
 	GetUnitarySystemInput( ); // get UnitarySystem input from object above
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
 
@@ -4218,7 +5322,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  FlowPerCoolingCapacity, !- Supply Air Flow Rate Method During Cooling Operation",
 		"  ,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -4258,6 +5362,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"  4,                       !- Number of Speeds for Heating",
 		"  3,                       !- Number of Speeds for Cooling",
 		"  No,                      !- Single Mode Operation",
+		"  ,                        !- No Load Supply Air Flow Rate Ratio",
 		"  autosize,                !- Heating Speed 1 Supply Air Flow Ratio",
 		"  autosize,                !- Cooling Speed 1 Supply Air Flow Ratio",
 		"  autosize,                !- Heating Speed 2 Supply Air Flow Ratio",
@@ -4285,6 +5390,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"  Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
 		"  ,                        !- Condenser Air Inlet Node Name",
 		"  AirCooled,               !- Condenser Type",
+		"  ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"  ,                        !- Supply Water Storage Tank Name",
 		"  ,                        !- Condensate Collection Water Storage Tank Name",
 		"  No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -4713,9 +5819,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"  Dimensionless;           !- Output Unit Type",
 		"  ",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5012,6 +6119,13 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 	GetUnitarySystemInput( ); // get UnitarySystem input from object above
 	ASSERT_FALSE( DXCoil( 1 ).MSHPHeatRecActive ); // electricity
 	ASSERT_TRUE( DXCoil( 2 ).MSHPHeatRecActive ); // natural gas
+	// Minimum Outdoor Temperature for Compressor Operation blank field defaults to -25.0 C
+	EXPECT_EQ( DXCoil( 1 ).MinOATCompressor, -25.0 );
+	// Minimum Outdoor Temperature for Compressor read from input field as -8.0 C
+	EXPECT_EQ( DXCoil( 2 ).MinOATCompressor,  -8.0 );
+	// Unitary System mines data from coil objects
+	EXPECT_EQ( DXCoil( 1 ).MinOATCompressor, UnitarySystem( 1 ).MinOATCompressorCooling );
+	EXPECT_EQ( DXCoil( 2 ).MinOATCompressor, UnitarySystem( 1 ).MinOATCompressorHeating );
 
 }
 TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
@@ -5077,7 +6191,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 		"  ,                       !- Use DOAS DX Cooling Coil",
 		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 		"  ,                       !- Latent Load Control",
-		"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+		"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 		"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 		"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 		"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -5160,9 +6274,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 		"  -0.050682973,            !- Heating Power Consumption Coefficient 4",
 		"  0.011385145;             !- Heating Power Consumption Coefficient 5",
 
-		"Coil:Heating:Gas,",
+		"Coil:Heating:Fuel,",
 		"  Humidistat Reheat Coil 1, !- Name",
 		"  FanAndCoilAvailSched, !- Availability Schedule Name",
+		"  Gas,                    !- Fuel Type",
 		"  0.8, !- Gas Burner Efficiency",
 		"  32000, !- Nominal Capacity{ W }",
 		"  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5390,5 +6505,1220 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow * UnitarySystem( 1 ).PartLoadFrac  );
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
 
+	// water to air HP coils do not have a Minimum OAT for Compressor Operation input field
+	// Unitary System mines data from coil objects
+	EXPECT_EQ( UnitarySystem( 1 ).MinOATCompressorCooling, -1000.0 );
+	EXPECT_EQ( UnitarySystem( 1 ).MinOATCompressorHeating, -1000.0 );
+
 }
 
+TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
+
+	bool ErrorsFound( false );
+	bool FirstHVACIteration( false );
+	Real64 CpAir( 0.0 ); // specific heat of air
+	Real64 Qsens_sys( 0.0 ); // UnitarySystem delivered sensible capacity wrt zone
+	Real64 MinHumRatio( 0.0 ); // track minimum of outlet node or zone humidity ratio
+	Real64 ZoneTemp( 0.0 ); // control zone temperature
+	int InletNode( 0 ); // UnitarySystem inlet node number
+	int OutletNode( 0 ); // UnitarySystem outlet node number
+	int ControlZoneNum( 0 ); // index to control zone
+
+	std::string const idf_objects = delimited_string( {
+
+		"Zone,",
+		"  EAST ZONE,                !- Name",
+		"  0,                        !- Direction of Relative North{ deg }",
+		"  0,                        !- X Origin{ m }",
+		"  0,                        !- Y Origin{ m }",
+		"  0,                        !- Z Origin{ m }",
+		"  1,                        !- Type",
+		"  1,                        !- Multiplier",
+		"  autocalculate,            !- Ceiling Height{ m }",
+		"  autocalculate;            !- Volume{ m3 }",
+		"  ",
+
+		"ZoneHVAC:EquipmentConnections,",
+		"EAST ZONE,                  !- Zone Name",
+		"  Zone2Equipment,           !- Zone Conditioning Equipment List Name",
+		"  Zone 2 Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
+		"  Zone Exhaust Node,        !- Zone Air Exhaust Node or NodeList Name",
+		"  Zone 2 Node,              !- Zone Air Node Name",
+		"  Zone 2 Outlet Node;       !- Zone Return Air Node Name",
+		"  ",
+
+		"ZoneHVAC:EquipmentList,",
+		"  Zone2Equipment,           !- Name",
+		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+		"  ASHRAE Model HVAC,        !- Zone Equipment 1 Name",
+		"  1,                        !- Zone Equipment 1 Cooling Sequence",
+		"  1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+		"  ",
+
+		"AirLoopHVAC:UnitarySystem,",
+		"  ASHRAE Model HVAC,       !- Name",
+		"  SingleZoneVAV,           !- Control Type",
+		"  East Zone,               !- Controlling Zone or Thermostat Location",
+		"  None,                    !- Dehumidification Control Type",
+		"  FanAndCoilAvailSched,    !- Availability Schedule Name",
+		"  Zone Exhaust Node,       !- Air Inlet Node Name",
+		"  Zone 2 Inlet Node,       !- Air Outlet Node Name",
+		"  Fan:OnOff,               !- Supply Fan Object Type",
+		"  Supply Fan 1,            !- Supply Fan Name",
+		"  BlowThrough,             !- Fan Placement",
+		"  ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name",
+		"  Coil:Heating:Water,      !- Heating Coil Object Type",
+		"  Water Heating Coil,      !- Heating Coil Name",
+		"  ,                        !- DX Heating Coil Sizing Ratio",
+		"  Coil:Cooling:Water,      !- Cooling Coil Object Type",
+		"  Water Cooling Coil,      !- Cooling Coil Name",
+		"  ,                        !- Use DOAS DX Cooling Coil",
+		"  15.0,                    !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+		"  ,                        !- Latent Load Control",
+		"  ,                        !- Supplemental Heating Coil Object Type",
+		"  ,                        !- Supplemental Heating Coil Name",
+		"  SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation",
+		"  1.6,                     !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+		"  ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+		"  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+		"  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+		"  SupplyAirFlowRate,       !- Supply air Flow Rate Method During Heating Operation",
+		"  1.6,                     !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+		"  ,                        !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+		"  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+		"  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+		"  SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+		"  0.8,                     !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+		"  ,                        !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+		"  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+		"  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+		"  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+		"  ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+		"  25.0;                    !- Maximum Supply Air Temperature{ C }",
+
+		"Fan:OnOff,",
+		"  Supply Fan 1,            !- Name",
+		"  FanAndCoilAvailSched,    !- Availability Schedule Name",
+		"  0.7,                     !- Fan Total Efficiency",
+		"  600.0,                   !- Pressure Rise{ Pa }",
+		"  1.6,                     !- Maximum Flow Rate{ m3 / s }",
+		"  0.9,                     !- Motor Efficiency",
+		"  1.0,                     !- Motor In Airstream Fraction",
+		"  Zone Exhaust Node,       !- Air Inlet Node Name",
+		"  Water Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
+
+		"Coil:Cooling:Water,",
+		"  Water Cooling Coil,      !- Name",
+		"  FanAndCoilAvailSched,    !- Availability Schedule Namev",
+		"  0.0002,                  !- Design Water Flow Rate { m3 / s }",
+		"  1.6000,                  !- Design Air Flow Rate { m3 / s }",
+		"  7.22,                    !- Design Inlet Water Temperature { Cv }",
+		"  24.340,                  !- Design Inlet Air Temperature { C }",
+		"  14.000,                  !- Design Outlet Air Temperature { C }",
+		"  0.0095,                  !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+		"  0.0090,                  !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+		"  ChWInletNode,            !- Water Inlet Node Name",
+		"  ChWOutletNode,           !- Water Outlet Node Name",
+		"  Water Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+		"  Water Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+		"  SimpleAnalysis,          !- Type of Analysis",
+		"  CrossFlow;               !- Heat Exchanger Configuration",
+
+		"Coil:Heating:Water,",
+		"  Water Heating Coil,      !- Name",
+		"  FanAndCoilAvailSched,    !- Availability Schedule Name",
+		"  300.0,                   !- U - Factor Times Area Value { W / K }",
+		"  0.0006,                  !- Maximum Water Flow Rate { m3 / s }",
+		"  HWInletNode,             !- Water Inlet Node Name",
+		"  HWOutletNode,            !- Water Outlet Node Name",
+		"  Water Heating Coil Air Inlet Node, !- Air Inlet Node Name",
+		"  Zone 2 Inlet Node,       !- Air Outlet Node Name",
+		"  UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+		"  5000.0,                  !- Rated Capacity { W }",
+		"  82.2,                    !- Rated Inlet Water Temperature { C }",
+		"  16.6,                    !- Rated Inlet Air Temperature { C }",
+		"  71.1,                    !- Rated Outlet Water Temperature { C }",
+		"  32.2,                    !- Rated Outlet Air Temperature { C }",
+		"  ;                        !- Rated Ratio for Air and Water Convection",
+
+		"ScheduleTypeLimits,",
+		"  Any Number;              !- Name",
+
+		"Schedule:Compact,",
+		"  FanAndCoilAvailSched,    !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 24:00, 1.0;       !- Field 3",
+
+		"Schedule:Compact,",
+		"  ContinuousFanSchedule,   !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 24:00, 1.0;       !- Field 3",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+
+	GetZoneData( ErrorsFound ); // read zone data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	GetZoneEquipmentData1(); // read zone equipment configuration and list objects
+
+	ZoneEqSizing.allocate( 1 );
+	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
+	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
+
+	TotNumLoops = 2;
+	PlantLoop.allocate( TotNumLoops );
+	for ( int l = 1; l <= TotNumLoops; ++l ) {
+		auto & loop( PlantLoop( l ) );
+		loop.LoopSide.allocate( 2 );
+		auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
+		loopside.TotalBranches = 1;
+		loopside.Branch.allocate( 1 );
+		auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+		loopsidebranch.TotalComponents = 1;
+		loopsidebranch.Comp.allocate( 1 );
+	}
+	PlantLoop( 1 ).Name = "ChilledWaterLoop";
+	PlantLoop( 1 ).FluidName = "FluidWaterLoop";
+	PlantLoop( 1 ).FluidIndex = 1;
+	PlantLoop( 1 ).FluidName = "WATER";
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "WATER COOLING COIL";
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = TypeOf_CoilWaterCooling;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 9;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 10;
+
+	PlantLoop( 2 ).Name = "HotWaterLoop";
+	PlantLoop( 2 ).FluidName = "FluidWaterLoop";
+	PlantLoop( 2 ).FluidIndex = 1;
+	PlantLoop( 2 ).FluidName = "WATER";
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "WATER HEATING COIL";
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 6;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 7;
+
+	GetUnitarySystemInputData( ErrorsFound ); // get UnitarySystem input from object above
+	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
+	EXPECT_EQ( UnitarySystem( 1 ).UnitarySystemType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
+
+	DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
+
+	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
+	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
+
+	// set up unitary system inlet condtions
+	Node( InletNode ).Temp = 20.0; // zone winter dry-bulb temp
+	Node( InletNode ).HumRat = 0.005; // dry winter condition
+	Node( InletNode ).Enthalpy = PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat );
+	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).DesignMassFlowRate;
+
+	// set zone temperature
+	Node( ControlZoneNum ).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
+	DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
+	DataEnvironment::OutHumRat = 0.1;
+	DataEnvironment::OutBaroPress = 101325.0;
+	DataEnvironment::OutWetBulbTemp = 30.0;
+
+	// initialize other incidentals that are used within the UnitarySystem module during calculations
+	CurZoneEqNum = 1;
+	ZoneSysEnergyDemand.allocate( 1 );
+	ZoneSysMoistureDemand.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = 2000.0; // heating load
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = 4000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = 2000.0;
+	ZoneSysMoistureDemand( ControlZoneNum ).OutputRequiredToDehumidifyingSP = 0.0;
+
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP.allocate( 1 );
+	ZoneSysMoistureDemand( ControlZoneNum ).SequencedOutputRequiredToDehumidSP.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+	ZoneSysMoistureDemand( ControlZoneNum ).SequencedOutputRequiredToDehumidSP( 1 ) = ZoneSysMoistureDemand( ControlZoneNum ).OutputRequiredToDehumidifyingSP;
+
+	TempControlType.allocate( 1 );
+	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
+	CurDeadBandOrSetback.allocate( 1 );
+	CurDeadBandOrSetback( 1 ) = false;
+	// fill the schedule values
+	Schedule( 1 ).CurrentValue = 1.0; // availability
+	Schedule( 2 ).CurrentValue = 1.0; // constant fan
+	DataGlobals::BeginEnvrnFlag = true;
+	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
+	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).DesignFanVolFlowRate * StdRhoAir;
+
+	SetPredefinedTables();
+	// call once to initialize some variables (i.e., min air flow rate not correct on first pass)
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+	// reset air flow control since schedule value was not update prior to GetInput usage
+	UnitarySystem( 1 ).AirFlowControl = UseCompressorOffFlow;
+
+	// 4 general tests for heating and cooling:
+	// 1 - low load, min fan speed and coil modulates to meet load
+	// 2 - moderate load, fan speed and water flow modulate to meet load. Outlet air temp is typically at limit
+	// 3 - high load, max fan speed, water modulate to meet load
+	// 4 - very high load, max fan speed and water flow rate, load not met
+	//
+	// HEATING LOAD
+	// Heating Test 1 - low load, operate at min fan flow, modulate water flow to meet load
+	// system output should match RemainingOutputRequired = 2000.0 W (heating mode)
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	ZoneTemp = Node( ControlZoneNum ).Temp;
+	CpAir = PsyCpAirFnWTdb( Node( InletNode ).HumRat, Node( InletNode ).Temp );
+
+	// calculation at end of CalcUnitarySystemToLoad():
+	//	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem( UnitarySysNum ).SenLoadLoss;
+
+	MinHumRatio = Node( ControlZoneNum ).HumRat; // zone humidity ratio
+	if ( Node( OutletNode ).Temp < Node( ControlZoneNum ).Temp ) MinHumRatio = Node( OutletNode ).HumRat; // use lower of zone and outlet humidity ratio
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+
+	// test model performance
+	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 2.0 ); // Watts (2.0 = 0.001 * load)
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxNoCoolHeatAirMassFlow ); // low speed fan flow
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate ); // inlet = outlet flow rate
+	// these next 2 variables are used to modulate the coil PLR irrespective of the fan PLR - they are non-zero when the model is called and CAN be 0 when load exceeds capacity
+	// the ASHRAE model is the only model that uses these variables, and flow is determined by Heat/CoolWaterFlowRatio * max
+	// other models will show 0 here and in this case water flow will equal max flow * PartLoadRatio
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0135, 0.0001 ); // heating coil water flow ratio, heating coil is on
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.0, 0.0001 ); // cooling coil water flow ratio, cooling coil is off
+	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, UnitarySystem( 1 ).MaxNoCoolHeatAirMassFlow / UnitarySystem( 1 ).MaxHeatAirMassFlow, 0.0001 ); // fan PLR at minimum speed
+	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMaxOutletTemp ); // outlet temperature does not exceed max limit
+
+	// increase heating load so that upper temperature limit is reached
+	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = 6000.0; // heating load
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = 8000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = 6000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+
+	// Heating Test 2 - moderate load, operate above min fan flow, modulate water flow to meet load
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	ZoneTemp = Node( ControlZoneNum ).Temp;
+	CpAir = PsyCpAirFnWTdb( Node( InletNode ).HumRat, Node( InletNode ).Temp );
+	MinHumRatio = Node( ControlZoneNum ).HumRat; // zone humidity ratio
+	if ( Node( OutletNode ).Temp < Node( ControlZoneNum ).Temp ) MinHumRatio = Node( OutletNode ).HumRat; // use lower of zone and outlet humidity ratio
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+
+	// test model performance
+	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 6.0 ); // Watts
+	EXPECT_GT( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxNoCoolHeatAirMassFlow ); // air flow higher than low speed fan flow
+	EXPECT_LT( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxHeatAirMassFlow ); // air flow lower than high speed fan flow
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate ); // inlet = outlet flow rate
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0655, 0.0001 ); // heating coil water flow ratio, heating coil is on
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.0, 0.0001 ); // cooling coil water flow ratio, cooling coil is off
+	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 0.6197, 0.0001 ); // fan PLR above minimum and below maximum speed (0-1 means fraction between no load flow and full flow)
+	EXPECT_NEAR( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMaxOutletTemp, 0.01 ); // outlet temperature modulated to meet max limit
+
+	// increase heating load again so that upper temperature limit is exceeded to meet load
+	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = 10000.0; // heating load
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = 12000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = 10000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+
+	// Heating Test 3 - high load, operate at max fan flow, modulate water flow to meet load
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	ZoneTemp = Node( ControlZoneNum ).Temp;
+	CpAir = PsyCpAirFnWTdb( Node( InletNode ).HumRat, Node( InletNode ).Temp );
+	MinHumRatio = Node( ControlZoneNum ).HumRat; // zone humidity ratio
+	if ( Node( OutletNode ).Temp < Node( ControlZoneNum ).Temp ) MinHumRatio = Node( OutletNode ).HumRat; // use lower of zone and outlet humidity ratio
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+
+	// test model performance
+	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 10.0 ); // Watts
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate ); // inlet = outlet flow rate
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.2489, 0.001 ); // heating coil water flow ratio, heating coil is on
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.0, 0.0001 ); // cooling coil water flow ratio, cooling coil is off
+	EXPECT_EQ( UnitarySystem( 1 ).FanPartLoadRatio, 1.0 ); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
+	EXPECT_GT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMaxOutletTemp ); // outlet temperature exceeds max limit
+
+	// increase heating load again to push water flow rate towards max
+	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = 12000.0; // heating load
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = 14000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = 12000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+
+	// Heating Test 4 - very high load, operate at max fan and water flow, load not met
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	ZoneTemp = Node( ControlZoneNum ).Temp;
+	CpAir = PsyCpAirFnWTdb( Node( InletNode ).HumRat, Node( InletNode ).Temp );
+	MinHumRatio = Node( ControlZoneNum ).HumRat; // zone humidity ratio
+	if ( Node( OutletNode ).Temp < Node( ControlZoneNum ).Temp ) MinHumRatio = Node( OutletNode ).HumRat; // use lower of zone and outlet humidity ratio
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+
+	// test model performance
+	EXPECT_GT( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys ); // Watts - system CANNOT meet load
+	EXPECT_NEAR( Qsens_sys, 11330.43, 0.1 ); // system maxed out on capacity
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate ); // inlet = outlet flow rate
+	EXPECT_EQ( Node( UnitarySystem( 1 ).HeatCoilFluidInletNode ).MassFlowRate, UnitarySystem( 1 ).MaxHeatCoilFluidFlow ); // water coil water flow rate at max
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio not set, heating coil is on since function returned when load exceeded capacity
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.0, 0.0001 ); // cooling coil water flow ratio, cooling coil is off
+	EXPECT_EQ( UnitarySystem( 1 ).FanPartLoadRatio, 1.0 ); // fan PLR at maximum speed (0-1 means fraction between no load flow and full flow)
+	EXPECT_GT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMaxOutletTemp ); // outlet temperature exceeds max limit
+	EXPECT_NEAR( Node( OutletNode ).Temp, 25.85, 0.01 ); // system allowed to exceed max outlet air temp to meet additional load
+
+	// COOLING LOAD
+	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -2000.0; // cooling load
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -2000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = -4000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+
+	// set zone temperature
+	Node( ControlZoneNum ).Temp = 24.0; // zone summer dry-bulb temp
+	Node( InletNode ).Temp = 24.0; // system inlet node dry-bulb temp
+	Node( InletNode ).Enthalpy = PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat );
+	DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
+	DataEnvironment::OutHumRat = 0.1;
+	DataEnvironment::OutBaroPress=101325.0;
+	DataEnvironment::OutWetBulbTemp = 30.0;
+
+	// Cooling Test 1 - low load, operate at min fan flow, modulate water flow to meet load
+	// system output should match RemainingOutputRequired = -2000.0 W (cooling mode)
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	ZoneTemp = Node( ControlZoneNum ).Temp;
+	CpAir = PsyCpAirFnWTdb( Node( InletNode ).HumRat, Node( InletNode ).Temp );
+
+	// calculation at end of CalcUnitarySystemToLoad():
+	//	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem( UnitarySysNum ).SenLoadLoss;
+
+	MinHumRatio = Node( ControlZoneNum ).HumRat; // zone humidity ratio
+	if ( Node( OutletNode ).Temp < Node( ControlZoneNum ).Temp ) MinHumRatio = Node( OutletNode ).HumRat; // use lower of zone and outlet humidity ratio
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+
+	// test model performance
+	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 3.0 ); // Watts
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxNoCoolHeatAirMassFlow ); // low speed fan flow
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate ); // inlet = outlet flow rate
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.103, 0.001 ); // cooling coil water flow ratio, cooling coil is on
+	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, UnitarySystem( 1 ).MaxNoCoolHeatAirMassFlow / UnitarySystem( 1 ).MaxCoolAirMassFlow, 0.0001 ); // fan PLR at minimum speed
+	EXPECT_GT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature is not below min limit
+
+	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -9000.0; // cooling load
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -9000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = -11000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+
+	// Cooling Test 2 - moderate load, operate above min fan flow, modulate water flow to meet load
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	ZoneTemp = Node( ControlZoneNum ).Temp;
+	CpAir = PsyCpAirFnWTdb( Node( InletNode ).HumRat, Node( InletNode ).Temp );
+	MinHumRatio = Node( ControlZoneNum ).HumRat; // zone humidity ratio
+	if ( Node( OutletNode ).Temp < Node( ControlZoneNum ).Temp ) MinHumRatio = Node( OutletNode ).HumRat; // use lower of zone and outlet humidity ratio
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+
+	// test model performance
+	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 9.0 ); // Watts
+	EXPECT_GT( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxNoCoolHeatAirMassFlow ); // air flow higher than low speed fan flow
+	EXPECT_LT( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow ); // air flow lower than high speed fan flow
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate ); // inlet = outlet flow rate
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.392, 0.001 ); // cooling coil water flow ratio, cooling coil is on
+	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 0.5117, 0.0001 ); // fan PLR above minimum speed
+	EXPECT_NEAR( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout, 0.01 ); // outlet temperature modulated to meet max limit
+
+	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -18000.0; // cooling load
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -18000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = -20000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+
+	// Cooling Test 3 - high load, operate at max fan flow, modulate water flow to meet load
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	ZoneTemp = Node( ControlZoneNum ).Temp;
+	CpAir = PsyCpAirFnWTdb( Node( InletNode ).HumRat, Node( InletNode ).Temp );
+	MinHumRatio = Node( ControlZoneNum ).HumRat; // zone humidity ratio
+	if ( Node( OutletNode ).Temp < Node( ControlZoneNum ).Temp ) MinHumRatio = Node( OutletNode ).HumRat; // use lower of zone and outlet humidity ratio
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+
+	// test model performance
+	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 18.0 ); // Watts
+	EXPECT_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow ); // air flow at high speed fan flow
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate ); // inlet = outlet flow rate
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.795, 0.001 ); // cooling coil water flow ratio, cooling coil is on
+	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 1.0, 0.0001 ); // fan PLR at maximum speed
+	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature below minimum temperature limit
+
+	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -22000.0; // cooling load
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -22000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = -24000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+
+	// Cooling Test 4 - very high load, operate at max fan and water flow, load not met
+	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
+
+	ZoneTemp = Node( ControlZoneNum ).Temp;
+	CpAir = PsyCpAirFnWTdb( Node( InletNode ).HumRat, Node( InletNode ).Temp );
+	MinHumRatio = Node( ControlZoneNum ).HumRat; // zone humidity ratio
+	if ( Node( OutletNode ).Temp < Node( ControlZoneNum ).Temp ) MinHumRatio = Node( OutletNode ).HumRat; // use lower of zone and outlet humidity ratio
+	Qsens_sys = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+
+	// test model performance
+	EXPECT_LT( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys ); // Watts - system CANNOT meet load
+	EXPECT_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow ); // air flow at high speed fan flow
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate ); // inlet = outlet flow rate
+	EXPECT_EQ( Node( UnitarySystem( 1 ).CoolCoilFluidInletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolCoilFluidFlow ); // water coil water flow rate at max
+	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
+	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.0, 0.001 ); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
+	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 1.0, 0.0001 ); // fan PLR at maximum speed
+	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature below minimum temperature limit
+
+}
+
+TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXHeatingCoilOnly ) {
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+
+		"  Timestep,6;",
+
+		"  Site:Location,",
+		"    USA IL-CHICAGO-OHARE,    !- Name",
+		"    41.77,                   !- Latitude {deg}",
+		"    -87.75,                  !- Longitude {deg}",
+		"    -6.00,                   !- Time Zone {hr}",
+		"    190;                     !- Elevation {m}",
+
+		"SimulationControl, YES, NO, NO, YES, NO;",
+
+		"  SizingPeriod:DesignDay,",
+		"    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name",
+		"    1,                       !- Month",
+		"    21,                      !- Day of Month",
+		"    WinterDesignDay,         !- Day Type",
+		"    11.2,                    !- Maximum Dry-Bulb Temperature {C}",
+		"    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+		"    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+		"    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+		"    Wetbulb,                 !- Humidity Condition Type",
+		"    5.5,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+		"    ,                        !- Humidity Condition Day Schedule Name",
+		"    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+		"    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+		"    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+		"    99063.,                  !- Barometric Pressure {Pa}",
+		"    5.3,                     !- Wind Speed {m/s}",
+		"    230,                     !- Wind Direction {deg}",
+		"    No,                      !- Rain Indicator",
+		"    No,                      !- Snow Indicator",
+		"    No,                      !- Daylight Saving Time Indicator",
+		"    ASHRAEClearSky,          !- Solar Model Indicator",
+		"    ,                        !- Beam Solar Day Schedule Name",
+		"    ,                        !- Diffuse Solar Day Schedule Name",
+		"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+		"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+		"    0.00;                    !- Sky Clearness",
+
+		"Zone,",
+		"  EAST ZONE,              !- Name",
+		"  0,                      !- Direction of Relative North{ deg }",
+		"  0,                      !- X Origin{ m }",
+		"  0,                      !- Y Origin{ m }",
+		"  0,                      !- Z Origin{ m }",
+		"  1,                      !- Type",
+		"  1,                      !- Multiplier",
+		"  autocalculate,          !- Ceiling Height{ m }",
+		"  autocalculate;          !- Volume{ m3 }",
+
+		"ZoneHVAC:EquipmentConnections,",
+		"EAST ZONE,                 !- Zone Name",
+		"  Zone2Equipment,          !- Zone Conditioning Equipment List Name",
+		"  Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name",
+		"  Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name",
+		"  Zone 2 Node,             !- Zone Air Node Name",
+		"  Zone 2 Outlet Node;      !- Zone Return Air Node Name",
+
+		"ZoneHVAC:EquipmentList,",
+		"  Zone2Equipment,          !- Name",
+		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+		"  Multispeed DXAC,         !- Zone Equipment 1 Name",
+		"  1,                       !- Zone Equipment 1 Cooling Sequence",
+		"  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+
+		"AirLoopHVAC:UnitarySystem,",
+		"  Multispeed DXAC,        !- Name",
+		"  Load,                   !- Control Type",
+		"  East Zone,              !- Controlling Zone or Thermostat Location",
+		"  None,                   !- Dehumidification Control Type",
+		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+		"  Zone Exhaust Node,      !- Air Inlet Node Name",
+		"  Zone 2 Inlet Node,      !- Air Outlet Node Name",
+		"  Fan:OnOff,              !- Supply Fan Object Type",
+		"  Supply Fan 1,           !- Supply Fan Name",
+		"  BlowThrough,            !- Fan Placement",
+		"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
+		"  Coil:Heating:DX:MultiSpeed,       !- Heating Coil Object Type",
+		"  MS Heating Coil 1,      !- Heating Coil Name",
+		"  ,                       !- DX Heating Coil Sizing Ratio",
+		"  ,                       !- Cooling Coil Object Type",
+		"  ,                       !- Cooling Coil Name",
+		"  ,                       !- Use DOAS DX Cooling Coil",
+		"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+		"  ,                       !- Latent Load Control",
+		"  ,                       !- Supplemental Heating Coil Object Type",
+		"  ,                       !- Supplemental Heating Coil Name",
+		"  None,                   !- Supply Air Flow Rate Method During Cooling Operation",
+		"  ,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+		"  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+		"  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+		"  0.00005,                !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+		"  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation",
+		"  autosize,               !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+		"  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+		"  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+		"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+		"  None,                   !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+		"  ,                       !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+		"  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+		"  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+		"  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+		"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+		"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+		"  80,                     !- Maximum Supply Air Temperature{ C }",
+		"  21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
+		"  ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name",
+		"  ,                        !- Maximum Cycling Rate {cycles/hr}",
+		"  ,                        !- Heat Pump Time Constant {s}",
+		"  ,                        !- Fraction of On-Cycle Power Use",
+		"  ,                        !- Heat Pump Fan Delay Time {s}",
+		"  ,                        !- Ancillary On-Cycle Electric Power {W}",
+		"  ,                        !- Ancillary Off-Cycle Electric Power {W}",
+		"  ,                        !- Design Heat Recovery Water Flow Rate {m3/s}",
+		"  ,                        !- Maximum Temperature for Heat Recovery {C}",
+		"  ,                        !- Heat Recovery Water Inlet Node Name",
+		"  ,                        !- Heat Recovery Water Outlet Node Name",
+		"  UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Heat Pump Object Type",
+		"  MultiSpeed Performance;  !- Design Specification Multispeed Heat Pump Object Name",
+
+		"UnitarySystemPerformance:Multispeed,",
+		"  MultiSpeed Performance,  !- Name",
+		"  4,                       !- Number of Speeds for Heating",
+		"  0,                       !- Number of Speeds for Cooling",
+		"  No,                      !- Single Mode Operation",
+		"  ,                        !- No Load Supply Air Flow Rate Ratio",
+		"  autosize,                !- Heating Speed 1 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 1 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 2 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 2 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 3 Supply Air Flow Ratio",
+		"  autosize,                !- Cooling Speed 3 Supply Air Flow Ratio",
+		"  autosize,                !- Heating Speed 4 Supply Air Flow Ratio",
+		"  autosize;                !- Cooling Speed 4 Supply Air Flow Ratio",
+
+		"Fan:OnOff,",
+		"  Supply Fan 1,           !- Name",
+		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+		"  0.7,                    !- Fan Total Efficiency",
+		"  600.0,                  !- Pressure Rise{ Pa }",
+		"  autosize,               !- Maximum Flow Rate{ m3 / s }",
+		"  0.9,                    !- Motor Efficiency",
+		"  1.0,                    !- Motor In Airstream Fraction",
+		"  Zone Exhaust Node,      !- Air Inlet Node Name",
+		"  DX Heating Coil Air Inlet Node;  !- Air Outlet Node Name",
+
+		"Coil:Heating:DX:MultiSpeed,",
+		"  MS Heating Coil 1,       !- Name",
+		"  FanAndCoilAvailSched,    !- Availability Schedule Name",
+		"  DX Heating Coil Air Inlet Node,  !- Indoor Air Inlet Node Name",
+		"  Zone 2 Inlet Node,       !- Indoor Air Outlet Node Name",
+		"  -8.0,                    !- Minimum Outdoor Dry - Bulb Temperature for Compressor Operation{ C }",
+		"  -5.0,                    !- Outdoor Dry - Bulb Temperature to Turn On Compressor{ C }",
+		"  200.0,                   !- Crankcase Heater Capacity{ W }",
+		"  10.0,                    !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+		"  ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+		"  7.22,                    !- Maximum Outdoor Dry - Bulb Temperature for Defrost Operation{ C }",
+		"  Resistive,               !- Defrost Strategy",
+		"  timed,                   !- Defrost Control",
+		"  0.058333,                !- Defrost Time Period Fraction",
+		"  autosize,                !- Resistive Defrost Heater Capacity{ W }",
+		"  No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
+		"  NaturalGas,              !- Fuel Type",
+		"  4,                       !- Region number for Calculating HSPF",
+		"  4,                       !- Number of Speeds",
+		"  autosize,                !- Speed 1 Gross Rated Heating Capacity{ W }",
+		"  2.75,                    !- Speed 1 Gross Rated Heating COP{ W / W }",
+		"  autosize,                !- Speed 1 Rated Air Flow Rate{ m3 / s }",
+		"  345.0,                   !- Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+		"  HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name",
+		"  HPACHeatCapFFF,          !- Speed 1 Heating Capacity Function of Flow Fraction Curve Name",
+		"  HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+		"  HPACHeatEIRFFF,          !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+		"  HPACCOOLPLFFPLR,         !- Speed 1 Part Load Fraction Correlation Curve Name",
+		"  ,                        !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+		"  ,                        !- Speed 1 Waste Heat Function of Temperature Curve Name",
+		"  autosize,                !- Speed 2 Gross Rated Heating Capacity{ W }",
+		"  2.75,                    !- Speed 2 Gross Rated Heating COP{ W / W }",
+		"  autosize,                !- Speed 2 Rated Air Flow Rate{ m3 / s }",
+		"  425.0,                   !- Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+		"  HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name",
+		"  HPACHeatCapFFF,          !- Speed 2 Heating Capacity Function of Flow Fraction Curve Name",
+		"  HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+		"  HPACHeatEIRFFF,          !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+		"  HPACCOOLPLFFPLR,         !- Speed 2 Part Load Fraction Correlation Curve Name",
+		"  ,                        !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+		"  ,                        !- Speed 2 Waste Heat Function of Temperature Curve Name",
+		"  autosize,                !- Speed 3 Gross Rated Heating Capacity{ W }",
+		"  2.75,                    !- Speed 3 Gross Rated Heating COP{ W / W }",
+		"  autosize,                !- Speed 3 Rated Air Flow Rate{ m3 / s }",
+		"  525.0,                   !- Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+		"  HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name",
+		"  HPACHeatCapFFF,          !- Speed 3 Heating Capacity Function of Flow Fraction Curve Name",
+		"  HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+		"  HPACHeatEIRFFF,          !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+		"  HPACCOOLPLFFPLR,         !- Speed 3 Part Load Fraction Correlation Curve Name",
+		"  ,                        !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+		"  ,                        !- Speed 3 Waste Heat Function of Temperature Curve Name",
+		"  autosize,                !- Speed 4 Gross Rated Heating Capacity{ W }",
+		"  2.75,                    !- Speed 4 Gross Rated Heating COP{ W / W }",
+		"  autosize,                !- Speed 4 Rated Air Flow Rate{ m3 / s }",
+		"  673.0,                   !- Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+		"  HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name",
+		"  HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Flow Fraction Curve Name",
+		"  HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+		"  HPACHeatEIRFFF,          !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name",
+		"  HPACCOOLPLFFPLR,         !- Speed 4 Part Load Fraction Correlation Curve Name",
+		"  ,                        !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+		"  ;                        !- Speed 4 Waste Heat Function of Temperature Curve Name",
+
+		"  Curve:Quadratic,",
+		"    HPACHeatEIRFFF,          !- Name",
+		"    1.3824,                  !- Coefficient1 Constant",
+		"    -0.4336,                 !- Coefficient2 x",
+		"    0.0512,                  !- Coefficient3 x**2",
+		"    0.0,                     !- Minimum Value of x",
+		"    1.0;                     !- Maximum Value of x",
+
+
+		"  Curve:Quadratic,",
+		"    HPACCOOLPLFFPLR,         !- Name",
+		"    0.85,                    !- Coefficient1 Constant",
+		"    0.15,                    !- Coefficient2 x",
+		"    0.0,                     !- Coefficient3 x**2",
+		"    0.0,                     !- Minimum Value of x",
+		"    1.0;                     !- Maximum Value of x",
+
+		"  Curve:Cubic,",
+		"    HPACHeatCapFFF,          !- Name",
+		"    0.84,                    !- Coefficient1 Constant",
+		"    0.16,                    !- Coefficient2 x",
+		"    0.0,                     !- Coefficient3 x**2",
+		"    0.0,                     !- Coefficient4 x**3",
+		"    0.5,                     !- Minimum Value of x",
+		"    1.5;                     !- Maximum Value of x",
+
+
+		"    Curve:Biquadratic,",
+		"      HPACHeatCapFT,           !- Name",
+		"      0.8529681407,            !- Coefficient1 Constant",
+		"      -0.0004847169,           !- Coefficient2 x",
+		"     -0.0000010693,            !- Coefficient3 x**2",
+		"      0.0185542164,            !- Coefficient4 y",
+		"      0.0000872425,            !- Coefficient5 y**2",
+		"      -0.0000166868,           !- Coefficient6 x*y",
+		"      17.78,                   !- Minimum Value of x",
+		"      23.33,                   !- Maximum Value of x",
+		"      -28.89,                  !- Minimum Value of y",
+		"      17.22,                   !- Maximum Value of y",
+		"      0.3799,                  !- Minimum Curve Output",
+		"      1.1896,                  !- Maximum Curve Output",
+		"      Temperature,             !- Input Unit Type for X",
+		"      Temperature,             !- Input Unit Type for Y",
+		"      Dimensionless;           !- Output Unit Type",
+
+		"    Curve:Biquadratic,",
+		"      HPACHeatEIRFT,           !- Name",
+		"      0.7077081462,            !- Coefficient1 Constant",
+		"      0.0148163478,            !- Coefficient2 x",
+		"      0.0002622589,            !- Coefficient3 x**2",
+		"      -0.0113239622,           !- Coefficient4 y",
+		"      0.0002939277,            !- Coefficient5 y**2",
+		"      -0.0003605284,           !- Coefficient6 x*y",
+		"      17.78,                   !- Minimum Value of x",
+		"      23.33,                   !- Maximum Value of x",
+		"      -28.89,                  !- Minimum Value of y",
+		"      17.22,                   !- Maximum Value of y",
+		"      0.8266,                  !- Minimum Curve Output",
+		"      2.0277,                  !- Maximum Curve Output",
+		"      Temperature,             !- Input Unit Type for X",
+		"      Temperature,             !- Input Unit Type for Y",
+		"      Dimensionless;           !- Output Unit Type",
+
+		"ScheduleTypeLimits,",
+		"  Any Number;             !- Name",
+
+		"Schedule:Compact,",
+		"  FanAndCoilAvailSched,   !- Name",
+		"  Any Number,             !- Schedule Type Limits Name",
+		"  Through: 12/31,         !- Field 1",
+		"  For: AllDays,           !- Field 2",
+		"  Until: 24:00, 1.0;      !- Field 3",
+
+		"Schedule:Compact,",
+		"  ContinuousFanSchedule,  !- Name",
+		"  Any Number,             !- Schedule Type Limits Name",
+		"  Through: 12/31,         !- Field 1",
+		"  For: AllDays,           !- Field 2",
+		"  Until: 24:00, 1.0;      !- Field 3",
+
+		"  Sizing:Zone,",
+		"    EAST ZONE,      !- Zone or ZoneList Name",
+		"    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method",
+		"    12.8000,                 !- Zone Cooling Design Supply Air Temperature {C}",
+		"    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}",
+		"    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method",
+		"    50.0000,                 !- Zone Heating Design Supply Air Temperature {C}",
+		"    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}",
+		"    0.0085,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+		"    0.0080,                  !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+		"    SZ DSOA Zone One,        !- Design Specification Outdoor Air Object Name",
+		"    ,                        !- Zone Heating Sizing Factor",
+		"    ,                        !- Zone Cooling Sizing Factor",
+		"    DesignDay,               !- Cooling Design Air Flow Method",
+		"    ,                        !- Cooling Design Air Flow Rate {m3/s}",
+		"    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}",
+		"    ,                        !- Cooling Minimum Air Flow {m3/s}",
+		"    ,                        !- Cooling Minimum Air Flow Fraction",
+		"    DesignDay,               !- Heating Design Air Flow Method",
+		"    ,                        !- Heating Design Air Flow Rate {m3/s}",
+		"    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}",
+		"    ,                        !- Heating Maximum Air Flow {m3/s}",
+		"    ;                        !- Heating Maximum Air Flow Fraction",
+
+		"  DesignSpecification:OutdoorAir,",
+		"    SZ DSOA Zone One,  !- Name",
+		"    Flow/Person,             !- Outdoor Air Method",
+		"    0.0125;                  !- Outdoor Air Flow per Person {m3/s-person}",
+
+		"  BuildingSurface:Detailed,",
+		"    Zn001:Wall001,           !- Name",
+		"    Wall,                    !- Surface Type",
+		"    R13WALL,                 !- Construction Name",
+		"    EAST ZONE,               !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"     ,                       !- Outside Boundary Condition Object",
+		"    SunExposed,              !- Sun Exposure",
+		"    WindExposed,             !- Wind Exposure",
+		"    0.5000000,               !- View Factor to Ground",
+		"    4,                       !- Number of Vertices",
+		"    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+		"    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+		"  BuildingSurface:Detailed,",
+		"    Zn001:Wall002,           !- Name",
+		"    Wall,                    !- Surface Type",
+		"    R13WALL,                 !- Construction Name",
+		"    EAST ZONE,               !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    SunExposed,              !- Sun Exposure",
+		"    WindExposed,             !- Wind Exposure",
+		"    0.5000000,               !- View Factor to Ground",
+		"    4,                       !- Number of Vertices",
+		"    15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+		"    15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"    15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"    15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+		"  BuildingSurface:Detailed,",
+		"    Zn001:Wall003,           !- Name",
+		"    Wall,                    !- Surface Type",
+		"    R13WALL,                 !- Construction Name",
+		"    EAST ZONE,               !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    SunExposed,              !- Sun Exposure",
+		"    WindExposed,             !- Wind Exposure",
+		"    0.5000000,               !- View Factor to Ground",
+		"    4,                       !- Number of Vertices",
+		"    15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+		"    15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"    0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"    0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+		"  BuildingSurface:Detailed,",
+		"    Zn001:Wall004,           !- Name",
+		"    Wall,                    !- Surface Type",
+		"    R13WALL,                 !- Construction Name",
+		"    EAST ZONE,               !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    SunExposed,              !- Sun Exposure",
+		"    WindExposed,             !- Wind Exposure",
+		"    0.5000000,               !- View Factor to Ground",
+		"    4,                       !- Number of Vertices",
+		"    0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+		"    0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"    0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+		"  BuildingSurface:Detailed,",
+		"    Zn001:Flr001,            !- Name",
+		"    Floor,                   !- Surface Type",
+		"    FLOOR,                   !- Construction Name",
+		"    EAST ZONE,               !- Zone Name",
+		"    Adiabatic,               !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    NoSun,                   !- Sun Exposure",
+		"    NoWind,                  !- Wind Exposure",
+		"    1.000000,                !- View Factor to Ground",
+		"    4,                       !- Number of Vertices",
+		"    15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+		"    0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"    0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"    15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+		"  BuildingSurface:Detailed,",
+		"    Zn001:Roof001,           !- Name",
+		"    Roof,                    !- Surface Type",
+		"    ROOF31,                  !- Construction Name",
+		"    EAST ZONE,               !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    SunExposed,              !- Sun Exposure",
+		"    WindExposed,             !- Wind Exposure",
+		"    0,                       !- View Factor to Ground",
+		"    4,                       !- Number of Vertices",
+		"    0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}",
+		"    0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}",
+		"    15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}",
+		"    15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}",
+
+		"  Construction,",
+		"    R13WALL,                 !- Name",
+		"    R13LAYER;                !- Outside Layer",
+
+		"  Construction,",
+		"   FLOOR,                   !- Name",
+		"    C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+
+		"  Construction,",
+		"    ROOF31,                  !- Name",
+		"    R31LAYER;                !- Outside Layer",
+
+		"  Material:NoMass,",
+		"    R13LAYER,                !- Name",
+		"    Rough,                   !- Roughness",
+		"    2.290965,                !- Thermal Resistance {m2-K/W}",
+		"    0.9000000,               !- Thermal Absorptance",
+		"    0.7500000,               !- Solar Absorptance",
+		"    0.7500000;               !- Visible Absorptance",
+
+		"  Material:NoMass,",
+		"    R31LAYER,                !- Name",
+		"    Rough,                   !- Roughness",
+		"    5.456,                   !- Thermal Resistance {m2-K/W}",
+		"    0.9000000,               !- Thermal Absorptance",
+		"    0.7500000,               !- Solar Absorptance",
+		"    0.7500000;               !- Visible Absorptance",
+
+		"  Material,",
+		"    C5 - 4 IN HW CONCRETE,   !- Name",
+		"    MediumRough,             !- Roughness",
+		"    0.1014984,               !- Thickness {m}",
+		"    1.729577,                !- Conductivity {W/m-K}",
+		"    2242.585,                !- Density {kg/m3}",
+		"    836.8000,                !- Specific Heat {J/kg-K}",
+		"    0.9000000,               !- Thermal Absorptance",
+		"    0.6500000,               !- Solar Absorptance",
+		"    0.6500000;               !- Visible Absorptance",
+
+		"  ZoneControl:Thermostat,",
+		"    EAST ZONE Thermostat,    !- Name",
+		"    EAST ZONE,               !- Zone or ZoneList Name",
+		"    Dual Zone Control Type Sched,  !- Control Type Schedule Name",
+		"    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+		"    Zone One DualSPSched;    !- Control 1 Name",
+
+		"  Schedule:Compact,",
+		"    Dual Zone Control Type Sched,  !- Name",
+		"    Any Number,              !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,4;          !- Field 3",
+
+		"  ThermostatSetpoint:DualSetpoint,",
+		"    Zone One DualSPSched,    !- Name",
+		"    HTGSETP_SCH,             !- Heating Setpoint Temperature Schedule Name",
+		"    CLGSETP_SCH;             !- Cooling Setpoint Temperature Schedule Name",
+
+		"  Schedule:Compact,",
+		"    CLGSETP_SCH,             !- Name",
+		"    Any Number,              !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 19",
+		"    Until: 24:00,26.7;       !- Field 20",
+
+		"  Schedule:Compact,",
+		"    HTGSETP_SCH,             !- Name",
+		"    Any Number,              !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 22",
+		"    Until: 24:00,15.6;       !- Field 23",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+
+	SimulationManager::GetProjectData();
+	createFacilityElectricPowerServiceObject();
+	DataGlobals::BeginSimFlag = true;
+	DataGlobals::DoingSizing = true;
+	SizingManager::ManageSizing();
+	DataGlobals::DoingSizing = false;
+	DataGlobals::SysSizingCalc = false;
+	DataSizing::CurZoneEqNum = 1;
+	DataSizing::ZoneEqSizing.allocate( 1 );
+
+	GetUnitarySystemInput(); // get UnitarySystem input from object above
+	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once
+
+	OutputReportPredefined::SetPredefinedTables();
+
+	ZoneSizingRunDone = true;
+	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
+
+	SizeUnitarySystem( NumUnitarySystem, true, 0 );
+	SizeDXCoil( 1 );
+
+	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
+
+	ASSERT_NEAR( UnitarySystem( 1 ).DesignHeatingCapacity, 1301.766, 0.001 );
+	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, 0.0 );
+	ASSERT_NEAR( DXCoil( 1 ).MSRatedTotCap( 1 ), 325.441, 0.001 );
+	ASSERT_NEAR( DXCoil( 1 ).MSRatedTotCap( 2 ), 650.883, 0.001 );
+	ASSERT_NEAR( DXCoil( 1 ).MSRatedTotCap( 3 ), 976.324, 0.001 );
+	ASSERT_NEAR( DXCoil( 1 ).MSRatedTotCap( 4 ), 1301.766, 0.001 );
+	ASSERT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 1 ), 0.0131, 0.0001 );
+	ASSERT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 2 ), 0.0262, 0.0001 );
+	ASSERT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 3 ), 0.0393, 0.0001 );
+	ASSERT_NEAR( UnitarySystem( 1 ).HeatVolumeFlowRate( 4 ), 0.0524, 0.0001 );
+	ASSERT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 1 ), 0.0131, 0.0001 );
+	ASSERT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 2 ), 0.0262, 0.0001 );
+	ASSERT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 3 ), 0.0393, 0.0001 );
+	ASSERT_NEAR( DXCoil( 1 ).MSRatedAirVolFlowRate( 4 ), 0.0524, 0.0001 );
+
+}
+
+TEST_F( EnergyPlusFixture, UnitarySystem_SizingWithFans ) {
+
+// Add three fans to this model - one Fan:ConstantVolume, and three Fan:SystemModel in order to make the SupFanIndex=2
+	std::string const idf_objects = delimited_string({
+
+		"  Fan:SystemModel,",
+		"    Test Fan 1 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFanAirInletNode,         !- Air Inlet Node Name",
+		"    TestFanOutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    50.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  ",
+		"  Fan:SystemModel,",
+		"    Test Fan 2 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFan2AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan2OutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    100.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  Fan:SystemModel,",
+		"    Test Fan 3 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFan3AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan3OutletNode,           !- Air Outlet Node Name",
+		"    1.005 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    200.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  Fan:ConstantVolume,",
+		"    Test Fan 4,            !- Name",
+		"    ,    !- Availability Schedule Name",
+		"    0.5,                     !- Fan Total Efficiency",
+		"    25.0,                   !- Pressure Rise {Pa}",
+		"    1.0,                  !- Maximum Flow Rate {m3/s}",
+		"    0.9,                     !- Motor Efficiency",
+		"    1.0,                     !- Motor In Airstream Fraction",
+		"    TestFan4AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan4OutletNode;           !- Air Outlet Node Name",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	std::string fanName = "TEST FAN 1";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+
+	fanName = "TEST FAN 2";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+
+	fanName = "TEST FAN 3";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+	DataSizing::CurZoneEqNum = 0;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+	DataEnvironment::StdRhoAir = 1.2;
+	HVACFan::fanObjs[ 2 ]->simulate( _,_,_,_ ); // triggers sizing call
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 2 ]->designAirVolFlowRate; // get function
+	Real64 locDesignHeatGain3 = HVACFan::fanObjs[ 2 ]->getFanDesignHeatGain( locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain3, 402.0, 0.1 );
+
+	Fans::GetFanInput();
+	Real64 locDesignHeatGain4 = Fans::FanDesHeatGain( 1, locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain4, 50.25, 0.1 );
+
+	DataConstantUsedForSizing = 1.0;
+	DataFractionUsedForSizing = 1.0;
+	DataTotCapCurveIndex = 0;
+	DataDesOutletAirTemp = 0.0;
+
+	CurSysNum = 1;
+	FinalSysSizing.allocate( 1 );
+	FinalSysSizing( CurSysNum ).CoolSupTemp = 12.0;
+	FinalSysSizing( CurSysNum ).CoolSupHumRat = 0.0085;
+	FinalSysSizing( CurSysNum ).MixTempAtCoolPeak = 28.0;
+	FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak = 0.0075;
+	FinalSysSizing( CurSysNum ).DesCoolVolFlow = 1.005;
+	FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
+
+	PrimaryAirSystem.allocate( 1 );
+	PrimaryAirSystem( CurSysNum ).NumOACoolCoils = 0;
+	PrimaryAirSystem( CurSysNum ).SupFanNum = 0;
+	PrimaryAirSystem( CurSysNum ).RetFanNum = 0;
+	PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+
+	SysSizingRunDone = true;
+	SysSizInput.allocate( 1 );
+	SysSizInput( 1 ).AirLoopNum = CurSysNum;
+	DataSizing::NumSysSizInput = 1;
+
+	StdBaroPress = 101325.0;
+	InitializePsychRoutines();
+
+	// Need this to prevent crash in RequestSizing
+	UnitarySysEqSizing.allocate( 1 );
+	OASysEqSizing.allocate( 1 );
+
+	int UnitarySysNum( 1 );
+	int AirLoopNum( 1 );
+	bool FirstHVACIteration( true );
+	HVACUnitarySystem::NumUnitarySystem = 2; // Need to be one more than calls to unitarysystem in order to prevent deallocation of fields arrays
+
+	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
+
+	UnitarySystem.allocate( HVACUnitarySystem::NumUnitarySystem );
+	UnitarySystem( UnitarySysNum ).UnitarySystemType = "AirLoopHVAC:UnitarySystem";
+	UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
+	UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
+
+	UnitarySystemNumericFields.allocate( 1 );
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames.allocate( 20 );
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 3 ) = "Cooling Supply Air Flow Rate";
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 7 ) = "Heating Supply Air Flow Rate";
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 11 ) = "No Load Supply Air Flow Rate";
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 17 ) = "Maximum Supply Air Temperature";
+	UnitarySystemNumericFields( UnitarySysNum ).FieldNames( 18 ) = "Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation";
+
+	// test cooling only sizing
+	UnitarySystem( UnitarySysNum ).FanExists = true;
+	UnitarySystem( UnitarySysNum ).CoolCoilExists = true;
+	UnitarySystem( UnitarySysNum ).HeatCoilExists = false;
+
+	UnitarySystem( UnitarySysNum ).Name = "UnitarySystem:CoolingOnly";
+	UnitarySystem( UnitarySysNum ).CoolingSAFMethod = DataSizing::FractionOfAutosizedCoolingAirflow;
+	UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = AutoSize;
+	UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 1.0;
+	UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+	UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
+	UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
+
+	// With Test Fan 3 fan heat - this fails before the #6026 fix in HVACUnitarySystem (and in ReportSizingManager)
+	UnitarySystem( UnitarySysNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+	UnitarySystem( UnitarySysNum ).FanIndex = 2; // Fan:SystemModel is zero-based subscripts, so 2 is 3
+	Real64 expectedSize = 18976.394 + locDesignHeatGain3;
+
+	SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
+
+	EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow );
+	EXPECT_NEAR( expectedSize, UnitarySystem( UnitarySysNum ).DesignCoolingCapacity, 0.001 );
+
+    // reset for next test
+	UnitarySystem(UnitarySysNum).DesignCoolingCapacity = AutoSize;
+	UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow = 1.0;
+	UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow = AutoSize;
+	UnitarySystem(UnitarySysNum).MaxNoCoolHeatAirVolFlow = AutoSize;
+	UnitarySystem(UnitarySysNum).DesignFanVolFlowRate = AutoSize;
+
+	// With Test Fan 4 fan heat
+	UnitarySystem(UnitarySysNum).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+	UnitarySystem(UnitarySysNum).FanIndex = 1; // Fan:ConstantVolume is one-based subscripts, so 1 is 1
+	expectedSize = 18976.394 + locDesignHeatGain4;
+
+	SizeUnitarySystem(UnitarySysNum, FirstHVACIteration, AirLoopNum);
+
+	EXPECT_EQ(1.005, UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow);
+	EXPECT_NEAR(expectedSize, UnitarySystem(UnitarySysNum).DesignCoolingCapacity, 0.001);
+
+
+
+	// clean
+	DataSizing::NumSysSizInput = 0;
+	FinalSysSizing.deallocate();
+	PrimaryAirSystem.deallocate();
+	SysSizInput.deallocate();
+	UnitarySysEqSizing.deallocate();
+	OASysEqSizing.deallocate();
+}

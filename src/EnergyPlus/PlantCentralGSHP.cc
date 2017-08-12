@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -314,9 +302,6 @@ namespace PlantCentralGSHP {
 		//  flow (or sourse side) rate is calculated from the reference capacity, the COP, and the condenser
 		//  loop design delta T.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
@@ -325,22 +310,12 @@ namespace PlantCentralGSHP {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::DisplayExtraWarnings;
 		using namespace OutputReportPredefined;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeCGSHPChillerHeater" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
@@ -455,9 +430,9 @@ namespace PlantCentralGSHP {
 				// each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
 				if ( PltSizNum > 0 ) {
 					if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0 ) {
-						Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+						Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 						tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate;
 						if ( ! Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCoolingWasAutoSized ) tmpNomCap = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling;
 					} else {
@@ -517,7 +492,7 @@ namespace PlantCentralGSHP {
 				// each individule chiller heater module is sized to be capable of supporting the total load on the wrapper
 				if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, RoutineName );
 						Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).TempRefCondIn, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, RoutineName );
 						tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCOPCooling ) * Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).OpenMotorEff ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 						Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).tmpCondVolFlowRate = tmpCondVolFlowRate;
@@ -1277,13 +1252,9 @@ namespace PlantCentralGSHP {
 		// METHODOLOGY EMPLOYED:
 		//  Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
-		using DataGlobals::InitConvTemp;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CentralGroundSourceHeatPump;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -1298,17 +1269,8 @@ namespace PlantCentralGSHP {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitCGSHPHeatPump" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyWrapperOneTimeFlag( true ); // Flag used to execute code only once
@@ -1439,7 +1401,7 @@ namespace PlantCentralGSHP {
 					Wrapper( WrapperNum ).GLHEVolFlowRate += Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondVolFlowRate;
 				}
 
-				rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 				Wrapper( WrapperNum ).CHWMassFlowRateMax = Wrapper( WrapperNum ).CHWVolFlowRate * rho;
 				Wrapper( WrapperNum ).HWMassFlowRateMax = Wrapper( WrapperNum ).HWVolFlowRate * rho;
@@ -1572,7 +1534,6 @@ namespace PlantCentralGSHP {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::InitConvTemp;
 		using DataHVACGlobals::SmallLoad;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveMinMaxValues;
@@ -1582,20 +1543,9 @@ namespace PlantCentralGSHP {
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcChillerHeaterModel" );
 		static std::string const RoutineNameElecEIRChiller( "CalcElectricEIRChillerModel" );
-
-		//CHARACTER(len=*), PARAMETER :: OutputFormat  = '(F6.2)'
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool IsLoadCoolRemaining( true );
@@ -1719,7 +1669,7 @@ namespace PlantCentralGSHP {
 
 				// Calculate density ratios to adjust mass flow rates from initialized ones
 				// Hot water temperature is known, but evaporator mass flow rates will be adjusted in the following "Do" loop
-				InitDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+				InitDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 				EvapDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 				CondDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 
@@ -2045,7 +1995,6 @@ namespace PlantCentralGSHP {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::InitConvTemp;
 		using DataHVACGlobals::SmallLoad;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveMinMaxValues;
@@ -2055,20 +2004,9 @@ namespace PlantCentralGSHP {
 		using General::RoundSigDigits;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcChillerHeaterModel" );
 		static std::string const RoutineNameElecEIRChiller( "CalcElectricEIRChillerModel" );
-
-		//CHARACTER(len=*), PARAMETER :: OutputFormat  = '(F6.2)'
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool IsLoadHeatRemaining( true ); // Ture if heating load remains for this chiller heater
@@ -2183,7 +2121,7 @@ namespace PlantCentralGSHP {
 
 				// Calculate density ratios to adjust mass flow rates from initialized ones
 				// Hot water temperature is known, but condenser mass flow rates will be adjusted in the following "Do" loop
-				InitDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+				InitDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 				EvapDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 				CondDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 

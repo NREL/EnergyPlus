@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataPlant_hh_INCLUDED
 #define DataPlant_hh_INCLUDED
@@ -100,7 +88,6 @@ namespace DataPlant {
 	enum OpSchemeType { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11 enum "class")
 		UnknownStatusOpSchemeType = -2,
 		NoControlOpSchemeType = -1, // Scheme Type placeholder for items such as pipes
-		LoadRBOpSchemeType = 0, // Scheme Type for Load Range Based Operation (Deprecated)
 		HeatingRBOpSchemeType = 1, // Scheme Type for Heating Load Range Based Operation
 		CoolingRBOpSchemeType = 2, // Scheme Type for Cooling  Load Range Based Operation
 		WetBulbRBOpSchemeType = 3, // Scheme Type for Wet bulb range based Operation
@@ -114,7 +101,7 @@ namespace DataPlant {
 		UncontrolledOpSchemeType = 11, // Scheme Type for Uncontrolled Operation
 		EMSOpSchemeType = 12, // Scheme Type for EMS based operation user Define scheme
 		PumpOpSchemeType = 13, // Not really an OpScheme, just a placeholder
-		DemandOpSchemeType = 14, // Plcaeholder for demand side equipment such as coils
+		DemandOpSchemeType = 14, // Placeholder for demand side equipment such as coils
 		FreeRejectionOpSchemeType = 15, // Scheme Type for waterside economizers and the like
 		WSEconOpSchemeType = 16, // Scheme Type for waterside economizers and the like
 		ThermalEnergyStorageSchemeType = 17 // Scheme Type for Simplified Thermal Energy Storage operation
@@ -298,6 +285,7 @@ namespace DataPlant {
 	extern int const TypeOf_Baseboard_Conv_Water;
 	extern int const TypeOf_Baseboard_Rad_Conv_Steam;
 	extern int const TypeOf_Baseboard_Rad_Conv_Water;
+	extern int const TypeOf_CoolingPanel_Simple;
 	extern int const TypeOf_LowTempRadiant_VarFlow;
 	extern int const TypeOf_LowTempRadiant_ConstFlow;
 	extern int const TypeOf_CooledBeamAirTerminal;
@@ -356,8 +344,6 @@ namespace DataPlant {
 	extern int const GenEquipTypes_Refrigeration;
 	extern int const GenEquipTypes_PlantComponent;
 	extern int const GenEquipTypes_CentralHeatPumpSystem;
-
-	extern Array1D_string const OpSchemeTypes; // long since Deprecated, remove?
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -882,6 +868,11 @@ namespace DataPlant {
 		int errCount_LoadRemains;
 		int errIndex_LoadRemains;
 		Real64 LoopSideInlet_TankTemp;
+		Real64 LoopSideInlet_MdotCpDeltaT;
+		Real64 LoopSideInlet_McpDTdt;
+		Real64 LoopSideInlet_CapExcessStorageTime;
+		Real64 LoopSideInlet_CapExcessStorageTimeReport;
+		Real64 LoopSideInlet_TotalTime;
 		PlantConvergencePoint InletNode;
 		PlantConvergencePoint OutletNode;
 
@@ -927,6 +918,11 @@ namespace DataPlant {
 			errCount_LoadRemains( 0 ),
 			errIndex_LoadRemains( 0 ),
 			LoopSideInlet_TankTemp( 0.0 ),
+			LoopSideInlet_MdotCpDeltaT(0.0),
+			LoopSideInlet_McpDTdt(0.0),
+			LoopSideInlet_CapExcessStorageTime(0.0),
+			LoopSideInlet_CapExcessStorageTimeReport(0.0),
+			LoopSideInlet_TotalTime(0.0),
 			InletNode( 0.0, 0.0 ),
 			OutletNode( 0.0, 0.0 )
 		{}
@@ -958,6 +954,7 @@ namespace DataPlant {
 		Real64 MaxMassFlowRate; // Maximum flow rate allowed in the loop
 		Real64 Volume; // Volume of the fluid in the loop
 		bool VolumeWasAutoSized; //true if Volume was set to autocalculate
+		Real64 CirculationTime; // Loop circulation time [minutes] used to autocalculate loop volume, default is 2 minutes
 		Real64 Mass; // Mass of the fluid in the loop
 		bool EMSCtrl;
 		Real64 EMSValue;
@@ -1010,6 +1007,7 @@ namespace DataPlant {
 			MaxMassFlowRate( 0.0 ),
 			Volume( 0.0 ),
 			VolumeWasAutoSized ( false ), //true if Volume was set to autocalculate
+			CirculationTime( 2.0 ),
 			Mass( 0.0 ),
 			EMSCtrl( false ),
 			EMSValue( 0.0 ),

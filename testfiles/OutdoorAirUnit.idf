@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.7;
 
   Building,
     Building,                !- Name
@@ -455,10 +455,11 @@
     AIR 6MM,                 !- Layer 2
     CLEAR 6MM;               !- Layer 3
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Zone2OAUHeatingCoil,     !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
-    0.77,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.77,                    !- Burner Efficiency
     30000,                   !- Nominal Capacity {W}
     Zone2OAUHCoilIn,         !- Air Inlet Node Name
     Zone2OAUHCoilout;        !- Air Outlet Node Name
@@ -562,13 +563,11 @@
 
   Branch,
     Zone2ChWBranch2,         !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     Zone2OAUWCcoil2,         !- Component 1 Name
     Zone2OAUChWInletNode2,   !- Component 1 Inlet Node Name
-    Zone2OAUChWOutletNode2,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone2OAUChWOutletNode2;  !- Component 1 Outlet Node Name
 
   NodeList,
     Hot Water Loop Setpoint Node List,  !- Name
@@ -664,27 +663,39 @@
     Zone5OAUFanOutletNode,   !- Supply FanOutlet Node Name
     Zone5OAUEquip1;          !- Outdoor Air Unit List Name
 
-  Fan:ConstantVolume,
-    Zone5OAUFan1,            !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Zone5OAUOANode,          !- Air Inlet Node Name
-    Zone5OAUFanOutletNode;   !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone5OAUFan1 , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  Zone5OAUOANode,  !- Air Inlet Node Name
+  Zone5OAUFanOutletNode,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.5; !- Fan Total Efficiency 
 
-  Fan:ConstantVolume,
-    Zone5OAUExhaustFan1,     !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
-    Zone5OAU Relief Node;    !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone5OAUExhaustFan1 , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
+  Zone5OAU Relief Node,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.5; !- Fan Total Efficiency 
 
   ZoneHVAC:OutdoorAirUnit:EquipmentList,
     Zone5OAUEquip1,          !- Name
@@ -709,30 +720,45 @@
     1,                       !- Nominal Process Air Flow Rate {m3/s}
     2.5,                     !- Nominal Process Air Velocity {m/s}
     10,                      !- Rotor Power {W}
-    Coil:Heating:Gas,        !- Regeneration Coil Object Type
+    Coil:Heating:Fuel,       !- Regeneration Coil Object Type
     Desiccant Regen Coil,    !- Regeneration Coil Name
-    Fan:VariableVolume,      !- Regeneration Fan Object Type
+    Fan:SystemModel,      !- Regeneration Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Fan Name
     DEFAULT;                 !- Performance Model Type
 
-  Fan:VariableVolume,
-    Desiccant Regen Fan,     !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    600.0,                   !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
-    ,                        !- Fan Power Minimum Flow Fraction
-    0.0,                     !- Fan Power Minimum Air Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    0,                       !- Fan Power Coefficient 1
-    1,                       !- Fan Power Coefficient 2
-    0,                       !- Fan Power Coefficient 3
-    0,                       !- Fan Power Coefficient 4
-    0,                       !- Fan Power Coefficient 5
-    Outside Air Inlet Node 2,!- Air Inlet Node Name
-    Regen Coil Inlet Node;   !- Air Outlet Node Name
+Fan:SystemModel,
+  Desiccant Regen Fan , !- Name
+  FanAndCoilAvailSched , !- Availability Schedule Name
+  Outside Air Inlet Node 2,  !- Air Inlet Node Name
+  Regen Coil Inlet Node,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Continuous , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  600.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.7,  !- Fan Total Efficiency 
+  VAV Fan Curve, !- Electric Power Function of Flow Fraction Curve Name
+  , !- Night Ventilation Mode Pressure Rise
+  , !- Night Ventilation Mode Flow Fraction
+  , !- Motor Loss Zone Name
+  , !- Motor Loss Radiative Fraction 
+  Fan Energy; !- End-Use Subcategory
+
+Curve:Linear,
+  VAV Fan Curve,
+  0, ! constant
+  1, ! x coef
+  0, ! min x
+  1, ! max x
+  0, ! min output
+  1, ! max output
+  Dimensionless,
+  Dimensionless;
 
   HeatExchanger:AirToAir:FlatPlate,
     Zone5A2AHeat Recovery,   !- Name
@@ -751,10 +777,11 @@
     Zone5OAUZoneOutletNode,  !- Secondary Air Inlet Node Name
     Heat Recovery Secondary Outlet Node;  !- Secondary Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Desiccant Regen Coil,    !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.80,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.80,                    !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Regen Coil Inlet Node,   !- Air Inlet Node Name
     Regen Coil Out Node;     !- Air Outlet Node Name
@@ -851,7 +878,7 @@
     5;                       !- Loop Design Temperature Difference {deltaC}
 
   Sizing:Plant,
-    Hot Water Loop,      !- Plant or Condenser Loop Name
+    Hot Water Loop,          !- Plant or Condenser Loop Name
     Heating,                 !- Loop Type
     82,                      !- Design Loop Exit Temperature {C}
     5;                       !- Loop Design Temperature Difference {deltaC}
@@ -1031,16 +1058,22 @@
     Zone5OAUFanOutletNode2,  !- Supply FanOutlet Node Name
     Zone5OAUEquip2;          !- Outdoor Air Unit List Name
 
-  Fan:ConstantVolume,
-    Zone5OAUFan2,            !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Zone5DESHCoilOut2,       !- Air Inlet Node Name
-    Zone5OAUZoneInletNode2;  !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone5OAUFan2 , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  Zone5DESHCoilOut2,  !- Air Inlet Node Name
+  Zone5OAUZoneInletNode2,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   Coil:Heating:Water,
     Zone5OAUWaterHCoil,      !- Name
@@ -1075,16 +1108,22 @@
     Coil:Heating:Water,      !- Component 2 Object Type
     Zone5OAUWaterHCoil;      !- Component 2 Name
 
-  Fan:ConstantVolume,
-    Zone5OAUextFan1,         !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Zone5OAUZoneOutletNode2, !- Air Inlet Node Name
-    OutAir5;                 !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone5OAUextFan1 , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  Zone5OAUZoneOutletNode2,  !- Air Inlet Node Name
+  OutAir5,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   Coil:Cooling:DX:SingleSpeed,
     ACDXCoil 52,             !- Name
@@ -1102,16 +1141,22 @@
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR;           !- Part Load Fraction Correlation Curve Name
 
-  Fan:ConstantVolume,
-    Zone3OAUextFan,          !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    HXoutnode3,              !- Air Inlet Node Name
-    OutAir3;                 !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone3OAUextFan , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  HXoutnode3,  !- Air Inlet Node Name
+  OutAir3,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   Coil:Cooling:Water,
     Zone4OAUWCcoil,          !- Name
@@ -1132,13 +1177,11 @@
 
   Branch,
     Zone4ChWBranch,          !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     Zone4OAUWCcoil,          !- Component 1 Name
     Zone4OAUChWInletNode,    !- Component 1 Inlet Node Name
-    Zone4OAUChWOutletNode,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone4OAUChWOutletNode;   !- Component 1 Outlet Node Name
 
   BranchList,
     Cooling Demand Side Branches,  !- Name
@@ -1228,27 +1271,39 @@
     Zone4OAUZoneOutletNode,  !- Secondary Air Inlet Node Name
     HXoutnode4;              !- Secondary Air Outlet Node Name
 
-  Fan:ConstantVolume,
-    Zone4OAUFan,             !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Zone4OAUOANode,          !- Air Inlet Node Name
-    Zone4OAUFanOutletNode;   !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone4OAUFan , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  Zone4OAUOANode,  !- Air Inlet Node Name
+  Zone4OAUFanOutletNode,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
-  Fan:ConstantVolume,
-    Zone4OAUextFan,          !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    HXoutnode4,              !- Air Inlet Node Name
-    OutAir4;                 !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone4OAUextFan , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  HXoutnode4,  !- Air Inlet Node Name
+  OutAir4,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
@@ -1267,93 +1322,75 @@
 
   Branch,
     Heating Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HW Circ Pump,            !- Component 1 Name
     HW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    HW Pump Outlet Node,     !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    HW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     Heating Purchased Hot Water Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictHeating,         !- Component 1 Object Type
     Purchased Heating,       !- Component 1 Name
     Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Heating Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Side Bypass,  !- Component 1 Name
     Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Heating Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Heating Supply Outlet,   !- Component 1 Name
     Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     ZonesHWInletBranch,      !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWInletPipe,        !- Component 1 Name
     HW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     ZonesHWOutletBranch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWOutletPipe,       !- Component 1 Name
     HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    HW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
   Branch,
     Zone3HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Zone3OAUWaterHCoil,      !- Component 1 Name
     Zone3OAUHWInletNode,     !- Component 1 Inlet Node Name
-    Zone3OAUHWOutletNode,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone3OAUHWOutletNode;    !- Component 1 Outlet Node Name
 
   Branch,
     Zone4HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Zone4OAUWaterHCoil,      !- Component 1 Name
     Zone4OAUHWInletNode,     !- Component 1 Inlet Node Name
-    Zone4OAUHWOutletNode,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone4OAUHWOutletNode;    !- Component 1 Outlet Node Name
 
   Branch,
     ZonesHWBypassBranch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesHWBypassPipe,       !- Component 1 Name
     ZonesHWBypassInletNode,  !- Component 1 Inlet Node Name
-    ZonesHWBypassOutletNode, !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    ZonesHWBypassOutletNode; !- Component 1 Outlet Node Name
 
   Coil:Heating:Water,
     Zone3OAUWaterHCoil,      !- Name
@@ -1374,13 +1411,11 @@
 
   Branch,
     Zone5HWBranch,           !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     Zone5OAUWaterHCoil,      !- Component 1 Name
     Zone5OAUHWInletNode,     !- Component 1 Inlet Node Name
-    Zone5OAUHWOutletNode,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone5OAUHWOutletNode;    !- Component 1 Outlet Node Name
 
   BranchList,
     Heating Supply Side Branches,  !- Name
@@ -1456,16 +1491,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    0.002,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    900,                     !- Rated Power Consumption {W}
+    0.002,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    900,                     !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictHeating,
@@ -1603,16 +1638,22 @@
     Zone 3 Node,             !- Zone Air Node Name
     Zone 3 Outlet Node;      !- Zone Return Air Node Name
 
-  Fan:ConstantVolume,
-    Zone3OAUFan,             !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Zone3OAUHCOutletNode,    !- Air Inlet Node Name
-    Zone3OAUZoneInletNode;   !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone3OAUFan , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  Zone3OAUHCOutletNode,  !- Air Inlet Node Name
+  Zone3OAUZoneInletNode,  !- Air Outlet Node Name
+  0.42 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System 3,!- Name
@@ -1686,90 +1727,74 @@
     Zone2OAUHX,              !- Component 1 Name
     coil:cooling:water,      !- Component 2 Object Type
     Zone2OAUWCcoil,          !- Component 2 Name
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Zone2OAUHeatingCoil,     !- Component 3 Name
     Coil:Cooling:Water,      !- Component 4 Object Type
     Zone2OAUWCcoil2;         !- Component 4 Name
 
   Branch,
     Cooling Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     ChW Circ Pump,           !- Component 1 Name
     ChW Supply Inlet Node,   !- Component 1 Inlet Node Name
-    ChW Pump Outlet Node,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ChW Pump Outlet Node;    !- Component 1 Outlet Node Name
 
   Branch,
     Cooling Purchased Chilled Water Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     DistrictCooling,         !- Component 1 Object Type
     Purchased Cooling,       !- Component 1 Name
     Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Cooling Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Purchased Cooling Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Cooling Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Cooling Supply Side Bypass,  !- Component 1 Name
     Cooling Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cooling Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cooling Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Cooling Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Cooling Supply Outlet,   !- Component 1 Name
     Cooling Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    ChW Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    ChW Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     ZonesChWInletBranch,     !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesChWInletPipe,       !- Component 1 Name
     ChW Demand Inlet Node,   !- Component 1 Inlet Node Name
-    ChW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    ChW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     ZonesChWOutletBranch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesChWOutletPipe,      !- Component 1 Name
     ChW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    ChW Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    ChW Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Zone2ChWBranch,          !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     Zone2OAUWCcoil,          !- Component 1 Name
     Zone2OAUChWInletNode,    !- Component 1 Inlet Node Name
-    Zone2OAUChWOutletNode,   !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Zone2OAUChWOutletNode;   !- Component 1 Outlet Node Name
 
   Branch,
     ZonesChWBypassBranch,    !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ZonesChWBypassPipe,      !- Component 1 Name
     ZonesChWBypassInletNode, !- Component 1 Inlet Node Name
-    ZonesChWBypassOutletNode,!- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    ZonesChWBypassOutletNode;!- Component 1 Outlet Node Name
 
   BranchList,
     Cooling Supply Side Branches,  !- Name
@@ -1812,16 +1837,16 @@
     ChW Circ Pump,           !- Name
     ChW Supply Inlet Node,   !- Inlet Node Name
     ChW Pump Outlet Node,    !- Outlet Node Name
-    0.004,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    1800,                    !- Rated Power Consumption {W}
+    0.004,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1800,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictCooling,
@@ -1968,27 +1993,39 @@
     Zone2OAUOANode,          !- Name
     -1.0;                    !- Height Above Ground {m}
 
-  Fan:ConstantVolume,
-    Zone2OAUFan,             !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Zone2OAUOANode,          !- Air Inlet Node Name
-    Zone2OAUFanOutletNode;   !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone2OAUFan , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  Zone2OAUOANode,  !- Air Inlet Node Name
+  Zone2OAUFanOutletNode,  !- Air Outlet Node Name
+  0.42 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
-  Fan:ConstantVolume,
-    Zone2OAUExhaustFan,      !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    0.42,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    HXoutnode2,              !- Air Inlet Node Name
-    Zone2OAU Relief Node;    !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone2OAUExhaustFan , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  HXoutnode2,  !- Air Inlet Node Name
+  Zone2OAU Relief Node,  !- Air Outlet Node Name
+  0.42 , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -2226,16 +2263,22 @@
     Zone1OAUFanOutletNode,   !- Supply FanOutlet Node Name
     Zone1OAEQLIST;           !- Outdoor Air Unit List Name
 
-  Fan:ConstantVolume,
-    Zone1OAUextFan,          !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    HXoutnode,               !- Air Inlet Node Name
-    OutAir1;                 !- Air Outlet Node Name
+Fan:SystemModel,
+  Zone1OAUextFan , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  HXoutnode,  !- Air Inlet Node Name
+  OutAir1,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   ZoneHVAC:OutdoorAirUnit:EquipmentList,
     Zone1OAEQLIST,           !- Name
@@ -3448,16 +3491,23 @@
     Zone1OAUOANode,          !- Name
     -1.0;                    !- Height Above Ground {m}
 
-  Fan:ConstantVolume,
-    Zone1OAUFan,             !- Name
-    OAUnitOASched_01,        !- Availability Schedule Name
-    0.5,                     !- Fan Total Efficiency
-    75.0,                    !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
-    Z1OAFanIn,               !- Air Inlet Node Name
-    Zone1OAUZoneInletNode;   !- Air Outlet Node Name
+
+Fan:SystemModel,
+  Zone1OAUFan , !- Name
+  OAUnitOASched_01 , !- Availability Schedule Name
+  Z1OAFanIn,  !- Air Inlet Node Name
+  Zone1OAUZoneInletNode,  !- Air Outlet Node Name
+  AUTOSIZE , !- Design Maximum Air Flow Rate
+  Discrete , !- Speed Control Method
+  0.0, !- Electric Power Minimum Flow Rate Fraction
+  75.0, !- Design Pressure Rise
+  0.9 , !- Motor Efficiency
+  1.0 , !- Motor In Air Stream Fraction
+  AUTOSIZE, !- Design Electric Power Consumption
+  TotalEfficiencyAndPressure, !- Design Power Sizing Method
+  , !- Electric Power Per Unit Flow Rate
+  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+  0.50;  !- Fan Total Efficiency 
 
   Output:Variable,*,Zone Air Temperature,hourly;
 

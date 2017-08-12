@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef HeatingCoils_hh_INCLUDED
 #define HeatingCoils_hh_INCLUDED
@@ -84,6 +72,7 @@ namespace HeatingCoils {
 	extern int const COIL_DX_MULTISPEED;
 	extern int const COIL_DX_MULTIMODE;
 	extern int const CONDENSER_REFRIGERATION;
+	extern int const COIL_DX_VARIABLE_COOLING;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -119,6 +108,7 @@ namespace HeatingCoils {
 		std::string HeatingCoilType; // Type of HeatingCoil ie. Heating or Cooling
 		std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
 		int HCoilType_Num;
+		int FuelType_Num; // Type of fuel used, reference resource type integers
 		std::string Schedule; // HeatingCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		int InsuffTemperatureWarn; // Used for recurring error message
@@ -132,9 +122,9 @@ namespace HeatingCoils {
 		Real64 OutletAirEnthalpy;
 		Real64 HeatingCoilLoad; // Total Load on the Coil [J]
 		Real64 HeatingCoilRate; // Total Coil Rate on the Coil [W]
-		Real64 GasUseLoad; // Gas Usage of Coil [J]
+		Real64 FuelUseLoad; // Fuel Usage of Coil [J]
 		Real64 ElecUseLoad; // Electric Usage of Coil [J]
-		Real64 GasUseRate; // Gas Usage of Coil [W]
+		Real64 FuelUseRate; // Fuel Usage of Coil [W]
 		Real64 ElecUseRate; // Electric Usage of Coil [W]
 		Real64 Efficiency; // HeatingCoil Efficiency Value
 		Real64 NominalCapacity; // Nominal Capacity of Coil [W]
@@ -147,11 +137,11 @@ namespace HeatingCoils {
 		int Control;
 		int PLFCurveIndex; // Index for part-load factor curve index for gas heating coil
 		Real64 ParasiticElecLoad; // parasitic electric load associated with the gas heating coil
-		Real64 ParasiticGasLoad; // parasitic gas load associated with the gas heating coil
+		Real64 ParasiticFuelLoad; // parasitic fuel load associated with the gas heating coil
 		// (standing pilot light) [J]
-		Real64 ParasiticGasRate; // avg. parasitic gas consumption rate with the gas heating coil
+		Real64 ParasiticFuelRate; // avg. parasitic fuel consumption rate with the gas heating coil
 		// (standing pilot light) [J]
-		Real64 ParasiticGasCapacity; // capacity of parasitic gas consumption rate, input by user [W]
+		Real64 ParasiticFuelCapacity; // capacity of parasitic fuel consumption rate, input by user [W]
 		Real64 RTF; // Heater runtime fraction, including PLF curve impacts
 		int RTFErrorIndex; // used in recurring error warnings
 		int RTFErrorCount; // used in recurring error warnings
@@ -171,10 +161,14 @@ namespace HeatingCoils {
 		Array1D< Real64 > MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
 		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
-
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		
 		// Default Constructor
 		HeatingCoilEquipConditions() :
 			HCoilType_Num( 0 ),
+			FuelType_Num( 0 ),
 			SchedPtr( 0 ),
 			InsuffTemperatureWarn( 0 ),
 			InletAirMassFlowRate( 0.0 ),
@@ -187,9 +181,9 @@ namespace HeatingCoils {
 			OutletAirEnthalpy( 0.0 ),
 			HeatingCoilLoad( 0.0 ),
 			HeatingCoilRate( 0.0 ),
-			GasUseLoad( 0.0 ),
+			FuelUseLoad( 0.0 ),
 			ElecUseLoad( 0.0 ),
-			GasUseRate( 0.0 ),
+			FuelUseRate( 0.0 ),
 			ElecUseRate( 0.0 ),
 			Efficiency( 0.0 ),
 			NominalCapacity( 0.0 ),
@@ -202,9 +196,9 @@ namespace HeatingCoils {
 			Control( 0 ),
 			PLFCurveIndex( 0 ),
 			ParasiticElecLoad( 0.0 ),
-			ParasiticGasLoad( 0.0 ),
-			ParasiticGasRate( 0.0 ),
-			ParasiticGasCapacity( 0.0 ),
+			ParasiticFuelLoad( 0.0 ),
+			ParasiticFuelRate( 0.0 ),
+			ParasiticFuelCapacity( 0.0 ),
 			RTF( 0.0 ),
 			RTFErrorIndex( 0 ),
 			RTFErrorCount( 0 ),
@@ -214,7 +208,10 @@ namespace HeatingCoils {
 			ReclaimHeatingSource( 0 ),
 			NumOfStages( 0 ),
 			DesiccantRegenerationCoil( false ),
-			DesiccantDehumNum( 0 )
+			DesiccantDehumNum( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 		{}
 
 	};
@@ -296,7 +293,7 @@ namespace HeatingCoils {
 	);
 
 	void
-	CalcGasHeatingCoil(
+	CalcFuelHeatingCoil(
 		int const CoilNum, // index to heating coil
 		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
