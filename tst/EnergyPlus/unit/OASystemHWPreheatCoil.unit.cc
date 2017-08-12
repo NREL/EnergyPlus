@@ -164,8 +164,7 @@ namespace EnergyPlus {
 			"    Outdoor Air Mixer Inlet Node,  !- Supply Side Inlet Node Name",
 			"    Return Air Mixer Outlet, !- Demand Side Outlet Node Name",
 			"    Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names",
-			"    Air Loop Outlet Node,    !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"    Air Loop Outlet Node;    !- Supply Side Outlet Node Names",
 
 			"  AirLoopHVAC:SupplyPath,",
 			"    OASysSupplyPath,         !- Name",
@@ -1142,8 +1141,7 @@ namespace EnergyPlus {
 			"    Outdoor Air Mixer Inlet Node,  !- Supply Side Inlet Node Name",
 			"    Return Air Mixer Outlet, !- Demand Side Outlet Node Name",
 			"    Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names",
-			"    Air Loop Outlet Node,    !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"    Air Loop Outlet Node;    !- Supply Side Outlet Node Names",
 
 			"  AirLoopHVAC:SupplyPath,",
 			"    OASysSupplyPath,         !- Name",

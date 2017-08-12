@@ -197,8 +197,7 @@ namespace HVACSingleDuctInduc {
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
 		int const ZoneNum, // index of zone served by the terminal unit
 		int const ZoneNodeNum, // zone node number of zone served by the terminal unit
-		int & CompIndex, // which terminal unit in data structure
-		int const ControlledZoneNum // controlled zone equip number
+		int & CompIndex // which terminal unit in data structure
 	);
 
 	void
@@ -207,8 +206,7 @@ namespace HVACSingleDuctInduc {
 	void
 	InitIndUnit(
 		int const IUNum, // number of the current induction unit being simulated
-		bool const FirstHVACIteration, // TRUE if first air loop solution this HVAC step
-		int const ControlledZoneNum // controlled zone equip number
+		bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
 	);
 
 	void

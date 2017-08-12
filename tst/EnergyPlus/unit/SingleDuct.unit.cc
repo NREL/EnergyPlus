@@ -139,7 +139,6 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData(ErrorsFound);
 	ASSERT_FALSE(ErrorsFound);
-	DataSizing::TermUnitSizing.allocate( 1 );
 	DataZoneEquipment::GetZoneEquipmentData1();
 	ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 	SingleDuct::GetSysInput();
@@ -311,7 +310,6 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData(ErrorsFound);
 	ASSERT_FALSE(ErrorsFound);
-	DataSizing::TermUnitSizing.allocate( 1 );
 	DataZoneEquipment::GetZoneEquipmentData1();
 	ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 	SingleDuct::GetSysInput();
@@ -721,8 +719,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name",
 		"    Demand Out Node,         !- Demand Side Outlet Node Name",
 		"    Zone Eq In Node,         !- Demand Side Inlet Node Names",
-		"    VAV Sys 1 Outlet Node,   !- Supply Side Outlet Node Names",
-		"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+		"    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names",
 
 		"  AirLoopHVAC:SupplyPath,",
 		"    Zone Supply Air Path 1,  !- Name",

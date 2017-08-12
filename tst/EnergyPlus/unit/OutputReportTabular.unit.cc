@@ -2092,8 +2092,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
 		"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
 		"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
-		"  DOAS Supply Fan Outlet,  !- Supply Side Outlet Node Names",
-		"  1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+		"  DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
 
 		"BranchList,",
 		"  DOAS Branches,           !- Name",
@@ -3070,8 +3069,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 		"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
 		"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
 		"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
-		"  DOAS Supply Fan Outlet,  !- Supply Side Outlet Node Names",
-		"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+		"  DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
 
 		"BranchList,",
 		"  DOAS Branches,           !- Name",

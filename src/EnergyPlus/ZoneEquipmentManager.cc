@@ -3152,7 +3152,7 @@ namespace ZoneEquipmentManager {
 				SysOutputProvided = 0.0;
 				LatOutputProvided = 0.0;
 				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
-				CurTermUnitSizingNum = ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex( EquipTypeNum );
+				CurTermUnitSizingNum = ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex( EquipPtr );
 
 				// Reset ZoneEqSizing data (because these may change from one equipment type to the next)
 				if ( FirstPassZoneEquipFlag ) {

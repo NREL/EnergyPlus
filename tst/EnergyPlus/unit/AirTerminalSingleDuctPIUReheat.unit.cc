@@ -55,7 +55,6 @@
 
 
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -182,7 +181,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 

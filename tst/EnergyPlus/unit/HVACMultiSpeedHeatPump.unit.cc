@@ -55,7 +55,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -66,7 +65,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus::BranchInputManager;
@@ -764,8 +762,7 @@ namespace EnergyPlus {
 			"    AC-24 airloop inlet node,!- Supply Side Inlet Node Name",
 			"    Z401 RA node,            !- Demand Side Outlet Node Name",
 			"    Z401 splitter inlet,     !- Demand Side Inlet Node Names",
-			"    AC-24 airloop outlet node,  !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"    AC-24 airloop outlet node;  !- Supply Side Outlet Node Names",
 
 			"  AirLoopHVAC,",
 			"    Z402 airloop,            !- Name",
@@ -777,8 +774,7 @@ namespace EnergyPlus {
 			"    AC-25 airloop inlet node,!- Supply Side Inlet Node Name",
 			"    Z402 RA node,            !- Demand Side Outlet Node Name",
 			"    Z402 splitter inlet,     !- Demand Side Inlet Node Names",
-			"    AC-25 airloop outlet node,  !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"    AC-25 airloop outlet node;  !- Supply Side Outlet Node Names",
 
 			"!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM:EQUIPMENTLIST ===========",
 
@@ -1236,7 +1232,6 @@ namespace EnergyPlus {
 			EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
 			// Get Zone Equipment Configuration ata
-            DataSizing::TermUnitSizing.allocate( 2 );
 			DataZoneEquipment::GetZoneEquipmentData();
 			MixedAir::GetOutsideAirSysInputs();
 			MixedAir::GetOAControllerInputs();

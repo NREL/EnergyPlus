@@ -945,8 +945,7 @@ namespace EnergyPlus {
 		"    CV_1 Supply Equipment Inlet Node,  !- Supply Side Inlet Node Name",
 		"    CV_1 Zone Equipment Outlet Node,  !- Demand Side Outlet Node Name",
 		"    CV_1 Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names",
-		"    CV_1 Supply Equipment Outlet Node,  !- Supply Side Outlet Node Names",
-		"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+		"    CV_1 Supply Equipment Outlet Node;  !- Supply Side Outlet Node Names",
 
 		"  AvailabilityManagerAssignmentList,",
 		"    CV_1 Availability Manager List,  !- Name",

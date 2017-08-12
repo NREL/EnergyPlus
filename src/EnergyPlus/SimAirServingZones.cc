@@ -294,7 +294,7 @@ namespace SimAirServingZones {
 		InitAirLoops( FirstHVACIteration );
 
 		// Call the AirLoop Simulation
-		if ( SysSizingCalc && DoSizeAirLoops ) {
+		if ( SysSizingCalc ) {
 			SizeAirLoops();
 		} else if ( !SysSizingCalc ) {
 			SimAirLoops( FirstHVACIteration, SimZoneEquipment );

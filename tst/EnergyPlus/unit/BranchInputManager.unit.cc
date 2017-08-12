@@ -344,21 +344,20 @@ namespace EnergyPlus {
 		TEST_F( EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
 	{
 
-		std::string const idf_objects = delimited_string( {
-			" Version,8.5;",
+			std::string const idf_objects = delimited_string({
+				" Version,8.5;",
 
-			"AirLoopHVAC,",
-			"  DOAS,                    !- Name",
-			"  ,                        !- Controller List Name",
-			"  DOAS Availability Managers,  !- Availability Manager List Name",
-			"  autosize,                !- Design Supply Air Flow Rate {m3/s}",
-			"  DOAS Branches,           !- Branch List Name",
-			"  ,                        !- Connector List Name",
-			"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
-			"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
-			"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
-			"  DOAS Supply Fan Outlet,  !- Supply Side Outlet Node Names",
-			"  1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+				"AirLoopHVAC,",
+				"  DOAS,                    !- Name",
+				"  ,                        !- Controller List Name",
+				"  DOAS Availability Managers,  !- Availability Manager List Name",
+				"  autosize,                !- Design Supply Air Flow Rate {m3/s}",
+				"  DOAS Branches,           !- Branch List Name",
+				"  ,                        !- Connector List Name",
+				"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
+				"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
+				"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
+				"  DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
 
 			"AirLoopHVAC,",
 			"  Air Loop 1,                    !- Name",
@@ -370,8 +369,7 @@ namespace EnergyPlus {
 			"  Air Loop 1 Air Loop Inlet,     !- Supply Side Inlet Node Name",
 			"  Air Loop 1 Return Air Outlet,  !- Demand Side Outlet Node Name",
 			"  Air Loop 1 Supply Path Inlet,  !- Demand Side Inlet Node Names",
-			"  Air Loop 1 Supply Fan Outlet,  !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"  Air Loop 1 Supply Fan Outlet;  !- Supply Side Outlet Node Names",
 
 		} );
 

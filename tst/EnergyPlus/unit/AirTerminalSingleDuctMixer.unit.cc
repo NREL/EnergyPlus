@@ -337,7 +337,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetPTUnit();
@@ -584,7 +583,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetPTUnit();
@@ -911,7 +909,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetPTUnit();
@@ -1324,7 +1321,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetPTUnit();
@@ -1734,7 +1730,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetPTUnit();
@@ -2403,7 +2398,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 
@@ -3076,7 +3070,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 
@@ -4826,7 +4819,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 
@@ -6578,7 +6570,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 
@@ -6819,7 +6810,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetUnitVentilatorInput();
@@ -7052,7 +7042,6 @@ namespace EnergyPlus {
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		DataSizing::TermUnitSizing.allocate( 1 );
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetUnitVentilatorInput();

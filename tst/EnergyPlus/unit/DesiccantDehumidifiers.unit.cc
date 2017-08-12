@@ -2181,8 +2181,7 @@ namespace EnergyPlus {
 			"    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name",
 			"    PLENUM-1 Out Node,       !- Demand Side Outlet Node Name",
 			"    Zone Eq In Node,         !- Demand Side Inlet Node Names",
-			"    VAV Sys 1 Outlet Node,   !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names",
 
 			"  AirLoopHVAC:ControllerList,",
 			"    OA Sys 1 Controllers,    !- Name",
@@ -3632,8 +3631,7 @@ namespace EnergyPlus {
 			"    Desiccant DXSystem Air Loop Inlet Node,  !- Supply Side Inlet Node Name",
 			"    Desiccant DXSystem Return Air Mixer Outlet Node,  !- Demand Side Outlet Node Name",
 			"    Desiccant DXSystem Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names",
-			"    Desiccant DXSystem Air Loop Outlet Node,  !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"    Desiccant DXSystem Air Loop Outlet Node;  !- Supply Side Outlet Node Names",
 
 			"  AirLoopHVAC:ControllerList,",
 			"    Desiccant DXSystem OA System Controllers,  !- Name",
@@ -4803,8 +4801,7 @@ namespace EnergyPlus {
 			"    Desiccant DXSystem Air Loop Inlet Node,  !- Supply Side Inlet Node Name",
 			"    Desiccant DXSystem Return Air Mixer Outlet Node,  !- Demand Side Outlet Node Name",
 			"    Desiccant DXSystem Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names",
-			"    Desiccant DXSystem Air Loop Outlet Node,  !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"    Desiccant DXSystem Air Loop Outlet Node;  !- Supply Side Outlet Node Names",
 
 			"  AirLoopHVAC:ControllerList,",
 			"    Desiccant DXSystem OA System Controllers,  !- Name",

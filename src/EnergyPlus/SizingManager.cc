@@ -510,7 +510,6 @@ namespace SizingManager {
 			}
 			SimAir = true;
 			SimZoneEquip = true;
-			DoSizeAirLoops = true; // Now we want the airloops to size
 
 			ManageZoneEquipment( true, SimZoneEquip, SimAir );
 			ManageAirLoops( true, SimAir, SimZoneEquip );

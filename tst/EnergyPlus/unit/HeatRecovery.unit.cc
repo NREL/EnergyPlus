@@ -427,8 +427,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 			"   AHU air loop inlet,    !- Supply Side Inlet Node Name",
 			"   AHU return air outlet, !- Demand Side Outlet Node Name",
 			"   AHU Supply Path Inlet, !- Demand Side Inlet Node Names",
-			"   AHU Supply fan Outlet, !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"   AHU Supply fan Outlet; !- Supply Side Outlet Node Names",
 
 			" BranchList,",
 			"   AHU Branches,          !- Name",
@@ -3033,8 +3032,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
 		"    DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
 		"    DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
-		"    DOAS Supply Fan Outlet,  !- Supply Side Outlet Node Names",
-		"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+		"    DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
 
 		"AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
 		"    DOAS OA System Equipment,!- Name",

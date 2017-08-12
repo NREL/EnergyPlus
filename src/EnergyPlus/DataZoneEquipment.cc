@@ -737,7 +737,7 @@ namespace DataZoneEquipment {
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).OutNode = 0;
 				}
 			} else {
-				ShowContinueError( "Invalid Zone Air Inlet NOde or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				ShowContinueError( "Invalid Zone Air Inlet Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 				GetZoneEquipmentDataErrorsFound = true;
 			}
 

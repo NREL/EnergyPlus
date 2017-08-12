@@ -4168,8 +4168,7 @@ namespace EnergyPlus {
 			"    DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
 			"    DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
 			"    DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
-			"    DOAS Supply Fan Outlet,  !- Supply Side Outlet Node Names",
-			"    1.0;                     !- Design Return Air Flow Fraction of Supply Air Flow",
+			"    DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
 
 			"AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
 			"    DOAS OA System Equipment,!- Name",
