@@ -87,7 +87,7 @@ namespace DirectAirManager {
 		Real64 AirMassFlowFraction;
 		int ZoneEquipAirInletNode;
 		int AirTerminalSizingSpecIndex; // Pointer to DesignSpecification:AirTerminal:Sizing obect
-		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+		int TermUnitSizingNum; // index to TermUnitSizing and TermUnitFinalZoneSizing for this terminal unit
 		// Simulation Data
 		Real64 SensOutputProvided;
 		bool EMSOverrideAirFlow; // if true, EMS is calling to override flow rate

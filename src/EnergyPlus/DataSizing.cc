@@ -276,7 +276,7 @@ namespace DataSizing {
 	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
 	int NumZoneHVACSizing( 0 ); // Number of design specification zone HVAC sizing objects
 	int NumAirTerminalSizingSpec( 0 ); // Number of design specfication air terminal sizing objects
-	int NumAirTerminalUnits( 0 ); // Number of air terminal units
+	int NumAirTerminalUnits( 0 ); // Number of air terminal units (same as total number of zone inlet nodes)
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio

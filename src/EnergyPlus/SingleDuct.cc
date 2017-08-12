@@ -669,7 +669,7 @@ namespace SingleDuct {
 							} else {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
 
@@ -886,7 +886,7 @@ namespace SingleDuct {
 							} else {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
 						}
@@ -1060,7 +1060,7 @@ namespace SingleDuct {
 							} else {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).OutletNodeNum;
-								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
 						}
@@ -1213,7 +1213,7 @@ namespace SingleDuct {
 							} else {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
 
@@ -1328,7 +1328,7 @@ namespace SingleDuct {
 							} else {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
 						}
@@ -1570,7 +1570,7 @@ namespace SingleDuct {
 							} else {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
-								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
 						}
@@ -4937,19 +4937,27 @@ namespace SingleDuct {
 	AirTerminalMixerData::InitATMixer()
 	{
 		if ( this->OneTimeInitFlag ){
-			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqNum ) );
+			{ auto & thisADU( DataDefineEquip::AirDistUnit( this->ADUNum ) );
+			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( thisADU.ZoneEqNum ) );
 			for ( int SupAirIn = 1; SupAirIn <= thisZoneEqConfig.NumInletNodes; ++SupAirIn ) {
 				if ( this->ZoneInletNode == thisZoneEqConfig.InletNode( SupAirIn ) ) {
 					thisZoneEqConfig.AirDistUnitCool( SupAirIn ).InNode = this->PriInNode;
 					thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode = this->MixedAirOutNode;
-					//thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
 					thisZoneEqConfig.AirDistUnitHeat( SupAirIn ).InNode = this->PriInNode;
 					thisZoneEqConfig.AirDistUnitHeat( SupAirIn ).OutNode = this->MixedAirOutNode;
-					//thisZoneEqConfig.AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
-					DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
-					DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqAirDistHeatNum = SupAirIn;
+					thisADU.TermUnitSizingNum = thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+					// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this terminal unit
+					if ( thisADU.AirTerminalSizingSpecIndex > 0 ) {
+						{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( thisADU.AirTerminalSizingSpecIndex ) );
+						{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex ) );
+						thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
+						thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
+						thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
+						thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
+						thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
+					}}}
 				}
-			}}
+			}}}
 			this->OneTimeInitFlag = false;
 		}
 

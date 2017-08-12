@@ -418,9 +418,7 @@ namespace DataZoneEquipment {
 		InitUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
 
 		overallEquipCount = 0;
-		DataSizing::NumAirTerminalUnits = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" ) + InputProcessor::GetNumObjectsFound( "ZoneHVAC:AirDistributionUnit" );
-		DataSizing::TermUnitSizing.allocate( DataSizing::NumAirTerminalUnits );
-		int locTermUnitSizingIndex = 0; // will increment for every air distribution unit and direct air  unit
+		int locTermUnitSizingCounter = 0; // will increment for every zone inlet node
 
 		for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop ) {
 
@@ -529,7 +527,6 @@ namespace DataZoneEquipment {
 				ZoneEquipList( ControlledZoneNum ).EquipType_Num.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).EquipName.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).EquipIndex.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
-				ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).EquipData.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).CoolingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
@@ -537,7 +534,6 @@ namespace DataZoneEquipment {
 				ZoneEquipList( ControlledZoneNum ).EquipType_Num = 0;
 				ZoneEquipList( ControlledZoneNum ).EquipName = "";
 				ZoneEquipList( ControlledZoneNum ).EquipIndex = 0;
-				ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex = 0;
 				ZoneEquipList( ControlledZoneNum ).CoolingPriority = 0;
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority = 0;
 
@@ -573,17 +569,9 @@ namespace DataZoneEquipment {
 
 					if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
-						// Increment terminal unit sizing index and cross-reference
-						++locTermUnitSizingIndex;
-						ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex( ZoneEquipTypeNum ) = locTermUnitSizingIndex;
-						DataSizing::TermUnitSizing( locTermUnitSizingIndex ).CtrlZoneNum = ControlledZoneNum;
 
 					} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = DirectAir_Num;
-						// Increment terminal unit sizing index and cross-reference
-						++locTermUnitSizingIndex;
-						ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex( ZoneEquipTypeNum ) = locTermUnitSizingIndex;
-						DataSizing::TermUnitSizing( locTermUnitSizingIndex ).CtrlZoneNum = ControlledZoneNum;
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER" ) { // Window Air Conditioner
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = WindowAC_Num;
@@ -727,7 +715,6 @@ namespace DataZoneEquipment {
 					UniqueNodeError = false;
 					CheckUniqueNodes( "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 					if ( UniqueNodeError ) {
-						//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
 						GetZoneEquipmentDataErrorsFound = true;
 					}
 					ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( NodeNum ) = 0;
@@ -735,6 +722,9 @@ namespace DataZoneEquipment {
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).OutNode = 0;
+					++locTermUnitSizingCounter;
+					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).TermUnitSizingIndex = locTermUnitSizingCounter;
+					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).TermUnitSizingIndex = locTermUnitSizingCounter;
 				}
 			} else {
 				ShowContinueError( "Invalid Zone Air Inlet Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
@@ -807,6 +797,17 @@ namespace DataZoneEquipment {
 
 		} // end loop over controlled zones
 
+		// Allocate TermUnitSizing array and set zone number
+		if ( locTermUnitSizingCounter > 0 ) {
+			DataSizing::NumAirTerminalUnits = locTermUnitSizingCounter;
+			DataSizing::TermUnitSizing.allocate( DataSizing::NumAirTerminalUnits );
+			for ( int loopZoneNum = 1; loopZoneNum <= NumOfZones; ++loopZoneNum ) {
+				{ auto & thisZoneEqConfig( ZoneEquipConfig( loopZoneNum ) );
+				for ( int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum ) {
+					DataSizing::TermUnitSizing( thisZoneEqConfig.AirDistUnitCool( loopNodeNum ).TermUnitSizingIndex ).CtrlZoneNum = loopZoneNum;
+				}}
+			}
+		}
 		if ( GetZoneEquipmentDataErrorsFound ) {
 			ShowWarningError( RoutineName + CurrentModuleObject + ", duplicate items NOT CHECKED due to previous errors." );
 			overallEquipCount = 0;

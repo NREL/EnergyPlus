@@ -486,7 +486,7 @@ namespace HVACSingleDuctInduc {
 							} else {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = IndUnit( IUNum ).PriAirInNode;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = IndUnit( IUNum ).OutAirNode;
-								AirDistUnit( IndUnit( IUNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+								AirDistUnit( IndUnit( IUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( IndUnit( IUNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
 							AirNodeFound = true;

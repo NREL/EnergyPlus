@@ -266,7 +266,7 @@ namespace DataSizing {
 	extern int DataZoneNumber; // a pointer to a zone served by zoneHVAC equipment
 	extern int NumZoneHVACSizing; // Number of design specification zone HVAC sizing objects
 	extern int NumAirTerminalSizingSpec; // Number of design specification air terminal sizing objects
-	extern int NumAirTerminalUnits; // Number of air terminal units
+	extern int NumAirTerminalUnits; // Number of air terminal units (same as total number of zone inlet nodes)
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit

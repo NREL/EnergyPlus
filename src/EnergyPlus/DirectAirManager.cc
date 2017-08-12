@@ -128,7 +128,6 @@ namespace DirectAirManager {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MySizeFlag;
-		static Array1D_bool MyAirDistInitFlag;
 	}
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
@@ -147,7 +146,6 @@ namespace DirectAirManager {
 		ZoneEquipmentListChecked = false;
 		MyEnvrnFlag.deallocate();
 		MySizeFlag.deallocate();
-		MyAirDistInitFlag.deallocate();
 	}
 
 	// Functions
@@ -226,6 +224,7 @@ namespace DirectAirManager {
 		}
 
 		// With the correct DirectAirNum to Initialize the system
+		DataSizing::CurTermUnitSizingNum = DirectAir( DirectAirNum ).TermUnitSizingNum;
 		InitDirectAir( DirectAirNum, ControlledZoneNum, FirstHVACIteration );
 
 		CalcDirectAir( DirectAirNum, ControlledZoneNum, SensOutputProvided, LatOutputProvided );
@@ -343,14 +342,27 @@ namespace DirectAirManager {
 
 				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					{ auto & thisZoneEqConfig( ZoneEquipConfig( CtrlZone ) );
+					if ( ! thisZoneEqConfig.IsControlled ) continue;
 					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
-							ZoneEquipConfig( CtrlZone ).SDUNum = DirectAirNum;
+							thisZoneEqConfig.AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+							thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+							thisZoneEqConfig.SDUNum = DirectAirNum;
+							DirectAir( DirectAirNum ).TermUnitSizingNum = thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+							DirectAir( DirectAirNum ).ZoneEqNum = CtrlZone;
+							// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this terminal unit
+							if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex > 0 ) {
+								{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex ) );
+								{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex ) );
+								thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
+								thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
+								thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
+								thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
+								thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
+							}}}
 						}
-					}
+					}}
 				}
 
 				// Find the Zone Equipment Inlet Node from the Supply Air Path Splitter
@@ -427,39 +439,13 @@ namespace DirectAirManager {
 
 			MyEnvrnFlag.allocate( NumDirectAir );
 			MySizeFlag.allocate( NumDirectAir );
-			MyAirDistInitFlag.allocate( NumDirectAir );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
-			MyAirDistInitFlag = true;
 
 			MyOneTimeFlag = false;
 
 		}
 
-		// need to associate zone equip config AirDistUnits with this terminal unit
-		if ( MyAirDistInitFlag( DirectAirNum ) ) {
-			// Match Zone Equipment data inlet node (again) with the supply air inlet node number of this unit and fill in TermUnitSizingIndex
-			{ auto & thisZoneEqConfig( ZoneEquipConfig( ControlledZoneNum ) );
-			for ( int SupAirIn = 1; SupAirIn <= thisZoneEqConfig.NumInletNodes; ++SupAirIn ) {
-				if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == thisZoneEqConfig.InletNode( SupAirIn ) ) {
-					thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
-					break;
-				}
-			}}
-			
-			// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this terminal unit
-			if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex > 0 ) {
-				auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex ) );
-				auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( DataSizing::CurTermUnitSizingNum ) );
-				thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
-				thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
-				thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
-				thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
-				thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
-			}
-
-			MyAirDistInitFlag( DirectAirNum ) = false;
-		}
 		// need to check all direct air units to see if they are on Zone Equipment List or issue warning
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
 			ZoneEquipmentListChecked = true;

@@ -492,7 +492,7 @@ namespace PoweredInductionUnits {
 						if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
-							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							AirNodeFound = true;
 							break;
@@ -655,7 +655,7 @@ namespace PoweredInductionUnits {
 						if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
-							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							AirNodeFound = true;
 						}

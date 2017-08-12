@@ -462,7 +462,6 @@ namespace DataZoneEquipment {
 		Array1D_int EquipType_Num;
 		Array1D_string EquipName;
 		Array1D_int EquipIndex;
-		Array1D_int EquipAirTermSizingIndex; // index to TermUnitSizing and TermUnitFinalZoneSizing (only applies to air distribution units and direct air)
 		Array1D_int CoolingPriority;
 		Array1D_int HeatingPriority;
 		Array1D< EquipmentData > EquipData; // Index of energy output report data

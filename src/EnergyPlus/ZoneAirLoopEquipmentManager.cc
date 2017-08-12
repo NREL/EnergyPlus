@@ -219,7 +219,7 @@ namespace ZoneAirLoopEquipmentManager {
 				ShowFatalError( "ManageZoneAirLoopEquipment: Invalid CompIndex passed=" + TrimSigDigits( AirDistUnitNum ) + ", Unit name=" + ZoneAirLoopEquipName + ", stored Unit Name for that index=" + AirDistUnit( AirDistUnitNum ).Name );
 			}
 		}
-
+		DataSizing::CurTermUnitSizingNum = AirDistUnit( AirDistUnitNum ).TermUnitSizingNum;
 		InitZoneAirLoopEquipment( AirDistUnitNum, ControlledZoneNum, ActualZoneNum );
 
 		SimZoneAirLoopEquipment( AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum );
@@ -524,45 +524,27 @@ namespace ZoneAirLoopEquipmentManager {
 			EachOnceFlag = true;
 			InitAirDistUnitsFlag = false;
 		}
-		if ( EachOnceFlag( AirDistUnitNum ) ) {
-			AirDistUnit( AirDistUnitNum ).ZoneNum = ActualZoneNum;
+		if ( EachOnceFlag( AirDistUnitNum ) && ( AirDistUnit( AirDistUnitNum ).TermUnitSizingNum > 0 ) ) {
 
-			// find and save corresponding zone equip config
 			{ auto & thisADU( AirDistUnit( AirDistUnitNum ) );
 			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ) );
-			if ( thisADU.ZoneEqAirDistCoolNum > 0 ) {
-				thisZoneEqConfig.AirDistUnitCool( thisADU.ZoneEqAirDistCoolNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
-			}
- 			if ( thisADU.ZoneEqAirDistHeatNum > 0 ) {
-				thisZoneEqConfig.AirDistUnitHeat( thisADU.ZoneEqAirDistHeatNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
-			} 
-			if ( ( thisADU.ZoneEqAirDistCoolNum == 0 ) && ( thisADU.ZoneEqAirDistHeatNum == 0 ) ) {
-				for ( int InletNum = 1; InletNum <= thisZoneEqConfig.NumInletNodes; ++InletNum ) {
- 					if ( thisZoneEqConfig.InletNode( InletNum ) == AirDistUnit( AirDistUnitNum ).OutletNodeNum ) {
- 						AirDistUnit( AirDistUnitNum ).ZoneEqNum = ControlledZoneNum;
- 						thisZoneEqConfig.AirDistUnitCool( InletNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
- 						thisZoneEqConfig.AirDistUnitHeat( InletNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
- 						thisZoneEqConfig.ADUNum = AirDistUnitNum;
- 						break;
- 					}
-				}
- 			}
+			thisADU.ZoneNum = ActualZoneNum;
 			thisZoneEqConfig.ADUNum = AirDistUnitNum;
 
 			if ( thisADU.UpStreamLeak || thisADU.DownStreamLeak ) {
 				thisZoneEqConfig.SupLeakToRetPlen = true;
-			}}}
+			}}
 
 			// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
-			if ( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex > 0 ) {
-				auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex ) );
-				auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( DataSizing::CurTermUnitSizingNum ) );
+			if ( thisADU.AirTerminalSizingSpecIndex > 0 ) {
+				{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( thisADU.AirTerminalSizingSpecIndex ) );
+				{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisADU.TermUnitSizingNum ) );
 				thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
 				thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
 				thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
 				thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
 				thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
-			}
+			}}}}
 			EachOnceFlag( AirDistUnitNum ) = false;
 		}
 

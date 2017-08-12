@@ -1035,7 +1035,6 @@ namespace ZoneEquipmentManager {
 		FinalZoneSizing.allocate( NumOfZones );
 		CalcZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
 		CalcFinalZoneSizing.allocate( NumOfZones );
-		DataSizing::NumAirTerminalUnits = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" ) + InputProcessor::GetNumObjectsFound( "ZoneHVAC:AirDistributionUnit" );
 		TermUnitFinalZoneSizing.allocate( DataSizing::NumAirTerminalUnits );
 		DesDayWeath.allocate( TotDesDays + TotRunDesPersDays );
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
@@ -3152,7 +3151,6 @@ namespace ZoneEquipmentManager {
 				SysOutputProvided = 0.0;
 				LatOutputProvided = 0.0;
 				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
-				CurTermUnitSizingNum = ZoneEquipList( ControlledZoneNum ).EquipAirTermSizingIndex( EquipPtr );
 
 				// Reset ZoneEqSizing data (because these may change from one equipment type to the next)
 				if ( FirstPassZoneEquipFlag ) {
