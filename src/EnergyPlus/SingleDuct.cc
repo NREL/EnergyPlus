@@ -302,6 +302,7 @@ namespace SingleDuct {
 		}
 
 		TermUnitSingDuct = true;
+		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum;
 
 		// With the correct SysNum Initialize the system
 		InitSys( SysNum, FirstHVACIteration ); // Initialize all Sys related parameters
@@ -4680,7 +4681,7 @@ namespace SingleDuct {
 	void
 	SimATMixer(
 		std::string const & SysName,
-		bool const FirstHVACIteration,
+		bool const EP_UNUSED( FirstHVACIteration ),
 		int & SysIndex
 	)
 	{
@@ -4795,7 +4796,6 @@ namespace SingleDuct {
 		int NodeNum; // Index to node number
 		int CtrlZone; // Index to control zone
 		bool ZoneNodeNotFound; // Flag for error checking
-		int SupAirIn; // Supply air inlet node index
 		bool errFlag; // error flag from component validation
 
 		if ( !GetATMixerFlag ) {

@@ -226,6 +226,7 @@ namespace HVACCooledBeam {
 			ShowFatalError( "Cool Beam Unit not found = " + CompName );
 		}
 
+		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( CoolBeam( CBNum ).ADUNum ).TermUnitSizingNum;
 		// initialize the unit
 		InitCoolBeam( CBNum, FirstHVACIteration );
 

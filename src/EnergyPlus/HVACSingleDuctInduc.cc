@@ -241,6 +241,7 @@ namespace HVACSingleDuctInduc {
 			}
 		}
 
+		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( IndUnit( IUNum ).ADUNum ).TermUnitSizingNum;
 		// initialize the unit
 		InitIndUnit( IUNum, FirstHVACIteration );
 

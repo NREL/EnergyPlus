@@ -224,6 +224,7 @@ namespace DualDuct {
 		}
 
 		if ( CompIndex > 0 ) {
+			DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingNum;
 			// With the correct DamperNum Initialize
 			InitDualDuct( DamperNum, FirstHVACIteration ); // Initialize all Damper related parameters
 

@@ -247,6 +247,7 @@ namespace PoweredInductionUnits {
 			}
 		}
 
+		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum;
 		// initialize the unit
 		InitPIU( PIUNum, FirstHVACIteration );
 
