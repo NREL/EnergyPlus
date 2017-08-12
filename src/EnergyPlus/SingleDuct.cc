@@ -669,6 +669,8 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 						}
 
 						Sys( SysNum ).CtrlZoneNum = CtrlZone;
@@ -884,6 +886,8 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 						}
 					}
 				}
@@ -1056,6 +1060,8 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).OutletNodeNum;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 						}
 					}
 				}
@@ -1206,6 +1212,8 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 						}
 
 						Sys( SysNum ).CtrlZoneNum = CtrlZone;
@@ -1319,6 +1327,8 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 						}
 					}
 				}
@@ -1559,6 +1569,8 @@ namespace SingleDuct {
 						} else {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = Sys( SysNum ).InletNodeNum;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Sys( SysNum ).ReheatAirOutletNode;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 						}
 					}
 				}
@@ -4879,6 +4891,9 @@ namespace SingleDuct {
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+									AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+									AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqAirDistHeatNum = SupAirIn;
+									AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqNum = CtrlZone;
 								}
 							}
 							goto ControlledZoneLoop_exit;
@@ -4907,6 +4922,9 @@ namespace SingleDuct {
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+									AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+									AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqAirDistHeatNum = SupAirIn;
+									AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqNum = CtrlZone;
 								}
 							}
 							goto ControlZoneLoop_exit;

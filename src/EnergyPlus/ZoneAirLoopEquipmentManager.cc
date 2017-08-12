@@ -528,20 +528,30 @@ namespace ZoneAirLoopEquipmentManager {
 			AirDistUnit( AirDistUnitNum ).ZoneNum = ActualZoneNum;
 
 			// find and save corresponding zone equip config
+			{ auto & thisADU( AirDistUnit( AirDistUnitNum ) );
 			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ) );
-			for ( int InletNum = 1; InletNum <= thisZoneEqConfig.NumInletNodes; ++InletNum ) {
-				if ( thisZoneEqConfig.InletNode( InletNum ) == AirDistUnit( AirDistUnitNum ).OutletNodeNum ) {
-					AirDistUnit( AirDistUnitNum ).ZoneEqNum = ControlledZoneNum;
-					thisZoneEqConfig.AirDistUnitCool( InletNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
-					thisZoneEqConfig.AirDistUnitHeat( InletNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
-					thisZoneEqConfig.ADUNum = AirDistUnitNum;
-					break;
-				}
+			if ( thisADU.ZoneEqAirDistCoolNum > 0 ) {
+				thisZoneEqConfig.AirDistUnitCool( thisADU.ZoneEqAirDistCoolNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
 			}
+ 			if ( thisADU.ZoneEqAirDistHeatNum > 0 ) {
+				thisZoneEqConfig.AirDistUnitHeat( thisADU.ZoneEqAirDistHeatNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
+			} 
+			if ( ( thisADU.ZoneEqAirDistCoolNum == 0 ) && ( thisADU.ZoneEqAirDistHeatNum == 0 ) ) {
+				for ( int InletNum = 1; InletNum <= thisZoneEqConfig.NumInletNodes; ++InletNum ) {
+ 					if ( thisZoneEqConfig.InletNode( InletNum ) == AirDistUnit( AirDistUnitNum ).OutletNodeNum ) {
+ 						AirDistUnit( AirDistUnitNum ).ZoneEqNum = ControlledZoneNum;
+ 						thisZoneEqConfig.AirDistUnitCool( InletNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
+ 						thisZoneEqConfig.AirDistUnitHeat( InletNum ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
+ 						thisZoneEqConfig.ADUNum = AirDistUnitNum;
+ 						break;
+ 					}
+				}
+ 			}
+			thisZoneEqConfig.ADUNum = AirDistUnitNum;
 
-			if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
+			if ( thisADU.UpStreamLeak || thisADU.DownStreamLeak ) {
 				thisZoneEqConfig.SupLeakToRetPlen = true;
-			}}
+			}}}
 
 			// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
 			if ( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex > 0 ) {

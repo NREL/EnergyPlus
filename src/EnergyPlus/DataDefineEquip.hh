@@ -121,6 +121,8 @@ namespace DataDefineEquip {
 		Real64 MinAvailDelta; // change in min avail mass low rate due to leaks [kg/s]
 		int InletNodeNum; // index of inlet node
 		int ZoneEqNum; // index of zone equipment object for this terminal unit
+		int ZoneEqAirDistCoolNum; // index of DataZoneEquipment::ZoneEquipConfig.AirDistUnitCool that this ADU is connected to, zero if none
+		int ZoneEqAirDistHeatNum; // index of DataZoneEquipment::ZoneEquipConfig.AirDistUnitHeat that this ADU is connected to, zero if none
 		Real64 LeakLoadMult; // zome load multiplier to adjust for downstream leak
 		bool UpStreamLeak; // if true, there is an upstream leak
 		bool DownStreamLeak; // if true, there is an downstream leak
@@ -153,6 +155,8 @@ namespace DataDefineEquip {
 			MinAvailDelta( 0.0 ),
 			InletNodeNum( 0 ),
 			ZoneEqNum( 0 ),
+			ZoneEqAirDistCoolNum( 0 ),
+			ZoneEqAirDistHeatNum( 0 ),
 			LeakLoadMult( 0.0 ),
 			UpStreamLeak( false ),
 			DownStreamLeak( false ),
