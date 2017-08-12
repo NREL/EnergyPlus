@@ -4730,8 +4730,6 @@ namespace SingleDuct {
 			SysNum = SysIndex;
 		}
 
-		InitATMixer( SysNum, FirstHVACIteration ); // Not being used, is placeholder
-
 		CalcATMixer( SysNum );
 
 		UpdateATMixer( SysNum );
@@ -4887,17 +4885,8 @@ namespace SingleDuct {
 						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumExhaustNodes; ++NodeNum ) {
 							if ( SysATMixer( ATMixerNum ).SecInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( NodeNum ) ) {
 								ZoneNodeNotFound = false;
-								for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-									if ( SysATMixer( ATMixerNum ).SecInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( SupAirIn ) ) {
-										ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
-										ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-										ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
-										ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-										AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
-										AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqAirDistHeatNum = SupAirIn;
-										AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqNum = CtrlZone;
-									}
-								}
+								AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqNum = CtrlZone;
+								// Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet for inlet side mixers
 								goto ControlledZoneLoop_exit;
 							}
 						}
@@ -4918,17 +4907,8 @@ namespace SingleDuct {
 						for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 							if ( SysATMixer( ATMixerNum ).MixedAirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
 								ZoneNodeNotFound = false;
-								for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-									if ( SysATMixer( ATMixerNum ).MixedAirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-										ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
-										ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-										ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
-										ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-										AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
-										AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqAirDistHeatNum = SupAirIn;
-										AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqNum = CtrlZone;
-									}
-								}
+								AirDistUnit( SysATMixer( ATMixerNum ).ADUNum ).ZoneEqNum = CtrlZone;
+								// Wait until InitATMixer to fill other zone equip config data
 								goto ControlZoneLoop_exit;
 							}
 						}
@@ -4954,56 +4934,23 @@ namespace SingleDuct {
 	}
 
 	void
-	InitATMixer(
-		int const ATMixerNum,
-		bool const FirstHVACIteration
-	)
+	AirTerminalMixerData::InitATMixer()
 	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR
-		//       DATE WRITTEN   March 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE
-		// Initialize the AirTerminalMixers data structure with node data
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int PriInNode;
-		int MixedAirOutNode;
-
-		InletNode = SysATMixer( ATMixerNum ).SecInNode;
-		PriInNode = SysATMixer( ATMixerNum ).PriInNode;
-		MixedAirOutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
-
-		if ( FirstHVACIteration ) {
-			//  SysATMixer(ATMixerNum)%ZoneAirMassFlowRate = SysATMixer(ATMixerNum)%MaxAirMassFlowRate
-		}
-
-		if ( BeginDayFlag ) {
-		}
-
-		if ( FirstHVACIteration ) {
+		if ( this->OneTimeInitFlag ){
+			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqNum ) );
+			for ( int SupAirIn = 1; SupAirIn <= thisZoneEqConfig.NumInletNodes; ++SupAirIn ) {
+				if ( this->ZoneInletNode == thisZoneEqConfig.InletNode( SupAirIn ) ) {
+					thisZoneEqConfig.AirDistUnitCool( SupAirIn ).InNode = this->PriInNode;
+					thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode = this->MixedAirOutNode;
+					//thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
+					thisZoneEqConfig.AirDistUnitHeat( SupAirIn ).InNode = this->PriInNode;
+					thisZoneEqConfig.AirDistUnitHeat( SupAirIn ).OutNode = this->MixedAirOutNode;
+					//thisZoneEqConfig.AirDistUnitHeat( SupAirIn ).TermUnitSizingIndex = DataSizing::CurTermUnitSizingNum;
+					DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+					DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqAirDistHeatNum = SupAirIn;
+				}
+			}}
+			this->OneTimeInitFlag = false;
 		}
 
 	}
@@ -5143,7 +5090,8 @@ namespace SingleDuct {
 		int & ATMixerType, // air teminal mixer type
 		int & ATMixerPriNode, // air terminal mixer primary air node number
 		int & ATMixerSecNode, // air terminal mixer secondary air node number
-		int & ATMixerOutNode // air terminal mixer outlet air node number
+		int & ATMixerOutNode, // air terminal mixer outlet air node number
+		int const & ZoneEquipOutletNode // zone equipment outlet node (used with inlet side mixers)
 	)
 	{
 
@@ -5156,30 +5104,9 @@ namespace SingleDuct {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets: 1) the index of the named AT Mixer in the SysATMixer data array
 		//                       2) the node number of the primary air inlet node of the AT Mixer
+		//                       3) set the AT Mixer ultimate zone inlet node
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ATMixerIndex; // local air terminal mixer index
 
 
@@ -5207,6 +5134,13 @@ namespace SingleDuct {
 			ATMixerSecNode = SysATMixer( ATMixerIndex ).SecInNode;
 			ATMixerOutNode = SysATMixer( ATMixerIndex ).MixedAirOutNode;
 			ATMixerType = SysATMixer( ATMixerIndex ).MixerType;
+			if ( ATMixerType == ATMixer_InletSide ) { 
+				SysATMixer( ATMixerIndex ).ZoneInletNode = ZoneEquipOutletNode;
+			} else {
+				SysATMixer( ATMixerIndex ).ZoneInletNode = ATMixerOutNode;
+			}
+			SysATMixer( ATMixerIndex ).InitATMixer();
+
 		} else {
 			ATMixerNum = 0;
 			ATMixerName = "";

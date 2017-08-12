@@ -460,6 +460,7 @@ namespace HVACSingleDuctInduc {
 			// Register component set data
 			TestCompSet( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, NodeID( IndUnit( IUNum ).PriAirInNode ), NodeID( IndUnit( IUNum ).OutAirNode ), "Air Nodes" );
 
+			AirNodeFound = false;
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( IndUnit( IUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					IndUnit( IUNum ).ADUNum = ADUNum;
@@ -472,7 +473,6 @@ namespace HVACSingleDuctInduc {
 				ErrorsFound = true;
 			} else {
 				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-				AirNodeFound = false;
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {

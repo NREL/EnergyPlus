@@ -279,6 +279,7 @@ namespace SingleDuct {
 		int SecInNode; // secondary air inlet node number
 		int PriInNode; // primary air inlet node number
 		int MixedAirOutNode; // mixed air outlet node number
+		int ZoneInletNode; // zone inlet node that ultimately receives air from this mixer
 		Real64 ZoneAirTemp; // zone air in temp
 		Real64 ZoneAirHumRat; // zone air in hum rat
 		Real64 ZoneAirEnthalpy; // zone air in enthalpy
@@ -297,6 +298,7 @@ namespace SingleDuct {
 		Real64 MaxAirMassFlowRate; // maximum air mass flow rate allowed through component
 		int ADUNum; // index of Air Distribution Unit
 		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+		bool OneTimeInitFlag; // true if one-time inits should be done
 
 		// Default Constructor
 		AirTerminalMixerData() :
@@ -305,6 +307,7 @@ namespace SingleDuct {
 			SecInNode( 0 ),
 			PriInNode( 0 ),
 			MixedAirOutNode( 0 ),
+			ZoneInletNode( 0 ),
 			ZoneAirTemp( 0.0 ),
 			ZoneAirHumRat( 0.0 ),
 			ZoneAirEnthalpy( 0.0 ),
@@ -322,8 +325,12 @@ namespace SingleDuct {
 			MixedAirMassFlowRate( 0.0 ),
 			MaxAirMassFlowRate( 0.0 ),
 			ADUNum( 0 ),
-			TermUnitSizingIndex( 0 )
+			TermUnitSizingIndex( 0 ),
+			OneTimeInitFlag( true )
 		{}
+
+		void
+		InitATMixer();
 
 	};
 
@@ -513,12 +520,6 @@ namespace SingleDuct {
 	GetATMixers();
 
 	void
-	InitATMixer(
-		int const ATMixerNum,
-		bool const FirstHVACIteration
-	);
-
-	void
 	CalcATMixer( int const SysNum );
 
 	void
@@ -532,7 +533,8 @@ namespace SingleDuct {
 		int & ATMixerType, // air teminal mixer type
 		int & ATMixerPriNode, // air terminal mixer primary air node number
 		int & ATMixerSecNode, // air terminal mixer secondary air node number
-		int & ATMixerOutNode // air terminal mixer outlet air node number
+		int & ATMixerOutNode, // air terminal mixer outlet air node number
+		int const & ZoneEquipOutletNode // zone equipment outlet node (used with inlet side mixers)
 	);
 
 	void

@@ -4086,6 +4086,10 @@ namespace SimAirServingZones {
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
+					if ( TermUnitSizingIndex == 0 ) {
+						ShowSevereError( "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + AirToZoneNodeInfo( AirLoopNum ).AirLoopName + ", Zone =" + Zone( AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum ) ).Name );
+						ShowFatalError( "This is a defect. Please report this issue." );
+					}
 					if ( SysSizNum > 0 ) {
 						if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_ZoneSum ) { // ZoneSum Method
 							MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;

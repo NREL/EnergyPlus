@@ -472,6 +472,7 @@ namespace PoweredInductionUnits {
 			// Register component set data
 			TestCompSet( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, NodeID( PIU( PIUNum ).PriAirInNode ), NodeID( PIU( PIUNum ).OutAirNode ), "Air Nodes" );
 
+			AirNodeFound = false;
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					PIU( PIUNum ).ADUNum = ADUNum;
@@ -485,7 +486,6 @@ namespace PoweredInductionUnits {
 			} else {
 
 				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-				AirNodeFound = false;
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
@@ -633,6 +633,7 @@ namespace PoweredInductionUnits {
 			// Register component set data
 			TestCompSet( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, NodeID( PIU( PIUNum ).PriAirInNode ), NodeID( PIU( PIUNum ).OutAirNode ), "Air Nodes" );
 
+			AirNodeFound = false;
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					//      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum

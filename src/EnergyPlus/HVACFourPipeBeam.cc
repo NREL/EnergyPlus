@@ -304,6 +304,7 @@ namespace FourPipeBeam {
 		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Heating Rate [W]", thisBeam->supAirHeatingRate, "System", "Average", thisBeam->name );
 		SetupOutputVariable( "Zone Air Terminal Primary Air Flow Rate [m3/s]", thisBeam->primAirFlow, "System", "Average", thisBeam->name );
 
+		airNodeFound = false;
 		for ( aDUIndex = 1; aDUIndex <= NumAirDistUnits; ++aDUIndex ) {
 			if ( thisBeam->airOutNodeNum == AirDistUnit( aDUIndex ).OutletNodeNum ) {
 				thisBeam->aDUNum = aDUIndex;
@@ -317,7 +318,6 @@ namespace FourPipeBeam {
 		} else {
 
 			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-			airNodeFound = false;
 			for ( ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
 				if ( ! ZoneEquipConfig( ctrlZone ).IsControlled ) continue;
 				for ( supAirIn = 1; supAirIn <= ZoneEquipConfig( ctrlZone ).NumInletNodes; ++supAirIn ) {

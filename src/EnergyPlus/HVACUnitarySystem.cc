@@ -5188,7 +5188,7 @@ namespace HVACUnitarySystem {
 			}
 			 
 			// Get AirTerminal mixer data
-			GetATMixer( UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ATMixerName, UnitarySystem( UnitarySysNum ).ATMixerIndex, UnitarySystem( UnitarySysNum ).ATMixerType, UnitarySystem( UnitarySysNum ).ATMixerPriNode, UnitarySystem( UnitarySysNum ).ATMixerSecNode, UnitarySystem( UnitarySysNum ).ATMixerOutNode );
+			GetATMixer( UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ATMixerName, UnitarySystem( UnitarySysNum ).ATMixerIndex, UnitarySystem( UnitarySysNum ).ATMixerType, UnitarySystem( UnitarySysNum ).ATMixerPriNode, UnitarySystem( UnitarySysNum ).ATMixerSecNode, UnitarySystem( UnitarySysNum ).ATMixerOutNode, UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum );
 			if ( UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_InletSide || UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_SupplySide ) {
 				UnitarySystem( UnitarySysNum ).ATMixerExists = true;
 			}

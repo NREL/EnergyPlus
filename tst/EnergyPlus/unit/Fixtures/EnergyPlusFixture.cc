@@ -135,7 +135,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACManager.hh>
-#include <EnergYPlus/HVACSingleDuctInduc.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>

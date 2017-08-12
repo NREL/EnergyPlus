@@ -524,7 +524,7 @@ namespace ZoneAirLoopEquipmentManager {
 			EachOnceFlag = true;
 			InitAirDistUnitsFlag = false;
 		}
-		if ( EachOnceFlag( AirDistUnitNum )) {
+		if ( EachOnceFlag( AirDistUnitNum ) ) {
 			AirDistUnit( AirDistUnitNum ).ZoneNum = ActualZoneNum;
 
 			// find and save corresponding zone equip config
