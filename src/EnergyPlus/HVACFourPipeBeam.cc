@@ -314,24 +314,28 @@ namespace FourPipeBeam {
 			ShowSevereError( routineName + "No matching Air Distribution Unit, for Unit = [" + cCurrentModuleObject + ',' + thisBeam->name + "]." );
 			ShowContinueError( "...should have outlet node=" + DataLoopNode::NodeID( thisBeam->airOutNodeNum ) );
 			ErrorsFound = true;
-		}
+		} else {
 
-		// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-		airNodeFound = false;
-		for ( ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
-			if ( ! ZoneEquipConfig( ctrlZone ).IsControlled ) continue;
-			for ( supAirIn = 1; supAirIn <= ZoneEquipConfig( ctrlZone ).NumInletNodes; ++supAirIn ) {
-				if ( thisBeam->airOutNodeNum == ZoneEquipConfig( ctrlZone ).InletNode( supAirIn ) ) {
-					thisBeam->zoneIndex = ctrlZone;
-					thisBeam->zoneNodeIndex = ZoneEquipConfig( ctrlZone ).ZoneNode;
-					ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).InNode = thisBeam->airInNodeNum;
-					ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).OutNode = thisBeam->airOutNodeNum;
-					if ( thisBeam->beamHeatingPresent ) {
-						ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).InNode = thisBeam->airInNodeNum;
-						ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).OutNode =thisBeam->airOutNodeNum;
+			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+			airNodeFound = false;
+			for ( ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
+				if ( ! ZoneEquipConfig( ctrlZone ).IsControlled ) continue;
+				for ( supAirIn = 1; supAirIn <= ZoneEquipConfig( ctrlZone ).NumInletNodes; ++supAirIn ) {
+					if ( thisBeam->airOutNodeNum == ZoneEquipConfig( ctrlZone ).InletNode( supAirIn ) ) {
+						thisBeam->zoneIndex = ctrlZone;
+						thisBeam->zoneNodeIndex = ZoneEquipConfig( ctrlZone ).ZoneNode;
+						ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).InNode = thisBeam->airInNodeNum;
+						ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).OutNode = thisBeam->airOutNodeNum;
+						AirDistUnit( thisBeam->aDUNum ).ZoneEqAirDistCoolNum = supAirIn;
+						AirDistUnit( thisBeam->aDUNum ).ZoneEqNum = ctrlZone;
+						if ( thisBeam->beamHeatingPresent ) {
+							ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).InNode = thisBeam->airInNodeNum;
+							ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).OutNode =thisBeam->airOutNodeNum;
+							AirDistUnit( thisBeam->aDUNum ).ZoneEqAirDistHeatNum = supAirIn;
+						}
+						airNodeFound = true;
+						break;
 					}
-					airNodeFound = true;
-					break;
 				}
 			}
 		}

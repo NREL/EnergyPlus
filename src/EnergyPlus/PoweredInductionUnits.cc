@@ -474,7 +474,6 @@ namespace PoweredInductionUnits {
 
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					//      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
 					PIU( PIUNum ).ADUNum = ADUNum;
 				}
 			}
@@ -482,28 +481,30 @@ namespace PoweredInductionUnits {
 			if ( PIU( PIUNum ).ADUNum == 0 ) {
 				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for PIU = [" + PIU( PIUNum ).UnitType + ',' + PIU( PIUNum ).Name + "]." );
 				ShowContinueError( "...should have outlet node = " + NodeID( PIU( PIUNum ).OutAirNode ) );
-				//          ErrorsFound=.TRUE.
-			}
+				ErrorsFound = true;
+			} else {
 
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
-						AirNodeFound = true;
-						break;
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				AirNodeFound = false;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							AirNodeFound = true;
+							break;
+						}
 					}
 				}
+				if ( ! AirNodeFound ) {
+					ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " Unit = " + PIU( PIUNum ).Name );
+					ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs( 5 ) );
+					ErrorsFound = true;
+				}
 			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " Unit = " + PIU( PIUNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs( 5 ) );
-				ErrorsFound = true;
-			}
-
 		}
 
 		for ( PIUIndex = 1; PIUIndex <= NumParallelPIUs; ++PIUIndex ) {
@@ -642,27 +643,29 @@ namespace PoweredInductionUnits {
 			if ( PIU( PIUNum ).ADUNum == 0 ) {
 				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for PIU = [" + PIU( PIUNum ).UnitType + ',' + PIU( PIUNum ).Name + "]." );
 				ShowContinueError( "...should have outlet node = " + NodeID( PIU( PIUNum ).OutAirNode ) );
-				//          ErrorsFound=.TRUE.
-			}
+				ErrorsFound = true;
+			} else {
 
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
-						AirNodeFound = true;
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				AirNodeFound = false;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							AirNodeFound = true;
+						}
 					}
 				}
+				if ( ! AirNodeFound ) {
+					ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " Unit = " + PIU( PIUNum ).Name );
+					ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs( 5 ) );
+					ErrorsFound = true;
+				}
 			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " Unit = " + PIU( PIUNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs( 5 ) );
-				ErrorsFound = true;
-			}
-
 		}
 
 		if ( ErrorsFound ) {

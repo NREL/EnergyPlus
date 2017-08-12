@@ -460,39 +460,8 @@ namespace HVACSingleDuctInduc {
 			// Register component set data
 			TestCompSet( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, NodeID( IndUnit( IUNum ).PriAirInNode ), NodeID( IndUnit( IUNum ).OutAirNode ), "Air Nodes" );
 
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( IndUnit( IUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
-							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( NodeID( IndUnit( IUNum ).OutAirNode ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + IndUnit( IUNum ).UnitType + " = " + IndUnit( IUNum ).Name );
-							ShowContinueError( "Check terminal unit node names for errors" );
-							ErrorsFound = true;
-						} else {
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = IndUnit( IUNum ).PriAirInNode;
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = IndUnit( IUNum ).OutAirNode;
-						}
-						AirNodeFound = true;
-						break;
-					}
-				}
-			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 3 ) );
-				ErrorsFound = true;
-			}
-
-		}
-
-		for ( IUNum = 1; IUNum <= NumIndUnits; ++IUNum ) {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( IndUnit( IUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					//        AirDistUnit(ADUNum)%InletNodeNum = IndUnitIUNum)%InletNodeNum
 					IndUnit( IUNum ).ADUNum = ADUNum;
 				}
 			}
@@ -500,7 +469,36 @@ namespace HVACSingleDuctInduc {
 			if ( IndUnit( IUNum ).ADUNum == 0 ) {
 				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for Unit = [" + IndUnit( IUNum ).UnitType + ',' + IndUnit( IUNum ).Name + "]." );
 				ShowContinueError( "...should have outlet node=" + NodeID( IndUnit( IUNum ).OutAirNode ) );
-				//          ErrorsFound=.TRUE.
+				ErrorsFound = true;
+			} else {
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				AirNodeFound = false;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( IndUnit( IUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
+								ShowSevereError( "Error in connecting a terminal unit to a zone" );
+								ShowContinueError( NodeID( IndUnit( IUNum ).OutAirNode ) + " already connects to another zone" );
+								ShowContinueError( "Occurs for terminal unit " + IndUnit( IUNum ).UnitType + " = " + IndUnit( IUNum ).Name );
+								ShowContinueError( "Check terminal unit node names for errors" );
+								ErrorsFound = true;
+							} else {
+								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = IndUnit( IUNum ).PriAirInNode;
+								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = IndUnit( IUNum ).OutAirNode;
+								AirDistUnit( IndUnit( IUNum ).ADUNum ).ZoneEqAirDistCoolNum = SupAirIn;
+								AirDistUnit( IndUnit( IUNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							}
+							AirNodeFound = true;
+							break;
+						}
+					}
+				}
+				if ( ! AirNodeFound ) {
+					ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );
+					ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 3 ) );
+					ErrorsFound = true;
+				}
 			}
 		}
 
