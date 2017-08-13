@@ -3700,7 +3700,7 @@ namespace SizingManager {
 	UpdateTermUnitFinalZoneSizing()
 	{
 		// Move data from FinalZoneSizing to TermUnitFinalZoneSizing and apply terminal unit sizing adjustments
-		// Called once after system sizing
+		// Called once to initialize before system sizing, then called again to update after system sizing
 		// M.J. Witte, July 2017
 
 		for ( int termUnitSizingIndex = 1; termUnitSizingIndex <= DataSizing::NumAirTerminalUnits; ++termUnitSizingIndex ) {

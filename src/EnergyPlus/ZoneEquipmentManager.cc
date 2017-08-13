@@ -103,6 +103,7 @@
 #include <RefrigeratedCase.hh>
 #include <ReturnAirPathManager.hh>
 #include <ScheduleManager.hh>
+#include <SizingManager.hh>
 #include <SplitterComponent.hh>
 #include <SteamBaseboardRadiator.hh>
 #include <SwimmingPool.hh>
@@ -2953,7 +2954,7 @@ namespace ZoneEquipmentManager {
 			}
 
 		}}
-
+		SizingManager::UpdateTermUnitFinalZoneSizing();
 	}
 
 	void
