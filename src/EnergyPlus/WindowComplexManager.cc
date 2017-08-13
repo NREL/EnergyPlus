@@ -3285,8 +3285,6 @@ namespace WindowComplexManager {
 		int SrdSurfNum; // Surrounding surface number DO loop counter
 		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
 		Real64 SrdSurfViewFac; // View factor of a surrounding surface
-		Real64 TSurf; // Absolute temperature of the outside surface of an exterior surface
-
 
 		// fill local vars
 
@@ -3422,6 +3420,7 @@ namespace WindowComplexManager {
 			} else { // Exterior window (ExtBoundCond = 0)
 			    // X Luo added Aug 2017
 				// Calculate LWR from surrounding surfaces if defined for an exterior window
+				QRadLWOutSrdSurfs( SurfNum ) = 0;
 				if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 					SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
 					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
@@ -3429,8 +3428,7 @@ namespace WindowComplexManager {
 					}
 					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
 						Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
-					}
-					QRadLWOutSrdSurfs( SurfNum ) = 0;
+					}					
 					for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 						SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 						SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;

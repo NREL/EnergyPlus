@@ -5185,7 +5185,6 @@ namespace ZoneEquipmentManager {
 			} //ZoneA=1,(NumOfZones - 1)
 		} //(TotRefrigerationDoorMixing > 0) THEN
 
-		int t = TotInfiltration;
 		// Process the scheduled Infiltration for air heat balance depending on model type
 		for ( j = 1; j <= TotInfiltration; ++j ) {
 

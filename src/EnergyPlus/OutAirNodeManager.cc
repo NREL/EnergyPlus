@@ -455,7 +455,12 @@ namespace OutAirNodeManager {
 			if ( Node( NodeNum ).EMSOverrideOutAirWindDir ) Node( NodeNum ).OutAirWindDir = Node( NodeNum ).EMSValueForOutAirWindDir;
 
 			Node( NodeNum ).Temp = Node( NodeNum ).OutAirDryBulb;
-			Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );
+			if ( Node( NodeNum ).SchedOutAirDryBulb || Node( NodeNum ).SchedOutAirWetBulb ) {
+				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );				
+			}
+			else {
+				Node(NodeNum).HumRat = OutHumRat;
+			}
 			Node( NodeNum ).Enthalpy = PsyHFnTdbW( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).HumRat );
 			Node( NodeNum ).Press = OutBaroPress;
 			Node( NodeNum ).Quality = 0.0;
@@ -603,8 +608,12 @@ namespace OutAirNodeManager {
 				Node( NodeNumber ).OutAirWindDir = WindDir;
 
 				Node( NodeNumber ).Temp = Node( NodeNumber ).OutAirDryBulb;
-				Node( NodeNumber ).HumRat = OutHumRat; //TODO: CHECK THIS ON REPLACEMENT
-				Node( NodeNumber ).Enthalpy = PsyHFnTdbW( Node( NodeNumber ).Temp, OutHumRat );
+				if ( Node( NodeNumber ).SchedOutAirDryBulb || Node( NodeNumber ).SchedOutAirWetBulb ) {
+					Node( NodeNumber ).HumRat = PsyHFnTdbW( Node( NodeNumber ).OutAirDryBulb, Node( NodeNumber ).OutAirWetBulb );
+				}
+				else {
+					Node( NodeNumber ).HumRat = OutHumRat;
+				}
 				Node( NodeNumber ).Press = OutBaroPress;
 				Node( NodeNumber ).Quality = 0.0;
 				// Add contaminants

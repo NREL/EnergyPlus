@@ -852,7 +852,6 @@ namespace SurfaceGeometry {
 		int SubSurfNum; // DO loop counter/index for sub-surface number
 		int SurfNum; // DO loop counter/index for surface number
 		int ZoneNum; // DO loop counter (zones)
-		int SrdSurfsNum; // Surrounding surface Do loop counter
 		int Found; // For matching interzone surfaces
 		int ConstrNumFound; // Construction number of matching interzone surface
 		static bool NonMatch( false ); // Error for non-matching interzone surfaces
@@ -6006,10 +6005,6 @@ namespace SurfaceGeometry {
 		int ExtShadingSchedNum;
 		int SurroundingSurfsNum;
 		int OutdoorAirNodeNum;
-		int i;
-		int NumOfScheduledLayers;
-		bool NumOfLayersMatch;
-		int iZone;
 
 		//-----------------------------------------------------------------------
 		//                SurfaceProperty:LocalEnvironment

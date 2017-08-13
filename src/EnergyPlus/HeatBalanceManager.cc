@@ -4579,7 +4579,6 @@ namespace HeatBalanceManager {
 		bool IsBlank;
 		int IOStat;
 		int NodeNum;
-		int OutdoorAirNodeNum;
 
 		//-----------------------------------------------------------------------
 		//               ZoneProperty:LocalEnvironment

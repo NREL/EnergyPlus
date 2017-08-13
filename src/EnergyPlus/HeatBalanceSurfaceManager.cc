@@ -379,8 +379,6 @@ namespace HeatBalanceSurfaceManager {
 		Real64 QIC; // Intermediate calculation variable
 		Real64 QOC; // Intermediate calculation variable
 		int SurfNum; // DO loop counter for surfaces
-		int ZoneNum; // DO loop counter for zones
-		int SrdSurfsNum; // DO loop counter for srd surfaces
 		int Term; // DO loop counter for conduction equation terms
 		Real64 TSC; // Intermediate calculation variable (temperature at source location)
 		Real64 TUC; // Intermediate calculation variable (temperature at user specified location)

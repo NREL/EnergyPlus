@@ -2758,6 +2758,7 @@ namespace WindowManager {
 				// Calculate LWR from surrounding surfaces if defined for an exterior window
 				// TODO: Update report vars
 				// TODO: Check how view factor overridden back for window
+				QRadLWOutSrdSurfs( SurfNum ) = 0;
 				if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 					SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
 					// Real64 test = surface.ViewFactorSkyIR;
@@ -2766,8 +2767,7 @@ namespace WindowManager {
 					}
 					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
 						surface.ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
-					}
-					QRadLWOutSrdSurfs( SurfNum ) = 0;
+					}					
 					for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 						SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 						SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
