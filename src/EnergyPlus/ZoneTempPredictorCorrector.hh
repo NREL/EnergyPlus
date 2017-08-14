@@ -373,6 +373,9 @@ namespace ZoneTempPredictorCorrector {
 	);
 
 	void
+	OverrideAirSetPointsforEMSCntrl();
+
+	void
 	FillPredefinedTableOnThermostatSetpoints();
 
 	std::tuple< Real64, int, std::string >
