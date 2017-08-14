@@ -980,7 +980,7 @@ SizingPeriod:DesignDay,
        \note Required only if field Humidity Condition Type is "HumidityRatio".
        \type real
        \units kgWater/kgDryAir
-  N7,  \field Enthalpy at Maximum Dry-Bulb will require units transition.
+  N7,  \field Enthalpy at Maximum Dry-Bulb
        \note Enthalpy coincident with the maximum temperature.
        \note Required only if field Humidity Condition Type is "Enthalpy".
        \type real
@@ -78237,8 +78237,7 @@ ZoneHVAC:RefrigerationChillerSet,
 DemandManagerAssignmentList,
        \extensible:2 Duplicate the last two fields DemandManager Object Type and DemandManager Name
        \memo a list of meters that can be reported are available after a run on
-       \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has
-       been requested.
+       \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
   A1 , \field Name
        \required-field
        \type alpha
