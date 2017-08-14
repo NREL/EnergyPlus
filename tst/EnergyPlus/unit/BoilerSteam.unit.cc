@@ -66,21 +66,21 @@ TEST_F( EnergyPlusFixture, BoilerSteam_GetInput )
 {
 
 	std::string const idf_objects = delimited_string( {
-		"  Boiler:Steam,																							",
-		"	Steam Boiler Plant Boiler,  !- Name																		",
-		"	NaturalGas,					!- Fuel Type																",
-		"	160000,						!- Maximum Operating Pressure{ Pa }											",
-		"	0.8,						!- Theoretical Efficiency													",
-		"	115,						!- Design Outlet Steam Temperature{ C }										",
-		"	autosize,					!- Nominal Capacity{ W }													",
-		"	0.00001,					!- Minimum Part Load Ratio													",
-		"	1.0,						!- Maximum Part Load Ratio													",
-		"	0.2,						!- Optimum Part Load Ratio													",
-		"	0.8,						!- Coefficient 1 of Fuel Use Function of Part Load Ratio Curve				",
-		"	0.1,						!- Coefficient 2 of Fuel Use Function of Part Load Ratio Curve				",
-		"	0.1,						!- Coefficient 3 of Fuel Use Function of Part Load Ratio Curve				",
-		"	Steam Boiler Plant Boiler Inlet Node,  !- Water Inlet Node Name											",
-		"	Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name										",
+		"  Boiler:Steam,                                                                                            ",
+		"    Steam Boiler Plant Boiler,  !- Name                                                                    ",
+		"    NaturalGas,                !- Fuel Type                                                                ",
+		"    160000,                    !- Maximum Operating Pressure{ Pa }                                         ",
+		"    0.8,                       !- Theoretical Efficiency                                                   ",
+		"    115,                       !- Design Outlet Steam Temperature{ C }                                     ",
+		"    autosize,                  !- Nominal Capacity{ W }                                                    ",
+		"    0.00001,                   !- Minimum Part Load Ratio                                                  ",
+		"    1.0,                       !- Maximum Part Load Ratio                                                  ",
+		"    0.2,                       !- Optimum Part Load Ratio                                                  ",
+		"    0.8,                       !- Coefficient 1 of Fuel Use Function of Part Load Ratio Curve              ",
+		"    0.1,                       !- Coefficient 2 of Fuel Use Function of Part Load Ratio Curve              ",
+		"    0.1,                       !- Coefficient 3 of Fuel Use Function of Part Load Ratio Curve              ",
+		"    Steam Boiler Plant Boiler Inlet Node,  !- Water Inlet Node Name                                        ",
+		"    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects, false ) );
