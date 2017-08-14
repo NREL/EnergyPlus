@@ -653,8 +653,12 @@ namespace OutputReportPredefined {
 	int pdchLeedPerfElDem;
 	int pdchLeedPerfGasEneUse;
 	int pdchLeedPerfGasDem;
-	int pdchLeedPerfOthEneUse;
-	int pdchLeedPerfOthDem;
+	int pdchLeedPerfAddFuelEneUse;
+	int pdchLeedPerfAddFuelDem;
+	int pdchLeedPerfDisClEneUse;
+	int pdchLeedPerfDisClDem;
+	int pdchLeedPerfDisHtEneUse;
+	int pdchLeedPerfDisHtDem;
 
 	int pdstLeedEneUseSum;
 	int pdchLeedEusUnt;
@@ -1234,8 +1238,12 @@ namespace OutputReportPredefined {
 		pdchLeedPerfElDem = 0;
 		pdchLeedPerfGasEneUse = 0;
 		pdchLeedPerfGasDem = 0;
-		pdchLeedPerfOthEneUse = 0;
-		pdchLeedPerfOthDem = 0;
+		pdchLeedPerfAddFuelEneUse = 0;
+		pdchLeedPerfAddFuelDem = 0;
+		pdchLeedPerfDisClEneUse = 0;
+		pdchLeedPerfDisClDem = 0;
+		pdchLeedPerfDisHtEneUse = 0;
+		pdchLeedPerfDisHtDem = 0;
 		pdstLeedEneUseSum = 0;
 		pdchLeedEusUnt = 0;
 		pdchLeedEusProc = 0;
@@ -2025,8 +2033,12 @@ namespace OutputReportPredefined {
 		pdchLeedPerfElDem = newPreDefColumn( pdstLeedPerf, "Electric Demand [W]" );
 		pdchLeedPerfGasEneUse = newPreDefColumn( pdstLeedPerf, "Natural Gas Energy Use [GJ]" );
 		pdchLeedPerfGasDem = newPreDefColumn( pdstLeedPerf, "Natural Gas Demand [W]" );
-		pdchLeedPerfOthEneUse = newPreDefColumn( pdstLeedPerf, "Additional Energy Use [GJ]" );
-		pdchLeedPerfOthDem = newPreDefColumn( pdstLeedPerf, "Additional Demand [W]" );
+		pdchLeedPerfAddFuelEneUse = newPreDefColumn( pdstLeedPerf, "Additional Fuel Use [GJ]" );
+		pdchLeedPerfAddFuelDem = newPreDefColumn( pdstLeedPerf, "Additional Fuel Demand [W]" );
+		pdchLeedPerfDisClEneUse = newPreDefColumn( pdstLeedPerf, "District Cooling Use [GJ]" );
+		pdchLeedPerfDisClDem = newPreDefColumn( pdstLeedPerf, "District Cooling Demand [W]" );
+		pdchLeedPerfDisHtEneUse = newPreDefColumn( pdstLeedPerf, "District Heating Use [GJ]" );
+		pdchLeedPerfDisHtDem = newPreDefColumn( pdstLeedPerf, "District Heating Demand [W]" );
 
 		pdstLeedEneUseSum = newPreDefSubTable( pdrLeed, "EAp2-6. Energy Use Summary" );
 		// Multiple columns with rows of:
