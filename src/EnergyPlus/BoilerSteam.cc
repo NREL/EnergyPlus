@@ -383,6 +383,10 @@ namespace BoilerSteam {
 
 			// INPUTS from the IDF file
 			Boiler( BoilerNum ).BoilerMaxOperPress = rNumericArgs( 1 );
+			if ( Boiler( BoilerNum ).BoilerInletNodeNum < 10e5 ) {
+				ShowWarningMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
+				ShowContinueError( "Field: Maximum Operation Pressure units are Pa. Verify units." );
+			}
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			Boiler( BoilerNum ).TempUpLimitBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).NomCap = rNumericArgs( 4 );

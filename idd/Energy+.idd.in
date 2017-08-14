@@ -63385,14 +63385,17 @@ Boiler:Steam,
   N1 , \field Maximum Operating Pressure
        \required-field
        \units Pa
+       \default 160000
   N2 , \field Theoretical Efficiency
        \required-field
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
+       \default 0.8
   N3 , \field Design Outlet Steam Temperature
        \required-field
        \units C
+       \default 100
   N4 , \field Nominal Capacity
        \units W
        \autosizable
