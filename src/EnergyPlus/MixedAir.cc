@@ -64,6 +64,7 @@
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
+#include <DataHVACControllers.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
@@ -81,6 +82,7 @@
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
+#include <HVACControllers.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -622,8 +624,17 @@ namespace MixedAir {
 		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 		using Humidifiers::SimHumidifier;
+		using HVACControllers::ManageControllers;
+		using WaterCoils::WaterCoil;
+		using WaterCoils::CalcWaterCoilWaterFlowRate;
+		using HVACControllers::ControllerProps;
+
 		// Locals
 		// SUBROUTINE ARGUMENTS:
+		std::string const ControllerName( "DontCare" );
+		int AirLoopPass;
+		bool ControllerConvergedFlag;
+		bool IsUpToDateFlag;
 
 		// SUBROUTINE PARAMETER DEFINITIONS: None
 
@@ -638,6 +649,9 @@ namespace MixedAir {
 		OAHX = false;
 		Real64 AirloopPLR;
 		int FanOpMode;
+		AirLoopPass = 1;
+		ControllerConvergedFlag = false;
+		IsUpToDateFlag = false;
 
 		{ auto const SELECT_CASE_var( CompTypeNum );
 
@@ -672,11 +686,19 @@ namespace MixedAir {
 			// Coil Types
 		} else if ( SELECT_CASE_var == WaterCoil_Cooling ) { // 'Coil:Cooling:Water'
 			if ( Sim ) {
+				if ( CompIndex > 0 ) {
+					CalcWaterCoilWaterFlowRate( CompName, FirstHVACIteration, CompIndex );
+					ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
+				}
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_SimpleHeat ) { // 'Coil:Heating:Water')
 			if ( Sim ) {
+				if ( CompIndex > 0 ) {
+					CalcWaterCoilWaterFlowRate( CompName, FirstHVACIteration, CompIndex );
+					ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
+				}
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 			OAHeatingCoil = true;
@@ -687,6 +709,10 @@ namespace MixedAir {
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_DetailedCool ) { // 'Coil:Cooling:Water:DetailedGeometry'
 			if ( Sim ) {
+				if ( CompIndex > 0 ) {
+					CalcWaterCoilWaterFlowRate( CompName, FirstHVACIteration, CompIndex );
+					ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
+				}
 				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 			OACoolingCoil = true;

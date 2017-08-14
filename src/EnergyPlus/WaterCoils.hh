@@ -263,6 +263,15 @@ namespace WaterCoils {
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
 		Real64 DesignWaterDeltaTemp; // water deltaT for coil sizing [K]
 		bool UseDesignWaterDeltaTemp; // is true, the DesignWaterDeltaTemp is used for sizing coil design water flow rate
+		int ControllerIndex; // index to water coil controller
+		int ControllerSensedNode; // water coil sensed node
+		int ControllerControlVar; // controller control variable (e.g., Temp, TempandHumRat)
+		Real64 ControllerTolerance; // controller solution tolerance for convergence
+		int WaterCoilMaxIterIndex; // warning index for messages
+		int WaterCoilIterFailedIndex; // warning index for messages
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -375,8 +384,17 @@ namespace WaterCoils {
 			DesiccantRegenerationCoil( false ),
 			DesiccantDehumNum( 0 ),
 			DesignWaterDeltaTemp( 0.0 ),
-			UseDesignWaterDeltaTemp( false )
-		{}
+			UseDesignWaterDeltaTemp( false ),
+			ControllerIndex( 0 ),
+			ControllerSensedNode( 0 ),
+			ControllerControlVar( 0 ),
+			ControllerTolerance( 0.0 ),
+			WaterCoilMaxIterIndex( 0 ),
+			WaterCoilIterFailedIndex( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
+			{}
 
 	};
 
@@ -774,8 +792,21 @@ namespace WaterCoils {
 		Real64 const PartLoadRatio, // part-load ratio of heating coil
 		Real64 const UAMax, // maximum UA-Value
 		Real64 & DesCoilInletWaterTempUsed // estimated coil design inlet water temperature
-		);
-	
+	);
+
+	void
+	CalcWaterCoilWaterFlowRate(
+		std::string const & CoilName, // name of water coil
+		bool const FirstHVACIteration, // first HVAC iteration flag
+		int & CoilNum // index to heating coil
+	);
+
+	Real64
+	WaterCoilResidual(
+		Real64 const PartLoadRatio, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par(1) = DX coil number
+	);
+
 	// End of Coil Utility subroutines
 	// *****************************************************************************
 

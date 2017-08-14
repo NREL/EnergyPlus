@@ -72,6 +72,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACControllers.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -305,10 +306,10 @@ namespace WaterCoils {
 			CompIndex = CoilNum;
 		} else {
 			CoilNum = CompIndex;
-			if ( CoilNum > NumWaterCoils || CoilNum < 1 ) {
-				ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Water Coils=" + TrimSigDigits( NumWaterCoils ) + ", Coil name=" + CompName );
-			}
 			if ( CheckEquipName( CoilNum ) ) {
+				if ( CoilNum > NumWaterCoils || CoilNum < 1 ) {
+					ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Water Coils=" + TrimSigDigits( NumWaterCoils ) + ", Coil name=" + CompName );
+				}
 				if ( CompName != WaterCoil( CoilNum ).Name ) {
 					ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );
 				}
@@ -382,9 +383,9 @@ namespace WaterCoils {
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankSupplyComponent;
 		using namespace DataIPShortCuts;
+		using namespace FaultsManager;
 		using GlobalNames::VerifyUniqueCoilName;
 		using SetPointManager::NodeHasSPMCtrlVarType;
-		using namespace FaultsManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -866,6 +867,10 @@ namespace WaterCoils {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using namespace FaultsManager;
 		using DataAirSystems::PrimaryAirSystem;
+		using HVACControllers::GetControllerIndex;
+		using HVACControllers::GetControllerSensedNode;
+		using HVACControllers::GetControllerControlVar;
+		using HVACControllers::GetControllerTolerance;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallNo( 1.e-9 ); // SmallNo number in place of zero
@@ -909,6 +914,7 @@ namespace WaterCoils {
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyCoilReportFlag;
 		static Array1D_bool PlantLoopScanFlag;
+		static Array1D_bool ControllerScanFlag;
 
 		static Array1D< Real64 > CoefSeries( 5 ); //Tuned Changed to static: High call count: Set before use
 		Real64 FinDiamVar;
@@ -969,6 +975,7 @@ namespace WaterCoils {
 			MyCoilReportFlag.allocate( NumWaterCoils );
 			DesUARangeCheck.allocate( NumWaterCoils );
 			PlantLoopScanFlag.allocate( NumWaterCoils );
+			ControllerScanFlag.allocate( NumWaterCoils );
 
 			DesCpAir = 0.0;
 			DesUARangeCheck = 0.0;
@@ -980,6 +987,19 @@ namespace WaterCoils {
 			MyCoilReportFlag = true;
 			InitWaterCoilOneTimeFlag = false;
 			PlantLoopScanFlag = true;
+			ControllerScanFlag = true;
+		}
+
+		if ( ControllerScanFlag( CoilNum ) ) {
+
+			// get water coil controller index
+			errFlag = false;
+			GetControllerIndex( WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).ControllerIndex, errFlag );
+			GetControllerSensedNode( WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).ControllerSensedNode, errFlag );
+			GetControllerControlVar( WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).ControllerControlVar, errFlag );
+			GetControllerTolerance( WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).ControllerTolerance, errFlag );
+			ControllerScanFlag( CoilNum ) = false;
+
 		}
 
 		if ( PlantLoopScanFlag( CoilNum ) && allocated( PlantLoop ) ) {
@@ -991,6 +1011,7 @@ namespace WaterCoils {
 			PlantLoopScanFlag( CoilNum ) = false;
 		}
 		if ( ! SysSizingCalc && MySizeFlag( CoilNum ) ) {
+
 			// for each coil, do the sizing once.
 			SizeWaterCoil( CoilNum );
 
@@ -5592,11 +5613,6 @@ Label10: ;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::iHumidityRatioMaxSetPoint;
 
-		//USE HVACControllers,     ONLY: iTemperature, iHumidityRatio, iTemperatureAndHumidityRatio
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CheckForSensorAndSetpointNode: " );
 		int const iTemperature( 1 );
@@ -6383,6 +6399,355 @@ Label10: ;
 			// water coil should not be sized at coil water inlet temperature lower than 46.0C (for convergence problem in Regulafalsi)
 			DesCoilInletWaterTempUsed = max( DesCoilInletWaterTempUsed, DesCoilHWInletTempMin );
 		} 
+	}
+
+	void
+	CalcWaterCoilWaterFlowRate(
+		std::string const & CoilName, // name of water coil
+		bool const FirstHVACIteration, // first HVAC iteration flag
+		int & CoilNum // index to heating coil
+	)
+	{
+		// Using/Aliasing
+		using DataPlant::ScanPlantLoopsForObject;
+		using FaultsManager::FaultsCoilSATSensor;
+		using General::RoundSigDigits;
+		using General::SolveRegulaFalsi;
+		using PlantUtilities::SetComponentFlowRate;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcWaterCoilWaterFlowRate: " ); // for error messages
+		int const MaxIter( 6 ); // Maximum number of iterations for solver
+		int const MaxIter2( 2 ); // Maximum number of iterations for solver
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Array1D< Real64 > Par( 6 ); // Parameter array passed to solver
+		Real64 Acc; // accuracy of convergence
+		int AirOutletNode; // node number of coil outlet air node
+		int SensedNode; // node number of coil sensed node for control
+		int WaterInletNode; // node number of coil inlet water node
+		int WaterOutletNode; // node number of coil outlet water node
+		Real64 TempSetPoint; // target coil outlet node temperature set point [C]
+		Real64 mdot; // local water mass flow rate [kg/s]
+		Real64 mdotLow; // saved low water mass flow rate [kg/s]
+		bool errFlag; // warning flag
+		Real64 PartLoadFrac; // local fraction of max water flow rate
+		Real64 minPartLoadFrac; // minPLR pass to solver, based on max water flow rate
+		Real64 maxPartLoadFrac; // manPLR pass to solver, based on max water flow rate
+		int SolFlag; // solver return flag, -1 = max iterations exceeded, -2 = solution not found, other = number of iterations
+		Real64 deltaT; // air temperature difference from temperature set point [C]
+		std::string WaterCoilType; // used for warning messages
+		Real64 ApproachTemp; // difference between node air dry-bulb and dew point temperature [C]
+		Real64 DesiredDewPoint; // desired dew point temperature for humidity control [C]
+		Real64 HumidityControlTempSetPoint; // temperature set point when humidity control is requestd [C]
+		int LoopNum; // plant index
+		int LoopSide; // plant loop side index
+		int BranchNum; // plant loop branch number
+		int CompNum; // plant loop component number
+
+		LoopNum = WaterCoil( CoilNum ).WaterLoopNum;
+		LoopSide = WaterCoil( CoilNum ).WaterLoopSide;
+		BranchNum = WaterCoil( CoilNum ).WaterLoopBranchNum;
+		CompNum = WaterCoil( CoilNum ).WaterLoopCompNum;
+
+		if ( CompNum == 0 ) {
+			ScanPlantLoopsForObject( WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterCoilType_Num, LoopNum, LoopSide, BranchNum, CompNum, _, _, _, _, _, errFlag );
+			if ( CompNum == 0 ) return;
+		}
+
+		AirOutletNode = WaterCoil( CoilNum ).AirOutletNodeNum;
+		WaterInletNode = WaterCoil( CoilNum ).WaterInletNodeNum;
+		WaterOutletNode = WaterCoil( CoilNum ).WaterOutletNodeNum;
+		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSide ) );
+
+		mdot = 0.0;
+		SetComponentFlowRate( mdot, WaterInletNode, WaterOutletNode, LoopNum, LoopSide, BranchNum, CompNum );
+		mdotLow = mdot;
+		PartLoadFrac = mdot / WaterCoil( CoilNum ).MaxWaterMassFlowRate;
+		SimulateWaterCoilComponents( CoilName, FirstHVACIteration, CoilNum );
+
+		// the coil is available, air flow is non-zero, and the plant is not locked. Othewise coil is off.
+		// if flow is locked, the above call to SetComponentFlowRate will set the locked flow (i.e., whatever is at the coil water inlet node) ... no need to simulate.
+		if ( GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ) > 0.0 && Node( AirOutletNode ).MassFlowRate > 0.0 && loop_side.FlowLock == DataPlant::FlowUnlocked ) {
+
+			if ( WaterCoil( CoilNum ).ControllerTolerance == DataSizing::AutoSize ) {
+				Acc = 0.001;
+			} else {
+				Acc = WaterCoil( CoilNum ).ControllerTolerance;
+			}
+
+			SensedNode = WaterCoil( CoilNum ).ControllerSensedNode;
+
+			if ( SensedNode == AirOutletNode ) {
+				TempSetPoint = Node( AirOutletNode ).TempSetPoint;
+			} else {
+				TempSetPoint = Node( SensedNode ).TempSetPoint - ( Node( SensedNode ).Temp - Node( AirOutletNode ).Temp );
+			}
+
+			if ( WaterCoil( CoilNum ).ControllerControlVar == HVACControllers::iTemperatureAndHumidityRatio && WaterCoil( CoilNum ).WaterCoilType_Num != WaterCoil_SimpleHeating ) {
+				if ( ( Node( SensedNode ).HumRatMax > 0 ) && ( Node( SensedNode ).HumRat > Node( SensedNode ).HumRatMax ) ) {
+					// Check if outlet air humidity ratio is greater than the set point. If so, calculate new temperature based set point.
+					// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
+					ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress );
+					// Calculate the dew point temperature at the SA humidity ratio setpoint
+					DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress );
+					// Adjust the calculated dew point temperature by the approach temp. Should be within 0.3C of air temperature.
+					HumidityControlTempSetPoint = DesiredDewPoint + min( 0.3, ApproachTemp );
+					TempSetPoint = min( TempSetPoint, HumidityControlTempSetPoint );
+				}
+			}
+
+			//If there is a fault of coil SAT Sensor
+			if ( WaterCoil( CoilNum ).FaultyCoilSATFlag && ( !WarmupFlag ) && ( !DoingSizing ) && ( !KickOffSimulation ) ) {
+				//calculate the sensor offset using fault information
+				int FaultIndex = WaterCoil( CoilNum ).FaultyCoilSATIndex;
+				WaterCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+				//update the TempSetPoint
+				TempSetPoint -= WaterCoil( CoilNum ).FaultyCoilSATOffset;
+			}
+
+			if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) { // heating coil
+				deltaT = TempSetPoint - Node( AirOutletNode ).Temp; // positive result means coil should be on
+			} else {
+				deltaT = Node( AirOutletNode ).Temp - TempSetPoint; // positive result means coil should be on
+			}
+
+			// *** NEED TO FIGURE OUT LOCKOUT LOGIC for non-OA system coils ( and OA system coils if they can be locked out ) *** and bypass next calculations if in lockout mode //
+			// maybe lockout logic needs to be higher up to save clock cycles
+			if ( deltaT > Acc ) {
+
+				mdot = WaterCoil( CoilNum ).MaxWaterMassFlowRate;
+				SetComponentFlowRate( mdot, WaterInletNode, WaterOutletNode, LoopNum, LoopSide, BranchNum, CompNum );
+				SimulateWaterCoilComponents( CoilName, FirstHVACIteration, CoilNum );
+
+				if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) { // heating coil
+					deltaT = Node( AirOutletNode ).Temp - TempSetPoint; // positive result means coil should modulate
+				} else {
+					deltaT = TempSetPoint - Node( AirOutletNode ).Temp; // positive result means coil should modulate
+				}
+
+				if ( deltaT > Acc ) {
+
+					Par( 1 ) = Real64( CoilNum );
+					Par( 2 ) = Real64( WaterInletNode );
+					Par( 3 ) = 0.0;
+					if ( FirstHVACIteration ) Par( 3 ) = 1.0;
+					Par( 4 ) = TempSetPoint;
+					Par( 5 ) = Real64( AirOutletNode );
+					Par( 6 ) = WaterCoil( CoilNum ).MaxWaterMassFlowRate;
+
+					minPartLoadFrac = max( 0.0, ( ( mdotLow / WaterCoil( CoilNum ).MaxWaterMassFlowRate ) - 0.0001 ) ); // here flow is not locked so min must be 0? can other equip raise min? don't think so.
+					maxPartLoadFrac = min( 1.0, ( ( mdot / WaterCoil( CoilNum ).MaxWaterMassFlowRate ) + 0.0001 ) ); // same here, max must be 1? can other equip lower max? don't think so.
+					SolveRegulaFalsi( Acc, MaxIter, SolFlag, PartLoadFrac, WaterCoilResidual, minPartLoadFrac, maxPartLoadFrac, Par );
+
+					if ( SolFlag < 0 ) {
+
+						if ( SolFlag == -1 ) { // Bisect and solve again. Replace this with new solver logic (RootSolver by Gu) when available.
+
+							// update previous min/max based on solver result
+							if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) { // heating coil
+								deltaT = Node( AirOutletNode ).Temp - TempSetPoint; // positive result means coil should modulate
+							} else {
+								deltaT = TempSetPoint - Node( AirOutletNode ).Temp; // positive result means coil should modulate
+							}
+
+							if ( deltaT < 0 ) {
+								minPartLoadFrac = max( 0.0, (PartLoadFrac - 0.0001 ) ); // relax limit so as not to prevent a solution (i.e., avoid SolFalg == -2)
+							} else if ( deltaT > 0 ) {
+								maxPartLoadFrac = min( 1.0, ( PartLoadFrac + 0.0001 ) ); // relax limit so as not to prevent a solution (i.e., avoid SolFalg == -2)
+							} else { // == 0
+								// if the answer is found go ahead and solve (should never get here since SolFlag == -1)
+								SolFlag = 0;
+								mdot = PartLoadFrac * WaterCoil( CoilNum ).MaxWaterMassFlowRate;
+								SetComponentFlowRate( mdot, WaterInletNode, WaterOutletNode, LoopNum, LoopSide, BranchNum, CompNum );
+							}
+
+							if ( SolFlag < 0 ) { // no need to do this if deltaT = 0 from above
+
+								int maxIter = 10;
+								int iter = 0;
+								
+								while ( SolFlag < 0 && iter < maxIter ) {
+
+									iter += 1;
+
+									// bisect once and adjust min/max used for RegulaFalsi
+									mdot = ( ( minPartLoadFrac + maxPartLoadFrac ) / 2.0 ) * WaterCoil( CoilNum ).MaxWaterMassFlowRate;
+									Node( WaterInletNode ).MassFlowRate = mdot; // OK to set water inlet node flow rate since PLR is between limits imposed by SetComponentFlowRate
+									SimulateWaterCoilComponents( CoilName, FirstHVACIteration, CoilNum );
+
+									if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) { // heating coil
+										deltaT = Node( AirOutletNode ).Temp - TempSetPoint; // positive result means coil should modulate
+									} else {
+										deltaT = TempSetPoint - Node( AirOutletNode ).Temp; // positive result means coil should modulate
+									}
+
+									if ( deltaT == 0.0 ) { // hit set point exactly
+
+										// if the answer is found go ahead and solve
+										SolFlag = 0;
+										PartLoadFrac = mdot / WaterCoil( CoilNum ).MaxWaterMassFlowRate;
+
+									} else {
+
+										// update min or max accordingly
+										if ( deltaT < 0 ) {
+											minPartLoadFrac = max( 0.0, ( ( minPartLoadFrac + maxPartLoadFrac ) / 2.0 ) - 0.0001 ); // relax limit so as not to prevent a solution (i.e., avoid SolFalg == -2)
+										} else { // deltaT > 0
+											maxPartLoadFrac = min( 1.0, ( ( minPartLoadFrac + maxPartLoadFrac ) / 2.0 ) + 0.0001 ); // relax limit so as not to prevent a solution (i.e., avoid SolFalg == -2)
+										}
+
+										SolveRegulaFalsi( Acc, MaxIter2, SolFlag, PartLoadFrac, WaterCoilResidual, minPartLoadFrac, maxPartLoadFrac, Par );
+
+										if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) { // heating coil
+											deltaT = Node( AirOutletNode ).Temp - TempSetPoint; // positive result means coil should modulate
+										} else {
+											deltaT = TempSetPoint - Node( AirOutletNode ).Temp; // positive result means coil should modulate
+										}
+
+										// update min or max accordingly
+										if ( deltaT < 0 ) {
+											minPartLoadFrac = max( 0.0, ( PartLoadFrac - 0.0001 ) ); // relax limit so as not to prevent a solution (i.e., avoid SolFalg == -2)
+										} else { // deltaT > 0
+											maxPartLoadFrac = min( 1.0, ( PartLoadFrac + 0.0001 ) ); // relax limit so as not to prevent a solution (i.e., avoid SolFalg == -2)
+										}
+
+									}
+
+								}
+
+								mdot = PartLoadFrac * WaterCoil( CoilNum ).MaxWaterMassFlowRate;
+								SetComponentFlowRate( mdot, WaterInletNode, WaterOutletNode, LoopNum, LoopSide, BranchNum, CompNum );
+
+								if ( SolFlag < 0 ) {
+
+									if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_DetFlatFinCooling ) {
+										WaterCoilType = "Coil:Cooling:Water:DetailedGeometry";
+									} else if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_Cooling ) {
+										WaterCoilType = "Coil:Cooling:Water";
+									} else if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) {
+										WaterCoilType = "Coil:Heating:Water";
+									}
+
+									if ( SolFlag == -1 ) {
+
+										if ( WaterCoil( CoilNum ).WaterCoilMaxIterIndex == 0 ) {
+											ShowWarningMessage( RoutineName + "Water coil control failed for " + WaterCoilType + "=\"" + WaterCoil( CoilNum ).Name + "\"" );
+											ShowContinueErrorTimeStamp( "" );
+											ShowContinueError( "  Iteration limit [" + RoundSigDigits( MaxIter2 ) + "] exceeded in calculating water mass flow rate" );
+											ShowContinueError( "  Last calculated water flow ratio [" + RoundSigDigits( PartLoadFrac, 3 ) + "] will be used and the simulation continues" );
+										}
+										ShowRecurringWarningErrorAtEnd( RoutineName + "Water coil control failed (iteration limit [" + RoundSigDigits( MaxIter2 ) + "]) for " + WaterCoilType + "=\"" + WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterCoilMaxIterIndex );
+
+									}
+									if ( SolFlag == -2 ) {
+
+										if ( WaterCoil( CoilNum ).WaterCoilIterFailedIndex == 0 ) {
+											ShowWarningMessage( RoutineName + "Water coil control failed for " + WaterCoilType + "=\"" + WaterCoil( CoilNum ).Name + "\"" );
+											ShowContinueErrorTimeStamp( "" );
+											ShowContinueError( "...Bad water flow rate limits" );
+											ShowContinueError( "...Starting minimum part load ratio =" + RoundSigDigits( minPartLoadFrac, 3 ) );
+											ShowContinueError( "...Starting maximum part load ratio =" + RoundSigDigits( maxPartLoadFrac, 3 ) );
+											ShowContinueError( "...Water water flow rate of [" + RoundSigDigits( mdot, 5 ) + " (kg/s)] will be used and the simulation continues" );
+										}
+										ShowRecurringWarningErrorAtEnd( RoutineName + "Water coil control failed for " + WaterCoilType + "=\"" + WaterCoil( CoilNum ).Name + "\"", WaterCoil( CoilNum ).WaterCoilIterFailedIndex, minPartLoadFrac, maxPartLoadFrac );
+
+									}
+
+								}
+
+							}
+
+						}
+
+						if ( SolFlag == -2 ) {
+
+							if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_DetFlatFinCooling ) {
+								WaterCoilType = "Coil:Cooling:Water:DetailedGeometry";
+							} else if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_Cooling ) {
+								WaterCoilType = "Coil:Cooling:Water";
+							} else if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) {
+								WaterCoilType = "Coil:Heating:Water";
+							}
+
+							if ( WaterCoil( CoilNum ).WaterCoilIterFailedIndex == 0 ) {
+								ShowWarningMessage( RoutineName + "Water coil control failed for " + WaterCoilType + "=\"" + WaterCoil( CoilNum ).Name + "\"" );
+								ShowContinueErrorTimeStamp( "" );
+								ShowContinueError( "...Bad water flow rate limits" );
+								ShowContinueError( "...Starting minimum part load ratio =" + RoundSigDigits( minPartLoadFrac, 3 ) );
+								ShowContinueError( "...Starting maximum part load ratio =" + RoundSigDigits( maxPartLoadFrac, 3 ) );
+								ShowContinueError( "...Water water flow rate of [" + RoundSigDigits( mdot, 5 ) + " (kg/s)] will be used and the simulation continues" );
+							}
+							ShowRecurringWarningErrorAtEnd( RoutineName + "Water coil control failed for " + WaterCoilType + "=\"" + WaterCoil( CoilNum ).Name + "\"", WaterCoil( CoilNum ).WaterCoilIterFailedIndex, minPartLoadFrac, maxPartLoadFrac );
+
+						}
+
+					} else {
+
+						mdot = PartLoadFrac * WaterCoil( CoilNum ).MaxWaterMassFlowRate;
+						SetComponentFlowRate( mdot, WaterInletNode, WaterOutletNode, LoopNum, LoopSide, BranchNum, CompNum );
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	Real64
+	WaterCoilResidual(
+		Real64 const PartLoadRatio, // water coil water flow ratio (fraction of max flow)
+		Array1< Real64 > const & Par // model inputs
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Richard Raustad, FSEC
+		//       DATE WRITTEN   June 2017
+
+		// PURPOSE OF THIS FUNCTION:
+		// Calculates residual function (desired outlet temp - actual outlet temp)
+		// water coil output depends on the water flow rate which is being varied via PLR to zero the residual.
+
+		// METHODOLOGY EMPLOYED:
+		// Calls SimulateWaterCoilComponents to get outlet temperature at the given part load ratio
+		// and calculates the residual as defined above
+
+		// Using/Aliasing
+		using WaterCoils::SimulateWaterCoilComponents;
+
+		// Return value
+		Real64 Residuum; // Residual to be minimized to zero
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 OutletAirTemp; // Outlet air temperature [C]
+		Real64 mdot; // water-side flow rate of HW coil [kg/s]
+		int WaterCoilNum; // index to water coil
+		int WaterInletNode; // water coil inlet water node number
+		int AirOutletNode; // water coil outlet air node number
+		bool FirstHVACIteration; // iteration flag
+		Real64 DesiredOutletTemp; // temperature set point [C]
+		Real64 maxWaterFlowRate; // maximum water coil water mass flow rate [kg/s]
+
+		WaterCoilNum = int( Par( 1 ) );
+		WaterInletNode = int( Par( 2 ) );
+		FirstHVACIteration = ( Par( 3 ) > 0.0 );
+		DesiredOutletTemp = Par( 4 );
+		AirOutletNode = int( Par( 5 ) );
+		maxWaterFlowRate = Par( 6 );
+
+		mdot = maxWaterFlowRate * PartLoadRatio;
+		Node( WaterInletNode ).MassFlowRate = mdot; // OK to set water inlet node flow rate since PLR is between limits imposed by SetComponentFlowRate
+		SimulateWaterCoilComponents( WaterCoil( WaterCoilNum ).Name, FirstHVACIteration, WaterCoilNum );
+		OutletAirTemp = Node( AirOutletNode ).Temp;
+
+		Residuum = DesiredOutletTemp - OutletAirTemp;
+
+		return Residuum;
+
 	}
 
 	// End of Coil Utility subroutines
