@@ -213,6 +213,13 @@ namespace EarthTube {
 		);
 	
 	void
+	CheckEarthTubesInZones
+		( std::string const ZoneName, // name of zone for error reporting
+	 	  std::string const FieldName, // name of earth tube in input
+		  bool & ErrorsFound // Found a problem
+		);
+	
+	void
 	CalcEarthTube();
 
 	void

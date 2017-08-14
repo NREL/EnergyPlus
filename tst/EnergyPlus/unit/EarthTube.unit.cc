@@ -115,7 +115,6 @@ namespace EnergyPlus {
 	// DATE WRITTEN: June 2017
 			
 	// Set subroutine arguments
-		
 	std::string ZoneName = "ZONE 1";
 	std::string InputName = "ZoneEarthtube";
 	bool ErrorsFound = false;
