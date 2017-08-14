@@ -96,10 +96,10 @@
 ! Timestep or Hourly Variables:   Timestep
 ! Time bins Report:               None
 ! HTML Report:                    None
-! Environmental Emissions:        None
+! Environmental Emissions:        None 
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
   Building,
     NONE,                    !- Name
