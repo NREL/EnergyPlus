@@ -227,7 +227,7 @@ This alpha field contains the identifying name given to the unitary system suppl
 
 \paragraph{Field: Cooling Supply Air Flow Rate Method}\label{field-cooling-supply-air-flow-rate-method-000}
 
-This alpha field defines the supply air flow method during cooling operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FlowPerCoolingCapacity. For each of the choices, a corresponding air flow rate for cooling must be specified.
+This alpha field defines the supply air flow method during cooling operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FlowPerCoolingCapacity. For each of the choices, a corresponding air flow rate for cooling must be specified. If the system does not have a heating coil a 0 may be entered for heating air flow rate and/or no load supply air flow rate to turn the fan off when cooling is not required.
 
 \paragraph{Field: Cooling Supply Air Flow Rate}\label{field-cooling-supply-air-flow-rate-001}
 
@@ -247,7 +247,7 @@ This numeric field defines the supply air flow rate per unit of capacity leaving
 
 \paragraph{Field: Heating Supply Air Flow Rate Method}\label{field-heating-supply-air-flow-rate-method-000}
 
-This alpha field defines the supply air flow method during heating operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedHeatingValue, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate for heating must be specified.
+This alpha field defines the supply air flow method during heating operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedHeatingValue, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate for heating must be specified. If the system does not have a cooling coil a 0 may be entered for cooling air flow rate and/or no load supply air flow rate to turn the fan off when heating is not required.
 
 \paragraph{Field: Heating Supply Air Flow Rate}\label{field-heating-supply-air-flow-rate-001}
 

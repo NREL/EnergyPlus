@@ -1429,6 +1429,24 @@ TEST_F( EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTes
 
 	}
 
+	// #6200 defect file shows fan flow rate when cooling coil is off and no cooling coil exists. Allow user to set flow rate = 0 when coil does not exist.
+	UnitarySystem( UnitarySysNum ).Name = "UnitarySystem:CoolingOnly No Heating Coil";
+	UnitarySystem( UnitarySysNum ).CoolingSAFMethod = SizingTypes( DataSizing::SupplyAirFlowRate );
+	UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = AutoSize;
+	UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+	UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 0.0; // no heating coil
+	UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
+	UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
+
+	SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
+
+	EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate );
+	EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow );
+	EXPECT_EQ( 0.0, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
+	EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
+	EXPECT_EQ( 18827.616766698276, ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad );
+
+	// continue with unit testing of heating only system
 	UnitarySystem( UnitarySysNum ).CoolCoilExists = false;
 	UnitarySystem( UnitarySysNum ).HeatCoilExists = true;
 	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.005;
@@ -1467,6 +1485,25 @@ TEST_F( EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTes
 
 	}
 
+	// #6200 defect file shows fan flow rate when cooling coil is off and no cooling coil exists. Allow user to set flow rate = 0 when coil does not exist.
+	UnitarySystem( UnitarySysNum ).Name = "UnitarySystem:HeatingOnly No Cooling Coil";
+	UnitarySystem( UnitarySysNum ).HeatingSAFMethod = SizingTypes( DataSizing::SupplyAirFlowRate );
+	UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = AutoSize;
+	UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 0.0; // nocooling coil
+	UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+	UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
+	UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
+
+	SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
+
+	EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate );
+	EXPECT_EQ( 0.0, UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow );
+	EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
+	EXPECT_EQ( 1.005, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
+	EXPECT_EQ( 15148.243236712493, ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad );
+
+
+	// continue with unit testing of cooling and heating system
 	UnitarySystem( UnitarySysNum ).CoolCoilExists = true;
 	UnitarySystem( UnitarySysNum ).HeatCoilExists = true;
 	FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 1.005;
