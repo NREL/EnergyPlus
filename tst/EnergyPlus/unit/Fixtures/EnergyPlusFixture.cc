@@ -75,6 +75,7 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -135,6 +136,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HybridModel.hh>
@@ -144,6 +146,7 @@
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
@@ -163,6 +166,7 @@
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -179,7 +183,6 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SwimmingPool.hh>
@@ -203,7 +206,6 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -286,6 +288,7 @@ namespace EnergyPlus {
 		DataBranchAirLoopPlant::clear_state();
 		DataAirSystems::clear_state();
 		DataBranchNodeConnections::clear_state();
+		DataContaminantBalance::clear_state();
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();
 		DataEnvironment::clear_state();
@@ -372,6 +375,7 @@ namespace EnergyPlus {
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
 		PollutionModule::clear_state();
+		PoweredInductionUnits::clear_state();
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();

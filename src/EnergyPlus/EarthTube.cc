@@ -246,7 +246,6 @@ namespace EarthTube {
 		int NumNumber;
 		int IOStat;
 		int Loop;
-		int Loop1;
 		Array1D_bool RepVarSet;
 
 		RepVarSet.dimension( NumOfZones, true );
@@ -418,16 +417,7 @@ namespace EarthTube {
 			}
 		}
 
-		// Check to make sure there is only on ventilation statement per zone
-		for ( Loop = 1; Loop <= TotEarthTube; ++Loop ) {
-			for ( Loop1 = Loop + 1; Loop1 <= TotEarthTube - 1; ++Loop1 ) {
-				if ( EarthTubeSys( Loop ).ZonePtr == EarthTubeSys( Loop1 ).ZonePtr ) {
-					ShowSevereError( cAlphaArgs( 1 ) + " is assigned to more than one " + cCurrentModuleObject );
-					ShowContinueError( "Only one such assignment is allowed." );
-					ErrorsFound = true;
-				}
-			}
-		}
+		CheckEarthTubesInZones( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 
 		if ( ErrorsFound ) {
 			ShowFatalError( cCurrentModuleObject + ": Errors getting input.  Program terminates." );
@@ -435,6 +425,34 @@ namespace EarthTube {
 
 	}
 
+	
+	void
+	CheckEarthTubesInZones
+	(
+		std::string const ZoneName, // name of zone for error reporting
+		std::string const FieldName, // name of earth tube in input
+		bool & ErrorsFound // Found a problem
+	)
+	{
+
+		int Loop;
+		int Loop1;
+		
+		// Check to make sure there is only one earth tube statement per zone
+		for ( Loop = 1; Loop <= TotEarthTube - 1; ++Loop ) {
+			for ( Loop1 = Loop + 1; Loop1 <= TotEarthTube; ++Loop1 ) {
+				if ( EarthTubeSys( Loop ).ZonePtr == EarthTubeSys( Loop1 ).ZonePtr ) {
+					ShowSevereError( ZoneName + " has more than one " + FieldName + " associated with it.");
+					ShowContinueError( "Only one " + FieldName + " is allowed per zone.  Check the definitions of " +  FieldName );
+					ShowContinueError( "in your input file and make sure that there is only one defined for each zone.");
+					ErrorsFound = true;
+				}
+			}
+		}
+
+		
+	}
+	
 	void
 	CalcEarthTube()
 	{

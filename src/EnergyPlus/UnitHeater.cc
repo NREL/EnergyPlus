@@ -815,7 +815,7 @@ namespace UnitHeater {
 		InNode = UnitHeat( UnitHeatNum ).AirInNode;
 		OutNode = UnitHeat( UnitHeatNum ).AirOutNode;
 
-		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired; // zone load needed
+		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP; // zone load needed
 		if ( UnitHeat( UnitHeatNum ).FanSchedPtr > 0 ) {
 			if ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).FanSchedPtr ) == 0.0 && UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff ) {
 				UnitHeat( UnitHeatNum ).OpMode = CycFanCycCoil;
@@ -833,7 +833,7 @@ namespace UnitHeater {
 		SetMassFlowRateToZero = false;
 		if ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).SchedPtr ) > 0 ) {
 			if ( ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).FanAvailSchedPtr ) > 0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) {
-				if ( UnitHeat( UnitHeatNum ).FanOffNoHeating && ( ( ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired < SmallLoad ) || ( CurDeadBandOrSetback( ZoneNum ) ) ) ) {
+				if ( UnitHeat( UnitHeatNum ).FanOffNoHeating && ( ( ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP < SmallLoad ) || ( CurDeadBandOrSetback( ZoneNum ) ) ) ) {
 					SetMassFlowRateToZero = true;
 				}
 			} else {
@@ -1289,7 +1289,7 @@ namespace UnitHeater {
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using DataZoneEquipment::UnitHeater_Num;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -1462,7 +1462,7 @@ namespace UnitHeater {
 						if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 						Par( 3 ) = double( UnitHeat( UnitHeatNum ).OpMode );
 						// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-						SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitHeaterResidual, 0.0, 1.0, Par );
+						SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitHeaterResidual, 0.0, 1.0, Par );
 					}
 				}
 
@@ -1742,7 +1742,7 @@ namespace UnitHeater {
 		// To calculate the part-load ratio for the unit heater
 
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 
 		// REFERENCES:
 		// na

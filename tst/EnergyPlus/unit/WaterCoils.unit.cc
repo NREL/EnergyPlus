@@ -74,7 +74,6 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
 using namespace DataAirLoop;
@@ -152,10 +151,6 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 	OutBaroPress = 101325.0;
 	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 	ShowMessage( "Begin Test: WaterCoilsTest, WaterCoolingCoilSizing" );
-	int write_stat;
-	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	// set up sizing flags
 	SysSizingRunDone = true;
@@ -332,9 +327,6 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 	EXPECT_DOUBLE_EQ( 0.0, DataDesInletAirHumRat );
 	EXPECT_DOUBLE_EQ( 0.0, DataDesInletWaterTemp );
 
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-
 }
 
 TEST_F( WaterCoilsTest, TdbFnHRhPbTest )
@@ -357,10 +349,6 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	OutBaroPress = 101325.0;
 	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 	ShowMessage( "Begin Test: WaterCoilsTest, CoilHeatingWaterSimpleSizing" );
-	int write_stat;
-
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	// set up sizing flags
 	SysSizingRunDone = true;
@@ -458,10 +446,52 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
 
 	// check coil UA-value sizing
-	EXPECT_NEAR( 1435.00, WaterCoil( CoilNum ).UACoil, 0.01 );
+	EXPECT_NEAR( 1439.30, WaterCoil( CoilNum ).UACoil, 0.01 );
 
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+	// test single zone VAV reheat coil sizing
+	CurZoneEqNum = 1;
+	CurSysNum = 0;
+	TermUnitSizing.allocate( 1 );
+	TermUnitSizing( CurZoneEqNum ).AirVolFlow = WaterCoil( CoilNum ).DesAirVolFlowRate / 3.0; // DesAirVolFlowRate = 1.0
+	TermUnitSizing( CurZoneEqNum ).MaxHWVolFlow = WaterCoil( CoilNum ).MaxWaterVolFlowRate / 3.0;
+	TermUnitSizing( CurZoneEqNum ).MinFlowFrac = 0.5;
+	DataSizing::TermUnitSingDuct = true;
+
+	WaterCoil( CoilNum ).DesAirVolFlowRate = AutoSize;
+	WaterCoil( CoilNum ).UACoil = AutoSize;
+	WaterCoil( CoilNum ).MaxWaterVolFlowRate = AutoSize;
+	WaterCoil( CoilNum ).CoilPerfInpMeth = UAandFlow;
+	WaterCoil( CoilNum ).DesInletAirTemp = AutoSize;
+	WaterCoil( CoilNum ).DesOutletAirTemp = AutoSize;
+	WaterCoil( CoilNum ).DesInletWaterTemp = AutoSize;
+	WaterCoil( CoilNum ).DesInletAirHumRat = AutoSize;
+	WaterCoil( CoilNum ).DesOutletAirHumRat = AutoSize;
+
+	SysSizingRunDone = false;
+	ZoneSizingRunDone = true;
+	NumZoneSizingInput = 1;
+	ZoneSizingInput.allocate( 1 );
+	ZoneSizingInput( 1 ).ZoneNum = 1;
+	ZoneEqSizing.allocate( 1 );
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 20 );
+	ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::HeatingAirflowSizing ) = DataHVACGlobals::HeatingAirflowSizing;
+	ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = 0.0;
+	ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = 1.0;
+	FinalZoneSizing.allocate( 1 );
+	FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.0;
+	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.0;
+	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 10.0;
+	FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.0;
+	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.006;
+	FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.008;
+
+
+	MySizeFlag( 1 ) = true;
+	// run water coil sizing 
+	SizeWaterCoil( CoilNum );
+
+	// check coil UA-value sizing
+	EXPECT_NEAR( 558.656, WaterCoil( CoilNum ).UACoil, 0.01 ); // smaller UA than result above at 1435.00
 
 }
 
@@ -469,10 +499,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	InitializePsychRoutines();
 	OutBaroPress = 101325.0;
 	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
-	int write_stat;
 
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	// set up sizing flags
 	SysSizingRunDone = true;
@@ -570,7 +597,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
 
 	// check coil UA-value sizing
-	EXPECT_NEAR( 1435.00, WaterCoil( CoilNum ).UACoil, 0.01 );
+	EXPECT_NEAR( 1439.30, WaterCoil( CoilNum ).UACoil, 0.01 );
 
 	// test single zone VAV reheat coil sizing
 	CurZoneEqNum = 1;
@@ -619,9 +646,6 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	// check coil UA-value sizing
 	EXPECT_NEAR( 1.0, WaterCoil( CoilNum ).UACoil, 0.0001 ); // TU air flow is too low to size, set to 0, so UA is set to 1.0
 
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-
 }
 
 TEST_F( WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp )
@@ -630,10 +654,6 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp )
 	OutBaroPress = 101325.0;
 	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 	ShowMessage( "Begin Test: WaterCoilsTest, CoilHeatingWaterSimpleSizing" );
-	int write_stat;
-
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	// set up sizing flags
 	SysSizingRunDone = true;
@@ -732,7 +752,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp )
 	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
 
 	// check coil UA-value sizing for low design loop exit temp
-	EXPECT_NEAR( 2479.27, WaterCoil( CoilNum ).UACoil, 0.01 );
+	EXPECT_NEAR( 2491.37, WaterCoil( CoilNum ).UACoil, 0.01 );
 
 	Real64 DesCoilInletWaterTempUsed = 0.0;
 	Real64 DataFanOpMode = ContFanCycCoil;
@@ -742,9 +762,6 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp )
 	EstimateCoilInletWaterTemp( CoilNum, DataFanOpMode, 1.0, UAMax, DesCoilInletWaterTempUsed );
 	EXPECT_GT( DesCoilInletWaterTempUsed, PlantSizData( 1 ).ExitTemp );
 	EXPECT_NEAR( 48.73, DesCoilInletWaterTempUsed, 0.01 );
-
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 }
 
 TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
@@ -753,10 +770,6 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  	OutBaroPress = 101325.0;
  	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
  	ShowMessage( "Begin Test: WaterCoilsTest, CoilCoolingWaterSimpleSizing" );
- 	int write_stat;
- 
- 	OutputFileInits = GetNewUnitNumber();
- 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
  
  	// set up sizing flags
  	SysSizingRunDone = true;
@@ -849,9 +862,6 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  
  	// check cooling coil design water flow rate
  	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
- 	//
- 	// Close and delete eio output file
- 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
  
  }
  
@@ -861,10 +871,6 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  	OutBaroPress = 101325.0;
  	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
  	ShowMessage( "Begin Test: WaterCoilsTest, CoilCoolingWaterDetailedSizing" );
- 	int write_stat;
- 
- 	OutputFileInits = GetNewUnitNumber();
- 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
  
  	// set up sizing flags
  	SysSizingRunDone = true;
@@ -970,9 +976,6 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  	DesWaterFlowRate = WaterCoil( CoilNum ).DesWaterCoolingCoilRate / ( 6.67 * Cp * rho );
  	// check cooling coil design water flow rate
  	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
- 	//
- 	// Close and delete eio output file
- 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
  
  }
  TEST_F( WaterCoilsTest, CoilHeatingWaterSimpleSizing )
@@ -981,10 +984,6 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  	OutBaroPress = 101325.0;
  	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
  	ShowMessage( "Begin Test: WaterCoilsTest, CoilHeatingWaterSimpleSizing" );
- 	int write_stat;
- 
- 	OutputFileInits = GetNewUnitNumber();
- 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
  
  	// set up sizing flags
  	SysSizingRunDone = true;
@@ -1075,7 +1074,4 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  
  	// check heating coil design water flow rate
  	EXPECT_DOUBLE_EQ( DesWaterFlowRate, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
- 	//
- 	// Close and delete eio output file
-  { IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
   }
