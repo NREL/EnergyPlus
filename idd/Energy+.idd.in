@@ -980,7 +980,7 @@ SizingPeriod:DesignDay,
        \note Required only if field Humidity Condition Type is "HumidityRatio".
        \type real
        \units kgWater/kgDryAir
-  N7,  \field Enthalpy at Maximum Dry-Bulb  !will require units transition.
+  N7,  \field Enthalpy at Maximum Dry-Bulb
        \note Enthalpy coincident with the maximum temperature.
        \note Required only if field Humidity Condition Type is "Enthalpy".
        \type real
@@ -17784,7 +17784,7 @@ SurfaceProperty:SolarIncidentInside,
        \type object-list
        \object-list ConstructionNames
   A4;  \field Inside Surface Incident Sun Solar Radiation Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \required-field
        \type object-list
        \object-list ScheduleNames
@@ -17803,24 +17803,24 @@ ComplexFenestrationProperty:SolarAbsorbedLayers,
        \type object-list
        \object-list ComplexFenestrationStates
   A4,  \field Layer 1 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \required-field
        \type object-list
        \object-list ScheduleNames
   A5,  \field Layer 2 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A6,  \field Layer 3 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A7,  \field Layer 4 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A8;  \field Layer 5 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
 
@@ -40608,12 +40608,12 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
   A3,  \field Air Inlet Node Name
        \type node
        \note The name of the HVAC system node that is the air inlet node for the
-       \note terminal unit. This is also the air inlet node for the unit’s fan.
+       \note terminal unit. This is also the air inlet node for the unit's fan.
   A4,  \field Air Outlet Node Name
        \type node
        \note The name of the HVAC system node that is the air outlet node for the
-       \note terminal unit. This is also the air outlet node for the unit’s heating
-       \note coil’s air outlet node. This node is also a zone inlet node.
+       \note terminal unit. This is also the air outlet node for the unit's heating
+       \note coil's air outlet node. This node is also a zone inlet node.
   A5,  \field Fan Object Type
        \required-field
        \type choice
@@ -44757,7 +44757,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N21, \field Speed 2 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44812,7 +44812,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N27, \field Speed 3 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44867,7 +44867,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N33, \field Speed 4 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44922,7 +44922,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N39, \field Speed 5 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44977,7 +44977,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N45, \field Speed 6 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45032,7 +45032,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N51, \field Speed 7 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45087,7 +45087,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N57, \field Speed 8 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45142,7 +45142,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N63, \field Speed 9 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45199,7 +45199,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N69, \field Speed 10 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48232,7 +48232,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
         \required-field
    N11, \field Speed 1 Reference Unit Gross Rated Cooling COP
         \units dimensionless
@@ -48320,7 +48320,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N17, \field Speed 2 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48396,7 +48396,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N23, \field Speed 3 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48479,7 +48479,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N29, \field Speed 4 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48562,7 +48562,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N35, \field Speed 5 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48645,7 +48645,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N41, \field Speed 6 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48728,7 +48728,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N47, \field Speed 7 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48811,7 +48811,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N53, \field Speed 8 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48894,7 +48894,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N59, \field Speed 9 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48977,7 +48977,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N65, \field Speed 10 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -78833,12 +78833,12 @@ DemandManager:Thermostats,
        \units minutes
        \note If blank, duration defaults to the timestep
   N2 , \field Fixed Rate
-       \memo Used in case when Limit strategy is set to FixedRate
+       \note Used in case when Limit strategy is set to FixedRate
        \type real
        \minimum 0.0
        \units m3/s
   N3 , \field Reduction Ratio
-       \memo Used in case when Limit Control is set to ReductionRatio
+       \note Used in case when Limit Control is set to ReductionRatio
        \type real
        \minimum 0.0
        \maximum 1.0
