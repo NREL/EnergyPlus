@@ -1,14 +1,14 @@
 
 # Create include directories that will connect to library itself. This must be created before downloading 
 # Windows Calculation Engine library or otherwise connections will not be created
-set(CommonIncludeDir "${CMAKE_BINARY_DIR}/Windows-CalcEngine-src/src")
-set(WindowsCalcEngine_INCLUDE_DIRS "${CommonIncludeDir}/Common/include")
-set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonIncludeDir}/Gases/include")
-set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonIncludeDir}/SingleLayerOptics/include")
-set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonIncludeDir}/MultiLayerOptics/include")
-set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonIncludeDir}/SpectralAveraging/include")
-set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonIncludeDir}/Tarcog/include")
-set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonIncludeDir}/Viewer/include")
+set(CommonWCEIncludeDir "${CMAKE_BINARY_DIR}/Windows-CalcEngine-src/src")
+set(WindowsCalcEngine_INCLUDE_DIRS "${CommonWCEIncludeDir}/Common/include")
+set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonWCEIncludeDir}/Gases/include")
+set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonWCEIncludeDir}/SingleLayerOptics/include")
+set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonWCEIncludeDir}/MultiLayerOptics/include")
+set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonWCEIncludeDir}/SpectralAveraging/include")
+set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonWCEIncludeDir}/Tarcog/include")
+set(WindowsCalcEngine_INCLUDE_DIRS ${WindowsCalcEngine_INCLUDE_DIRS} "${CommonWCEIncludeDir}/Viewer/include")
 
 include_directories(${WindowsCalcEngine_INCLUDE_DIRS})
 
