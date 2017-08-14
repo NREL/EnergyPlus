@@ -1609,7 +1609,7 @@ namespace WindowManager {
           ShadingLayerPtr = Material( ShadingLayerPtr ).ComplexShadePtr;
           auto & complexShade = ComplexShade( ShadingLayerPtr );
           auto TauShadeIR = complexShade.IRTransmittance;
-				  auto EpsShadeIR = complexShade.FrontEmissivity;
+				  auto EpsShadeIR = complexShade.BackEmissivity;
 				  auto RhoShadeIR = max( 0.0, 1.0 - TauShadeIR - EpsShadeIR );
           // Get properties of glass next to inside shading layer
 				  int GlassLayPtr = construction.LayerPoint( TotLay - 2 );

@@ -330,7 +330,7 @@ namespace HeatBalanceIntRadExchange {
 				auto const & surface_window( SurfaceWindow( SendSurfNum ) );
 				ConstrNumSend = Surface( SendSurfNum ).Construction;
 				auto const & construct( Construct( ConstrNumSend ) );
-				if ( construct.WindowTypeEQL ) {
+				if ( construct.WindowTypeEQL || construct.WindowTypeBSDF ) {
 					SendSurfTemp = surface_window.EffInsSurfTemp;
 				} else if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser ) {
 					if ( SurfIterations == 0 && surface_window.ShadingFlag <= 0 ) {
