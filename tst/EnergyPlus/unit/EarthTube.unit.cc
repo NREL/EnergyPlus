@@ -68,18 +68,13 @@ using namespace EnergyPlus::DataEnvironment;
 namespace EnergyPlus {
 	
 
-<<<<<<< HEAD
 	TEST_F( EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest )
-=======
-	TEST_F( EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest )
->>>>>>> develop
 	{
 
 	// AUTHOR: R. Strand, UIUC
 	// DATE WRITTEN: June 2017
 	
 	// Set subroutine arguments
-<<<<<<< HEAD
 	int ETnum = 1;
 	int ZNnum = 1;
 	
@@ -111,7 +106,16 @@ namespace EnergyPlus {
 	CalcEarthTubeHumRat( ETnum, ZNnum );
 	EXPECT_GT( OutHumRat, EarthTubeSys( ETnum ).HumRat );
 		
-=======
+	}
+	
+	TEST_F( EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest )
+	{
+			
+	// AUTHOR: R. Strand, UIUC
+	// DATE WRITTEN: June 2017
+			
+	// Set subroutine arguments
+		
 	std::string ZoneName = "ZONE 1";
 	std::string InputName = "ZoneEarthtube";
 	bool ErrorsFound = false;
@@ -135,7 +139,6 @@ namespace EnergyPlus {
 	EarthTubeSys.deallocate();
 	TotEarthTube = 0;
 	
->>>>>>> develop
 	}
 	
 }

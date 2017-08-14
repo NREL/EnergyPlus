@@ -75,22 +75,15 @@ namespace EarthTube {
 	// MODULE INFORMATION:
 	//       AUTHOR         Kwang Ho Lee
 	//       DATE WRITTEN   November 2005
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// To encapsulate the data and algorithyms required to manage the EarthTube System Component
-
-	// METHODOLOGY EMPLOYED:
-	// na
 
 	// REFERENCES:
 	// 1. M. Krarti, "Analytical Model to Predict Annual Soil Surface Temperature Variation",
 	// Journal of Solar Energy Engineering 117, 1995, pp 91-99
 	// 2. K. Labs In: J. Cook, editor, "Passive Cooling",
 	// Cambridge Massachusetts, MIT Press, 1989, pp 206-212
-
-	// OTHER NOTES: none
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
@@ -103,9 +96,6 @@ namespace EarthTube {
 	// Use statements for access to subroutines in other modules
 	using namespace Psychrometrics;
 
-	// Data
-	// DERIVED TYPE DEFINITIONS
-
 	// MODULE VARIABLES DECLARATIONS:
 	static std::string const BlankString;
 
@@ -114,15 +104,6 @@ namespace EarthTube {
 	int const NaturalEarthTube( 0 );
 	int const IntakeEarthTube( 1 );
 	int const ExhaustEarthTube( 2 );
-
-	//         Subroutine Specifications for the Heat Balance Module
-	// Driver Routines
-
-	// Get Input routines for module
-
-	// Algorithms for the module
-
-	// Reporting routines for module
 
 	// Object Data
 	Array1D< EarthTubeData > EarthTubeSys;
@@ -149,35 +130,11 @@ namespace EarthTube {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Kwang Ho Lee
 		//       DATE WRITTEN   November 2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages the simulation of EarthTube unit.
 		// This driver manages the calls to all of
 		// the other drivers and simulation algorithms.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true );
@@ -204,18 +161,10 @@ namespace EarthTube {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Kwang Ho Lee
 		//       DATE WRITTEN   November 2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine obtains input data for EarthTube units and
 		// stores it in the EarthTube data structure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
@@ -233,15 +182,7 @@ namespace EarthTube {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const EarthTubeTempLimit( 100.0 ); // degrees Celsius
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208    CHARACTER(len=MaxNameLength), DIMENSION(10) :: AlphaName
-		//unused1208    REAL(r64), DIMENSION(20)              :: IHGNumbers
 		int NumAlpha;
 		int NumNumber;
 		int IOStat;
@@ -460,34 +401,13 @@ namespace EarthTube {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Kwang Ho Lee
 		//       DATE WRITTEN   November 2005
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine simulates the components making up the EarthTube unit.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -611,33 +531,10 @@ namespace EarthTube {
 		//       AUTHOR         Kwang Ho Lee
 		//       DATE WRITTEN   November 2005
 		//       MODIFIED       Rick Strand, June 2017 (made this a separate subroutine)
-		//       RE-ENGINEERED  na
 		
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine determines the leaving humidity ratio for the EarthTube
 		// and calculates parameters associated with humidity ratio.
-		
-		// METHODOLOGY EMPLOYED:
-		// na
-		
-		// REFERENCES:
-		// na
-		
-		// Using/Aliasing
-		// na
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-		
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-		
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		
-		// DERIVED TYPE DEFINITIONS
-		// na
 		
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 InsideEnthalpy;
@@ -694,33 +591,12 @@ namespace EarthTube {
 		//       AUTHOR         Kwang Ho Lee
 		//       DATE WRITTEN   November 2005
 		//       MODIFIED       B. Griffith April 2010 added output reports
-		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine fills remaining report variables.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
+		// PURPOSE OF THIS SUBROUTINE: This subroutine fills remaining report variables.
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::StdRhoAir;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneLoop; // Counter for the # of zones (nz)
