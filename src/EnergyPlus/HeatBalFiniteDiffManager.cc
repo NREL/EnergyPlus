@@ -87,7 +87,7 @@ namespace HeatBalFiniteDiffManager {
 	//                      and included enthalpy formulations for phase change materials
 	// PURPOSE OF THIS MODULE:
 	// To encapsulate the data and algorithms required to
-	// manage the fiite difference heat balance simulation on the building.
+	// manage the finite difference heat balance simulation on the building.
 
 	// REFERENCES:
 	// The MFD moisture balance method
@@ -764,7 +764,7 @@ namespace HeatBalFiniteDiffManager {
 					mAlpha = 0.0;
 
 					//check for Material layers that are too thin and highly conductivity (not appropriate for surface models)
-					if ( Alpha > HighDiffusivityThreshold && ! Material( CurrentLayer ).WarnedForHighDiffusivity ) {
+					if ( Alpha > HighDiffusivityThreshold ) {
 						DeltaTimestep = TimeStepZoneSec;
 						ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 						if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
@@ -776,7 +776,7 @@ namespace HeatBalFiniteDiffManager {
 								ShowContinueError( "Material may be too thin to be modeled well, thickness = " + RoundSigDigits( Material( CurrentLayer ).Thickness, 5 ) + " [m]" );
 								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThinMaterialLayerThreshold, 5 ) + " [m]" );
 							}
-							Material( CurrentLayer ).WarnedForHighDiffusivity = true;
+							ShowFatalError( "Preceding conditions cause termination." );
 						}
 					}
 
@@ -1045,7 +1045,7 @@ namespace HeatBalFiniteDiffManager {
 						}
 					}
 
-					if ( ( Lay < TotLayers ) && ( TotNodes != 1 ) ) { // Interface equations for 2 capactive materials
+					if ( ( Lay < TotLayers ) && ( TotNodes != 1 ) ) { // Interface equations for 2 capacitive materials
 						++i;
 						IntInterfaceNodeEqns( Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, GSiter );
 					} else if ( Lay == TotLayers ) { // For the Interior surface node with a convective boundary condition
@@ -1071,7 +1071,7 @@ namespace HeatBalFiniteDiffManager {
 
 				if ( ( GSiter > 2 ) && ( std::abs( sum_array_diff( TDT, TDTLast ) / sum( TDT ) ) < 0.00001 ) ) break;
 
-			} // End of Gauss Seidell iteration loop
+			} // End of Gauss Seidel iteration loop
 
 			GSloopCounter = GSiter; // outputs GSloop iterations, useful for pinpointing stability issues with condFD
 			if ( CondFDRelaxFactor != 1.0 ) {
@@ -1136,7 +1136,7 @@ namespace HeatBalFiniteDiffManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine gives a detailed report to the user about
-		// the initializations for the Fintie Difference calculations
+		// the initializations for the Finite Difference calculations
 		// of each construction.
 
 		// Using/Aliasing
@@ -1473,11 +1473,11 @@ namespace HeatBalFiniteDiffManager {
 						}
 
 					} else { // HMovInsul > 0.0: Transparent insulation on outside
-						// Transparent insulaton additions
+						// Transparent insulation additions
 
 						// Movable Insulation Layer Outside surface temp
 
-						Real64 const TInsulOut( ( QRadSWOutMvInsulFD + hgnd * Tgnd + HMovInsul * TDT_i + ( hconvo + hrad ) * Toa + hsky * Tsky ) / ( hconvo + hgnd + HMovInsul + hrad + hsky ) ); // Temperature of outisde face of Outside Insulation
+						Real64 const TInsulOut( ( QRadSWOutMvInsulFD + hgnd * Tgnd + HMovInsul * TDT_i + ( hconvo + hrad ) * Toa + hsky * Tsky ) / ( hconvo + hgnd + HMovInsul + hrad + hsky ) ); // Temperature of outside face of Outside Insulation
 						Real64 const Two_Delt_DelX( 2.0 * Delt_DelX );
 						Real64 const Cp_DelX2_RhoS( Cp * pow_2( DelX ) * RhoS );
 						Real64 const Two_Delt_kt( 2.0 * Delt * kt );
@@ -1507,13 +1507,13 @@ namespace HeatBalFiniteDiffManager {
 
 			} // regular detailed FD part or SigmaR SigmaC part
 
-			// Determine net heat flux to ooutside face
+			// Determine net heat flux to outside face
 			// One formulation that works for Fully Implicit and CrankNicholson and massless wall
 
 			Real64 const Toa_TDT_i( Toa - TDT_i );
 			Real64 const QNetSurfFromOutside( QRadSWOutFD + ( hgnd * ( -TDT_i + Tgnd ) + ( hconvo + hrad ) * Toa_TDT_i + hsky * ( -TDT_i + Tsky ) ) );
 
-			//S ame sign convention as CTFs
+			// Same sign convention as CTFs
 			OpaqSurfOutsideFaceConductionFlux( Surf ) = -QNetSurfFromOutside;
 			OpaqSurfOutsideFaceConduction( Surf ) = surface.Area * OpaqSurfOutsideFaceConductionFlux( Surf );
 
@@ -1636,7 +1636,7 @@ namespace HeatBalFiniteDiffManager {
 		Array1< Real64 > & TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
 		Array1< Real64 > const & EP_UNUSED( EnthOld ), // Old Nodal enthalpy
 		Array1< Real64 > & EnthNew, // New Nodal enthalpy
-		int const EP_UNUSED( GSiter ) // Iteration number of Gauss Seidell iteration
+		int const EP_UNUSED( GSiter ) // Iteration number of Gauss Seidel iteration
 	)
 	{
 
@@ -1644,7 +1644,7 @@ namespace HeatBalFiniteDiffManager {
 		//       AUTHOR         Richard Liesen
 		//       DATE WRITTEN   November, 2003
 		//       MODIFIED       May 2011, B. Griffith, P. Tabares,  add first order fully implicit, bug fixes, cleanup
-		//       RE-ENGINEERED  Curtis Pedersen, Changed to Implit mode and included enthalpy.  FY2006
+		//       RE-ENGINEERED  Curtis Pedersen, Changed to Implicit mode and included enthalpy.  FY2006
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// calculate finite difference heat transfer for nodes that interface two different material layers inside construction
@@ -1921,7 +1921,7 @@ namespace HeatBalFiniteDiffManager {
 		Array1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
 		Array1< Real64 > & EnthNew, // New Nodal enthalpy
-		Array1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager titeration's value
+		Array1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager iteration's value
 	)
 	{
 		// SUBROUTINE INFORMATION:
