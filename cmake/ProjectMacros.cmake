@@ -83,8 +83,7 @@ function( ADD_SIMULATION_TEST )
   set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs ENERGYPLUS_FLAGS)
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-
-
+  
   if( DESIGN_DAY_ONLY )
     set(ANNUAL_SIMULATION false)
   elseif( ADD_SIM_TEST_ANNUAL_SIMULATION OR TEST_ANNUAL_SIMULATION  )

@@ -158,8 +158,6 @@ IF(NOT APPLE )
 ENDIF()
 ADD_SUBDIRECTORY(third_party/jsoncpp)
 
-# Windows-CalcEngine exterior library
-include(externalGitHubLibs/CMakeLists-Windows-CalcEngine.txt)
 # Kiva
 option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging only)" OFF )
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
@@ -188,6 +186,9 @@ if( BUILD_TESTING )
     ADD_SUBDIRECTORY(performance_tests)
   endif()
 endif()
+
+# Windows-CalcEngine exterior library
+include(externalGitHubLibs/CMakeLists-Windows-CalcEngine.txt)
 
 configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
 configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )

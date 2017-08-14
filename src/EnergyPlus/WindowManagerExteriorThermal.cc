@@ -461,8 +461,8 @@ namespace EnergyPlus {
       shared_ptr< ISurface > backSurface = make_shared< CSurface >( emissBack, transThermalBack );
       auto aSolidLayer = make_shared< CIGUSolidLayer >( thickness, conductivity, frontSurface, backSurface );
       if( createOpenness ) {
-        aSolidLayer = make_shared< CIGUShadeLayer >( aSolidLayer, 
-          make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront ) );
+        auto aOpenings = make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront );
+        aSolidLayer = make_shared< CIGUShadeLayer >( aSolidLayer, aOpenings);
       }
       auto swRadiation = surface.getSWIncident( t_SurfNum );
       if( swRadiation > 0 ) {
