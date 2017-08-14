@@ -177,7 +177,7 @@ namespace BoilerSteam {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subrountine controls the boiler component simulation
+		// This subroutine controls the boiler component simulation
 
 		// METHODOLOGY EMPLOYED: na
 
