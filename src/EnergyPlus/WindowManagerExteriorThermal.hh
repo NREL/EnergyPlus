@@ -73,8 +73,8 @@ namespace EnergyPlus {
 
 namespace Tarcog {
 
-  class CEnvironment;
   class CBaseIGULayer;
+  class CEnvironment;
   class CIGU;
   class CSingleSystem;
 
