@@ -1352,7 +1352,7 @@ namespace HeatBalanceSurfaceManager {
 		HAirExtSurf.dimension( TotSurfaces, 0.0 );
 		HSkyExtSurf.dimension( TotSurfaces, 0.0 );
 		HGrdExtSurf.dimension( TotSurfaces, 0.0 );
-		QRadLWOutSrdSurfs.dimension(TotSurfaces, 0.0);
+		QRadLWOutSrdSurfs.dimension( TotSurfaces, 0.0 );
 		TempSurfIn.dimension( TotSurfaces, 0.0 );
 		TempSurfInTmp.dimension( TotSurfaces, 0.0 );
 		QRadSWOutAbs.dimension( TotSurfaces, 0.0 );
@@ -1529,7 +1529,6 @@ namespace HeatBalanceSurfaceManager {
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Energy [J]", QConvOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Transfer Coefficient [W/m2-K]", HcExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Rate [W]", QdotRadOutRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Net Long Wave Radiation Heat Gain Rate [W]", QRadLWOutSrdSurfs( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area [W/m2]", QdotRadOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]", QRadOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]", HAirExtSurf( loop ), "Zone", "State", Surface( loop ).Name );

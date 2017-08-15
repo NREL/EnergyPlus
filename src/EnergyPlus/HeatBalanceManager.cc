@@ -4291,8 +4291,6 @@ namespace HeatBalanceManager {
 
 		GetZoneData( ErrorsFound ); // Read Zone data from input file
 
-		GetZoneLocalEnvData( ErrorsFound );
-
 		SetupZoneGeometry( ErrorsFound );
 
 	}
@@ -4517,7 +4515,7 @@ namespace HeatBalanceManager {
 			} // GroupNum
 		}
 
-		// GetZoneLocalEnvData( ErrorsFound );
+		GetZoneLocalEnvData( ErrorsFound );
 
 		//allocate the array the holds the predefined report data
 		ZonePreDefRep.allocate( NumOfZones );
@@ -4586,13 +4584,15 @@ namespace HeatBalanceManager {
 
 		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";		
 		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
+		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
+		if ( NumAlpha != 3 ) {
+			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates wroung number of Alpha Objects (requires 3)." );
+			ErrorsFound = true;
+		}
+
 		if ( TotZoneEnv > 0 ) {
 			// Check if IDD definition is correct
-			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
-			if ( NumAlpha != 3 ) {
-				ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates wroung number of Alpha Objects (requires 3)." );
-				ErrorsFound = true;
-			}
+			AnyLocalEnvironmentsInModel = true;
 
 			if ( !allocated( ZoneLocalEnvironment ) ) {
 				ZoneLocalEnvironment.allocate( TotZoneEnv );
@@ -4641,6 +4641,7 @@ namespace HeatBalanceManager {
 					if ( ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
 						Zone( ZoneLoop ).HasLinkedOutAirNode = true;
 						Zone( ZoneLoop ).LinkedOutAirNode = ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr;
+						
 					}
 				}
 			}
@@ -4836,7 +4837,7 @@ namespace HeatBalanceManager {
 		using namespace WindowManager;
 		using namespace SolarShading;
 		using DataLoopNode::Node;
-		using OutAirNodeManager::GetOutAirNodesInput;
+		using OutAirNodeManager::SetOutAirNodes;
 		using DaylightingDevices::InitDaylightingDevices;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		//  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -4954,20 +4955,24 @@ namespace HeatBalanceManager {
 
 		// X Luo Added 07/30/2017
 		// Set zone data to linked air node value if defined.
-		GetOutAirNodesInput();
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
-				if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
-					Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
-				}
-				if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWetBulb ) {
-					Zone( ZoneNum ).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
-				}
-				if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWindSpeed ) {
-					Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
-				}
-				if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWindDir ) {
-					Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
+		if ( AnyLocalEnvironmentsInModel ) {
+			SetOutAirNodes();
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
+						Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+						Real64 ts = Zone(ZoneNum).OutDryBulbTemp;
+						ts = 0;
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWetBulb ) {
+						Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWindSpeed ) {
+						Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWindDir ) {
+						Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
+					}
 				}
 			}
 		}

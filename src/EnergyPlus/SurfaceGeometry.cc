@@ -6004,7 +6004,6 @@ namespace SurfaceGeometry {
 		int NodeNum;
 		int ExtShadingSchedNum;
 		int SurroundingSurfsNum;
-		int OutdoorAirNodeNum;
 
 		//-----------------------------------------------------------------------
 		//                SurfaceProperty:LocalEnvironment
@@ -6012,14 +6011,16 @@ namespace SurfaceGeometry {
 
 		cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
 		TotSurfLocalEnv = GetNumObjectsFound( cCurrentModuleObject );
+		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
+		if ( NumAlpha < 3 || NumAlpha > 5 ) {
+			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates more that 5 or less than 3 Alpha Objects." );
+			ErrorsFound = true;
+		}
 
 		if ( TotSurfLocalEnv > 0 ) {
 			// Check if IDD definition is correct
-			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
-			if ( NumAlpha < 3 || NumAlpha > 5 ) {
-				ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates more that 5 or less than 3 Alpha Objects." );
-				ErrorsFound = true;
-			}
+			AnyLocalEnvironmentsInModel = true;
+
 			if ( !allocated( SurfLocalEnvironment ) ) {
 				SurfLocalEnvironment.allocate( TotSurfLocalEnv );
 			}
@@ -6176,14 +6177,14 @@ namespace SurfaceGeometry {
 
 		cCurrentModuleObject = "SurfaceProperty:SurroundingSurfaces";
 		TotSrdSurfProperties = GetNumObjectsFound( cCurrentModuleObject );
+		// Check if IDD definition is correct
+		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
+		if ( NumArgs < 8 ) {
+			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates less than 8 Objects." );
+			ErrorsFound = true;
+		}
 
 		if ( TotSrdSurfProperties > 0 ) {
-			// Check if IDD definition is correct
-			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
-			if ( NumArgs < 8 ) {
-				ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates less than 8 Objects." );
-				ErrorsFound = true;
-			}
 
 			if ( !allocated( SurroundingSurfsProperty ) ) {
 				SurroundingSurfsProperty.allocate( TotSrdSurfProperties );

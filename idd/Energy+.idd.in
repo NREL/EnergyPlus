@@ -17872,7 +17872,87 @@ SurfaceProperty:SurroundingSurfaces,
        \minimum 0.0
        \maximum 1.0
        \default 0.0
-   A7; \field Surrounding Surface 2 Temperature Schedule Name
+   A7, \field Surrounding Surface 2 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A8, \field Surrounding Surface 3 Name       
+       \type alpha 
+   N5, \field Surrounding Surface 3 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A9, \field Surrounding Surface 3 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A10,\field Surrounding Surface 4 Name       
+       \type alpha 
+   N6, \field Surrounding Surface 4 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A11,\field Surrounding Surface 4 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A12,\field Surrounding Surface 5 Name       
+       \type alpha 
+   N7, \field Surrounding Surface 5 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A13,\field Surrounding Surface 5 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A14,\field Surrounding Surface 6 Name       
+       \type alpha 
+   N8, \field Surrounding Surface 6 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A15,\field Surrounding Surface 6 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A16,\field Surrounding Surface 7 Name       
+       \type alpha 
+   N9, \field Surrounding Surface 7 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A17,\field Surrounding Surface 7 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A18,\field Surrounding Surface 8 Name       
+       \type alpha 
+   N10,\field Surrounding Surface 8 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A19,\field Surrounding Surface 8 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A20, \field Surrounding Surface 9 Name       
+       \type alpha 
+   N11,\field Surrounding Surface 9 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A21,\field Surrounding Surface 9 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A22,\field Surrounding Surface 10 Name       
+       \type alpha 
+   N12,\field Surrounding Surface 10 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A23;\field Surrounding Surface 10 Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
@@ -61300,10 +61380,16 @@ OutdoorAir:Node,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, 0.0 to 40.0, units m/s
-  A5 ; \field Wind Direction Schedule Name 
+  A5 , \field Wind Direction Schedule Name 
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, 0.0 to 360.0, units degree
+  A6 ; \field Wind Pressure Coefficient Curve Name 
+       \type object-list
+       \object-list WPCValueNames
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+       \note The name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues, curve, or table object specifying the wind pressure coefficient.
 
 
 OutdoorAir:NodeList,
