@@ -67,6 +67,7 @@
 #include <DataGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <HybridEvapCoolingModel.hh>
+//#include <DataZoneEnvironment.hh>
 //#include <HybridModelConfigFile.hh>
 namespace EnergyPlus {
 

@@ -250,7 +250,7 @@ namespace EnergyPlus {//***************
 			{
 				ZoneHybridUnitaryAirConditioner(UnitNum).Initialize(ZoneNum);//, pConfig);
 			}
-			
+			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToHeatingSetpoint = 0;
 			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToCoolingSetpoint = 0;
 			ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingRate = 0.0;
 			ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingEnergy = 0.0;
@@ -357,7 +357,8 @@ namespace EnergyPlus {//***************
 			using DataGlobals::SecInHour;
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
-		
+			using DataEnvironment::StdRhoAir;
+
 			Real64 QTotUnitOut = 0;
 			Real64 QSensUnitOut=0;
 			Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, RemainQ, DesignMinVR, returnQSensible, returnQLatent, returnSupplyAirMassFlow, returnSupplyAirTemp, returnSupplyAirRelHum, returnVentilationAir, ElectricalPowerUse;
@@ -383,7 +384,9 @@ namespace EnergyPlus {//***************
 			//OARequirementsPtr = 1;
 			using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 			DesignMinVR = CalcDesignSpecificationOutdoorAir(ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag); //[m3/s]
-			
+			double DesignMinVRMassFlow = 0;
+			if (StdRhoAir>1) 	DesignMinVRMassFlow = DesignMinVR * StdRhoAir;
+			else DesignMinVRMassFlow = DesignMinVR *  1.225;
 			// note: the multplication of the max values of the "Fraction of peak Msa" and the OSAF as specified in the config must be greater than the ratio of MinVR/SystemMaximumSupplyAirFlowRate otherwise it will never reach mi								 
 			ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVR);
 

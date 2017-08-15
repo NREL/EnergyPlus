@@ -160,8 +160,8 @@ namespace EnergyPlus {
 		class CStepInputs
 		{
 			public:
-			CStepInputs() : Tosa(0), Tra(0), RHosa(0), RHra(0), RequestedLoad(0), ZoneHeatingLoad(0), ZoneMoistureLoad(0), ZoneDehumidificationLoad(0), MinimumOA(0) {}
-			double Tosa; double Tra; double RHosa; double RHra; double RequestedLoad; double ZoneHeatingLoad; double ZoneMoistureLoad; double ZoneDehumidificationLoad; double MinimumOA ;
+			CStepInputs() : Tosa(0), Tra(0), RHosa(0), RHra(0), RequestedCoolingLoad(0), RequestedHeatingLoad(0), ZoneMoistureLoad(0), ZoneDehumidificationLoad(0), MinimumOA(0) {}
+			double Tosa; double Tra; double RHosa; double RHra; double RequestedCoolingLoad; double RequestedHeatingLoad; double ZoneMoistureLoad; double ZoneDehumidificationLoad; double MinimumOA ;
 		};
 
 		class Model                   // begin declaration of the class
@@ -206,6 +206,7 @@ namespace EnergyPlus {
 			Real64 SystemSensibleHeatingEnergy;
 			Real64 SystemLatentHeatingRate;
 			Real64 SystemLatentHeatingEnergy;
+			Real64 RequestedLoadToHeatingSetpoint;
 			Real64 RequestedLoadToCoolingSetpoint;
 			Real64  RequestedHumdificationMass;
 			Real64  RequestedHumdificationLoad;

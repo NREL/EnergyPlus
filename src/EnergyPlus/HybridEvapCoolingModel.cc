@@ -574,6 +574,7 @@ namespace EnergyPlus {//***************
 			SystemSensibleHeatingEnergy(0.0),
 			SystemLatentHeatingRate(0.0),
 			SystemLatentHeatingEnergy(0.0),
+			RequestedLoadToHeatingSetpoint(0.0),
 			RequestedLoadToCoolingSetpoint(0.0),
 			RequestedHumdificationMass(0.0),
 		RequestedHumdificationLoad(0.0),
@@ -986,7 +987,7 @@ namespace EnergyPlus {//***************
 			double Msa = 0;
 			double Mvent = 0;
 			double pOptimal_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
-			double EIR, ElectricalPower, SHR, Tma, Wma, Hsa, Hma, TotalSystem,RequestedConditioningLoad;
+			double EIR, ElectricalPower, SHR, Tma, Wma, Hsa, Hma, TotalSystem;
 			//mode_optimal_power = 0;
 			double PreviousMaxiumConditioningOutput = 0;
 			double PreviousMaxiumHumidOrDehumidOutput = 0;
@@ -1001,7 +1002,7 @@ namespace EnergyPlus {//***************
 			EnvironmentConditionsMetOnce = SAT_OC_Met = SAT_OC_MetOnce = SARH_OC_Met = SAHR_OC_MetOnce = false;
 
 			MinOA_Msa = StepIns.MinimumOA; //?why you copy it before?
-			RequestedConditioningLoad = -StepIns.RequestedLoad / 1000; //convert to kw Cooling possitive now, heating negitive
+			//RequestedConditioningLoad = -StepIns.RequestedCoolingLoad / 1000; //convert to kw Cooling possitive now, heating negitive
 			
 			bool DehumidificationRequested = false;
 			bool HumidificationRequested = false;
@@ -1175,8 +1176,8 @@ namespace EnergyPlus {//***************
 				pSetting->Dehumidification = 0; //add
 
 				bool Conditioning_load_met = false;
-				if (CoolingRequested && SensibleRoomORZone > RequestedConditioningLoad) Conditioning_load_met = true;
-				if (HeatingRequested && SensibleRoomORZone < RequestedConditioningLoad) Conditioning_load_met = true;
+				if (CoolingRequested && SensibleRoomORZone > StepIns.RequestedCoolingLoad) Conditioning_load_met = true;
+				if (HeatingRequested && SensibleRoomORZone < StepIns.RequestedHeatingLoad) Conditioning_load_met = true;
 				if (!(HeatingRequested || CoolingRequested))  Conditioning_load_met = true;
 
 				bool Humidification_load_met = false;
@@ -1197,7 +1198,10 @@ namespace EnergyPlus {//***************
 				SHR = SupplyAirCp * (Tma - Tsa) / (Hma - Hsa);
 
 				// Calculate partload fraction required to meet all requirements
-				double PartRuntimeFraction = CalculatePartRuntimeFraction(pSetting->Supply_Air_Ventilation_Volume*StdRhoAir, MinOA_Msa, RequestedConditioningLoad, SensibleRoomORZone, LatentRoomORZone, StepIns.ZoneDehumidificationLoad, LatentRoomORZone, StepIns.ZoneMoistureLoad);//
+				double PartRuntimeFraction = 0;
+				if (CoolingRequested)  PartRuntimeFraction = CalculatePartRuntimeFraction(pSetting->Supply_Air_Ventilation_Volume*StdRhoAir, MinOA_Msa, StepIns.RequestedCoolingLoad, SensibleRoomORZone, LatentRoomORZone, StepIns.ZoneDehumidificationLoad, LatentRoomORZone, StepIns.ZoneMoistureLoad);//
+				if (HeatingRequested)  PartRuntimeFraction = CalculatePartRuntimeFraction(pSetting->Supply_Air_Ventilation_Volume*StdRhoAir, MinOA_Msa, StepIns.RequestedHeatingLoad, SensibleRoomORZone, LatentRoomORZone, StepIns.ZoneDehumidificationLoad, LatentRoomORZone, StepIns.ZoneMoistureLoad);//
+
 				double RunFractionTotalFuel = ElectricalPower*PartRuntimeFraction; // fraction can be above 1 meaning its not able to do it completely in a time step.
 				pSetting->Runtime_Fraction=PartRuntimeFraction;
 				if (Conditioning_load_met && Humidification_load_met)
@@ -1377,7 +1381,8 @@ namespace EnergyPlus {//***************
 		}
 
 		//doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful in unit testing
-		void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedLoad, double ZoneHeatingLoad, double OutputRequiredToHumidify, double OutputRequiredToDehumidify, double DesignMinVR) {
+		void Model::doStep(double Tosa, double Tra, double RHosa, double RHra, double RequestedCoolingLoad, double RequestedHeatingLoad, double OutputRequiredToHumidify, double OutputRequiredToDehumidify, double DesignMinVR) {
+
 
 		
 			MinOA_Msa = DesignMinVR;// as mass flow kg/s
@@ -1391,23 +1396,24 @@ namespace EnergyPlus {//***************
 			RequestedDeHumdificationLoad = OutputRequiredToDehumidify * 2257; // [W]; 
 			RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * 2257 * TimeStepSys * SecInHour; // [W] =
 
-
-			StepIns.Tosa = Tosa; StepIns.Tra = Tra; StepIns.RHosa = RHosa; StepIns.RHra = RHra; StepIns.RequestedLoad = RequestedLoad; StepIns.ZoneMoistureLoad = RequestedHumdificationLoad;  StepIns.ZoneDehumidificationLoad = RequestedDeHumdificationLoad; StepIns.MinimumOA = MinOA_Msa;
+			StepIns.RequestedCoolingLoad = -RequestedCoolingLoad/1000; //convert to kw Cooling possitive now, heating negitive
+			StepIns.RequestedHeatingLoad = -RequestedHeatingLoad/1000;
+			StepIns.Tosa = Tosa; StepIns.Tra = Tra; StepIns.RHosa = RHosa; StepIns.RHra = RHra; StepIns.ZoneMoistureLoad = RequestedHumdificationLoad;  StepIns.ZoneDehumidificationLoad = RequestedDeHumdificationLoad; StepIns.MinimumOA = MinOA_Msa;
 			double Wosa = CalcHum_ratio_W(Tosa, RHosa, 101.325);
 			double Wra = CalcHum_ratio_W(Tra, RHra, 101.325);
-			 CoolingRequested = false;
-			 HeatingRequested = false;
+			CoolingRequested = false;
+			HeatingRequested = false;
 			 
-			RequestedLoadToCoolingSetpoint = StepIns.RequestedLoad;
-			double RequestedConditioningLoad = -StepIns.RequestedLoad / 1000; //convert to kw Cooling possitive now, heating negitive
+		//	RequestedLoadToCoolingSetpoint = StepIns.RequestedCoolingLoad;
+		//	double RequestedConditioningLoad = -StepIns.RequestedCoolingLoad / 1000; //convert to kw Cooling possitive now, heating negitive
 
 																			  //Heat Transfer Rate[W] = ... Moisture Transfer Rate{ kgWater / s } *L{ kJ / kgWater } where L {kJ/kgWater} = latent heat of phase change for water = 2,257 {kJ/kgWater}
 			
 
-			// establish if conditioning needed 
-			if (RequestedConditioningLoad >= MINIMUM_LOAD_TO_ACTIVATE) 
+																			  // establish if conditioning needed 
+			if (StepIns.RequestedCoolingLoad >= MINIMUM_LOAD_TO_ACTIVATE)
 				CoolingRequested = true;
-			if (RequestedConditioningLoad <= -MINIMUM_LOAD_TO_ACTIVATE) 
+			if (StepIns.RequestedHeatingLoad <= -MINIMUM_LOAD_TO_ACTIVATE)
 				HeatingRequested = true;
 		
 			// the fist mode (mode0) is always the standby mode.
@@ -1424,7 +1430,7 @@ namespace EnergyPlus {//***************
 				UnitOn = 0;
 			}
 			// go into standby if unit is off or not needed
-			if (RequestedLoad == 0 || !UnitOn)
+			if (((CoolingRequested ==false)&& (HeatingRequested == false)) || !UnitOn)
 			{
 				pStandBy->Runtime_Fraction = 1;
 				list<CSetting*>::iterator iterOperatingSettings2= CurrentOperatingSettings.begin();
