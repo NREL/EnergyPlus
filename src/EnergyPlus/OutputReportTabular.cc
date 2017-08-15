@@ -8691,11 +8691,6 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const colElectricity( 1 );
-		int const colGas( 2 );
-		int const colAdditionalFuel( 3 );
-		int const colPurchCool( 4 );
-		int const colPurchHeat( 5 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
