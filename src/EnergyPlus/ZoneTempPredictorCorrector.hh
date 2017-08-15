@@ -372,6 +372,10 @@ namespace ZoneTempPredictorCorrector {
 		int const ActualZoneNum // controlled zone actual zone number
 	);
 
+	void
+	OverrideAirSetPointsforEMSCntrl();
+
+
 } // ZoneTempPredictorCorrector
 
 } // EnergyPlus
