@@ -294,6 +294,7 @@ namespace EnergyPlus {
 
 	TEST( General, nthDayOfWeekOfMonth_test )
 	{
+		// J.Glazer - August 2017
 		ShowMessage( "Begin Test: General, nthDayOfWeekOfMonth_test" );
 
 //		nthDayOfWeekOfMonth(
