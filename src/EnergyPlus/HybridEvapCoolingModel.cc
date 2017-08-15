@@ -962,7 +962,7 @@ namespace EnergyPlus {//***************
 			PLLatetRatio = PLVentRatio = PLSensibleRatio = 0;
 
 			if (Mvent > 0)   PLVentRatio = MinOA_Msa / Mvent;
-			PartRuntimeFraction = PLVentRatio;
+			PartRuntimeFraction = 0; //PLVentRatio; tempory fix to deal with fact we haven't yet implimented a ventilation only backup mode.
 			if (SensibleRoomORZone != 0)   PLSensibleRatio = abs(RequestedConditioningLoad) / abs(SensibleRoomORZone);
 			if (PLSensibleRatio > PartRuntimeFraction) PartRuntimeFraction = PLSensibleRatio;
 			if (ZoneDehumidificationLoad > 0)  PLLatetRatio = RequestedLatentRoomORZone / ZoneDehumidificationLoad;
@@ -1176,8 +1176,8 @@ namespace EnergyPlus {//***************
 				pSetting->Dehumidification = 0; //add
 
 				bool Conditioning_load_met = false;
-				if (CoolingRequested && SensibleRoomORZone > StepIns.RequestedCoolingLoad) Conditioning_load_met = true;
-				if (HeatingRequested && SensibleRoomORZone < StepIns.RequestedHeatingLoad) Conditioning_load_met = true;
+				if (CoolingRequested && (SensibleRoomORZone > StepIns.RequestedCoolingLoad)) Conditioning_load_met = true;
+				if (HeatingRequested && (SensibleRoomORZone < StepIns.RequestedHeatingLoad)) Conditioning_load_met = true;
 				if (!(HeatingRequested || CoolingRequested))  Conditioning_load_met = true;
 
 				bool Humidification_load_met = false;
@@ -1325,7 +1325,7 @@ namespace EnergyPlus {//***************
 			}
 
 			bool foundwarnings = false;
-			double TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+			double TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + SysTimeElapsed;
 			if ((TimeElapsed > 24) && WarnOnceFlag&& !WarmupFlag)
 			{
 				//count_EnvironmentConditionsMetOnce
@@ -1348,7 +1348,7 @@ namespace EnergyPlus {//***************
 				WarnOnceFlag = false;
 				
 			}
-			if (HourOfDay == 1 && WarnOnceFlag==false && !WarmupFlag)
+			if (DataGlobals::HourOfDay == 1 && WarnOnceFlag==false && !WarmupFlag)
 			{
 				WarnOnceFlag = true;
 			}
@@ -1464,9 +1464,12 @@ namespace EnergyPlus {//***************
 
 					if (StdRhoAir>1) 	OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
 					else OutletVolumetricFlowRate = OutletMassFlowRate / 1.225;
-					if (OutletMassFlowRate > 0) averageOSAF = SupplyVentilationAir / OutletMassFlowRate;
+					if (OutletMassFlowRate > 0)
+					{
+						averageOSAF = SupplyVentilationAir / OutletMassFlowRate;
+					}
 					else {
-						ShowSevereError("Outlet air mass flow rate <=0");
+						if (CoolingRequested || HeatingRequested) ShowSevereError("Outlet air mass flow rate <=0");
 						averageOSAF = 1;
 					}
 					PrimaryMode = CurrentPrimaryMode();
