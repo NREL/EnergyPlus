@@ -811,7 +811,7 @@ HVACSystemRootFindingAlgorithm,
        \key RegulaFalsiThenBisection
        \default RegulaFalsi
   N1 ; \field Number of Iterations Before Algorithm Switch
-       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is 
+       \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is
        \note entered. When iteration number is greater than the value, algorithm switches.
        \type integer
        \default 5
@@ -980,7 +980,7 @@ SizingPeriod:DesignDay,
        \note Required only if field Humidity Condition Type is "HumidityRatio".
        \type real
        \units kgWater/kgDryAir
-  N7,  \field Enthalpy at Maximum Dry-Bulb  !will require units transition.
+  N7,  \field Enthalpy at Maximum Dry-Bulb
        \note Enthalpy coincident with the maximum temperature.
        \note Required only if field Humidity Condition Type is "Enthalpy".
        \type real
@@ -6271,8 +6271,8 @@ WindowMaterial:Blind:EquivalentLayer,
        \minimum -90
        \maximum 90
        \default 45
-       \note Slat angle is +ve if the tip of the slat front face is tilted upward, else  
-       \note the slat angle is -ve if the tip of the slat front face is tilted downward. 
+       \note Slat angle is +ve if the tip of the slat front face is tilted upward, else
+       \note the slat angle is -ve if the tip of the slat front face is tilted downward.
        \note The slat angle varies between -90 to +90. The default value is 45 degrees.
   N5 , \field Front Side Slat Beam-Diffuse Solar Transmittance
        \note The front side beam-diffuse solar transmittance of the slat at normal
@@ -17784,7 +17784,7 @@ SurfaceProperty:SolarIncidentInside,
        \type object-list
        \object-list ConstructionNames
   A4;  \field Inside Surface Incident Sun Solar Radiation Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \required-field
        \type object-list
        \object-list ScheduleNames
@@ -17803,24 +17803,24 @@ ComplexFenestrationProperty:SolarAbsorbedLayers,
        \type object-list
        \object-list ComplexFenestrationStates
   A4,  \field Layer 1 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \required-field
        \type object-list
        \object-list ScheduleNames
   A5,  \field Layer 2 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A6,  \field Layer 3 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A7,  \field Layer 4 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A8;  \field Layer 5 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
 
@@ -31770,7 +31770,7 @@ DesignSpecification:OutdoorAir,
   A4; \field Proportional Control Minimum Outdoor Air Flow Rate Schedule Name
       \type object-list
       \object-list ScheduleNames
-      \note This input is only used to calculate the minimum outdoor air flow rate when the field 
+      \note This input is only used to calculate the minimum outdoor air flow rate when the field
       \note System Outdoor Air Method = ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation.
 
 DesignSpecification:ZoneAirDistribution,
@@ -33034,7 +33034,7 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy, 
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy,
        \note or ProportionalControlBasedOnDesignOARate in Controller:MechanicalVentilation
   A6 , \field Maximum Carbon Dioxide Concentration Schedule Name
        \type object-list
@@ -33042,8 +33042,8 @@ ZoneControl:ContaminantController,
        \note Schedule values should be carbon dioxide concentration in parts per
        \note million (ppm)
        \note This field is used when the field System Outdoor Air Method =
-       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy 
-       \note or ProportionalControlBasedOnDesignOARate.  
+       \note ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy
+       \note or ProportionalControlBasedOnDesignOARate.
   A7 , \field Generic Contaminant Control Availability Schedule Name
        \note Availability schedule name for generic contaminant controller. Schedule value > 0 means
        \note the generic contaminant controller is enabled. If this field is blank, then generic
@@ -40608,12 +40608,12 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
   A3,  \field Air Inlet Node Name
        \type node
        \note The name of the HVAC system node that is the air inlet node for the
-       \note terminal unit. This is also the air inlet node for the unit’s fan.
+       \note terminal unit. This is also the air inlet node for the unit's fan.
   A4,  \field Air Outlet Node Name
        \type node
        \note The name of the HVAC system node that is the air outlet node for the
-       \note terminal unit. This is also the air outlet node for the unit’s heating
-       \note coil’s air outlet node. This node is also a zone inlet node.
+       \note terminal unit. This is also the air outlet node for the unit's heating
+       \note coil's air outlet node. This node is also a zone inlet node.
   A5,  \field Fan Object Type
        \required-field
        \type choice
@@ -44757,7 +44757,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N21, \field Speed 2 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44812,7 +44812,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N27, \field Speed 3 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44867,7 +44867,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N33, \field Speed 4 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44922,7 +44922,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N39, \field Speed 5 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44977,7 +44977,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N45, \field Speed 6 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45032,7 +45032,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N51, \field Speed 7 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45087,7 +45087,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N57, \field Speed 8 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45142,7 +45142,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N63, \field Speed 9 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45199,7 +45199,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N69, \field Speed 10 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48232,7 +48232,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
         \required-field
    N11, \field Speed 1 Reference Unit Gross Rated Cooling COP
         \units dimensionless
@@ -48320,7 +48320,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N17, \field Speed 2 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48396,7 +48396,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N23, \field Speed 3 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48479,7 +48479,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N29, \field Speed 4 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48562,7 +48562,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N35, \field Speed 5 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48645,7 +48645,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N41, \field Speed 6 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48728,7 +48728,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N47, \field Speed 7 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48811,7 +48811,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N53, \field Speed 8 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48894,7 +48894,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N59, \field Speed 9 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48977,7 +48977,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N65, \field Speed 10 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -57690,7 +57690,7 @@ Controller:MechanicalVentilation,
         \key ProportionalControlBasedonOccupancySchedule
         \key IndoorAirQualityProcedureGenericContaminant
         \key IndoorAirQualityProcedureCombined
-        \key ProportionalControlBasedOnDesignOARate 
+        \key ProportionalControlBasedOnDesignOARate
         \default VentilationRateProcedure
    N1,  \field Zone Maximum Outdoor Air Fraction
         \type real
@@ -69973,7 +69973,6 @@ WaterHeater:HeatPump:PumpedCondenser,
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
@@ -70225,7 +70224,6 @@ WaterHeater:HeatPump:WrappedCondenser,
   N5 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
@@ -74947,9 +74945,9 @@ SetpointManager:Scheduled:DualSetpoint,
        \type node
 
 SetpointManager:OutdoorAirReset,
-     \memo This Setpoint Manager is used to place a setpoint temperature on system node 
+     \memo This Setpoint Manager is used to place a setpoint temperature on system node
      \memo according to the outdoor air temperature using a reset rule. The outdoor air
-     \memo temperature is obtained from the weather information during the simulation. 
+     \memo temperature is obtained from the weather information during the simulation.
   A1 , \field Name
        \required-field
   A2 , \field Control Variable
@@ -78829,12 +78827,12 @@ DemandManager:Thermostats,
        \units minutes
        \note If blank, duration defaults to the timestep
   N2 , \field Fixed Rate
-       \memo Used in case when Limit strategy is set to FixedRate
+       \note Used in case when Limit strategy is set to FixedRate
        \type real
        \minimum 0.0
        \units m3/s
   N3 , \field Reduction Ratio
-       \memo Used in case when Limit Control is set to ReductionRatio
+       \note Used in case when Limit Control is set to ReductionRatio
        \type real
        \minimum 0.0
        \maximum 1.0

@@ -208,6 +208,7 @@ namespace PackagedTerminalHeatPump {
 	clear_state()
 	{
 		MyOneTimeFlag = true;
+		PTUnit.deallocate();
 	}
 
 
