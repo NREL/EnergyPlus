@@ -2541,10 +2541,6 @@ The heat pump is controlled by matching its sensible (temperature) heating outpu
 
 The maximum number of iterations is limited, with a warning message generated if the above equation is not satisfied within the maximum number of iterations.
 
-\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-001}
-
-This numeric field defines the minimum outdoor dry-bulb temperature in degrees Celsius for PTHP compressor operation. The compressor will not operate (for DX heating or DX cooling) when outdoor dry-bulb temperatures fall below this value. The minimum value must be greater than or equal to -20 °C. If this field is left blank, the default value is -8°C. This temperature should match the minimum compressor operating temperature specified for the heat pump's DX heating coil (if they don't match, the highest of the two temperatures will be the cut-off temperature for compressor operation).
-
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-4-000}
 
 This alpha field defines the type of DX cooling coil used by this PTHP. The input requirements for these DX cooling coil objects are described elsewhere in this document. Only allowable coil types are:
@@ -2655,7 +2651,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
   Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
   Zone2PTHPDXHeatCoil,     !- Heating Coil Name
   0.001,                   !- Heating Convergence Tolerance {dimensionless}
-  2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
   Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
   0.001,                   !- Cooling Convergence Tolerance {dimensionless}
