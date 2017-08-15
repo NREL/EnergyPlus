@@ -303,7 +303,6 @@ namespace SingleDuct {
 		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
 		int AirLoopNum; //System sizing adjustments
 		Real64 DesignPrimaryAirVolRate; //System sizing adjustments, filled from design OA spec using sizing mode flags.
-		int SizingInputNum; // ZoneSizingInput index
 		// Default Constructor
 		AirTerminalMixerData() :
 			MixerType( 0 ),
@@ -332,8 +331,7 @@ namespace SingleDuct {
 			NoOAFlowInputFromUser( true ), 
 			OARequirementsPtr( 0 ), 
 			AirLoopNum( 0 ), 
-			DesignPrimaryAirVolRate( 0.0 ),
-			SizingInputNum( 0 )
+			DesignPrimaryAirVolRate( 0.0 )
 		{}
 
 	};

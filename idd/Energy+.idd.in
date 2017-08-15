@@ -41356,8 +41356,8 @@ AirTerminal:SingleDuct:Mixer,
        \note unit will adjust flow to meet this outdoor air requirement. 
        \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
        \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
-       \note If this field is blank, then the terminal unit will still receive outdoor air from the DOA system but 
-       \note the flow is not controlled on zone-by-zone basis.   
+       \note If this field is blank, then the terminal unit will be controlled using the  
+       \note DesignSpecification:OutdoorAir objec referenced in the Sizing:Zone object.   
 
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.

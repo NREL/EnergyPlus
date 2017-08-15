@@ -4867,7 +4867,7 @@ namespace SingleDuct {
 				if ( ZoneSizingInput.allocated( ) ) {
 					for ( int SizingInputNum = 1; SizingInputNum <= NumZoneSizingInput; ++SizingInputNum ) {
 						if ( ZoneSizingInput( SizingInputNum ).ZoneNum == SysATMixer( ATMixerNum ).ZoneNum ) {
-							SysATMixer( ATMixerNum ).SizingInputNum = SizingInputNum;
+							SysATMixer( ATMixerNum ).OARequirementsPtr = SizingInputNum;
 							if ( ZoneSizingInput( SizingInputNum ).ZoneDesignSpecOAIndex == 0 ) {
 								ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 								ShowContinueError( "If " + cAlphaFieldNames( 8 ) + "is blank, the input of Design Specification Outdoor Air Object Name in Sizing:Zone is needed. Otherwise the mixer outdoor airflow rate is zero." );
@@ -4966,11 +4966,7 @@ namespace SingleDuct {
 			if ( SysATMixer( ATMixerNum ).AirLoopNum > 0 ) {
 				airLoopOAFrac = DataAirLoop::AirLoopFlow( SysATMixer( ATMixerNum ).AirLoopNum ).OAFrac;
 				if ( airLoopOAFrac > 0.0 ) {
-					if ( SysATMixer( ATMixerNum ).OARequirementsPtr > 0 ) {
-						vDotOAReq = CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, true, true );
-					} else {
-						vDotOAReq = CalcDesignSpecificationOutdoorAir( ZoneSizingInput( SysATMixer( ATMixerNum ).SizingInputNum ).ZoneDesignSpecOAIndex, SysATMixer( ATMixerNum ).ZoneNum, true, true );
-					}
+					vDotOAReq = CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, true, true );
 					mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
 				} else {
 					mDotFromOARequirement = Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate;
