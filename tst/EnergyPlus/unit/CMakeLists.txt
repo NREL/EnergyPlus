@@ -153,6 +153,7 @@ set( test_src
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
   WindowAC.unit.cc
+  WindowEquivalentLayer.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc
