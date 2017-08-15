@@ -155,5 +155,77 @@ TEST_F( EnergyPlusFixture, ScheduleAnnualFullLoadHours_test )
 
 }
 
+TEST_F( EnergyPlusFixture, ScheduleAverageHoursPerWeek_test )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.7;",
+		" ",
+		"ScheduleTypeLimits,",
+		"  Any Number;              !- Name",
+		" ",
+		"Schedule:Compact,",
+		" OnSched,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 1.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" OffSched,                 !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 0.0;        !- Field 3",
+		" ",
+		"Schedule:Compact,",
+		" JanOnSched,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 1/31,            !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 1.0,        !- Field 26",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 0.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" HalfOnSched,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 12:00, 1.0,        !- Field 26",
+		" Until: 24:00, 0.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" HalfOnSched2,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 12:00, 0.75,        !- Field 26",
+		" Until: 24:00, 0.25;        !- Field 26",
+		" ",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 15;
+
+	int onSchedIndex = GetScheduleIndex( "ONSCHED" );
+	EXPECT_EQ( 168., ScheduleAverageHoursPerWeek( onSchedIndex, 1, false ) );
+
+	int offSchedIndex = GetScheduleIndex( "OFFSCHED" );
+	EXPECT_EQ( 0., ScheduleAverageHoursPerWeek( offSchedIndex, 1, false ) );
+
+	int janOnSchedIndex = GetScheduleIndex( "JANONSCHED" );
+	EXPECT_NEAR( 14.3, ScheduleAverageHoursPerWeek( janOnSchedIndex, 1, false ), 0.1 );
+
+	int halfOnSchedIndex = GetScheduleIndex( "HALFONSCHED" );
+	EXPECT_EQ( 84., ScheduleAverageHoursPerWeek( halfOnSchedIndex, 1, false ) );
+
+	int halfOnSched2Index = GetScheduleIndex( "HALFONSCHED2" );
+	EXPECT_EQ( 84., ScheduleAverageHoursPerWeek( halfOnSched2Index, 1, false ) );
+
+}
+
 
 
