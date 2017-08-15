@@ -58372,8 +58372,10 @@ AirLoopHVAC,
        \type object-list
        \object-list ConnectorLists
    A6, \field Supply Side Inlet Node Name
-       \note Name of inlet node where return air or outdoor air enters the supply side of the air loop
-       \note Required if this air loop has a return path. Leave this field blank if there is no return.
+       \note Name of inlet node where air enters the supply side of the air loop.
+       \note If this air loop has a return path, then this node is where return air enters the supply side.
+       \note If this air loop has no return path, then this node is where outdoor air or other air enters the supply side.
+       \required-field
        \type node
    A7, \field Demand Side Outlet Node Name
        \note Name of outlet node where return air leaves the demand side and enters the supply side.

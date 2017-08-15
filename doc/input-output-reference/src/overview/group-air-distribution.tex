@@ -6,7 +6,7 @@ Air loops along with zone equipment form the entire forced air heating and cooli
 
 The only numeric input is the design primary air flow rate. This item is input just before the BranchList name.
 
-The next series of names refer to nodes for the various inlet and outlet points of the air loop. The air loop starts where the zone equipment ends. This is a single point consisting of the return air duct once all of the zone return air streams have been collected. While in reality, there is really only one point, for clarity within the simulation components and consistency with the other HVAC loop sections, this point in the systems is defined as two points: one that resides with the zone equipment simulation and one that is acted upon by the air loop simulation. Both node names must be entered into the input file, and both nodes must have unique names. Similarly, the end points of the air loop that also correspond to the beginning points of the zone equipment loop must also be defined. These consist of names referencing lists of up to three pairs of node names as shown below. Up to three air loop outlets are allowed to accommodate the simulation of three deck systems.
+The next series of names refer to nodes for the various inlet and outlet points of the air loop. The air loop starts where the zone equipment ends. This is a single point consisting of the return air duct once all of the zone return air streams have been collected (if the loop has a return path). While in reality, there is really only one point, for clarity within the simulation components and consistency with the other HVAC loop sections, this point in the systems is defined as two points: one that resides with the zone equipment simulation and one that is acted upon by the air loop simulation. Both node names must be entered into the input file (if the loop has a return path), and both nodes must have unique names. Similarly, the end points of the air loop that also correspond to the beginning points of the zone equipment loop must also be defined. These consist of names referencing lists of up to three pairs of node names as shown below. Up to three air loop outlets are allowed to accommodate the simulation of three deck systems.
 
 \paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
 Regarding component schedules, the general rule is don't schedule any components except the supply fan and the corresponding availability manager(s). Beyond that, every component should always be available and let the controls determine what runs or doesn't run. If a component other than the supply fan is scheduled off, then it will remain off even if the night cycle manager turns on the system.
@@ -39,11 +39,11 @@ This field is the name of ConnectorList object. This ConnectorList object lists 
 
 \paragraph{Field: Supply Side Inlet Node Name}\label{field-supply-side-inlet-node-name}
 
-The name of the air entrance node of this primary air system. This is the inlet node for return air for this air system.
+The name of the air entrance node of this primary air system. If this air loop has a return path, then this is the inlet node for return air for this air system. If this air loop does not have a return path, then this node is where outdoor air or other air enters the supply side.
 
 \paragraph{Field: Demand Side Outlet Node Name}\label{field-demand-side-outlet-node-name}
 
-The name of the air outlet node for the zone equipment group (ZoneHVAC:EquipmentConnections objects) attached to the primary air system. This should be the outlet node of a AirLoopHVAC:ZoneMixer in the AirLoopHVAC:ReturnPath for the zone equipment group attached to this primary air system.
+The name of the air outlet node for the zone equipment group (ZoneHVAC:EquipmentConnections objects) attached to the primary air system. This should be the outlet node of a AirLoopHVAC:ZoneMixer or AirloopHVAC:ReturnPlenum in the AirLoopHVAC:ReturnPath for the zone equipment group attached to this primary air system. Leave this field blank if this air loop does not have a return path.
 
 \paragraph{Field: Demand Side Inlet Node Names}\label{field-demand-side-inlet-node-names}
 
@@ -53,21 +53,26 @@ This field can be the name of a node which is the air inlet node for the zone eq
 
 This field can be the name of a node which is the air outlet node for each supply duct of this primary air system. Or, this field can be the name of a node list containing one or more nodes (up to 3). The list can contain the names of up to three nodes. For single duct systems, there is only one node name in this list. For two and three duct systems, the order of the nodes in this list must correspond with the order of the nodes in the Demand Side Inlet Node Names list.
 
+\paragraph{Field: Design Return Air Flow Fraction of Supply Air Flow}\label{design-return-air-flow-fraction-of-supply-air-flow}
+
+This field specifies the design air loop return air flow rate as a fraction of the supply flow rate when there is no exhaust flow.  It may be used to set zero return air flow for a DOAS system or to model a pressurized system where the return flow is a fraction of the supply flow. The return air flow rate will never be greater than the current supply air flow rate multiplied by this fraction.  It may be less if there is unbalanced exhaust from any zones served by this airloop. The default is 1.0. If the air loop has no return path, then this field is ignored.
+
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
 
 AirLoopHVAC,
-    Main Dual Duct Air Loop,           ! Primary Air Loop Name
-    Dual Duct System 1 Controllers,    ! Controller List
-    Dual Duct System 1 Schedule List , ! System Availability Manager List
-    1.3 ,                              ! Primary air design volumetric flow rate
-    Dual Duct Air Loop Branches ,      ! Air Loop Branch List Name
-    Dual Duct Connectors ,             ! Air Loop Connector List Name
-    Supply Fan Inlet Node ,            ! ReturnAir AirLoop Inlet Node
-    Return Air Mixer Outlet ,          ! ZoneEquipGroup Outlet Node
-    Zone Equipment Inlet Node List ,   ! SupplyAirPath ZoneEquipGroup Inlet Nodes
-    Air Loop Outlet Node List ;        ! AirLoop Outlet Nodes
+    Main Dual Duct Air Loop,           !- Name
+    Dual Duct System 1 Controllers,    !- Controller List Name
+    Dual Duct System 1 Schedule List , !- Availability Manager List Name
+    1.3 ,                              !- Design Supply Air Flow Rate {m3/s}
+    Dual Duct Air Loop Branches ,      !- Branch List Name
+    Dual Duct Connectors ,             !- Connector List Name
+    Supply Fan Inlet Node ,            !- Supply Side Inlet Node Name
+    Return Air Mixer Outlet ,          !- Demand Side Outlet Node Name
+    Zone Equipment Inlet Node List ,   !- Demand Side Inlet Node Names
+    Air Loop Outlet Node List,         !- Supply Side Outlet Node Names
+    1.0;                               !- Design Return Air Flow Fraction of Supply Air Flow
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-001}

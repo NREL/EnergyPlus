@@ -1042,7 +1042,7 @@ OutputControl:Sizing:Style,
 
 For this field, the desired separator for columns is entered. ``Comma'' creates comma separated fields/columns in the outputs (eplus\textless{}sizing type\textgreater{}.csv files are created). ``Tab'' creates tab separated fields/columns in the outputs (eplus\textless{}sizing type\textgreater{}.tab files are created). ``Fixed'' creates space separated fields/columns in the outputs (eplus\textless{}sizing type\textgreater{}.txt files are created) but these are not necessarily lined up for easy printing.
 
-Note that both tab and comma separated files easily import into Excelâ„¢ or other spreadsheet programs. The tab delimited files can also be viewed by text editors, word processing programs and easily converted to ``tables'' within those programs.
+Note that both tab and comma separated files easily import into Excel™ or other spreadsheet programs. The tab delimited files can also be viewed by text editors, word processing programs and easily converted to ``tables'' within those programs.
 
 \subsection{Sizing:Zone}\label{sizingzone}
 
@@ -1490,6 +1490,49 @@ Enter the heating capacity as a fraction of the autosized heating capacity. This
       autosize,                !- Heating Design Capacity {W}
       ,                        !- Heating Design Capacity Per Floor Area {W/m2}
       ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+\end{lstlisting}
+
+\subsection{DesignSpecification:AirTerminal:Sizing}\label{designspecificationairterminalsizing}
+
+This object modifies the sizing of an air loop terminal unit. It may be referenced by a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled object. The values specified here are applied to the base sizing results from the corresponding Sizing:Zone inputs. Any given DesignSpecification:AirTerminal:Sizing object may be used by multiple terminal units with similar characteristics.
+
+\subsubsection{Inputs}\label{inputs-52-007}
+
+\paragraph{Field: Name}\label{field-name-2-009}
+
+Name of the design specification air terminal sizing object. This name may be referenced by a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled object.
+
+\paragraph{Field: Fraction of Design Sensible Cooling Load}\label{fraction-of-design-sensible-cooling-load}
+
+The fraction of the design sensible cooling load to be met by this terminal unit. This fraction is applied after the Zone Cooling Sizing Factor (see Sizing:Zone).
+
+\paragraph{Field: Cooling Design Supply Air Temperature Difference Ratio}\label{cooling-design-supply-air-temperature-difference-ratio}
+
+This ratio adjusts the supply air temperature difference used to calculate the cooling design supply air flow rate for this terminal unit.
+
+\paragraph{Field: Fraction of Design Sensible Heating Load}\label{fraction-of-design-sensible-heating-load}
+
+The fraction of the design sensible heating load to be met by this terminal unit. This fraction is applied after the Zone Heating Sizing Factor (see Sizing:Zone).
+
+\paragraph{Field: Heating Design Supply Air Temperature Difference Ratio}\label{heating-design-supply-air-temperature-difference-ratio}
+
+This ratio adjusts the supply air temperature difference used to calculate the heating design supply air flow rate for this terminal unit.
+
+\paragraph{Field: Fraction of Minimum Outdoor Air Flow}\label{fraction-of-minimum-outdoor-air-requirement}
+
+The fraction of the zone minimum outdoor air requirement to be met by this terminal unit.
+
+An IDF example:
+
+\begin{lstlisting}
+
+  DesignSpecification:AirTerminal:Sizing,
+    Recirculation System A Terminal Sizing, !- Name
+    0.6,                     !- Fraction of Design Cooling Load
+    0.8,                     !- Cooling Design Supply Air Temperature Difference Ratio
+    1.0,                     !- Fraction of Design Heating Load
+    1.0,                     !- Heating Design Supply Air Temperature Difference Ratio
+    0.0;                     !- Fraction of Minimum Outdoor Air Flow
 \end{lstlisting}
 
 \subsection{Sizing:System}\label{sizingsystem}
