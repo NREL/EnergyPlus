@@ -4747,7 +4747,7 @@ namespace SystemAvailabilityManager {
 						if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
 							if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlledZoneNum > 0 ) {
 								for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
-									if ( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum ) {
+									if ( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) = HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum ) {
 										zoneFound = true;
 										break;
 									}
