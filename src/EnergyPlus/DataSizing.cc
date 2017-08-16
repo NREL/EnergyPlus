@@ -148,6 +148,11 @@ namespace DataSizing {
 	int const ZOAM_FlowPerACH( 4 ); // sum the outdoor air flow rate based on number of air changes for the zone
 	int const ZOAM_Sum( 5 ); // sum the outdoor air flow rate of the people component and the space floor area component
 	int const ZOAM_Max( 6 ); // use the maximum of the outdoor air flow rate of the people component and the space floor area component
+	int const ZOAM_IAQP( 7 ); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
+	int const ZOAM_ProportionalControlSchOcc( 8 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+												   // to calculate the zone level outdoor air flow rates based on scheduled occupancy
+	int const ZOAM_ProportionalControlDesOcc( 9 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+												   // to calculate the zone level outdoor air flow rates based on design occupancy
 
 	//System Outdoor Air Method
 	int const SOAM_ZoneSum( 1 ); // Sum the outdoor air flow rates of all zones

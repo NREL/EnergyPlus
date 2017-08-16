@@ -51,6 +51,8 @@
 // EnergyPlus Headers
 #include <DataZoneEquipment.hh>
 #include <BranchNodeConnections.hh>
+#include <DataContaminantBalance.hh>
+#include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -60,6 +62,7 @@
 #include <GeneralRoutines.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -1348,12 +1351,22 @@ namespace DataZoneEquipment {
 		using DataSizing::OAFlowACH;
 		using DataSizing::OAFlowSum;
 		using DataSizing::OAFlowMax;
+		using DataSizing::ZOAM_IAQP;
+		using DataSizing::ZOAM_ProportionalControlSchOcc;
+		using DataSizing::ZOAM_ProportionalControlDesOcc;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleMaxValue;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
+		using DataContaminantBalance::ZoneSysContDemand;
+		using DataEnvironment::StdRhoAir;
+		using DataContaminantBalance::ZoneCO2GainFromPeople;
+		using DataContaminantBalance::OutdoorCO2;
+		using General::RoundSigDigits;
+		using DataContaminantBalance::ZoneAirCO2;
+		using DataGlobals::DisplayExtraWarnings;
 
 		// Return value
 		Real64 OAVolumeFlowRate; // Return value for calculated outdoor air volume flow rate [m3/s]
@@ -1379,9 +1392,28 @@ namespace DataZoneEquipment {
 		int Loop; // index counter in LOOP
 		bool PerPersonModeNotSet;
 		bool MaxOAFlag;
+		Real64 ZoneOAPeople; // Zone OA flow rate based on number of occupants [m3/s]
+		Real64 ZoneOAArea; // Zone OA flow rate based on space floor area [m3/s]
+		Real64 ZoneOAMin; // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
+						  // used for "ProportionalControl" System outdoor air method
+		Real64 ZoneOAMax; // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOAArea)
+						  // used for "ProportionalControl" System outdoor air method
+		Real64 ZoneMaxCO2; // Breathing-zone CO2 concentartion
+		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
+		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
+		Real64 CO2PeopleGeneration; // CO2 generation from people at design level
+		int PeopleNum;
+		static Array1D_bool MyEnvrnFlag;
+		static bool OneTimeFlag( true );
 
 		OAVolumeFlowRate = 0.0;
 		if ( DSOAPtr == 0 ) return OAVolumeFlowRate;
+
+		if ( OneTimeFlag ) {
+			MyEnvrnFlag.allocate( DataSizing::NumOARequirements );
+			MyEnvrnFlag = true;
+			OneTimeFlag = false;
+		}
 
 		if ( present( PerPersonNotSet ) ) {
 			PerPersonModeNotSet = PerPersonNotSet;
@@ -1393,6 +1425,31 @@ namespace DataZoneEquipment {
 			MaxOAFlag = MaxOAVolFlowFlag;
 		} else {
 			MaxOAFlag = false;
+		}
+
+		if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_IAQP && MyEnvrnFlag( DSOAPtr ) ) {
+			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
+				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" IndoorAirQualityProcedure\" requires CO2 simulation." );
+				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+			}
+			MyEnvrnFlag( DSOAPtr ) = false;
+		}
+		if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlSchOcc && MyEnvrnFlag( DSOAPtr ) ) {
+			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
+				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" ProportionalControlBasedOnDesignOccupancy\" requires CO2 simulation." );
+				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+			}
+			MyEnvrnFlag( DSOAPtr ) = false;
+		}
+		if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc && MyEnvrnFlag( DSOAPtr ) ) {
+			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
+				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" ProportionalControlBasedonOccupancySchedule\" requires CO2 simulation." );
+				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+			}
+			MyEnvrnFlag( DSOAPtr ) = false;
 		}
 
 		// Calculate people outdoor air flow rate as needed
@@ -1444,7 +1501,6 @@ namespace DataZoneEquipment {
 		} else if ( SELECT_CASE_var == OAFlowACH ) {
 			// Multiplied by zone volume
 			OAVolumeFlowRate = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.0;
-
 		} else if ( ( SELECT_CASE_var == OAFlowSum ) || ( SELECT_CASE_var == OAFlowMax ) ) {
 			// Use sum or max of per person and the following
 			DSOAFlowPerZone = OARequirements( DSOAPtr ).OAFlowPerZone;
@@ -1454,6 +1510,135 @@ namespace DataZoneEquipment {
 				OAVolumeFlowRate = max( DSOAFlowPeople, DSOAFlowPerZone, DSOAFlowPerArea, DSOAFlowACH );
 			} else {
 				OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
+			}
+		} else if ( SELECT_CASE_var == ZOAM_IAQP ) {
+			if ( DataGlobals::DoingSizing ) {
+				DSOAFlowPeople = Zone( ActualZoneNum ).TotOccupants * OARequirements( DSOAPtr ).OAFlowPerPerson;
+				DSOAFlowPerZone = OARequirements( DSOAPtr ).OAFlowPerZone;
+				DSOAFlowPerArea = OARequirements( DSOAPtr ).OAFlowPerArea * Zone( ActualZoneNum ).FloorArea;
+				DSOAFlowACH = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.0;
+				OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
+			} else {
+				OAVolumeFlowRate = ZoneSysContDemand( ActualZoneNum ).OutputRequiredToCO2SP / StdRhoAir;
+			}
+
+		} else if ( SELECT_CASE_var == ZOAM_ProportionalControlSchOcc || SELECT_CASE_var == ZOAM_ProportionalControlDesOcc ) {
+			Real64 ZoneEz = 1.0;
+			ZoneOAPeople = 0.0;
+			if ( OARequirements( DSOAPtr ).OAFlowMethod != ZOAM_ProportionalControlDesOcc ) {
+				ZoneOAPeople = ZoneIntGain( ActualZoneNum ).NOFOCC * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * OARequirements( DSOAPtr ).OAFlowPerPerson;
+			} else {
+				ZoneOAPeople = Zone( ActualZoneNum ).TotOccupants * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * OARequirements( DSOAPtr ).OAFlowPerPerson;
+				CO2PeopleGeneration = 0.0;
+				if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc ) {
+					// Accumulate CO2 generation from people at design occupancy and current activity level
+					for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
+						if ( People( PeopleNum ).ZonePtr != ActualZoneNum ) continue;
+						CO2PeopleGeneration += People( PeopleNum ).NumberOfPeople * People( PeopleNum ).CO2RateFactor * GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr );
+					}
+				}
+			}
+			ZoneOAArea = Zone( ActualZoneNum ).FloorArea * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * OARequirements( DSOAPtr ).OAFlowPerArea;
+			ZoneOAMin = ZoneOAArea / ZoneEz;
+			ZoneOAMax = ( ZoneOAArea + ZoneOAPeople ) / ZoneEz;
+			if ( Zone( ActualZoneNum ).ZoneContamControllerSchedIndex > 0.0 ) {
+				// Check the availability schedule value for ZoneControl:ContaminantController
+				ZoneContamControllerSched = GetCurrentScheduleValue( Zone( ActualZoneNum ).ZoneContamControllerSchedIndex );
+				if ( ZoneContamControllerSched > 0.0 ) {
+					if ( ZoneOAPeople > 0.0 ) {
+						if ( ZoneCO2GainFromPeople( ActualZoneNum ) > 0.0 ) {
+							if ( Zone( ActualZoneNum ).ZoneMinCO2SchedIndex > 0.0 ) {
+								// Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
+								// in the ZoneControl:ContaminantController
+								ZoneMinCO2 = GetCurrentScheduleValue( Zone( ActualZoneNum ).ZoneMinCO2SchedIndex );
+							} else {
+								ZoneMinCO2 = OutdoorCO2;
+							}
+
+							// Calculate zone maximum target CO2 concentration in PPM
+							if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc ) {
+								ZoneMaxCO2 = OutdoorCO2 + ( CO2PeopleGeneration * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+							} else {
+								ZoneMaxCO2 = OutdoorCO2 + ( ZoneCO2GainFromPeople( ActualZoneNum ) * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+							}
+
+							if ( ZoneMaxCO2 <= ZoneMinCO2 ) {
+								++OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount;
+								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlSchOcc ) {
+									if ( OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount < 2 ) {
+										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
+										ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+										ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues..." );
+										ShowContinueErrorTimeStamp( "" );
+									} else {
+										ShowRecurringWarningErrorAtEnd( "DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", OARequirements( DSOAPtr ).CO2MaxMinLimitErrorIndex );
+									}
+								}
+								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc ) {
+									if ( OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount < 2 ) {
+										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
+										ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+										ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues..." );
+										ShowContinueErrorTimeStamp( "" );
+									} else {
+										ShowRecurringWarningErrorAtEnd( "DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", OARequirements( DSOAPtr ).CO2MaxMinLimitErrorIndex );
+									}
+								}
+
+								OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+							} else {
+
+								if ( ZoneAirCO2( ActualZoneNum ) <= ZoneMinCO2 ) {
+									// Zone air CO2 concentration is less than minimum zone CO2 concentration, set the Zone OA flow rate to
+									// minimum Zone OA flow rate when the zone is unoccupied
+									OAVolumeFlowRate = ZoneOAMin;
+								} else if ( ZoneAirCO2( ActualZoneNum ) >= ZoneMaxCO2 ) {
+									// Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow rate to
+									// maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
+									OAVolumeFlowRate = ZoneOAMax;
+								} else {
+									// Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
+									// set Zone OA flow rate by proportionally adjusting between ZoneOAMin and ZoneOAMax
+									OAVolumeFlowRate = ZoneOAMin + ( ZoneOAMax - ZoneOAMin ) * ( ( ZoneAirCO2( ActualZoneNum ) - ZoneMinCO2 ) / ( ZoneMaxCO2 - ZoneMinCO2 ) );
+								}
+							}
+						} else {
+							if ( DisplayExtraWarnings ) {
+								++OARequirements( DSOAPtr ).CO2GainErrorCount;
+								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlSchOcc ) {
+									if ( OARequirements( DSOAPtr ).CO2GainErrorCount < 2 ) {
+										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
+										ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ActualZoneNum ).Name + "\". " );
+										ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues..." );
+										ShowContinueErrorTimeStamp( "" );
+									} else {
+										ShowRecurringWarningErrorAtEnd( "DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Error continues...", OARequirements( DSOAPtr ).CO2GainErrorIndex );
+									}
+								}
+								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc ) {
+									if ( OARequirements( DSOAPtr ).CO2GainErrorCount < 2 ) {
+										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
+										ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ActualZoneNum ).Name + "\". " );
+										ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues..." );
+										ShowContinueErrorTimeStamp( "" );
+									} else {
+										ShowRecurringWarningErrorAtEnd( "DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Error continues...", OARequirements( DSOAPtr ).CO2GainErrorIndex );
+									}
+								}
+							}
+							OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+						}
+					} else {
+						// ZoneOAPeople is less than or equal to zero
+						OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+					}
+				} else {
+					// ZoneControl:ContaminantController is scheduled off (not available)
+					OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+				}
+			} else {
+				// "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController not found
+				OAVolumeFlowRate = ZoneOAMax / ZoneEz;
 			}
 
 		} else {
