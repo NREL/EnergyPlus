@@ -603,34 +603,35 @@ namespace SimAirServingZones {
 			if ( !lNumericBlanks( 2 ) ) {
 				PrimaryAirSystem( AirSysNum ).DesignReturnFlowFraction = Numbers( 2 );
 			}
-			if ( lAlphaBlanks( 7 ) ){
-				AirToZoneNodeInfo( AirSysNum ).NumReturnNodes = 0;
-			} else {
-				//Only allow one return air node (at the loop level)
-				AirToZoneNodeInfo( AirSysNum ).NumReturnNodes = 1;
-				// Allocate the return air node arrays
-				AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
-				AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
-				// fill the return air node arrays with node numbers
-				AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			//Only allow one return air node (at the loop level)
+			AirToZoneNodeInfo( AirSysNum ).NumReturnNodes = 1;
+			// Allocate the return air node arrays
+			AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
+			AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
+			// fill the return air node arrays with node numbers
+			AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			if ( ! lAlphaBlanks( 7 ) ){
 				AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			} else {
+				// If no return path, set this to zero to trigger special handling when calling UpdateHVACInterface
+				AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) = 0;
 			}
 
-			if( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes > 0){
 				// work on unique nodes
 			test = FindItemInList( Alphas( 6 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
-				if ( test == 0 ) {
-					++TestUniqueNodesNum;
-					TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 6 );
-					TestUniqueNodes( TestUniqueNodesNum ).AirLoopName = Alphas( 1 );
-					TestUniqueNodes( TestUniqueNodesNum ).FieldName = cAlphaFields( 6 );
-					TestUniqueNodes( TestUniqueNodesNum ).NodeNameUsed = true;
-				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate node name." );
-					ShowContinueError( "...used for " + cAlphaFields( 6 ) + "=\"" + Alphas( 6 ) + "\"" );
-					ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
-					ErrorsFound = true;
-				}
+			if ( test == 0 ) {
+				++TestUniqueNodesNum;
+				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 6 );
+				TestUniqueNodes( TestUniqueNodesNum ).AirLoopName = Alphas( 1 );
+				TestUniqueNodes( TestUniqueNodesNum ).FieldName = cAlphaFields( 6 );
+				TestUniqueNodes( TestUniqueNodesNum ).NodeNameUsed = true;
+			} else {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate node name." );
+				ShowContinueError( "...used for " + cAlphaFields( 6 ) + "=\"" + Alphas( 6 ) + "\"" );
+				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
+				ErrorsFound = true;
+			}
+			if ( ! lAlphaBlanks( 7 ) ){
 				test = FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 				if ( test == 0 ) {
 					++TestUniqueNodesNum;
