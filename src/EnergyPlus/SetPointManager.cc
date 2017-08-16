@@ -3392,10 +3392,7 @@ namespace SetPointManager {
 						ShowContinueError( "Node=\"" + NodeID( SingZoneRhSetPtMgr( SetPtMgrNum ).ZoneNodeNum ) + "\", not found in any controlled Zone" );
 						ErrorsFound = true;
 					} else {
-						for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ConZoneNum ).NumInletNodes; ++zoneInNode ) {
-							AirLoopNum = ZoneEquipConfig( ConZoneNum ).InletNodeAirLoopNum( zoneInNode );
-							if (AirLoopNum > 0) break; // Use the first airloop found for now
-						}
+						AirLoopNum = ZoneEquipConfig( ConZoneNum ).AirLoopNum;
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr( SetPtMgrNum ).Name + "\", Zone not on air loop:" );
 							ShowContinueError( "Controlled Zone not on air loop, Zone=" + ZoneEquipConfig( ConZoneNum ).ZoneName );

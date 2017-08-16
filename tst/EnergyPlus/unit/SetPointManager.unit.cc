@@ -602,8 +602,7 @@ TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 		DataZoneEquipment::ZoneEquipConfig( 1 ).AirDistUnitHeat.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 3;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode = NodeInputManager::GetOnlySingleNode( "KITCHEN AIR NODE", ErrorsFound, "Zone", "SZRHspmTest", DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_ZoneNode, 1, DataLoopNode::ObjectIsNotParent, "Test zone node" );
-		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
-		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 
 		SetPointManager::GetSetPointManagerInputs();
 		EXPECT_EQ( SetPointManager::SingZoneRhSetPtMgr( 1 ).ControlZoneNum, 1);

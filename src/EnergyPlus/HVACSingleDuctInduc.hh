@@ -134,9 +134,6 @@ namespace HVACSingleDuctInduc {
 		int ADUNum; // index of corresponding air distribution unit
 		Real64 DesCoolingLoad; // used for reporting during coil sizing
 		Real64 DesHeatingLoad; // used for reporting during coil sizing
-		int CtrlZoneNum; // Pointer to CtrlZone data structure
-		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
-		int AirLoopNum; // index to airloop that this terminal unit is connected to
 
 		// Default Constructor
 		IndUnitData() :
@@ -181,10 +178,7 @@ namespace HVACSingleDuctInduc {
 			MaxSecAirMassFlow( 0.0 ),
 			ADUNum( 0 ),
 			DesCoolingLoad( 0.0 ),
-			DesHeatingLoad( 0.0 ),
-			CtrlZoneNum( 0 ),
-			CtrlZoneInNodeIndex( 0 ),
-			AirLoopNum( 0 )
+			DesHeatingLoad( 0.0 )
 		{}
 
 	};

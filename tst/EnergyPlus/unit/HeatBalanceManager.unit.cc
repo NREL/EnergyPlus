@@ -405,7 +405,6 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 		ZoneEquipConfig( 1 ).NumInletNodes = 1;
 		ZoneEquipConfig( 1 ).InletNode.allocate( 1 );
-		ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
 		ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 		ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 		ZoneEquipConfig( 1 ).ZoneNode = 1;
@@ -415,10 +414,8 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 1 ).NumReturnNodes = 1;
 		ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
 		ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
-		ZoneEquipConfig( 1 ).ReturnNodeAirLoopNum.allocate( 1 );
-		ZoneEquipConfig( 1 ).ReturnNodeAirLoopNum( 1 ) = 1;
 		ZoneEquipConfig( 1 ).IsControlled = true;
-		ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 1 ).AirLoopNum = 1;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 
 		ZoneEquipConfig( 2 ).ZoneName = "Zone 2";
@@ -427,7 +424,6 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 2 ).ExhaustNode.allocate( 1 );
 		ZoneEquipConfig( 2 ).NumInletNodes = 1;
 		ZoneEquipConfig( 2 ).InletNode.allocate( 1 );
-		ZoneEquipConfig( 2 ).InletNodeAirLoopNum.allocate( 1 );
 		ZoneEquipConfig( 2 ).ZoneNode = 5;
 		ZoneEquipConfig( 2 ).InletNode( 1 ) = 6;
 		ZoneEquipConfig( 2 ).ExhaustNode( 1 ) = 7;
@@ -435,10 +431,8 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 2 ).NumReturnNodes = 1;
 		ZoneEquipConfig( 2 ).ReturnNode.allocate( 1 );
 		ZoneEquipConfig( 2 ).ReturnNode( 1 ) = 8;
-		ZoneEquipConfig( 2 ).ReturnNodeAirLoopNum.allocate( 1 );
-		ZoneEquipConfig( 2 ).ReturnNodeAirLoopNum( 1 ) = 1;
 		ZoneEquipConfig( 2 ).IsControlled = true;
-		ZoneEquipConfig( 2 ).InletNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 2 ).AirLoopNum = 1;
 		ZoneEquipConfig( 2 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 
 		ZoneEquipInputsFilled = true;

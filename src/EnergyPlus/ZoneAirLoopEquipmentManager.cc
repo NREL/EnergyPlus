@@ -638,7 +638,7 @@ namespace ZoneAirLoopEquipmentManager {
 				if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak ) {
 					MassFlowRateMaxAvail = Node( InNodeNum ).MassFlowRateMaxAvail;
 					MassFlowRateMinAvail = Node( InNodeNum ).MassFlowRateMinAvail;
-					AirLoopNum = AirDistUnit( AirDistUnitNum ).AirLoopNum;
+					AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
 					if ( AirLoopNum > 0 ) {
 						DesFlowRatio = AirLoopFlow( AirLoopNum ).SysToZoneDesFlowRatio;
 					} else {

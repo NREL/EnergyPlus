@@ -342,10 +342,10 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
 				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
-					AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInletNodeNum );
 					for ( CompNum = 1; CompNum <= ZoneEquipList( ListNum ).NumOfEquipTypes; ++CompNum ) {
 						for ( NodeCount = 1; NodeCount <= ZoneEquipList( ListNum ).EquipData( CompNum ).NumOutlets; ++NodeCount ) {
 							if ( ZoneEquipList( ListNum ).EquipData( CompNum ).OutletNodeNums( NodeCount ) == ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInletNodeNum ).OutNode ) {
@@ -456,11 +456,11 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
 				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				//loop over the zone supply air path inlet nodes
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
-				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInletNodeNum );
 
 					// 1. Find HVAC component plant loop connections
 					MainBranchNum = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInletNodeNum ).MainBranchIndex;
@@ -3241,21 +3241,21 @@ namespace SystemReports {
 			//if system operating in deadband reset zone load
 			if ( DeadBandOrSetback( ActualZoneNum ) ) ZoneLoad = 0.0;
 
+			// retrieve air loop indexes
+			AirLoopNum = zecCtrlZone.AirLoopNum;
+			if ( AirLoopNum == 0 ) continue;
+
+			//Zone cooling load
+			if ( ZoneLoad < -SmallLoad ) {
+				SysTotZoneLoadCLNG( AirLoopNum ) += std::abs( ZoneLoad );
+
+				//Zone heating load
+			} else if ( ZoneLoad > SmallLoad ) {
+				SysTotZoneLoadHTNG( AirLoopNum ) += std::abs( ZoneLoad );
+			}
 
 			//loop over the zone supply air path inlet nodes
 			for ( ZoneInNum = 1; ZoneInNum <= zecCtrlZone.NumInletNodes; ++ZoneInNum ) {
-				// retrieve air loop indexes
-				AirLoopNum = zecCtrlZone.InletNodeAirLoopNum( ZoneInNum );
-				if ( AirLoopNum == 0 ) continue;
-
-				//Zone cooling load - this will double count if there is more than one airloop serving the same zone - but not sure how to apportion
-				if ( ZoneLoad < -SmallLoad ) {
-					SysTotZoneLoadCLNG( AirLoopNum ) += std::abs( ZoneLoad );
-
-					//Zone heating load
-				} else if ( ZoneLoad > SmallLoad ) {
-					SysTotZoneLoadHTNG( AirLoopNum ) += std::abs( ZoneLoad );
-				}
 				auto const & zecCtrlZoneCool = zecCtrlZone.AirDistUnitCool( ZoneInNum );
 				auto const & zecCtrlZoneHeat = zecCtrlZone.AirDistUnitHeat( ZoneInNum );
 
@@ -4234,13 +4234,12 @@ namespace SystemReports {
 
 			}
 
-			//loop over the zone supply air path inlet nodes
-			for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
-				// retrieve air loop indexes
-				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum );
-				MixedAirNode = 0;
-				ReturnAirNode = 0;
-				if ( AirLoopNum != 0 ) { // deal with primary air system
+			// retrieve air loop indexes
+			AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
+			if ( AirLoopNum != 0 ) { // deal with primary air system
+				//loop over the zone supply air path inlet nodes
+
+				for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
 					AirDistCoolInletNodeNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode, 0 );
 					AirDistHeatInletNodeNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode, 0 );
 					// Set for cooling or heating path
@@ -4258,11 +4257,11 @@ namespace SystemReports {
 					} else {
 						// do nothing (already inits)
 					}
-					//Find the mixed air node and return air node of the system that supplies the zone
-					MixedAirNode = PrimaryAirSystem( AirLoopNum ).OASysOutletNodeNum;
-					ReturnAirNode = PrimaryAirSystem( AirLoopNum ).OASysInletNodeNum;
 				}
 
+				//Find the mixed air node and return air node of the system that supplies the zone
+				MixedAirNode = PrimaryAirSystem( AirLoopNum ).OASysOutletNodeNum;
+				ReturnAirNode = PrimaryAirSystem( AirLoopNum ).OASysInletNodeNum;
 				if ( MixedAirNode == 0 || ReturnAirNode == 0 ) {
 					AirSysZoneVentLoad = 0.0;
 					AirSysOutAirFlow = 0.0;

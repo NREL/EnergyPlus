@@ -89,16 +89,13 @@ TEST_F( EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir ) {
 	Damper( 1 ).OARequirementsPtr = 1;
 	Damper( 1 ).NoOAFlowInputFromUser = false;
 	Damper( 1 ).ActualZoneNum = 1;
-	Damper( 1 ).AirLoopNum = 1;
 	Damper( 2 ).CtrlZoneNum = 1;
 	Damper( 2 ).NoOAFlowInputFromUser = false;
 	Damper( 2 ).OARequirementsPtr = 1;
 	Damper( 2 ).ActualZoneNum = 1;
-	Damper( 2 ).AirLoopNum = 1;
 
 	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
-	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
-	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 
 	DataAirLoop::AirLoopFlow.allocate( 1 );
 	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 0.5;

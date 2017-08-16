@@ -160,14 +160,8 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	CurDeadBandOrSetback.allocate( 2 );
 	ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
 	ZoneEquipConfig( 2 ).InletNode.allocate( 2 );
-	ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 2 );
-	ZoneEquipConfig( 2 ).InletNodeAirLoopNum.allocate( 2 );
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 2 ).ExhaustNode.allocate( 1 );
-	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
-	ZoneEquipConfig( 2 ).ReturnNode.allocate( 1 );
-	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
-	ZoneEquipConfig( 2 ).NumReturnNodes = 1;
 	ZoneMassBalanceFlag.allocate( 2 );
 	NumOfZones = 2;
 	MassConservation.allocate( NumOfZones );
@@ -283,8 +277,8 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	Node( 8 ).MassFlowRateMinAvail = 0.0;
 	Node( 8 ).MassFlowRateMaxAvail = 0.0;
 	Node( 8 ).MassFlowRateMax = 0.0;
-	ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 0;
-	ZoneEquipConfig( 2 ).InletNodeAirLoopNum( 1 ) = 0;
+	ZoneEquipConfig( 1 ).AirLoopNum = 0;
+	ZoneEquipConfig( 2 ).AirLoopNum = 0;
 	ZoneEquipConfig( 1 ).ZoneExh = 0.0;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	ZoneEquipConfig( 1 ).PlenumMassFlow = 0.0;

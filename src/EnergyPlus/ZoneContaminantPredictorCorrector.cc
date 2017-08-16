@@ -1172,6 +1172,7 @@ namespace ZoneContaminantPredictorCorrector {
 		Real64 Sch; // Schedule value
 		Real64 Cs; // Surface concentration level for the Boundary Layer Diffusion Controlled Model
 		static bool MyConfigOneTimeFlag( true );
+		int AirLoopNum;
 		int ContZoneNum;
 		int I;
 		static bool ErrorsFound( false );
@@ -1342,35 +1343,27 @@ namespace ZoneContaminantPredictorCorrector {
 		if ( allocated( ZoneEquipConfig ) && MyConfigOneTimeFlag ) {
 			for ( ContZoneNum = 1; ContZoneNum <= NumContControlledZones; ++ContZoneNum ) {
 				ZoneNum = ContaminantControlledZone( ContZoneNum ).ActualZoneNum;
-				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ContZoneNum ).NumInletNodes; ++zoneInNode ) {
-					int AirLoopNum = ZoneEquipConfig( ContZoneNum ).InletNodeAirLoopNum( zoneInNode );
-					ContaminantControlledZone( ContZoneNum ).NumOfZones = 0;
+				AirLoopNum = ZoneEquipConfig( ZoneNum ).AirLoopNum;
+				ContaminantControlledZone( ContZoneNum ).NumOfZones = 0;
+				for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
+					if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
+					if ( AirLoopNum == ZoneEquipConfig( Loop ).AirLoopNum ) {
+						++ContaminantControlledZone( ContZoneNum ).NumOfZones;
+					}
+				}
+				if ( ContaminantControlledZone( ContZoneNum ).NumOfZones > 0 ) {
+					ContaminantControlledZone( ContZoneNum ).ControlZoneNum.allocate( ContaminantControlledZone( ContZoneNum ).NumOfZones );
+					I = 1;
 					for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 						if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
-						for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig( Loop ).NumInletNodes; ++zoneInNode2 ) {
-							if ( AirLoopNum == ZoneEquipConfig( Loop ).InletNodeAirLoopNum( zoneInNode2 ) ) {
-								++ContaminantControlledZone( ContZoneNum ).NumOfZones;
-								break; // only count a zone once
-							}
+						if ( AirLoopNum == ZoneEquipConfig( Loop ).AirLoopNum ) {
+							ContaminantControlledZone( ContZoneNum ).ControlZoneNum( I ) = Loop;
+							++I;
 						}
 					}
-					if ( ContaminantControlledZone( ContZoneNum ).NumOfZones > 0 ) {
-						ContaminantControlledZone( ContZoneNum ).ControlZoneNum.allocate( ContaminantControlledZone( ContZoneNum ).NumOfZones );
-						I = 1;
-						for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
-							if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
-							for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig( Loop ).NumInletNodes; ++zoneInNode2 ) {
-								if ( AirLoopNum == ZoneEquipConfig( Loop ).InletNodeAirLoopNum( zoneInNode2 ) ) {
-									ContaminantControlledZone( ContZoneNum ).ControlZoneNum( I ) = Loop;
-									++I;
-									break; // only count a zone once
-								}
-							}
-						}
-					} else {
-						ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
-						ErrorsFound = true;
-					}
+				} else {
+					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
+					ErrorsFound = true;
 				}
 			}
 			MyConfigOneTimeFlag = false;

@@ -425,9 +425,6 @@ namespace DualDuct {
 									AirDistUnit( Damper( DamperIndex ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 									AirDistUnit( Damper( DamperIndex ).ADUNum ).ZoneEqNum = CtrlZone;
 								}
-								Damper( DamperNum ).CtrlZoneNum = CtrlZone;
-								Damper( DamperNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
-								Damper( DamperNum ).CtrlZoneInNodeIndex = SupAirIn;
 							}
 						}
 					}
@@ -515,7 +512,7 @@ namespace DualDuct {
 
 								Damper( DamperNum ).CtrlZoneNum = CtrlZone;
 								Damper( DamperNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
-								Damper( DamperNum ).CtrlZoneInNodeIndex = SupAirIn;
+
 							}
 						}
 					}
@@ -635,7 +632,6 @@ namespace DualDuct {
 
 								Damper( DamperNum ).CtrlZoneNum = CtrlZone;
 								Damper( DamperNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
-								Damper( DamperNum ).CtrlZoneInNodeIndex = SupAirIn;
 							}
 						}
 					}
@@ -869,9 +865,8 @@ namespace DualDuct {
 		if ( MyAirLoopFlag( DamperNum ) ) {
 			if ( Damper( DamperNum ).DamperType == DualDuct_VariableVolume || Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
 				if ( Damper( DamperNum ).AirLoopNum == 0 ) {
-					if ( ( Damper( DamperNum ).CtrlZoneNum > 0 ) && ( Damper( DamperNum ).CtrlZoneInNodeIndex > 0 ) ){
-						Damper( DamperNum ).AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).InletNodeAirLoopNum( Damper( DamperNum ).CtrlZoneInNodeIndex );
-						AirDistUnit( Damper( DamperNum ).ADUNum ).AirLoopNum = Damper( DamperNum ).AirLoopNum;
+					if ( Damper( DamperNum ).CtrlZoneNum > 0 ) {
+						Damper( DamperNum ).AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).AirLoopNum;
 					}
 				} else {
 					MyAirLoopFlag( DamperNum ) = false;
@@ -1735,21 +1730,37 @@ namespace DualDuct {
 		// METHODOLOGY EMPLOYED:
 		// User input defines method used to calculate OA.
 
+		// REFERENCES:
+
+		// Using/Aliasing
 		using DataAirLoop::AirLoopFlow;
 		using DataAirLoop::AirLoopControlInfo;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
 		bool const UseMinOASchFlag( true ); // Always use min OA schedule in calculations.
 
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int AirLoopNum; // Index to air loop
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		Real64 OAMassFlow; // outside air mass flow rate (kg/s)
 
 		// initialize OA flow rate and OA report variable
 		SAMassFlow = 0.0;
 		AirLoopOAFrac = 0.0;
-		int AirLoopNum = Damper( DamperNum ).AirLoopNum;
+		AirLoopNum = 0;
+		if ( Damper( DamperNum ).CtrlZoneNum > 0 ) AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).AirLoopNum;
 
 		// Calculate the amount of OA based on optional user inputs
 		if ( AirLoopNum > 0 ) {

@@ -324,7 +324,6 @@ namespace FourPipeBeam {
 					if ( thisBeam->airOutNodeNum == ZoneEquipConfig( ctrlZone ).InletNode( supAirIn ) ) {
 						thisBeam->zoneIndex = ctrlZone;
 						thisBeam->zoneNodeIndex = ZoneEquipConfig( ctrlZone ).ZoneNode;
-						thisBeam->ctrlZoneInNodeIndex = supAirIn;
 						ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).InNode = thisBeam->airInNodeNum;
 						ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).OutNode = thisBeam->airOutNodeNum;
 						AirDistUnit( thisBeam->aDUNum ).TermUnitSizingNum = ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).TermUnitSizingIndex;
@@ -439,8 +438,7 @@ namespace FourPipeBeam {
 
 		if ( ! SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
 	//	if ( DataGlobals::SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
-			this->airLoopNum = DataZoneEquipment::ZoneEquipConfig( this->zoneIndex ).InletNodeAirLoopNum( this-> ctrlZoneInNodeIndex );
-			AirDistUnit( this->aDUNum ).AirLoopNum = this->airLoopNum;
+
 			this->set_size(); // calculate autosize values (in any) and convert volume flow rates to mass flow rates
 			if ( this->beamCoolingPresent ) { // initialize chilled water design mass flow rate in plant routines
 				InitComponentNodes( 0.0,
@@ -779,15 +777,15 @@ namespace FourPipeBeam {
 		this->mDotDesignPrimAir = this->vDotDesignPrimAir * DataEnvironment::StdRhoAir;
 
 		if ( ( originalTermUnitSizeMaxVDot > 0.0 ) && ( originalTermUnitSizeMaxVDot != this->vDotDesignPrimAir ) && ( CurZoneEqNum > 0 ) ) {
-			if ( ( DataSizing::SysSizingRunDone ) && ( this->airLoopNum > 0 ) ) {
+			if ( DataSizing::SysSizingRunDone ) {
 				// perturb system size to handle change in system size calculated without knowing about 4 pipe beam
-				DataSizing::FinalSysSizing( this->airLoopNum).DesMainVolFlow
+				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).DesMainVolFlow
 					+= ( this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot );
-				DataSizing::FinalSysSizing( this->airLoopNum ).DesCoolVolFlow
+				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).DesCoolVolFlow
 					+= ( this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot );
-				DataSizing::FinalSysSizing( this->airLoopNum ).DesHeatVolFlow
+				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).DesHeatVolFlow
 					+= ( this->vDotDesignPrimAir - originalTermUnitSizeHeatVDot );
-				DataSizing::FinalSysSizing( this->airLoopNum ).MassFlowAtCoolPeak
+				DataSizing::FinalSysSizing( DataZoneEquipment::ZoneEquipConfig( CurZoneEqNum ).AirLoopNum ).MassFlowAtCoolPeak
 					+= ( this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot ) * DataEnvironment::StdRhoAir;
 
 				ReportSizingOutput( this->unitType, this->name, "AirLoopHVAC Design Supply Air Flow Rate Adjustment [m3/s]",

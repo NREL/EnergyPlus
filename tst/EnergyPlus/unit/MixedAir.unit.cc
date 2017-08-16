@@ -1390,9 +1390,7 @@ namespace EnergyPlus {
 		ZoneEquipConfig.allocate( 1 );
 		ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 		ZoneEquipConfig( 1 ).ZoneNode = 2;
-		ZoneEquipConfig( 1 ).NumInletNodes = 1;
-		ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
-		ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 1 ).AirLoopNum = 1;
 		PrimaryAirSystem.allocate( 1 );
 		PrimaryAirSystem( 1 ).NumBranches = 1;
 		PrimaryAirSystem( 1 ).Branch.allocate( 1 );

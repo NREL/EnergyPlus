@@ -334,6 +334,10 @@ namespace DataZoneEquipment {
 		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
 		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
+		int AirLoopNum; // the air loop index for this controlled zone
+		int FanOpMode; // =0 if no central sys;
+		// -1 if central sys is in cycling fan mode;
+		// =2 if central sysis in constant fan mode.
 		bool ZonalSystemOnly; // TRUE if served by a zonal system (only)
 		bool IsControlled; // True when this is a controlled zone.
 		Real64 ZoneExh; // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
@@ -371,6 +375,8 @@ namespace DataZoneEquipment {
 			ReturnFlowSchedPtrNum( 0 ),
 			FlowError( false ),
 			ReturnZonePlenumCondNum( 0 ),
+			AirLoopNum( 0 ),
+			FanOpMode( 0 ),
 			ZonalSystemOnly( false ),
 			IsControlled( false ),
 			ZoneExh( 0.0 ),

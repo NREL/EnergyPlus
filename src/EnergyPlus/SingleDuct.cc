@@ -675,7 +675,6 @@ namespace SingleDuct {
 							}
 
 							Sys( SysNum ).CtrlZoneNum = CtrlZone;
-							Sys( SysNum ).CtrlZoneInNodeIndex = SupAirIn;
 							Sys( SysNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
 							Sys( SysNum ).ZoneFloorArea = Zone( Sys( SysNum ).ActualZoneNum ).FloorArea * Zone( Sys( SysNum ).ActualZoneNum ).Multiplier * Zone( Sys( SysNum ).ActualZoneNum ).ListMultiplier;
 
@@ -891,10 +890,6 @@ namespace SingleDuct {
 								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
-							Sys( SysNum ).CtrlZoneNum = CtrlZone;
-							Sys( SysNum ).CtrlZoneInNodeIndex = SupAirIn;
-							Sys( SysNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
-							Sys( SysNum ).ZoneFloorArea = Zone( Sys( SysNum ).ActualZoneNum ).FloorArea * Zone( Sys( SysNum ).ActualZoneNum ).Multiplier * Zone( Sys( SysNum ).ActualZoneNum ).ListMultiplier;
 						}
 					}
 				}
@@ -1069,10 +1064,6 @@ namespace SingleDuct {
 								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
-							Sys( SysNum ).CtrlZoneNum = CtrlZone;
-							Sys( SysNum ).CtrlZoneInNodeIndex = SupAirIn;
-							Sys( SysNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
-							Sys( SysNum ).ZoneFloorArea = Zone( Sys( SysNum ).ActualZoneNum ).FloorArea * Zone( Sys( SysNum ).ActualZoneNum ).Multiplier * Zone( Sys( SysNum ).ActualZoneNum ).ListMultiplier;
 						}
 					}
 				}
@@ -1228,7 +1219,6 @@ namespace SingleDuct {
 							}
 
 							Sys( SysNum ).CtrlZoneNum = CtrlZone;
-							Sys( SysNum ).CtrlZoneInNodeIndex = SupAirIn;
 							Sys( SysNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
 							Sys( SysNum ).ZoneFloorArea = Zone( Sys( SysNum ).ActualZoneNum ).FloorArea * Zone( Sys( SysNum ).ActualZoneNum ).Multiplier * Zone( Sys( SysNum ).ActualZoneNum ).ListMultiplier;
 
@@ -1342,10 +1332,6 @@ namespace SingleDuct {
 								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
-							Sys( SysNum ).CtrlZoneNum = CtrlZone;
-							Sys( SysNum ).CtrlZoneInNodeIndex = SupAirIn;
-							Sys( SysNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
-							Sys( SysNum ).ZoneFloorArea = Zone( Sys( SysNum ).ActualZoneNum ).FloorArea * Zone( Sys( SysNum ).ActualZoneNum ).Multiplier * Zone( Sys( SysNum ).ActualZoneNum ).ListMultiplier;
 						}
 					}
 				}
@@ -1588,10 +1574,6 @@ namespace SingleDuct {
 								AirDistUnit( Sys( SysNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( Sys( SysNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
-							Sys( SysNum ).CtrlZoneNum = CtrlZone;
-							Sys( SysNum ).CtrlZoneInNodeIndex = SupAirIn;
-							Sys( SysNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
-							Sys( SysNum ).ZoneFloorArea = Zone( Sys( SysNum ).ActualZoneNum ).FloorArea * Zone( Sys( SysNum ).ActualZoneNum ).Multiplier * Zone( Sys( SysNum ).ActualZoneNum ).ListMultiplier;
 						}
 					}
 				}
@@ -1840,9 +1822,9 @@ namespace SingleDuct {
 			}
 			// Find air loop associated with terminal unit
 			if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheat || Sys( SysNum ).SysType_Num == SingleDuctVAVNoReheat ) {
-				if ( ( Sys( SysNum ).CtrlZoneNum > 0 ) && ( Sys( SysNum ).CtrlZoneInNodeIndex > 0 ) ){
-					Sys( SysNum ).AirLoopNum = ZoneEquipConfig( Sys( SysNum ).CtrlZoneNum ).InletNodeAirLoopNum( Sys( SysNum ).CtrlZoneInNodeIndex );
-					AirDistUnit( Sys( SysNum ).ADUNum ).AirLoopNum = Sys( SysNum ).AirLoopNum;
+				if ( Sys( SysNum ).CtrlZoneNum > 0 ) {
+					// MJW This will need more smarts - ok for now
+					Sys( SysNum ).AirLoopNum = ZoneEquipConfig( Sys( SysNum ).CtrlZoneNum ).AirLoopNum;
 				}
 			}
 
@@ -3118,14 +3100,16 @@ namespace SingleDuct {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int AirLoopNum; // Index to air loop
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		Real64 OAMassFlow; // outside air mass flow rate (kg/s)
 
 		// initialize OA flow rate and OA report variable
 		SAMassFlow = 0.0;
 		AirLoopOAFrac = 0.0;
-		int AirLoopNum = Sys( SysNum ).AirLoopNum;
+		AirLoopNum = 0;
 
+		if ( Sys( SysNum ).CtrlZoneNum > 0 ) AirLoopNum = ZoneEquipConfig( Sys( SysNum ).CtrlZoneNum ).AirLoopNum;
 
 		// Calculate the amount of OA based on optional user inputs
 		if ( AirLoopNum > 0 ) {

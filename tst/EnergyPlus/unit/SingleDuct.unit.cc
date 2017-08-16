@@ -1311,10 +1311,8 @@ TEST_F( EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir ) {
 	SingleDuct::Sys( 1 ).ActualZoneNum = 1;
 	SingleDuct::Sys( 1 ).NoOAFlowInputFromUser = false;
 	SingleDuct::Sys( 1 ).OARequirementsPtr = 1;
-	SingleDuct::Sys( 1 ).AirLoopNum = 1;
 
-	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
-	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 0.4;
 	DataAirLoop::AirLoopControlInfo( 1 ).AirLoopDCVFlag = true;
 

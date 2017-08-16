@@ -133,8 +133,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 	DataAirLoop::AirLoopFlow.allocate( 1 );
 	DataHVACGlobals::NumPrimaryAirSys = 1;
 
-	ZoneEquipConfig( ZoneNum ).InletNodeAirLoopNum( 1 ) = 1;
-	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 ) = 1;
+	ZoneEquipConfig(ZoneNum).AirLoopNum = 1;
 	DataHVACGlobals::AirLoopsSimOnce = true;
 	CalcZoneMassBalance( );
 	EXPECT_FALSE(has_err_output());
