@@ -3611,6 +3611,10 @@ namespace SolarShading {
 		int const NPhi( 6 ); // Number of altitude angle steps for sky integration
 		int const NTheta( 24 ); // Number of azimuth angle steps for sky integration
 		Real64 const Eps( 1.e-10 ); // Small number
+        Real64 const DPhi( PiOvr2 / NPhi ); // Altitude step size
+        Real64 const DTheta( 2.0 * Pi / NTheta ); // Azimuth step size
+        Real64 const DThetaDPhi( DTheta * DPhi ); // Product of DTheta and DPhi
+        Real64 const PhiMin( 0.5 * DPhi ); // Minimum altitude
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3626,10 +3630,6 @@ namespace SolarShading {
 		Real64 Fac1WithShdg; // Intermediate calculation factor, with shading
 		int IPhi; // Altitude step counter
 		int ITheta; // Azimuth step counter
-		Real64 DPhi; // Altitude step size
-		Real64 DTheta; // Azimuth step size
-		Real64 DThetaDPhi; // Product of DTheta and DPhi
-		Real64 PhiMin; // Minimum altitude
 		Real64 Phi; // Altitude angle
 		Real64 Theta; // Azimuth angle
 		Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
@@ -3677,11 +3677,6 @@ namespace SolarShading {
 			WoShdgIsoSky = 0.;
 			WithShdgHoriz = 0.;
 			WoShdgHoriz = 0.;
-
-			DPhi = PiOvr2 / NPhi; // 15 deg for NPhi = 6
-			DTheta = 2.0 * Pi / NTheta; // 15 deg for NTheta = 24
-			DThetaDPhi = DTheta * DPhi;
-			PhiMin = 0.5 * DPhi; // 7.5 deg for DPhi = 15 deg
 
 			for ( IPhi = 1; IPhi <= NPhi; ++IPhi ) { // Loop over patch altitude values
 				Phi = PhiMin + ( IPhi - 1 ) * DPhi; // 7.5,22.5,37.5,52.5,67.5,82.5 for NPhi = 6
@@ -8377,6 +8372,10 @@ namespace SolarShading {
 		int const NPhi( 6 ); // Number of altitude angle steps for sky integration
 		int const NTheta( 24 ); // Number of azimuth angle steps for sky integration
 		Real64 const Eps( 1.e-10 ); // Small number
+        Real64 const DPhi( PiOvr2 / NPhi ); // Altitude step size
+        Real64 const DTheta( 2.0 * Pi / NTheta ); // Azimuth step size
+        Real64 const DThetaDPhi( DTheta * DPhi ); // Product of DTheta and DPhi
+        Real64 const PhiMin( 0.5 * DPhi ); // Minimum altitude
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8389,10 +8388,6 @@ namespace SolarShading {
 		int SurfNum; // Surface counter
 		int IPhi; // Altitude step counter
 		int ITheta; // Azimuth step counter
-		Real64 DPhi; // Altitude step size
-		Real64 DTheta; // Azimuth step size
-		Real64 DThetaDPhi; // Product of DTheta and DPhi
-		Real64 PhiMin; // Minimum altitude
 		Real64 Phi; // Altitude angle
 		Real64 Theta; // Azimuth angle
 		Real64 CosPhi; // Cosine of Phi
@@ -8449,11 +8444,6 @@ namespace SolarShading {
 			SetupOutputVariable( "Debug Surface Solar Shading Model WithShdgIsoSky []", WithShdgIsoSky( SurfNum ), "Zone", "Average", Surface( SurfNum ).Name );
 			SetupOutputVariable( "Debug Surface Solar Shading Model WoShdgIsoSky []", WoShdgIsoSky( SurfNum ), "Zone", "Average", Surface( SurfNum ).Name );
 		}
-
-		DPhi = PiOvr2 / NPhi; // 15 deg for NPhi = 6
-		DTheta = 2.0 * Pi / NTheta; // 15 deg for NTheta = 24
-		DThetaDPhi = DTheta * DPhi;
-		PhiMin = 0.5 * DPhi; // 7.5 deg for DPhi = 15 deg
 
 		for ( IPhi = 1; IPhi <= NPhi; ++IPhi ) { // Loop over patch altitude values
 			Phi = PhiMin + ( IPhi - 1 ) * DPhi; // 7.5,22.5,37.5,52.5,67.5,82.5 for NPhi = 6
