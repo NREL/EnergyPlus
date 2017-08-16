@@ -1071,7 +1071,7 @@ namespace HeatBalFiniteDiffManager {
 
 				if ( ( GSiter > 2 ) && ( std::abs( sum_array_diff( TDT, TDTLast ) / sum( TDT ) ) < 0.00001 ) ) break;
 
-			} // End of Gauss Seidel iteration loop
+			} // End of Gauss Seidell iteration loop
 
 			GSloopCounter = GSiter; // outputs GSloop iterations, useful for pinpointing stability issues with condFD
 			if ( CondFDRelaxFactor != 1.0 ) {
