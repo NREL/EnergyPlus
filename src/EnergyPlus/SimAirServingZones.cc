@@ -1659,6 +1659,9 @@ namespace SimAirServingZones {
 
 					// Now Loop over the Supply Air Path outlet nodes and find out which zone and which air terminal
 					// unit on that zone is connected to that supply air path.
+					// Need to be sure AirloopHVAC:UnitarySystem input has been gotten before this check executes
+					HVACUnitarySystem::GetUnitarySystemInput();
+
 					for ( SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= NumSupAirPathOutNodes; ++SupAirPathOutNodeNum ) {
 						FoundSupPathZoneConnect = false;
 						// loop over all controlled zones.

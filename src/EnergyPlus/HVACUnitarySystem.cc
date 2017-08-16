@@ -377,11 +377,8 @@ namespace HVACUnitarySystem {
 			}
 		}
 		// Obtains and Allocates unitary system related parameters from input file
-		if ( GetInputFlag ) {
-			// Get the unitary system input
-			GetUnitarySystemInput();
-			GetInputFlag = false;
-		}
+		// Get the unitary system input
+		GetUnitarySystemInput();
 
 		// Find the correct unitary system Number
 		if ( CompIndex == 0 ) {
@@ -2724,8 +2721,10 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorFlag( false ); // true if errors detected in GetUnitarySystemInputData
 
-		// Flow
-		GetUnitarySystemInputData( ErrorFlag );
+		if ( GetInputFlag ) {
+			GetUnitarySystemInputData( ErrorFlag );
+			GetInputFlag = false;
+		}
 
 		if( ErrorFlag ) {
 			ShowFatalError( RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem input. Preceding condition(s) causes termination." );
