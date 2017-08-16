@@ -2,8 +2,7 @@ include(ExternalProject)
 
 ExternalProject_Add(Windows-CalcEngine
     GIT_REPOSITORY https://github.com/LBNL-ETA/Windows-CalcEngine.git
-    # GIT_TAG "Version_1.0.04"
-    GIT_TAG "InterpolationOfOpticalPropertiesInIGU"
+    GIT_TAG "Version_1.0.05"
     
     UPDATE_COMMAND ""
     PATCH_COMMAND ""

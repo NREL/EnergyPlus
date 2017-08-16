@@ -4793,6 +4793,14 @@ Construction:WindowDataFile,
 
 If there is a window called ConstructionName on the Window data file, the data for that window is read from the file and the following EnergyPlus objects and their names are created. The ``W5'' prefixed to these names indicates that the object originated in the Window data file.
 
+\subsection{Using LBNLs Windows Calculation Engine}
+This is new windows simulation engine that will be used in both EnergyPlus and Berkeley Lab WINDOW. The intent is for this engine to replace all other window calculation modules in EnergyPlus. For the time being, other modules will still be available. To use the new Window Calculation Engine, insert the following into IDF:
+
+ \begin{lstlisting}
+ WindowsCalculationEngine,
+ ExternalWindowsModel;
+ \end{lstlisting}
+
 \subsection{Zone Thermal Output(s)}\label{zone-thermal-outputs-1}
 
 In addition to the canned Surface reports (view the Reports section later in this document) and surface variables (above), the following variables are available for all zones:
