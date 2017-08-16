@@ -178,6 +178,7 @@ namespace SingleDuct {
 		int ErrCount2; // bad iterations limits in hot water flow calc
 		Real64 ZoneFloorArea; // Zone floor area
 		int CtrlZoneNum; // Pointer to CtrlZone data structure
+		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
 		int ActualZoneNum; // Pointer to Zone data Structure
 		Real64 MaxAirVolFlowRateDuringReheat; // Maximum vol flow during reheat
 		Real64 MaxAirVolFractionDuringReheat; // Maximum vol flow fraction during reheat
@@ -248,6 +249,7 @@ namespace SingleDuct {
 			ErrCount2( 0 ),
 			ZoneFloorArea( 0.0 ),
 			CtrlZoneNum( 0 ),
+			CtrlZoneInNodeIndex( 0 ),
 			ActualZoneNum( 0 ),
 			MaxAirVolFlowRateDuringReheat( 0.0 ),
 			MaxAirVolFractionDuringReheat( 0.0 ),

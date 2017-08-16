@@ -150,6 +150,8 @@ protected: // Data
 	int airOutNodeNum; // unit air outlet system node number, air enters into zone from air terminal
 	int zoneIndex; // zone index for this air terminal unit
 	int zoneNodeIndex; // index in node structure for the zone node for this air terminal
+	int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
+	int airLoopNum; // index to airloop that this terminal unit is connected to
 }; // AirTerminalUnit
 
 } // EnergyPlus

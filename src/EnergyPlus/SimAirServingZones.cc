@@ -1686,7 +1686,6 @@ namespace SimAirServingZones {
 										ZoneInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
 										TermInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode;
 										TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
-										ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
 										ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									}
 									FoundSupPathZoneConnect = true;
@@ -1718,7 +1717,6 @@ namespace SimAirServingZones {
 										ZoneInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
 										TermInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode;
 										TermUnitSizingNumsHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).TermUnitSizingIndex;
-										if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
 										if (ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									}
 									FoundSupPathZoneConnect = true;
@@ -1772,7 +1770,7 @@ namespace SimAirServingZones {
 									ZoneInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
 									TermInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode;
 									TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
-									if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
+									if (ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 
 									goto ControlledZoneLoop2_exit;
 
@@ -1788,7 +1786,7 @@ namespace SimAirServingZones {
 									ZoneInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
 									TermInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode;
 									TermUnitSizingNumsHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).TermUnitSizingIndex;
-									if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
+									if (ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 
 									goto ControlledZoneLoop2_exit;
 
@@ -4205,8 +4203,10 @@ namespace SimAirServingZones {
 					FinalZoneSizing(CtrlZoneNum).ZoneOAFracCooling = ZoneOAFracCooling;
 
 					// determined cooled zone floor area in an airloop
-					if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {
-						FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+					for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++zoneInNode ) {
+						if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( zoneInNode ) == AirLoopNum ) {
+							FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+						}
 					}
 				}
 
@@ -4320,10 +4320,11 @@ namespace SimAirServingZones {
 						FinalZoneSizing( CtrlZoneNum ).ZoneOAFracHeating = ZoneOAFracHeating;
 
 						// determined heated zone floor area in an airloop
-						if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum ) {
-							FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+						for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++zoneInNode ) {
+							if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( zoneInNode ) == AirLoopNum ) {
+								FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+							}
 						}
-
 					}
 
 				} else { // getting heating flow based values for Std 62.1 report for single path systems

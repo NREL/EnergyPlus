@@ -131,15 +131,16 @@ namespace DualDuct {
 		Real64 RecircAirDamperPosition; // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
 		Real64 OADamperPosition; // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
 		Real64 OAFraction; // Outdoor Air Fraction for VAV:OutdoorAir
-		int ADUNum; // index of corresponding air distribution unit
+		int ADUNum; // index of corresponding air distribution unit ZoneHVAC:AirdistributionUnit
 		int CtrlZoneNum; // Pointer to CtrlZone data structure
+		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
 		int ActualZoneNum; // Pointer to Zone data Structure
 		Real64 OutdoorAirFlowRate; // report variable for TU outdoor air flow rate
 		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
 		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
 		int OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
 		Real64 OAPerPersonByDesignLevel; // store sum of people and per person rate, constant, m3/s
-		int AirLoopNum;
+		int AirLoopNum; // index to airloop that this terminal unit is connected to
 
 		// Default Constructor
 		DamperDesignParams() :
@@ -165,6 +166,7 @@ namespace DualDuct {
 			OAFraction( 0.0 ),
 			ADUNum( 0 ),
 			CtrlZoneNum( 0 ),
+			CtrlZoneInNodeIndex( 0 ),
 			ActualZoneNum( 0 ),
 			OutdoorAirFlowRate( 0.0 ),
 			NoOAFlowInputFromUser( true ),
