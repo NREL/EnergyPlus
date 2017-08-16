@@ -3826,7 +3826,7 @@ namespace ZoneTempPredictorCorrector {
 				B = ( LatentGain / H2OHtOfVap ) + AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW + SumHmARaW( ZoneNum );
 				A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
 			} else {
-				B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
+				B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
 				A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 			}
 			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
@@ -4817,7 +4817,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Check for the flow and NO flow condition
 		if ( ZoneMassFlowRate > 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
+			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
 			A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 				// Multizone airflow calculated in AirflowNetwork
@@ -4826,7 +4826,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 		} else if ( ZoneMassFlowRate <= 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutHumRat ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum );
+			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum );
 			A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 				// Multizone airflow calculated in AirflowNetwork
