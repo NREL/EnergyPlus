@@ -31922,7 +31922,7 @@ Sizing:Zone,
       \type real
       \minimum 0
       \default 0.2
-      \note This input is currently used in sizing the Fan minimum Flow Rate.
+      \note This input is currently used in sizing the VAV air terminal unit and fan minimum flow rate
       \note It does not currently affect other component autosizing.
   A6, \field Heating Design Air Flow Method
       \type choice
