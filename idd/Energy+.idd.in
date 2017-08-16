@@ -7066,62 +7066,79 @@ MaterialProperty:PhaseChangeHysteresis,
        \object-list MaterialName
        \note Regular Material Name to which the additional properties will be added.
        \note this the material name for the basic material properties.
-  N1 , \field Temperature Coefficient for Thermal Conductivity
-       \note The base temperature is 20C.
-       \note This is the thermal conductivity change per degree excursion from 20C.
-       \note This variable conductivity function is overridden by the VariableThermalConductivity object, if present.
-       \units W/m-K2
-       \type real
-       \default 0.0
-  N2 , \field Latent Heat during the Entire Phase Change Process
+  N1 , \field Latent Heat during the Entire Phase Change Process
        \note The total latent heat absorbed or rejected during the transition from solid to liquid, or back
        \required-field
        \units J/kg
        \type real
        \minimum> 0
-  N3 , \field Liquid State Specific Heat
+  N2 , \field Liquid State Thermal Conductivity
+       \note The thermal conductivity used by this material when the material is fully liquid
+       \required-field
+       \units W/mK
+       \type real
+       \minimum> 0
+  N3 , \field Liquid State Density
+       \note The density used by this material when the material is fully liquid
+       \required-field
+       \units kg/m3
+       \type real
+       \minimum> 0
+  N4 , \field Liquid State Specific Heat
        \note The constant specific heat used for the fully melted (liquid) state
        \required-field
        \units J/kg-K
        \type real
        \minimum >0
-  N4 , \field High Temperature Difference of Melting Curve
+  N5 , \field High Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
        \minimum >0
-  N5 , \field Peak Melting Temperature
+  N6 , \field Peak Melting Temperature
        \note The temperature at which the melting curve peaks
        \required-field
        \units C
        \type real
        \minimum >0
-  N6 , \field Low Temperature Difference of Melting Curve
+  N7 , \field Low Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
        \minimum >0
-  N7 , \field Solid State Specific Heat
+  N8 , \field Solid State Thermal Conductivity
+       \note The thermal conductivity used by this material when the material is fully solid
+       \required-field
+       \units W/mK
+       \type real
+       \minimum> 0
+  N9 , \field Solid State Density
+       \note The density used by this material when the material is fully solid
+       \required-field
+       \units kg/m3
+       \type real
+       \minimum> 0
+  N10, \field Solid State Specific Heat
        \note The constant specific heat used for the fully frozen (crystallized) state
        \required-field
        \units J/kg-K
        \type real
        \minimum >0
-  N8 , \field High Temperature Difference of Freezing Curve
+  N11, \field High Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
        \minimum >0
-  N9 , \field Peak Freezing Temperature
+  N12, \field Peak Freezing Temperature
        \note The temperature at which the freezing curve peaks
        \required-field
        \units C
        \type real
        \minimum >0
- N10 ; \field Low Temperature Difference of Freezing Curve
+  N13; \field Low Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
