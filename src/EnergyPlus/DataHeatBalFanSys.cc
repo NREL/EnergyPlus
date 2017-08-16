@@ -140,6 +140,7 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > MCPTM; // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
 	Array1D< Real64 > MCPE; // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
 	Array1D< Real64 > EAMFL; // OUTDOOR AIR MASS FLOW for EarthTube
+	Array1D< Real64 > EAMFLxHumRat; // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
 	Array1D< Real64 > MCPTE; // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
 	Array1D< Real64 > MCPC; // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
 	Array1D< Real64 > CTMFL; // OUTDOOR AIR MASS FLOW for cooltower
@@ -285,6 +286,7 @@ namespace DataHeatBalFanSys {
 		MCPTM.deallocate();
 		MCPE.deallocate();
 		EAMFL.deallocate();
+		EAMFLxHumRat.deallocate();
 		MCPTE.deallocate();
 		MCPC.deallocate();
 		CTMFL.deallocate();
