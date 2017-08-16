@@ -241,6 +241,11 @@ This field is optional and is used to provide control over the logic used by the
 
 This field is optional and is used to provide a schedule with alternate setpoints for use with the IndirectHeatAlternateSetpoint mode in the previous field.~ The input field should contain a reference to a schedule object specifying the hot water temperature setpoint {[}°C{]} to use as the ``cut-out'' temperature for control logic at the source side.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-01}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water heater will be assigned to the ``General'' end-use subcategory.
+
+
 \begin{lstlisting}
 
 WaterHeater:Mixed,                     ! Stand-alone electric, outdoor example
@@ -658,7 +663,7 @@ The name of the WaterHeater:Stratified object.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-004}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Laundry'', ``Dish Washing'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table under the ``Water Systems'' end-use category. If this field is omitted or blank, the water use will be assigned to the ``General'' end-use subcategory.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Laundry'', ``Dish Washing'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table under the ``Water Systems'' end-use category and also appear in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water use will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Tank Volume}\label{field-tank-volume-1-000}
 

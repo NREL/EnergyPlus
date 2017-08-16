@@ -1167,6 +1167,11 @@ This field is optional.~ It can be used to control heat recovery operation of th
 
 This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluids.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-13}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
+
+
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
@@ -1543,6 +1548,10 @@ This field is optional.~ It can be used to control heat recovery operation of th
 
 This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluilds.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-11}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
+
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
@@ -1909,6 +1918,11 @@ This field is optional.~ It can be used to control heat recovery operation of th
 \paragraph{Field: Heat Recovery Leaving Temperature Setpoint Node Name}\label{field-heat-recovery-leaving-temperature-setpoint-node-name-2}
 
 This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluilds.
+
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-12}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
+
 
 An example of this statement in an IDF is:
 
@@ -3955,6 +3969,10 @@ This optional numeric field contains the parasitic electric power (W) consumed b
 
 This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. For this component the inputs that would be altered by the sizing factor are: Nominal Capacity and Design Water Flow Rate. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-10}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
+
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
@@ -4206,6 +4224,11 @@ This alpha field contains the steam outlet node name.
 \paragraph{Field: Sizing Factor}\label{field-sizing-factor-11}
 
 This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. For this component the inputs that would be altered by the sizing factor are: Nominal Capacity. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature.
+
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-11}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
+
 
 More information on the technical aspects of steam boiler can be found in the Engineering Reference Document.
 
