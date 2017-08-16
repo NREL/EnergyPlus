@@ -74,8 +74,7 @@ Output:Table:SummaryReports,
 
 The U.S. Green Building Council building certification system called Leadership in Energy and Environmental Design (LEED) Green Building Rating System™ includes Energy and Atmosphere Credit 1 Optimize Energy Performance. Credit 1 includes an option that requires a series of building energy simulations that follow the procedures of ASHRAE Standard 90.1 Appendix G Performance Rating Method. The~ LEED Summary report provides many of the simulation results required for the forms. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. 
 
-The EAp2-4/5 Performance Rating Method Compliance subtable has some special options in order to show end uses that are different than the end-uses that are typically used with EnergyPlus. By specifing the end-use subcategories of ``Cooking" most commonly with the ElectricEquipment and GasEquipment objects, ``Elevators and Escalators" most commonly with the ElectricEquipment object, ``Industrial Process" most commonly with the ElectricEquipment and GasEquipment objects, ``Interior Lighting-Process" most commonly with the Lights object, or ``Fans-Parking Garage" most commonly with the Exterior:FuelEquipment object, those end uses are shown in the EAp2-4/5 Performance Rating Method Compliance subtable.
-
+The EAp2-4/5 Performance Rating Method Compliance subtable show an energy breakdown by all end-use categories and subcategories. The end-use subcategories that are supplied on many objects are used to populate the rows of this table. Any text can be used for the end-use subcategories and no special meaning is attached to any specific text. You may want to consider using end-use subcategories with names like ``Cooking" which would be most commonly used with the ElectricEquipment and GasEquipment objects, ``Elevators and Escalators" most commonly with the ElectricEquipment object, ``Industrial Process" most commonly with the ElectricEquipment and GasEquipment objects, ``Interior Lighting-Process" most commonly with the Lights object, or ``Fans-Parking Garage" most commonly with the Exterior:FuelEquipment object. These end-use subcategories as well as any others used are shown in the EAp2-4/5 Performance Rating Method Compliance subtable.
 
 Report: \textbf{LEED Summary}
 
@@ -171,31 +170,27 @@ Other & ~ & ~ & ~ & ~ \tabularnewline
 
 \begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
 \toprule 
- & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Energy Use [GJ] & Other Demand [W] \tabularnewline
+ & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Fuel Use [GJ] & Other Fuel Demand [W] \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
- & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Energy Use [GJ] & Other Demand [W] \tabularnewline
+ & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Fuel Use [GJ] & Other Fuel Demand [W] \tabularnewline
 \midrule
 \endhead
 
-Interior Lighting & 81.24 & 7125.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Space Heating & 0.00 & 0.00 & 103.92 & 62499.99 & 0.00 & 0.00 \tabularnewline
-Space Cooling & 17.63 & 9523.66 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Pumps & 1.54 & 319.57 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Fans-Interior & 7.01 & 609.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Fans-Parking Garage & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Service Water Heating & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Receptacle Equipment & 47.70 & 4500.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Interior Lighting (process) & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Refrigeration Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Cooking & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Industrial Process & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Elevators and Escalators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Total Line & 155.12 & ~ & 274.01 & ~ & 0.00 & ~ \tabularnewline
+Heating -- Not Subdivided  & 0.00 & 0.00 & 103.92 & 62499.99 & 0.00 & 0.00 \tabularnewline
+Cooling -- Not Subdivided  & 17.63 & 9523.66 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting -- General & 81.24 & 7125.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting -- Process & 81.24 & 7125.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting -- General  & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps -- Not Subdivided  & 1.54 & 319.57 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection -- Not Subdivided  & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans -- Interior  & 7.01 & 609.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans -- Garage  & 7.01 & 609.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Service Water Heating  -- Not Subdivided & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Receptacle Equipment - Not Subdivided& 47.70 & 4500.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration Equipment -- Not Subdivided & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -344,6 +339,55 @@ Miscellaneous & 39.99 \tabularnewline
 \bottomrule
 \end{longtable}
 
+\textbf{Schedules-Equivalent Full Load Hours (Schedule Type=Fraction)}
+\begin{longtable}[c]{@{}lll@{}}
+
+\toprule 
+ & Equivalent Full Load Hours of Operation Per Year [hr] & Hours > 1\% [hr] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Equivalent Full Load Hours of Operation Per Year [hr] & Hours > 1\% [hr] \tabularnewline
+\midrule
+\endhead
+
+    OCCUPY-1              &        2532.                                          &        3393.     \tabularnewline
+    LIGHTS-1              &        3009.                                          &        8760.     \tabularnewline
+    EQUIP-1               &        2650.                                          &        8760.     \tabularnewline
+    INFIL-SCH             &        3624.                                          &        3624.     \tabularnewline
+    SHADETRANSSCH         &           0.                                          &           0.     \tabularnewline
+    MIN OA SCHED          &        3245.                                          &        8760.     \tabularnewline
+    FANAVAILSCHED         &        5678.                                          &        5678.     \tabularnewline
+    COOLINGCOILAVAILSCHED &        1310.                                          &        1310.     \tabularnewline
+    REHEATCOILAVAILSCHED  &        5678.                                          &        5678.     \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+\textbf{Schedules-SetPoints (Schedule Type=Temperature)}
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+ & First Object Used     & Month Assumed & 11am First Wednesday [C] & Days with Same 11am Value & 11pm First Wednesday [C] & Days with Same 11pm Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & First Object Used     & Month Assumed & 11am First Wednesday [C] & Days with Same 11am Value & 11pm First Wednesday [C] & Days with Same 11pm Value \tabularnewline
+\midrule
+\endhead
+
+    HTG-SETP-SCH       & HEATING SETPOINT       & January       &        21.10             &          365              &        12.80             &          365              \tabularnewline
+    PLENUM-HTG-SETP-SCH & PLENUM HEATING SETPOINT & January       &        12.80             &          365              &        12.80             &          365              \tabularnewline
+    CLG-SETP-SCH3      & COOLING SETPOINT       & July          &        25.00             &          122              &        25.00             &          122              \tabularnewline
+    PLENUM-CLG-SETP-SCH & PLENUM COOLING SETPOINT & July          &        40.00             &          365              &        40.00             &          365              \tabularnewline
+    CLG-SETP-SCH       & DUAL SETPOINT          & July          &        23.90             &          365              &        40.00             &          365              \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+
 \subsubsection{LEED Form Section 1.4 -- Comparison of Proposed Design Versus Baseline Design}\label{leed-form-section-1.4-comparison-of-proposed-design-versus-baseline-design}
 
 Unlike other portions of the LEED forms, Section 1.4 Comparison of Proposed Design Versus Baseline Design is less structured with many possible ``Model Input Parameters'' to match with the ``Proposed Design Input'' and ``Baseline Design Input''.
@@ -374,4 +418,4 @@ Use the Equipment Summary report, Service Water Heating subtable for Type, Stora
 
 \emph{7. General schedule information.}
 
-Use the Lighting Summary report, Interior Lighting subtable Schedule Name and Average Hours/Week; Exterior Lighting subtable Schedule Name and Average Hours/Week. Use the System Summary report, Demand Controlled Ventilation using Controller:MechanicalVentilation subtable for the Air Distribution Effectiveness Schedule.
+In the LEED Summary report, the Schedules-Equivalent Full Load Hours (Schedule Type=Fraction) and Schedules-SetPoints (Schedule Type=Temperature) are useful. Also see the Lighting Summary report, Interior Lighting subtable Schedule Name and Average Hours/Week; Exterior Lighting subtable Schedule Name and Average Hours/Week. Use the System Summary report, Demand Controlled Ventilation using Controller:MechanicalVentilation subtable for the Air Distribution Effectiveness Schedule.
