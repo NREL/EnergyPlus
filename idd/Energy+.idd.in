@@ -16210,16 +16210,19 @@ SurfaceProperty:OtherSideConditionsModel,
       \default GapConvectionRadiation
 
 SurfaceProperty:Underwater,
-       \memo This object sets up a convective boundary condition for a surface
-       \memo The free stream velocity is determined from the SiteLocation:Varying object
+       \memo This object sets up a convective water boundary condition for a surface
+       \memo The free stream velocity is determined from the changing latitude and 
+       \memo longitude defined in the Site:VaryingLocation object.  If the free stream
+       \memo velocity is zero, as if no varying location object is defined, the 
+       \memo surface will naturally convect with the surrounding water.
   A1,  \field Name
        \required-field
        \reference SurfacePropUnderWaterNames
        \type alpha
   N1,  \field Distance from surface centroid to leading edge of building or ship
        \note This is the distance from the leading edge of the boundary layer development 
-       \note  to the centroid of the surface of interest.  The value of this field is used
-       \note  as the distance in the Reynolds number for evaluating the local convection coefficient.
+       \note to the centroid of the surface of interest.  The value of this field is used
+       \note as the distance in the Reynolds number for evaluating the local convection coefficient.
        \type real
        \units m
   A2,  \field Free Stream (water) Temperature Schedule

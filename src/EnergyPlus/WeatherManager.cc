@@ -600,87 +600,89 @@ namespace WeatherManager {
 	bool
 	CheckIfAnyUnderwaterBoundaries()
 	{
-	    bool errorsFound = false;
-	    int NumAlpha = 0, NumNumber = 0, IOStat = 0;
-	    DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
-	    int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
-	    for ( int i = 1; i <= Num; i++ ) {
-		underwaterBoundaries.push_back( UnderwaterBoundary() );
-		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, i, 
-					       DataIPShortCuts::cAlphaArgs, 
-					       NumAlpha, 
-					       DataIPShortCuts::rNumericArgs, 
-					       NumNumber, 
-					       IOStat, 
-					       DataIPShortCuts::lNumericFieldBlanks, 
-					       DataIPShortCuts::lAlphaFieldBlanks, 
-					       DataIPShortCuts::cAlphaFieldNames, 
-					       DataIPShortCuts::cNumericFieldNames );
-		underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
-		underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
-		underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
-		if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
-		    ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
-		    errorsFound = true;
+		bool errorsFound = false;
+		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
+		DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
+		int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
+		for ( int i = 1; i <= Num; i++ ) {
+			underwaterBoundaries.push_back( UnderwaterBoundary() );
+			InputProcessor::GetObjectItem(
+				DataIPShortCuts::cCurrentModuleObject, i, 
+				DataIPShortCuts::cAlphaArgs, 
+				NumAlpha, 
+				DataIPShortCuts::rNumericArgs, 
+				NumNumber, 
+				IOStat, 
+				DataIPShortCuts::lNumericFieldBlanks, 
+				DataIPShortCuts::lAlphaFieldBlanks, 
+				DataIPShortCuts::cAlphaFieldNames, 
+				DataIPShortCuts::cNumericFieldNames
+			);
+			underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
+			underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
+			underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+			if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
+				ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
+				errorsFound = true;
+			}
+			underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+				ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+				errorsFound = true;
+			}
+			underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+				ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+				errorsFound = true;
+			}
 		}
-		underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
-		if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
-		    ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
-		    errorsFound = true;
+		if ( errorsFound ) {
+			ShowFatalError( "Previous input problems cause program termination" );
 		}
-		underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
-		if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
-		    ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
-		    errorsFound = true;
-		}
-	    }
-	    if ( errorsFound ) {
-		ShowFatalError( "Previous input problems cause program termination" );
-	    }
-	    return ( Num > 0 );
+		return ( Num > 0 );
 	}
 
 	void
 	UpdateUnderwaterBoundaries()
 	{
-	    Real64 const waterKinematicViscosity = 1e-6; // m2/s
-	    Real64 const waterPrandtlNumber = 6; // -
-	    Real64 const waterThermalConductivity = 0.6; // W/mK
-	    for ( auto & thisBoundary : underwaterBoundaries ) {
-		Real64 const curWaterTemp = ScheduleManager::GetCurrentScheduleValue( thisBoundary.WaterTempScheduleIndex ); // C
-		Real64 const freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue( thisBoundary.VelocityScheduleIndex ); // m/s
-		Real64 const thisDistance = thisBoundary.distanceFromLeadingEdge;
-		
-		// do some calculation for forced convection from the leading edge of the ship
-		Real64 const localReynoldsNumber = freeStreamVelocity * thisDistance / waterKinematicViscosity;
-		Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0/3.0 );
-		Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / thisDistance;
-		
-		// do some calculations for natural convection from the bottom of the ship
-		Real64 const distanceFromBottomOfHull = 12;   // meters, assumed for now
-		// this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
-		Real64 const prandtlCorrection = ( 0.75 * pow(waterPrandtlNumber, 0.5) ) / pow( 0.609 + 1.221*pow(waterPrandtlNumber,0.5) + 1.238*waterPrandtlNumber, 0.25 );
-		// calculate the Grashof number
-		Real64 const gravity = 9.81; // m/s2
-		Real64 const beta = 0.000214;  // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
-		Real64 const assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
-		Real64 const localGrashofNumber = ( gravity * beta * ( assumedSurfaceTemp - curWaterTemp ) * pow( distanceFromBottomOfHull, 3 ) ) / pow( waterKinematicViscosity, 2 );
-		Real64 const localNusseltFreeConvection = pow( localGrashofNumber / 4, 0.25 ) * prandtlCorrection;
-		Real64 const localConvectionCoeffFreeConv = localNusseltFreeConvection * waterThermalConductivity / distanceFromBottomOfHull;
-		DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TConv = curWaterTemp;
-		DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HConv = max( localConvectionCoeff, localConvectionCoeffFreeConv );
-		DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TRad = curWaterTemp;
-		DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HRad = 0.0;
-	    }
+		Real64 const waterKinematicViscosity = 1e-6; // m2/s
+		Real64 const waterPrandtlNumber = 6; // -
+		Real64 const waterThermalConductivity = 0.6; // W/mK
+		for ( auto & thisBoundary : underwaterBoundaries ) {
+			Real64 const curWaterTemp = ScheduleManager::GetCurrentScheduleValue( thisBoundary.WaterTempScheduleIndex ); // C
+			Real64 const freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue( thisBoundary.VelocityScheduleIndex ); // m/s
+			Real64 const thisDistance = thisBoundary.distanceFromLeadingEdge;
+
+			// do some calculation for forced convection from the leading edge of the ship
+			Real64 const localReynoldsNumber = freeStreamVelocity * thisDistance / waterKinematicViscosity;
+			Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0/3.0 );
+			Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / thisDistance;
+
+			// do some calculations for natural convection from the bottom of the ship
+			Real64 const distanceFromBottomOfHull = 12;   // meters, assumed for now
+			// this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
+			Real64 const prandtlCorrection = ( 0.75 * pow(waterPrandtlNumber, 0.5) ) / pow( 0.609 + 1.221*pow(waterPrandtlNumber,0.5) + 1.238*waterPrandtlNumber, 0.25 );
+			// calculate the Grashof number
+			Real64 const gravity = 9.81; // m/s2
+			Real64 const beta = 0.000214;  // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
+			Real64 const assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
+			Real64 const localGrashofNumber = ( gravity * beta * ( assumedSurfaceTemp - curWaterTemp ) * pow( distanceFromBottomOfHull, 3 ) ) / pow( waterKinematicViscosity, 2 );
+			Real64 const localNusseltFreeConvection = pow( localGrashofNumber / 4, 0.25 ) * prandtlCorrection;
+			Real64 const localConvectionCoeffFreeConv = localNusseltFreeConvection * waterThermalConductivity / distanceFromBottomOfHull;
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TConv = curWaterTemp;
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HConv = max( localConvectionCoeff, localConvectionCoeffFreeConv );
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TRad = curWaterTemp;
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HRad = 0.0;
+		}
 	}
 	
 	void
 	ReadVariableLocationOrientation()
 	{
 		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
-	    DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
-	    if ( InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
-	    InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, 1, 
+		DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
+		if ( InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
+		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, 1, 
 			DataIPShortCuts::cAlphaArgs, 
 			NumAlpha, 
 			DataIPShortCuts::rNumericArgs, 
@@ -711,13 +713,7 @@ namespace WeatherManager {
 			SurfaceGeometry::CosBldgRelNorth = std::cos( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
 			SurfaceGeometry::SinBldgRelNorth = std::sin( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
 			for ( size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum ) {
-									if ( DataSurfaces::Surface( SurfNum ).Sides == 0 ) {
-					continue;
-				}
 				for ( int n = 1; n <= DataSurfaces::Surface( SurfNum ).Sides; ++n ) {
-					//int const ZoneNum = 1;
-					//Real64 Xb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x * SurfaceGeometry::CosZoneRelNorth( ZoneNum ) - DataSurfaces::Surface( SurfNum ).Vertex( n ).y * SurfaceGeometry::SinZoneRelNorth( ZoneNum ) + DataHeatBalance::Zone( ZoneNum ).OriginX;
-					//Real64 Yb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x * SurfaceGeometry::SinZoneRelNorth( ZoneNum ) + DataSurfaces::Surface( SurfNum ).Vertex( n ).y * SurfaceGeometry::CosZoneRelNorth( ZoneNum ) + DataHeatBalance::Zone( ZoneNum ).OriginY;
 					Real64 Xb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x;
 					Real64 Yb = DataSurfaces::Surface( SurfNum ).Vertex( n ).y;
 					DataSurfaces::Surface( SurfNum ).NewVertex( n ).x = Xb * SurfaceGeometry::CosBldgRelNorth - Yb * SurfaceGeometry::SinBldgRelNorth;
