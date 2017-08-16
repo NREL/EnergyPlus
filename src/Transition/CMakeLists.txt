@@ -1,11 +1,13 @@
 project(Transition Fortran)
 
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
+
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
-set(STATIC_EXE FALSE)
-
 # first create a static library of shared stuff
-set(LIB_SRC
+SET(LIB_SRC
   DataGlobals.f90
   DataStringGlobals.f90
   DataVCompareGlobals.f90
@@ -69,13 +71,11 @@ elseif(UNIX)
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fbounds-check")
-    set(STATIC_EXE TRUE)
   else()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
   endif()
 else()  # Windows
-  set(STATIC_EXE TRUE)
   if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
@@ -95,36 +95,33 @@ math(EXPR end "${VERSIONS_SIZE} - 1")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
 
-foreach( i RANGE 1 ${end} )
+FOREACH( i RANGE 1 ${end} )
 
   math(EXPR ii "${i} - 1")
 
-  list(GET VERSIONS ${ii} OLD_VERSION)
-  list(GET VERSIONS ${i} NEW_VERSION)
+  LIST(GET VERSIONS ${ii} OLD_VERSION)
+  LIST(GET VERSIONS ${i} NEW_VERSION)
 
   # then create all the binaries using just the Transition source and the appropriate version of the main sub
-  set(SRC
+  SET(SRC
     Transition.f90
     CreateNewIDFUsingRulesV${NEW_VERSION}.f90
   )
 
-  string( REPLACE _ - OLD-VERSION ${OLD_VERSION} )
-  string( REPLACE _ - NEW-VERSION ${NEW_VERSION} )
+  STRING( REPLACE _ - OLD-VERSION ${OLD_VERSION} )
+  STRING( REPLACE _ - NEW-VERSION ${NEW_VERSION} )
 
-  set(LAST_NAME "Transition-V${OLD-VERSION}-to-V${NEW-VERSION}" )
+  SET(LAST_NAME "Transition-V${OLD-VERSION}-to-V${NEW-VERSION}" )
 
-  set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
-  add_executable( "${LAST_NAME}" ${SRC} )
-  target_link_libraries( "${LAST_NAME}" TransitionLib )
+  SET(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
+  ADD_EXECUTABLE( "${LAST_NAME}" ${SRC} )
+  TARGET_LINK_LIBRARIES( "${LAST_NAME}" TransitionLib )
 
   if( "${i}" GREATER "22" )
-    install( TARGETS "${LAST_NAME}" DESTINATION PreProcess/IDFVersionUpdater )
-    if(NOT ${STATIC_EXE})
-      install_target_prereqs( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
-    endif()
+    install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
   endif()
 
-endforeach()
+ENDFOREACH()
 
 # then install all the support files
 install( FILES "SupportFiles/Report Variables 7-2-0-006 to 8-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
