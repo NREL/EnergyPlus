@@ -1731,7 +1731,7 @@ namespace SimulationManager {
 		}
 
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
-		if ( ErrorsFound ) ShowFatalError( "Previous Conditions cause program termination." );
+		if ( ErrorsFound ) ShowFatalError( "Previous conditions cause program termination." );
 
 	}
 

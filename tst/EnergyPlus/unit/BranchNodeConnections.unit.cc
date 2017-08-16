@@ -201,7 +201,16 @@ namespace EnergyPlus {
 			"  AllSummaryAndSizingPeriod; !- Report 1 Name",
 
 			"Zone,",
-			" Plenum zone;              !- Name",
+			" Plenum zone,              !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  2.4,                     !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate;           !- Floor Area {m2}",
 
 			"Zone,",
 			"  Space,                   !- Name",
@@ -846,6 +855,7 @@ namespace EnergyPlus {
 			"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
 			"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
 			"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
+			"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
 			"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
 			"	0.0,                   !- Maximum Cycling Rate",
@@ -1099,7 +1109,7 @@ namespace EnergyPlus {
 		} );
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
-
+		compare_err_stream( "" );
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
 
@@ -1201,7 +1211,16 @@ namespace EnergyPlus {
 			"  AllSummaryAndSizingPeriod; !- Report 1 Name",
 
 			"Zone,",
-			" Plenum zone;              !- Name",
+			" Plenum zone,              !- Name",
+			"  0.0000,                  !- Direction of Relative North {deg}",
+			"  0.0000,                  !- X Origin {m}",
+			"  0.0000,                  !- Y Origin {m}",
+			"  0.0000,                  !- Z Origin {m}",
+			"  1,                       !- Type",
+			"  1,                       !- Multiplier",
+			"  2.4,                     !- Ceiling Height {m}",
+			"  ,                        !- Volume {m3}",
+			"  autocalculate;           !- Floor Area {m2}",
 
 			"Zone,",
 			"  Space,                   !- Name",
@@ -1846,6 +1865,7 @@ namespace EnergyPlus {
 			"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
 			"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
 			"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
+			"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
 			"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
 			"	0.0,                   !- Maximum Cycling Rate",
