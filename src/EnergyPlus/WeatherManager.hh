@@ -818,6 +818,12 @@ namespace WeatherManager {
 	UpdateUnderwaterBoundaries();
 
 	void
+	ReadVariableLocationOrientation();
+
+	void
+	UpdateLocationAndOrientation();
+	
+	void
 	SetupWeekDaysByMonth(
 		int const StMon,
 		int const StDay,

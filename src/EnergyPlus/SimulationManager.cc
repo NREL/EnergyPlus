@@ -447,10 +447,10 @@ namespace SimulationManager {
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
-		int varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex("MPACTVARYINGLATITUDE");
-		int varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex("MPACTVARYINGLONGITUDE");
-		int varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex("MPACTVARYINGORIENTATION");
-
+		
+		// check for variable latitude/location/etc
+		WeatherManager::ReadVariableLocationOrientation();
+		
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
@@ -551,42 +551,8 @@ namespace SimulationManager {
 						    WeatherManager::UpdateUnderwaterBoundaries();
 						}
 
-						if ( varyingLocationSchedIndexLat > 0 || varyingLocationSchedIndexLong > 0 || varyingOrientationSchedIndex > 0 ) {
-							if ( varyingLocationSchedIndexLat > 0 ) {
-								DataEnvironment::Latitude = ScheduleManager::GetCurrentScheduleValue( varyingLocationSchedIndexLat );
-							}
-							if ( varyingLocationSchedIndexLong > 0 ) {
-								DataEnvironment::Longitude = ScheduleManager::GetCurrentScheduleValue( varyingLocationSchedIndexLong );
-							}
-							CheckLocationValidity();
-							if ( varyingOrientationSchedIndex > 0 ) {
-								DataHeatBalance::BuildingAzimuth = mod( ScheduleManager::GetCurrentScheduleValue( varyingOrientationSchedIndex ), 360.0 );
-								SurfaceGeometry::CosBldgRelNorth = std::cos( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
-								SurfaceGeometry::SinBldgRelNorth = std::sin( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
-								for ( size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum ) {
-                                    					if ( DataSurfaces::Surface( SurfNum ).Sides == 0 ) {
-										continue;
-									}
-									for ( int n = 1; n <= DataSurfaces::Surface( SurfNum ).Sides; ++n ) {
-                                        //int const ZoneNum = 1;
-                                        //Real64 Xb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x * SurfaceGeometry::CosZoneRelNorth( ZoneNum ) - DataSurfaces::Surface( SurfNum ).Vertex( n ).y * SurfaceGeometry::SinZoneRelNorth( ZoneNum ) + DataHeatBalance::Zone( ZoneNum ).OriginX;
-                                        //Real64 Yb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x * SurfaceGeometry::SinZoneRelNorth( ZoneNum ) + DataSurfaces::Surface( SurfNum ).Vertex( n ).y * SurfaceGeometry::CosZoneRelNorth( ZoneNum ) + DataHeatBalance::Zone( ZoneNum ).OriginY;
-                                        Real64 Xb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x;
-                                        Real64 Yb = DataSurfaces::Surface( SurfNum ).Vertex( n ).y;
-                                        DataSurfaces::Surface( SurfNum ).NewVertex( n ).x = Xb * SurfaceGeometry::CosBldgRelNorth - Yb * SurfaceGeometry::SinBldgRelNorth;
-                                        DataSurfaces::Surface( SurfNum ).NewVertex( n ).y = Xb * SurfaceGeometry::SinBldgRelNorth + Yb * SurfaceGeometry::CosBldgRelNorth;
-                                        DataSurfaces::Surface( SurfNum ).NewVertex( n ).z = DataSurfaces::Surface( SurfNum ).Vertex( n ).z;
-                                    }
-                                    Vectors::CreateNewellSurfaceNormalVector( DataSurfaces::Surface( SurfNum ).NewVertex, DataSurfaces::Surface( SurfNum ).Sides, DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector );
-                                    Real64 SurfWorldAz = 0.0;
-                                    Real64 SurfTilt = 0.0;
-                                    Vectors::DetermineAzimuthAndTilt( DataSurfaces::Surface( SurfNum ).NewVertex, DataSurfaces::Surface( SurfNum ).Sides, SurfWorldAz, SurfTilt, DataSurfaces::Surface( SurfNum ).lcsx, DataSurfaces::Surface( SurfNum ).lcsy, DataSurfaces::Surface( SurfNum ).lcsz, DataSurfaces::Surface( SurfNum ).GrossArea, DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector );
-                                    DataSurfaces::Surface( SurfNum ).Azimuth = SurfWorldAz;
-                                    DataSurfaces::Surface( SurfNum ).SinAzim = std::sin( SurfWorldAz * DegToRadians );
-                                    DataSurfaces::Surface( SurfNum ).CosAzim = std::cos( SurfWorldAz * DegToRadians );
-                                    DataSurfaces::Surface( SurfNum ).OutNormVec = DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector;
-								}
-							}
+						if ( DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 || DataEnvironment::varyingOrientationSchedIndex > 0 ) {
+							WeatherManager::UpdateLocationAndOrientation();
 						}
 
 						BeginTimeStepFlag = true;
