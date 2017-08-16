@@ -334,34 +334,3 @@ Schedule:Compact,
     Until: 24:00,
     0;
 
-!**** ORIENTING SHIP! ****!
-!This is the delta angle from the nominal inputs in the xyz coordinates, measured positive clockwise from north
-! Currently a super-hack, but it will let us test it out before we spend a lot of time on the actual interface
-Schedule:Compact,
-    MPACTVARYINGORIENTATION,
-    Any Number,
-    Through: 01/31,
-    For: AllDays,
-    Until: 24:00,
-    0,
-    Through: 02/28,
-    For: AllDays,
-    Until: 24:00,
-    90,
-    Through: 03/31,
-    For: AllDays,
-    Until: 24:00,
-    180,
-    Through: 04/30,
-    For: AllDays,
-    Until: 24:00,
-    270,
-    Through: 05/31,
-    For: AllDays,
-    Until: 24:00,
-    360,
-    Through: 12/31,
-    For: AllDays,
-    Until: 24:00,
-    0;
-

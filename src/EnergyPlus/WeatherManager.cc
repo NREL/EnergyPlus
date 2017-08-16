@@ -630,10 +630,15 @@ namespace WeatherManager {
 				ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
 				errorsFound = true;
 			}
-			underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
-			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
-				ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
-				errorsFound = true;
+			if ( DataIPShortCuts::cAlphaFieldBlanks( 3 ) {
+				// that's OK, we can have a blank schedule, the water will just have no free stream velocity
+				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
+			} else {
+				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+				if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+					ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+					errorsFound = true;
+				}
 			}
 		}
 		if ( errorsFound ) {
@@ -650,18 +655,21 @@ namespace WeatherManager {
 		Real64 const waterThermalConductivity = 0.6; // W/mK
 		for ( auto & thisBoundary : underwaterBoundaries ) {
 			Real64 const curWaterTemp = ScheduleManager::GetCurrentScheduleValue( thisBoundary.WaterTempScheduleIndex ); // C
-			Real64 const freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue( thisBoundary.VelocityScheduleIndex ); // m/s
+			Real64 freeStreamVelocity = 0;
+			if ( thisBoundary.VelocityScheduleIndex > 0 ) {
+				freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue( thisBoundary.VelocityScheduleIndex ); // m/s
+			}
 			Real64 const thisDistance = thisBoundary.distanceFromLeadingEdge;
 
 			// do some calculation for forced convection from the leading edge of the ship
 			Real64 const localReynoldsNumber = freeStreamVelocity * thisDistance / waterKinematicViscosity;
-			Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0/3.0 );
+			Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0 / 3.0 );
 			Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / thisDistance;
 
 			// do some calculations for natural convection from the bottom of the ship
 			Real64 const distanceFromBottomOfHull = 12;   // meters, assumed for now
 			// this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
-			Real64 const prandtlCorrection = ( 0.75 * pow(waterPrandtlNumber, 0.5) ) / pow( 0.609 + 1.221*pow(waterPrandtlNumber,0.5) + 1.238*waterPrandtlNumber, 0.25 );
+			Real64 const prandtlCorrection = ( 0.75 * pow(waterPrandtlNumber, 0.5) ) / pow( 0.609 + 1.221 * pow( waterPrandtlNumber, 0.5 ) + 1.238 * waterPrandtlNumber, 0.25 );
 			// calculate the Grashof number
 			Real64 const gravity = 9.81; // m/s2
 			Real64 const beta = 0.000214;  // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
@@ -675,7 +683,7 @@ namespace WeatherManager {
 			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HRad = 0.0;
 		}
 	}
-	
+
 	void
 	ReadVariableLocationOrientation()
 	{
@@ -697,7 +705,7 @@ namespace WeatherManager {
 		DataEnvironment::varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
 		DataEnvironment::varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 4 ) );
 	}
-	
+
 	void
 	UpdateLocationAndOrientation()
 	{

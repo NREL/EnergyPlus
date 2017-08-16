@@ -43,9 +43,9 @@
     Yes,                     !- Run Simulation for Sizing Periods
     No;                      !- Run Simulation for Weather File Run Periods
 
-ShadowCalculation,
-  AverageOverDaysInFrequency, !- Calculation Method
-  1;                         !- Calculation Frequency
+  ShadowCalculation,
+    AverageOverDaysInFrequency, !- Calculation Method
+    1;                         !- Calculation Frequency
 
 !***********************************************************
 !****** LOCATION SPECIFIC OBJECTS **************************
@@ -113,6 +113,63 @@ ShadowCalculation,
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
+
+  Site:VariableLocation,
+    VaryingLatitude,
+    VaryingLongitude,
+    VaryingOrientation;
+
+  Schedule:Compact,
+    VaryingLatitude,
+    Any Number,
+    Through: 01/31,
+    For: AllDays,
+    Until: 24:00,
+    25,
+    Through: 12/31,
+    For: AllDays,
+    Until: 24:00,
+    45;
+
+  Schedule:Compact,
+    VaryingLocation,
+    Any Number,
+    Through: 01/31,
+    For: AllDays,
+    Until: 24:00,
+    -95,
+    Through: 12/31,
+    For: AllDays,
+    Until: 24:00,
+    -102;
+
+  Schedule:Compact,
+    VaryingOrientation,
+    Any Number,
+    Through: 01/31,
+    For: AllDays,
+    Until: 24:00,
+    0,
+    Through: 02/28,
+    For: AllDays,
+    Until: 24:00,
+    90,
+    Through: 03/31,
+    For: AllDays,
+    Until: 24:00,
+    180,
+    Through: 04/30,
+    For: AllDays,
+    Until: 24:00,
+    270,
+    Through: 05/31,
+    For: AllDays,
+    Until: 24:00,
+    360,
+    Through: 12/31,
+    For: AllDays,
+    Until: 24:00,
+    0;
 
   Zone,
     Main Floor,              !- Name
@@ -332,29 +389,3 @@ Schedule:Compact,
     For: AllDays,
     Until: 24:00,
     0;
-
-!**** MOVING SHIP! ****!
-! Currently a super-hack, but it will let us test it out before we spend a lot of time on the actual interface
-Schedule:Compact,
-    MPACTVARYINGLATITUDE,
-    Any Number,
-    Through: 01/31,
-    For: AllDays,
-    Until: 24:00,
-    25,
-    Through: 12/31,
-    For: AllDays,
-    Until: 24:00,
-    45;
-
-Schedule:Compact,
-    MPACTVARYINGLONGITUDE,
-    Any Number,
-    Through: 01/31,
-    For: AllDays,
-    Until: 24:00,
-    -95,
-    Through: 12/31,
-    For: AllDays,
-    Until: 24:00,
-    -102;

@@ -1,0 +1,13 @@
+\section{Underwater Surface Boundary Condition}\label{otherside-conditions-model-underwater}
+
+\subsection{Overview}\label{overview-018}
+
+The input object SurfaceProperty:Underwater provides a model for applying a water boundary condition to a surface.
+This boundary condition captures the convective heat transfer to the free stream water.
+The convection may be forced if a velocity is applied to the free stream relative to the surface, or buoyant for slow or non-moving flow.
+
+The model assumes the convective is boundary layer is developed along a nearly flat plate, and that this surface is centered at a user-specified distance from the leading edge of the boundary layer.
+The model also assumes free stream flow beyond the boundary layer.
+
+The model uses a standard flat plate mixed convection Reynolds number correlation to determine a local Reynolds number and therefore a local convection coefficient.
+Once the convection coefficient is calculated, the convection heat transfer can be imposed on the surface outside heat balance.
