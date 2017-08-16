@@ -1023,8 +1023,8 @@ namespace CoolingPanelSimple {
 
 	bool
 	SizeCoolingPanelUA(
-					 int const CoolingPanelNum
-					 )
+		int const CoolingPanelNum
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1053,13 +1053,22 @@ namespace CoolingPanelSimple {
 		Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
 		Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
 		Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
-		RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) );
-		if (RatCapToTheoMax >= 1.0 ) {
+		if ( std::abs( Tinletr - Tzoner ) < 0.5 ) {
+			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * 0.5 ); // Avoid a divide by zero error
+		} else {
+			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) );
+		}
+		if ( ( RatCapToTheoMax < 1.1 ) && ( RatCapToTheoMax > 0.9999 ) ) {
+			// close to unity with some graciousness given in case the approximation of Cp causes a problem
+			RatCapToTheoMax = 0.9999;
+		} else if (RatCapToTheoMax >= 1.1 ) {
 			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a cooling capacity that is greater than the maximum possible value." );
 			ShowContinueError( "The result of this is that a UA value is impossible to calculate." );
 			ShowContinueError( "Check the rated input for temperatures, flow, and capacity for this unit." );
 			ShowContinueError( "The ratio of the capacity to the rated theoretical maximum must be less than unity." );
-			ShowContinueError( "The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high or the rated flow being too low." );
+			ShowContinueError( "The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high, the rated flow being too low, rated temperatures being too close to each other, or all of those reasons." );
+			ShowContinueError( "Compare the rated capacity in your input to the product of the rated mass flow rate, Cp of water, and the difference between the rated temperatures." );
+			ShowContinueError( "If the rated capacity is higher than this product, then the cooling panel would violate the Second Law of Thermodynamics." );
 			SizeCoolingPanelUA = false;
 			CoolingPanel( CoolingPanelNum ).UA = 1.0;
 		}
@@ -1076,11 +1085,11 @@ namespace CoolingPanelSimple {
 				SizeCoolingPanelUA = false;
 			}
 		}
-	
+
 		return SizeCoolingPanelUA;
-		
+
 	}
-		
+
 	void
 	CalcCoolingPanel(
 		int & CoolingPanelNum

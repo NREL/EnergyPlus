@@ -116,16 +116,33 @@ namespace EnergyPlus {
 
 		CoolingPanelSimple::CoolingPanel.allocate( CoolingPanelNum );
 
-		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
-
-		// No error case
+		// Valid input combination
 		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
 		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 4000.0;
 		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
 		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 21.0;
 		SizeCoolingPanelUASuccess = SizeCoolingPanelUA( CoolingPanelNum );
 		EXPECT_EQ( SizeCoolingPanelUASuccess, true );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).UA, 14569.0, 1.0 );
 
+		// Capacity slightly high case--code fixes this and moves on
+		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
+		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 4200.0;
+		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
+		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 21.0;
+		SizeCoolingPanelUASuccess = SizeCoolingPanelUA( CoolingPanelNum );
+		EXPECT_EQ( SizeCoolingPanelUASuccess, true );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).UA, 37947.0, 1.0 );
+
+		// Temperatures too close--code fixes this and moves on
+		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
+		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 2000.0;
+		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
+		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 20.4;
+		SizeCoolingPanelUASuccess = SizeCoolingPanelUA( CoolingPanelNum );
+		EXPECT_EQ( SizeCoolingPanelUASuccess, true );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).UA, 14569.0, 1.0 );
+		
 		// Capacity too high case
 		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
 		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 5000.0;
