@@ -44,100 +44,61 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::EarthTube Unit Tests
+// EnergyPlus::BoilerSteam Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/EarthTube.hh>
-#include <DataHeatBalFanSys.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <DataEnvironment.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::EarthTube;
-using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace ObjexxFCL;
-using namespace DataGlobals;
-using namespace EnergyPlus::DataEnvironment;
+using namespace EnergyPlus::BoilerSteam;
+using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataGlobalConstants;
 
-namespace EnergyPlus {
-	
 
-	TEST_F( EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest )
-	{
+TEST_F( EnergyPlusFixture, BoilerSteam_GetInput )
+{
 
-	// AUTHOR: R. Strand, UIUC
-	// DATE WRITTEN: June 2017
-	
-	// Set subroutine arguments
-	int ETnum = 1;
-	int ZNnum = 1;
-	
-	// Set environmental variables for all cases
-	OutHumRat = 0.009;
-	OutBaroPress = 101400.0;
-	
-	// Allocate and set earth tube parameters necessary to run the tests
-	EarthTubeSys.allocate( ETnum );
-	EarthTubeSys( ETnum ).InsideAirTemp = 21.0;
-	EarthTubeSys( ETnum ).FanType = NaturalEarthTube;
-	EarthTubeSys( ETnum ).AirTemp = 20.0;
-	EarthTubeSys( ETnum ).FanPower = 0.05;
+	std::string const idf_objects = delimited_string( {
+		"  Boiler:Steam,                                                                                            ",
+		"    Steam Boiler Plant Boiler,  !- Name                                                                    ",
+		"    NaturalGas,                !- Fuel Type                                                                ",
+		"    160000,                    !- Maximum Operating Pressure{ Pa }                                         ",
+		"    0.8,                       !- Theoretical Efficiency                                                   ",
+		"    115,                       !- Design Outlet Steam Temperature{ C }                                     ",
+		"    autosize,                  !- Nominal Capacity{ W }                                                    ",
+		"    0.00001,                   !- Minimum Part Load Ratio                                                  ",
+		"    1.0,                       !- Maximum Part Load Ratio                                                  ",
+		"    0.2,                       !- Optimum Part Load Ratio                                                  ",
+		"    0.8,                       !- Coefficient 1 of Fuel Use Function of Part Load Ratio Curve              ",
+		"    0.1,                       !- Coefficient 2 of Fuel Use Function of Part Load Ratio Curve              ",
+		"    0.1,                       !- Coefficient 3 of Fuel Use Function of Part Load Ratio Curve              ",
+		"    Steam Boiler Plant Boiler Inlet Node,  !- Water Inlet Node Name                                        ",
+		"    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
+	} );
 
-	// Allocate and set any zone variables necessary to run the tests
-	MCPE.allocate( ZNnum );
-	MCPTE.allocate( ZNnum );
-	EAMFL.allocate( ZNnum );
-	EAMFLxHumRat.allocate( ZNnum );
-	MCPE( ZNnum ) = 0.05;
-	EAMFL( ZNnum ) = 0.05;
-	
-	// First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
-	CalcEarthTubeHumRat( ETnum, ZNnum );
-	EXPECT_EQ( EarthTubeSys( ETnum ).HumRat, OutHumRat );
+	ASSERT_FALSE( process_idf( idf_objects, false ) );
 
-	// Second case--condensation so inside humidity should be less than outdoor humidity ratio
-	EarthTubeSys( ETnum ).InsideAirTemp = 10.0;
-	CalcEarthTubeHumRat( ETnum, ZNnum );
-	EXPECT_GT( OutHumRat, EarthTubeSys( ETnum ).HumRat );
-		
-	}
-	
-	TEST_F( EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest )
-	{
-			
-	// AUTHOR: R. Strand, UIUC
-	// DATE WRITTEN: June 2017
-			
-	// Set subroutine arguments
-	std::string ZoneName = "ZONE 1";
-	std::string InputName = "ZoneEarthtube";
-	bool ErrorsFound = false;
-	
-	// Allocate and set earth tube parameters necessary to run the tests
-	TotEarthTube = 3;
-	EarthTubeSys.allocate( TotEarthTube );
-	EarthTubeSys( 1 ).ZonePtr = 1;
-	EarthTubeSys( 2 ).ZonePtr = 2;
-	EarthTubeSys( 3 ).ZonePtr = 3;
-	
-	// First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
-	CheckEarthTubesInZones( ZoneName, InputName, ErrorsFound );
-	EXPECT_EQ( ErrorsFound, false );
+	GetBoilerInput();
 
-	// Second case--conflict with the last earth tube and first (ErrorsFound = true)
-	EarthTubeSys( 3 ).ZonePtr = 1;
-	CheckEarthTubesInZones( ZoneName, InputName, ErrorsFound );
-	EXPECT_EQ( ErrorsFound, true );
-	
-	EarthTubeSys.deallocate();
-	TotEarthTube = 0;
-	
-	}
-	
+	EXPECT_EQ( Boiler( NumBoilers ).Name, "STEAM BOILER PLANT BOILER" );
+	EXPECT_EQ( Boiler( NumBoilers ).FuelType, AssignResourceTypeNum( "NATURALGAS" ) );
+	EXPECT_EQ( Boiler( NumBoilers ).BoilerMaxOperPress, 160000 );
+	EXPECT_EQ( Boiler( NumBoilers ).Effic, 0.8 );
+	EXPECT_EQ( Boiler( NumBoilers ).TempUpLimitBoilerOut, 115 );
+	EXPECT_EQ( Boiler( NumBoilers ).NomCap, AutoSize );
+	EXPECT_EQ( Boiler( NumBoilers ).MinPartLoadRat, 0.00001 );
+	EXPECT_EQ( Boiler( NumBoilers ).MaxPartLoadRat, 1.0 );
+	EXPECT_EQ( Boiler( NumBoilers ).OptPartLoadRat, 0.2 );
+	EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 1 ), 0.8 );
+	EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 2 ), 0.1 );
+	EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 3 ), 0.1 );
+	EXPECT_EQ( Boiler( NumBoilers ).SizFac, 1.0 );
+
 }

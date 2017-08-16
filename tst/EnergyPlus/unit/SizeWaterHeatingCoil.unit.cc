@@ -292,7 +292,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.008;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
@@ -307,7 +306,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -529,7 +527,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.008;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
@@ -544,7 +541,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -765,7 +761,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.008;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
@@ -780,7 +775,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -1002,7 +996,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.008;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
@@ -1017,7 +1010,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;

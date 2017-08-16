@@ -230,12 +230,15 @@
 
   MaterialProperty:PhaseChangeHysteresis,
     C5 - 4 IN HW CONCRETE,   !- Name
-    0,                       !- Temperature Coefficient for Thermal Conductivity {W/m-K2}
-    10000,                   !- Latent Heat during the Entire Phase Change Process {J/kg}
+    10000,                   !- Latent Heat of Fusion {J/kg}
+    1.5,                     !- Liquid State Thermal Conductivity {W/m-K}
+    2200,                    !- Liquid State Density {kg/m3}
     2000,                    !- Liquid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Melting Curve {deltaC}
     20,                      !- Peak Melting Temperature {C}
     1,                       !- Low Temperature Difference of Melting Curve {deltaC}
+    1.8,                     !- Solid State Thermal Conductivity {W/m-K}
+    2300,                    !- Solid State Density {kg/m3}
     2000,                    !- Solid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Freezing Curve {deltaC}
     23,                      !- Peak Freezing Temperature {C}

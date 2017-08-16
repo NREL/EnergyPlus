@@ -3174,7 +3174,7 @@
   Boiler:Steam,
     Steam Boiler Plant Boiler,  !- Name
     NaturalGas,              !- Fuel Type
-    160000,                  !- Maximum Operating Pressure {Kpa}
+    160000,                  !- Maximum Operating Pressure {Pa}
     0.8,                     !- Theoretical Efficiency
     115,                     !- Design Outlet Steam Temperature {C}
     autosize,                !- Nominal Capacity {W}

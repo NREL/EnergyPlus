@@ -149,6 +149,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL.allocate( 1 );
 	VAMFL.allocate( 1 );
 	EAMFL.allocate( 1 );
+	EAMFLxHumRat.allocate( 1 );
 	CTMFL.allocate( 1 );
 
 	SumHmARaW.allocate( 1 );
@@ -182,6 +183,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.008;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -208,6 +210,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -234,6 +237,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.02 * 0.008;
@@ -260,6 +264,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -289,6 +294,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL.deallocate();
 	VAMFL.deallocate();
 	EAMFL.deallocate();
+	EAMFLxHumRat.deallocate();
 	CTMFL.deallocate();
 	SumHmARaW.deallocate();
 	SumHmARa.deallocate();
@@ -1092,4 +1098,47 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	DataHeatBalSurface::TempSurfInTmp.deallocate( );
 
 }
+
+TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest )
+{
+	// AUTHOR: L. Gu, FSEC
+	// DATE WRITTEN: Jun. 2017
+	// #5870 EMS actuators for Zone Temperature Control not working
+
+	NumTempControlledZones = 1;
+	NumComfortControlledZones = 0;
+	TempControlledZone.allocate( 1 );
+	TempControlledZone( 1 ).EMSOverrideHeatingSetPointOn = true;
+	TempControlledZone( 1 ).EMSOverrideCoolingSetPointOn = true;
+	TempControlledZone( 1 ).ActualZoneNum = 1;
+	TempControlledZone( 1 ).EMSOverrideHeatingSetPointValue = 23;
+	TempControlledZone( 1 ).EMSOverrideCoolingSetPointValue = 26;
+
+	TempControlType.allocate( 1 );
+	TempZoneThermostatSetPoint.allocate( 1 );
+	ZoneThermostatSetPointLo.allocate( 1 );
+	ZoneThermostatSetPointHi.allocate( 1 );
+	TempControlType( 1 ) = DualSetPointWithDeadBand;
+
+	OverrideAirSetPointsforEMSCntrl( );
+	EXPECT_EQ( 23.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+
+	NumTempControlledZones = 0;
+	NumComfortControlledZones = 1;
+	ComfortControlledZone.allocate( 1 );
+	ComfortControlType.allocate( 1 );
+	ComfortControlledZone( 1 ).ActualZoneNum = 1;
+	ComfortControlledZone( 1 ).EMSOverrideHeatingSetPointOn = true;
+	ComfortControlledZone( 1 ).EMSOverrideCoolingSetPointOn = true;
+	ComfortControlType( 1 ) = DualSetPointWithDeadBand;
+	ComfortControlledZone( 1 ).EMSOverrideHeatingSetPointValue = 22;
+	ComfortControlledZone( 1 ).EMSOverrideCoolingSetPointValue = 25;
+
+	OverrideAirSetPointsforEMSCntrl( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 25.0, ZoneThermostatSetPointHi( 1 ) );
+
+}
+
 
