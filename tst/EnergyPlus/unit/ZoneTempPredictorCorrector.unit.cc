@@ -152,6 +152,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL.allocate( 1 );
 	VAMFL.allocate( 1 );
 	EAMFL.allocate( 1 );
+	EAMFLxHumRat.allocate( 1 );
 	CTMFL.allocate( 1 );
 
 	SumHmARaW.allocate( 1 );
@@ -185,6 +186,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.008;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -211,6 +213,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -237,6 +240,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.02 * 0.008;
@@ -263,6 +267,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -292,6 +297,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL.deallocate();
 	VAMFL.deallocate();
 	EAMFL.deallocate();
+	EAMFLxHumRat.deallocate();
 	CTMFL.deallocate();
 	SumHmARaW.deallocate();
 	SumHmARa.deallocate();
