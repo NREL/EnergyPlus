@@ -1948,7 +1948,7 @@ Fan:SystemModel,
   TotalEfficiencyAndPressure, !- Design Power Sizing Method
   , !- Electric Power Per Unit Flow Rate
   , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.5; !- Fan Total Efficiency 
+  0.5; !- Fan Total Efficiency
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -1967,7 +1967,7 @@ Fan:SystemModel,
   TotalEfficiencyAndPressure, !- Design Power Sizing Method
   , !- Electric Power Per Unit Flow Rate
   , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.5; !- Fan Total Efficiency 
+  0.5; !- Fan Total Efficiency
 
 Fan:SystemModel,
   Zone3PTACFan , !- Name
@@ -1984,7 +1984,7 @@ Fan:SystemModel,
   TotalEfficiencyAndPressure, !- Design Power Sizing Method
   , !- Electric Power Per Unit Flow Rate
   , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.5; !- Fan Total Efficiency 
+  0.5; !- Fan Total Efficiency
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:STEAM ===========
 
@@ -2229,7 +2229,7 @@ Fan:SystemModel,
   Boiler:Steam,
     Steam Boiler Plant Boiler,  !- Name
     NaturalGas,              !- Fuel Type
-    160000,                  !- Maximum Operating Pressure {Kpa}
+    160000,                  !- Maximum Operating Pressure {Pa}
     0.8,                     !- Theoretical Efficiency
     115,                     !- Design Outlet Steam Temperature {C}
     autosize,                !- Nominal Capacity {W}

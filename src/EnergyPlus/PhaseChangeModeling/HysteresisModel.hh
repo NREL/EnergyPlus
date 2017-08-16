@@ -91,6 +91,12 @@ namespace EnergyPlus {
 			Real64 peakTempFreezing;
 			Real64 deltaTempFreezingLow;
 
+			// additional thermal propreties
+			Real64 fullySolidThermalConductivity;
+			Real64 fullyLiquidThermalConductivity;
+			Real64 fullySolidDensity;
+			Real64 fullyLiquidDensity;
+
 			// history and state terms
 			bool phaseChangeTransition;
 			Real64 enthOld;
@@ -102,9 +108,15 @@ namespace EnergyPlus {
 			// the factory for this class
 			static HysteresisPhaseChange *factory( const std::string &objectName );
 
-			// the one main public function for this class
+			// the Cp calculation function for this class
 			Real64 getCurrentSpecificHeat( Real64 prevTempTD, Real64 updatedTempTDT, Real64 phaseChangeTempReverse,
 										   int prevPhaseChangeState, int &phaseChangeState );
+
+			// the conductivity calculation function for this class
+			Real64 getConductivity( Real64 T );
+
+			// the density calculation function for this class
+			Real64 getDensity( Real64 T );
 
 			// and the destructor
 			virtual
