@@ -2087,30 +2087,19 @@ namespace SingleDuct {
 		if ( Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
 			if ( ZoneSizingRunDone ) {
 				if ( CurZoneEqNum > 0 ) {
-					// if design values are available
-					if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
-						// if the user input a value for min flow frac in Sizing:Zone, use it
-						MinAirFlowFracDes = FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac;
-					}
-					else {
-						// otherwise use the combined defaults or other user inputs stored in DesCoolVolFlowMin
-						if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
-							MinAirFlowFracDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
-						}
-						else {
-							MinAirFlowFracDes = 0.0;
-						}
+					// use the combined defaults or other user inputs stored in DesCoolVolFlowMin
+					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
+						MinAirFlowFracDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
+					} else {
+						MinAirFlowFracDes = 0.0;
 					}
 				}
-			}
-			else {
-				// if no sizing run, do same defaulting as would have been done in zone sizing
+			} else {
+				// if no zone sizing values available; use max of min frac = 0.2 and 0.000762 [m3/s-m2]
 				if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
-					MinMinFlowRatio = ( 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ) /
-						Sys( SysNum ).MaxAirVolFlowRate;
+					MinMinFlowRatio = ( 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ) / Sys( SysNum ).MaxAirVolFlowRate;
 					MinAirFlowFracDes = max( 0.2, MinMinFlowRatio );
-				}
-				else {
+				} else {
 					MinAirFlowFracDes = 0.0;
 				}
 			}
@@ -2151,21 +2140,21 @@ namespace SingleDuct {
 		if ( Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
 			if ( ZoneSizingRunDone ) {
 				if ( CurZoneEqNum > 0 ) {
-					// if zone sizing values are available
-					if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
-						// if the user input a value for min flow frac in Sizing:Zone, use it
-						FixedMinAirDes = FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac * Sys( SysNum ).MaxAirVolFlowRate;
-					}
-					else {
-						// otherwise use the combined defaults or other user inputs stored in DesCoolVolFlowMin
+					// use the combined defaults or other user inputs stored in DesCoolVolFlowMin
+					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
 						FixedMinAirDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin;
+					} else {
+						MinAirFlowFracDes = 0.0;
 					}
 				}
 			}
 			else {
-				// no zone sizing values available; use max of min frac = 0.2 and 0.000762 [m3/s-m2]
-				FixedMinAirDes = max( 0.2*Sys( SysNum ).MaxAirVolFlowRate, 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier *
-					Zone( ZoneNum ).ListMultiplier );
+				// if no zone sizing values available; use max of min frac = 0.2 and 0.000762 [m3/s-m2]
+				if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
+					FixedMinAirDes = max( 0.2 * Sys( SysNum ).MaxAirVolFlowRate, 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier );
+				} else {
+					MinAirFlowFracDes = 0.0;
+				}
 			}
 			if ( IsAutoSize ) {
 				// report out autosized result and save value in Sys array

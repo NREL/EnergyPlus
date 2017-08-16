@@ -4171,6 +4171,7 @@ namespace SimAirServingZones {
 						// For re-circulation systems, Vpz used to determine Zpz is the design terminal airflow
 						// Std 62.1-2010, section 6.2.5.1: "Vpz (used to determin Zpz) is the primary airflow rate
 						// rate to the ventilation zone from the air handler, including outdoor air and recirculated air.
+						//MJW - Not sure this is correct, seems like it should be ZonePA - above comments contradict each other
 						VpzMinClgByZone( CtrlZoneNum ) = ZoneSA;
 
 					} else { // single path system
@@ -4722,7 +4723,7 @@ namespace SimAirServingZones {
 		int MatchingCooledZoneNum; // temporary variable
 		Real64 termunitsizingtempfrac; // 1.0/(1.0+termunitsizing(ctrlzone)%inducrat)
 		Real64 termunitsizingtemp; // (1.0+termunitsizing(ctrlzone)%inducrat)
-		Real64 VozClg( 0.0 ); // corrected (for ventilation efficiency) zone outside air flaw rate [m3/s]
+		Real64 VozClg( 0.0 ); // corrected (for ventilation efficiency) zone outside air flow rate [m3/s]
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		//  NumZonesCooled=0
@@ -6757,6 +6758,8 @@ namespace SimAirServingZones {
 		// PURPOSE OF THIS FUNCTION:
 		// Check that system ventilation eff is not less than input minimum system ventilation efficiency.
 		// If it is, back calculate and reset ZpzClgByZone and DesCoolVolFlowMin and system ventilation efficiency
+		// Also increase DesCoolVolFlow if needed to match the new DesCoolVolFlowMin
+		// Why does this look only at cooling?  Shouldn't heating also be checked?
 
 		// METHODOLOGY EMPLOYED:
 		// Ventilation Rate Procedure for single pass system
@@ -6765,6 +6768,7 @@ namespace SimAirServingZones {
 		// na
 
 		// Using/Aliasing
+		using namespace OutputReportPredefined;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ZoneOAFrac( 0.0 ); // ratio of Voz to available zone supply air flow
@@ -6779,8 +6783,28 @@ namespace SimAirServingZones {
 			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
 			// save new (increased) minimum flow rate
 			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;
+			// make sure the max flow rate is >= the new minimum flow rate
+			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = max( AvailSAFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
 			// set the system ventilation efficiency to the user specified minimum
 			SystemCoolingEv = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+
+			//Vpz: "Primary" supply air from main air handler served by an oa mixer
+			Real64 VpzClgByZone = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+
+			//Vdz: "Discharge" supply air delivered to zone by terminal unit
+			Real64 VdzClgByZone = 0.0;
+			// Taken from similar section in SetUpSysSizingArrays
+			if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
+				VdzClgByZone = max( TermUnitSizing( CtrlZoneNum ).AirVolFlow, VpzClgByZone );
+			} else { // single path system
+				VdzClgByZone = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+			}
+
+			// Update VRP table entries:
+			PreDefTableEntry( pdchS62zcdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzClgByZone, 4 ); //Vpz
+			PreDefTableEntry( pdchS62zcdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzClgByZone, 4 ); //Vdz
+			PreDefTableEntry( pdchS62zcdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 4 ); //Vpz-min
+			PreDefTableEntry( pdchS62zcdZpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone, 3 ); //Zpz = Voz/Vpz		}
 		}
 	}
 
