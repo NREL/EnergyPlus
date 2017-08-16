@@ -630,7 +630,7 @@ namespace WeatherManager {
 				ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
 				errorsFound = true;
 			}
-			if ( DataIPShortCuts::cAlphaFieldBlanks( 3 ) {
+			if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
 				// that's OK, we can have a blank schedule, the water will just have no free stream velocity
 				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
 			} else {
