@@ -28,6 +28,10 @@ The name of the node to which the component is supplying air. This should be one
 
 The design maximum volume flow rate~ (m\(^{3}\)/sec) specified for the AirTerminal:SingleDuct:Uncontrolled object.~ This field is autosizable.
 
+\paragraph{Field: Design Specification Air Terminal Sizing Name}\label{design-specification-air-terminal-sizing-name1}
+
+This optional input field is the name of a DesignSpecification:AirTerminal:Sizing object which specifies sizing adjustments to be made for this terminal unit. The terminal unit is initially sized according to the inputs in the corresponding Sizing:Zone object. Then the adjustment factors in the DesignSpecification:AirTerminal:Sizing object are applied. See DesignSpecification:AirTerminal:Sizing for more details. If left blank, then no adjustments are made.
+
 An example input follows.
 
 \begin{lstlisting}

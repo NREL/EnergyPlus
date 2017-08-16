@@ -151,7 +151,9 @@ protected:
 		ZoneEquipConfig( 1 ).ZoneName = "EAST ZONE";
 		ZoneEquipConfig( 1 ).EquipListName = "ZONE2EQUIPMENT";
 		ZoneEquipConfig( 1 ).ZoneNode = 20;
-		ZoneEquipConfig( 1 ).ReturnAirNode = 21;
+		ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 21;
 		Zone( ZoneEquipConfig( 1 ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( 1 ).ZoneNode;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 		ZoneEquipList( 1 ).Name = "ZONE2EQUIPMENT";
@@ -3553,7 +3555,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
-	AirLoopNum = ZoneEquipConfig( 1 ).AirLoopNum;
+	AirLoopNum = ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 );
 	HeatingLoad = false;
 	CoolingLoad = false;
 
@@ -5059,7 +5061,9 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 
 	GetZoneEquipmentData1( ); // read zone equipment configuration and list objects
 
-	ZoneEquipConfig( 1 ).AirLoopNum = 1;
+	ZoneEquipConfig( 1 ).NumInletNodes = 1;
+	ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
+	ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
 
 	BranchInputManager::ManageBranchInput( ); // just gets input and returns.
 

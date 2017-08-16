@@ -92,9 +92,8 @@ namespace DataDefineEquip {
 	int const SingleDuctConstVolCooledBeam( 12 );
 	int const DualDuctVAVOutdoorAir( 13 );
 	int const SingleDuctUserDefined( 14 );
-	int const SingleDuctInletATMixer( 15 );
-	int const SingleDuctSupplyATMixer( 16 );
-	int const SingleDuctConstVolFourPipeBeam( 17 );
+	int const SingleDuctATMixer( 15 );
+	int const SingleDuctConstVolFourPipeBeam( 16 );
 
 	// DERIVED TYPE DEFINITIONS
 

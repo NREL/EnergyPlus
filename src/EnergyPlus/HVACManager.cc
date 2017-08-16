@@ -2594,7 +2594,13 @@ namespace HVACManager {
 			// check to see if a controlled zone is served exclusively by a zonal system
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 				ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-				if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == 0 && ZoneEquipConfig( ControlledZoneNum ).NumInletNodes == ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes ) {
+				bool airLoopFound = false;
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					if( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) > 0 ) {
+						airLoopFound = true;
+					}
+				}
+				if ( !airLoopFound && ZoneEquipConfig( ControlledZoneNum ).NumInletNodes == ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes ) {
 					ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly = true;
 				}
 			}
@@ -2604,10 +2610,14 @@ namespace HVACManager {
 				if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 				ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
 				CyclingFan = false;
-				AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-				if ( AirLoopNum > 0 ) {
-					if ( AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr > 0 ) {
-						CyclingFan = CheckScheduleValue( AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr, 0.0 );
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
+					if ( AirLoopNum > 0 ) {
+						if ( AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr > 0 ) {
+							if ( CheckScheduleValue( AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr, 0.0 ) ) {
+								CyclingFan = true;
+							}
+						}
 					}
 				}
 				if ( ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly || CyclingFan ) {
@@ -2645,22 +2655,25 @@ namespace HVACManager {
 			}
 		}
 		// set the zone level NoHeatToReturnAir flag and the ZoneEquip fan operation mode
+		// for now, if any air loop in the zone is cycling fan, then set NoHeatToReturnAir = true
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 			ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-			AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-			if ( AirLoopNum > 0 ) {
-				ZoneEquipConfig( ControlledZoneNum ).FanOpMode = AirLoopControlInfo( AirLoopNum ).FanOpMode;
-			} else {
-				ZoneEquipConfig( ControlledZoneNum ).FanOpMode = 0;
-			}
-			if ( ZoneEquipConfig( ControlledZoneNum ).FanOpMode == CycFanCycCoil || ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly ) {
+			Zone( ZoneNum ).NoHeatToReturnAir = false;
+			if ( ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly ) {
 				Zone( ZoneNum ).NoHeatToReturnAir = true;
 			} else {
-				Zone( ZoneNum ).NoHeatToReturnAir = false;
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
+					if ( AirLoopNum > 0 ) {
+						if ( AirLoopControlInfo( AirLoopNum ).FanOpMode == CycFanCycCoil ) {
+							Zone( ZoneNum ).NoHeatToReturnAir = true;
+							break;
+						}
+					}
+				}
 			}
 		}
-
 	}
 
 

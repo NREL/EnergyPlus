@@ -85,8 +85,7 @@ namespace DataDefineEquip {
 	extern int const SingleDuctConstVolCooledBeam;
 	extern int const DualDuctVAVOutdoorAir;
 	extern int const SingleDuctUserDefined;
-	extern int const SingleDuctInletATMixer;
-	extern int const SingleDuctSupplyATMixer;
+	extern int const SingleDuctATMixer;
 	extern int const SingleDuctConstVolFourPipeBeam;
 
 	// DERIVED TYPE DEFINITIONS
@@ -110,6 +109,8 @@ namespace DataDefineEquip {
 		std::shared_ptr< AirTerminalUnit > airTerminalPtr;
 		Array1D_string EquipName; // name of subcomponent
 		Array1D_int EquipIndex;
+		int AirTerminalSizingSpecIndex; // index to DesignSpecification:AirTerminal:Sizing obect
+		int TermUnitSizingNum; // index to TermUnitSizing and TermUnitFinalZoneSizing for this air distribution unit
 		Real64 UpStreamLeakFrac; // upstream nominal leakage fraction
 		Real64 DownStreamLeakFrac; // downstream constant leakage fraction
 		Real64 MassFlowRateUpStrLk; // current air mass flow rate of the upstream leak [kg/s]
@@ -121,6 +122,7 @@ namespace DataDefineEquip {
 		Real64 MinAvailDelta; // change in min avail mass low rate due to leaks [kg/s]
 		int InletNodeNum; // index of inlet node
 		int ZoneEqNum; // index of zone equipment object for this terminal unit
+		int AirLoopNum; // index to airloop that this terminal unit is connected to
 		Real64 LeakLoadMult; // zome load multiplier to adjust for downstream leak
 		bool UpStreamLeak; // if true, there is an upstream leak
 		bool DownStreamLeak; // if true, there is an downstream leak
@@ -141,6 +143,8 @@ namespace DataDefineEquip {
 			airTerminalPtr( nullptr ),
 			EquipName( MaxZoneAirComponents ),
 			EquipIndex( MaxZoneAirComponents, 0 ),
+			AirTerminalSizingSpecIndex( 0 ),
+			TermUnitSizingNum( 0 ),
 			UpStreamLeakFrac( 0.0 ),
 			DownStreamLeakFrac( 0.0 ),
 			MassFlowRateUpStrLk( 0.0 ),
@@ -152,6 +156,7 @@ namespace DataDefineEquip {
 			MinAvailDelta( 0.0 ),
 			InletNodeNum( 0 ),
 			ZoneEqNum( 0 ),
+			AirLoopNum( 0 ),
 			LeakLoadMult( 0.0 ),
 			UpStreamLeak( false ),
 			DownStreamLeak( false ),

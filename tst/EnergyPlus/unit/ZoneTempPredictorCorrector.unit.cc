@@ -117,6 +117,9 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
 	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	Node.allocate( 5 );
 

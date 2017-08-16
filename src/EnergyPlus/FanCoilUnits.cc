@@ -739,7 +739,7 @@ namespace FanCoilUnits {
 			}
 
 			//check for inlet side air mixer
-			GetATMixer( FanCoil( FanCoilNum ).Name, ATMixerName, ATMixerNum, ATMixerType, ATMixerPriNode, ATMixerSecNode, ATMixerOutNode );
+			GetATMixer( FanCoil( FanCoilNum ).Name, ATMixerName, ATMixerNum, ATMixerType, ATMixerPriNode, ATMixerSecNode, ATMixerOutNode, FanCoil( FanCoilNum ).AirOutNode );
 			if ( ATMixerType == ATMixer_InletSide ) {
 				// save the air terminal mixer data in the fan coil data array
 				FanCoil( FanCoilNum ).ATMixerExists = true;

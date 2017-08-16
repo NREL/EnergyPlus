@@ -487,12 +487,6 @@ namespace UnitVentilator {
 				ShowContinueError( "Illegal " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
 			}}
 
-			// Get AirTerminal mixer data
-			GetATMixer( UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).ATMixerName, UnitVent( UnitVentNum ).ATMixerIndex, UnitVent( UnitVentNum ).ATMixerType, UnitVent( UnitVentNum ).ATMixerPriNode, UnitVent( UnitVentNum ).ATMixerSecNode, UnitVent( UnitVentNum ).ATMixerOutNode );
-			if (UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide || UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide) {
-				UnitVent( UnitVentNum ).ATMixerExists = true;
-			}
-
 			// Main air nodes (except outside air node):
 			// For node connections, this object is both a parent and a non-parent, because the
 			// OA mixing box is not called out as a separate component, its nodes must be connected
@@ -510,6 +504,11 @@ namespace UnitVentilator {
 			}
 			UnitVent( UnitVentNum ).AirOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
+			// Get AirTerminal mixer data
+			GetATMixer( UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).ATMixerName, UnitVent( UnitVentNum ).ATMixerIndex, UnitVent( UnitVentNum ).ATMixerType, UnitVent( UnitVentNum ).ATMixerPriNode, UnitVent( UnitVentNum ).ATMixerSecNode, UnitVent( UnitVentNum ).ATMixerOutNode, UnitVent( UnitVentNum ).AirOutNode );
+			if (UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide || UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide) {
+				UnitVent( UnitVentNum ).ATMixerExists = true;
+			}
 
 			UnitVent( UnitVentNum ).FanType = Alphas( 11 );
 			UnitVent( UnitVentNum ).FanName = Alphas( 12 );
