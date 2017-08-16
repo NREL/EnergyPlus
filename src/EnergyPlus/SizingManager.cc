@@ -1705,17 +1705,6 @@ namespace SizingManager {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlow = rNumericArgs( 11 );
 					}
 					//  N12,\field Cooling Minimum Air Flow Fraction
-					//      \note fraction of the Cooling design Air Flow Rate
-					//      \type real
-					//      \minimum 0
-					//      \default 0
-					//      \note This input is currently used in sizing the Fan minimum Flow Rate.
-					//      \note It does not currently affect other component autosizing.
-					if ( lNumericFieldBlanks( 12 ) ) {
-						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = false;
-					} else {
-						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = true;
-					}
 					if ( rNumericArgs( 12 ) < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 						ShowContinueError( "... incorrect " + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( rNumericArgs( 12 ), 2 ) + "],  value should not be negative." );
