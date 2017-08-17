@@ -377,8 +377,11 @@ namespace HVACUnitarySystem {
 			}
 		}
 		// Obtains and Allocates unitary system related parameters from input file
-		// Get the unitary system input
-		GetUnitarySystemInput();
+		if ( GetInputFlag ) {
+			// Get the unitary system input
+			GetUnitarySystemInput();
+			GetInputFlag = false;
+		}
 
 		// Find the correct unitary system Number
 		if ( CompIndex == 0 ) {
@@ -1400,25 +1403,10 @@ namespace HVACUnitarySystem {
 			}
 		}
 
-		// Get the zone inlet node
 		if ( allocated( ZoneEquipConfig ) && MyCheckFlag( UnitarySysNum ) ) {
 			for ( i = 1; i <= NumOfZones; ++i ) {
 				if ( UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
-					if ( AirLoopNum != ZoneEquipConfig( i ).AirLoopNum ) continue;
 					if ( UnitarySystem( UnitarySysNum ).ControlZoneNum == ZoneEquipConfig( i ).ActualZoneNum ) {
-						for ( j = 1; j <= ZoneEquipConfig( i ).NumInletNodes; ++j ) {
-							if ( UnitarySystem( UnitarySysNum ).ZoneInletNode == 0 ) {
-								for ( k = 1; k <= ZoneEquipConfig( i ).NumInletNodes; ++k ) {
-									if ( ZoneEquipConfig( i ).InletNode( j ) == ZoneEquipConfig( i ).AirDistUnitCool( k ).OutNode ) {
-										UnitarySystem( UnitarySysNum ).ZoneInletNode = ZoneEquipConfig( i ).InletNode( j );
-										break;
-									} else if ( ZoneEquipConfig( i ).InletNode( j ) == ZoneEquipConfig( i ).AirDistUnitHeat( k ).OutNode ) {
-										UnitarySystem( UnitarySysNum ).ZoneInletNode = ZoneEquipConfig( i ).InletNode( j );
-										break;
-									}
-								}
-							}
-						}
 						//setup unitary system zone equipment sequence information based on finding an air terminal
 						if ( ZoneEquipConfig( i ).EquipListIndex > 0 ) {
 							for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
@@ -2721,10 +2709,8 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorFlag( false ); // true if errors detected in GetUnitarySystemInputData
 
-		if ( GetInputFlag ) {
-			GetUnitarySystemInputData( ErrorFlag );
-			GetInputFlag = false;
-		}
+		// Flow
+		GetUnitarySystemInputData( ErrorFlag );
 
 		if( ErrorFlag ) {
 			ShowFatalError( RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem input. Preceding condition(s) causes termination." );
@@ -2901,7 +2887,8 @@ namespace HVACUnitarySystem {
 		int HeatingCoilOutletNode; // Used for node checking warning messages
 		int SupHeatCoilInletNode; // Used for node checking warning messages
 		int SupHeatCoilOutletNode; // Used for node checking warning messages
-		int TotalZonesOnAirLoop; // number of zones connected to air loop
+		// TotalZonesOnAirLoop doesn't appear to be used anywhere
+		//int TotalZonesOnAirLoop; // number of zones connected to air loop
 		int ActualCoolCoilType; // Coil type number for HX assisted coils
 		int ControlledZoneNum; // loop counter
 		int ZoneExhNum; // loop counter
@@ -5132,7 +5119,8 @@ namespace HVACUnitarySystem {
 			// Add supplemental heating coil to component sets array
 			if ( UnitarySystem( UnitarySysNum ).SuppCoilExists ) SetUpCompSets( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iSuppHeatCoilTypeAlphaNum ), Alphas( iSuppHeatCoilNameAlphaNum ), NodeID( SupHeatCoilInletNode ), NodeID( SupHeatCoilOutletNode ) );
 
-			TotalZonesOnAirLoop = 0;
+			// TotalZonesOnAirLoop doesn't appear to be used anywhere
+			//TotalZonesOnAirLoop = 0;
 			TotalFloorAreaOnAirLoop = 0.0;
 			AirLoopNumber = 0;
 
@@ -5155,9 +5143,13 @@ namespace HVACUnitarySystem {
 								UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 								UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
 								//             Determine if system is on air loop served by the thermostat location specified
-								if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == AirLoopNumber ) {
-									++TotalZonesOnAirLoop;
-									TotalFloorAreaOnAirLoop += Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
+								for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+									if ( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) == AirLoopNumber ) {
+										// TotalZonesOnAirLoop doesn't appear to be used anywhere
+										//++TotalZonesOnAirLoop;
+										UnitarySystem( UnitarySysNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( zoneInNode );
+										TotalFloorAreaOnAirLoop += Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
+									}
 								}
 								for ( TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum ) {
 									if ( TempControlledZone( TstatZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
@@ -5200,7 +5192,8 @@ namespace HVACUnitarySystem {
 						ZoneEquipmentFound = true;
 						//               Find the controlled zone number for the specified thermostat location
 						UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
-						++TotalZonesOnAirLoop;
+						// TotalZonesOnAirLoop doesn't appear to be used anywhere
+						//++TotalZonesOnAirLoop;
 						TotalFloorAreaOnAirLoop = Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
 						UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
 						UnitarySystem( UnitarySysNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum );
@@ -5256,7 +5249,8 @@ namespace HVACUnitarySystem {
 							ZoneEquipmentFound = true;
 							//               Find the controlled zone number for the specified thermostat location
 							UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
-							++TotalZonesOnAirLoop;
+							// TotalZonesOnAirLoop doesn't appear to be used anywhere
+							//++TotalZonesOnAirLoop;
 							TotalFloorAreaOnAirLoop = Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
 							UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
 							UnitarySystem( UnitarySysNum ).ZoneInletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
@@ -5312,7 +5306,8 @@ namespace HVACUnitarySystem {
 							ZoneEquipmentFound = true;
 							//               Find the controlled zone number for the specified thermostat location
 							UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
-							++TotalZonesOnAirLoop;
+							// TotalZonesOnAirLoop doesn't appear to be used anywhere
+							//++TotalZonesOnAirLoop;
 							TotalFloorAreaOnAirLoop = Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
 							UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
 							UnitarySystem( UnitarySysNum ).ZoneInletNode = UnitarySystem( UnitarySysNum ).ATMixerOutNode;							

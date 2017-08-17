@@ -154,34 +154,34 @@ namespace HVACInterfaceManager {
 		Real64 DeltaEnergy;
 
 		if ( ( CalledFrom == CalledFromAirSystemDemandSide ) && ( OutletNode == 0 ) ) {
-			//// Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
-			//AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
-			//AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = true;
-			//AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 1 ) = true;
-			//AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 1 ) = true;
-			//AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 1 ) = true;
-			//AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 1 ) = true;
+			// Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
+			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = true;
+			AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 1 ) = true;
+			AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 1 ) = true;
+			AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 1 ) = true;
+			AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 1 ) = true;
 
-			//int totDemandSideMassFlow = 0.0;
-			//int totDemandSideMinAvail = 0.0;
-			//int totDemanSideMaxAvail = 0.0;
-			//for ( int demIn = 1; demIn <  DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumSupplyNodes; ++demIn ) {
-			//	int demInNode =  DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).ZoneEquipSupplyNodeNum( demIn );
-			//	totDemandSideMassFlow +=  Node( demInNode ).MassFlowRate;
-			//	totDemandSideMinAvail +=  Node( demInNode ).MassFlowRateMinAvail;
-			//	totDemanSideMaxAvail +=  Node( demInNode ).MassFlowRateMaxAvail;
-			//}
-			//TmpRealARR = AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue;
-			//AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) = std::abs( totDemandSideMassFlow - Node( InletNode ).MassFlowRate );
-			//AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
-			//if ( AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) > HVACFlowRateToler ) {
-			//	AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = true;
-			//	OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
-			//}
+			int totDemandSideMassFlow = 0.0;
+			int totDemandSideMinAvail = 0.0;
+			int totDemanSideMaxAvail = 0.0;
+			for ( int demIn = 1; demIn <  DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumSupplyNodes; ++demIn ) {
+				int demInNode =  DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).ZoneEquipSupplyNodeNum( demIn );
+				totDemandSideMassFlow +=  Node( demInNode ).MassFlowRate;
+				totDemandSideMinAvail +=  Node( demInNode ).MassFlowRateMinAvail;
+				totDemanSideMaxAvail +=  Node( demInNode ).MassFlowRateMaxAvail;
+			}
+			TmpRealARR = AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue;
+			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) = std::abs( totDemandSideMassFlow - Node( InletNode ).MassFlowRate );
+			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
+			if ( AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) > HVACFlowRateToler ) {
+				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = true;
+				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+			}
 
-			//Node( InletNode ).MassFlowRate = totDemandSideMassFlow;
-			//Node( InletNode ).MassFlowRateMinAvail = totDemandSideMinAvail;
-			//Node( InletNode ).MassFlowRateMaxAvail = totDemanSideMaxAvail;
+			Node( InletNode ).MassFlowRate = totDemandSideMassFlow;
+			Node( InletNode ).MassFlowRateMinAvail = totDemandSideMinAvail;
+			Node( InletNode ).MassFlowRateMaxAvail = totDemanSideMaxAvail;
 			return;
 		}
 

@@ -1777,7 +1777,7 @@ namespace SimAirServingZones {
 									TermInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode;
 									TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
 									if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
-
+									if (ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									goto ControlledZoneLoop2_exit;
 
 								}
@@ -1793,7 +1793,7 @@ namespace SimAirServingZones {
 									TermInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode;
 									TermUnitSizingNumsHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).TermUnitSizingIndex;
 									if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
-
+									if (ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									goto ControlledZoneLoop2_exit;
 
 								}

@@ -179,6 +179,7 @@ namespace SingleDuct {
 		int ErrCount2; // bad iterations limits in hot water flow calc
 		Real64 ZoneFloorArea; // Zone floor area
 		int CtrlZoneNum; // Pointer to CtrlZone data structure
+		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
 		int ActualZoneNum; // Pointer to Zone data Structure
 		Real64 MaxAirVolFlowRateDuringReheat; // Maximum vol flow during reheat
 		Real64 MaxAirVolFractionDuringReheat; // Maximum vol flow fraction during reheat
@@ -249,7 +250,8 @@ namespace SingleDuct {
 			ErrCount2( 0 ),
 			ZoneFloorArea( 0.0 ),
 			CtrlZoneNum( 0 ),
-			ActualZoneNum( 0 ),
+			CtrlZoneInNodeIndex( 0 ),
+  			ActualZoneNum( 0 ),
 			MaxAirVolFlowRateDuringReheat( 0.0 ),
 			MaxAirVolFractionDuringReheat( 0.0 ),
 			AirMassFlowDuringReheatMax( 0.0 ),
@@ -300,8 +302,9 @@ namespace SingleDuct {
 		int ADUNum; // index of Air Distribution Unit
 		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
 		bool OneTimeInitFlag; // true if one-time inits should be done
-
+		bool OneTimeInitFlag2; // true if more one-time inits should be done
 		int ZoneEqNum;
+		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
 		int ZoneNum;
 		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
 		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
@@ -332,6 +335,7 @@ namespace SingleDuct {
 			MixedAirMassFlowRate( 0.0 ),
 			MassFlowRateMaxAvail( 0.0 ),
 			ZoneEqNum( 0 ), 
+			CtrlZoneInNodeIndex( 0 ),
 			ZoneNum( 0 ), 
 			NoOAFlowInputFromUser( true ), 
 			OARequirementsPtr( 0 ), 
@@ -339,7 +343,8 @@ namespace SingleDuct {
 			DesignPrimaryAirVolRate( 0.0 ),
 			ADUNum( 0 ),
 			TermUnitSizingIndex( 0 ),
-			OneTimeInitFlag( true )
+			OneTimeInitFlag( true ),
+			OneTimeInitFlag2( true )
 		{}
 
 		void

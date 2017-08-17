@@ -490,6 +490,7 @@ namespace HVACSingleDuctInduc {
 								AirDistUnit( IndUnit( IUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( IndUnit( IUNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							}
+							IndUnit( IUNum ).CtrlZoneInNodeIndex = SupAirIn;
 							AirNodeFound = true;
 							break;
 						}
@@ -608,7 +609,14 @@ namespace HVACSingleDuctInduc {
 			if ( DataSizing::CurTermUnitSizingNum > 0 ){
 				DataSizing::TermUnitSizing( DataSizing::CurTermUnitSizingNum ).InducRat = IndUnit( IUNum ).InducRatio;
 			}
-			MyAirDistInitFlag( IUNum ) = false;
+			if ( IndUnit( IUNum ).AirLoopNum == 0 ) {
+				if ( (IndUnit( IUNum ).CtrlZoneNum > 0 ) && ( IndUnit( IUNum ).CtrlZoneInNodeIndex > 0 ) ){
+					IndUnit( IUNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( IndUnit( IUNum ).CtrlZoneNum ).InletNodeAirLoopNum( IndUnit( IUNum ).CtrlZoneInNodeIndex );
+					AirDistUnit( IndUnit( IUNum ).ADUNum ).AirLoopNum = IndUnit( IUNum ).AirLoopNum;
+				}
+			} else {
+				MyAirDistInitFlag( IUNum ) = false;
+			}
 		}
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
 			ZoneEquipmentListChecked = true;
