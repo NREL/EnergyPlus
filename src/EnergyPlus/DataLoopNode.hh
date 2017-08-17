@@ -155,6 +155,8 @@ namespace DataLoopNode {
 		int  OutAirWindSpeedSchedNum;
 		bool SchedOutAirWindDir;
 		int  OutAirWindDirSchedNum;
+		bool SchedWindCoefCurve;  // if true, wind coefficient curve is defined by local outdoor air node
+		int  WindCoefCurveNum;    // Wind coefficient Curve ID, replace with pointer after curve refactor
 
 
 		//  Following are for Outdoor Air Nodes "read only"
@@ -205,13 +207,15 @@ namespace DataLoopNode {
 			TempSetPointLo( SensedNodeFlagValue ),
 			Height( -1.0 ),
 			SchedOutAirDryBulb( false ),
-		    OutAirDryBulbSchedNum( 0.0 ),
+		    OutAirDryBulbSchedNum( 0 ),
 		    SchedOutAirWetBulb( false ),
-		    OutAirWetBulbSchedNum( 0.0 ),
+		    OutAirWetBulbSchedNum( 0 ),
 		    SchedOutAirWindSpeed( false ),
-		    OutAirWindSpeedSchedNum( 0.0 ),
+		    OutAirWindSpeedSchedNum( 0 ),
 		    SchedOutAirWindDir( false ),
-		    OutAirWindDirSchedNum( 0.0 ),
+		    OutAirWindDirSchedNum( 0 ),
+			SchedWindCoefCurve( false ),
+			WindCoefCurveNum( 0 ),
 			OutAirDryBulb( 0.0 ),
 			EMSOverrideOutAirDryBulb( false ),
 			EMSValueForOutAirDryBulb( 0.0 ),
@@ -266,6 +270,8 @@ namespace DataLoopNode {
 		    int    const OutAirWindSpeedSchedNum, // schedule value in {m/s}
 		    bool   const SchedOutAirWindDir, // if true, dry bulb temp of the outdoor air node is overwritten by sched value
 		    int    const OutAirWindDirSchedNum, // schedule value in {degree}
+			bool   const SchedWindCoefCurve, // if true, wind coefficient curve is defined by local outdoor air node
+			int    const WindCoefCurveNum,
 			Real64 const OutAirDryBulb, // {C}
 			bool   const EMSOverrideOutAirDryBulb, // if true, the EMS is calling to override outdoor air node drybulb setting
 			Real64 const EMSValueForOutAirDryBulb, // value EMS is directing to use for outdoor air node's drybulb {C}
@@ -317,6 +323,8 @@ namespace DataLoopNode {
 			OutAirWindSpeedSchedNum( OutAirWindSpeedSchedNum ),
 			SchedOutAirWindDir( SchedOutAirWindDir ),
 			OutAirWindDirSchedNum( OutAirWindDirSchedNum ),
+			SchedWindCoefCurve( SchedWindCoefCurve ),
+			WindCoefCurveNum( WindCoefCurveNum ),
 			OutAirDryBulb( OutAirDryBulb ),
 			EMSOverrideOutAirDryBulb( EMSOverrideOutAirDryBulb ),
 			EMSValueForOutAirDryBulb( EMSValueForOutAirDryBulb ),

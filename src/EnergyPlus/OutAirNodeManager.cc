@@ -57,6 +57,7 @@
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ScheduleManager.hh>
+#include <CurveManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
 
@@ -186,6 +187,7 @@ namespace OutAirNodeManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using ScheduleManager::GetScheduleIndex;
+		using CurveManager::GetCurveIndex;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -346,10 +348,16 @@ namespace OutAirNodeManager {
 				//	\type object - list
 				//	\object - list ScheduleNames
 				//	\note Schedule values are real numbers, 0.0 to 40.0, units m / s
-				//	A5; \field Wind Direction Schedule Name
+				//	A5, \field Wind Direction Schedule Name
 				//	\type object - list
 				//	\object - list ScheduleNames
 				//	\note Schedule values are real numbers, 0.0 to 360.0, units degree
+				//  A6; \field Wind Pressure Coefficient Curve Name
+				//	\type object - list
+				//	\object - list WPCValueNames
+				//	\object - list UniVariateCurves
+				//	\object - list UniVariateTables
+				//	\note The name of the AirflowNetwork : MultiZone:WindPressureCoefficientValues, curve, or table object specifying the wind pressure coefficient.
 
 				if ( NumAlphas > 1 ) {
 					Node( NodeNums( 1 ) ).SchedOutAirDryBulb = true;
@@ -372,8 +380,13 @@ namespace OutAirNodeManager {
 				}
 
 				if ( NumAlphas > 5 ) {
+					Node( NodeNums( 1 ) ).SchedWindCoefCurve = true;
+					Node( NodeNums( 1 ) ).WindCoefCurveNum = GetCurveIndex( Alphas( 6 ) );
+				}
+
+				if ( NumAlphas > 6 ) {
 					ShowSevereError( CurrentModuleObject + ", " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
-					ShowContinueError( "Object Definition indicates more that 5 Alpha Objects." );
+					ShowContinueError( "Object Definition indicates more that 6 Alpha Objects." );
 					ErrorsFound = true;
 					continue;
 				}

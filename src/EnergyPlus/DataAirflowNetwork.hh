@@ -645,6 +645,7 @@ namespace DataAirflowNetwork {
 		Real64 azimuth; // Azimuthal angle of the associated surface
 		Real64 height; // Nodal height
 		int ExtNum; // External node number
+		int OutAirNodeNum;
 		int facadeNum; // Facade number
 		int curve; // Curve ID, replace with pointer after curve refactor
 		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
@@ -655,6 +656,7 @@ namespace DataAirflowNetwork {
 			azimuth( 0.0 ),
 			height( 0.0 ),
 			ExtNum( 0 ),
+			OutAirNodeNum( 0 ),
 			facadeNum( 0 ),
 			curve( 0 ),
 			symmetricCurve( false ),
@@ -1005,6 +1007,7 @@ namespace DataAirflowNetwork {
 		int EPlusZoneNum; // E+ zone number
 		int EPlusNodeNum;
 		int ExtNodeNum;
+		int OutAirNodeNum;
 		int EPlusTypeNum;
 		int RAFNNodeNum;  // RoomAir model node number
 		int NumOfLinks; // Number of links for RoomAir model
@@ -1017,6 +1020,7 @@ namespace DataAirflowNetwork {
 			EPlusZoneNum( 0 ),
 			EPlusNodeNum( 0 ),
 			ExtNodeNum( 0 ),
+			OutAirNodeNum( 0 ),
 			EPlusTypeNum( 0 ),
 			RAFNNodeNum( 0 ),
 			NumOfLinks( 0 )
