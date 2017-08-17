@@ -5891,53 +5891,80 @@ namespace SurfaceGeometry {
 				continue;
 			}
 
+			// Choose calculation method
+			std::string calculationMethod = cAlphaArgs( alpF );
+			if ( calculationMethod != "TOTALEXPOSEDPERIMETER" && calculationMethod != "EXPOSEDPERIMETERFRACTION" && calculationMethod != "BYSEGMENT" ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + calculationMethod + " is not a valid choice for " + cAlphaFieldNames( alpF ) );
+				ErrorsFound = true;
+			}
+			alpF++;
 
 			Data data;
 			data.useDetailedExposedPerimeter = true;
-			int optionsUsed = 0;
+
 			if ( !lNumericFieldBlanks( numF ) ) {
-				data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter;
-				if (data.exposedFraction > 1.0) {
-					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", "+ cNumericFieldNames( numF ) + " is greater than the perimeter of " + Surface(Found).Name);
-					ShowContinueError( Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " + cCurrentModuleObject + " exposed perimeter = " + RoundSigDigits(rNumericArgs( numF )) );
-					ShowContinueError( cNumericFieldNames( numF ) + " will be set equal to " + Surface(Found).Name + " perimeter");
-					data.exposedFraction = 1.0;
+				if ( calculationMethod == "TOTALEXPOSEDPERIMETER" ) {
+					data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter;
+					if (data.exposedFraction > 1.0) {
+						ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cNumericFieldNames( numF ) + " is greater than the perimeter of " + Surface(Found).Name);
+						ShowContinueError( Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " + cCurrentModuleObject + " exposed perimeter = " + RoundSigDigits(rNumericArgs( numF )) );
+						ShowContinueError( cNumericFieldNames( numF ) + " will be set equal to " + Surface(Found).Name + " perimeter");
+						data.exposedFraction = 1.0;
+					}
+
+					data.useDetailedExposedPerimeter = false;
+				} else {
+					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but a value has been set for " + cNumericFieldNames( numF ) + ". This value will be ignored." );
 				}
-
-				data.useDetailedExposedPerimeter = false;
-				optionsUsed++;
-			} numF++;
-			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ); data.useDetailedExposedPerimeter = false; optionsUsed++;} numF++;
-
-			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
-			if (numRemainingFields > 0) {
-				optionsUsed++;
-				if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
-					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
-					ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
+			} else {
+				if ( calculationMethod == "TOTALEXPOSEDPERIMETER" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cNumericFieldNames( numF ));
 					ErrorsFound = true;
 				}
-				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
-					if ( lAlphaFieldBlanks( alpF ) || SameString(cAlphaArgs( alpF ), "YES") ) {
-						data.isExposedPerimeter.push_back(true);
-					} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
-						data.isExposedPerimeter.push_back(false);
-					} else {
-						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + ']' );
+			} numF++;
+
+			if ( !lNumericFieldBlanks( numF )) {
+				if ( calculationMethod == "EXPOSEDPERIMETERFRACTION" ) {
+					data.exposedFraction = rNumericArgs( numF );
+					data.useDetailedExposedPerimeter = false;
+				} else {
+					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but a value has been set for " + cNumericFieldNames( numF ) + ". This value will be ignored." );
+				}
+			} else {
+				if ( calculationMethod == "EXPOSEDPERIMETERFRACTION" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cNumericFieldNames( numF ));
+					ErrorsFound = true;
+				}
+			}  numF++;
+
+			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
+			if ( numRemainingFields > 0) {
+				if ( calculationMethod == "BYSEGMENT" ) {
+					if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
+						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
+						ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
 						ErrorsFound = true;
-					} alpF++;
+					}
+					for (int segNum = 0; segNum < numRemainingFields; segNum++) {
+						if ( SameString(cAlphaArgs( alpF ), "YES") ) {
+							data.isExposedPerimeter.push_back(true);
+						} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
+							data.isExposedPerimeter.push_back(false);
+						} else if ( lAlphaFieldBlanks( alpF ) ) {
+							ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cAlphaFieldNames( alpF ) + ". Must be \"Yes\" or \"No\".");
+							ErrorsFound = true;
+						} else {
+							ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + "]. Must be \"Yes\" or \"No\"." );
+							ErrorsFound = true;
+						} alpF++;
+					}
+				}
+			} else {
+				if ( calculationMethod == "BYSEGMENT" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no values have been set for Surface Segments Exposed");
+					ErrorsFound = true;
 				}
 			}
-			if (optionsUsed == 0) {
-				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must define at least one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
-				ErrorsFound = true;
-			}
-
-			if (optionsUsed > 1) {
-				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", may only define one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
-				ErrorsFound = true;
-			}
-
 			surfaceMap[Found] = data;
 		}
 	}
@@ -7710,8 +7737,11 @@ namespace SurfaceGeometry {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
 				} else if (SameString(cAlphaArgs( alpF ), "GroundWater")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
-				} else /* if (SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
+				} else if (SameString(cAlphaArgs( alpF ), "Autoselect")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
+				} else {
+					ErrorsFound = true;
+					ShowSevereError( "Foundation:Kiva:Settings, " + cAlphaArgs( alpF ) + " is not a valid choice for " + cAlphaFieldNames( alpF ) );
 				}
 			} alpF++;
 
@@ -8018,7 +8048,7 @@ namespace SurfaceGeometry {
 						} alpF++;
 
 						if ( lNumericFieldBlanks( numF ) ) {
-							block.depth = 0.0;
+							block.depth = 0.0; // Temporary indicator to default to foundation depth
 						} else {
 							block.depth = rNumericArgs( numF );
 						} numF++;
@@ -8657,7 +8687,7 @@ namespace SurfaceGeometry {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 				volCalcMethod = zoneVolumeCalculationMethod::floorAreaTimesHeight1;
 			} else if ( isFloorHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
-				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;  
+				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 				volCalcMethod = zoneVolumeCalculationMethod::floorAreaTimesHeight2;
 			} else if ( isCeilingHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).CeilingArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0) {
 			    CalcVolume = Zone( ZoneNum ).CeilingArea * Zone( ZoneNum ).CeilingHeight;
@@ -8840,10 +8870,10 @@ namespace SurfaceGeometry {
 	edgesInBoth(
 		std::vector<EdgeOfSurf> edges1,
 		std::vector<EdgeOfSurf> edges2
-	) 
+	)
 	{
 		// J. Glazer - June 2017
-		// this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20. 
+		// this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20.
 
 		std::vector<EdgeOfSurf> inBoth;
 		for ( auto e1 : edges1 ) {
@@ -8941,7 +8971,7 @@ namespace SurfaceGeometry {
 				}
 			}
 		}
-		// All edges for an enclosed polyhedron should be shared by two (and only two) sides. 
+		// All edges for an enclosed polyhedron should be shared by two (and only two) sides.
 		// So if the count is not two for all edges, the polyhedron is not enclosed
 		std::vector<EdgeOfSurf> edgesNotTwoCount;
 		for ( auto anEdge : uniqueEdges ) {
@@ -9069,7 +9099,7 @@ namespace SurfaceGeometry {
 
 	// test if the ceiling and floor are the same except for their height difference by looking at the corners
 	bool
-	areFloorAndCeilingSame( 
+	areFloorAndCeilingSame(
 		DataVectorTypes::Polyhedron const & zonePoly
 	)
 	{
@@ -9077,7 +9107,7 @@ namespace SurfaceGeometry {
 
 		// check if the floor and ceiling are the same
 		// this is almost equivent to saying, if you ignore the z-coordinate, are the vertices the same
-		// so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they 
+		// so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they
 		// should always be even (they would be two but you might define multiple surfaces that meet in a corner)
 
 		using DataVectorTypes::Vector;
@@ -9151,7 +9181,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				if ( foundWallHeight ) {
-					if ( abs( maxZ - wallHeightZ ) > 0.0254 ) {    //  2.54 cm = 1 inch 
+					if ( abs( maxZ - wallHeightZ ) > 0.0254 ) {    //  2.54 cm = 1 inch
 						areWlHgtSame = false;
 						break;
 					}
@@ -9179,15 +9209,15 @@ namespace SurfaceGeometry {
 		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
 			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
 			if ( Surface( curSurfNum ).Class == SurfaceClass_Floor ) {
-				if ( abs( Surface( curSurfNum ).Tilt - 180. ) > 1. ) {  // with 1 degree angle  
+				if ( abs( Surface( curSurfNum ).Tilt - 180. ) > 1. ) {  // with 1 degree angle
 					isFlrHoriz = false;
 				}
 			} else if ( Surface( curSurfNum ).Class == SurfaceClass_Roof ) { //includes ceilings
-				if ( abs( Surface( curSurfNum ).Tilt ) > 1. ) {  // with 1 degree angle of 
+				if ( abs( Surface( curSurfNum ).Tilt ) > 1. ) {  // with 1 degree angle of
 					isClgHoriz = false;
 				}
 			} else if ( Surface( curSurfNum ).Class == SurfaceClass_Wall ) {
-				if ( abs( Surface( curSurfNum ).Tilt - 90 ) > 1. ) {  // with 1 degree angle  
+				if ( abs( Surface( curSurfNum ).Tilt - 90 ) > 1. ) {  // with 1 degree angle
 					areWlVert = false;
 				}
 			}
@@ -9205,7 +9235,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		// approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the 
+		// approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the
 		// vertices( one counting backwards ) and if it is the same distance than assume that it is the same.
 		using DataVectorTypes::Vector;
 		bool foundOppEqual = false;
@@ -9238,7 +9268,7 @@ namespace SurfaceGeometry {
     }
 
 	// provides a list of indices of polyhedron faces that are facing a specific azimuth
-	std::vector<int> 
+	std::vector<int>
 	listOfFacesFacingAzimuth(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		Real64 const & azimuth
@@ -9259,10 +9289,10 @@ namespace SurfaceGeometry {
 	}
 
 	// returns the index of the face of a polyhedron that is probably opposite of the face index provided
-	int 
+	int
 	findPossibleOppositeFace(
 		DataVectorTypes::Polyhedron const & zonePoly,
-		int const & faceIndex 
+		int const & faceIndex
 	)
 	{
 		// J. Glazer - March 2017
@@ -9295,7 +9325,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		bool allAreEquidistant = true;
 		Real64 firstDistance = -99.;
 		if ( zonePoly.SurfaceFace( faceIndex ).NSides == zonePoly.SurfaceFace( opFaceIndex ).NSides ) { // double check that the number of sides match
@@ -9307,7 +9337,7 @@ namespace SurfaceGeometry {
 				} else {
 					if ( abs( curDistBetwCorners - firstDistance ) > tol ) {
 						allAreEquidistant = false;
-						break; 
+						break;
 					}
 				}
 			}
@@ -9319,7 +9349,7 @@ namespace SurfaceGeometry {
 	}
 
 	// test if two points in space are in the same position based on a small tolerance
-	bool 
+	bool
 	isAlmostEqual3dPt(
 		DataVectorTypes::Vector v1,
 		DataVectorTypes::Vector v2
@@ -9327,7 +9357,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) && ( abs( v1.z - v2.z ) < tol ) ) ;
 	}
 
@@ -9340,7 +9370,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
@@ -9353,7 +9383,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
@@ -9398,7 +9428,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( abs( (distance(start, end ) - (distance(start, test ) + distance(test, end) ) ) ) < tol );
 	}
 
