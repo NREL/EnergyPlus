@@ -8587,6 +8587,9 @@ namespace SolarShading {
 		ElevSun = PiOvr2 - std::acos( SolCosVec.z );
 		AzimSun = std::atan2( SolCosVec.x, SolCosVec.y );
 
+		Real64 const cos_ElevSun( std::cos( ElevSun ) );
+		Real64 const sin_ElevSun( std::sin( ElevSun ) );
+
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 
 			if ( Surface( SurfNum ).Class != SurfaceClass_Window || ( Surface( SurfNum ).ExtBoundCond != ExternalEnvironment && Surface( SurfNum ).ExtBoundCond != OtherSideCondModeledExt ) ) continue;
@@ -8598,7 +8601,7 @@ namespace SolarShading {
 			ElevWin = PiOvr2 - Surface( SurfNum ).Tilt * DegToRadians;
 			AzimWin = Surface( SurfNum ).Azimuth * DegToRadians;
 
-			ProfileAngHor = std::atan( std::sin( ElevSun ) / std::abs( std::cos( ElevSun ) * std::cos( AzimWin - AzimSun ) ) ) - ElevWin;
+			ProfileAngHor = std::atan( sin_ElevSun / std::abs( cos_ElevSun * std::cos( AzimWin - AzimSun ) ) ) - ElevWin;
 
 			//CR9280 - were having negative profile angles on west sides.  commenting out previous code (original code) for
 			// vertical windows

@@ -749,21 +749,19 @@ namespace DXFEarClipping {
 		// na
 
 		// Subroutine local variable declarations:
-		int i; // Loop Control
-		Real64 alpha;
-		Real64 alphrad;
-		Real64 alpha180;
 
 		// convert surface (wall) to facing 180 (outward normal)
 
-		alpha = surfazimuth;
+		Real64 const alpha = surfazimuth;
 
-		alpha180 = 180.0 - alpha; // amount to rotate
-		alphrad = alpha180 / RadToDeg;
+		Real64 const alpha180 = 180.0 - alpha; // amount to rotate
+		Real64 const alphrad = alpha180 / RadToDeg;
+		Real64 const cos_alphrad( std::cos( alphrad ) );
+		Real64 const sin_alphrad( std::sin( alphrad ) );
 
-		for ( i = 1; i <= nsides; ++i ) {
-			xvt( i ) = std::cos( alphrad ) * polygon( i ).x + std::sin( alphrad ) * polygon( i ).y;
-			yvt( i ) = -std::sin( alphrad ) * polygon( i ).x + std::cos( alphrad ) * polygon( i ).y;
+		for ( int i = 1; i <= nsides; ++i ) {
+			xvt( i ) = cos_alphrad * polygon( i ).x + sin_alphrad * polygon( i ).y;
+			yvt( i ) = -sin_alphrad * polygon( i ).x + cos_alphrad * polygon( i ).y;
 			zvt( i ) = polygon( i ).z;
 		}
 
@@ -819,18 +817,16 @@ namespace DXFEarClipping {
 		// na
 
 		// Subroutine local variable declarations:
-		int i; // Loop Control
-		Real64 alpha;
-		Real64 alphrad;
 
-		alpha = -surftilt;
+		Real64 const alpha = -surftilt;
+		Real64 const alphrad = alpha / RadToDeg;
+		Real64 const cos_alphrad( std::cos( alphrad ) );
+		Real64 const sin_alphrad( std::sin( alphrad ) );
 
-		alphrad = alpha / RadToDeg;
-
-		for ( i = 1; i <= nsides; ++i ) {
+		for ( int i = 1; i <= nsides; ++i ) {
 			xvt( i ) = polygon( i ).x;
-			yvt( i ) = std::cos( alphrad ) * polygon( i ).x + std::sin( alphrad ) * polygon( i ).y;
-			zvt( i ) = -std::sin( alphrad ) * polygon( i ).x + std::cos( alphrad ) * polygon( i ).y;
+			yvt( i ) = cos_alphrad * polygon( i ).x + sin_alphrad * polygon( i ).y;
+			zvt( i ) = -sin_alphrad * polygon( i ).x + cos_alphrad * polygon( i ).y;
 		}
 
 	}

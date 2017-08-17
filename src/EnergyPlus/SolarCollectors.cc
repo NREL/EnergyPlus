@@ -1691,12 +1691,13 @@ namespace SolarCollectors {
 		// get the incidence and refraction angles
 		IncAngle = IncidentAngle;
 		ParamNum = Collector( ColleNum ).Parameters;
+		Real64 sin_IncAngle( std::sin( IncAngle ) );
 
 		for ( nCover = 1; nCover <= Parameters( ParamNum ).NumOfCovers; ++nCover ) {
 
 			CoverRefrIndex = Parameters( ParamNum ).RefractiveIndex( nCover );
 
-			RefrAngle = std::asin( std::sin( IncAngle ) * AirRefIndex / CoverRefrIndex );
+			RefrAngle = std::asin( sin_IncAngle * AirRefIndex / CoverRefrIndex );
 
 			// transmitted component with absorption only considered:
 			TransAbsOnly( nCover ) = std::exp( -Parameters( ParamNum ).ExtCoefTimesThickness( nCover ) / std::cos( RefrAngle ) );

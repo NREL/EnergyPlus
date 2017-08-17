@@ -864,6 +864,8 @@ namespace TarcogShading {
 		converged = false;
 		iter = 0;
 		Real64 const s_2( pow_2( s ) );
+		Real64 const abs_cos_tilt( std::abs( std::cos( tilt ) ) );
+
 		while ( ! converged ) {
 			++iter;
 			GASSES90( Tgap, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage );
@@ -873,7 +875,7 @@ namespace TarcogShading {
 			//  A = dens0 * T0 * gravity * ABS(cos(tilt)) * ABS(Tgap - Tenv) / (Tgap * Tenv)
 
 			//bi...Bug fix #00005:
-			A = dens0 * T0 * GravityConstant * H * std::abs( std::cos( tilt ) ) * std::abs( Tgap - Tenv ) / ( Tgap * Tenv );
+			A = dens0 * T0 * GravityConstant * H * abs_cos_tilt * std::abs( Tgap - Tenv ) / ( Tgap * Tenv );
 			//  A = dens0 * T0 * GravityConstant * H * ABS(cos(tilt)) * (Tgap - Tenv) / (Tgap * Tenv)
 
 			B1 = dens2 / 2;

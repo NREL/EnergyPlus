@@ -1927,7 +1927,7 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value." );
 				ShowContinueError( cNumericFieldNames( 4 ) + " must be Yes or No, entered value=" + MaterialNames( 4 ) );
 			}
-			// Get SpectralAndAngle table names 
+			// Get SpectralAndAngle table names
 			if ( Material( MaterNum ).GlassSpectralAndAngle ) {
 				if ( lAlphaFieldBlanks( 5 ) ) {
 					ErrorsFound = true;
@@ -5659,7 +5659,6 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > CosPhiIndepVar( 10 ); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
 		int IPhi; // Incidence angle counter
 		Real64 Phi; // Incidence angle (deg)
-		Real64 CosPhi; // Cosine of incidence angle
 		Array1D< Real64 > tsolFit( 10 ); // Fitted solar transmittance vs incidence angle
 		Array1D< Real64 > tvisFit( 10 ); // Fitted visible transmittance vs incidence angle
 		Array1D< Real64 > rfsolFit( 10 ); // Fitted solar front reflectance vs incidence angle
@@ -6084,6 +6083,18 @@ Label20: ;
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
 			++FileLineCount;
 
+			// Pre-calculate constants
+			for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
+			}
+
+			// Pre-calculate constants
+			std::vector< Real64 >CosPhi;
+			for( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				Phi = double( IPhi - 1 ) * 10.0;
+				CosPhi.push_back( std::cos( Phi * DegToRadians ) );
+			}
+
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				ConstrNum = TotConstructs - NGlSys + IGlSys;
 				if ( IGlSys == 1 ) {
@@ -6164,10 +6175,6 @@ Label20: ;
 				Construct( ConstrNum ).W5FileMullionWidth = MullionWidth;
 
 				// Fill Construct with system transmission, reflection and absorption properties
-
-				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
-				}
 
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
@@ -6277,21 +6284,19 @@ Label20: ;
 				}
 
 				// For comparing fitted vs. input distribution in incidence angle
-				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					Phi = double( IPhi - 1 ) * 10.0;
-					CosPhi = std::cos( Phi * DegToRadians );
-					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
-					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef );
-					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef );
-					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef );
+				for ( IPhi = 0; IPhi < 10; ++IPhi ) {
+					if ( std::abs( CosPhi[IPhi] ) < 0.0001 ) CosPhi[IPhi] = 0.0;
+					tsolFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).TransSolBeamCoef );
+					tvisFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).TransVisBeamCoef );
+					rfsolFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).ReflSolBeamFrontCoef );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
-						solabsFit( IGlass, IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
+						solabsFit( IGlass, IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
 				}
 				// end
 
 				// NominalRforNominalUCalculation of this construction (actually the total resistance of all of its layers; gas layer
-				// conductivity here ignores convective efffects in gap.)
+				// conductivity here ignores convective effects in gap.)
 				NominalRforNominalUCalculation( ConstrNum ) = 0.0;
 				for ( loop = 1; loop <= NGlass( IGlSys ) + NGaps( IGlSys ); ++loop ) {
 					MatNum = Construct( ConstrNum ).LayerPoint( loop );
