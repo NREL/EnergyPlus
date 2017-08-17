@@ -662,6 +662,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 	SolarDistribution = FullExterior;
 
 	CalcSkyDifShading = true;
+	SolarShading::InitSolarCalculations();
 	SolarShading::SkyDifSolarShading();
 	CalcSkyDifShading = false;
 

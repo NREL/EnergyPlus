@@ -3487,7 +3487,7 @@ namespace SolarShading {
 		++NumCalcPerSolBeam_Calls;
 #endif
 
-		// Intialize some values for the appropriate period
+		// Initialize some values for the appropriate period
 		if ( ! DetailedSolarTimestepIntegration ) {
 			SunlitFracHR = 0.0;
 			SunlitFrac = 0.0;
@@ -3691,12 +3691,12 @@ namespace SolarShading {
 			WithShdgHoriz = 0.;
 			WoShdgHoriz = 0.;
 
-			for ( int IPhi = 1; IPhi <= NPhi; ++IPhi ) { // Loop over patch altitude values
-				SUNCOS( 3 ) = SinPhi[ IPhi ];
+			for ( int IPhi = 0; IPhi < NPhi; ++IPhi ) { // Loop over patch altitude values
+				SUNCOS( 3 ) = SinPhi[IPhi];
 
-				for ( int ITheta = 1; ITheta <= NTheta; ++ITheta ) { // Loop over patch azimuth values
-					SUNCOS( 1 ) = CosPhi[ IPhi ] * CosTheta[ ITheta ];
-					SUNCOS( 2 ) = CosPhi[ IPhi ] * SinTheta[ ITheta ];
+				for ( int ITheta = 0; ITheta < NTheta; ++ITheta ) { // Loop over patch azimuth values
+					SUNCOS( 1 ) = CosPhi[IPhi] * CosTheta[ITheta];
+					SUNCOS( 2 ) = CosPhi[IPhi] * SinTheta[ITheta];
 
 					for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 						if ( !Surface( SurfNum ).ShadowingSurf && !Surface( SurfNum ).HeatTransSurf ) continue;
@@ -3711,7 +3711,7 @@ namespace SolarShading {
 
 						if ( CTHETA( SurfNum ) < 0.0 ) continue;
 
-						Fac1WoShdg = CosPhi[ IPhi ] * DThetaDPhi * CTHETA( SurfNum );
+						Fac1WoShdg = CosPhi[IPhi] * DThetaDPhi * CTHETA( SurfNum );
 						SurfArea = Surface( SurfNum ).NetAreaShadowCalc;
 						if ( SurfArea > Eps ) {
 							FracIlluminated = SAREA( SurfNum ) / SurfArea;
@@ -3723,7 +3723,7 @@ namespace SolarShading {
 						WoShdgIsoSky( SurfNum ) += Fac1WoShdg;
 
 						// Horizon region
-						if ( IPhi == 1 ) {
+						if ( IPhi == 0 ) {
 							WithShdgHoriz( SurfNum ) += Fac1WithShdg;
 							WoShdgHoriz( SurfNum ) += Fac1WoShdg;
 						}
@@ -8442,12 +8442,12 @@ namespace SolarShading {
 			SetupOutputVariable( "Debug Surface Solar Shading Model WoShdgIsoSky []", WoShdgIsoSky( SurfNum ), "Zone", "Average", Surface( SurfNum ).Name );
 		}
 
-		for ( int IPhi = 1; IPhi <= NPhi; ++IPhi ) { // Loop over patch altitude values
-			SUNCOS( 3 ) = SinPhi[ IPhi ];
+		for ( int IPhi = 0; IPhi < NPhi; ++IPhi ) { // Loop over patch altitude values
+			SUNCOS( 3 ) = SinPhi[IPhi];
 
-			for ( int ITheta = 1; ITheta <= NTheta; ++ITheta ) { // Loop over patch azimuth values
-				SUNCOS( 1 ) = CosPhi[ IPhi ] * CosTheta[ ITheta ];
-				SUNCOS( 2 ) = CosPhi[ IPhi ] * SinTheta[ ITheta ];
+			for ( int ITheta = 0; ITheta < NTheta; ++ITheta ) { // Loop over patch azimuth values
+				SUNCOS( 1 ) = CosPhi[IPhi] * CosTheta[ITheta];
+				SUNCOS( 2 ) = CosPhi[IPhi] * SinTheta[ITheta];
 
 				for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) { // Cosine of angle of incidence on surface of solar
 					// radiation from patch
@@ -8467,7 +8467,7 @@ namespace SolarShading {
 
 					if ( CTHETA( SurfNum ) < 0.0 ) continue;
 
-					Fac1WoShdg = CosPhi[ IPhi ] * DThetaDPhi * CTHETA( SurfNum );
+					Fac1WoShdg = CosPhi[IPhi] * DThetaDPhi * CTHETA( SurfNum );
 					SurfArea = Surface( SurfNum ).NetAreaShadowCalc;
 					if ( SurfArea > Eps ) {
 						FracIlluminated = SAREA( SurfNum ) / SurfArea;
@@ -8479,7 +8479,7 @@ namespace SolarShading {
 					WoShdgIsoSky( SurfNum ) += Fac1WoShdg;
 
 					// Horizon region
-					if ( IPhi == 1 ) {
+					if ( IPhi == 0 ) {
 						WithShdgHoriz( SurfNum ) += Fac1WithShdg;
 						WoShdgHoriz( SurfNum ) += Fac1WoShdg;
 					}
