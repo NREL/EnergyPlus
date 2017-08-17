@@ -2480,6 +2480,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing )
 TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 
 	// Address #6205
+	// Address #6241
 
 	using SingleDuct::SysATMixer;
 	int ATMixerNum = 1;
@@ -2520,8 +2521,15 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 
 	DataEnvironment::StdRhoAir = 1.20;
 	SysATMixer( 1 ).MassFlowRateMaxAvail = 1.0;
+	// Current occupancy
+	SysATMixer( 1 ).OAPerPersonMode = 1;
 	SingleDuct::InitATMixer( 1, true );
 	EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 0.72, 0.0001 );
+	// Design occupancy
+	SysATMixer( 1 ).OAPerPersonMode = 2;
+	Zone( 1 ).TotOccupants = 10;
+	SingleDuct::InitATMixer( 1, true );
+	EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 1.32, 0.0001 );
 
 	SysATMixer.deallocate( );
 	DataZoneEquipment::ZoneEquipConfig.deallocate( );

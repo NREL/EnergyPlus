@@ -103,6 +103,7 @@ namespace DirectAirManager {
 		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
 		int AirLoopNum; // air loop index 
 		int CtrlZoneNum;  // control zone index
+		int OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
 
 		// Default Constructor
 		DirectAirProps() :
@@ -125,7 +126,8 @@ namespace DirectAirManager {
 			NoOAFlowInputFromUser( true ), 
 			OARequirementsPtr( 0 ), 
 			AirLoopNum( 0 ), 
-			CtrlZoneNum( 0 )
+			CtrlZoneNum( 0 ),
+			OAPerPersonMode( 0 )
 		{}
 
 	};
