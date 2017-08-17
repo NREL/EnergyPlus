@@ -57,6 +57,7 @@
 #include <ScheduleManager.hh>
 #include <DataGlobals.hh>
 #include <DataEnvironment.hh>
+#include <DataIPShortCuts.hh>
 
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -280,5 +281,38 @@ TEST_F( EnergyPlusFixture, interpolateWindDirectionTest )
 	EXPECT_EQ( interpolateWindDirection( 10, 200, 0.7 ), 251. );
 	EXPECT_EQ( interpolateWindDirection( 160, 350, 0.3 ), 109. );
 	EXPECT_EQ( interpolateWindDirection( 160, 350, 0.7 ), 41. );
+
+}
+
+TEST_F( EnergyPlusFixture, UnderwaterBoundaryCondition ) {
+
+	// set up dataipshortcuts structure
+	//bool errorsFound = false;
+
+	DataIPShortCuts::cAlphaArgs = Array1D<std::string>({"MyUnderwaterName", "WaterTempSchedule", "WaterVelocitySchedule"});
+	DataIPShortCuts::lAlphaFieldBlanks = Array1D<bool>({false, false, false});
+	DataIPShortCuts::rNumericArgs = Array1D<Real64>({31.415926535});
+
+//	underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
+//	underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+//	if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
+//		ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
+//		errorsFound = true;
+//	}
+//	underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+//	if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+//		ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+//		errorsFound = true;
+//	}
+//	if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
+//		// that's OK, we can have a blank schedule, the water will just have no free stream velocity
+//		underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
+//	} else {
+//		underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+//		if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+//			ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+//			errorsFound = true;
+//		}
+//	}
 
 }

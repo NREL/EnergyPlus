@@ -598,6 +598,36 @@ namespace WeatherManager {
 	}
 
 	bool
+	addUnderwaterBoundary( int i )
+	{
+		bool errorsFound = false;
+		underwaterBoundaries.push_back( UnderwaterBoundary() );
+		underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
+		underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
+		underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+		if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
+			ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
+			errorsFound = true;
+		}
+		underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+		if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+			ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+			errorsFound = true;
+		}
+		if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
+			// that's OK, we can have a blank schedule, the water will just have no free stream velocity
+			underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
+		} else {
+			underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+				ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+				errorsFound = true;
+			}
+		}
+		return errorsFound;
+	}
+
+	bool
 	CheckIfAnyUnderwaterBoundaries()
 	{
 		bool errorsFound = false;
@@ -605,7 +635,6 @@ namespace WeatherManager {
 		DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
 		int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 		for ( int i = 1; i <= Num; i++ ) {
-			underwaterBoundaries.push_back( UnderwaterBoundary() );
 			InputProcessor::GetObjectItem(
 				DataIPShortCuts::cCurrentModuleObject, i, 
 				DataIPShortCuts::cAlphaArgs, 
@@ -618,28 +647,8 @@ namespace WeatherManager {
 				DataIPShortCuts::cAlphaFieldNames, 
 				DataIPShortCuts::cNumericFieldNames
 			);
-			underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
-			underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
-			underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
-			if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
-				ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
-				errorsFound = true;
-			}
-			underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
-			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
-				ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
-				errorsFound = true;
-			}
-			if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
-				// that's OK, we can have a blank schedule, the water will just have no free stream velocity
-				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
-			} else {
-				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
-				if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
-					ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
-					errorsFound = true;
-				}
-			}
+			errorsFound = WeatherManager::addUnderwaterBoundary( i );
+			if ( errorsFound ) break;
 		}
 		if ( errorsFound ) {
 			ShowFatalError( "Previous input problems cause program termination" );
