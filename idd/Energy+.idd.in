@@ -61546,17 +61546,10 @@ OutdoorAir:Node,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, 0.0 to 40.0, units m/s
-  A5 , \field Wind Direction Schedule Name 
+  A5 ; \field Wind Direction Schedule Name 
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, 0.0 to 360.0, units degree
-  A6 ; \field Wind Pressure Coefficient Curve Name 
-       \type object-list
-       \object-list WPCValueNames
-       \object-list UniVariateCurves
-       \object-list UniVariateTables
-       \note The name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues, curve, or table object specifying the wind pressure coefficient.
-
 
 OutdoorAir:NodeList,
        \extensible:1 Just duplicate last field and comments (changing numbering, please)
