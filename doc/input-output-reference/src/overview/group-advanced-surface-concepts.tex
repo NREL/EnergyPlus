@@ -478,6 +478,10 @@ Limitations when using Foundation:Kiva objects include:
   All foundation wall surfaces must be quadrilateral.
 \end{itemize}
 
+For each floor surface with ``Foundation'' set as the ``Outside Boundary Condition''
+there must also be a corresponding ``SurfaceProperty:ExposedFoundationPerimeter''
+object to define how much of the floor perimeter is below exterior walls.
+
 The inputs from Foundation:Kiva objects are translated into Kiva's
 foundation heat transfer model. Kiva\textsuperscript{TM} generates a
 two-dimensional heat transfer calculation to represent heat flow between
@@ -494,9 +498,10 @@ the ceiling of the basement and the exterior wall of the zone above the
 basement refer to ``Surface'' (or ``Zone'') and ``Outdoors'',
 respectively. Note: Not all of the foundation wall surface needs to be
 below grade (see the ``Wall Height Above Grade'' field for this object).
-Any part above grade is modeled in Kiva's two-dimensional heat transfer
-calculations. The non-foundation surfaces are shown in Figure
-\ref{fig:context} for context, but are not part of the Kiva model.
+Any part of the foundation wall above grade is modeled in Kiva's
+two-dimensional heat transfer calculations. The non-foundation surfaces
+are shown in Figure \ref{fig:context} for context, but are not part of the
+Kiva model.
 
 \begin{figure}
 \centering
@@ -769,14 +774,21 @@ Grade}\label{field-wall-height-above-grade}
 
 Distance from the exterior grade to the wall top, in m. Default: 0.2 m
 
-Figure \ref{fig:2d-w} illustrates the definition of both the ``Wall
+Figures \ref{fig:2d-w} and \ref{fig:2d-w-slab} illustrate the definition of both the ``Wall
 Height Above Grade'' and the following field, ``Wall Depth Below Slab''.
 
 \begin{figure}
 \centering
 \includegraphics{media/kiva-2d-wall.png}
 \caption{Definition of exterior grade and footing wall depth relative to
-the wall surface\label{fig:2d-w}}
+the wall surface (for a basement foundation context)\label{fig:2d-w}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-wall-slab.png}
+\caption{Definition of exterior grade and footing wall depth relative to
+the wall surface (for a slab foundation context)\label{fig:2d-w-slab}}
 \end{figure}
 
 \paragraph{Field: Wall Depth Below
@@ -989,7 +1001,9 @@ Williamson, 1989):
 \[d_{wt}=0.1022\cdot d_{elev}\]
 
 If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied, otherwise
-a ZeroFlux boundary is applied at 40 m.
+a ZeroFlux boundary is applied at 40 m. If the calculated ground water depth is
+shallower than any element of the foundation construction, then the GroundWater
+is applied at 1 m below the lowest element.
 
 Default: Autoselect.
 
@@ -1028,8 +1042,7 @@ boundary conditions) defines the perimeter of a foundation floor that is
 exposed to the exterior environment through the floor. The user may
 either define the total exposed perimeter, the fraction of the total
 perimeter that is exposed, or individually define which segments of the
-floor surface perimeter are exposed. This object is optional. By default
-it is assumed that the entire perimeter of each foundation is exposed.
+floor surface perimeter are exposed. This object is required for any floor surface with a Foundation:Kiva boundary condition.
 
 Figure \ref{fig:ex} illustrates how the exposed perimeter is determined
 from a floor plan of the foundation level.
@@ -1060,6 +1073,19 @@ interior foundation wall using an Adiabatic Outside Boundary Condition.
 
 Name of foundation floor surface.
 
+\paragraph{Field: Exposed Perimeter Calculation Method}\label{field-exposed-perimeter-calculation-method}
+
+Required key/choice field that tells which method to use to calculate the exposed foundation perimeter. Choices are:
+
+\begin{itemize}
+\item TotalExposedPerimeter: Exposed perimeter is defined as an absolute distance in m. (The Total Exposed Perimeter field should be filled.)
+
+\item ExposedPerimeterFraction: Exposed perimeter is defined as a fraction of the total floor perimeter. (The Exposed Perimeter Fraction field should be filled.)
+
+\item BySegment: Each segment of the floor polygon (corresponding to distance between each set of vertices) is defined as exposed (``Yes'') or not exposed (``No'') in an extensible list corresponding to the number of vertices in the floor polygon. Exposed perimeter is defined as the sum of all exposed segement lengths. (The Surface Segment \textless{}x\textgreater{}
+Exposed fields should be filled.)
+\end{itemize}
+
 \paragraph{Field: Total Exposed
 Perimeter}\label{field-total-exposed-perimeter}
 
@@ -1075,9 +1101,7 @@ Exposed}\label{field-surface-segment-x-exposed}
 
 Surface Segment \textless{}x\textgreater{} is the perimeter between the
 \textless{}x\textgreater{}th and (\textless{}x\textgreater{}+1)th
-vertices. The default is ``Yes'', so users may elect to only enter
-``No'' for segments that are not exposed and leave the others blank.
-Default: Yes
+vertices.
 
 \subsection{SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections}\label{surfaceconvectionalgorithminsideadaptivemodelselections}
 
