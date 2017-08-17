@@ -4675,6 +4675,7 @@ namespace HeatBalanceManager {
 		MCPTE.dimension( NumOfZones, 0.0 );
 		MCPE.dimension( NumOfZones, 0.0 );
 		EAMFL.dimension( NumOfZones, 0.0 );
+		EAMFLxHumRat.dimension( NumOfZones, 0.0 );
 		MCPTC.dimension( NumOfZones, 0.0 );
 		MCPC.dimension( NumOfZones, 0.0 );
 		CTMFL.dimension( NumOfZones, 0.0 );

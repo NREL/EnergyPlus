@@ -980,7 +980,7 @@ SizingPeriod:DesignDay,
        \note Required only if field Humidity Condition Type is "HumidityRatio".
        \type real
        \units kgWater/kgDryAir
-  N7,  \field Enthalpy at Maximum Dry-Bulb  !will require units transition.
+  N7,  \field Enthalpy at Maximum Dry-Bulb
        \note Enthalpy coincident with the maximum temperature.
        \note Required only if field Humidity Condition Type is "Enthalpy".
        \type real
@@ -7044,62 +7044,79 @@ MaterialProperty:PhaseChangeHysteresis,
        \object-list MaterialName
        \note Regular Material Name to which the additional properties will be added.
        \note this the material name for the basic material properties.
-  N1 , \field Temperature Coefficient for Thermal Conductivity
-       \note The base temperature is 20C.
-       \note This is the thermal conductivity change per degree excursion from 20C.
-       \note This variable conductivity function is overridden by the VariableThermalConductivity object, if present.
-       \units W/m-K2
-       \type real
-       \default 0.0
-  N2 , \field Latent Heat during the Entire Phase Change Process
+  N1 , \field Latent Heat during the Entire Phase Change Process
        \note The total latent heat absorbed or rejected during the transition from solid to liquid, or back
        \required-field
        \units J/kg
        \type real
        \minimum> 0
-  N3 , \field Liquid State Specific Heat
+  N2 , \field Liquid State Thermal Conductivity
+       \note The thermal conductivity used by this material when the material is fully liquid
+       \required-field
+       \units W/mK
+       \type real
+       \minimum> 0
+  N3 , \field Liquid State Density
+       \note The density used by this material when the material is fully liquid
+       \required-field
+       \units kg/m3
+       \type real
+       \minimum> 0
+  N4 , \field Liquid State Specific Heat
        \note The constant specific heat used for the fully melted (liquid) state
        \required-field
        \units J/kg-K
        \type real
        \minimum >0
-  N4 , \field High Temperature Difference of Melting Curve
+  N5 , \field High Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
        \minimum >0
-  N5 , \field Peak Melting Temperature
+  N6 , \field Peak Melting Temperature
        \note The temperature at which the melting curve peaks
        \required-field
        \units C
        \type real
        \minimum >0
-  N6 , \field Low Temperature Difference of Melting Curve
+  N7 , \field Low Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
        \minimum >0
-  N7 , \field Solid State Specific Heat
+  N8 , \field Solid State Thermal Conductivity
+       \note The thermal conductivity used by this material when the material is fully solid
+       \required-field
+       \units W/mK
+       \type real
+       \minimum> 0
+  N9 , \field Solid State Density
+       \note The density used by this material when the material is fully solid
+       \required-field
+       \units kg/m3
+       \type real
+       \minimum> 0
+  N10, \field Solid State Specific Heat
        \note The constant specific heat used for the fully frozen (crystallized) state
        \required-field
        \units J/kg-K
        \type real
        \minimum >0
-  N8 , \field High Temperature Difference of Freezing Curve
+  N11, \field High Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
        \minimum >0
-  N9 , \field Peak Freezing Temperature
+  N12, \field Peak Freezing Temperature
        \note The temperature at which the freezing curve peaks
        \required-field
        \units C
        \type real
        \minimum >0
- N10 ; \field Low Temperature Difference of Freezing Curve
+  N13; \field Low Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
@@ -17789,7 +17806,7 @@ SurfaceProperty:SolarIncidentInside,
        \type object-list
        \object-list ConstructionNames
   A4;  \field Inside Surface Incident Sun Solar Radiation Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \required-field
        \type object-list
        \object-list ScheduleNames
@@ -17808,24 +17825,24 @@ ComplexFenestrationProperty:SolarAbsorbedLayers,
        \type object-list
        \object-list ComplexFenestrationStates
   A4,  \field Layer 1 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \required-field
        \type object-list
        \object-list ScheduleNames
   A5,  \field Layer 2 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A6,  \field Layer 3 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A7,  \field Layer 4 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
   A8;  \field Layer 5 Solar Radiation Absorbed Schedule Name
-       \memo Values in schedule are expected to be in W/m2
+       \note Values in schedule are expected to be in W/m2
        \type object-list
        \object-list ScheduleNames
 
@@ -31730,6 +31747,9 @@ DesignSpecification:OutdoorAir,
       \key AirChanges/Hour
       \key Sum
       \key Maximum
+      \key IndoorAirQualityProcedure
+      \key ProportionalControlBasedOnDesignOccupancy
+      \key ProportionalControlBasedonOccupancySchedule
       \default Flow/Person
       \note Flow/Person => Outdoor Air Flow per Person * Occupancy = Design Flow Rate,
       \note Flow/Area => Outdoor Air Flow per Zone Floor Area * Zone Floor Area = Design Flow Rate,
@@ -31935,7 +31955,7 @@ Sizing:Zone,
       \type real
       \minimum 0
       \default 0.2
-      \note This input is currently used in sizing the Fan minimum Flow Rate.
+      \note This input is currently used in sizing the VAV air terminal unit and fan minimum flow rate
       \note It does not currently affect other component autosizing.
   A6, \field Heating Design Air Flow Method
       \type choice
@@ -40299,11 +40319,20 @@ AirTerminal:SingleDuct:Uncontrolled,
    A3, \field Zone Supply Air Node Name
        \required-field
        \type node
-   N1; \field Maximum Air Flow Rate
+   N1, \field Maximum Air Flow Rate
        \required-field
        \units m3/s
        \minimum 0.0
        \autosizable
+   A4; \field Design Specification Outdoor Air Object Name
+       \type object-list
+       \object-list DesignSpecificationOutdoorAirNames
+       \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
+       \note unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled."
+       \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
+       \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
+       \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate.
+       \note If this field is blank, then the terminal unit will not be controlled for outdoor air flow.
 
 AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \memo Central air system terminal unit, single duct, constant volume, with reheat coil (hot
@@ -40615,12 +40644,12 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
   A3,  \field Air Inlet Node Name
        \type node
        \note The name of the HVAC system node that is the air inlet node for the
-       \note terminal unit. This is also the air inlet node for the unit’s fan.
+       \note terminal unit. This is also the air inlet node for the unit's fan.
   A4,  \field Air Outlet Node Name
        \type node
        \note The name of the HVAC system node that is the air outlet node for the
-       \note terminal unit. This is also the air outlet node for the unit’s heating
-       \note coil’s air outlet node. This node is also a zone inlet node.
+       \note terminal unit. This is also the air outlet node for the unit's heating
+       \note coil's air outlet node. This node is also a zone inlet node.
   A5,  \field Fan Object Type
        \required-field
        \type choice
@@ -41334,7 +41363,7 @@ AirTerminal:SingleDuct:Mixer,
        \note input field mixer Connection Type below is SupplySide, or else this will be an exhaust
        \note air node name of the conditioned zone if the connection type in the input field
        \note Mixer Connection Type below is InletSide.
-   A7; \field Mixer Connection Type
+   A7, \field Mixer Connection Type
        \required-field
        \type choice
        \key InletSide
@@ -41344,6 +41373,15 @@ AirTerminal:SingleDuct:Mixer,
        \note type selected is InletSide, then the mixer is connected on the inlet side of the
        \note ZoneHVAC equipment, or else if the mixer connection type selected is SupplySide, then
        \note the mixer is connected at the outlet side of the ZoneHVAC equipment.
+   A8; \field Design Specification Outdoor Air Object Name
+       \type object-list
+       \object-list DesignSpecificationOutdoorAirNames
+       \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
+       \note unit will adjust flow to meet this outdoor air requirement. 
+       \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
+       \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
+       \note If this field is blank, then the terminal unit will be controlled using the  
+       \note DesignSpecification:OutdoorAir objec referenced in the Sizing:Zone object.   
 
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.
@@ -44764,7 +44802,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N21, \field Speed 2 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44819,7 +44857,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N27, \field Speed 3 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44874,7 +44912,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N33, \field Speed 4 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44929,7 +44967,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N39, \field Speed 5 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -44984,7 +45022,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N45, \field Speed 6 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45039,7 +45077,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N51, \field Speed 7 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45094,7 +45132,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N57, \field Speed 8 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45149,7 +45187,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N63, \field Speed 9 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -45206,7 +45244,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N69, \field Speed 10 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48239,7 +48277,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
         \required-field
    N11, \field Speed 1 Reference Unit Gross Rated Cooling COP
         \units dimensionless
@@ -48327,7 +48365,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N17, \field Speed 2 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48403,7 +48441,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N23, \field Speed 3 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48486,7 +48524,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N29, \field Speed 4 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48569,7 +48607,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N35, \field Speed 5 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48652,7 +48690,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N41, \field Speed 6 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48735,7 +48773,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N47, \field Speed 7 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48818,7 +48856,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N53, \field Speed 8 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48901,7 +48939,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N59, \field Speed 9 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -48984,7 +49022,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
    N65, \field Speed 10 Reference Unit Gross Rated Cooling COP
         \units dimensionless
         \type real
@@ -63390,13 +63428,19 @@ Boiler:Steam,
        \key OtherFuel1
        \key OtherFuel2
   N1 , \field Maximum Operating Pressure
-       \units Kpa
+       \required-field
+       \units Pa
+       \default 160000
   N2 , \field Theoretical Efficiency
+       \required-field
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
+       \default 0.8
   N3 , \field Design Outlet Steam Temperature
+       \required-field
        \units C
+       \default 100
   N4 , \field Nominal Capacity
        \units W
        \autosizable
@@ -69982,7 +70026,6 @@ WaterHeater:HeatPump:PumpedCondenser,
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
@@ -70234,7 +70277,6 @@ WaterHeater:HeatPump:WrappedCondenser,
   N5 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
-       \minimum -5
        \default 10
        \note Heat pump compressor will not operate when the inlet air dry-bulb temperature
        \note is below this value.
@@ -78838,12 +78880,12 @@ DemandManager:Thermostats,
        \units minutes
        \note If blank, duration defaults to the timestep
   N2 , \field Fixed Rate
-       \memo Used in case when Limit strategy is set to FixedRate
+       \note Used in case when Limit strategy is set to FixedRate
        \type real
        \minimum 0.0
        \units m3/s
   N3 , \field Reduction Ratio
-       \memo Used in case when Limit Control is set to ReductionRatio
+       \note Used in case when Limit Control is set to ReductionRatio
        \type real
        \minimum 0.0
        \maximum 1.0

@@ -74,7 +74,6 @@ namespace PoweredInductionUnits {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern Array1D_bool CheckEquipName;
-	extern bool GetPIUInputFlag; // First time, input is "gotten"
 
 	extern int NumPIUs;
 	extern int NumSeriesPIUs;
@@ -252,6 +251,9 @@ namespace PoweredInductionUnits {
 
 	void
 	PIUInducesPlenumAir( int const NodeNum ); // induced air node number
+
+	void
+	clear_state();
 
 } // PoweredInductionUnits
 

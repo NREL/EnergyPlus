@@ -177,7 +177,7 @@ namespace BoilerSteam {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subrountine controls the boiler component simulation
+		// This subroutine controls the boiler component simulation
 
 		// METHODOLOGY EMPLOYED: na
 
@@ -369,6 +369,10 @@ namespace BoilerSteam {
 
 			// INPUTS from the IDF file
 			Boiler( BoilerNum ).BoilerMaxOperPress = rNumericArgs( 1 );
+			if ( Boiler( BoilerNum ).BoilerMaxOperPress < 1e5 ) {
+				ShowWarningMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
+				ShowContinueError( "Field: Maximum Operation Pressure units are Pa. Verify units." );
+			}
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			Boiler( BoilerNum ).TempUpLimitBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).NomCap = rNumericArgs( 4 );

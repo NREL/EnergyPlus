@@ -325,26 +325,8 @@ namespace ZoneTempPredictorCorrector {
 		// depending on the simulation status and determines the correct
 		// temperature setpoint for each zone from the schedule manager.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  INTEGER :: zoneloop
@@ -409,9 +391,18 @@ namespace ZoneTempPredictorCorrector {
 		using General::CheckCreatedZoneItemName;
 		using WeatherManager::NumDaysInYear;
 
+<<<<<<< HEAD
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneAirSetpoints: " );
 
+=======
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetZoneAirSetpoints: " );
+
+		// DERIVED TYPE DEFINITIONS:
+
+>>>>>>> NREL/develop
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TempControlledZoneNum; // The Splitter that you are currently loading input into
 		int NumAlphas;
@@ -2083,12 +2074,6 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculate the monthly running average dry bulb temperature;
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 
 		using WeatherManager::NumDaysInYear;
@@ -2101,12 +2086,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2229,12 +2208,6 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculate the zone operative temperature setpoint using adaptive comfort model.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using WeatherManager::DesDayInput;
 		using WeatherManager::NumDaysInYear;
@@ -2243,12 +2216,6 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int const summerDesignDayTypeIndex( 9 );
@@ -2325,25 +2292,14 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataSurfaces::Surface;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitZoneAirSetpoints: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -2697,94 +2653,6 @@ namespace ZoneTempPredictorCorrector {
 			} //Demand manager
 		}
 
-		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
-			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
-				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-			if ( TempControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
-				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-		}
-		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
-			if ( ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
-				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
-					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-			if ( ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
-				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
-
-				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
-
-				} else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
-					// do nothing
-				} else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
-					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else if ( SELECT_CASE_var == DualSetPointFanger ) {
-					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
-				} else {
-					// Do nothing
-				}}
-			}
-
-		}
-
 		if ( ErrorsFound ) {
 			ShowFatalError( "InitZoneAirSetpoints - program terminates due to previous condition." );
 		}
@@ -2836,9 +2704,6 @@ namespace ZoneTempPredictorCorrector {
 		//     the type of system being simulated.
 		// 3.  Calculate zone energy requirements
 
-		// REFERENCES:
-		// na
-
 		// USE STATEMENTS:
 
 		// Using/Aliasing
@@ -2874,15 +2739,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 SumIntGain; // Zone sum of convective internal gains
@@ -3158,12 +3014,6 @@ namespace ZoneTempPredictorCorrector {
 		// This routine sets what the setpoints for each controlled zone should be based on schedules.
 		// This is called each time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleValuesForDay;
@@ -3172,17 +3022,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneControls::OccRoomTSetPointCool;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RelativeZoneNum;
@@ -3381,6 +3220,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		if ( NumComfortControlledZones > 0 ) CalcZoneAirComfortSetPoints();
+		OverrideAirSetPointsforEMSCntrl( );
 
 	}
 
@@ -3397,12 +3237,6 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates the predicted system load for a time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataLoopNode::Node;
@@ -3410,15 +3244,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 LoadToHeatingSetPoint;
@@ -3747,12 +3572,6 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcPredictedHumidityRatio" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 LatentGain; // Zone latent load
 		Real64 RhoAir;
@@ -3950,7 +3769,7 @@ namespace ZoneTempPredictorCorrector {
 				B = ( LatentGain / H2OHtOfVap ) + AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW + SumHmARaW( ZoneNum );
 				A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
 			} else {
-				B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
+				B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
 				A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 			}
 			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
@@ -4064,12 +3883,6 @@ namespace ZoneTempPredictorCorrector {
 		// This subroutine updates the zone air temperature and modifies the system
 		// time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataRoomAirModel::AirModel;
@@ -4108,12 +3921,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CorrectZoneAirTemp" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CpAir; // specific heat of air
@@ -4525,24 +4332,9 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		static std::string const CorrectZoneAirTemp( "CorrectZoneAirTemp" );
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -4646,24 +4438,7 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -4758,25 +4533,6 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
 		int LoopNode;
@@ -4843,9 +4599,6 @@ namespace ZoneTempPredictorCorrector {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine updates the zone humidities.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron
 		// for BLAST.
@@ -4867,12 +4620,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CorrectZoneHumRat" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NodeNum;
@@ -5013,7 +4760,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Check for the flow and NO flow condition
 		if ( ZoneMassFlowRate > 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
+			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
 			A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 				// Multizone airflow calculated in AirflowNetwork
@@ -5022,7 +4769,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 		} else if ( ZoneMassFlowRate <= 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutHumRat ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum );
+			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum );
 			A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 				// Multizone airflow calculated in AirflowNetwork
@@ -5106,23 +4853,7 @@ namespace ZoneTempPredictorCorrector {
 		// The down step ratio, DSRatio = OldTimeStep/ NewTimeStep
 		//  is expected to be roughly integer-valued and near 2.0 or 3.0 or 4.0 or more.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 oldTime0;
@@ -5215,12 +4946,6 @@ namespace ZoneTempPredictorCorrector {
 		// If Tref is not used at all, SumHATref = 0, and SumHA /= 0.
 		// For future implementations, Tref can be easily converted into an array to
 		// allow a different reference temperature to be specified for each surface.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using namespace DataSurfaces;
@@ -5525,9 +5250,6 @@ namespace ZoneTempPredictorCorrector {
 		//  they are not necessarily proper averages for what happend over entire zone time step
 		//  these are not mulitplied by zone multipliers.
 		//  The values are all Watts.
-
-		// METHODOLOGY EMPLOYED:
-		// na
 
 		// REFERENCES:
 		// Equation 5 in Engineering Reference.
@@ -5868,9 +5590,20 @@ namespace ZoneTempPredictorCorrector {
 		// This function verifies that a zone (by name) has a Zone Control:Thermostatic
 		// object entered.
 
+<<<<<<< HEAD
 		// Return value
 		bool HasThermostat; // True if does, false if not.
 
+=======
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		bool HasThermostat; // True if does, false if not.
+
+		// Locals
+
+>>>>>>> NREL/develop
 		if ( GetZoneAirStatsInputFlag ) {
 			GetZoneAirSetPoints();
 			GetZoneAirStatsInputFlag = false;
@@ -5906,7 +5639,15 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::EquipConfiguration;
 
+<<<<<<< HEAD
 		return ( UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName ) > 0 );
+=======
+		// Return value
+
+		// Locals
+
+		return ( FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName ) > 0 );
+>>>>>>> NREL/develop
 	}
 
 	void
@@ -5928,27 +5669,7 @@ namespace ZoneTempPredictorCorrector {
 		// until that is reached unless it goes to less than the
 		// MinTimeStepSys.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iZone;
@@ -6040,24 +5761,11 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// pass in data and alter setpoint if needed
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalance::MRT;
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 thisMRT; // local variable for mean radiant temperature in this zone
@@ -6097,12 +5805,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine adjust the operative setpoints for each controlled adaptive thermal comfort models.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataEnvironment::DayOfYear;
@@ -6177,29 +5879,12 @@ namespace ZoneTempPredictorCorrector {
 		// This routine sets the thermal comfort setpoints for each controlled zone based on air tempeature
 		// obtained from thermal comfort models.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using General::TrimSigDigits;
 		using ThermalComfort::ManageThermalComfort;
 
 		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RelativeZoneNum;
@@ -6498,11 +6183,6 @@ namespace ZoneTempPredictorCorrector {
 		// obtained from thermal comfort models.
 		// This is called each time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using General::SolveRoot;
@@ -6515,12 +6195,6 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Acc( 0.001 ); // accuracy control for SolveRoot
 		int const MaxIter( 500 ); // iteration control for SolveRoot
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tmin; // Minimun drybulb setpoint temperature
@@ -6693,6 +6367,138 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 	}
+
+	void
+	OverrideAirSetPointsforEMSCntrl(
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   June 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine overrides the air temperature setpoint based on EMS
+
+		// Locals
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Loop; // index of temp control
+		int ZoneNum; // Zone index
+
+		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
+			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
+				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
+
+				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+			if ( TempControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
+				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
+
+				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
+			if ( ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
+				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
+				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointFanger ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideHeatingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+			if ( ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointOn ) {
+				ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
+				{ auto const SELECT_CASE_var( ComfortControlType( ZoneNum ) );
+
+				if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+				}
+				else if ( SELECT_CASE_var == SglHeatSetPointFanger ) {
+					// do nothing
+				}
+				else if ( SELECT_CASE_var == SglCoolSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == SglHCSetPointFanger ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else if ( SELECT_CASE_var == DualSetPointFanger ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = ComfortControlledZone( Loop ).EMSOverrideCoolingSetPointValue;
+				}
+				else {
+					// Do nothing
+				}}
+			}
+
+		}
+
+	}
+
 
 } // ZoneTempPredictorCorrector
 

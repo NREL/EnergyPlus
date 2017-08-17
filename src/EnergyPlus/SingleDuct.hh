@@ -67,6 +67,7 @@ namespace SingleDuct {
 	extern int const ReverseAction;
 	extern int const ReverseActionWithLimits;
 	extern int const HeatingActionNotUsed;
+	extern int const NormalEnforceVavMinForHtg; //TRANE, special version of Normal where (re)heating flow rates are enforced.
 	// SysTypes represented here
 	extern int const SingleDuctVAVReheat;
 	extern int const SingleDuctConstVolReheat;
@@ -294,8 +295,14 @@ namespace SingleDuct {
 		Real64 MixedAirEnthalpy; // mixed air in enthalpy
 		Real64 MixedAirPressure; // mixed air in pressure
 		Real64 MixedAirMassFlowRate; // mixed air in mass flow rate
-		Real64 MaxAirMassFlowRate; // maximum air mass flow rate allowed through component
+		Real64 MassFlowRateMaxAvail; // maximum air mass flow rate allowed through component
 
+		int ZoneEqNum;
+		int ZoneNum;
+		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
+		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
+		int AirLoopNum; //System sizing adjustments
+		Real64 DesignPrimaryAirVolRate; //System sizing adjustments, filled from design OA spec using sizing mode flags.
 		// Default Constructor
 		AirTerminalMixerData() :
 			MixerType( 0 ),
@@ -318,7 +325,13 @@ namespace SingleDuct {
 			MixedAirEnthalpy( 0.0 ),
 			MixedAirPressure( 0.0 ),
 			MixedAirMassFlowRate( 0.0 ),
-			MaxAirMassFlowRate( 0.0 )
+			MassFlowRateMaxAvail( 0.0 ),
+			ZoneEqNum( 0 ), 
+			ZoneNum( 0 ), 
+			NoOAFlowInputFromUser( true ), 
+			OARequirementsPtr( 0 ), 
+			AirLoopNum( 0 ), 
+			DesignPrimaryAirVolRate( 0.0 )
 		{}
 
 	};
