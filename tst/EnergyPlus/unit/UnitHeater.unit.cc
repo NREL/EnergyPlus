@@ -2429,7 +2429,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 	EXPECT_EQ( ZoneEquipmentManager::PrioritySimOrder( 2 ).EquipName, "UNITHEATER" );
 	EXPECT_EQ( HeatingCoils::HeatingCoil( 2 ).Name, "UNITHEATER_ELECTRICHEATER" );
 	// check the reheat coil output
-	EXPECT_NEAR( HeatingCoils::HeatingCoil( 1 ).HeatingCoilRate, 7015.5, 1.0 );
+	EXPECT_NEAR( HeatingCoils::HeatingCoil( 1 ).HeatingCoilRate, 7028.9, 1.0 );
 	// check the unit heater heating coil output
 	EXPECT_EQ( HeatingCoils::HeatingCoil( 2 ).HeatingCoilRate, 0.0 );
 
@@ -2456,7 +2456,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 	// check the reheat coil outputis the full capacity
 	EXPECT_NEAR( HeatingCoils::HeatingCoil( 1 ).HeatingCoilRate, 17542.3, 1.0 );
 	// check the unit heater heating coil is handling the remaining load
-	EXPECT_NEAR( HeatingCoils::HeatingCoil( 2 ).HeatingCoilRate, 223.7, 1.0 );
+	EXPECT_NEAR( HeatingCoils::HeatingCoil( 2 ).HeatingCoilRate, 213.9, 1.0 );
 	// finaly check that RemaingingOutputRequired is zero
 	EXPECT_EQ( ZoneSysEnergyDemand( 1 ).RemainingOutputRequired, 0.0 );
 
