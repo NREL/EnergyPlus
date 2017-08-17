@@ -5023,7 +5023,7 @@ namespace SingleDuct {
 			this->OneTimeInitFlag = false;
 		}
 
-		// Once FirstHVACIteration is true we should know the airloopnumbers
+		// Keep trying until we find it, the airloopnum, that is
 		if ( this->OneTimeInitFlag2 ){
 			this->AirLoopNum = DataZoneEquipment::ZoneEquipConfig( DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqNum ).InletNodeAirLoopNum( this->CtrlZoneInNodeIndex );
 			if (this->AirLoopNum > 0 ) {

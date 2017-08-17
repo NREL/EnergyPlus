@@ -2710,7 +2710,10 @@ namespace HVACUnitarySystem {
 		bool ErrorFlag( false ); // true if errors detected in GetUnitarySystemInputData
 
 		// Flow
-		GetUnitarySystemInputData( ErrorFlag );
+		if ( GetInputFlag ) { //First time subroutine has been entered
+			GetUnitarySystemInputData( ErrorFlag );
+			GetInputFlag = false;
+		}
 
 		if( ErrorFlag ) {
 			ShowFatalError( RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem input. Preceding condition(s) causes termination." );
