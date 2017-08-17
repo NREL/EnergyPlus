@@ -257,16 +257,6 @@ namespace AirflowNetworkBalanceManager {
         bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
     );
 
-	Real64
-	CalcLocalWindPressure(
-		int const curve, // Curve index, change this to pointer after curve refactor
-		Real64 const azimuth, // Azimuthal angle of surface
-		Real64 const windSpeed, // Wind speed of an air node
-		Real64 const windDir, // Wind direction of an air node
-		Real64 const dryBulb, // Dry bulb temperature of an air node
-		Real64 const humRat // Humidity ratio of an air node
-	);
-
 	void
 	CalcAirflowNetworkHeatBalance();
 

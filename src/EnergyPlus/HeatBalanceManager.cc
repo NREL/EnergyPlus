@@ -4551,6 +4551,7 @@ namespace HeatBalanceManager {
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
 		using DataHeatBalance::ZoneLocalEnvironment;
+		using DataLoopNode::Node;
 		using DataLoopNode::NodeType_Air;
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::ObjectIsParent;
@@ -4960,6 +4961,8 @@ namespace HeatBalanceManager {
 				if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
 					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
 						Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+						Real64 ts = Zone(ZoneNum).OutDryBulbTemp;
+						ts = 0;
 					}
 					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWetBulb ) {
 						Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );

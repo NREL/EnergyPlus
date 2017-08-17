@@ -23494,7 +23494,6 @@ AirflowNetwork:MultiZone:Surface,
   A3, \field External Node Name
       \type object-list
       \object-list ExternalNodeNames
-	  \object-list OutdoorAirNodeNames
       \note Used if Wind Pressure Coefficient Type = Input in the AirflowNetwork:SimulationControl object,
       \note otherwise this field may be left blank.
   N1, \field Window/Door Opening Factor, or Crack Factor

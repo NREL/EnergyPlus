@@ -787,7 +787,6 @@ namespace WindowEquivalentLayer {
 		using DataGlobals::StefanBoltzmann;
 		using DataEnvironment::SkyTempKelvin;
 		using DataEnvironment::IsRain;
-		using DataGlobals::AnyLocalEnvironmentsInModel;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using namespace DataHeatBalFanSys;
 
@@ -957,20 +956,18 @@ namespace WindowEquivalentLayer {
 			    // X Luo added Aug 2017
 			    // Calculate LWR from surrounding surfaces if defined for an exterior window
 				QRadLWOutSrdSurfs( SurfNum ) = 0;
-				if ( AnyLocalEnvironmentsInModel ) {
-					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
-						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
-						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
-							Surface( SurfNum ).ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
-						}
-						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
-							Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
-						}					
-						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
-							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
-							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
-							QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
-						}
+				if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+					SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+						Surface( SurfNum ).ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+					}
+					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+						Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+					}					
+					for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+						SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+						SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+						QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
 					}
 				}
 				if ( Surface( SurfNum ).ExtWind ) { // Window is exposed to wind (and possibly rain)

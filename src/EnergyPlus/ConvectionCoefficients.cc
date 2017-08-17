@@ -566,21 +566,21 @@ namespace ConvectionCoefficients {
 		TGround = TAir;
 
 		
-		if ( AnyLocalEnvironmentsInModel ) {
-			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
-				SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
-				if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum != 0 ) {
-					TSky = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum );
-				}
-				if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum != 0 ) {
-					TGround = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum );
-				}
+
+		if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+			SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+			if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum != 0 ) {
+				TSky = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum );
+			}
+			if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum != 0 ) {
+				TGround = GetCurrentScheduleValue(SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum );
 			}
 		}
 
+
 		BaseSurf = Surface( SurfNum ).BaseSurf; // If this is a base surface, BaseSurf = SurfNum
 
-		SurfWindDir = Surface( SurfNum ).WindDir;
+		SurfWindDir = Surface(SurfNum).WindDir;
 
 		if ( ! Surface( SurfNum ).ExtWind ) {
 			SurfWindSpeed = 0.0; // No wind exposure
@@ -6161,7 +6161,7 @@ namespace ConvectionCoefficients {
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
 			}
-			SurfWindDir = Surface( SurfNum ).WindDir;
+			SurfWindDir = Surface(SurfNum).WindDir;
 			Hf = CalcClearRoof( SurfNum, TH( 1, 1, SurfNum ), Surface( SurfNum ).OutDryBulbTemp, SurfWindSpeed, SurfWindDir, Surface( SurfNum ).OutConvFaceArea, Surface( SurfNum ).OutConvFacePerimeter );
 		} else if ( SELECT_CASE_var == HcExt_BlockenWindward ) {
 			//TODO: check if suppose to use global here

@@ -53,8 +53,6 @@
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
 #include <UtilityRoutines.hh>
-#include <DataLoopNode.hh>
-#include <ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -390,8 +388,6 @@ namespace DataEnvironment {
 
 	}
 
-
-
 	Real64
 	OutWetBulbTempAt( Real64 const Z ) // Height above ground (m)
 	{
@@ -534,161 +530,6 @@ namespace DataEnvironment {
 
 		return LocalWindSpeed;
 
-	}
-
-	Real64
-	DryBulbTempAtNode( int NodeNum )  // OutdoorAir:Node Number
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         X Luo
-		//       DATE WRITTEN   August 2017
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Calculates local dry bulb temperature at a given node.
-
-		// Using/Aliasing
-		using DataLoopNode::Node;
-
-		// Return value
-		Real64 LocalDryBumpTemp; // Return result for function (m/s)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		if ( NodeNum == 0 ) {
-			LocalDryBumpTemp = OutDryBulbTemp;
-		}
-		else {
-			LocalDryBumpTemp = Node( NodeNum ).OutAirDryBulb;
-		}
-		return LocalDryBumpTemp;
-	}
-
-	Real64
-	WetBulbTempAtNode( int NodeNum )  // OutdoorAir:Node Number
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         X Luo
-		//       DATE WRITTEN   August 2017
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Calculates local wet bulb temperature at a given node.
-
-		// Using/Aliasing
-		using DataLoopNode::Node;
-
-		// Return value
-		Real64 LocalWetBumpTemp; // Return result for function (m/s)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		if ( NodeNum == 0 ) {
-			LocalWetBumpTemp = OutWetBulbTemp;
-		}
-		else {
-			LocalWetBumpTemp = Node( NodeNum ).OutAirWetBulb;
-		}
-		return LocalWetBumpTemp;
-	}
-
-	Real64
-	WindSpeedAtNode( int NodeNum ) // OutdoorAir:Node Number
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         X Luo
-		//       DATE WRITTEN   August 2017
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Calculates local wind speed at a given node.
-
-		// Using/Aliasing
-		using DataLoopNode::Node;
-
-		// Return value
-		Real64 LocalWindSpeed; // Return result for function (m/s)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		if ( NodeNum == 0 ) {
-			LocalWindSpeed = WindSpeed;
-		}
-		else {
-			LocalWindSpeed = Node( NodeNum ).OutAirWindSpeed;
-		}
-		return LocalWindSpeed;
-	}
-
-	Real64
-	WindDirAtNode( int NodeNum ) // OutdoorAir:Node Number
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         X Luo
-		//       DATE WRITTEN   August 2017
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Calculates local wind direction at a given node.
-
-		// Using/Aliasing
-		using DataLoopNode::Node;
-
-		// Return value
-		Real64 LocalWindDir; // Return result for function (m/s)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		if ( NodeNum == 0 ) {
-			LocalWindDir = WindDir;
-		}
-		else {
-			LocalWindDir = Node( NodeNum ).OutAirWindDir;
-		}
-		return LocalWindDir;
-	}
-
-	Real64
-	HumRatAtNode( int NodeNum ) // OutdoorAir:Node Number
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         X Luo
-		//       DATE WRITTEN   August 2017
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Calculates local humunity ratio at a given node.
-
-		// Using/Aliasing
-		using DataLoopNode::Node;
-
-		// Return value
-		Real64 LocalHumRat; // Return result for function (m/s)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		if ( NodeNum == 0 ) {
-			LocalHumRat = OutHumRat;
-		}
-		else {
-			LocalHumRat = Node( NodeNum ).HumRat;
-		}
-		return LocalHumRat;
 	}
 
 	Real64

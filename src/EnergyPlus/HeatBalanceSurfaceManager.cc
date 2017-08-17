@@ -379,7 +379,6 @@ namespace HeatBalanceSurfaceManager {
 		Real64 QIC; // Intermediate calculation variable
 		Real64 QOC; // Intermediate calculation variable
 		int SurfNum; // DO loop counter for surfaces
-		int SrdSurfsNum; // DO loop counter for srd surfaces
 		int Term; // DO loop counter for conduction equation terms
 		Real64 TSC; // Intermediate calculation variable (temperature at source location)
 		Real64 TUC; // Intermediate calculation variable (temperature at user specified location)
@@ -448,21 +447,19 @@ namespace HeatBalanceSurfaceManager {
 
 		// X Luo Added 07/30/2017
 		// Set surface data to linked air node value 
-		if ( AnyLocalEnvironmentsInModel ) {
-			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-				if ( Surface( SurfNum ).HasLinkedOutAirNode ) {
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
-						Surface( SurfNum).OutDryBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWetBulb) {
-						Surface( SurfNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWindSpeed) {
-						Surface( SurfNum ).WindSpeed = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWindDir) {
-						Surface( SurfNum ).WindDir = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
-					}
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			if ( Surface( SurfNum ).HasLinkedOutAirNode ) {
+				if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
+					Surface( SurfNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+				}
+				if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWetBulb ) {
+					Surface( SurfNum ).OutWetBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
+				}
+				if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWindSpeed ) {
+					Surface( SurfNum ).WindSpeed = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
+				}
+				if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWindDir ) {
+					Surface( SurfNum ).WindDir = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
 				}
 			}
 		}
@@ -485,16 +482,15 @@ namespace HeatBalanceSurfaceManager {
 				}
 			}
 		}
-		if ( AnyLocalEnvironmentsInModel ) {
-			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-				if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
-					SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
-					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
-						Surface( SurfNum ).ViewFactorSkyIR *= SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
-					}
-					if (SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor != -1 ) {
-						Surface( SurfNum ).ViewFactorGroundIR *= SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
-					}
+
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+				int SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+				if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+					Surface( SurfNum ).ViewFactorSkyIR *= SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+				}
+				if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor != -1 ) {
+					Surface( SurfNum ).ViewFactorGroundIR *= SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
 				}
 			}
 		}

@@ -217,21 +217,6 @@ namespace DataEnvironment {
 	Real64
 	OutBaroPressAt( Real64 const Z ); // Height above ground (m)
 
-	Real64
-	DryBulbTempAtNode( int NodeNum );
-
-	Real64
-	WetBulbTempAtNode( int NodeNum );
-
-	Real64
-	HumRatAtNode( int NodeNum );
-
-	Real64
-	WindSpeedAtNode( int NodeNum );
-
-	Real64
-	WindDirAtNode( int NodeNum );
-
 	void
 	SetOutBulbTempAt_error(
 		std::string const & Settings,

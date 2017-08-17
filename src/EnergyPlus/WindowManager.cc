@@ -2759,21 +2759,19 @@ namespace WindowManager {
 				// TODO: Update report vars
 				// TODO: Check how view factor overridden back for window
 				QRadLWOutSrdSurfs( SurfNum ) = 0;
-				if ( AnyLocalEnvironmentsInModel ) {
-					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
-						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
-						// Real64 test = surface.ViewFactorSkyIR;
-						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
-							surface.ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
-						}
-						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
-							surface.ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
-						}					
-						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
-							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
-							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
-							QRadLWOutSrdSurfs( SurfNum ) += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
-						}
+				if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+					SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+					// Real64 test = surface.ViewFactorSkyIR;
+					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+						surface.ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+					}
+					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+						surface.ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+					}					
+					for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+						SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+						SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+						QRadLWOutSrdSurfs( SurfNum ) += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
 					}
 				}
 				if ( surface.ExtWind ) { // Window is exposed to wind (and possibly rain)
