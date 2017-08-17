@@ -642,7 +642,7 @@ namespace ZoneAirLoopEquipmentManager {
 					} else {
 						DesFlowRatio = 1.0;
 					}
-					MassFlowRateUpStreamLeakMax = AirDistUnit( AirDistUnitNum ).UpStreamLeakFrac * Node( InNodeNum ).MassFlowRateMax * DesFlowRatio;
+					MassFlowRateUpStreamLeakMax = max( AirDistUnit( AirDistUnitNum ).UpStreamLeakFrac * Node( InNodeNum ).MassFlowRateMax * DesFlowRatio, 0.0 );
 					if ( MassFlowRateMaxAvail > MassFlowRateUpStreamLeakMax ) {
 						AirDistUnit( AirDistUnitNum ).MassFlowRateUpStrLk = MassFlowRateUpStreamLeakMax;
 						Node( InNodeNum ).MassFlowRateMaxAvail = MassFlowRateMaxAvail - MassFlowRateUpStreamLeakMax;

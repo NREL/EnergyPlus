@@ -1806,13 +1806,7 @@ namespace SingleDuct {
 
 			Sys( SysNum ).AirMassFlowDuringReheatMax = Sys( SysNum ).MaxAirVolFlowRateDuringReheat * StdRhoAir;
 
-			// set the upstream leakage flowrate
-			ADUNum = Sys( SysNum ).ADUNum;
-			if ( AirDistUnit( ADUNum ).UpStreamLeak ) {
-				AirDistUnit( ADUNum ).MassFlowRateUpStrLk = Sys( SysNum ).AirMassFlowRateMax * AirDistUnit( ADUNum ).UpStreamLeakFrac;
-			} else {
-				AirDistUnit( ADUNum ).MassFlowRateUpStrLk = 0.0;
-			}
+			// set the upstream leakage flowrate - remove from here - done in ZoneAirLoopEquipmentManager::SimZoneAirLoopEquipment
 
 			if ( Sys( SysNum ).ReheatComp_Num == HCoilType_SteamAirHeating ) {
 				SteamTemp = 100.0;
