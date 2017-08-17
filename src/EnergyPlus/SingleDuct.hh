@@ -334,17 +334,17 @@ namespace SingleDuct {
 			MixedAirPressure( 0.0 ),
 			MixedAirMassFlowRate( 0.0 ),
 			MassFlowRateMaxAvail( 0.0 ),
+			ADUNum( 0 ),
+			TermUnitSizingIndex( 0 ),
+			OneTimeInitFlag( true ),
+			OneTimeInitFlag2( true ),
 			ZoneEqNum( 0 ), 
 			CtrlZoneInNodeIndex( 0 ),
 			ZoneNum( 0 ), 
 			NoOAFlowInputFromUser( true ), 
 			OARequirementsPtr( 0 ), 
 			AirLoopNum( 0 ), 
-			DesignPrimaryAirVolRate( 0.0 ),
-			ADUNum( 0 ),
-			TermUnitSizingIndex( 0 ),
-			OneTimeInitFlag( true ),
-			OneTimeInitFlag2( true )
+			DesignPrimaryAirVolRate( 0.0 )
 		{}
 
 		void

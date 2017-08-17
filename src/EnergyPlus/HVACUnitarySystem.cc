@@ -1271,8 +1271,6 @@ namespace HVACUnitarySystem {
 		Real64 DeltaMassRate; // DIFference of mass flow rate between
 		// inlet node and system outlet node
 		int i; // index to get the zone inlet node
-		int j;
-		int k;
 		Real64 MassFlowRate; // mass flow rate to calculate loss
 		Real64 MaxTemp; // Maximum temperature used in latent loss calculation
 		int EquipNum( 0 ); // local DO loop index for zone equipment
