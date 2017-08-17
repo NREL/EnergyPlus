@@ -139,6 +139,11 @@ namespace DataSizing {
 	extern int const ZOAM_Sum; // sum the outdoor air flow rate of the people component and the space floor area component
 	extern int const ZOAM_Max; // use the maximum of the outdoor air flow rate of the people component and
 	// the space floor area component
+	extern int const ZOAM_IAQP; // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
+	extern int const ZOAM_ProportionalControlSchOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+												   // to calculate the zone level outdoor air flow rates based on scheduled occupancy
+	extern int const ZOAM_ProportionalControlDesOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+												   // to calculate the zone level outdoor air flow rates based on design occupancy
 
 	//System Outdoor Air Method
 	extern int const SOAM_ZoneSum; // Sum the outdoor air flow rates of all zones
@@ -327,7 +332,6 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
-		bool DesCoolMinAirFlowFracUsInpFlg; // user input for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -372,7 +376,6 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
-			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			DesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -427,7 +430,6 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
-		bool DesCoolMinAirFlowFracUsInpFlg; // user flag for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -597,7 +599,6 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
-			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			InpDesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -1268,6 +1269,10 @@ namespace DataSizing {
 		Real64 OAFlowACH; // - OA requirement per zone per hour
 		int OAFlowFracSchPtr; // - Fraction schedule applied to total OA requirement
 		int OAPropCtlMinRateSchPtr; // - Fraction schedule applied to Proportional Control Minimum Outdoor Air Flow Rate 
+		int CO2MaxMinLimitErrorCount; // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
+		int CO2MaxMinLimitErrorIndex; // Index for max CO2 concentration < min CO2 concentration recurring error message for SOAM_ProportionalControlSchOcc
+		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+		int CO2GainErrorIndex; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
 
 		// Default Constructor
 		OARequirementsData() :
@@ -1277,7 +1282,11 @@ namespace DataSizing {
 			OAFlowPerZone( 0.0 ),
 			OAFlowACH( 0.0 ),
 			OAFlowFracSchPtr( DataGlobals::ScheduleAlwaysOn ),
-			OAPropCtlMinRateSchPtr( DataGlobals::ScheduleAlwaysOn )
+			OAPropCtlMinRateSchPtr( DataGlobals::ScheduleAlwaysOn ),
+			CO2MaxMinLimitErrorCount( 0 ),
+			CO2MaxMinLimitErrorIndex( 0 ),
+			CO2GainErrorCount( 0 ),
+			CO2GainErrorIndex( 0 )
 		{}
 
 	};

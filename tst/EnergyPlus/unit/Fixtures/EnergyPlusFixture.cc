@@ -107,6 +107,7 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -317,6 +318,7 @@ namespace EnergyPlus {
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
 		clearFacilityElectricPowerServiceObject();
+		EarthTube::clear_state();
 		EconomicLifeCycleCost::clear_state();
 		EconomicTariff::clear_state();
 		EMSManager::clear_state();
