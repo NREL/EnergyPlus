@@ -336,15 +336,16 @@ namespace SingleDuct {
 			NoOAFlowInputFromUser( true ), 
 			OARequirementsPtr( 0 ), 
 			AirLoopNum( 0 ), 
-			DesignPrimaryAirVolRate( 0.0 )
-			MaxAirMassFlowRate( 0.0 ),
+			DesignPrimaryAirVolRate( 0.0 ),
 			ADUNum( 0 ),
 			TermUnitSizingIndex( 0 ),
 			OneTimeInitFlag( true )
 		{}
 
 		void
-		InitATMixer();
+		InitATMixer(
+			bool const FirstHVACIteration
+		);
 
 	};
 

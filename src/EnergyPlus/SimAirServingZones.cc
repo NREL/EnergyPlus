@@ -1723,7 +1723,7 @@ namespace SimAirServingZones {
 										TermInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode;
 										TermUnitSizingNumsHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).TermUnitSizingIndex;
 										if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
-										if (ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
+										if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									}
 									FoundSupPathZoneConnect = true;
 
