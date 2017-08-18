@@ -7943,12 +7943,12 @@ namespace WindowManager {
 					//     Proceed in reverse order such that the last calculation yields zero sun angle to window screen normal (angles=0,0).
 					//     The properties calculated at zero sun angle are then used elsewhere prior to the start of the actual simulation.
 					for ( j = N; j >= 1; --j ) {
-						Real64 SunAzimuth( ( 90.0 / N ) * ( j - 1 ) * ( Pi / 180.0 ) ); // Azimuth angle of sun during integration
-						Real64 sin_SunAzimuth( std::sin( SunAzimuth ) );
-						Real64 cos_SunAzimuth( std::cos( SunAzimuth ) );
+						Real64 SunAzimuth = ( 90.0 / N ) * ( j - 1 ) * ( Pi / 180.0 ); // Azimuth angle of sun during integration
+						Real64 sin_SunAzimuth = std::sin( SunAzimuth );
+						Real64 cos_SunAzimuth = std::cos( SunAzimuth );
 						for ( i = M; i >= 1; --i ) {
-							Real64 SunAltitude( ( 90.0 / M ) * ( i - 1 ) * ( Pi / 180.0 ) ); // Altitude angle of sun during integration
-							Real64 sin_SunAltitude( std::sin( SunAltitude ) );
+							Real64 SunAltitude = ( 90.0 / M ) * ( i - 1 ) * ( Pi / 180.0 ); // Altitude angle of sun during integration
+							Real64 sin_SunAltitude = std::sin( SunAltitude );
 							SkyArea = sin_SunAltitude * std::cos( SunAltitude );
 							//         Integrate transmittance using coordinate transform
 							RelativeAzimuth = std::asin( sin_SunAltitude * cos_SunAzimuth ); // phi prime

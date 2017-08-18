@@ -789,7 +789,7 @@ namespace HeatBalanceHAMTManager {
 					Material( matid ).divs = Material( matid ).divmax;
 				}
 				// Check length of cell - reduce number of divisions if necessary
-				Real64 const sin_negPIOvr2( std::sin( -Pi / 2.0 ) );
+				Real64 const sin_negPIOvr2 = std::sin( -Pi / 2.0 );
 				while ( true ) {
 					testlen = Material( matid ).Thickness * ( ( std::sin( Pi * ( -1.0 / double( Material( matid ).divs ) ) - Pi / 2.0 ) / 2.0 ) - ( sin_negPIOvr2 / 2.0 ) );
 					if ( testlen > adjdist ) break;

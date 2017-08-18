@@ -1950,7 +1950,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2005,6 +2005,13 @@ namespace FuelCellElectricGenerator {
 		Tkel = ( FluidTemp + KelvinConv );
 		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
 
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
+
 		for ( thisConstit = 1; thisConstit <= FuelCell( GeneratorNum ).AirSup.NumConstituents; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AirSup.GasLibID( thisConstit );
 			if ( gasID > 0 ) {
@@ -2016,7 +2023,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2027,7 +2034,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 
 				}
 			}
@@ -2046,7 +2053,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2103,6 +2110,13 @@ namespace FuelCellElectricGenerator {
 
 		tempHair = 0.0;
 
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 		for ( thisConstit = 1; thisConstit <= FuelCell( GeneratorNum ).AirSup.NumConstituents; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AirSup.GasLibID( thisConstit );
 			if ( gasID > 0 ) {
@@ -2116,7 +2130,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					HairI = ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H );
+					HairI = ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H );
 
 					tempHair += HairI * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 
@@ -2129,7 +2143,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHair += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
+					tempHair += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 				}
 			}
 		}
@@ -2147,7 +2161,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2200,6 +2214,12 @@ namespace FuelCellElectricGenerator {
 
 		tempCp = 0.0;
 
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 		for ( thisConstit = 1; thisConstit <= FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).NumConstituents; ++thisConstit ) {
 			gasID = FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).GasLibID( thisConstit );
 			if ( gasID > 0 ) {
@@ -2211,7 +2231,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2221,7 +2241,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 
 				}
 			}
@@ -2240,7 +2260,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2297,6 +2317,13 @@ namespace FuelCellElectricGenerator {
 
 		tempHfuel = 0.0;
 
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 		for ( thisConstit = 1; thisConstit <= FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).NumConstituents; ++thisConstit ) {
 			gasID = FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).GasLibID( thisConstit );
 			if ( gasID > 0 ) {
@@ -2309,7 +2336,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					HfuelI = ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H );
+					HfuelI = ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H );
 
 					tempHfuel += HfuelI * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 
@@ -2323,7 +2350,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHfuel += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
+					tempHfuel += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 				}
 			}
 		}
@@ -2341,7 +2368,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2397,6 +2424,13 @@ namespace FuelCellElectricGenerator {
 
 		tempHprodGases = 0.0;
 
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 		for ( thisConstit = 1; thisConstit <= 5; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).FCPM.GasLibID( thisConstit );
 			if ( gasID > 0 ) {
@@ -2409,7 +2443,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					tempHprodGases += ( ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempHprodGases += ( ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
 					A1 = GasPhaseThermoChemistryData( gasID ).NASA_A1;
@@ -2419,7 +2453,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHprodGases += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
+					tempHprodGases += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
 				}
 			} // gasid > 0
 		}
@@ -2502,6 +2536,13 @@ namespace FuelCellElectricGenerator {
 
 		tempCp = 0.0;
 
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).FCPM.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).FCPM.GasLibID( thisConstit );
 			if ( gasID > 0 ) {
@@ -2513,7 +2554,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2523,7 +2564,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2609,6 +2650,13 @@ namespace FuelCellElectricGenerator {
 
 		tempCp = 0.0;
 
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).AuxilHeat.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AuxilHeat.GasLibID( thisConstit );
 			if ( gasID > 0 ) {
@@ -2620,7 +2668,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2630,7 +2678,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2716,6 +2764,13 @@ namespace FuelCellElectricGenerator {
 
 		tempCp = 0.0;
 
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).ExhaustHX.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).ExhaustHX.GasLibID( thisConstit );
 			if ( gasID > 0 ) {
@@ -2727,7 +2782,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2737,7 +2792,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2757,7 +2812,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   December 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2817,7 +2872,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   December 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na

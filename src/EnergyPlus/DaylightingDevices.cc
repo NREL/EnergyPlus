@@ -992,8 +992,8 @@ namespace DaylightingDevices {
 		int const NPH( 1000 ); // Number of altitude integration points
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 FluxInc( 0.0 );   // Incident solar flux
-		Real64 FluxTrans( 0.0 ); // Transmitted solar flux
+		Real64 FluxInc = 0.0;    // Incident solar flux
+		Real64 FluxTrans = 0.0 ; // Transmitted solar flux
 		Real64 trans;            // Total beam solar transmittance of TDD
 
 		Real64 const dPH = 90.0 * DegToRadians / NPH; // Altitude angle of sky element
@@ -1057,8 +1057,8 @@ namespace DaylightingDevices {
 		int const NTH( 18 ); // Number of azimuth integration points
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 FluxInc( 0.0 );   // Incident solar flux
-		Real64 FluxTrans( 0.0 ); // Transmitted solar flux
+		Real64 FluxInc = 0.0;   // Incident solar flux
+		Real64 FluxTrans = 0.0; // Transmitted solar flux
 		Real64 CosPhi; // Cosine of TDD:DOME altitude angle
 		Real64 Theta; // TDD:DOME azimuth angle
 
@@ -1067,13 +1067,13 @@ namespace DaylightingDevices {
 
 		if ( CosPhi > 0.01 ) { // Dome has a view of the horizon
 			// Integrate over the semicircle
-			Real64 const THMIN( Theta - PiOvr2 );           // Minimum azimuth integration limit
-			Real64 const THMAX( Theta + PiOvr2 );           // Maximum azimuth integration limit
-			Real64 const dTH( 180.0 * DegToRadians / NTH ); // Azimuth angle increment
-			Real64 TH( THMIN + 0.5 * dTH );                 // Azimuth angle of sky horizon element
+			Real64 const THMIN = Theta - PiOvr2;            // Minimum azimuth integration limit
+			Real64 const THMAX = Theta + PiOvr2;            // Maximum azimuth integration limit
+			Real64 const dTH = 180.0 * DegToRadians / NTH ; // Azimuth angle increment
+			Real64 TH = THMIN + 0.5 * dTH;                  // Azimuth angle of sky horizon element
 
 			// Calculate incident angle between dome outward normal and horizon element
-			Real64 COSI( CosPhi * std::cos( TH - Theta ) ); // Cosine of the incident angle
+			Real64 COSI = CosPhi * std::cos( TH - Theta );  // Cosine of the incident angle
 
 			for ( int N = 1; N <= NTH; ++N ) {
 

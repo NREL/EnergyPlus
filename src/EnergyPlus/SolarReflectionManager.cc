@@ -395,9 +395,9 @@ namespace SolarReflectionManager {
 			// Phi = 0 at the horizon; Phi = Pi/2 at the zenith
 
 			PhiSurf = std::asin( SolReflRecSurf( RecSurfNum ).NormVec.z );
-			Real64 const tan_PhiSurf( std::tan( PhiSurf ) );
-			Real64 const sin_PhiSurf( std::sin( PhiSurf ) );
-			Real64 const cos_PhiSurf( std::cos( PhiSurf ) );
+			Real64 const tan_PhiSurf = std::tan( PhiSurf );
+			Real64 const sin_PhiSurf = std::sin( PhiSurf );
+			Real64 const cos_PhiSurf = std::cos( PhiSurf );
 
 			if ( std::abs( SolReflRecSurf( RecSurfNum ).NormVec.x ) > 1.0e-5 || std::abs( SolReflRecSurf( RecSurfNum ).NormVec.y ) > 1.0e-5 ) {
 				ThetaSurf = std::atan2( SolReflRecSurf( RecSurfNum ).NormVec.y, SolReflRecSurf( RecSurfNum ).NormVec.x );
@@ -1163,9 +1163,9 @@ namespace SolarReflectionManager {
 		Real64 const DTheta( 2.0 * Pi / ( 2.0 * AzimAngStepsForSolReflCalc ) ); // Azimuth increment (radians)
 
 		// Pre-compute these constants
-		// Initialize the 0 index with null so the iterators line up below
-		std::vector<Real64> sin_Phi( {NULL} );
-		std::vector<Real64> cos_Phi( {NULL} );
+		// Initialize the 0 index with  so the iterators line up below
+		std::vector<Real64> sin_Phi( { NULL } );
+		std::vector<Real64> cos_Phi( { NULL } );
 		for( int IPhi = 1; IPhi <= ( AltAngStepsForSolReflCalc / 2 ); ++IPhi ) {
 			Real64 Phi( ( IPhi - 0.5 ) * DPhi); // Altitude angle and increment (radians)
 			sin_Phi.push_back( std::sin( Phi ) );

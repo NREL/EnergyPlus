@@ -516,10 +516,10 @@ namespace GroundHeatExchangers {
 
 		Real64 pipeOuterRadius = pipeOutDia / 2.0;
 
-		Real64 const cos_theta( std::cos( theta ) );
-		Real64 const sin_theta( std::sin( theta ) );
-		Real64 const cos_eta( std::cos( eta ) );
-		Real64 const sin_eta( std::sin( eta ) );
+		Real64 const cos_theta = std::cos( theta );
+		Real64 const sin_theta = std::sin( theta );
+		Real64 const cos_eta = std::cos( eta );
+		Real64 const sin_eta = std::sin( eta );
 
 		Real64 x = X0( n ) + cos_theta * ( coilDiameter / 2.0 );
 		Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );
@@ -570,10 +570,10 @@ namespace GroundHeatExchangers {
 
 		Real64 pipeOuterRadius = pipeOutDia / 2.0;
 
-		Real64 const sin_theta( std::sin( theta ) );
-		Real64 const cos_theta( std::cos( theta ) );
-		Real64 const sin_eta( std::sin( eta ) );
-		Real64 const cos_eta( std::cos( eta ) );
+		Real64 const sin_theta = std::sin( theta );
+		Real64 const cos_theta = std::cos( theta );
+		Real64 const sin_eta = std::sin( eta );
+		Real64 const cos_eta = std::cos( eta );
 
 		Real64 x = X0( n ) + cos_theta * ( coilDiameter / 2.0 );
 		Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );

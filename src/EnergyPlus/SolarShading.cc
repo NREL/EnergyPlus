@@ -251,13 +251,13 @@ namespace SolarShading {
 	Array1D< Real64 > YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
 	int maxNumberOfFigures( 0 );
 
-	int const NPhi( 6 ); // Number of altitude angle steps for sky integration
-	int const NTheta( 24 ); // Number of azimuth angle steps for sky integration
-	Real64 const Eps( 1.e-10 ); // Small number
-	Real64 const DPhi( PiOvr2 / NPhi ); // Altitude step size
-	Real64 const DTheta( 2.0 * Pi / NTheta ); // Azimuth step size
-	Real64 const DThetaDPhi( DTheta * DPhi ); // Product of DTheta and DPhi
-	Real64 const PhiMin( 0.5 * DPhi ); // Minimum altitude
+	int const NPhi = 6; // Number of altitude angle steps for sky integration
+	int const NTheta = 24; // Number of azimuth angle steps for sky integration
+	Real64 const Eps = 1.e-10; // Small number
+	Real64 const DPhi = PiOvr2 / NPhi; // Altitude step size
+	Real64 const DTheta = 2.0 * Pi / NTheta; // Azimuth step size
+	Real64 const DThetaDPhi = DTheta * DPhi; // Product of DTheta and DPhi
+	Real64 const PhiMin = 0.5 * DPhi; // Minimum altitude
 
 	std::vector< Real64 > sin_Phi;
 	std::vector< Real64 > cos_Phi;
@@ -8587,8 +8587,8 @@ namespace SolarShading {
 		ElevSun = PiOvr2 - std::acos( SolCosVec.z );
 		AzimSun = std::atan2( SolCosVec.x, SolCosVec.y );
 
-		Real64 const cos_ElevSun( std::cos( ElevSun ) );
-		Real64 const sin_ElevSun( std::sin( ElevSun ) );
+		Real64 const cos_ElevSun = std::cos( ElevSun );
+		Real64 const sin_ElevSun = std::sin( ElevSun );
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 
