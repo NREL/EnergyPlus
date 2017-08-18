@@ -4836,6 +4836,7 @@ namespace HeatBalanceManager {
 		using namespace WindowManager;
 		using namespace SolarShading;
 		using DataLoopNode::Node;
+		using DataSurfaces::Surface;
 		using OutAirNodeManager::SetOutAirNodes;
 		using DaylightingDevices::InitDaylightingDevices;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -4860,6 +4861,9 @@ namespace HeatBalanceManager {
 		int SurfNum; // Surface number
 		int ZoneNum;
 		static bool ChangeSet( true ); // Toggle for checking storm windows
+
+		static gio::Fmt ShdFracFmtName( "(A, A)" );
+		static gio::Fmt fmtN( "('\n')" );
 
 		// FLOW:
 
@@ -4921,6 +4925,14 @@ namespace HeatBalanceManager {
 				}
 				ChangeSet = true;
 			}
+		}
+
+		if ( BeginSimFlag && DataSystemVariables::ReportExtShadingSunlitFrac ) {
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, fmtA, flags ) << "Surface Name,"; }
+			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, ShdFracFmtName, flags ) << Surface( SurfNum ).Name << ","; }
+			}
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, fmtN, flags ); }
 		}
 
 		if ( BeginDayFlag ) {
@@ -5523,6 +5535,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
 		static gio::Fmt EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
+		static gio::Fmt EndOfDataFormat( "(\"End of Data\")" ); // Signifies the end of the data block in the output file
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5532,12 +5545,13 @@ namespace HeatBalanceManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  LOGICAL, SAVE :: PrintEnvrnStamp=.FALSE.
-
+		int write_stat;
 		// FLOW:
 
 		// Time step level reporting:
 
 		ReportScheduleValues();
+		
 		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );

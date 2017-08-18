@@ -261,6 +261,7 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileBNDetails, flags );
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
 			gio::close( DataGlobals::OutputDElightIn, flags );
+			gio::close( DataGlobals::OutputFileShadingFrac, flags );
 
 		}
 	}

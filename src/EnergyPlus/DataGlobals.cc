@@ -195,6 +195,7 @@ namespace DataGlobals {
 	int OutputFileSysSizing( 0 ); // Unit number of system sizing calc output file
 	int OutputFileMeters( 0 ); // Unit number for meters output
 	std::ostream * mtr_stream( nullptr ); // Internal stream used for mtr output (used for performance)
+	int OutputFileShadingFrac( 0 ); // Unit number for shading output
 	int StdMeterRecordCount( 0 ); // Count of Meter output records
 	int OutputFileBNDetails( 0 ); // Unit number for Branch-Node Details
 	int OutputDElightIn( 0 ); // Unit number for the DElight In file
@@ -287,6 +288,7 @@ namespace DataGlobals {
 		OutputFileZoneSizing = 0;
 		OutputFileSysSizing = 0;
 		OutputFileMeters = 0;
+		OutputFileShadingFrac = 0;
 		StdMeterRecordCount = 0;
 		OutputFileBNDetails = 0;
 		ZoneSizingCalc = false;

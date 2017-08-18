@@ -173,6 +173,7 @@ namespace DataGlobals {
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
+	extern int OutputFileShadingFrac; // Unit number for shading output
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
 	extern int OutputDElightIn; // Unit number for the DElight In file

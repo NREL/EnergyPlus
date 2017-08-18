@@ -6099,7 +6099,7 @@ namespace SurfaceGeometry {
 					}
 					if ( SurfLocalEnvironment( Loop ).ExtShadingSchedPtr != 0 ) {
 						Surface( SurfLoop ).SchedExternalShadingFrac = true;
-						Surface( SurfLoop ).SchedShadowSurfIndex = SurfLocalEnvironment( Loop ).ExtShadingSchedPtr;
+						Surface( SurfLoop ).ExternalShadingSchInd = SurfLocalEnvironment( Loop ).ExtShadingSchedPtr;
 					}
 					if ( SurfLocalEnvironment( Loop ).SurroundingSurfsPtr != 0 ) {
 						Surface( SurfLoop ).HasSurroundingSurfProperties = true;
