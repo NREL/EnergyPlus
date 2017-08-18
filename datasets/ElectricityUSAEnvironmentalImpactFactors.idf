@@ -3,6 +3,9 @@
 !
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Output:EnvironmentalImpactFactors,
     Monthly;                 !- Reporting Frequency
 

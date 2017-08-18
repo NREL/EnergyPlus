@@ -2159,12 +2159,12 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
@@ -2191,12 +2191,12 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -2223,12 +2223,12 @@
     Heat Recovery Demand Outlet Node,  !- Demand Side Outlet Node Name
     Heat Recovery Demand Side Branches,  !- Demand Side Branch List Name
     Heat Recovery Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Heat Recovery Water Loop,!- Plant or Condenser Loop Name
@@ -2689,7 +2689,7 @@
   Chiller:EngineDriven,
     Big Chiller,             !- Name
     WaterCooled,             !- Condenser Type
-    autosize,                  !- Nominal Capacity {W}
+    autosize,                !- Nominal Capacity {W}
     2.75,                    !- Nominal COP {W/W}
     Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
     Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
@@ -2701,8 +2701,8 @@
     35.0,                    !- Design Condenser Inlet Temperature {C}
     2.778,                   !- Temperature Rise Coefficient
     6.67,                    !- Design Chilled Water Outlet Temperature {C}
-    autosize,                  !- Design Chilled Water Flow Rate {m3/s}
-    autosize,                  !- Design Condenser Water Flow Rate {m3/s}
+    autosize,                !- Design Chilled Water Flow Rate {m3/s}
+    autosize,                !- Design Condenser Water Flow Rate {m3/s}
     0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
     -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
     -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
@@ -2724,17 +2724,17 @@
     150,                     !- Design Minimum Exhaust Temperature {C}
     DIESEL,                  !- Fuel Type
     45500,                   !- Fuel Higher Heating Value {kJ/kg}
-    autosize,                 !- Design Heat Recovery Water Flow Rate {m3/s}
+    autosize,                !- Design Heat Recovery Water Flow Rate {m3/s}
     Big Chiller Heat Rec Inlet Node,  !- Heat Recovery Inlet Node Name
     Big Chiller Heat Rec Outlet Node,  !- Heat Recovery Outlet Node Name
     LeavingSetpointModulated,!- Chiller Flow Mode
     80.0,                    !- Maximum Temperature for Heat Recovery at Heat Recovery Outlet Node {C}
     ,                        !- Sizing Factor
-    ,                        !- Basin Heater Capacity
-    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
     1.0;                     !- Condenser Heat Recovery Relative Capacity Fraction
-    
+
   SetpointManager:Scheduled,
     Big Chiller Setpoint Manager,  !- Name
     Temperature,             !- Control Variable

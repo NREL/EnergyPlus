@@ -2283,7 +2283,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE1-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2419,7 +2419,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE2-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2478,7 +2478,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE3-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2537,7 +2537,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE4-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2596,7 +2596,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE5-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name

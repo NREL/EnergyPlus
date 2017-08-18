@@ -35,10 +35,12 @@
   Output:DebuggingData,0,0;
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
+    1.,                      !- Name
+    1.,                      !- Zone or ZoneList Name
     1.,                      !- Temperature Capacity Multiplier
-    1.,                      !- Humidity Capacity Multiplier
-    1.,                      !- Carbon Dioxide Capacity Multiplier
-    1.0;                     !- Generic Contaminant Capacity Multiplier
+    1.0,                     !- Humidity Capacity Multiplier
+    ,                        !- Carbon Dioxide Capacity Multiplier
+    ;                        !- Generic Contaminant Capacity Multiplier
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
