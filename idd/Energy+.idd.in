@@ -7049,7 +7049,7 @@ MaterialProperty:PhaseChangeHysteresis,
   N2 , \field Liquid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully liquid
        \required-field
-       \units W/mK
+       \units W/m-K
        \type real
        \minimum> 0
   N3 , \field Liquid State Density
@@ -7085,7 +7085,7 @@ MaterialProperty:PhaseChangeHysteresis,
   N8 , \field Solid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully solid
        \required-field
-       \units W/mK
+       \units W/m-K
        \type real
        \minimum> 0
   N9 , \field Solid State Density
@@ -20642,7 +20642,7 @@ GasEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20722,7 +20722,7 @@ HotWaterEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20789,7 +20789,7 @@ SteamEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20871,7 +20871,7 @@ OtherEquipment,
        \ip-units Btu/h-ft2
   N3 , \field Power per Person
        \type real
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -35069,7 +35069,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \type real
        \maximum 10.0
        \minimum> 0.0
-       \units Kg/s
+       \units kg/s
        \default 0.063
   A5,  \field Heating Design Capacity Method
        \type choice
@@ -44646,7 +44646,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note must be lower than or equal to the highest speed number
    N3,  \field Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -44737,7 +44737,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note throughout the entire simulation.
    N13, \field Speed 1 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -44802,7 +44802,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N19, \field Speed 2 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N20, \field Speed 2 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44857,7 +44857,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N25, \field Speed 3 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N26, \field Speed 3 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44912,7 +44912,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N31, \field Speed 4 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N32, \field Speed 4 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44967,7 +44967,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N37, \field Speed 5 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N38, \field Speed 5 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45022,7 +45022,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N43, \field Speed 6 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N44, \field Speed 6 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45077,7 +45077,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N49, \field Speed 7 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N50, \field Speed 7 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45132,7 +45132,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N55, \field Speed 8 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N56, \field Speed 8 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45187,7 +45187,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N61, \field Speed 9 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N62, \field Speed 9 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45244,7 +45244,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N67, \field Speed 10 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N68, \field Speed 10 Reference Unit Gross Rated Sensible Heat Ratio
@@ -47255,7 +47255,7 @@ Coil:Heating:DX:VariableSpeed,
         \default 2
         \note must be lower than or equal to the highest speed number
    N3,  \field Rated Heating Capacity At Selected Nominal Speed Level
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -47337,7 +47337,7 @@ Coil:Heating:DX:VariableSpeed,
         \ip-units W
    N12, \field Speed 1 Reference Unit Gross Rated Heating Capacity
        \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -47385,7 +47385,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N15, \field Speed 2 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N16, \field Speed 2 Reference Unit Gross Rated Heating COP
@@ -47426,7 +47426,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N18, \field Speed 3 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N19, \field Speed 3 Reference Unit Gross Rated Heating COP
@@ -47467,7 +47467,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N21, \field Speed 4 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 4 Reference Unit Gross Rated Heating COP
@@ -47508,7 +47508,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N24, \field Speed 5 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N25, \field Speed 5 Reference Unit Gross Rated Heating COP
@@ -47549,7 +47549,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N27, \field Speed 6 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N28, \field Speed 6 Reference Unit Gross Rated Heating COP
@@ -47590,7 +47590,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N30, \field Speed 7 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N31, \field Speed 7 Reference Unit Gross Rated Heating COP
@@ -47631,7 +47631,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N33, \field Speed 8 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N34, \field Speed 8 Reference Unit Gross Rated Heating COP
@@ -47672,7 +47672,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N36, \field Speed 9 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N37, \field Speed 9 Reference Unit Gross Rated Heating COP
@@ -47713,7 +47713,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N39, \field Speed 10 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N40, \field Speed 10 Reference Unit Gross Rated Heating COP
@@ -48235,7 +48235,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note must be lower than or equal to the highest speed number
    N3,  \field Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -48276,7 +48276,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note PLR = part load ratio (cooling load/steady state capacity)
    N9,  \field Speed 1 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -48365,7 +48365,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N15, \field Speed 2 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N16, \field Speed 2 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48441,7 +48441,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N21, \field Speed 3 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 3 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48524,7 +48524,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N27, \field Speed 4 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N28, \field Speed 4 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48607,7 +48607,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N33, \field Speed 5 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N34, \field Speed 5 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48690,7 +48690,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N39, \field Speed 6 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N40, \field Speed 6 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48773,7 +48773,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N45, \field Speed 7 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N46, \field Speed 7 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48856,7 +48856,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N51, \field Speed 8 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N52, \field Speed 8 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48939,7 +48939,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N57, \field Speed 9 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N58, \field Speed 9 Reference Unit Gross Rated Sensible Heat Ratio
@@ -49022,7 +49022,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N63, \field Speed 10 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N64, \field Speed 10 Reference Unit Gross Rated Sensible Heat Ratio
@@ -49217,7 +49217,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \default 2
         \note must be lower than or equal to the highest speed number
    N3,  \field Rated Heating Capacity At Selected Nominal Speed Level
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -49242,7 +49242,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note PLR = part load ratio (heating load/steady state capacity)
    N6,  \field Speed 1 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -49325,7 +49325,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N11, \field Speed 2 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N12, \field Speed 2 Reference Unit Gross Rated Heating COP
@@ -49397,7 +49397,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N16, \field Speed 3 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N17, \field Speed 3 Reference Unit Gross Rated Heating COP
@@ -49475,7 +49475,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N21, \field Speed 4 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 4 Reference Unit Gross Rated Heating COP
@@ -49553,7 +49553,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N26, \field Speed 5 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N27, \field Speed 5 Reference Unit Gross Rated Heating COP
@@ -49631,7 +49631,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N31, \field Speed 6 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N32, \field Speed 6 Reference Unit Gross Rated Heating COP
@@ -49709,7 +49709,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N36, \field Speed 7 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N37, \field Speed 7 Reference Unit Gross Rated Heating COP
@@ -49787,7 +49787,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N41, \field Speed 8 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N42, \field Speed 8 Reference Unit Gross Rated Heating COP
@@ -49865,7 +49865,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N46, \field Speed 9 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N47, \field Speed 9 Reference Unit Gross Rated Heating COP
@@ -49943,7 +49943,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N51, \field Speed 10 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N52, \field Speed 10 Reference Unit Gross Rated Heating COP
@@ -69121,7 +69121,7 @@ HeatExchanger:FluidToFluid,
         \default Ideal
    N3 , \field Heat Exchanger U-Factor Times Area Value
         \type real
-        \units W/k
+        \units W/K
         \minimum> 0.0
         \autosizable
         \required-field
@@ -79106,7 +79106,7 @@ Generator:CombustionTurbine,
        \note typical value .9
        \maximum 2
   N7, \field Maximum Exhaust Flow per Unit of Power Output
-      \units (Kg/s)/W
+      \units (kg/s)/W
   N8, \field Design Minimum Exhaust Temperature
        \units C
   N9, \field Design Air Inlet Temperature
