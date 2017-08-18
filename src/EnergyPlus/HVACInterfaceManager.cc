@@ -156,20 +156,20 @@ namespace HVACInterfaceManager {
 		if ( ( CalledFrom == CalledFromAirSystemDemandSide ) && ( OutletNode == 0 ) ) {
 			// Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
-			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = true;
-			AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 1 ) = true;
-			AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 1 ) = true;
-			AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 1 ) = true;
-			AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 1 ) = true;
+			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 1 ) = false;
 
-			int totDemandSideMassFlow = 0.0;
-			int totDemandSideMinAvail = 0.0;
-			int totDemanSideMaxAvail = 0.0;
-			for ( int demIn = 1; demIn <  DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumSupplyNodes; ++demIn ) {
+			Real64 totDemandSideMassFlow = 0.0;
+			Real64 totDemandSideMinAvail = 0.0;
+			Real64 totDemandSideMaxAvail = 0.0;
+			for ( int demIn = 1; demIn <= DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumSupplyNodes; ++demIn ) {
 				int demInNode =  DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).ZoneEquipSupplyNodeNum( demIn );
 				totDemandSideMassFlow +=  Node( demInNode ).MassFlowRate;
 				totDemandSideMinAvail +=  Node( demInNode ).MassFlowRateMinAvail;
-				totDemanSideMaxAvail +=  Node( demInNode ).MassFlowRateMaxAvail;
+				totDemandSideMaxAvail +=  Node( demInNode ).MassFlowRateMaxAvail;
 			}
 			TmpRealARR = AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue;
 			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) = std::abs( totDemandSideMassFlow - Node( InletNode ).MassFlowRate );
@@ -181,7 +181,7 @@ namespace HVACInterfaceManager {
 
 			Node( InletNode ).MassFlowRate = totDemandSideMassFlow;
 			Node( InletNode ).MassFlowRateMinAvail = totDemandSideMinAvail;
-			Node( InletNode ).MassFlowRateMaxAvail = totDemanSideMaxAvail;
+			Node( InletNode ).MassFlowRateMaxAvail = totDemandSideMaxAvail;
 			return;
 		}
 
