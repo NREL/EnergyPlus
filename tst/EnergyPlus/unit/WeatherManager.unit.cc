@@ -288,54 +288,54 @@ TEST_F( EnergyPlusFixture, interpolateWindDirectionTest )
 TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated ) {
 
 	std::string const idf_objects = delimited_string({
-        "SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, WaterVelocitySchedule;",
-        "Schedule:Constant, WaterTempSchedule, , 30;",
-        "Schedule:Constant, WaterVelocitySchedule, , 3.0;"
-        "SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"
-    });
-    ASSERT_FALSE(process_idf(idf_objects));
+		"SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, WaterVelocitySchedule;",
+		"Schedule:Constant, WaterTempSchedule, , 30;",
+		"Schedule:Constant, WaterVelocitySchedule, , 3.0;"
+		"SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"
+	});
+	ASSERT_FALSE(process_idf(idf_objects));
 
 	// need to populate the OSCM array by calling the get input for it
 	bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(errorsFound);
-    EXPECT_FALSE(errorsFound);
-    EXPECT_EQ(DataSurfaces::TotOSCM, 1);
-    
-    // then process the input for this underwater surface
-    bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
-    EXPECT_TRUE(shouldBeTrue);
-    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
-    EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
+	SurfaceGeometry::GetOSCMData(errorsFound);
+	EXPECT_FALSE(errorsFound);
+	EXPECT_EQ(DataSurfaces::TotOSCM, 1);
+	
+	// then process the input for this underwater surface
+	bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+	EXPECT_TRUE(shouldBeTrue);
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
+	EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
-    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
-    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);    
-    
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);    
+	
 }
 
 TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK ) {
 
 	std::string const idf_objects = delimited_string({
-        "SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, ;",
-        "Schedule:Constant, WaterTempSchedule, , 30;",
-        "SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"
-    });
-    ASSERT_FALSE(process_idf(idf_objects));
+		"SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, ;",
+		"Schedule:Constant, WaterTempSchedule, , 30;",
+		"SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"
+	});
+	ASSERT_FALSE(process_idf(idf_objects));
 
 	// need to populate the OSCM array by calling the get input for it
 	bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(errorsFound);
-    EXPECT_FALSE(errorsFound);
-    EXPECT_EQ(DataSurfaces::TotOSCM, 1);
-    
-    // then process the input for this underwater surface
-    bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
-    EXPECT_TRUE(shouldBeTrue);
-    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
-    EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
+	SurfaceGeometry::GetOSCMData(errorsFound);
+	EXPECT_FALSE(errorsFound);
+	EXPECT_EQ(DataSurfaces::TotOSCM, 1);
+	
+	// then process the input for this underwater surface
+	bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+	EXPECT_TRUE(shouldBeTrue);
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
+	EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
-    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
-    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 0);
-    
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 0);
+	
 }
 
 TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients ) {
