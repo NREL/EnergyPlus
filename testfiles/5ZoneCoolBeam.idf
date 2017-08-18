@@ -2603,8 +2603,8 @@
     Mixed Air Node 1,        !- Air Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
     ,                        !- Condensate Collection Water Storage Tank Name
-    6.0;                     !- Design Water Temperature Difference
- 
+    6.0;                     !- Design Water Temperature Difference {deltaC}
+
   Coil:Heating:Water,
     Main Heating Coil 1,     !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
@@ -2621,7 +2621,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name

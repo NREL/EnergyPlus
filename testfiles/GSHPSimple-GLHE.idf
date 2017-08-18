@@ -1310,10 +1310,10 @@
     GshpCLG SourceSide Outlet Node,  !- Source Side Outlet Node Name
     GshpCLG LoadSide Inlet Node,  !- Load Side Inlet Node Name
     GshpCLG LoadSide Outlet Node,  !- Load Side Outlet Node Name
-    1.89E-03,                !- Rated Load Side Flow Rate {m3/s}
-    1.89E-03,                !- Rated Source Side Flow Rate {m3/s}
-    39890.91,                !- Rated Cooling Capacity {W}
-    4790.00,                 !- Rated Cooling Power Consumption {W}
+    1.89E-03,                !- Reference Load Side Flow Rate {m3/s}
+    1.89E-03,                !- Reference Source Side Flow Rate {m3/s}
+    39890.91,                !- Reference Cooling Capacity {W}
+    4790.00,                 !- Reference Cooling Power Consumption {W}
     -1.52030596,             !- Cooling Capacity Coefficient 1
     3.46625667,              !- Cooling Capacity Coefficient 2
     -1.32267797,             !- Cooling Capacity Coefficient 3
@@ -1600,10 +1600,10 @@
     GshpHeating SourceSide Outlet Node,  !- Source Side Outlet Node Name
     GshpHeating LoadSide Inlet Node,  !- Load Side Inlet Node Name
     GshpHeating LoadSide Outlet Node,  !- Load Side Outlet Node Name
-    1.89E-03,                !- Rated Load Side Flow Rate {m3/s}
-    1.89E-03,                !- Rated Source Side Flow Rate {m3/s}
-    39040.92,                !- Rated Heating Capacity {W}
-    5130.00,                 !- Rated Heating Power Consumption {W}
+    1.89E-03,                !- Reference Load Side Flow Rate {m3/s}
+    1.89E-03,                !- Reference Source Side Flow Rate {m3/s}
+    39040.92,                !- Reference Heating Capacity {W}
+    5130.00,                 !- Reference Heating Power Consumption {W}
     -3.33491153,             !- Heating Capacity Coefficient 1
     -0.51451946,             !- Heating Capacity Coefficient 2
     4.51592706,              !- Heating Capacity Coefficient 3
