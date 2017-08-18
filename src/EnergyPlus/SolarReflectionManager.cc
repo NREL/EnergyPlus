@@ -1163,17 +1163,17 @@ namespace SolarReflectionManager {
 		Real64 const DTheta( 2.0 * Pi / ( 2.0 * AzimAngStepsForSolReflCalc ) ); // Azimuth increment (radians)
 
 		// Pre-compute these constants
-		// Initialize the 0 index with  so the iterators line up below
-		std::vector<Real64> sin_Phi( { NULL } );
-		std::vector<Real64> cos_Phi( { NULL } );
+		// Initialize the 0 index with dummy value so the iterators line up below
+		std::vector<Real64> sin_Phi( { -1 } );
+		std::vector<Real64> cos_Phi( { -1 } );
 		for( int IPhi = 1; IPhi <= ( AltAngStepsForSolReflCalc / 2 ); ++IPhi ) {
 			Real64 Phi( ( IPhi - 0.5 ) * DPhi); // Altitude angle and increment (radians)
 			sin_Phi.push_back( std::sin( Phi ) );
 			cos_Phi.push_back( std::cos( Phi ) );
 		}
 
-		std::vector<Real64> sin_Theta( { NULL } );
-		std::vector<Real64> cos_Theta( { NULL } );
+		std::vector<Real64> sin_Theta( { -1 } );
+		std::vector<Real64> cos_Theta( { -1 } );
 		for( int ITheta = 1; ITheta <= 2 * AzimAngStepsForSolReflCalc; ++ITheta ) {
 			Real64 Theta = ( ITheta - 0.5 ) * DTheta; // Azimuth angle (radians)
 			sin_Theta.push_back( std::sin( Theta ) );
