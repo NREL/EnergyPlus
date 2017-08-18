@@ -4865,6 +4865,20 @@ namespace SingleDuct {
 				} 
 			} 
 
+			if ( lAlphaFieldBlanks( 9 ) ) {
+				SysATMixer( ATMixerNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+			} else {
+				if ( cAlphaArgs( 9 ) == "CURRENTOCCUPANCY" ) {
+					SysATMixer( ATMixerNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+				} else if ( cAlphaArgs( 9 ) == "DESIGNOCCUPANCY" ) {
+					SysATMixer( ATMixerNum ).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
+				} else {
+					SysATMixer( ATMixerNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+					ShowContinueError( "..invalid " + cAlphaFieldNames( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\". The default input of CurrentOccupancy is assigned" );
+				}
+			}
+
 			  // Check for dupes in the three nodes.
 			if ( SysATMixer( ATMixerNum ).SecInNode == SysATMixer( ATMixerNum ).PriInNode ) {
 				ShowSevereError( cCurrentModuleObject + " = " + SysATMixer( ATMixerNum ).Name + ' ' + cAlphaArgs( 5 ) + " = " + NodeID( SysATMixer( ATMixerNum ).PriInNode ) + " duplicates the " + cAlphaArgs( 4 ) + '.' );
@@ -5030,10 +5044,12 @@ namespace SingleDuct {
 		Real64 vDotOAReq( 0.0 );
 		if ( !this->NoOAFlowInputFromUser ) {
 			Real64 airLoopOAFrac( 0.0 );
-			if ( this-> AirLoopNum > 0 ) {
+			bool UseOccSchFlag = false;
+			if ( this->OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel ) UseOccSchFlag = true;
+			if ( this->AirLoopNum > 0 ) {
 				airLoopOAFrac = DataAirLoop::AirLoopFlow( this->AirLoopNum ).OAFrac;
 				if ( airLoopOAFrac > 0.0 ) {
-					vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( this->OARequirementsPtr, this->ZoneNum, true, true );
+					vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true );
 					mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
 				} else {
 					mDotFromOARequirement = Node( this->PriInNode ).MassFlowRate;

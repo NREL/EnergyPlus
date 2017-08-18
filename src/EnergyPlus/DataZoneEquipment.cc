@@ -133,6 +133,10 @@ namespace DataZoneEquipment {
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
 
+	// Per Person Ventilation Rate Mode
+	int const PerPersonDCVByCurrentLevel( 1 );
+	int const PerPersonByDesignLevel( 2 );
+
 	int const NumValidSysAvailZoneComponents( 13 );
 	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit" } );
 

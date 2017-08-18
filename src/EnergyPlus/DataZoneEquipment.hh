@@ -114,6 +114,10 @@ namespace DataZoneEquipment {
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
 
+	// Per Person Ventilation Rate Mode
+	extern int const PerPersonDCVByCurrentLevel;
+	extern int const PerPersonByDesignLevel;
+
 	extern int const NumValidSysAvailZoneComponents;
 	extern Array1D_string const cValidSysAvailManagerCompTypes;
 

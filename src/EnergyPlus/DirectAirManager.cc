@@ -343,12 +343,26 @@ namespace DirectAirManager {
 					}
 				}
 
+				if ( lAlphaFieldBlanks( 5 ) ) {
+					DirectAir( DirectAirNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+				} else {
+					if ( cAlphaArgs( 5 ) == "CURRENTOCCUPANCY" ) {
+						DirectAir( DirectAirNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+					} else if ( cAlphaArgs( 5 ) == "DESIGNOCCUPANCY" ) {
+						DirectAir( DirectAirNum ).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
+					} else {
+						DirectAir( DirectAirNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "..invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\". The default input of CurrentOccupancy is assigned" );
+					}
+				}
+
 				// DesignSpecification:AirTerminal:Sizing name
 				DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = 0;
-				if ( !lAlphaFieldBlanks( 5 )) {
+				if ( !lAlphaFieldBlanks( 6 )) {
 					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( cAlphaArgs( 5 ), DataSizing::AirTerminalSizingSpec );
 					if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex == 0 ) {
-						ShowSevereError(cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) + " not found.");
+						ShowSevereError(cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + DirectAir( DirectAirNum ).cObjectName );
 						ErrorsFound = true;
 					}
@@ -511,8 +525,10 @@ namespace DirectAirManager {
 			}
 			if ( airLoopNum > 0 ) {
 				airLoopOAFrac = DataAirLoop::AirLoopFlow( airLoopNum ).OAFrac;
+				bool UseOccSchFlag = false;
+				if ( DirectAir( DirectAirNum ).OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel ) UseOccSchFlag = true;
 				if ( airLoopOAFrac > 0.0 ) {
-					Real64 vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( DirectAir( DirectAirNum ).OARequirementsPtr, DirectAir( DirectAirNum ).ZoneNum, true, true );
+					Real64 vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( DirectAir( DirectAirNum ).OARequirementsPtr, DirectAir( DirectAirNum ).ZoneNum, UseOccSchFlag, true );
 					mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
 					mDotFromOARequirement = min( mDotFromOARequirement , DirectAir( DirectAirNum ).AirMassFlowRateMax );
 				} else {
