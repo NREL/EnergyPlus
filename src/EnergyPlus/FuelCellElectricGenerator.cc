@@ -1097,9 +1097,16 @@ namespace FuelCellElectricGenerator {
 					SetupOutputVariable( "Generator Produced DC Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.DCPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
 					SetupOutputVariable( "Generator DC Power Efficiency", Unit::None, FuelCell( GeneratorNum ).Report.DCPowerEff, "System", "Average", FuelCell( GeneratorNum ).Name );
 
+					SetupOutputVariable( "Generator Electric Storage Charge State", Unit::J, FuelCell( GeneratorNum ).Report.ElectEnergyinStorage, "System", "Average", FuelCell( GeneratorNum ).Name ); //? 'Sum'
+					SetupOutputVariable( "Generator DC Storage Charging Power", Unit::W, FuelCell( GeneratorNum ).Report.StoredPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Charging Energy", Unit::J, FuelCell( GeneratorNum ).Report.StoredEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Discharging Power", Unit::W, FuelCell( GeneratorNum ).Report.DrawnPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Discharging Energy", Unit::J, FuelCell( GeneratorNum ).Report.DrawnEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Ancillary AC Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.ACancillariesPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Ancillary AC Electric Energy", Unit::J, FuelCell( GeneratorNum ).Report.ACancillariesEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count [ ]", FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Root Solver Iteration Count [ ]", FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count", Unit::None, FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Root Solver Iteration Count", Unit::None, FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
 				}
 			}
 
