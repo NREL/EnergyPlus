@@ -643,8 +643,6 @@ namespace ZoneAirLoopEquipmentManager {
 		int InNodeNum; // air distribution unit inlet node
 		int OutNodeNum; // air distribution unit outlet node
 		static int AirLoopNum( 0 ); // index of air loop
-		Real64 CpAirZn;
-		Real64 CpAirSys;
 		Real64 MassFlowRateMaxAvail; // max avail mass flow rate excluding leaks [kg/s]
 		Real64 MassFlowRateMinAvail; // min avail mass flow rate excluding leaks [kg/s]
 		Real64 MassFlowRateUpStreamLeakMax; // max upstream leak flow rate [kg/s]
@@ -764,20 +762,19 @@ namespace ZoneAirLoopEquipmentManager {
 			}
 
 		}
-		// Sign convention: SysOutputProvided <0 Zone is cooled
-		//                  SysOutputProvided >0 Zone is heated
-		CpAirZn = PsyCpAirFnWTdb( Node( ZoneEquipConfig( ControlledZoneNum ).ZoneNode ).HumRat, Node( ZoneEquipConfig( ControlledZoneNum ).ZoneNode ).Temp );
-		CpAirSys = PsyCpAirFnWTdb( Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).HumRat, Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).Temp );
-		SysOutputProvided = Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).MassFlowRate *
-			( CpAirSys * Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).Temp - CpAirZn * Node( ZoneEquipConfig( ControlledZoneNum ).ZoneNode ).Temp );
-		// AirDistUnit( AirDistUnitNum ).HeatRate = max( 0.0, SysOutputProvided );
-		// AirDistUnit( AirDistUnitNum ).CoolRate = std::abs( min( 0.0, SysOutputProvided ));
 		if ( ProvideSysOutput ) {
+			// Sign convention: SysOutputProvided <0 Zone is cooled
+			//                  SysOutputProvided >0 Zone is heated
+			SpecHumOut = Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).HumRat;
+			SpecHumIn = Node( ZoneEquipConfig( ControlledZoneNum ).ZoneNode ).HumRat;
+			Real64 CpAirAvg = PsyCpAirFnWTdb( 0.5 *( SpecHumOut + SpecHumOut), 0.5 * ( Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).Temp + Node( ZoneEquipConfig( ControlledZoneNum ).ZoneNode ).Temp ) );
+			SysOutputProvided = Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).MassFlowRate * CpAirAvg * ( Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).Temp - Node( ZoneEquipConfig( ControlledZoneNum ).ZoneNode ).Temp );
+			// AirDistUnit( AirDistUnitNum ).HeatRate = max( 0.0, SysOutputProvided );
+			// AirDistUnit( AirDistUnitNum ).CoolRate = std::abs( min( 0.0, SysOutputProvided ));
+
 			// Sign convention: LatOutputProvided <0 Zone is dehumidified
 			//                  LatOutputProvided >0 Zone is humidified
 			// CR9155 Remove specific humidity calculations
-			SpecHumOut = Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).HumRat;
-			SpecHumIn = Node( ZoneEquipConfig( ControlledZoneNum ).ZoneNode ).HumRat;
 			LatOutputProvided = Node( AirDistUnit( AirDistUnitNum ).OutletNodeNum ).MassFlowRate * ( SpecHumOut - SpecHumIn ); // Latent rate (kg/s), dehumid = negative
 		} else {
 			SysOutputProvided = 0.0;

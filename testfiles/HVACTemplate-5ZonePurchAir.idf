@@ -1838,7 +1838,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    Min OA Sched;            !- Outdoor Air Flow Rate Fraction Schedule Name
+    Min OA Sched;            !- Outdoor Air Schedule Name
 
   HVACTemplate:Zone:IdealLoadsAirSystem,
     SPACE4-1,                !- Zone Name

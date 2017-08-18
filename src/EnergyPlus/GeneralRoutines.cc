@@ -84,6 +84,7 @@
 #include <PlantUtilities.hh>
 #include <PoweredInductionUnits.hh>
 #include <Psychrometrics.hh>
+#include <PurchasedAirManager.hh>
 #include <ScheduleManager.hh>
 #include <SolarCollectors.hh>
 #include <SplitterComponent.hh>
@@ -1764,6 +1765,7 @@ TestReturnAirPathIntegrity(
 	using MixerComponent::NumMixers;
 	auto & GetZoneMixerInput( MixerComponent::GetMixerInput );
 	using PoweredInductionUnits::PIUnitHasMixer;
+	using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
 	using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
 
 	// Argument array dimensioning
@@ -2036,6 +2038,7 @@ TestReturnAirPathIntegrity(
 				}
 			}
 		}
+		if ( CheckPurchasedAirForReturnPlenum( Count1 ) ) FoundReturnPlenum( Count1 ) = true;
 	}
 	FoundNames.deallocate();
 	FoundNames.allocate( NumMixers );

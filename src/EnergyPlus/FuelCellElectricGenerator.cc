@@ -1097,16 +1097,9 @@ namespace FuelCellElectricGenerator {
 					SetupOutputVariable( "Generator Produced DC Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.DCPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
 					SetupOutputVariable( "Generator DC Power Efficiency", Unit::None, FuelCell( GeneratorNum ).Report.DCPowerEff, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Electric Storage Charge State", Unit::J, FuelCell( GeneratorNum ).Report.ElectEnergyinStorage, "System", "Average", FuelCell( GeneratorNum ).Name ); //? 'Sum'
-					SetupOutputVariable( "Generator DC Storage Charging Power", Unit::W, FuelCell( GeneratorNum ).Report.StoredPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Charging Energy", Unit::J, FuelCell( GeneratorNum ).Report.StoredEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Discharging Power", Unit::W, FuelCell( GeneratorNum ).Report.DrawnPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Discharging Energy", Unit::J, FuelCell( GeneratorNum ).Report.DrawnEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Ancillary AC Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.ACancillariesPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Ancillary AC Electric Energy", Unit::J, FuelCell( GeneratorNum ).Report.ACancillariesEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count", Unit::None, FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Regula Falsi Iteration Count", Unit::None, FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count [ ]", FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Root Solver Iteration Count [ ]", FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
 				}
 			}
 
@@ -1149,7 +1142,7 @@ namespace FuelCellElectricGenerator {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataHeatBalFanSys::ZT;
 		using DataEnvironment::WaterMainsTemp;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -1192,10 +1185,10 @@ namespace FuelCellElectricGenerator {
 		int thisGas; // loop index
 		Real64 MagofImbalance; // error signal to control exiting loop and targeting product enthalpy
 		Real64 tmpTotProdGasEnthalphy;
-		Real64 Acc; // accuracy control for SolveRegulaFalsi
-		int MaxIter; // iteration control for SolveRegulaFalsi
-		int SolverFlag; // feed back flag from SolveRegulaFalsi
-		Array1D< Real64 > Par( 3 ); // parameters passed in to SolveRegulaFalsi
+		Real64 Acc; // accuracy control for SolveRoot
+		int MaxIter; // iteration control for SolveRoot
+		int SolverFlag; // feed back flag from SolveRoot
+		Array1D< Real64 > Par( 3 ); // parameters passed in to SolveRoot
 		// Par(1) = generator number index in structure
 		// Par(2) = targeted enthalpy (W)
 		// Par(3) = molar flow rate of product gases (kmol/s)
@@ -1638,20 +1631,20 @@ namespace FuelCellElectricGenerator {
 			Par( 2 ) = tmpTotProdGasEnthalphy;
 			Par( 3 ) = FuelCell( GeneratorNum ).FCPM.NdotProdGas;
 			tmpTprodGas = FuelCell( GeneratorNum ).FCPM.TprodGasLeavingFCPM;
-			SolveRegulaFalsi( Acc, MaxIter, SolverFlag, tmpTprodGas, FuelCellProductGasEnthResidual, MinProductGasTemp, MaxProductGasTemp, Par );
+			SolveRoot( Acc, MaxIter, SolverFlag, tmpTprodGas, FuelCellProductGasEnthResidual, MinProductGasTemp, MaxProductGasTemp, Par );
 
 			if ( SolverFlag == -2 ) {
 
-				ShowWarningError( "CalcFuelCellGeneratorModel: Regula falsi problem, flag = -2, check signs, all positive" );
+				ShowWarningError( "CalcFuelCellGeneratorModel: Root Solver problem, flag = -2, check signs, all positive" );
 
 			}
 			if ( SolverFlag == -1 ) {
-				ShowWarningError( "CalcFuelCellGeneratorModel: Regula falsi problem, flag = -1, check accuracy and iterations, did not converge" );
+				ShowWarningError( "CalcFuelCellGeneratorModel: Root Solver problem, flag = -1, check accuracy and iterations, did not converge" );
 
 			}
 			if ( SolverFlag > 0 ) {
 				FuelCell( GeneratorNum ).FCPM.TprodGasLeavingFCPM = tmpTprodGas;
-				//  write(*,*) 'Number of regula falsi iterations: ', solverFlag
+				//  write(*,*) 'Number of Root Solver iterations: ', solverFlag
 			}
 
 			//  moved call to HeatBalanceInternalGains.   Call FigureFuelCellZoneGains(GeneratorNum)

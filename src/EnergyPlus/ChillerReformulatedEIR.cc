@@ -1383,7 +1383,7 @@ namespace ChillerReformulatedEIR {
 
 		// METHODOLOGY EMPLOYED:
 		// Use empirical curve fits to model performance at off-design conditions. This subroutine
-		// calls Subroutines CalcReformEIRChillerModel and SolveRegulaFalsi to obtain solution.
+		// calls Subroutines CalcReformEIRChillerModel and SolveRoot to obtain solution.
 		// The actual chiller performance calculations are in Subroutine CalcReformEIRChillerModel.
 
 		// REFERENCES:
@@ -1395,15 +1395,15 @@ namespace ChillerReformulatedEIR {
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
 		using CurveManager::GetCurveMinMaxValues;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRegulaFalsi
-		int const MaxIter( 500 ); // Iteration control for SolveRegulaFalsi
+		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRoot
+		int const MaxIter( 500 ); // Iteration control for SolveRoot
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		//  na
@@ -1423,7 +1423,7 @@ namespace ChillerReformulatedEIR {
 		Real64 Tmax( -99 ); // Maximum condenser leaving temperature allowed by curve objects [C]
 		Array1D< Real64 > Par( 6 ); // Pass parameters for RegulaFalsi solver
 		Real64 FalsiCondOutTemp; // RegulaFalsi condenser outlet temperature result [C]
-		int SolFla; // Feedback flag from SolveRegulaFalsi
+		int SolFla; // Feedback flag from SolveRoot
 		Real64 CondTempMin; // Condenser outlet temperature when using Tmin as input to CalcReformEIRChillerModel [C]
 		Real64 CondTempMax; // Condenser outlet temperature when using Tmax as input to CalcReformEIRChillerModel [C]
 
@@ -1475,7 +1475,7 @@ namespace ChillerReformulatedEIR {
 				//Par(5) = FlowLock !DSU
 				Par( 6 ) = EquipFlowCtrl;
 
-				SolveRegulaFalsi( Acc, MaxIter, SolFla, FalsiCondOutTemp, CondOutTempResidual, Tmin, Tmax, Par );
+				SolveRoot( Acc, MaxIter, SolFla, FalsiCondOutTemp, CondOutTempResidual, Tmin, Tmax, Par );
 
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {

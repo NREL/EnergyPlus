@@ -840,7 +840,7 @@ namespace HVACCooledBeam {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -918,7 +918,7 @@ namespace HVACCooledBeam {
 					Par( 4 ) = QMin;
 					Par( 5 ) = QMax;
 					ErrTolerance = 0.01;
-					SolveRegulaFalsi( ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
+					SolveRoot( ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						ShowWarningError( "Cold water control failed in cooled beam unit " + CoolBeam( CBNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating cold water mass flow rate" );
