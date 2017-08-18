@@ -89383,7 +89383,6 @@ UtilityCost:Tariff,
         \key FullHour
         \key Day
         \key Week
-        \default QuarterHour
         \note The determination of demand can vary by utility. Some utilities use the peak instantaneous demand
         \note measured but most use a fifteen minute average demand or a one hour average demand. Some gas utilities
         \note measure demand as the use during the peak day or peak week.
