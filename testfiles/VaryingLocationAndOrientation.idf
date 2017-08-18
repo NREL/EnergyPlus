@@ -4,7 +4,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.4;
+  Version,8.7;
 
   Building,
     Shoebox,               !- Name
@@ -132,7 +132,7 @@
     45;
 
   Schedule:Compact,
-    VaryingLocation,
+    VaryingLongitude,
     Any Number,
     Through: 01/31,
     For: AllDays,

@@ -814,9 +814,6 @@ namespace WeatherManager {
 	bool
 	CheckIfAnyUnderwaterBoundaries();
 
-	bool
-	addUnderwaterBoundary( int i );
-
 	void
 	UpdateUnderwaterBoundaries();
 

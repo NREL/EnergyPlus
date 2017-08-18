@@ -598,36 +598,6 @@ namespace WeatherManager {
 	}
 
 	bool
-	addUnderwaterBoundary( int i )
-	{
-		bool errorsFound = false;
-		underwaterBoundaries.push_back( UnderwaterBoundary() );
-		underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
-		underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
-		underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
-		if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
-			ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
-			errorsFound = true;
-		}
-		underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
-		if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
-			ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
-			errorsFound = true;
-		}
-		if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
-			// that's OK, we can have a blank schedule, the water will just have no free stream velocity
-			underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
-		} else {
-			underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
-			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
-				ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
-				errorsFound = true;
-			}
-		}
-		return errorsFound;
-	}
-
-	bool
 	CheckIfAnyUnderwaterBoundaries()
 	{
 		bool errorsFound = false;
@@ -647,7 +617,29 @@ namespace WeatherManager {
 				DataIPShortCuts::cAlphaFieldNames, 
 				DataIPShortCuts::cNumericFieldNames
 			);
-			errorsFound = WeatherManager::addUnderwaterBoundary( i );
+			underwaterBoundaries.push_back( UnderwaterBoundary() );
+			underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
+			underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
+			underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+			if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
+				ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
+				errorsFound = true;
+			}
+			underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+				ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+				errorsFound = true;
+			}
+			if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
+				// that's OK, we can have a blank schedule, the water will just have no free stream velocity
+				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
+			} else {
+				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+				if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+					ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+					errorsFound = true;
+				}
+			}
 			if ( errorsFound ) break;
 		}
 		if ( errorsFound ) {
@@ -710,9 +702,9 @@ namespace WeatherManager {
 			DataIPShortCuts::cAlphaFieldNames, 
 			DataIPShortCuts::cNumericFieldNames
 		);
-		DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
-		DataEnvironment::varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
-		DataEnvironment::varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 4 ) );
+		DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 1 ) );
+		DataEnvironment::varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+		DataEnvironment::varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
 	}
 
 	void
@@ -5075,7 +5067,9 @@ Label9999: ;
 		// different, notify the user.  If StdTimeMerid couldn't be calculated,
 		// produce an error message.
 
-		if ( StdTimeMerid >= -12.0 && StdTimeMerid <= 12.0 ) {
+		if ( DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ) {
+			// don't do any warnings, the building is moving
+		} else if ( StdTimeMerid >= -12.0 && StdTimeMerid <= 12.0 ) {
 			if ( TimeZoneNumber != StdTimeMerid ) {
 				DiffCalc = std::abs( TimeZoneNumber - StdTimeMerid );
 				if ( DiffCalc > 1.0 && DiffCalc < 24.0 ) {
