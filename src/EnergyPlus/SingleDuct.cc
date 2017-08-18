@@ -2614,7 +2614,7 @@ namespace SingleDuct {
 		QToHeatSetPt = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP * LeakLoadMult;
 		SysOutletNode = Sys( SysNum ).ReheatAirOutletNode;
 		SysInletNode = Sys( SysNum ).InletNodeNum;
-		CpAirAvg = PsyCpAirFnWTdb( 0.5 * ( Node( ZoneNodeNum ).HumRat + SysInlet( SysNum ).AirHumRat), 0.5 * ( Node( ZoneNodeNum ).Temp, SysInlet( SysNum ).AirTemp ) );
+		CpAirAvg = PsyCpAirFnWTdb( 0.5 * ( Node( ZoneNodeNum ).HumRat + SysInlet( SysNum ).AirHumRat), 0.5 * ( Node( ZoneNodeNum ).Temp + SysInlet( SysNum ).AirTemp ) );
 		MinFlowFrac = Sys( SysNum ).ZoneMinAirFrac;
 		MassFlowBasedOnOA = 0.0;
 		ZoneTemp = Node( ZoneNodeNum ).Temp;
