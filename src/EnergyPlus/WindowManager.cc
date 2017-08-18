@@ -586,10 +586,10 @@ namespace WindowManager {
 			TotLay = Construct( ConstrNum ).TotLayers;
 
 			// First layer must be glass, shade, screen or blind to be a glazing construction
-			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass && 
-			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade && 
-			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen && 
-			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind && 
+			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind &&
 			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
 
 			ShadeLayNum = 0;
@@ -810,7 +810,7 @@ namespace WindowManager {
 							t( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).Y( ILam );
 							rff( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngFRefleDataPtr ).TableIndex ).Y( ILam );
 							rbb( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngBRefleDataPtr ).TableIndex ).Y( ILam );
-						}						
+						}
 						SolarSprectrumAverage( t, tmpTrans );
 						SolarSprectrumAverage( rff, tmpReflectSolBeamFront );
 						SolarSprectrumAverage( rbb, tmpReflectSolBeamBack );
@@ -867,7 +867,7 @@ namespace WindowManager {
 				// 10 degree increment for incident angle is only value for a construction without a layer = SpectralAndAngle
 				Phi = double( IPhi - 1 ) * 10.0;
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-					// Override 10 degeee icrement for incident angle for a construction with a layer = SpectralAndAngle
+					// Override 10 degree increment for incident angle for a construction with a layer = SpectralAndAngle
 					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
 					if ( Material( LayPtr ).GlassSpectralAndAngle ) {
 						Phi = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X1Var( IPhi );
@@ -7877,7 +7877,7 @@ namespace WindowManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SurfNum; // Index to surface number
 		int ScreenNum; // Index to each screen used on exterior of window
-		int ConstrNumSh; // Index to shaded constuction
+		int ConstrNumSh; // Index to shaded construction
 		int MatNum; // Index to material number
 		int i; // Integration loop counters
 		int j;
@@ -7887,8 +7887,6 @@ namespace WindowManager {
 		Real64 SumReflectVis; // Integration variable for visible reflectance
 		Real64 SumArea; // Integration variable for area of quarter hemisphere
 		Real64 SkyArea; // Area of integration
-		Real64 SunAzimuth; // Azimuth angle of sun during integration
-		Real64 SunAltitude; // Altitude angle of sun during integration
 		Real64 RelativeAzimuth; // Relative azimuth angle of sun with respect to surface outward normal
 		Real64 RelativeAltitude; // Relative altitude angle of sun with respect to surface outward normal
 		int ShadingType; // Type of shading device
@@ -7945,13 +7943,16 @@ namespace WindowManager {
 					//     Proceed in reverse order such that the last calculation yields zero sun angle to window screen normal (angles=0,0).
 					//     The properties calculated at zero sun angle are then used elsewhere prior to the start of the actual simulation.
 					for ( j = N; j >= 1; --j ) {
+						Real64 SunAzimuth( ( 90.0 / N ) * ( j - 1 ) * ( Pi / 180.0 ) ); // Azimuth angle of sun during integration
+						Real64 sin_SunAzimuth( std::sin( SunAzimuth ) );
+						Real64 cos_SunAzimuth( std::cos( SunAzimuth ) );
 						for ( i = M; i >= 1; --i ) {
-							SunAzimuth = ( 90.0 / N ) * ( j - 1 ) * ( Pi / 180.0 );
-							SunAltitude = ( 90.0 / M ) * ( i - 1 ) * ( Pi / 180.0 );
-							SkyArea = std::sin( SunAltitude ) * std::cos( SunAltitude );
-							//         Integrate transmittance using coordiante transform
-							RelativeAzimuth = std::asin( std::sin( SunAltitude ) * std::cos( SunAzimuth ) ); // phi prime
-							RelativeAltitude = std::atan( std::tan( SunAltitude ) * std::sin( SunAzimuth ) ); // alpha
+							Real64 SunAltitude( ( 90.0 / M ) * ( i - 1 ) * ( Pi / 180.0 ) ); // Altitude angle of sun during integration
+							Real64 sin_SunAltitude( std::sin( SunAltitude ) );
+							SkyArea = sin_SunAltitude * std::cos( SunAltitude );
+							//         Integrate transmittance using coordinate transform
+							RelativeAzimuth = std::asin( sin_SunAltitude * cos_SunAzimuth ); // phi prime
+							RelativeAltitude = std::atan( std::tan( SunAltitude ) * sin_SunAzimuth ); // alpha
 							CalcScreenTransmittance( 0, RelativeAltitude, RelativeAzimuth, ScreenNum );
 							SumTrans += ( SurfaceScreens( ScreenNum ).BmBmTrans + SurfaceScreens( ScreenNum ).BmDifTrans ) * SkyArea;
 							SumTransVis += ( SurfaceScreens( ScreenNum ).BmBmTransVis + SurfaceScreens( ScreenNum ).BmDifTransVis ) * SkyArea;
@@ -8007,8 +8008,8 @@ namespace WindowManager {
 					ScreenTrans( ScreenNum ).Scatt = 0.0;
 					for ( j = 90 / Material( MatNum ).ScreenMapResolution + 1; j >= 1; --j ) {
 						for ( i = 90 / Material( MatNum ).ScreenMapResolution + 1; i >= 1; --i ) {
-							SunAzimuth = Material( MatNum ).ScreenMapResolution * ( j - 1 ) * ( Pi / 180.0 );
-							SunAltitude = Material( MatNum ).ScreenMapResolution * ( i - 1 ) * ( Pi / 180.0 );
+							Real64 SunAzimuth = Material( MatNum ).ScreenMapResolution * ( j - 1 ) * ( Pi / 180.0 );
+							Real64 SunAltitude = Material( MatNum ).ScreenMapResolution * ( i - 1 ) * ( Pi / 180.0 );
 							CalcScreenTransmittance( 0, SunAltitude, SunAzimuth, ScreenNum );
 							ScreenTrans( ScreenNum ).Trans( i, j ) = SurfaceScreens( ScreenNum ).BmBmTrans;
 							ScreenTrans( ScreenNum ).Scatt( i, j ) = SurfaceScreens( ScreenNum ).BmDifTrans;

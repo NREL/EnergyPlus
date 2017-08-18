@@ -514,28 +514,21 @@ namespace GroundHeatExchangers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the distance between any two points on any two loops
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 x;
-		Real64 y;
-		Real64 z;
-		Real64 xIn;
-		Real64 yIn;
-		Real64 zIn;
-		Real64 xOut;
-		Real64 yOut;
-		Real64 zOut;
-		Real64 pipeOuterRadius;
+		Real64 pipeOuterRadius = pipeOutDia / 2.0;
 
-		pipeOuterRadius = pipeOutDia / 2.0;
+		Real64 const cos_theta( std::cos( theta ) );
+		Real64 const sin_theta( std::sin( theta ) );
+		Real64 const cos_eta( std::cos( eta ) );
+		Real64 const sin_eta( std::sin( eta ) );
 
-		x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
-		y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
+		Real64 x = X0( n ) + cos_theta * ( coilDiameter / 2.0 );
+		Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );
 
-		xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-		yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 xIn = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 yIn = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
 
-		xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
-		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 xOut = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 yOut = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 		if ( ! verticalConfig ) {
 
@@ -544,10 +537,10 @@ namespace GroundHeatExchangers {
 
 		} else {
 
-			z = Z0 + std::sin( theta ) * ( coilDiameter / 2.0 );
+			Real64 z = Z0 + sin_theta * ( coilDiameter / 2.0 );
 
-			zIn = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-			zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+			Real64 zIn = Z0 + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+			Real64 zOut = Z0 + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 			return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) )
 				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );
