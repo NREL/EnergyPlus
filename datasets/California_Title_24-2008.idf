@@ -21,6 +21,9 @@
 ! ;                         !Reserved
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   People,
     Auditoriums,             !- Name
     Auditoriums,             !- Zone or ZoneList Name

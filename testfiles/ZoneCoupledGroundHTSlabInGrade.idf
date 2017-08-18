@@ -399,31 +399,31 @@
 !***********************************************************
 
   Site:GroundDomain:Slab,
-    CoupledSlab, !- Name
-    5,          !- Ground Domain Depth {m}
-    1,          !- Aspect Ratio
-    5,          !- Domain Perimeter Offset {m}
-    1.8,        !- Soil Thermal Conductivity {W/m-K}
-    3200,       !- Soil Density {kg/m3}
-    836,        !- Soil Specific Heat {J/kg-K}
-    30,         !- Soil Moisture Content Volume Fraction {percent}
-    50,         !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Model
-    KATemps,    !- Name of Undisturbed Ground Temperature Model
-    1,          !- Evapotranspiration Ground Cover Parameter
-    GroundCoupledOSCM, !- Name of Floor Boundary Condition Model
-    InGrade,    !- Slab Location (InGrade/OnGrade)
-    Slab Material-In-grade, !- Slab Material Name
-    Yes,        !- Horizontal Insulation (Yes/No)
-    Insulation, !- Horizontal Insulation Material Name
-    Full,       !- Full Horizontal or Perimeter Only (Full/Perimeter)
-    ,           !- Perimeter insulation width (m)
-    Yes,        !- Vertical Insulation (Yes/No)
-    Insulation, !- Vertical Insulation Name
-    1.5,        !- Vertical perimeter insulation depth from surface (m)
-    Hourly,     !- Domain Simulation Interval. (Timestep/Hourly)
-    ,           !- Geometric Mesh Coefficient
-    ;           !- Mesh Density Parameter
+    CoupledSlab,             !- Name
+    5,                       !- Ground Domain Depth {m}
+    1,                       !- Aspect Ratio
+    5,                       !- Perimeter Offset {m}
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    KATemps,                 !- Undisturbed Ground Temperature Model Name
+    1,                       !- Evapotranspiration Ground Cover Parameter
+    GroundCoupledOSCM,       !- Slab Boundary Condition Model Name
+    InGrade,                 !- Slab Location
+    Slab Material-In-grade,  !- Slab Material Name
+    Yes,                     !- Horizontal Insulation
+    Insulation,              !- Horizontal Insulation Material Name
+    Full,                    !- Horizontal Insulation Extents
+    ,                        !- Perimeter Insulation Width {m}
+    Yes,                     !- Vertical Insulation
+    Insulation,              !- Vertical Insulation Material Name
+    1.5,                     !- Vertical Insulation Depth {m}
+    Hourly,                  !- Simulation Timestep
+    ,                        !- Geometric Mesh Coefficient
+    ;                        !- Mesh Density Parameter
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                 !- Name
@@ -535,3 +535,4 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+

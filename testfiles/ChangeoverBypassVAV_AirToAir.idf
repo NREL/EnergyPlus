@@ -97,7 +97,10 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 !
-  output:Sqlite, simple;
+
+  output:Sqlite,
+    simple;                  !- Option Type
+
   Version,8.7;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
@@ -106,8 +109,8 @@
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                      !- Run Simulation for Sizing Periods
-    No;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Sizing Periods
+    No;                      !- Run Simulation for Weather File Run Periods
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1366,7 +1369,6 @@
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-
   Coil:Heating:Electric,
     Reheat Coil Zone 1,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
@@ -1393,7 +1395,7 @@
     autosize,                !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Heating Coil Air Outlet Node,  !- Air Outlet Node Name
-    Heating Coil Air Outlet Node;
+    Heating Coil Air Outlet Node;  !- Temperature Setpoint Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS ===========
 
@@ -1418,7 +1420,7 @@
     BlowThrough,             !- Supply Air Fan Placement
     Fan OpMode Schedule,     !- Supply Air Fan Operating Mode Schedule Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
-    Main Cooling Coil 1,              !- Cooling Coil Name
+    Main Cooling Coil 1,     !- Cooling Coil Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     CoolingPriority,         !- Priority Control Mode
@@ -1524,8 +1526,8 @@
     Air Loop Outlet Node;    !- Setpoint Node or NodeList Name
 
   Coil:Cooling:DX:VariableSpeed,
-    Main Cooling Coil 1,    !- Name
-     DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
+    Main Cooling Coil 1,     !- Name
+    DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
     Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     4.0,                     !- Number of Speeds {dimensionless}
     4.0,                     !- Nominal Speed Level {dimensionless}
@@ -1586,16 +1588,14 @@
     HPCoolingEIRFTemp4,      !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF;                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
-
-   
-   Curve:Quadratic,
+  Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
-    1.0,                    !- Coefficient1 Constant
-    0.0,                    !- Coefficient2 x
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.5,                     !- Minimum Value of x
-    1.5;                     !- Maximum Value of x  
-   
+    1.5;                     !- Maximum Value of x
+
   Curve:Cubic,
     HPACFFF,                 !- Name
     1.0,                     !- Coefficient1 Constant
@@ -1604,7 +1604,7 @@
     0.0,                     !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
-    
+
   Curve:Biquadratic,
     HPHeatingCAPFTemp1,      !- Name
     0.8406506803,            !- Coefficient1 Constant
@@ -1763,7 +1763,6 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-
   Curve:Biquadratic,
     HPCoolingCAPFTemp1,      !- Name
     1.6253449506,            !- Coefficient1 Constant
@@ -1908,8 +1907,6 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-
-
   OutdoorAir:Node,
     Main Cooling Coil 1 Condenser Node,  !- Name
     -1.0;                    !- Height Above Ground {m}
@@ -2004,13 +2001,20 @@
 
   Output:Variable,*,Cooling Coil Dehumidification Mode,timestep;
 
-Output:Variable,*,Cooling Coil Air Mass Flow Rate,timestep; !- HVAC Average [kg/s]
-Output:Variable,*,Cooling Coil Air Inlet Temperature,timestep; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Outlet Temperature,timestep; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Total Cooling Rate,timestep; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Electric Power,timestep; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Upper Speed Level,timestep; !- HVAC Average []
-Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,timestep; !- HVAC Average []
+  Output:Variable,*,Cooling Coil Air Mass Flow Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Air Inlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Air Outlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Electric Power,timestep;
+
+  Output:Variable,*,Cooling Coil Upper Speed Level,timestep;
+
+  Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,timestep;
+
   Output:Variable,*,Zone Air System Sensible Heating Rate,timestep;
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,timestep;

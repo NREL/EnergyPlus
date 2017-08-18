@@ -72,7 +72,10 @@
 ! Utility Tariffs:                None
 
   Version,8.7;
-Output:Diagnostics,DisplayExtrawarnings;
+
+  Output:Diagnostics,
+    DisplayExtrawarnings;    !- Key 1
+
   Building,
     Building,                !- Name
     0,                       !- North Axis {deg}

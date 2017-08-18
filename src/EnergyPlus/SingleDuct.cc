@@ -207,6 +207,7 @@ namespace SingleDuct {
 		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool InitSysFlag( true ); // Flag set to make sure you do begin simulation initializaztions once
+		bool InitATMixerFlag( true ); // Flag set to make sure you do begin simulation initializaztions once for mixer
 	}
 
 	// MODULE SUBROUTINES:
@@ -224,6 +225,7 @@ namespace SingleDuct {
 		Sys.deallocate();
 		SysInlet.deallocate();
 		SysOutlet.deallocate();
+		InitATMixerFlag = true;
 	}
 
 	void
@@ -2001,30 +2003,19 @@ namespace SingleDuct {
 		if ( Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
 			if ( ZoneSizingRunDone ) {
 				if ( CurZoneEqNum > 0 ) {
-					// if design values are available
-					if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
-						// if the user input a value for min flow frac in Sizing:Zone, use it
-						MinAirFlowFracDes = FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac;
-					}
-					else {
-						// otherwise use the combined defaults or other user inputs stored in DesCoolVolFlowMin
-						if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
-							MinAirFlowFracDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
-						}
-						else {
-							MinAirFlowFracDes = 0.0;
-						}
+					// use the combined defaults or other user inputs stored in DesCoolVolFlowMin
+					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
+						MinAirFlowFracDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
+					} else {
+						MinAirFlowFracDes = 0.0;
 					}
 				}
-			}
-			else {
-				// if no sizing run, do same defaulting as would have been done in zone sizing
+			} else {
+				// if no zone sizing values available; use max of min frac = 0.2 and 0.000762 [m3/s-m2]
 				if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
-					MinMinFlowRatio = ( 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ) /
-						Sys( SysNum ).MaxAirVolFlowRate;
+					MinMinFlowRatio = ( 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ) / Sys( SysNum ).MaxAirVolFlowRate;
 					MinAirFlowFracDes = max( 0.2, MinMinFlowRatio );
-				}
-				else {
+				} else {
 					MinAirFlowFracDes = 0.0;
 				}
 			}
@@ -2065,21 +2056,21 @@ namespace SingleDuct {
 		if ( Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
 			if ( ZoneSizingRunDone ) {
 				if ( CurZoneEqNum > 0 ) {
-					// if zone sizing values are available
-					if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
-						// if the user input a value for min flow frac in Sizing:Zone, use it
-						FixedMinAirDes = FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac * Sys( SysNum ).MaxAirVolFlowRate;
-					}
-					else {
-						// otherwise use the combined defaults or other user inputs stored in DesCoolVolFlowMin
+					// use the combined defaults or other user inputs stored in DesCoolVolFlowMin
+					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
 						FixedMinAirDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin;
+					} else {
+						MinAirFlowFracDes = 0.0;
 					}
 				}
 			}
 			else {
-				// no zone sizing values available; use max of min frac = 0.2 and 0.000762 [m3/s-m2]
-				FixedMinAirDes = max( 0.2*Sys( SysNum ).MaxAirVolFlowRate, 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier *
-					Zone( ZoneNum ).ListMultiplier );
+				// if no zone sizing values available; use max of min frac = 0.2 and 0.000762 [m3/s-m2]
+				if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
+					FixedMinAirDes = max( 0.2 * Sys( SysNum ).MaxAirVolFlowRate, 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier );
+				} else {
+					MinAirFlowFracDes = 0.0;
+				}
 			}
 			if ( IsAutoSize ) {
 				// report out autosized result and save value in Sys array
@@ -2582,8 +2573,7 @@ namespace SingleDuct {
 		Real64 QZnReq; // [Watts] Load calculated for heating coil
 		Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
 		int ADUNum; // index of air distribution unit for this terminal unit
-		Real64 CpAirZn;
-		Real64 CpAirSysIn;
+		Real64 CpAirAvg;
 		Real64 DeltaTemp;
 		int SysOutletNode; // The node number of the terminal unit outlet node
 		int SysInletNode; // the node number of the terminal unit inlet node
@@ -2624,7 +2614,7 @@ namespace SingleDuct {
 		QToHeatSetPt = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP * LeakLoadMult;
 		SysOutletNode = Sys( SysNum ).ReheatAirOutletNode;
 		SysInletNode = Sys( SysNum ).InletNodeNum;
-		CpAirZn = PsyCpAirFnWTdb( Node( ZoneNodeNum ).HumRat, Node( ZoneNodeNum ).Temp );
+		CpAirAvg = PsyCpAirFnWTdb( 0.5 * ( Node( ZoneNodeNum ).HumRat + SysInlet( SysNum ).AirHumRat), 0.5 * ( Node( ZoneNodeNum ).Temp + SysInlet( SysNum ).AirTemp ) );
 		MinFlowFrac = Sys( SysNum ).ZoneMinAirFrac;
 		MassFlowBasedOnOA = 0.0;
 		ZoneTemp = Node( ZoneNodeNum ).Temp;
@@ -2636,8 +2626,7 @@ namespace SingleDuct {
 		// or the Max as specified for the VAV model.
 		if ( ( QTotLoad < 0.0 ) && ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( TempControlType( ZoneNum ) != SingleHeatingSetPoint ) && ( GetCurrentScheduleValue( Sys( SysNum ).SchedPtr ) > 0.0 ) ) {
 			// Calculate the flow required for cooling
-			CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, SysInlet( SysNum ).AirTemp );
-			DeltaTemp = CpAirSysIn * SysInlet( SysNum ).AirTemp - CpAirZn * ZoneTemp;
+			DeltaTemp = CpAirAvg * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
 
 			//Need to check DeltaTemp and ensure that it is not zero
 			if ( DeltaTemp != 0.0 ) {
@@ -2751,7 +2740,7 @@ namespace SingleDuct {
 		UpdateSys( SysNum );
 
 		// At the current air mass flow rate, calculate heating coil load
-		QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * ( SysInlet( SysNum ).AirTemp - ZoneTemp ); // reheat needed
+		QActualHeating = QToHeatSetPt - MassFlow * CpAirAvg * ( SysInlet( SysNum ).AirTemp - ZoneTemp ); // reheat needed
 
 		// do the reheat calculation if there's some air nass flow (or the damper action is "reverse action"), the flow is <= minimum ,
 		// there's a heating requirement, and there's a thermostat with a heating setpoint
@@ -2784,7 +2773,7 @@ namespace SingleDuct {
 
 				MaxHeatTemp = Sys( SysNum ).MaxReheatTemp;
 				if ( QToHeatSetPt > SmallLoad ) { // zone has a postive load to heating setpoint
-					MassFlowReqToLimitLeavingTemp = QToHeatSetPt / ( CpAirZn * ( MaxHeatTemp - ZoneTemp ) );
+					MassFlowReqToLimitLeavingTemp = QToHeatSetPt / ( CpAirAvg * ( MaxHeatTemp - ZoneTemp ) );
 				} else {
 					MassFlowReqToLimitLeavingTemp = 0.0;
 				}
@@ -2806,7 +2795,7 @@ namespace SingleDuct {
 
 			// now make any corrections to heating coil loads
 			if ( Sys( SysNum ).MaxReheatTempSetByUser ) {
-				QZoneMaxRHTempLimit = CpAirZn * MassFlow * ( MaxHeatTemp - ZoneTemp );
+				QZoneMaxRHTempLimit = MassFlow * CpAirAvg * ( MaxHeatTemp - ZoneTemp );
 				QZoneMax2 = min( QZoneMaxRHTempLimit, QToHeatSetPt );
 			}
 
@@ -2822,7 +2811,7 @@ namespace SingleDuct {
 				// Determine the load required to pass to the Component controller
 				// Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
 				// and is working as-is, temperature setpoints are maintained as expected.
-				QZnReq = QZoneMax2 + MassFlow * CpAirZn * ZoneTemp;
+				QZnReq = QZoneMax2 + MassFlow * CpAirAvg * ZoneTemp;
 
 				// Initialize hot water flow rate to zero.
 				DummyMdot = 0.0;
@@ -2874,7 +2863,7 @@ namespace SingleDuct {
 
 							// Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
 							// and is working as-is, temperature setpoints are maintained as expected.
-							QZnReq = QZoneMax2 + MassFlow * CpAirZn * ZoneTemp;
+							QZnReq = QZoneMax2 + MassFlow * CpAirAvg * ZoneTemp;
 							ControlCompOutput( Sys( SysNum ).ReheatName, Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatComp_Index, FirstHVACIteration, QZnReq, Sys( SysNum ).ReheatControlNode, MaxFlowWater, MinFlowWater, Sys( SysNum ).ControllerOffset, Sys( SysNum ).ControlCompTypeNum, Sys( SysNum ).CompErrIndex, _, SysOutletNode, MassFlow, _, _, Sys( SysNum ).HWLoopNum, Sys( SysNum ).HWLoopSide, Sys( SysNum ).HWBranchIndex );
 						}
 
@@ -2898,21 +2887,21 @@ namespace SingleDuct {
 
 			} else if ( SELECT_CASE_var == HCoilType_SteamAirHeating ) { // ! COIL:STEAM:AIRHEATING
 				// Determine the load required to pass to the Component controller
-				QZnReq = QZoneMax2 - MassFlow * CpAirZn * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
+				QZnReq = QZoneMax2 - MassFlow * CpAirAvg * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
 
 				// Simulate reheat coil for the VAV system
 				SimulateSteamCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, Sys( SysNum ).ReheatComp_Index, QZnReq );
 
 			} else if ( SELECT_CASE_var == HCoilType_Electric ) { // COIL:ELECTRIC:HEATING
 				// Determine the load required to pass to the Component controller
-				QZnReq = QZoneMax2 - MassFlow * CpAirZn * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
+				QZnReq = QZoneMax2 - MassFlow * CpAirAvg * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
 
 				// Simulate reheat coil for the VAV system
 				SimulateHeatingCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, QZnReq, Sys( SysNum ).ReheatComp_Index );
 
 			} else if ( SELECT_CASE_var == HCoilType_Gas ) { // COIL:GAS:HEATING
 				// Determine the load required to pass to the Component controller
-				QZnReq = QZoneMax2 - MassFlow * CpAirZn * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
+				QZnReq = QZoneMax2 - MassFlow * CpAirAvg * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
 
 				// Simulate reheat coil for the VAV system
 				SimulateHeatingCoilComponents( Sys( SysNum ).ReheatName, FirstHVACIteration, QZnReq, Sys( SysNum ).ReheatComp_Index, QHeatingDelivered );
@@ -4688,6 +4677,9 @@ namespace SingleDuct {
 		using DataGlobals::NumOfZones;
 		using DataHVACGlobals::ATMixer_InletSide;
 		using DataHVACGlobals::ATMixer_SupplySide;
+		using DataSizing::ZoneSizingInput;
+		using DataSizing::NumZoneSizingInput;
+
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -4756,7 +4748,35 @@ namespace SingleDuct {
 
 			SysATMixer( ATMixerNum ).PriInNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 5 ) );
 			SysATMixer( ATMixerNum ).SecInNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFieldNames( 6 ) );
-			// Check for dupes in the three nodes.
+
+			if ( lAlphaFieldBlanks( 8 ) ) { 
+				SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = true;
+			} else { 
+				SysATMixer( ATMixerNum ).OARequirementsPtr = InputProcessor::FindItemInList( cAlphaArgs( 8 ), DataSizing::OARequirements ); 
+				if ( SysATMixer( ATMixerNum ).OARequirementsPtr == 0 ) { 
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." ); 
+					ShowContinueError( "..invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." ); 
+					ErrorsFound = true; 
+				} else { 
+					SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false; 
+				} 
+			} 
+
+			if ( lAlphaFieldBlanks( 9 ) ) {
+				SysATMixer( ATMixerNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+			} else {
+				if ( cAlphaArgs( 9 ) == "CURRENTOCCUPANCY" ) {
+					SysATMixer( ATMixerNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+				} else if ( cAlphaArgs( 9 ) == "DESIGNOCCUPANCY" ) {
+					SysATMixer( ATMixerNum ).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
+				} else {
+					SysATMixer( ATMixerNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+					ShowContinueError( "..invalid " + cAlphaFieldNames( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\". The default input of CurrentOccupancy is assigned" );
+				}
+			}
+
+			  // Check for dupes in the three nodes.
 			if ( SysATMixer( ATMixerNum ).SecInNode == SysATMixer( ATMixerNum ).PriInNode ) {
 				ShowSevereError( cCurrentModuleObject + " = " + SysATMixer( ATMixerNum ).Name + ' ' + cAlphaArgs( 5 ) + " = " + NodeID( SysATMixer( ATMixerNum ).PriInNode ) + " duplicates the " + cAlphaArgs( 4 ) + '.' );
 				ErrorsFound = true;
@@ -4780,10 +4800,18 @@ namespace SingleDuct {
 							ZoneNodeNotFound = false;
 							for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
 								if ( SysATMixer( ATMixerNum ).SecInNode == ZoneEquipConfig( CtrlZone ).ExhaustNode( SupAirIn ) ) {
+									SysATMixer( ATMixerNum ).ZoneEqNum = CtrlZone; 
+									SysATMixer( ATMixerNum ).ZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum; 
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+
+									if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) { 																						 
+										bool UseOccSchFlag = false; 
+										bool UseMinOASchFlag = false; 
+										SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, UseOccSchFlag, UseMinOASchFlag ); 
+									} 
 								}
 							}
 							goto ControlledZoneLoop_exit;
@@ -4808,10 +4836,17 @@ namespace SingleDuct {
 							ZoneNodeNotFound = false;
 							for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
 								if ( SysATMixer( ATMixerNum ).MixedAirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+									SysATMixer( ATMixerNum ).ZoneEqNum = CtrlZone; 
+									SysATMixer( ATMixerNum ).ZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum; 
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = SysATMixer( ATMixerNum ).PriInNode;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = SysATMixer( ATMixerNum ).MixedAirOutNode;
+								}
+								if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) {
+									bool UseOccSchFlag = false;
+									bool UseMinOASchFlag = false;
+									SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, UseOccSchFlag, UseMinOASchFlag );
 								}
 							}
 							goto ControlZoneLoop_exit;
@@ -4829,6 +4864,27 @@ namespace SingleDuct {
 			}
 			TestCompSet( cCurrentModuleObject, SysATMixer( ATMixerNum ).Name, cAlphaArgs( 5 ), cAlphaArgs( 4 ), "Air Nodes" );
 
+			if ( SysATMixer( ATMixerNum ).OARequirementsPtr == 0 ) {
+				if ( ZoneSizingInput.allocated( ) ) {
+					for ( int SizingInputNum = 1; SizingInputNum <= NumZoneSizingInput; ++SizingInputNum ) {
+						if ( ZoneSizingInput( SizingInputNum ).ZoneNum == SysATMixer( ATMixerNum ).ZoneNum ) {
+							SysATMixer( ATMixerNum ).OARequirementsPtr = SizingInputNum;
+							if ( ZoneSizingInput( SizingInputNum ).ZoneDesignSpecOAIndex == 0 ) {
+								ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+								ShowContinueError( "If " + cAlphaFieldNames( 8 ) + "is blank, the input of Design Specification Outdoor Air Object Name in Sizing:Zone is needed. Otherwise the mixer outdoor airflow rate is zero." );
+								SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = 0.0;
+							} else {
+								SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( ZoneSizingInput( SizingInputNum ).ZoneDesignSpecOAIndex, SysATMixer( ATMixerNum ).ZoneNum, false, false );
+								SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false;
+							}
+						}
+					}
+				} else {
+					ShowWarningError( "If " + cAlphaFieldNames( 8 ) + "is blank and there is no Sizing:Zone in the same zone, the mixer outdoor airflow rate is set to zero." );
+					SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = 0.0;
+				}
+			}
+			SysATMixer( ATMixerNum ).MassFlowRateMaxAvail = SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate * DataEnvironment::StdRhoAir;
 		}
 
 		if ( ErrorsFound ) {
@@ -4859,6 +4915,8 @@ namespace SingleDuct {
 
 		// Using/Aliasing
 		using namespace DataLoopNode;
+		using DataZoneEquipment::ZoneEquipConfig;
+		using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -4875,6 +4933,14 @@ namespace SingleDuct {
 		int InletNode;
 		int PriInNode;
 		int MixedAirOutNode;
+		static Array1D_bool MyEnvrnFlag;
+
+		// Do the Begin Simulation initializations
+		if ( InitATMixerFlag ) {
+			MyEnvrnFlag.allocate( NumATMixers );
+			MyEnvrnFlag = true;
+			InitATMixerFlag = false;
+		}
 
 		InletNode = SysATMixer( ATMixerNum ).SecInNode;
 		PriInNode = SysATMixer( ATMixerNum ).PriInNode;
@@ -4887,7 +4953,40 @@ namespace SingleDuct {
 		if ( BeginDayFlag ) {
 		}
 
-		if ( FirstHVACIteration ) {
+		if ( MyEnvrnFlag( ATMixerNum ) ) {
+			if ( ZoneEquipConfig( SysATMixer( ATMixerNum ).ZoneEqNum ).AirLoopNum > 0 ) {
+				SysATMixer( ATMixerNum ).AirLoopNum = ZoneEquipConfig( SysATMixer( ATMixerNum ).ZoneEqNum ).AirLoopNum;
+				MyEnvrnFlag( ATMixerNum ) = false;
+			}
+		}
+
+		Real64 mDotFromOARequirement( 0.0 );
+		Real64 vDotOAReq( 0.0 );
+		if ( !SysATMixer( ATMixerNum ).NoOAFlowInputFromUser ) {
+			Real64 airLoopOAFrac( 0.0 );
+			bool UseOccSchFlag = false;
+			if ( SysATMixer( ATMixerNum ).OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel ) UseOccSchFlag = true;
+			if ( SysATMixer( ATMixerNum ).AirLoopNum > 0 ) {
+				airLoopOAFrac = DataAirLoop::AirLoopFlow( SysATMixer( ATMixerNum ).AirLoopNum ).OAFrac;
+				if ( airLoopOAFrac > 0.0 ) {
+					vDotOAReq = CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, UseOccSchFlag, true );
+					mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
+				} else {
+					mDotFromOARequirement = Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate;
+				}
+			}
+			if ( FirstHVACIteration ) {
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement;
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail = SysATMixer( ATMixerNum ).MassFlowRateMaxAvail;
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail = 0.0;
+			}
+			else {
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = mDotFromOARequirement;
+
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = min( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMaxAvail );
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMinAvail );
+				Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate = max( Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRate, Node( SysATMixer( ATMixerNum ).PriInNode ).MassFlowRateMin );
+			}
 		}
 
 	}
@@ -4993,6 +5092,7 @@ namespace SingleDuct {
 
 		// Using/Aliasing
 		using namespace DataLoopNode;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -5006,9 +5106,9 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int MixedAirOutNode;
-
-		MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;
+		int PriInNode = SysATMixer( SysNum ).PriInNode;
+		int SecInNode = SysATMixer( SysNum ).SecInNode;
+		int MixedAirOutNode = SysATMixer( SysNum ).MixedAirOutNode;
 
 		// mixed air data
 		Node( MixedAirOutNode ).Temp = SysATMixer( SysNum ).MixedAirTemp;
@@ -5017,6 +5117,21 @@ namespace SingleDuct {
 		Node( MixedAirOutNode ).Press = SysATMixer( SysNum ).MixedAirPressure;
 		Node( MixedAirOutNode ).MassFlowRate = SysATMixer( SysNum ).MixedAirMassFlowRate;
 
+		if ( Contaminant.CO2Simulation ) {
+			if ( SysATMixer( SysNum ).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow ) {
+				Node( MixedAirOutNode ).CO2 = Node( PriInNode ).CO2;
+			} else {
+				Node( MixedAirOutNode ).CO2 = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).CO2 + Node( PriInNode ).MassFlowRate * Node( PriInNode ).CO2 ) / Node( MixedAirOutNode ).MassFlowRate;
+			}
+		}
+
+		if ( Contaminant.GenericContamSimulation ) {
+			if ( SysATMixer( SysNum ).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow ) {
+				Node( MixedAirOutNode ).GenContam = Node( PriInNode ).GenContam;
+			} else {
+				Node( MixedAirOutNode ).GenContam = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).GenContam + Node( PriInNode ).MassFlowRate * Node( PriInNode ).GenContam ) / Node( MixedAirOutNode ).MassFlowRate;
+			}
+		}
 	}
 
 	void
