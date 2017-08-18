@@ -788,9 +788,10 @@ namespace HeatBalanceHAMTManager {
 				if ( Material( matid ).divs > Material( matid ).divmax ) {
 					Material( matid ).divs = Material( matid ).divmax;
 				}
-				// Check length of cell - reduce number of divisions if neccessary
+				// Check length of cell - reduce number of divisions if necessary
+				Real64 const sin_negPIOvr2( std::sin( -Pi / 2.0 ) );
 				while ( true ) {
-					testlen = Material( matid ).Thickness * ( ( std::sin( Pi * ( -1.0 / double( Material( matid ).divs ) ) - Pi / 2.0 ) / 2.0 ) - ( std::sin( -Pi / 2.0 ) / 2.0 ) );
+					testlen = Material( matid ).Thickness * ( ( std::sin( Pi * ( -1.0 / double( Material( matid ).divs ) ) - Pi / 2.0 ) / 2.0 ) - ( sin_negPIOvr2 / 2.0 ) );
 					if ( testlen > adjdist ) break;
 					--Material( matid ).divs;
 					if ( Material( matid ).divs < 1 ) {
@@ -810,7 +811,7 @@ namespace HeatBalanceHAMTManager {
 			ShowFatalError( "CombinedHeatAndMoistureFiniteElement: Incomplete data to start solution, program terminates." );
 		}
 
-		// Make the cells and initialise
+		// Make the cells and initialize
 		cells.allocate( TotCellsMax );
 		for ( auto & e : cells ) {
 			e.adjs = -1;
@@ -955,7 +956,7 @@ namespace HeatBalanceHAMTManager {
 			}
 		}
 
-		// Reset surface virtual cell origins and volumes. Initialise report variables.
+		// Reset surface virtual cell origins and volumes. Initialize report variables.
 		gio::write( OutputFileInits, Format_1966 );
 		gio::write( OutputFileInits, Format_1965 );
 		//cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
@@ -980,7 +981,7 @@ namespace HeatBalanceHAMTManager {
 			SetupOutputVariable( "HAMT Surface Outside Face Temperature [C]", surfexttemp( sid ), "Zone", "State", Surface( sid ).Name );
 			SetupOutputVariable( "HAMT Surface Outside Face Relative Humidity [%]", surfextrh( sid ), "Zone", "State", Surface( sid ).Name );
 
-			// write cell origins to initilisation output file
+			// write cell origins to initialization output file
 			conid = Surface( sid ).Construction;
 			gio::write( OutputFileInits, "('HAMT cells, ',A,',',A,$)" ) << Surface( sid ).Name << Construct( conid ).Name;
 			for ( int concell = 1, concell_end = Intcell( sid ) - Extcell( sid ) + 1; concell <= concell_end; ++concell ) {

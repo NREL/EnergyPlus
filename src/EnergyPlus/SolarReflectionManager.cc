@@ -1236,14 +1236,14 @@ namespace SolarReflectionManager {
 						// Altitude loop
 						for ( int IPhi = 1; IPhi <= ( AltAngStepsForSolReflCalc / 2 ); ++IPhi ) {
 							// Third component of ray unit vector in (Theta,Phi) direction
-							URay( 3 ) = sin_Phi[IPhi];
-							Real64 dOmega = cos_Phi[IPhi] * DTheta * DPhi; // Solid angle increment (steradians)
+							URay( 3 ) = sin_Phi[ IPhi ];
+							Real64 dOmega = cos_Phi[ IPhi ] * DTheta * DPhi; // Solid angle increment (steradians)
 							// Cosine of angle of incidence of ray on ground
-							Real64 CosIncAngRayToSky = sin_Phi[IPhi]; // Cosine of incidence angle on ground of ray to sky
+							Real64 CosIncAngRayToSky = sin_Phi[ IPhi ]; // Cosine of incidence angle on ground of ray to sky
 							// Azimuth loop
 							for ( int ITheta = 1; ITheta <= 2 * AzimAngStepsForSolReflCalc; ++ITheta ) {
-								URay.x = cos_Phi[IPhi] * cos_Theta[ITheta];
-								URay.y = cos_Phi[IPhi] * sin_Theta[ITheta];
+								URay.x = cos_Phi[ IPhi ] * cos_Theta[ ITheta ];
+								URay.y = cos_Phi[ IPhi ] * sin_Theta[ ITheta ];
 								// Does this ray hit an obstruction?
 								hitObs = false;
 								for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {

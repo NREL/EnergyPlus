@@ -1691,7 +1691,7 @@ namespace SolarCollectors {
 		// get the incidence and refraction angles
 		IncAngle = IncidentAngle;
 		ParamNum = Collector( ColleNum ).Parameters;
-		Real64 sin_IncAngle( std::sin( IncAngle ) );
+		Real64 const sin_IncAngle( std::sin( IncAngle ) );
 
 		for ( nCover = 1; nCover <= Parameters( ParamNum ).NumOfCovers; ++nCover ) {
 

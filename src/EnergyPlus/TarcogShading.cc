@@ -588,7 +588,7 @@ namespace TarcogShading {
 		Real64 const s1_2( pow_2( s1 ) );
 		Real64 const s2_2( pow_2( s2 ) );
 		Real64 const s1_s2_2( pow_2( s1 / s2 ) );
-		Real64 const CosTilt = std::cos( tilt );
+		Real64 const cos_Tilt( std::cos( tilt ) );
 		while ( ! converged ) {
 			++iter;
 			GASSES90( Tgap1, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, nperr, ErrorMessage );
@@ -597,7 +597,7 @@ namespace TarcogShading {
 			//  A = dens0 * T0 * GravityConstant * ABS(cos(tilt)) * ABS(Tgap1 - Tgap2) / (Tgap1 * Tgap2)
 
 			//bi...Bug fix #00005:
-			A = dens0 * T0 * GravityConstant * H * std::abs( CosTilt ) * std::abs( Tgap1 - Tgap2 ) / ( Tgap1 * Tgap2 );
+			A = dens0 * T0 * GravityConstant * H * std::abs( cos_Tilt ) * std::abs( Tgap1 - Tgap2 ) / ( Tgap1 * Tgap2 );
 
 			if ( A == 0.0 ) {
 				qv1 = 0.0;

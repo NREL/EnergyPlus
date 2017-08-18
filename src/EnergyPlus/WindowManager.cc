@@ -8232,7 +8232,9 @@ Label99999: ;
 				fEdge1 = 0.0;
 				gamma = phib - phis;
 				if ( std::abs( std::sin( gamma ) ) > 0.01 ) {
-					if ( ( phib > 0.0 && phib <= PiOvr2 && phis <= phib ) || ( phib > PiOvr2 && phib <= Pi && phis > -( Pi - phib ) ) ) fEdge1 = Blind( BlindNum ).SlatThickness * std::abs( std::sin( gamma ) ) / ( ( Blind( BlindNum ).SlatSeparation + Blind( BlindNum ).SlatThickness / std::abs( std::sin( phib ) ) ) * std::cos( phis ) );
+					if ( ( phib > 0.0 && phib <= PiOvr2 && phis <= phib ) || ( phib > PiOvr2 && phib <= Pi && phis > -( Pi - phib ) ) ) {
+						fEdge1 = Blind( BlindNum ).SlatThickness * std::abs( std::sin( gamma ) ) / ( ( Blind( BlindNum ).SlatSeparation + Blind( BlindNum ).SlatThickness / std::abs( std::sin( phib ) ) ) * std::cos( phis ) );
+					}
 					fEdgeSource( Iphis ) = min( 1.0, std::abs( fEdge1 ) );
 				}
 			}
@@ -8527,7 +8529,9 @@ Label99999: ;
 			fEdge1 = 0.0;
 			gamma = phib - phis;
 			if ( std::abs( std::sin( gamma ) ) > 0.01 ) {
-				if ( ( phib > 0.0 && phib <= PiOvr2 && phis <= phib ) || ( phib > PiOvr2 && phib <= Pi && phis > -( Pi - phib ) ) ) fEdge1 = Blind( BlindNum ).SlatThickness * std::abs( std::sin( gamma ) ) / ( ( Blind( BlindNum ).SlatSeparation + Blind( BlindNum ).SlatThickness / std::abs( std::sin( phib ) ) ) * std::cos( phis ) );
+				if ( ( phib > 0.0 && phib <= PiOvr2 && phis <= phib ) || ( phib > PiOvr2 && phib <= Pi && phis > -( Pi - phib ) ) ) {
+					fEdge1 = Blind( BlindNum ).SlatThickness * std::abs( std::sin( gamma ) ) / ( ( Blind( BlindNum ).SlatSeparation + Blind( BlindNum ).SlatThickness / std::abs( std::sin( phib ) ) ) * std::cos( phis ) );
+				}
 				fEdge = min( 1.0, std::abs( fEdge1 ) );
 			}
 
