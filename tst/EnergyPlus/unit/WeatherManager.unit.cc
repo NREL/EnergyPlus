@@ -289,9 +289,20 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryCondition ) {
 	// set up dataipshortcuts structure
 	//bool errorsFound = false;
 
-	DataIPShortCuts::cAlphaArgs = Array1D<std::string>({"MyUnderwaterName", "WaterTempSchedule", "WaterVelocitySchedule"});
-	DataIPShortCuts::lAlphaFieldBlanks = Array1D<bool>({false, false, false});
-	DataIPShortCuts::rNumericArgs = Array1D<Real64>({31.415926535});
+    std::string const idf_objects = delimited_string({
+        "SurfaceProperty:Underwater, MyUnderwaterName, 31.4159, WaterTempSchedule, WaterVelocitySchedule;",
+        "Schedule:Constant, WaterTempSchedule, , 30;"
+        "Schedule:Constant, WaterVelocitySchedule, , 3.0;"
+    });
+    ASSERT_FALSE(process_idf(idf_objects));
+
+    bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+    ASSERT_TRUE(shouldBeTrue);
+
+
+//    DataIPShortCuts::cAlphaArgs = Array1D<std::string>({"MyUnderwaterName", "WaterTempSchedule", "WaterVelocitySchedule"});
+//	DataIPShortCuts::lAlphaFieldBlanks = Array1D<bool>({false, false, false});
+//	DataIPShortCuts::rNumericArgs = Array1D<Real64>({31.415926535});
 
 //	underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
 //	underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
