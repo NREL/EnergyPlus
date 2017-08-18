@@ -859,12 +859,6 @@ namespace HVACUnitarySystem {
 		bool & ErrorFlag
 	);
 
-	void
-	GetUnitarySystemInputData2(
-		int const UnitarySysNum, // Index of AirloopHVAC:UnitarySystem object
-		bool & ErrorFlag
-	);
-
 	// End of Get Input subroutines for the Module
 	//******************************************************************************
 
