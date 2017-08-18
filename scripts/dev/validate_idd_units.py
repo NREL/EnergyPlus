@@ -1,6 +1,23 @@
 #!/usr/bin/env python
 
+# Usage: Pass in the path to an idd file (configured or raw) as the only command line argument
+#        The program will scan unit specifications in the idd header and then validate all field \units tags
+
+# Eventually, this should be brought into the custom_check tests
+# Just need to add the CMake logic to run it, and then have this report out warnings properly
+
 import sys
+
+
+# There are some missing units in a large number of fields.
+# I don't really want to add an ignore list, but I don't want to fix them all at the moment, either.
+# Thus, here is an ignore list.  To fix these up, you could add these to the 'not-translated units' section.
+ignore_list = ["hh:mm", "kgWater/kgDryAir"]
+
+# There are also some lines that include more than one unit specification
+# I'd like to include the warning for those, but I won't at the moment, so for now this warning is disabled.
+# Later on, enable this to ensure unit strings are properly formatted
+warn_for_bad_unit_tokens = False
 
 
 class ReadingMode:
@@ -19,9 +36,6 @@ class Problem:
 
 idd_file = sys.argv[1]
 idd_lines = open(idd_file).readlines()
-
-# I don't really want to add an ignore list, but so be it:
-ignore_list = ["hh:mm", "kgWater/kgDryAir"]
 
 original_units = []
 reading_mode = ReadingMode.FindTranslatedUnits
@@ -48,10 +62,9 @@ for line in idd_lines:
         if "\units " in line:
             tokens = line.split(" ")
             real_tokens = [t for t in tokens if t]
-            if not len(real_tokens) == 2:
+            if not len(real_tokens) == 2 and warn_for_bad_unit_tokens:
                 problem_unit_lines.append(Problem(line_num, "Unexpected number of unit specifications"))
-                continue
-            if real_tokens[1] not in original_units and real_tokens[1] not in ignore_list:
+            elif real_tokens[1] not in original_units and real_tokens[1] not in ignore_list:
                 problem_unit_lines.append(Problem(line_num, "Unexpected unit type found: " + real_tokens[1]))
 
 for problem in problem_unit_lines:
