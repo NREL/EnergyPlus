@@ -32260,7 +32260,7 @@ DesignSpecification:AirTerminal:Sizing,
       \note the cooling design supply air flow rate for this terminal unit.
       \type real
       \units dimensionless
-      \minimum 0.0
+      \minimum> 0.0
       \default 1.0
   N3, \field Fraction of Design Heating Load
       \note The fraction of the design sensible heating load to be met by this terminal unit. 
@@ -32274,7 +32274,7 @@ DesignSpecification:AirTerminal:Sizing,
       \note the heating design supply air flow rate for this terminal unit.
       \type real
       \units dimensionless
-      \minimum 0.0
+      \minimum> 0.0
       \default 1.0
   N5; \field Fraction of Minimum Outdoor Air Flow
       \note The fraction of the zone minimum outdoor air requirement to be met by this terminal unit.
