@@ -814,6 +814,13 @@ namespace WeatherManager {
 	bool
 	CheckIfAnyUnderwaterBoundaries();
 
+	Real64
+	calculateWaterBoundaryConvectionCoefficient(
+		Real64 const curWaterTemp,
+		Real64 const curWaterVelocity,
+		Real64 const distanceFromLeadingEdge
+	);
+		
 	void
 	UpdateUnderwaterBoundaries();
 

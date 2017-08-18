@@ -308,7 +308,7 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated ) {
     EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
     EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
-    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);
+    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);    
     
 }
 
@@ -338,3 +338,10 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK ) {
     
 }
 
+TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients ) {
+	EXPECT_NEAR(2483.702, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 30.0), 0.01);
+	EXPECT_NEAR(2162.188, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 60.0), 0.01);
+	EXPECT_NEAR(1993.771, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 90.0), 0.01);
+	EXPECT_NEAR(1882.294, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 120.0), 0.01);
+	EXPECT_NEAR(1800.136, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 150.0), 0.01);
+}

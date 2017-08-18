@@ -648,38 +648,45 @@ namespace WeatherManager {
 		return ( Num > 0 );
 	}
 
-	void
-	UpdateUnderwaterBoundaries()
-	{
+	Real64
+	calculateWaterBoundaryConvectionCoefficient(
+		Real64 const curWaterTemp,
+		Real64 const freeStreamVelocity,
+		Real64 const distanceFromLeadingEdge
+	) {
 		Real64 const waterKinematicViscosity = 1e-6; // m2/s
 		Real64 const waterPrandtlNumber = 6; // -
 		Real64 const waterThermalConductivity = 0.6; // W/mK
+		// do some calculation for forced convection from the leading edge of the ship
+		Real64 const localReynoldsNumber = freeStreamVelocity * distanceFromLeadingEdge / waterKinematicViscosity;
+		Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0 / 3.0 );
+		Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / distanceFromLeadingEdge;
+
+		// do some calculations for natural convection from the bottom of the ship
+		Real64 const distanceFromBottomOfHull = 12;   // meters, assumed for now
+		// this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
+		Real64 const prandtlCorrection = ( 0.75 * pow(waterPrandtlNumber, 0.5) ) / pow( 0.609 + 1.221 * pow( waterPrandtlNumber, 0.5 ) + 1.238 * waterPrandtlNumber, 0.25 );
+		// calculate the Grashof number
+		Real64 const gravity = 9.81; // m/s2
+		Real64 const beta = 0.000214;  // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
+		Real64 const assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
+		Real64 const localGrashofNumber = ( gravity * beta * ( assumedSurfaceTemp - curWaterTemp ) * pow( distanceFromBottomOfHull, 3 ) ) / pow( waterKinematicViscosity, 2 );
+		Real64 const localNusseltFreeConvection = pow( localGrashofNumber / 4, 0.25 ) * prandtlCorrection;
+		Real64 const localConvectionCoeffFreeConv = localNusseltFreeConvection * waterThermalConductivity / distanceFromBottomOfHull;
+		return max( localConvectionCoeff, localConvectionCoeffFreeConv );
+	}
+
+	void
+	UpdateUnderwaterBoundaries()
+	{
 		for ( auto & thisBoundary : underwaterBoundaries ) {
 			Real64 const curWaterTemp = ScheduleManager::GetCurrentScheduleValue( thisBoundary.WaterTempScheduleIndex ); // C
 			Real64 freeStreamVelocity = 0;
 			if ( thisBoundary.VelocityScheduleIndex > 0 ) {
 				freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue( thisBoundary.VelocityScheduleIndex ); // m/s
 			}
-			Real64 const thisDistance = thisBoundary.distanceFromLeadingEdge;
-
-			// do some calculation for forced convection from the leading edge of the ship
-			Real64 const localReynoldsNumber = freeStreamVelocity * thisDistance / waterKinematicViscosity;
-			Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0 / 3.0 );
-			Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / thisDistance;
-
-			// do some calculations for natural convection from the bottom of the ship
-			Real64 const distanceFromBottomOfHull = 12;   // meters, assumed for now
-			// this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
-			Real64 const prandtlCorrection = ( 0.75 * pow(waterPrandtlNumber, 0.5) ) / pow( 0.609 + 1.221 * pow( waterPrandtlNumber, 0.5 ) + 1.238 * waterPrandtlNumber, 0.25 );
-			// calculate the Grashof number
-			Real64 const gravity = 9.81; // m/s2
-			Real64 const beta = 0.000214;  // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
-			Real64 const assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
-			Real64 const localGrashofNumber = ( gravity * beta * ( assumedSurfaceTemp - curWaterTemp ) * pow( distanceFromBottomOfHull, 3 ) ) / pow( waterKinematicViscosity, 2 );
-			Real64 const localNusseltFreeConvection = pow( localGrashofNumber / 4, 0.25 ) * prandtlCorrection;
-			Real64 const localConvectionCoeffFreeConv = localNusseltFreeConvection * waterThermalConductivity / distanceFromBottomOfHull;
 			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TConv = curWaterTemp;
-			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HConv = max( localConvectionCoeff, localConvectionCoeffFreeConv );
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HConv = WeatherManager::calculateWaterBoundaryConvectionCoefficient(curWaterTemp, freeStreamVelocity, thisBoundary.distanceFromLeadingEdge);
 			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TRad = curWaterTemp;
 			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HRad = 0.0;
 		}
