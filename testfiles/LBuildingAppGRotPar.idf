@@ -1285,7 +1285,6 @@
 
                              !- Name
                              !- Construction Name
-
 ! ========== ADDD INTERIOR WALLS ==========
 
   BuildingSurface:Detailed,
@@ -1385,7 +1384,6 @@
     30.47851,0,3.047851;  !- X,Y,Z ==> Vertex 4 {m}
 
 ! ===========================================
-
 
   BuildingSurface:Detailed,
     RoofAbove_Main_Zone_a_b_g_l,  !- Name

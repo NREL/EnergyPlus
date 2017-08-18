@@ -391,6 +391,9 @@
 !Example CaseAndWalkInList object
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Refrigeration:CaseAndWalkInList,
     NameofCaseList,          !- Name
     Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Case or WalkIn 1 Name
