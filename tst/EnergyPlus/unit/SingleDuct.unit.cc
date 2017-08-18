@@ -2534,7 +2534,7 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 	// Design occupancy
 	SysATMixer( 1 ).OAPerPersonMode = 2;
 	Zone( 1 ).TotOccupants = 10;
-	SingleDuct::InitATMixer( 1, true );
+	SysATMixer(1).InitATMixer( true );
 	EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 1.32, 0.0001 );
 
 	SysATMixer.deallocate( );

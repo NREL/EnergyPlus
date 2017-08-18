@@ -1701,7 +1701,6 @@ namespace SingleDuct {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode;
 		int OutletNode;
-		int ADUNum;
 		int SysIndex;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static Array1D_bool MyEnvrnFlag;
