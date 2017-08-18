@@ -551,6 +551,7 @@ namespace SimAirServingZones {
 		AirLoopConvergence.allocate( NumPrimaryAirSys );
 		UnitarySysEqSizing.allocate( NumPrimaryAirSys );
 
+		DataHVACGlobals::GetAirPathDataDone = true; // used by HVACUnitarySystem::GetUnitarySystemInputData to determine if airloops are setup yet
 		if ( NumPrimaryAirSys <= 0 ) {
 			TestUniqueNodes.deallocate();
 			NodeNums.deallocate();
