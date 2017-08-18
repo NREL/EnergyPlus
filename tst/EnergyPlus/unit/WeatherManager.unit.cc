@@ -304,11 +304,11 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated ) {
     // then process the input for this underwater surface
     bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
     EXPECT_TRUE(shouldBeTrue);
-    //~ EXPECT_EQ(WeatherManager::underwaterBoundaries[0].Name, "UnderwaterSurfaceName");
-    //~ EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
-	//~ EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
-    //~ EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
-    //~ EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);
+    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
+    EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
+    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
+    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);
     
 }
 
@@ -330,11 +330,11 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK ) {
     // then process the input for this underwater surface
     bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
     EXPECT_TRUE(shouldBeTrue);
-    //~ EXPECT_EQ(WeatherManager::underwaterBoundaries[0].Name, "UnderwaterSurfaceName");
-    //~ EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
-	//~ EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
-    //~ EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
-    //~ EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);
+    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
+    EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
+    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
+    EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 0);
     
 }
 
