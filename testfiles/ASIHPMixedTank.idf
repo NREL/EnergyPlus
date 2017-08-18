@@ -2665,23 +2665,23 @@
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Air Loop Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+  Output:Variable,*,Integrated Heat Pump Air Loop Mass Flow Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Condenser Water Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+  Output:Variable,*,Integrated Heat Pump Condenser Water Mass Flow Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Air Total Cooling Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Air Total Cooling Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Air Heating Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Air Heating Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Water Heating Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Water Heating Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Electric Power,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Electric Power,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Air Latent Cooling Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Air Latent Cooling Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Source Heat Transfer Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Source Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump COP,timestep; !- HVAC Average []
+  Output:Variable,*,Integrated Heat Pump COP,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -2721,3 +2721,4 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+

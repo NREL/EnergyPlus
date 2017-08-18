@@ -1229,12 +1229,12 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
@@ -1449,10 +1449,10 @@
     GshpCLG SourceSide Outlet Node,  !- Source Side Outlet Node Name
     GshpCLG LoadSide Inlet Node,  !- Load Side Inlet Node Name
     GshpCLG LoadSide Outlet Node,  !- Load Side Outlet Node Name
-    autosize,                !- Rated Load Side Flow Rate {m3/s}
-    autosize,                !- Rated Source Side Flow Rate {m3/s}
-    autosize,                !- Rated Cooling Capacity {W}
-    autosize,                 !- Rated Cooling Power Consumption {W}
+    autosize,                !- Reference Load Side Flow Rate {m3/s}
+    autosize,                !- Reference Source Side Flow Rate {m3/s}
+    autosize,                !- Reference Cooling Capacity {W}
+    autosize,                !- Reference Cooling Power Consumption {W}
     -1.52030596,             !- Cooling Capacity Coefficient 1
     3.46625667,              !- Cooling Capacity Coefficient 2
     -1.32267797,             !- Cooling Capacity Coefficient 3
@@ -1497,12 +1497,12 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -1753,10 +1753,10 @@
     GshpHeating SourceSide Outlet Node,  !- Source Side Outlet Node Name
     GshpHeating LoadSide Inlet Node,  !- Load Side Inlet Node Name
     GshpHeating LoadSide Outlet Node,  !- Load Side Outlet Node Name
-    autosize,                !- Rated Load Side Flow Rate {m3/s}
-    autosize,                !- Rated Source Side Flow Rate {m3/s}
-    autosize,                !- Rated Heating Capacity {W}
-    autosize,                 !- Rated Heating Power Consumption {W}
+    autosize,                !- Reference Load Side Flow Rate {m3/s}
+    autosize,                !- Reference Source Side Flow Rate {m3/s}
+    autosize,                !- Reference Heating Capacity {W}
+    autosize,                !- Reference Heating Power Consumption {W}
     -3.33491153,             !- Heating Capacity Coefficient 1
     -0.51451946,             !- Heating Capacity Coefficient 2
     4.51592706,              !- Heating Capacity Coefficient 3
@@ -1790,10 +1790,10 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    SequentialLoad,                     !- Load Distribution Scheme
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
-    
+    SequentialLoad,          !- Load Distribution Scheme
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
+
   SetpointManager:FollowGroundTemperature,
     MyCondenserControl,      !- Name
     Temperature,             !- Control Variable

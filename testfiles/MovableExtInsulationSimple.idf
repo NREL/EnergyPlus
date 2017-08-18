@@ -419,7 +419,6 @@
     15.24,15.24,4.572,  !- X,Y,Z ==> Vertex 3 {m}
     0,15.24,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
-
   ZoneControl:Thermostat,
     Zone 1 Thermostat,       !- Name
     ZONE ONE,                !- Zone or ZoneList Name

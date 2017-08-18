@@ -5,7 +5,7 @@
 ! DOAToUnitVentilator.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-!                          Illustrates the use of a dedicated outdoor air system (DOAS) with Unit Ventilator. The DOA 
+!                          Illustrates the use of a dedicated outdoor air system (DOAS) with Unit Ventilator. The DOA
 !                          is ducted to the inlet side of the Unit Ventilator and mixed with zone recirculating air
 !                          through the use of inlet side mixer terminal units for zones: SPACE1-1, SPACE2-1 and SPACE3-1.
 !                          The DOA is ducted to the outlet side of the Unit Ventilator and mixed with the Unit Ventilator
@@ -2423,50 +2423,49 @@
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:MIXER ===========
 
   AirTerminal:SingleDuct:Mixer,
     SPACE1-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:UnitVentilator,   !- ZoneHVAC Unit Object Type
-    TU1,                       !- ZoneHVAC Unit Object Name
-    Zone1UnitVentOAMixerOutletNode, !- Mixer Outlet Node Name
+    ZoneHVAC:UnitVentilator, !- ZoneHVAC Unit Object Type
+    TU1,                     !- ZoneHVAC Unit Object Name
+    Zone1UnitVentOAMixerOutletNode,  !- Mixer Outlet Node Name
     SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    Zone1UnitVentAirInletNode, !- Mixer Secondary Air Inlet Node Name
-    InletSide;                 !- Mixer Connection Type
+    Zone1UnitVentAirInletNode,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;               !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
-    SPACE2-1 DOAS Air Terminal, !- Name
-    ZoneHVAC:UnitVentilator,    !- ZoneHVAC Unit Object Type
-    TU2,                        !- ZoneHVAC Unit Object Name
+    SPACE2-1 DOAS Air Terminal,  !- Name
+    ZoneHVAC:UnitVentilator, !- ZoneHVAC Unit Object Type
+    TU2,                     !- ZoneHVAC Unit Object Name
     Zone2UnitVentOAMixerOutletNode,  !- Mixer Outlet Node Name
     SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     Zone2UnitVentAirInletNode,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;                  !- Mixer Connection Type
+    InletSide;               !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
-    SPACE3-1 DOAS Air Terminal, !- Name
-    ZoneHVAC:UnitVentilator,    !- ZoneHVAC Unit Object Type
-    TU3,                        !- ZoneHVAC Unit Object Name
+    SPACE3-1 DOAS Air Terminal,  !- Name
+    ZoneHVAC:UnitVentilator, !- ZoneHVAC Unit Object Type
+    TU3,                     !- ZoneHVAC Unit Object Name
     Zone3UnitVentOAMixerOutletNode,  !- Mixer Outlet Node Name
     SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     Zone3UnitVentAirInletNode,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;                  !- Mixer Connection Type
+    InletSide;               !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:UnitVentilator,  !- ZoneHVAC Unit Object Type
-    TU4,                      !- ZoneHVAC Unit Object Name
-    TU4 Outlet Node,          !- Mixer Outlet Node Name
+    ZoneHVAC:UnitVentilator, !- ZoneHVAC Unit Object Type
+    TU4,                     !- ZoneHVAC Unit Object Name
+    TU4 Outlet Node,         !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     Zone4UnitVentAirOutletNode,  !- Mixer Secondary Air Inlet Node Name
     SupplySide;              !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:UnitVentilator,  !- ZoneHVAC Unit Object Type
-    TU5,                      !- ZoneHVAC Unit Object Name
-    TU5 Outlet Node,          !- Mixer Outlet Node Name
+    ZoneHVAC:UnitVentilator, !- ZoneHVAC Unit Object Type
+    TU5,                     !- ZoneHVAC Unit Object Name
+    TU5 Outlet Node,         !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     Zone5UnitVentAirOutletNode,  !- Mixer Secondary Air Inlet Node Name
     SupplySide;              !- Mixer Connection Type
@@ -2474,33 +2473,33 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE1-1 DOAS ATU,            !- Name
-    Zone1UnitVentOAMixerOutletNode, !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer, !- Air Terminal Object Type
-    SPACE1-1 DOAS Air Terminal;   !- Air Terminal Name
+    SPACE1-1 DOAS ATU,       !- Name
+    Zone1UnitVentOAMixerOutletNode,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
+    SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE2-1 DOAS ATU,            !- Name
-    Zone2UnitVentOAMixerOutletNode,    !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer, !- Air Terminal Object Type
-    SPACE2-1 DOAS Air Terminal;   !- Air Terminal Name
+    SPACE2-1 DOAS ATU,       !- Name
+    Zone2UnitVentOAMixerOutletNode,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
+    SPACE2-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE3-1 DOAS ATU,            !- Name
-    Zone3UnitVentOAMixerOutletNode,    !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer, !- Air Terminal Object Type
-    SPACE3-1 DOAS Air Terminal;   !- Air Terminal Name
+    SPACE3-1 DOAS ATU,       !- Name
+    Zone3UnitVentOAMixerOutletNode,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
+    SPACE3-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE4-1 DOAS ATU,           !- Name
-    TU4 Outlet Node,             !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
+    SPACE4-1 DOAS ATU,       !- Name
+    TU4 Outlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE4-1 DOAS Air Terminal;  !- Air Terminal Name
 
- ZoneHVAC:AirDistributionUnit,
-    SPACE5-1 DOAS ATU,           !- Name
-    TU5 Outlet Node,             !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
+  ZoneHVAC:AirDistributionUnit,
+    SPACE5-1 DOAS ATU,       !- Name
+    TU5 Outlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE5-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:UnitVentilator,
@@ -2512,8 +2511,8 @@
     U2MinOASched,            !- Minimum Outdoor Air Schedule Name
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     UnitVentMaxOA,           !- Maximum Outdoor Air Fraction or Temperature Schedule Name
-    Zone1UnitVentOAMixerOutletNode, !- Air Inlet Node Name
-    Zone1UnitVentAirOutletNode, !- Air Outlet Node Name
+    Zone1UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone1UnitVentAirOutletNode,  !- Air Outlet Node Name
     ,                        !- Outdoor Air Node Name
     ,                        !- Exhaust Air Node Name
     ,                        !- Mixed Air Node Name
@@ -2529,7 +2528,7 @@
     0.001;                   !- Cooling Convergence Tolerance
 
   ZoneHVAC:UnitVentilator,
-    TU2,           !- Name
+    TU2,                     !- Name
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
@@ -2551,7 +2550,7 @@
     0.001;                   !- Heating Convergence Tolerance
 
   ZoneHVAC:UnitVentilator,
-    TU3,           !- Name
+    TU3,                     !- Name
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
@@ -2559,7 +2558,7 @@
     U2MinOASched,            !- Minimum Outdoor Air Schedule Name
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     UnitVentMaxOA,           !- Maximum Outdoor Air Fraction or Temperature Schedule Name
-    Zone3UnitVentOAMixerOutletNode, !- Air Inlet Node Name
+    Zone3UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
     Zone3UnitVentAirOutletNode,  !- Air Outlet Node Name
     ,                        !- Outdoor Air Node Name
     ,                        !- Exhaust Air Node Name
@@ -2573,7 +2572,7 @@
     0.001;                   !- Heating Convergence Tolerance
 
   ZoneHVAC:UnitVentilator,
-    TU4,           !- Name
+    TU4,                     !- Name
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
@@ -2582,7 +2581,7 @@
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     UnitVentMaxOA,           !- Maximum Outdoor Air Fraction or Temperature Schedule Name
     Zone4UnitVentAirInletNode,  !- Air Inlet Node Name
-    Zone4UnitVentAirOutletNode, !- Air Outlet Node Name
+    Zone4UnitVentAirOutletNode,  !- Air Outlet Node Name
     ,                        !- Outdoor Air Node Name
     ,                        !- Exhaust Air Node Name
     ,                        !- Mixed Air Node Name
@@ -2598,7 +2597,7 @@
     0.001;                   !- Cooling Convergence Tolerance
 
   ZoneHVAC:UnitVentilator,
-    TU5,           !- Name
+    TU5,                     !- Name
     UnitVentAvailability,    !- Availability Schedule Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     VariablePercent,         !- Outdoor Air Control Type
@@ -2607,7 +2606,7 @@
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
     UnitVentMaxOA,           !- Maximum Outdoor Air Fraction or Temperature Schedule Name
     Zone5UnitVentAirInletNode,  !- Air Inlet Node Name
-    Zone5UnitVentAirOutletNode, !- Air Outlet Node Name
+    Zone5UnitVentAirOutletNode,  !- Air Outlet Node Name
     ,                        !- Outdoor Air Node Name
     ,                        !- Exhaust Air Node Name
     ,                        !- Mixed Air Node Name
@@ -2621,15 +2620,15 @@
 
   NodeList,
     SPACE1-1 In Nodes,       !- Name
-    Zone1UnitVentAirOutletNode;         !- Node 1 Name
+    Zone1UnitVentAirOutletNode;  !- Node 1 Name
 
   NodeList,
     SPACE2-1 In Nodes,       !- Name
-    Zone2UnitVentAirOutletNode;         !- Node 1 Name
+    Zone2UnitVentAirOutletNode;  !- Node 1 Name
 
   NodeList,
     SPACE3-1 In Nodes,       !- Name
-    Zone3UnitVentAirOutletNode;         !- Node 1 Name
+    Zone3UnitVentAirOutletNode;  !- Node 1 Name
 
   NodeList,
     SPACE4-1 In Nodes,       !- Name
@@ -2637,7 +2636,7 @@
 
   NodeList,
     SPACE5-1 In Nodes,       !- Name
-    Zone5UnitVentAirOutletNode;         !- Node 1 Name
+    Zone5UnitVentAirOutletNode;  !- Node 1 Name
 
   ZoneControl:Thermostat,
     SPACE1-1 Thermostat,     !- Name
@@ -2647,9 +2646,9 @@
     Zone Dual SP Control;    !- Control 1 Name
 
   ThermostatSetpoint:DualSetpoint,
-    Zone Dual SP Control,     !- Name
-    Heating Setpoints,          !- Heating Setpoint Temperature Schedule Name
-    Cooling Setpoints;          !- Cooling Setpoint Temperature Schedule Name
+    Zone Dual SP Control,    !- Name
+    Heating Setpoints,       !- Heating Setpoint Temperature Schedule Name
+    Cooling Setpoints;       !- Cooling Setpoint Temperature Schedule Name
 
   ZoneControl:Thermostat,
     Zone 2 Thermostat,       !- Name
@@ -2674,7 +2673,7 @@
     SPACE4-1,                !- Zone or ZoneList Name
     HVACTemplate-Always 4,   !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    Zone Dual SP Control;  !- Control 1 Name
+    Zone Dual SP Control;    !- Control 1 Name
 
   ZoneControl:Thermostat,
     Zone 5 Thermostat,       !- Name
@@ -2697,13 +2696,13 @@
     Purchased Cooling,       !- Name
     Purchased Cooling Inlet Node,  !- Chilled Water Inlet Node Name
     Purchased Cooling Outlet Node,  !- Chilled Water Outlet Node Name
-    autosize;                 !- Nominal Capacity {W}
+    autosize;                !- Nominal Capacity {W}
 
   DistrictHeating,
     Purchased Heating,       !- Name
     Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name
     Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name
-    autosize;                 !- Nominal Capacity {W}
+    autosize;                !- Nominal Capacity {W}
 
   Pump:VariableSpeed,
     ChW Circ Pump,           !- Name
@@ -2894,7 +2893,6 @@
     Zone5UnitVentAirInletNode,  !- Air Inlet Node Name
     Zone5UnitVentFanOutletNode;  !- Air Outlet Node Name
 
- 
 ! ************** DOAS System providing OA to the inlet side of Zone HVAC Unit Ventilator *********
 ! ***** Central OA is Fed Directly to Zone HVAC Unit Ventilator inlet and mixed with re-cir air ***
 !
