@@ -2257,121 +2257,120 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:CONSTANTVOLUME ===========
 
-
   Fan:SystemModel,
-    Zone1VentSlabFan, !- Name
-    VentSlabAvailability , !- Availability Schedule Name
+    Zone1VentSlabFan,        !- Name
+    VentSlabAvailability,    !- Availability Schedule Name
     Zone1VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone1VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
   Fan:SystemModel,
-    Zone2VentSlabFan, !- Name
-    UnitVentAvailability , !- Availability Schedule Name
+    Zone2VentSlabFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
     Zone2VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone2VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
   Fan:SystemModel,
-    Zone3VentSlabFan, !- Name
-    VentSlabAvailability , !- Availability Schedule Name
+    Zone3VentSlabFan,        !- Name
+    VentSlabAvailability,    !- Availability Schedule Name
     Zone3VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone3VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
   Fan:SystemModel,
-    Zone4VentSlabFan, !- Name
-    VentSlabAvailability , !- Availability Schedule Name
+    Zone4VentSlabFan,        !- Name
+    VentSlabAvailability,    !- Availability Schedule Name
     Zone4VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone4VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
   Fan:SystemModel,
-    Zone5VentSlabFan, !- Name
-    UnitVentAvailability , !- Availability Schedule Name
+    Zone5VentSlabFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
     Zone5VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone5VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:WATER ===========
 
