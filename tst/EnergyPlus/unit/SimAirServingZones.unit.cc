@@ -59,6 +59,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <DataAirSystems.hh>
 #include <DataSizing.hh>
 #include <SimAirServingZones.hh>
@@ -220,4 +221,86 @@ namespace EnergyPlus {
 
 
 	}
+
+	TEST_F( EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1 ) {
+		// this unit test is related to issue #5835
+		// when system capacit is hard sized user input
+		int AirLoopNum( 0 ); // index of air loops
+		Real64 ScaledCoolDesignFlowRate( 0.0 ); //system cooling design flow rate
+		Real64 ScaledHeatDesignFlowRate( 0.0 ); //system heating design flow rate
+
+		AirLoopNum = 1;
+		CalcSysSizing.allocate( AirLoopNum );
+		FinalSysSizing.allocate( AirLoopNum );
+		
+		// set system flow sizing method for cooling
+		FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
+		FinalSysSizing( AirLoopNum ).CoolingCapMethod = CoolingDesignCapacity;
+		FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity = 12500.0;
+		FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity = 0.00006041;
+		// scale cooling flow rate using user input capacity
+		ScaledCoolDesignFlowRate = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.755125, ScaledCoolDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.755125, FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow );
+
+		// set system flow sizing method for heating
+		FinalSysSizing( AirLoopNum ).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
+		FinalSysSizing( AirLoopNum ).HeatingCapMethod = HeatingDesignCapacity;
+		FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity = 14400.0;
+		FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity = 0.00006041;
+		// scale heating flow rate using user input capacity
+		ScaledHeatDesignFlowRate = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.869904, ScaledHeatDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.869904, FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow );
+
+	}
+
+	TEST_F( EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2 ) {
+		// this unit test is related to issue #5835
+		// when system capacity is scaled using floor area
+		int AirLoopNum( 0 ); // index of air loops
+		Real64 ScaledCoolDesignFlowRate( 0.0 ); // system cooling design flow rate
+		Real64 ScaledHeatDesignFlowRate( 0.0 ); // system heating design flow rate
+		Real64 ScaledCoolDesignCapacity( 0.0 ); // system cooling design capacity
+		Real64 ScaledHeatDesignCapacity( 0.0 ); // system heating design capacity
+
+		AirLoopNum = 1;
+		CalcSysSizing.allocate( AirLoopNum );
+		FinalSysSizing.allocate( AirLoopNum );
+
+		// set system flow sizing method for cooling
+		FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
+		FinalSysSizing( AirLoopNum ).CoolingCapMethod = CapacityPerFloorArea;
+		FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity = 10.4732; // Watts per m2 floor area
+		FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity = 0.00006041;
+		FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled = 61.450534421531373;
+		// scale cooling capacity using floor area
+		ScaledCoolDesignCapacity = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
+		ScaledCoolDesignFlowRate = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * ScaledCoolDesignCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.038878893558427413, ScaledCoolDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.038878893558427413, FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow );
+
+		// set system flow sizing method for heating
+		FinalSysSizing( AirLoopNum ).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
+		FinalSysSizing( AirLoopNum ).HeatingCapMethod = CapacityPerFloorArea;
+		FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity = 32.0050; // Watts per m2 floor area
+		FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity = 0.00006041;
+		FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled = 61.450534421531373;
+		// scale heating capacity using floor area
+		ScaledHeatDesignCapacity = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
+		ScaledHeatDesignFlowRate = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * ScaledHeatDesignCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.11880981823487276, ScaledHeatDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.11880981823487276, FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow );
+
+	}
+
 }
+
