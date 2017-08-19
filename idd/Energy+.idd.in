@@ -834,7 +834,7 @@ Site:Location,
        \min-fields 5
   A1 , \field Name
        \required-field
-       \type  alpha
+       \type alpha
   N1 , \field Latitude
        \units deg
        \minimum -90.0
@@ -863,6 +863,32 @@ Site:Location,
        \maximum< 8900.0
        \default 0.0
        \type real
+
+Site:VariableLocation,
+       \memo Captures the scheduling of a moving/reorienting building, or more likely a vessel
+       \unique-object
+       \min-fields 1
+  A1 , \field Name
+       \required-field
+       \type alpha
+  A2 , \field Building Location Latitude Schedule
+       \note The name of a schedule that defines the latitude of the building at any time.
+       \note If not entered, the latitude defined in the Site:Location, or the default
+       \note latitude, will be used for the entirety of the simulation
+       \type object-list
+       \object-list ScheduleNames
+  A3 , \field Building Location Longitude Schedule
+       \note The name of a schedule that defines the longitude of the building at any time.
+       \note If not entered, the longitude defined in the Site:Location, or the default
+       \note longitude, will be used for the entirety of the simulation
+       \type object-list
+       \object-list ScheduleNames
+  A4 ; \field Building Location Orientation Schedule
+       \note The name of a schedule that defines the orientation of the building at any time.
+       \note This orientation is based on a change from the original orientation. -- NEED TO REFINE THIS
+       \note If not entered, the original orientation will be used for the entirety of the simulation
+       \type object-list
+       \object-list ScheduleNames
 
 SizingPeriod:DesignDay,
       \memo The design day object creates the parameters for the program to create
@@ -16104,9 +16130,9 @@ SurfaceControl:MovableInsulation,
       \type object-list
       \object-list MaterialName
   A4; \field Schedule Name
-       \required-field
-       \type object-list
-       \object-list ScheduleNames
+      \required-field
+      \type object-list
+      \object-list ScheduleNames
 
 SurfaceProperty:OtherSideCoefficients,
       \memo This object sets the other side conditions for a surface in a variety of ways.
@@ -16189,6 +16215,7 @@ SurfaceProperty:OtherSideConditionsModel,
       \key GapConvectionRadiation
       \key UndergroundPipingSystemSurface
       \key GroundCoupledSurface
+      \key ConvectiveUnderwater
       \note GapConvectionRadiation provides boundary conditions for convection
       \note  and linearized thermal radiation across a gap or cavity
       \note  on the other side of the surface that are modeled separately.
@@ -16196,7 +16223,36 @@ SurfaceProperty:OtherSideConditionsModel,
       \note  surfaces in contact with PipingSystem:Underground domains
       \note GroundCoupledSurface provides boundary conditions for surfaces
       \note  in contact with GroundDomain objects
+      \note ConvectiveUnderwater provides a connection between a surface and
+      \note  an underwater boundary condition defined using a
+      \note  SurfaceProperty:Underwater object
       \default GapConvectionRadiation
+
+SurfaceProperty:Underwater,
+       \memo This object sets up a convective water boundary condition for a surface
+       \memo The free stream temperature and velocity are scheduled. If the free stream
+       \memo velocity is zero, the surface will naturally convect with the surrounding water.
+       \min-fields 3
+  A1,  \field Name
+       \required-field
+       \reference SurfacePropUnderWaterNames
+       \type alpha
+  N1,  \field Distance from Surface Centroid to Leading Edge of Boundary Layer
+       \note This is the distance from the leading edge of the boundary layer development 
+       \note to the centroid of the surface of interest.  The value of this field is used
+       \note as the distance in the Reynolds number for evaluating the local convection coefficient.
+       \type real
+       \units m
+       \required-field
+  A2,  \field Free Stream Water Temperature Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \units C
+  A3;  \field Free Stream Water Velocity Schedule
+       \type object-list
+       \object-list ScheduleNames
+       \units m/s
 
 Foundation:Kiva,
        \memo Refined definition of the foundation surface construction used to

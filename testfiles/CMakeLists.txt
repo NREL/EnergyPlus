@@ -501,6 +501,7 @@ ADD_SIMULATION_TEST(IDF_FILE VSHeatPumpWaterHeater.idf EPW_FILE USA_FL_Miami.Int
 ADD_SIMULATION_TEST(IDF_FILE VSHeatPumpWaterToAirEquationFit.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VSHeatPumpWaterToAirWithRHControl.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VSWaterHeaterHeatPumpStratifiedTank.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE VaryingLocationAndOrientation.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VariableRefrigerantFlow_5Zone.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VariableRefrigerantFlow_FluidTCtrl_5Zone.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VariableRefrigerantFlow_FluidTCtrl_HR_5Zone.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)

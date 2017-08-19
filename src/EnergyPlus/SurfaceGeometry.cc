@@ -3028,6 +3028,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				SurfaceTmp( SurfNum ).Vertex.allocate( SurfaceTmp( SurfNum ).Sides );
+				SurfaceTmp( SurfNum ).NewVertex.allocate( SurfaceTmp( SurfNum ).Sides );
 				GetVertices( SurfNum, SurfaceTmp( SurfNum ).Sides, rNumericArgs( {3,_} ) );
 				if ( SurfaceTmp( SurfNum ).Area <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Surface Area <= 0.0; Entered Area=" + TrimSigDigits( SurfaceTmp( SurfNum ).Area, 2 ) );
