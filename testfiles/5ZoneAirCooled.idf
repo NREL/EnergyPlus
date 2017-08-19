@@ -2417,7 +2417,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Coil:Heating:Water,
     SPACE2-1 Zone Coil,      !- Name
@@ -2435,7 +2435,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Coil:Heating:Water,
     SPACE3-1 Zone Coil,      !- Name
@@ -2453,7 +2453,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Coil:Heating:Water,
     SPACE4-1 Zone Coil,      !- Name
@@ -2471,7 +2471,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Coil:Heating:Water,
     SPACE5-1 Zone Coil,      !- Name
@@ -2489,7 +2489,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   AirLoopHVAC:ReturnPath,
     ReturnAirPath1,          !- Name
@@ -2616,7 +2616,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Coil:Cooling:Water,
     OA Cooling Coil 1,       !- Name
@@ -2635,7 +2635,7 @@
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow,               !- Heat Exchanger Configuration
     ,                        !- Condensate Collection Water Storage Tank Name
-    4.0;                     !- Design Water Temperature Difference
+    4.0;                     !- Design Water Temperature Difference {deltaC}
 
   OutdoorAir:Mixer,
     OA Mixing Box 1,         !- Name
@@ -2661,7 +2661,7 @@
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow,               !- Heat Exchanger Configuration
     ,                        !- Condensate Collection Water Storage Tank Name
-    4.0;                     !- Design Water Temperature Difference
+    4.0;                     !- Design Water Temperature Difference {deltaC}
 
   Coil:Heating:Water,
     Main Heating Coil 1,     !- Name
@@ -2679,7 +2679,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name

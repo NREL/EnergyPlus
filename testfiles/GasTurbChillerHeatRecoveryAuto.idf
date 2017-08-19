@@ -96,7 +96,7 @@
 ! Timestep or Hourly Variables:   Timestep
 ! Time bins Report:               None
 ! HTML Report:                    None
-! Environmental Emissions:        None
+! Environmental Emissions:        None 
 ! Utility Tariffs:                None
 
   Version,8.7;
@@ -1635,7 +1635,6 @@
     HW Supply Inlet Node,    !- Component 1 Inlet Node Name
     HW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
-
   Branch,
     Heating Supply Bypass Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
@@ -1803,7 +1802,7 @@
     CW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name
     98,                      !- Maximum Loop Temperature {C}
     1,                       !- Minimum Loop Temperature {C}
-    autosize,                  !- Maximum Loop Flow Rate {m3/s}
+    autosize,                !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     CW Supply Inlet Node,    !- Plant Side Inlet Node Name
@@ -1814,12 +1813,12 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
@@ -1835,7 +1834,7 @@
     HW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     10,                      !- Minimum Loop Temperature {C}
-    autosize,                  !- Maximum Loop Flow Rate {m3/s}
+    autosize,                !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     HW Supply Inlet Node,    !- Plant Side Inlet Node Name
@@ -1846,12 +1845,12 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -1867,7 +1866,7 @@
     Condenser Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name
     80,                      !- Maximum Loop Temperature {C}
     10,                      !- Minimum Loop Temperature {C}
-    autosize,                  !- Maximum Loop Flow Rate {m3/s}
+    autosize,                !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Condenser Loop Volume {m3}
     Condenser Supply Inlet Node,  !- Condenser Side Inlet Node Name
@@ -1878,15 +1877,15 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    SequentialLoad,                     !- Load Distribution Scheme
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
-    
+    SequentialLoad,          !- Load Distribution Scheme
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
+
   Sizing:Plant,
-    Chilled Water Condenser Loop,
-    Condenser,
-    29.4,
-    5.6;
+    Chilled Water Condenser Loop,  !- Plant or Condenser Loop Name
+    Condenser,               !- Loop Type
+    29.4,                    !- Design Loop Exit Temperature {C}
+    5.6;                     !- Loop Design Temperature Difference {deltaC}
 
   PlantLoop,
     Heat Recovery Water Loop,!- Name
@@ -1896,9 +1895,9 @@
     Heat Recovery Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
     98,                      !- Maximum Loop Temperature {C}
     10,                      !- Minimum Loop Temperature {C}
-    autosize,                   !- Maximum Loop Flow Rate {m3/s}
+    autosize,                !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
-    0.005,           !- Plant Loop Volume {m3}
+    0.005,                   !- Plant Loop Volume {m3}
     Heat Recovery Supply Inlet Node,  !- Plant Side Inlet Node Name
     Heat Recovery Supply Outlet Node,  !- Plant Side Outlet Node Name
     Heat Recovery Supply Side Branches,  !- Plant Side Branch List Name
@@ -1907,12 +1906,12 @@
     Heat Recovery Demand Outlet Node,  !- Demand Side Outlet Node Name
     Heat Recovery Demand Side Branches,  !- Demand Side Branch List Name
     Heat Recovery Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Heat Recovery Water Loop,!- Plant or Condenser Loop Name
@@ -2412,7 +2411,7 @@
   Chiller:CombustionTurbine,
     Big Chiller,             !- Name
     WaterCooled,             !- Condenser Type
-    autosize,                   !- Nominal Capacity {W}
+    autosize,                !- Nominal Capacity {W}
     2.75,                    !- Nominal COP {W/W}
     Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
     Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
@@ -2461,17 +2460,17 @@
     150,                     !- Design Steam Saturation Temperature {C}
     43500,                   !- Fuel Higher Heating Value {kJ/kg}
     autosize,                !- Design Heat Recovery Water Flow Rate {m3/s}
-    Big Chiller Heat Rec Inlet Node,                        !- Heat Recovery Inlet Node Name
-    Big Chiller Heat Rec Outlet Node,                        !- Heat Recovery Outlet Node Name
+    Big Chiller Heat Rec Inlet Node,  !- Heat Recovery Inlet Node Name
+    Big Chiller Heat Rec Outlet Node,  !- Heat Recovery Outlet Node Name
     LeavingSetpointModulated,!- Chiller Flow Mode
     NaturalGas,              !- Fuel Type
     80.0,                    !- Heat Recovery Maximum Temperature {C}
     1.0,                     !- Sizing Factor
-    ,                        !- Basin Heater Capacity
-    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
     0.25;                    !- Condenser Heat Recovery Relative Capacity Fraction
-    
+
   SetpointManager:Scheduled,
     Big Chiller Setpoint Manager,  !- Name
     Temperature,             !- Control Variable

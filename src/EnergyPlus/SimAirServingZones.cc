@@ -6356,6 +6356,7 @@ namespace SimAirServingZones {
 
 		if ( AirLoopNum > 0 ) {
 
+			TempSize = 0.0;
 			FractionOfAutosize = 1.0;
 
 			// scalable sizing option for cooling supply air flow rate
@@ -6371,26 +6372,52 @@ namespace SimAirServingZones {
 			} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
 				if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
 					FractionOfAutosize = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity;
-				}
-				if ( PrimaryAirSystem( AirLoopNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-					CoilInTemp = FinalSysSizing( AirLoopNum ).MixTempAtCoolPeak;
-					CoilInHumRat = FinalSysSizing( AirLoopNum ).MixHumRatAtCoolPeak;
-				} else { // there is precooling of OA stream
-					if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlow > 0.0 ) {
-						OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesCoolVolFlow;
-					} else {
-						OutAirFrac = 1.0;
+					if ( PrimaryAirSystem( AirLoopNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+						CoilInTemp = FinalSysSizing( AirLoopNum ).MixTempAtCoolPeak;
+						CoilInHumRat = FinalSysSizing( AirLoopNum ).MixHumRatAtCoolPeak;
+					} else { // there is precooling of OA stream
+						if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlow > 0.0 ) {
+							OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesCoolVolFlow;
+						} else {
+							OutAirFrac = 1.0;
+						}
+						OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+						CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( AirLoopNum ).RetTempAtCoolPeak;
+						CoilInHumRat = OutAirFrac * FinalSysSizing( AirLoopNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing( AirLoopNum ).RetHumRatAtCoolPeak;
 					}
-					OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-					CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( AirLoopNum ).RetTempAtCoolPeak;
-					CoilInHumRat = OutAirFrac * FinalSysSizing( AirLoopNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing( AirLoopNum ).RetHumRatAtCoolPeak;
-				}
-				CoilOutTemp = FinalSysSizing( AirLoopNum ).CoolSupTemp;
-				CoilOutHumRat = FinalSysSizing( AirLoopNum ).CoolSupHumRat;
-				CoilInEnth = PsyHFnTdbW( CoilInTemp, CoilInHumRat );
-				CoilOutEnth = PsyHFnTdbW( CoilOutTemp, CoilOutHumRat );
-				AutosizedCapacity = StdRhoAir * FinalSysSizing( AirLoopNum ).DesCoolVolFlow * ( CoilInEnth - CoilOutEnth );
-				TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * AutosizedCapacity * FractionOfAutosize;
+					CoilOutTemp = FinalSysSizing( AirLoopNum ).CoolSupTemp;
+					CoilOutHumRat = FinalSysSizing( AirLoopNum ).CoolSupHumRat;
+					CoilInEnth = PsyHFnTdbW( CoilInTemp, CoilInHumRat );
+					CoilOutEnth = PsyHFnTdbW( CoilOutTemp, CoilOutHumRat );
+					AutosizedCapacity = StdRhoAir * FinalSysSizing( AirLoopNum ).DesCoolVolFlow * ( CoilInEnth - CoilOutEnth );
+					TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * AutosizedCapacity * FractionOfAutosize;
+				} else if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == CoolingDesignCapacity ) {
+					if ( FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity == DataSizing::AutoSize ) {
+						if ( PrimaryAirSystem( AirLoopNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+							CoilInTemp = FinalSysSizing( AirLoopNum ).MixTempAtCoolPeak;
+							CoilInHumRat = FinalSysSizing( AirLoopNum ).MixHumRatAtCoolPeak;
+						} else { // there is precooling of OA stream
+							if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlow > 0.0 ) {
+								OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesCoolVolFlow;
+							} else {
+								OutAirFrac = 1.0;
+							}
+							OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+							CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).PrecoolTemp + (1.0 - OutAirFrac) * FinalSysSizing( AirLoopNum ).RetTempAtCoolPeak;
+							CoilInHumRat = OutAirFrac * FinalSysSizing( AirLoopNum ).PrecoolHumRat + (1.0 - OutAirFrac)*FinalSysSizing( AirLoopNum ).RetHumRatAtCoolPeak;
+						}
+						CoilOutTemp = FinalSysSizing( AirLoopNum ).CoolSupTemp;
+						CoilOutHumRat = FinalSysSizing( AirLoopNum ).CoolSupHumRat;
+						CoilInEnth = PsyHFnTdbW( CoilInTemp, CoilInHumRat );
+						CoilOutEnth = PsyHFnTdbW( CoilOutTemp, CoilOutHumRat );
+						AutosizedCapacity = StdRhoAir * FinalSysSizing( AirLoopNum ).DesCoolVolFlow * (CoilInEnth - CoilOutEnth);
+						TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * AutosizedCapacity * FractionOfAutosize;
+					} else {
+						TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity;
+					}
+				} else if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == CapacityPerFloorArea ) {
+					TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
+				} 
 				CalcSysSizing( AirLoopNum ).InpDesCoolAirFlow = TempSize;
 				FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow = TempSize;
 			}}
@@ -6412,26 +6439,52 @@ namespace SimAirServingZones {
 			} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
 				if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity ) {
 					FractionOfAutosize = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity;
-				}
-				if ( FinalSysSizing( AirLoopNum ).HeatOAOption == MinOA ) {
-					if ( FinalSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
-						OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesHeatVolFlow;
+					if ( FinalSysSizing( AirLoopNum ).HeatOAOption == MinOA ) {
+						if ( FinalSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
+							OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesHeatVolFlow;
+						} else {
+							OutAirFrac = 1.0;
+						}
+						OutAirFrac = std::min( 1.0, std::max( 0.0, OutAirFrac ) );
 					} else {
 						OutAirFrac = 1.0;
 					}
-					OutAirFrac = std::min( 1.0, std::max( 0.0, OutAirFrac ) );
-				} else {
-					OutAirFrac = 1.0;
-				}
-				if ( CurOASysNum == 0 && PrimaryAirSystem( AirLoopNum ).NumOAHeatCoils > 0 ) {
-					CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).PreheatTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( AirLoopNum ).HeatRetTemp;
-				} else {
-					CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( AirLoopNum ).HeatRetTemp;
-				}
-				CoilOutTemp = FinalSysSizing( AirLoopNum ).HeatSupTemp;
-				CpAirStd = PsyCpAirFnWTdb( constant_zero, constant_twenty );
-				AutosizedCapacity = StdRhoAir * FinalSysSizing( AirLoopNum ).DesHeatVolFlow * CpAirStd * ( CoilOutTemp - CoilInTemp );
-				TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * AutosizedCapacity * FractionOfAutosize;
+					if ( CurOASysNum == 0 && PrimaryAirSystem( AirLoopNum ).NumOAHeatCoils > 0 ) {
+						CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).PreheatTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( AirLoopNum ).HeatRetTemp;
+					} else {
+						CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( AirLoopNum ).HeatRetTemp;
+					}
+					CoilOutTemp = FinalSysSizing( AirLoopNum ).HeatSupTemp;
+					CpAirStd = PsyCpAirFnWTdb( constant_zero, constant_twenty );
+					AutosizedCapacity = StdRhoAir * FinalSysSizing( AirLoopNum ).DesHeatVolFlow * CpAirStd * ( CoilOutTemp - CoilInTemp );
+					TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * AutosizedCapacity * FractionOfAutosize;
+				} else if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == HeatingDesignCapacity ) {
+					if ( FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity == DataSizing::AutoSize ) {
+						if ( FinalSysSizing( AirLoopNum ).HeatOAOption == MinOA ) {
+							if ( FinalSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
+								OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesHeatVolFlow;
+							} else {
+								OutAirFrac = 1.0;
+							}
+							OutAirFrac = std::min( 1.0, std::max( 0.0, OutAirFrac ) );
+						} else {
+							OutAirFrac = 1.0;
+						}
+						if ( CurOASysNum == 0 && PrimaryAirSystem( AirLoopNum ).NumOAHeatCoils > 0 ) {
+							CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).PreheatTemp + (1.0 - OutAirFrac) * FinalSysSizing( AirLoopNum ).HeatRetTemp;
+						} else {
+							CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).HeatOutTemp + (1.0 - OutAirFrac) * FinalSysSizing( AirLoopNum ).HeatRetTemp;
+						}
+						CoilOutTemp = FinalSysSizing( AirLoopNum ).HeatSupTemp;
+						CpAirStd = PsyCpAirFnWTdb( constant_zero, constant_twenty );
+						AutosizedCapacity = StdRhoAir * FinalSysSizing( AirLoopNum ).DesHeatVolFlow * CpAirStd * (CoilOutTemp - CoilInTemp);
+						TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * AutosizedCapacity * FractionOfAutosize;
+					} else {
+						TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity;
+					}
+				} else if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == CapacityPerFloorArea ) {
+					TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
+				} 
 				CalcSysSizing( AirLoopNum ).InpDesHeatAirFlow = TempSize;
 				FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow = TempSize;
 			}}
@@ -6446,7 +6499,7 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = 0.0;  // autosized, set to zero initially
 				}
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity * CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
+				FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 			} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {
 				CalcSysSizing( AirLoopNum ).FractionOfAutosizedCoolingCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 				FinalSysSizing( AirLoopNum ).FractionOfAutosizedCoolingCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
@@ -6461,7 +6514,8 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = 0.0; // autosized, set to zero initially
 				}
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity * CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated;
+				// even for heating capacity we use cooled zones floor area ( *.FloorAreaOnAirLoopCooled ) served by the airloop 
+				FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity ) {
 				FinalSysSizing( AirLoopNum ).FractionOfAutosizedHeatingCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity;
 			}}

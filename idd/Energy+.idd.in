@@ -375,10 +375,6 @@
 !      years
 ! **************************************************************************
 
-Lead Input;
-
-Simulation Data;
-
 \group Simulation Parameters
 
 Version,
@@ -2301,6 +2297,7 @@ Site:SpectrumData,
       \memo Spectrum Data Type is followed by up to 107 sets of normal-incidence measured values of
       \memo [wavelength, spectrum] for wavelengths covering the solar (0.25 to 2.5 microns) or visible
       \memo spectrum (0.38 to 0.78 microns)
+      \extensible:2
   A1, \field Name
       \required-field
       \type alpha
@@ -2321,6 +2318,7 @@ Site:SpectrumData,
   N4, \field Spectrum
       \type real
   N5, \field Wavelength
+      \begin-extensible
       \type real
       \units micron
   N6, \field Spectrum
@@ -3163,6 +3161,7 @@ Schedule:Day:Interval,
 Schedule:Day:List,
       \memo Schedule:Day:List will allow the user to list 24 hours worth of values, which can be sub-hourly in nature.
       \min-fields 5
+      \extensible:1
   A1 , \field Name
        \required-field
        \type alpha
@@ -3184,6 +3183,7 @@ Schedule:Day:List,
        \minimum 1
        \maximum 60
   N2,  \field Value 1
+       \begin-extensible
        \default 0.0
         N3,N4,         N5,N6,N7,N8,         N9,N10,N11,N12,      N13,N14,N15,N16,     N17,N18,N19,N20, \note fields as indicated
   N21,N22,N23,N24,     N25,N26,N27,N28,     N29,N30,N31,N32,     N33,N34,N35,N36,     N37,N38,N39,N40, \note fields as indicated
@@ -7049,7 +7049,7 @@ MaterialProperty:PhaseChangeHysteresis,
   N2 , \field Liquid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully liquid
        \required-field
-       \units W/mK
+       \units W/m-K
        \type real
        \minimum> 0
   N3 , \field Liquid State Density
@@ -7085,7 +7085,7 @@ MaterialProperty:PhaseChangeHysteresis,
   N8 , \field Solid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully solid
        \required-field
-       \units W/mK
+       \units W/m-K
        \type real
        \minimum> 0
   N9 , \field Solid State Density
@@ -8184,6 +8184,7 @@ MaterialProperty:GlazingSpectralData,
        \memo [wavelength, transmittance, front reflectance, back reflectance] for wavelengths
        \memo covering the solar spectrum (from about 0.25 to 2.5 microns)
        \format Spectral
+       \extensible:4
   A1,  \field Name
        \required-field
        \reference SpectralDataSets
@@ -8212,6 +8213,7 @@ MaterialProperty:GlazingSpectralData,
   N15, \field Front Reflectance 4
   N16, \field Back Reflectance 4
   N17, \field Wavelength 5
+       \begin-extensible
        \type real
        \units micron
   N18, \field Transmittance 5
@@ -18962,7 +18964,7 @@ RoomAir:TemperaturePattern:UserDefined,
 RoomAir:TemperaturePattern:ConstantGradient,
       \memo Used to model room air with a fixed temperature gradient in the vertical direction.
       \memo Used in combination with RoomAir:TemperaturePattern:UserDefined.
-  A1, \field Name
+  A1, \field Room Air Temperature Pattern Constant Gradient Name
       \required-field
       \type alpha
   N1, \field Control Integer for Pattern Control Schedule Name
@@ -18989,7 +18991,7 @@ RoomAir:TemperaturePattern:ConstantGradient,
 RoomAir:TemperaturePattern:TwoGradient,
       \memo Used to model room air with two temperature gradients in the vertical direction.
       \memo Used in combination with RoomAir:TemperaturePattern:UserDefined.
-  A1, \field Name
+  A1, \field Room Air Temperature Pattern Two Gradient Name
       \required-field
       \type alpha
   N1, \field Control Integer for Pattern Control Schedule Name
@@ -20642,7 +20644,7 @@ GasEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20722,7 +20724,7 @@ HotWaterEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20789,7 +20791,7 @@ SteamEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20871,7 +20873,7 @@ OtherEquipment,
        \ip-units Btu/h-ft2
   N3 , \field Power per Person
        \type real
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -24714,6 +24716,7 @@ AirflowNetwork:Distribution:Linkage,
       \note conduction loss is ignored.
 
 AirflowNetwork:Distribution:DuctViewFactors,
+       \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
        \memo This object is used to allow user-defined view factors to be used for duct-surface radiation
        \memo calculations.
   A1,  \field Linkage Name
@@ -35069,7 +35072,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \type real
        \maximum 10.0
        \minimum> 0.0
-       \units Kg/s
+       \units kg/s
        \default 0.063
   A5,  \field Heating Design Capacity Method
        \type choice
@@ -40317,7 +40320,7 @@ AirTerminal:SingleDuct:Uncontrolled,
        \units m3/s
        \minimum 0.0
        \autosizable
-   A4; \field Design Specification Outdoor Air Object Name
+   A4, \field Design Specification Outdoor Air Object Name
        \type object-list
        \object-list DesignSpecificationOutdoorAirNames
        \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
@@ -40326,6 +40329,13 @@ AirTerminal:SingleDuct:Uncontrolled,
        \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
        \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate.
        \note If this field is blank, then the terminal unit will not be controlled for outdoor air flow.
+   A5; \field Per Person Ventilation Rate Mode
+       \type choice
+       \key CurrentOccupancy
+       \key DesignOccupancy
+       \default CurrentOccupancy
+       \note CurrentOccupancy models demand controlled ventilation using the current number of people
+       \note DesignOccupancy uses the total Number of People in the zone and is constant
 
 AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \memo Central air system terminal unit, single duct, constant volume, with reheat coil (hot
@@ -41366,15 +41376,22 @@ AirTerminal:SingleDuct:Mixer,
        \note type selected is InletSide, then the mixer is connected on the inlet side of the
        \note ZoneHVAC equipment, or else if the mixer connection type selected is SupplySide, then
        \note the mixer is connected at the outlet side of the ZoneHVAC equipment.
-   A8; \field Design Specification Outdoor Air Object Name
+   A8, \field Design Specification Outdoor Air Object Name
        \type object-list
        \object-list DesignSpecificationOutdoorAirNames
        \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
-       \note unit will adjust flow to meet this outdoor air requirement. 
+       \note unit will adjust flow to meet this outdoor air requirement.
        \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
        \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
-       \note If this field is blank, then the terminal unit will be controlled using the  
-       \note DesignSpecification:OutdoorAir objec referenced in the Sizing:Zone object.   
+       \note If this field is blank, then the terminal unit will be controlled using the
+       \note DesignSpecification:OutdoorAir objec referenced in the Sizing:Zone object.
+   A9; \field Per Person Ventilation Rate Mode
+       \type choice
+       \key CurrentOccupancy
+       \key DesignOccupancy
+       \default CurrentOccupancy
+       \note CurrentOccupancy models demand controlled ventilation using the current number of people
+       \note DesignOccupancy uses the total Number of People in the zone and is constant
 
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.
@@ -44632,7 +44649,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note must be lower than or equal to the highest speed number
    N3,  \field Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -44723,7 +44740,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note throughout the entire simulation.
    N13, \field Speed 1 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -44788,7 +44805,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N19, \field Speed 2 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N20, \field Speed 2 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44843,7 +44860,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N25, \field Speed 3 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N26, \field Speed 3 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44898,7 +44915,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N31, \field Speed 4 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N32, \field Speed 4 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44953,7 +44970,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N37, \field Speed 5 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N38, \field Speed 5 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45008,7 +45025,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N43, \field Speed 6 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N44, \field Speed 6 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45063,7 +45080,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N49, \field Speed 7 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N50, \field Speed 7 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45118,7 +45135,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N55, \field Speed 8 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N56, \field Speed 8 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45173,7 +45190,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N61, \field Speed 9 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N62, \field Speed 9 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45230,7 +45247,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N67, \field Speed 10 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N68, \field Speed 10 Reference Unit Gross Rated Sensible Heat Ratio
@@ -47241,7 +47258,7 @@ Coil:Heating:DX:VariableSpeed,
         \default 2
         \note must be lower than or equal to the highest speed number
    N3,  \field Rated Heating Capacity At Selected Nominal Speed Level
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -47323,7 +47340,7 @@ Coil:Heating:DX:VariableSpeed,
         \ip-units W
    N12, \field Speed 1 Reference Unit Gross Rated Heating Capacity
        \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -47371,7 +47388,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N15, \field Speed 2 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N16, \field Speed 2 Reference Unit Gross Rated Heating COP
@@ -47412,7 +47429,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N18, \field Speed 3 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N19, \field Speed 3 Reference Unit Gross Rated Heating COP
@@ -47453,7 +47470,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N21, \field Speed 4 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 4 Reference Unit Gross Rated Heating COP
@@ -47494,7 +47511,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N24, \field Speed 5 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N25, \field Speed 5 Reference Unit Gross Rated Heating COP
@@ -47535,7 +47552,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N27, \field Speed 6 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N28, \field Speed 6 Reference Unit Gross Rated Heating COP
@@ -47576,7 +47593,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N30, \field Speed 7 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N31, \field Speed 7 Reference Unit Gross Rated Heating COP
@@ -47617,7 +47634,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N33, \field Speed 8 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N34, \field Speed 8 Reference Unit Gross Rated Heating COP
@@ -47658,7 +47675,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N36, \field Speed 9 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N37, \field Speed 9 Reference Unit Gross Rated Heating COP
@@ -47699,7 +47716,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N39, \field Speed 10 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N40, \field Speed 10 Reference Unit Gross Rated Heating COP
@@ -48221,7 +48238,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note must be lower than or equal to the highest speed number
    N3,  \field Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -48262,7 +48279,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note PLR = part load ratio (cooling load/steady state capacity)
    N9,  \field Speed 1 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -48351,7 +48368,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N15, \field Speed 2 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N16, \field Speed 2 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48427,7 +48444,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N21, \field Speed 3 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 3 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48510,7 +48527,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N27, \field Speed 4 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N28, \field Speed 4 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48593,7 +48610,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N33, \field Speed 5 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N34, \field Speed 5 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48676,7 +48693,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N39, \field Speed 6 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N40, \field Speed 6 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48759,7 +48776,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N45, \field Speed 7 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N46, \field Speed 7 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48842,7 +48859,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N51, \field Speed 8 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N52, \field Speed 8 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48925,7 +48942,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N57, \field Speed 9 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N58, \field Speed 9 Reference Unit Gross Rated Sensible Heat Ratio
@@ -49008,7 +49025,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N63, \field Speed 10 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N64, \field Speed 10 Reference Unit Gross Rated Sensible Heat Ratio
@@ -49203,7 +49220,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \default 2
         \note must be lower than or equal to the highest speed number
    N3,  \field Rated Heating Capacity At Selected Nominal Speed Level
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -49228,7 +49245,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note PLR = part load ratio (heating load/steady state capacity)
    N6,  \field Speed 1 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -49311,7 +49328,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N11, \field Speed 2 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N12, \field Speed 2 Reference Unit Gross Rated Heating COP
@@ -49383,7 +49400,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N16, \field Speed 3 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N17, \field Speed 3 Reference Unit Gross Rated Heating COP
@@ -49461,7 +49478,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N21, \field Speed 4 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 4 Reference Unit Gross Rated Heating COP
@@ -49539,7 +49556,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N26, \field Speed 5 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N27, \field Speed 5 Reference Unit Gross Rated Heating COP
@@ -49617,7 +49634,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N31, \field Speed 6 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N32, \field Speed 6 Reference Unit Gross Rated Heating COP
@@ -49695,7 +49712,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N36, \field Speed 7 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N37, \field Speed 7 Reference Unit Gross Rated Heating COP
@@ -49773,7 +49790,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N41, \field Speed 8 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N42, \field Speed 8 Reference Unit Gross Rated Heating COP
@@ -49851,7 +49868,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N46, \field Speed 9 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N47, \field Speed 9 Reference Unit Gross Rated Heating COP
@@ -49929,7 +49946,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N51, \field Speed 10 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N52, \field Speed 10 Reference Unit Gross Rated Heating COP
@@ -56486,7 +56503,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo It describes the Variable Refrigerant Flow system excluding the performance of indoor units
        \memo Indoor units are modeled separately, see ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \extensible:3 - repeat last three fields, remembering to remove ; from "inner" fields.
-       \min-fields 47
+       \min-fields 41
   A1 , \field Heat Pump Name
        \required-field
        \type alpha
@@ -56866,7 +56883,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \memo Temperature Control. It describes the VRF HR system excluding the performance of indoor units.
        \memo Indoor units are modeled separately in the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
        \extensible:3 repeat last three fields (changing numbering, please), remembering to remove ";" from "inner" fields.
-       \min-fields 64
+       \min-fields 58
   A1 , \field Name
        \required-field
        \type alpha
@@ -68174,6 +68191,7 @@ FluidCooler:TwoSpeed,
 
 GroundHeatExchanger:Vertical,
  \min-fields 20
+ \extensible:2 - repeat last field, remembering to remove ; from "inner" fields.
  \memo Variable short time step vertical ground heat exchanger model based on
  \memo Yavuztruk, C., J.D.Spitler. 1999. A Short Time Step response Factor Model for
  \memo Vertical Ground Loop Heat Exchangers
@@ -68271,6 +68289,7 @@ GroundHeatExchanger:Vertical,
         \minimum 1
         \maximum 100
   N16,  \field G-Function Ln(T/Ts) Value 1
+        \begin-extensible
         \required-field
         \type real
   N17,  \field G-Function G Value 1
@@ -69107,7 +69126,7 @@ HeatExchanger:FluidToFluid,
         \default Ideal
    N3 , \field Heat Exchanger U-Factor Times Area Value
         \type real
-        \units W/k
+        \units W/K
         \minimum> 0.0
         \autosizable
         \required-field
@@ -70103,7 +70122,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note proportional to the schedule value (i.e. 0.4 = 40% outdoor air, 60% zone air).
   A29, \field Tank Element Control Logic
        \type choice
-       \key MutuallyExlcusive
+       \key MutuallyExclusive
        \key Simultaneous
        \default Simultaneous
        \note MutuallyExclusive means that once the tank heating element is active the
@@ -79092,7 +79111,7 @@ Generator:CombustionTurbine,
        \note typical value .9
        \maximum 2
   N7, \field Maximum Exhaust Flow per Unit of Power Output
-      \units (Kg/s)/W
+      \units (kg/s)/W
   N8, \field Design Minimum Exhaust Temperature
        \units C
   N9, \field Design Air Inlet Temperature
@@ -84715,10 +84734,12 @@ Curve:CubicLinear,
   A2,  \field Input Unit Type for X
        \type choice
        \key Dimensionless
+       \key Temperature
        \default Dimensionless
   A3,  \field Input Unit Type for Y
        \type choice
        \key Dimensionless
+       \key Temperature
        \default Dimensionless
   A4;  \field Output Unit Type
        \type choice
@@ -86730,7 +86751,7 @@ FluidProperties:Temperatures,
 FluidProperties:Saturated,
       \memo fluid properties for the saturated region
       \format FluidProperty
-  A1, \field Name
+  A1, \field Fluid Name
       \type object-list
       \object-list FluidNames
   A2, \field Fluid Property Type
@@ -89419,7 +89440,7 @@ UtilityCost:Qualify,
         \memo "Qualified" entry will say "No" and the UtilityCost:Qualify that caused its exclusion
         \memo is shown. Multiple UtilityCost:Qualify objects can appear for the same tariff and
         \memo they can be based on any variable.
-   A1,  \field Name
+   A1,  \field Utility Cost Qualify Name
         \required-field
         \note Displayed in the report if the tariff does not qualify
    A2,  \field Tariff Name
@@ -89473,7 +89494,7 @@ UtilityCost:Charge:Simple,
         \memo It may also be used for taxes, surcharges and any other charges that occur on a
         \memo utility bill. Multiple UtilityCost:Charge:Simple objects may be defined for a single
         \memo tariff and they will be added together.
-   A1,  \field Name
+   A1,  \field Utility Cost Charge Simple Name
         \required-field
         \note Charge Variable Name
         \note This is the name associated with the UtilityCost:Charge:Simple object and will appear in the report.
@@ -89531,7 +89552,7 @@ UtilityCost:Charge:Block,
         \memo Used to compute energy and demand charges (or any other charges) that are structured
         \memo in blocks of charges. Multiple UtilityCost:Charge:Block objects may be defined for a
         \memo single tariff and they will be added together.
-   A1,  \field Name
+   A1,  \field Utility Cost Charge Block Name
         \required-field
         \note Charge Variable Name
         \note This is the name associated with the UtilityCost:Charge:Block object and will appear in the report.
@@ -90076,7 +90097,7 @@ LifeCycleCost:UsePriceEscalation,
         \memo annual supplement to NIST Handbook 135 in Tables Ca-1 to Ca-5 and are included in an
         \memo EnergyPlus dataset file.
         \extensible:1
-   A1,  \field Name
+   A1,  \field LCC Price Escalation Name
         \required-field
         \type alpha
         \note The identifier used for the object. The name usually identifies the location (such as the
@@ -93341,7 +93362,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A16, \field Report 16 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -94797,7 +94817,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A31, \field Report 31 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -96253,7 +96272,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A46, \field Report 46 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -97709,7 +97727,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A61, \field Report 61 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -99165,7 +99182,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A76, \field Report 76 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -101087,7 +101103,7 @@ Output:Meter,
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
        \format singleLine
-  A1 , \field Name
+  A1 , \field Key Name
        \required-field
        \type external-list
        \external-list autoRDDmeter
@@ -101102,6 +101118,7 @@ Output:Meter,
        \note RunPeriod, Environment, and Annual are the same
        \key Hourly
        \key Daily
+       \key Detailed
        \key Monthly
        \key RunPeriod
        \key Environment
@@ -101114,7 +101131,7 @@ Output:Meter:MeterFileOnly,
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
        \format singleLine
-  A1,  \field Name
+  A1,  \field Key Name
        \required-field
        \type external-list
        \external-list autoRDDmeter
@@ -101142,7 +101159,7 @@ Output:Meter:Cumulative,
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
        \format singleLine
-  A1,  \field Name
+  A1,  \field Key Name
        \required-field
        \type external-list
        \external-list autoRDDmeter
@@ -101170,7 +101187,7 @@ Output:Meter:Cumulative:MeterFileOnly,
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
        \format singleLine
-  A1,  \field Name
+  A1,  \field Key Name
        \required-field
        \type external-list
        \external-list autoRDDmeter
@@ -101347,6 +101364,7 @@ Output:EnvironmentalImpactFactors,
        \key Hourly
        \key Daily
        \key Monthly
+       \key Annual
        \key RunPeriod
        \key Environment
        \key Annual
