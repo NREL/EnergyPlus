@@ -845,13 +845,13 @@ namespace EnergyPlus {
 
 			ASSERT_EQ( 5, NumSectionDefs );
 
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
+			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 2 ).Name );
 			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
 
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 3 ).Name );
+			EXPECT_EQ( "LEAD INPUT", SectionDef( 3 ).Name );
 			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
 
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
+			EXPECT_EQ( "SIMULATION DATA", SectionDef( 1 ).Name );
 			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
 
 			EXPECT_EQ( "SIMULATIONCONTROL", SectionDef( 4 ).Name );
@@ -962,13 +962,13 @@ namespace EnergyPlus {
 
 			ASSERT_EQ( 3, NumSectionDefs );
 
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
+			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 2 ).Name );
 			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
 
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 3 ).Name );
+			EXPECT_EQ( "LEAD INPUT", SectionDef( 3 ).Name );
 			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
 
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
+			EXPECT_EQ( "SIMULATION DATA", SectionDef( 1 ).Name );
 			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
 
 			ASSERT_EQ( 3, NumIDFSections );

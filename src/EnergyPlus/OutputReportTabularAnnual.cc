@@ -119,7 +119,6 @@ namespace EnergyPlus {
 			InputProcessor::GetObjectDefMaxArgs( currentModuleObject, numParams, numAlphas, numNums );
 			alphArray.allocate( numAlphas );
 			numArray.dimension( numNums, 0.0 );
-
 			for ( int tabNum = 1 ; tabNum <= objCount; ++tabNum ) {
 				InputProcessor::GetObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
 				if ( numAlphas >= 5 ) {
@@ -150,7 +149,6 @@ namespace EnergyPlus {
 				}
 			}
 		}
-
 
 		void
 		AnnualTable::addFieldSet( std::string varName, AnnualFieldSet::AggregationKind aggKind, int dgts)

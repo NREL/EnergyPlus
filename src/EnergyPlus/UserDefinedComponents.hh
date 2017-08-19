@@ -110,7 +110,7 @@ namespace UserDefinedComponents {
 		Real64 MaxLoad; // filled by actuator, reports back size for load dispatch [W]
 		Real64 OptLoad; // filled by actuator, reports back size for load dispatch [W]
 		Real64 InletRho; // fills internal variable, current density for fluid type and inlet temperature [kg/m3]
-		Real64 InletCp; // fills internal Varaible, current specific heat for fluid type and inlet temperature [J/kg-C]
+		Real64 InletCp; // fills internal Variable, current specific heat for fluid type and inlet temperature [J/kg-C]
 		Real64 InletTemp; // fills internal variable, current inlet fluid temperature [C]
 		Real64 InletMassFlowRate; // fills internal variable, current inlet mass flow rate [kg/s]
 		Real64 OutletTemp; // filled by actuator, componenent outlet temperature [C]

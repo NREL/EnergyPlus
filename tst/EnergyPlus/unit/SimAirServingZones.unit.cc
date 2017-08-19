@@ -57,7 +57,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <DataAirSystems.hh>
@@ -65,6 +64,7 @@
 #include <SimAirServingZones.hh>
 #include <MixedAir.hh>
 #include <UtilityRoutines.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace DataAirSystems;
@@ -157,4 +157,67 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff ) {
+		int CtrlZoneNum = 1;
+		FinalZoneSizing.allocate( 1 );
+
+		// Test case 1, low OA, low zoneventilationeff, no change in SysCoolingEv
+		Real64 StartingDesCoolVolFlow = 1.0;
+		Real64 StartingDesCoolVolFlowMin = 0.2;
+		Real64 UncorrectedOAFlow = 0.1;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = StartingDesCoolVolFlow;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+		FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = 0.0;
+		FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.5;
+		Real64 Xs = 0.25; // uncorrected system outdoor air fraction
+		Real64 VozClg = UncorrectedOAFlow; // corrected (for ventilation efficiency) zone outside air flow rate [m3/s] 
+		Real64 ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
+
+		Real64 SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before call to LimitZoneVentEff)
+		Real64 StartingSysCoolingEv = SysCoolingEv;
+		LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
+		EXPECT_EQ( StartingSysCoolingEv, SysCoolingEv );
+		EXPECT_EQ( StartingDesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
+		EXPECT_EQ( StartingDesCoolVolFlowMin, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin );
+
+		// Test case 2, low OA, high zoneventilationeff, increase SysCoolingEv and DesCoolVolFlowMin
+		StartingDesCoolVolFlow = 1.0;
+		StartingDesCoolVolFlowMin = 0.2;
+		UncorrectedOAFlow = 0.1;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = StartingDesCoolVolFlow;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+		FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = 0.0;
+		FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.9;
+		Xs = 0.25; // uncorrected system outdoor air fraction
+		VozClg = UncorrectedOAFlow; // corrected (for ventilation efficiency) zone outside air flow rate [m3/s] 
+		ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
+
+		SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before call to LimitZoneVentEff)
+		StartingSysCoolingEv = SysCoolingEv;
+		LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
+		EXPECT_EQ( FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff, SysCoolingEv );
+		EXPECT_EQ( StartingDesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
+		EXPECT_NEAR( 0.2857, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 0.001 );
+
+		// Test case 3, high OA, high zoneventilationeff, increase SysCoolingEv, DesCoolVolFlowMin, and DesCoolVolFlow
+		StartingDesCoolVolFlow = 1.0;
+		StartingDesCoolVolFlowMin = 0.8;
+		UncorrectedOAFlow = 0.8;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = StartingDesCoolVolFlow;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+		FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = 0.0;
+		FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.9;
+		Xs = 0.25; // uncorrected system outdoor air fraction
+		VozClg = UncorrectedOAFlow; // corrected (for ventilation efficiency) zone outside air flow rate [m3/s] 
+		ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
+
+		SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before call to LimitZoneVentEff)
+		StartingSysCoolingEv = SysCoolingEv;
+		LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
+		EXPECT_EQ( FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff, SysCoolingEv );
+		EXPECT_NEAR( 2.2857, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 0.001 );
+		EXPECT_NEAR( 2.2857, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 0.001 );
+
+
+	}
 }

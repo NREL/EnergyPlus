@@ -70,7 +70,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <ObjexxFCL/gio.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

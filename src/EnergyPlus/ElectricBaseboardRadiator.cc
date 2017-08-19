@@ -712,6 +712,7 @@ namespace ElectricBaseboardRadiator {
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value of coil input field
+		Real64 FracOfAutoSzCap; // fraction of autosized capacity
 		int FieldNum = 1; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
@@ -743,18 +744,23 @@ namespace ElectricBaseboardRadiator {
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 					}
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 				} else if ( CapSizingMethod == CapacityPerFloorArea ) {
-					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
-					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+					if ( ZoneSizingRunDone ) {
+						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
+					}
+					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 					DataScalableCapSizingON = true;
 				} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 					CheckZoneSizing(CompType, CompName);
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					DataFracOfAutosizedHeatingCapacity = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
-					TempSize = AutoSize;
+					FracOfAutoSzCap = AutoSize;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, FracOfAutoSzCap, false, RoutineName );
+					TempSize = FracOfAutoSzCap;
+					DataFracOfAutosizedHeatingCapacity = 1.0;
 					DataScalableCapSizingON = true;
 				} else {
 					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;

@@ -31,19 +31,21 @@ There are several material additions that can be made to the basic material prop
 \item
   MaterialProperty:MoisturePenetrationDepth:Settings
 \item
-  Material\-Prop\-erty:\-Heat\-And\-Moisture\-Trans\-fer:\-Sorp\-tion\-Iso\-therm
+  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
 \item
   MaterialProperty:HeatAndMoistureTransfer:Diffusion
 \item
   MaterialProperty:HeatAndMoistureTransfer:Settings
 \item
-  Material\-Prop\-erty:\-Heat\-And\-Moisture\-Trans\-fer:\-Re\-dist\-ribu\-tion
+  MaterialProperty:HeatAndMoistureTransfer:Redistribution
 \item
   MaterialProperty:HeatAndMoistureTransfer:Suction
 \item
-  Material\-Prop\-erty:\-Heat\-And\-Moisture\-Trans\-fer:\-Thermal\-Con\-ductivity
+  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
 \item
   MaterialProperty:PhaseChange
+\item
+  MaterialProperty:PhaseChangeHysteresis
 \end{itemize}
 
 These material property objects are used in conjunction with the basic material specification and reference back to the name of the basic material type. Without the basic material type specified the program, will give a severe error and terminate. For example, specifying the moisture materials and changing the HeatBalanceAlgorithm to a moisture simulation will allow the moisture simulation to take place.
@@ -554,8 +556,6 @@ k\(_{o}\) is the 20C value of thermal conductivity(normal idf~ input)
 
 k\(_{1}\) is the change in conductivity per degree temperature difference from 20C
 
-(this field).
-
 \paragraph{Field Set: Temperature-Enthalpy}\label{field-set-temperature-enthalpy}
 
 The temperature -- enthalpy set of inputs specify a two column tabular temperature-enthalpy function for the basic material. Sixteen pairs can be specified. Specify only the number of pairs necessary. The tabular function must cover the entire temperature range that will be seen by the material in the simulation. It is suggested that the function start at a low temperature, and extend to 100C. Note that the function has no negative slopes and the lowest slope that will occur is the base material specific heat. Temperature values should be strictly increasing. Enthalpy contributions of the phase change are always added to the enthalpy that would result from a constant specific heat base material. An example of a simple enthalpy temperature function is shown below.
@@ -611,6 +611,113 @@ HeatBalanceAlgorithm,
       70000,           !- Enthalpy 3, (J/kg)
       100.,            !- Temperature 4, C
       137000;          !- Enthalpy 4, (J/kg)
+\end{lstlisting}
+
+\subsection{MaterialProperty:PhaseChangeHysteresis}\label{materialpropertyphasechangehysteresis}
+
+This object is used to describe an advanced level of physics belonging to phase change materials used in building envelopes.
+The base phase change input object describes a single process curve whereby a material moves from a crystallized to liquid state and back.
+This input object adds a hysteresis effect, allowing the melting/freezing process to follow different curves, representing an effect that is commonly seen in actual building envelope phase change material applications.
+This object also allows users to enter characteristic properties of the processes instead of a detailed temperature/enthalpy curve, making it more amenable for studies in which the user does not have the detailed test data required to generate the temperature/enthalpy curve.
+
+\subsubsection{Inputs}\label{materialpropertyphasechangehysteresis-inputs}
+
+The MaterialProperty:PhaseChangeHysteresis object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
+
+\paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This input must match the name of a material defined elsewhere within EnergyPlus.  The thermal properies of that material are then overridden by the properties defind in this object.
+
+\paragraph{Field: Latent Heat during the Entire Phase Change Process}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the total amount of latent heat absorbed or discharged during the transition from solid to liquid or back, in Joules.
+The shapes of the enthalpy curves differ based on direction, but the total amount of energy from one state to the other does not.
+
+\paragraph{Field: Liquid State Thermal Conductivity}\label{materialpropertyphasechangehysteresis-inputs-liquidk}
+
+This is the constant thermal conductivity used while the material is fully liquid, in W/m-K.
+
+\paragraph{Field: Liquid State Density}\label{materialpropertyphasechangehysteresis-inputs-liquidrho}
+
+This is the constant density while the material is fully liquid, in kg/m3.
+
+\paragraph{Field: Liquid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the constant specific heat while the material is fully liquid, in J/kg-K.
+
+\paragraph{Field: High Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the width of the enthalpy/specific heat melting curve, on the high side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+\paragraph{Field: Peak Melting Temperature}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the center (peak) of the melting curve, in Kelvin.
+
+\paragraph{Field: Low Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the width of the enthalpy/specific heat melting curve, on the low side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+\paragraph{Field: Solid State Thermal Conductivity}\label{materialpropertyphasechangehysteresis-inputs-solidk}
+
+This is the constant thermal conductivity used while the material is fully solid, in W/m-K.
+
+\paragraph{Field: Solid State Density}\label{materialpropertyphasechangehysteresis-inputs-solidrho}
+
+This is the constant density while the material is fully solid, in kg/m3.
+
+\paragraph{Field: Solid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the constant specific heat while the material is fully crystallized, in J/kg-K.
+
+\paragraph{Field: High Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the width of the enthalpy/specific heat freezing curve, on the high side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+\paragraph{Field: Peak Freezing Temperature}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the center (peak) of the freezing curve, in Kelvin.  This will be higher than the peak melting temperature based on empirical data.
+
+\paragraph{Field: Low Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+
+This is the width of the enthalpy/specific heat freezing curve, on the low side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+Next is an IDF example showing how it is used in conjunction with the Material:
+
+Note, the following Heat Balance Algorithm is necessary (only specified once). Also, when using ConductionFiniteDifference, it is more efficient to set the zone timestep shorter than those used for the ConductionTransferFunction solution algorithm. It should be set to 12 timesteps per hour or greater, and can range up to 60.
+
+\begin{lstlisting}
+
+  HeatBalanceAlgorithm, ConductionFiniteDifference;
+
+  Timestep, 12;
+
+  Material,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    1.9050000E-02,           !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1601.846,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  MaterialProperty:PhaseChangeHysteresis,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,   !- Name
+    10000,                   !- Latent Heat of Fusion {J/kg}
+    0.5,                     !- Liquid State Thermal Conductivity {W/m-K}
+    1500,                    !- Liquid State Density {kg/m3}
+    2000,                    !- Liquid State Specific Heat {J/kg-K}
+    1,                       !- High Temperature Difference of Melting Curve {deltaC}
+    20,                      !- Peak Melting Temperature {C}
+    1,                       !- Low Temperature Difference of Melting Curve {deltaC}
+    0.5,                     !- Solid State Thermal Conductivity {W/m-K}
+    1600,                    !- Solid State Density {kg/m3}
+    2000,                    !- Solid State Specific Heat {J/kg-K}
+    1,                       !- High Temperature Difference of Freezing Curve {deltaC}
+    23,                      !- Peak Freezing Temperature {C}
+    1;                       !- Low Temperature Difference of Freezing Curve {deltaC}
+
 \end{lstlisting}
 
 \subsection{MaterialProperty:VariableThermalConductivity}\label{materialpropertyvariablethermalconductivity}
@@ -1087,11 +1194,13 @@ The name of the glass layer. It corresponds to a layer in a window construction.
 
 \paragraph{Field: Optical Data Type}\label{field-optical-data-type}
 
-Valid values for this field are SpectralAverage, Spectral, BSDF.
+Valid values for this field are SpectralAverage, Spectral, SpectralAndAngle, and BSDF.
 
 If Optical Data Type = SpectralAverage, the values you enter for solar transmittance and reflectance are assumed to be averaged over the solar spectrum, and the values you enter for visible transmittance and reflectance are assumed to be averaged over the solar spectrum and weighted by the response of~ the human eye. There is an EnergyPlus Reference Data Set for WindowMaterial:Glazing that contains spectral average properties for many different types of glass.
 
 If Optical Data Type = Spectral, then, in the following field, you must enter the name of a spectral data set defined with the WindowGlassSpectralData object. In this case, the values of~ solar and visible transmittance and reflectance in the fields below should be blank.
+
+If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with the Table:TwoIndependentVariables object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
 
 If Optical Data Type = BSDF, the Construction:ComplexFenestrationState object must be used to define the window construction layers. The Construction:ComplexFenestrationState object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
 
@@ -1201,6 +1310,20 @@ A measure of the stiffness of an elastic material.~ It is defined as the ratio o
 
 The ratio, when a sample object is stretched, of the contraction or transverse strain (perpendicular to the applied load), to the extension or axial strain (in the direction of the applied load). This value is used only with complex fenestration systems defined through the Construction:ComplexFenestrationState object. The default value for glass is 0.22.
 
+\paragraph{Field: Window Glass Spectral and Incident Angle Transmittance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-transmittance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+\paragraph{Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-front-reflectance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+\paragraph{Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-back-reflectance-data}
+
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a Table:TwoIndependentVariables object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+
+It should be pointed out that when Optical Data Type = SpectralAndAngle for a glass layer in a construction, the table input data are converted into polynomial curve fits with 6 coefficients, so that all outputs of optical properties for the same construction will be curve values for a given incident angle. Therefore, the values may be slightly different from input values.
+  
 IDF examples of Spectral average and using a Spectral data set:
 
 \begin{lstlisting}
@@ -1234,6 +1357,36 @@ MATERIAL:WINDOWGLASS, GLASS - CLEAR SHEET 1 / 8 IN,
       0.84,  ! IR emissivity: front side
       0.84,  ! IR emissivity: back side
       0.798; ! Conductivity {W/m-K}
+      
+\end{lstlisting}
+
+IDF example using a SpectralAndAngle data set:
+
+\begin{lstlisting}
+
+  WindowMaterial:Glazing ,SPECTRAL AND ANGLE GLASS INNER PANE, ! Material name
+    SpectralAndAngle, ! Optical data type {SpectralAverage or Spectral}
+    , !- Name of spectral data set
+
+    0.0099, ! Thickness {m}
+    ,  !- Solar transmittance at normal incidence
+    ,  !- Solar reflectance at normal incidence: front side
+    ,  !- Solar reflectance at normal incidence: back side
+    ,  !- Visible transmittance at normal incidence
+    ,  !- Visible reflectance at normal incidence: front side
+    ,  !- Visible reflectance at normal incidence: back side
+    0.0,   !- IR transmittance at normal incidence
+    0.84,  !- IR emissivity: front side
+    0.84,  !- IR emissivity: back side
+    0.798, !- Conductivity {W/m-K}
+    ,      !- Dirt Correction Factor for Solar and Visible Transmittance
+    ,      !- Solar Diffusing
+    ,      !- Young's modulus
+    ,      !- Poisson's ratio
+    TranmittanceDataSet,  !- Window Glass Spectral and Incident Angle Transmittance Data Set Table Name
+    FrontReflectanceDataSet,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
+    BackReflectanceDataSet;      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
+
 \end{lstlisting}
 
 IDF example of Spectral Data Type = BSDF
@@ -2925,7 +3078,7 @@ The perpendicular length between the slat cord ~and the curve (m). Crown = 0.062
 
 \paragraph{Field: Slat Angle}\label{field-slat-angle-2}
 
-The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). If the ``Slat Angle Control'' input field below specified is ``FixedSlatAngle'', then the slat angle is fixed at ``Slat Angle'' value entered.~ Minimum value is zero, and the maximum value allowed is 180.0 degrees.~ The default value is 45 degrees.
+The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). The slat angle is +ve if the tip of the slat front face is tilted upward, or else the slat angle is -ve if the tip of the slat front face is tilted downward. The slat angle varies between -90 to +90.~ If the ``Slat Angle Control'' input field below specified is ``FixedSlatAngle'', then the slat angle is fixed at ``Slat Angle'' value entered.~ Minimum value allowed is -90.0, and the maximum value allowed is 90.0 degrees.~ The default value is 45 degrees.
 
 \paragraph{Field: Front Side Slat Beam-Diffuse Solar Transmittance}\label{field-front-side-slat-beam-diffuse-solar-transmittance}
 

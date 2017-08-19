@@ -147,7 +147,7 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/special-modules-reporting/environmental-impacts.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/special-modules-reporting/zone-component-loads-summary.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/special-modules-reporting/output-table-annual.tex
-  ${CMAKE_SOURCE_DIR}/doc/title.tex
+  ${CMAKE_BINARY_DIR}/doc-build/title.tex
 )
 
 # to get the list of inluded images, go to the root of the document folder and:
@@ -528,6 +528,8 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure4.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure5.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure6.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/PCMModel.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/IdealLoadsSchematic.png
 )
 
 SET( SOURCE_FILENAME "engineering-reference" )

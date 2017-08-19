@@ -39,6 +39,8 @@ The input object AvailabilityManager:NightCycle is to specify when a system that
 
 \item  Thermostat on/off tolerance \emph{T\(_{tol}\)} (degrees C);
 
+\item  Cycling run time control type: \emph{FixedRunTime}, \emph{Thermostat}, or \emph{ThermostatWithMinimumRunTime};
+
 \item  Cycling run time in seconds; used to calculate a stop time (in time steps since the start of the current run period) once the status has become \emph{Cycle On}.
 
 \item  A control zone or zone list name.
@@ -56,11 +58,11 @@ If the fan schedule current value is \textgreater{} 0 or the applicability sched
 Otherwise:
 
 \begin{enumerate}
-\item  If current time (in time steps since the start of the run period) is greater than the start time and less than the stop time, \emph{AvailStatus = CycleOn} (or \emph{CycleOnZoneFansOnly} if the control type is \emph{Cycle On Any -- Zone Fans only}).
+\item  If current time (in time steps since the start of the run period) is greater than the start time and less than the stop time, \emph{AvailStatus = CycleOn} (or \emph{CycleOnZoneFansOnly} if the control type is \emph{Cycle On Any -- Zone Fans only}) for CyclingRunTimeControlType = \emph{CyclingRunTimeControlType = FixedRunTime}, or \emph{CyclingRunTimeControlType = ThermostatWithMinimumRunTime} but for \emph{CyclingRunTimeControlType = Thermostat} the availability status is determined based on the zone air and the thermostat setpoint temperature difference and the tolerance limits.  
 
-\item  If the current time equals the stop time, \emph{AvailStatus = NoAction} ~and the fan schedule will determine if the system is on.
+\item  If the current time equals the stop time and the CyclingRunTimeControlType = \emph{CyclingRunTimeControlType = FixedRunTime}, or \emph{CyclingRunTimeControlType = ThermostatWithMinimumRunTime}, \emph{AvailStatus = NoAction} ~and the fan schedule will determine if the system is on. For \emph{CyclingRunTimeControlType = Thermostat} the availability status is determined based on the zone air and the thermostat setpoint temperature difference and the tolerance limits, and the fan schedule will determine if the system is on.
 
-\item  If the current time is greater than the stop time, the manager can potentially cycle the system on.
+\item  If the current time is greater than the stop time, the manager can potentially cycle the system on for \emph{CyclingRunTimeControlType = FixedRunTime}, \emph{CyclingRunTimeControlType = Thermostat}, or \emph{CyclingRunTimeControlType = ThermostatWithMinimumRunTime}.
 
   \begin{enumerate}
   \item  For control types \emph{CycleOnAny} and \emph{CycleOnAnyZoneFansOnly} the manger looks at each zone served by the air loop and detects whether the zone temperature at the thermostat is greater than the cooling setpoint plus ½\emph{T\(_{tol}\)} or less than the heating setpoint minus ½\emph{T\(_{tol}\)}. If it is, \emph{AvailStatus} is set to \emph{CycleOn} (or \emph{CycleOnZoneFansOnly}). If not, \emph{AvailStatus} is set to \emph{NoAction}.

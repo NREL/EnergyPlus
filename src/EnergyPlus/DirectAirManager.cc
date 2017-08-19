@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <DirectAirManager.hh>
 #include <DataAirflowNetwork.hh>
+#include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -320,6 +321,33 @@ namespace DirectAirManager {
 				//Load the maximum volume flow rate
 				DirectAir( DirectAirNum ).MaxAirVolFlowRate = rNumericArgs( 1 );
 
+				if ( lAlphaFieldBlanks( 4 ) ) {
+					DirectAir( DirectAirNum ).NoOAFlowInputFromUser = true;
+				} else {
+					DirectAir( DirectAirNum ).OARequirementsPtr = InputProcessor::FindItemInList( cAlphaArgs( 4 ), DataSizing::OARequirements );
+					if ( DirectAir( DirectAirNum ).OARequirementsPtr == 0 ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "..invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
+						ErrorsFound = true;
+					} else {
+						DirectAir( DirectAirNum ).NoOAFlowInputFromUser = false;
+					}
+				}
+
+				if ( lAlphaFieldBlanks( 5 ) ) {
+					DirectAir( DirectAirNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+				} else {
+					if ( cAlphaArgs( 5 ) == "CURRENTOCCUPANCY" ) {
+						DirectAir( DirectAirNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+					} else if ( cAlphaArgs( 5 ) == "DESIGNOCCUPANCY" ) {
+						DirectAir( DirectAirNum ).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
+					} else {
+						DirectAir( DirectAirNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+						ShowContinueError( "..invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\". The default input of CurrentOccupancy is assigned" );
+					}
+				}
+
 				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
@@ -451,8 +479,13 @@ namespace DirectAirManager {
 
 			DirectAir( DirectAirNum ).ZoneEqNum = ControlledZoneNum;
 			DirectAir( DirectAirNum ).ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-
-			MySizeFlag( DirectAirNum ) = false;
+			if ( ControlledZoneNum > 0 ) { 
+				if ( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum > 0  ) {  
+					DirectAir( DirectAirNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum; 
+					DirectAir( DirectAirNum ).CtrlZoneNum = ControlledZoneNum; 
+					MySizeFlag( DirectAirNum ) = false;
+				}
+			} 
 		}
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( DirectAirNum ) ) {
@@ -472,12 +505,41 @@ namespace DirectAirManager {
 
 		// Set the ZoneNode number
 		ZoneNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
+
+		Real64 mDotFromOARequirement( 0.0 );
+		if ( ! DirectAir( DirectAirNum ).NoOAFlowInputFromUser ) {
+			mDotFromOARequirement = DirectAir( DirectAirNum ).AirMassFlowRateMax;
+			int airLoopNum( 0 );
+			Real64 airLoopOAFrac( 0.0 );
+			if ( DirectAir( DirectAirNum ).ZoneEqNum > 0) {
+				airLoopNum =ZoneEquipConfig( DirectAir( DirectAirNum ).ZoneEqNum ).AirLoopNum;
+			}
+			if ( airLoopNum > 0 ) {
+				airLoopOAFrac = DataAirLoop::AirLoopFlow( airLoopNum ).OAFrac;
+				bool UseOccSchFlag = false;
+				if ( DirectAir( DirectAirNum ).OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel ) UseOccSchFlag = true;
+				if ( airLoopOAFrac > 0.0 ) {
+					Real64 vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( DirectAir( DirectAirNum ).OARequirementsPtr, DirectAir( DirectAirNum ).ZoneNum, UseOccSchFlag, true );
+					mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
+					mDotFromOARequirement = min( mDotFromOARequirement , DirectAir( DirectAirNum ).AirMassFlowRateMax );
+				} else {
+					mDotFromOARequirement = DirectAir( DirectAirNum ).AirMassFlowRateMax;
+				}
+			}
+		}
+
 		if ( FirstHVACIteration ) {
 			//The first time through set the mass flow rate to the Max
 			if ( ( Node( ZoneNode ).MassFlowRateMaxAvail > 0.0 ) && ( GetCurrentScheduleValue( DirectAir( DirectAirNum ).SchedPtr ) > 0.0 ) ) {
 				if ( ! ( SimulateAirflowNetwork > AirflowNetworkControlMultizone && AirflowNetworkFanActivated ) ) {
-					Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).AirMassFlowRateMax;
-					Node( ZoneNode ).MassFlowRateMaxAvail = DirectAir( DirectAirNum ).AirMassFlowRateMax;
+					if ( DirectAir( DirectAirNum ).NoOAFlowInputFromUser ) { 
+						Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).AirMassFlowRateMax;
+						Node( ZoneNode ).MassFlowRateMaxAvail = DirectAir( DirectAirNum ).AirMassFlowRateMax;
+					} else { 
+						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement; 
+						Node( ZoneNode ).MassFlowRateMaxAvail = mDotFromOARequirement; 
+					} 
+
 					if ( DirectAir( DirectAirNum ).EMSOverrideAirFlow ) Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).EMSMassFlowRateValue;
 				}
 				Node( ZoneNode ).MassFlowRateMinAvail = 0.0;
@@ -489,12 +551,21 @@ namespace DirectAirManager {
 			//When not FirstHCAVIteration
 			if ( ! DirectAir( DirectAirNum ).EMSOverrideAirFlow ) {
 				if ( ( Node( ZoneNode ).MassFlowRateMaxAvail > 0.0 ) && ( GetCurrentScheduleValue( DirectAir( DirectAirNum ).SchedPtr ) > 0.0 ) ) {
-					if ( Node( ZoneNode ).MassFlowRateMaxAvail < Node( ZoneNode ).MassFlowRateMax ) {
-						Node( ZoneNode ).MassFlowRate = Node( ZoneNode ).MassFlowRateMaxAvail;
-					} else if ( Node( ZoneNode ).MassFlowRateMinAvail > Node( ZoneNode ).MassFlowRateMin ) {
-						Node( ZoneNode ).MassFlowRate = Node( ZoneNode ).MassFlowRateMinAvail;
-					} else {
-						Node( ZoneNode ).MassFlowRate = Node( ZoneNode ).MassFlowRateMaxAvail;
+					if ( DirectAir( DirectAirNum ).NoOAFlowInputFromUser ) {
+						if ( Node( ZoneNode ).MassFlowRateMaxAvail < Node( ZoneNode ).MassFlowRateMax ) {
+							Node( ZoneNode ).MassFlowRate = Node( ZoneNode ).MassFlowRateMaxAvail;
+						} else if ( Node( ZoneNode ).MassFlowRateMinAvail > Node( ZoneNode ).MassFlowRateMin ) {
+							Node( ZoneNode ).MassFlowRate = Node( ZoneNode ).MassFlowRateMinAvail;
+						} else {
+							Node( ZoneNode ).MassFlowRate = Node( ZoneNode ).MassFlowRateMaxAvail;
+						}
+					} else {  
+						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement;  
+						// but also apply constraints 
+						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMaxAvail );  
+						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMax );  
+						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMinAvail );  
+						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMin ); 
 					}
 				} else {
 					Node( ZoneNode ).MassFlowRate = 0.0;
