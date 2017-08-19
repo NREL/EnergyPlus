@@ -243,7 +243,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-1-000}
 
-This field is for the a radiant/convective steam baseboard unit heating capacity in watts. This field can be autosized by EnergyPlus. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified.
+This field is for the a radiant/convective steam baseboard unit heating capacity in watts. This field can be autosized by EnergyPlus. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified.
 
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-1-000}
 
@@ -414,7 +414,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-2}
 
-This field is for the radiant-convective electric baseboard unit nominal heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified.
+This field is for the radiant-convective electric baseboard unit nominal heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified.
 
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-2}
 
@@ -571,7 +571,7 @@ This field is the combined space temperature (air and surface) that the panel is
 
 \paragraph{Field: Rated Water Mass Flow Rate}\label{field-rated-water-mass-flow-rate}
 
-This field is the rated standard water flow rate in kg/s that was used to obtain the rated capacity under rated conditions.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  The default value is 0.063kg/s (1 gpm).  If it is blank or zero, the default value is assumed.
+This field is the rated standard water flow rate in kg/s that was used to obtain the design cooling capacity under rated temperature conditions.  This value along with the rated space and water inlet temperatures as well as the cooling capacity (whether autosized or entered by the user) is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  Users should note that if this value is too low in comparison to the cooling design capacity that the program will produce an error message and the user must adjust one of these two parameters or the rated temperature values.  The default value is 0.063kg/s (1 gpm).  If it is blank or zero, the default value is assumed.
 
 \paragraph{Field: Cooling Design Capacity Method}\label{field-cooling-design-capacity-method-2}
 
@@ -579,7 +579,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Cooling Design Capacity}\label{field-cooling-design-capacity-2}
 
-This field is for the cooling panel unit nominal cooling capacity in watts. This field can be autosized by EnergyPlus. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified.
+This field is for the cooling panel unit nominal cooling capacity in watts at the rated flow rate of water through the unit (see Rated Water Mass Flow Rate field above). This field can be autosized by EnergyPlus. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified.
 
 \paragraph{Field: Cooling Design Capacity Per Floor Area}\label{field-cooling-design-capacity-per-floor-area-2}
 
@@ -789,7 +789,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-3}
 
-This field is for the hot water baseboard heater design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified id autosize is specified.
+This field is for the hot water baseboard heater design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified id autosize is specified.
 
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-3}
 
@@ -1038,7 +1038,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-5}
 
-This field is for the low temperature radiant variable flow unit design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
+This field is for the low temperature radiant variable flow unit design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
 
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-5}
 
@@ -1074,7 +1074,7 @@ Enter the method used to determine the cooling design capacity for scalable sizi
 
 \paragraph{Field: Cooling Design Capacity \{W\}}\label{field-cooling-design-capacity-w-000}
 
-This field is for the low temperature radiant variable flow unit design cooling capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity} and this input is is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
+This field is for the low temperature radiant variable flow unit design cooling capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity} and this input is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
 
 \paragraph{Field: Cooling Design Capacity Per Floor Area \{W/m2\}}\label{field-cooling-design-capacity-per-floor-area-wm2-000}
 
