@@ -6392,7 +6392,7 @@ namespace OutputReportTabular {
 		for ( long iSch = 1; iSch <= ScheduleManager::NumSchedules; ++iSch ) {
 			std::string curSchName = ScheduleManager::Schedule(iSch).Name;
 			std::string curSchType = ScheduleManager::GetScheduleType( iSch );
-			if ( SameString( curSchType, "FRACTION" ) ) {
+			if ( UtilityRoutines::SameString( curSchType, "FRACTION" ) ) {
 				PreDefTableEntry( pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours( iSch, StartOfWeek, CurrentYearIsLeapYear ), 0 );
 				PreDefTableEntry( pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc( iSch, StartOfWeek, CurrentYearIsLeapYear ), 0 );
 			}

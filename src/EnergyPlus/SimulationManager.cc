@@ -447,10 +447,10 @@ namespace SimulationManager {
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
-		
+
 		// check for variable latitude/location/etc
 		WeatherManager::ReadVariableLocationOrientation();
-		
+
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
@@ -581,21 +581,11 @@ namespace SimulationManager {
 
 						ManageHeatBalance();
 
-<<<<<<< HEAD
-=======
-						//  After the first iteration of HeatBalance, all the 'input' has been gotten
-						if ( BeginFullSimFlag ) {
-							if ( GetNumRangeCheckErrorsFound() > 0 ) {
-								ShowFatalError( "Out of \"range\" values found in input" );
-							}
-						}
-
 						if ( oneTimeUnderwaterBoundaryCheck ) {
 						    AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
 						    oneTimeUnderwaterBoundaryCheck = false;
 						}
 
->>>>>>> NREL/develop
 						BeginHourFlag = false;
 						BeginDayFlag = false;
 						BeginEnvrnFlag = false;

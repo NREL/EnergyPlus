@@ -352,7 +352,7 @@ namespace WeatherManager {
 	static gio::Fmt fmtAN( "(A,$)" );
 
 	std::vector< UnderwaterBoundary > underwaterBoundaries;
-	
+
 	// MODULE SUBROUTINES:
 
 	// Functions
@@ -607,24 +607,24 @@ namespace WeatherManager {
 		bool errorsFound = false;
 		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
 		DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
-		int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
+		int Num = inputProcessor->getNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 		for ( int i = 1; i <= Num; i++ ) {
-			InputProcessor::GetObjectItem(
-				DataIPShortCuts::cCurrentModuleObject, i, 
-				DataIPShortCuts::cAlphaArgs, 
-				NumAlpha, 
-				DataIPShortCuts::rNumericArgs, 
-				NumNumber, 
-				IOStat, 
-				DataIPShortCuts::lNumericFieldBlanks, 
-				DataIPShortCuts::lAlphaFieldBlanks, 
-				DataIPShortCuts::cAlphaFieldNames, 
+			inputProcessor->getObjectItem(
+				DataIPShortCuts::cCurrentModuleObject, i,
+				DataIPShortCuts::cAlphaArgs,
+				NumAlpha,
+				DataIPShortCuts::rNumericArgs,
+				NumNumber,
+				IOStat,
+				DataIPShortCuts::lNumericFieldBlanks,
+				DataIPShortCuts::lAlphaFieldBlanks,
+				DataIPShortCuts::cAlphaFieldNames,
 				DataIPShortCuts::cNumericFieldNames
 			);
 			underwaterBoundaries.push_back( UnderwaterBoundary() );
 			underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
 			underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
-			underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+			underwaterBoundaries[ i-1 ].OSCMIndex = UtilityRoutines::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
 			if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
 				ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
 				errorsFound = true;
@@ -701,16 +701,16 @@ namespace WeatherManager {
 	{
 		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
 		DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
-		if ( InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
-		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, 1, 
-			DataIPShortCuts::cAlphaArgs, 
-			NumAlpha, 
-			DataIPShortCuts::rNumericArgs, 
-			NumNumber, 
-			IOStat, 
-			DataIPShortCuts::lNumericFieldBlanks, 
-			DataIPShortCuts::lAlphaFieldBlanks, 
-			DataIPShortCuts::cAlphaFieldNames, 
+		if ( inputProcessor->getNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
+		inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, 1,
+			DataIPShortCuts::cAlphaArgs,
+			NumAlpha,
+			DataIPShortCuts::rNumericArgs,
+			NumNumber,
+			IOStat,
+			DataIPShortCuts::lNumericFieldBlanks,
+			DataIPShortCuts::lAlphaFieldBlanks,
+			DataIPShortCuts::cAlphaFieldNames,
 			DataIPShortCuts::cNumericFieldNames
 		);
 		DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 1 ) );

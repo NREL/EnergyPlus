@@ -164,18 +164,13 @@ namespace PoweredInductionUnits {
 	std::unordered_map< std::string, std::string > PiuUniqueNames;
 
 	void
-	clear_state() {
-		PiuUniqueNames.clear();
-		GetPIUInputFlag = true;
-	}
-
-	void
 	clear_state()
 	{
 		NumPIUs = 0;
 		NumSeriesPIUs = 0;
 		NumParallelPIUs = 0;
 		GetPIUInputFlag = true;
+		PiuUniqueNames.clear();
 		PIU.deallocate();
 	}
 

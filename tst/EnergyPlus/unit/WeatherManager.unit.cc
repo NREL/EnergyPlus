@@ -293,14 +293,14 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated ) {
 		"Schedule:Constant, WaterVelocitySchedule, , 3.0;"
 		"SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"
 	});
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 
 	// need to populate the OSCM array by calling the get input for it
 	bool errorsFound = false;
 	SurfaceGeometry::GetOSCMData(errorsFound);
 	EXPECT_FALSE(errorsFound);
 	EXPECT_EQ(DataSurfaces::TotOSCM, 1);
-	
+
 	// then process the input for this underwater surface
 	bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
 	EXPECT_TRUE(shouldBeTrue);
@@ -308,8 +308,8 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated ) {
 	EXPECT_NEAR(WeatherManager::underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
-	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);    
-	
+	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);
+
 }
 
 TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK ) {
@@ -319,14 +319,14 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK ) {
 		"Schedule:Constant, WaterTempSchedule, , 30;",
 		"SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"
 	});
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 
 	// need to populate the OSCM array by calling the get input for it
 	bool errorsFound = false;
 	SurfaceGeometry::GetOSCMData(errorsFound);
 	EXPECT_FALSE(errorsFound);
 	EXPECT_EQ(DataSurfaces::TotOSCM, 1);
-	
+
 	// then process the input for this underwater surface
 	bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries();
 	EXPECT_TRUE(shouldBeTrue);
@@ -335,7 +335,7 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK ) {
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 0);
-	
+
 }
 
 TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients ) {

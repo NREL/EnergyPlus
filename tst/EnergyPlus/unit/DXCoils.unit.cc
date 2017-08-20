@@ -1847,7 +1847,7 @@ namespace EnergyPlus {
 		// tests minimum limits of Minimum Outdoor Drybulb Temperature for Compressor Operation
 
 		std::string const idf_objects = delimited_string( {
-			
+
 			"  Version,8.7;",
 
 			"  Schedule:Compact,",
@@ -1935,7 +1935,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ProcessScheduleInput();
 		GetDXCoils();

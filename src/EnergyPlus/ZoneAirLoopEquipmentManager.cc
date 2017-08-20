@@ -345,7 +345,7 @@ namespace ZoneAirLoopEquipmentManager {
 				// DesignSpecification:AirTerminal:Sizing name
 				AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex = 0;
 				if ( !lAlphaBlanks( 5 )) {
-					AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( AlphArray( 5 ), DataSizing::AirTerminalSizingSpec );
+					AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex = UtilityRoutines::FindItemInList( AlphArray( 5 ), DataSizing::AirTerminalSizingSpec );
 					if ( AirDistUnit( AirDistUnitNum ).AirTerminalSizingSpecIndex  == 0) {
 						ShowSevereError( cAlphaFields( 5 ) + " = " + AlphArray( 5 ) + " not found." );
 						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );

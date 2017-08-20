@@ -83,7 +83,7 @@ TEST_F( EnergyPlusFixture, BoilerSteam_GetInput )
 		"    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects, false ) );
+	ASSERT_TRUE( process_idf( idf_objects, false ) );
 
 	GetBoilerInput();
 

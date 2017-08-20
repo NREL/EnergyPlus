@@ -4712,7 +4712,7 @@ namespace SingleDuct {
 			if ( lAlphaFieldBlanks( 8 ) ) {
 				SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = true;
 			} else {
-				SysATMixer( ATMixerNum ).OARequirementsPtr = InputProcessor::FindItemInList( cAlphaArgs( 8 ), DataSizing::OARequirements );
+				SysATMixer( ATMixerNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 8 ), DataSizing::OARequirements );
 				if ( SysATMixer( ATMixerNum ).OARequirementsPtr == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 					ShowContinueError( "..invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );

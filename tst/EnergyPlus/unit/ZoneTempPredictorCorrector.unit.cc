@@ -1189,7 +1189,7 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;

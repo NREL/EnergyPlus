@@ -135,13 +135,13 @@ TEST_F( EnergyPlusFixture, ScheduleAnnualFullLoadHours_test )
 		" ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
 
 	int onSchedIndex = GetScheduleIndex("ONSCHED");
-	EXPECT_EQ( 8760., ScheduleAnnualFullLoadHours( onSchedIndex, 1, false ) ); 
+	EXPECT_EQ( 8760., ScheduleAnnualFullLoadHours( onSchedIndex, 1, false ) );
 
 	int offSchedIndex = GetScheduleIndex( "OFFSCHED" );
 	EXPECT_EQ( 0., ScheduleAnnualFullLoadHours( offSchedIndex, 1, false ) );
@@ -209,7 +209,7 @@ TEST_F( EnergyPlusFixture, ScheduleAverageHoursPerWeek_test )
 		" ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
@@ -291,7 +291,7 @@ TEST_F( EnergyPlusFixture, ScheduleHoursGT1perc_test )
 		" ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
