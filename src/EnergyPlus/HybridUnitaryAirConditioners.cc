@@ -199,7 +199,6 @@ namespace EnergyPlus {//***************
 			return &(ZoneHybridUnitaryAirConditioner(UnitNum));
 		}
 
-
 		void
 			InitZoneHybridUnitaryAirConditioners(
 				int const UnitNum, // unit number
@@ -207,7 +206,6 @@ namespace EnergyPlus {//***************
 				)
 		{
 
-			// Using/Aliasing
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
 			using DataGlobals::TimeStep;
@@ -248,7 +246,7 @@ namespace EnergyPlus {//***************
 			}
 			if(!ZoneHybridUnitaryAirConditioner(UnitNum).Initialized)
 			{
-				ZoneHybridUnitaryAirConditioner(UnitNum).Initialize(ZoneNum);//, pConfig);
+				ZoneHybridUnitaryAirConditioner(UnitNum).Initialize(ZoneNum);
 			}
 			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToHeatingSetpoint = 0;
 			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToCoolingSetpoint = 0;
@@ -259,7 +257,6 @@ namespace EnergyPlus {//***************
 			ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingEnergy = 0.0;
 			ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingRate = 0.0;
 			ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingEnergy = 0.0;
-		
 
 			ZoneHybridUnitaryAirConditioner(UnitNum).InitializeModelParams();
 			// Do the following initializations (every time step): This should be the info from
@@ -267,7 +264,6 @@ namespace EnergyPlus {//***************
 
 			//Transfer the node data to EvapCond data structure
 			InletNode = ZoneHybridUnitaryAirConditioner(UnitNum).InletNode;
-
 			ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate = Node(InletNode).MassFlowRate;
 
 			//Set all of the inlet state variables from the inlet nodes
@@ -277,71 +273,23 @@ namespace EnergyPlus {//***************
 			ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure = Node(InletNode).Press;
 			ZoneHybridUnitaryAirConditioner(UnitNum).InletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat, ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure, "InitZoneHybridUnitaryAirConditioners");
 
-			//Set default outlet state to inlet states(?)
+			//Set default outlet state to inlet states, just to be safe
 			ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
 			ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
 			ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
 			ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure = ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure;
 			ZoneHybridUnitaryAirConditioner(UnitNum).OutletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat, ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure, "InitZoneHybridUnitaryAirConditioners");
-
 			ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
 
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp;
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
-			double RHosa = Part_press(101.325, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat) / Sat_press(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp);
+			Real64 RHosa = ZoneHybridUnitaryAirConditioner(UnitNum).Part_press(101.325, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat) / ZoneHybridUnitaryAirConditioner(UnitNum).Sat_press(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp);
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure, "InitZoneHybridUnitaryAirConditioners");
 
 		}
-
-		double Part_press(double P, double W)
-		{
-			// Function to compute partial vapor pressure in [kPa]
-			// From page 6.9 equation 38 in ASHRAE Fundamentals handbook (2005)
-			//   P = ambient pressure [kPa]
-			//   W = humidity ratio [kg/kg dry air]
-
-			return (P * W / (0.62198 + W));
-		}
-
-		double Sat_press(double Tdb)
-		{
-			// Function to compute saturation vapor pressure in [kPa]
-			//ASHRAE Fundamentals handbood (2005) p 6.2, equation 5 and 6
-			//   Tdb = Dry bulb temperature [degC]
-			// Valid from -100C to 200 C
-
-			double  C1 = -5674.5359;
-			double  C2 = 6.3925247;
-			double  C3 = -0.009677843;
-			double  C4 = 0.00000062215701;
-			double  C5 = 2.0747825E-09;
-			double  C6 = -9.484024E-13;
-			double  C7 = 4.1635019;
-			double  C8 = -5800.2206;
-			double  C9 = 1.3914993;
-			double  C10 = -0.048640239;
-			double  C11 = 0.000041764768;
-			double  C12 = -0.000000014452093;
-			double  C13 = 6.5459673;
-			double  Sat_press_val = 0;
-
-			double   TK = Tdb + 273.15;         //Converts from degC to degK
-
-			if (TK <= 273.15)
-			{
-				Sat_press_val = exp(C1 / TK + C2 + C3 * TK + C4 * pow(TK, 2) + C5 * pow(TK, 3) + C6 * pow(TK, 4) + C7 * log(TK)) / 1000;
-			}
-			else
-			{
-				Sat_press_val = exp(C8 / TK + C9 + C10 * TK + C11 * pow(TK, 2) + C12 * pow(TK, 3) + C13 * log(TK)) / 1000;
-			}
-			return Sat_press_val;
-
-		}
-
-		
+	
 
 		void
 			CalcZoneHybridUnitaryAirConditioners(
@@ -365,36 +313,33 @@ namespace EnergyPlus {//***************
 		
 			Real64 ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
 			Real64 ZoneHeatingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
-			double OutputRequiredToHumidify= ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
+			Real64 OutputRequiredToHumidify= ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
 			
-			
-			double OutputRequiredToDehumidify =ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
-			
+			Real64 OutputRequiredToDehumidify =ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
 
 			SensibleOutputProvided = ZoneCoolingLoad;
 			LatentOutputProvided = 0;
 			// taking class members out of the object and then using them in the calcualtion is odd but its for clarity with unit testing.
-			EnvDryBulbT = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp;// eg. 34.95;
-			AirTempRoom = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;//23.94039067;
-			EnvRelHumm = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;//RH 78; 
-			RoomRelHum = ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;//RH 38;
+			EnvDryBulbT = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp;// degrees C
+			AirTempRoom = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;//degrees C
+			EnvRelHumm = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;//RH 
+			RoomRelHum = ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;//RH 
 			
 			bool UseOccSchFlag = 1;
 			bool UseMinOASchFlag = 1;
-			//OARequirementsPtr = 1;
+			
 			using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 			DesignMinVR = CalcDesignSpecificationOutdoorAir(ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag); //[m3/s]
-			double DesignMinVRMassFlow = 0;
+			Real64 DesignMinVRMassFlow = 0;
 			if (StdRhoAir>1) 	DesignMinVRMassFlow = DesignMinVR * StdRhoAir;
 			else DesignMinVRMassFlow = DesignMinVR *  1.225;
-			// note: the multplication of the max values of the "Fraction of peak Msa" and the OSAF as specified in the config must be greater than the ratio of MinVR/SystemMaximumSupplyAirFlowRate otherwise it will never reach mi								 
 			ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
 
 
 		}
 
 		void
-			ReportZoneHybridUnitaryAirConditioners(int const UnitNum) // unit number
+			ReportZoneHybridUnitaryAirConditioners(int const UnitNum)
 		{
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
@@ -404,9 +349,7 @@ namespace EnergyPlus {//***************
 			Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).Temp =         ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp;
 			Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).HumRat =       ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat;
 			Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate;
-			Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).Enthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy;//PsyHFnTdbW(ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat);
-		
-
+			Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).Enthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy;
 		}
 
 		void
@@ -451,7 +394,6 @@ namespace EnergyPlus {//***************
 			static std::string const RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
 			MaxNumbers = 0;
 			MaxAlphas = 0;
-
 			CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
 			NumZoneHybridEvap = GetNumObjectsFound(CurrentModuleObject);
 			GetObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
@@ -473,13 +415,6 @@ namespace EnergyPlus {//***************
 
 				for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
 					GetObjectItem(CurrentModuleObject, UnitLoop, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
-					for (int k = 1; k <= MaxAlphas; ++k) {
-
-						test.push_back(Alphas(k));
-						blanks.push_back(lAlphaFieldBlanks(k));
-
-
-					}
 
 					IsNotOK = false;
 					IsBlank = false;
@@ -502,8 +437,7 @@ namespace EnergyPlus {//***************
 					}
 						//A3, \field Availability Manager List Name
 		
-						//A4, \field Minimum Supply Air Temperature Schedule Name
-					
+						//A4, \field Minimum Supply Air Temperature Schedule Named
 					ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer = GetScheduleIndex(Alphas(4));
 					if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer == 0) {
 						ShowSevereError("Invalid " + cAlphaFields(4) + '=' + Alphas(4));
@@ -517,8 +451,21 @@ namespace EnergyPlus {//***************
 						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
 						ErrorsFound = true;
 					}
-						//A6, \field Minimum Supply Air Humidity Ratio Schedule Name
-						//A7, \field Maximum Supply Air Humidity Ratio Schedule Name
+					//A6, \field Minimum Supply Air Humidity Ratio Schedule Name
+					ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer = GetScheduleIndex(Alphas(6));
+					if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer == 0) {
+						ShowSevereError("Invalid " + cAlphaFields(6) + '=' + Alphas(6));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+					//A7, \field Maximum Supply Air Humidity Ratio Schedule Name
+					ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer = GetScheduleIndex(Alphas(7));
+					if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer == 0) {
+						ShowSevereError("Invalid " + cAlphaFields(7) + '=' + Alphas(7));
+						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+						ErrorsFound = true;
+					}
+						
 						//A8, \field Method to Choose Value of Controlled Inputs
 
 						//A9, \field Return Air Node Name
@@ -534,12 +481,11 @@ namespace EnergyPlus {//***************
 						
 						//N1, \field System Maximum Supply AirFlow Rate
 					ZoneHybridUnitaryAirConditioner(UnitLoop).SystemMaximumSupplyAirFlowRate = Numbers(1);
-					
-					//In each time step, the result for system power, fan power, gas use, water user, or supply airflow rate will be determined as :
-					//TableValue * SysMaxSupply * ScalingFactor
 
 						//N2, \field External Static Pressure at System Maximum Supply Air Flow Rate
-
+						
+					//In each time step, the result for system power, fan power, gas use, water user, or supply airflow rate will be determined as :
+					//TableValue * SysMaxSupply * ScalingFactor
 						//N3, \field Scaling Factor
 					ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(3);
 					
@@ -560,23 +506,19 @@ namespace EnergyPlus {//***************
 						//A14, \field Second fuel type
 						//A15, \field Third fuel type
 						//A16, \field Objective Function Minimizes
-						//A17, \field Mode0 Name
-						//A18, \field Mode0 Supply Air Temperature Lookup Table Name
 
-					
-					// get Design specification outdoor air object
-					//if (!lAlphaFieldBlanks(15)) {
+						//A17, \ OA requiremnt pointer
 	
-						ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = FindItemInList(Alphas(17), OARequirements);
-						if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
-							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
-							ShowContinueError("Invalid-not found" + cAlphaFieldNames(17) + "=\"" + Alphas(17) + "\".");
-							ErrorsFound = true;
-						}
-						else {
-							ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
-						}
-					//}
+					ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = FindItemInList(Alphas(17), OARequirements);
+					if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
+						ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
+						ShowContinueError("Invalid-not found" + cAlphaFieldNames(17) + "=\"" + Alphas(17) + "\".");
+						ErrorsFound = true;
+					}
+					else {
+						ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
+					}
+					
 
 					pMode = ZoneHybridUnitaryAirConditioner(UnitLoop).AddNewOperatingMode(ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate);
 					ErrorsFound = pMode->ParseMode0(Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
@@ -633,10 +575,7 @@ namespace EnergyPlus {//***************
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Heating Energy[J]", ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentHeatingEnergy, "System", "Sum", ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
 				
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Predicted Sensible Load to Setpoint Heat Transfer Rate [W]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedLoadToCoolingSetpoint,"System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-				//SetupOutputVariable("Average Mode Number []", ZoneHybridUnitaryAirConditioner(UnitLoop).PrimaryMode, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("ErrorCode []", ZoneHybridUnitaryAirConditioner(UnitLoop).ErrorCode, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-				//SetupOutputVariable("Attempted Tsa []", ZoneHybridUnitaryAirConditioner(UnitLoop).Tsa, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-
 				
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Temperature [C]", ZoneHybridUnitaryAirConditioner(UnitLoop).OutletTemp, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Temperature [C]", ZoneHybridUnitaryAirConditioner(UnitLoop).InletTemp, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
@@ -658,7 +597,7 @@ namespace EnergyPlus {//***************
 
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate [kg/s]", ZoneHybridUnitaryAirConditioner(UnitLoop).MinOA_Msa, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate[kg/s]", ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyVentilationAir, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-				SetupOutputVariable("Zone Hybrid Unitary HVAC Availability Status[]", ZoneHybridUnitaryAirConditioner(UnitLoop).UnitOn, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Availability Status[]",  ZoneHybridUnitaryAirConditioner(UnitLoop).UnitOn, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Outside Air Fraction []", ZoneHybridUnitaryAirConditioner(UnitLoop).averageOSAF, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Moisture Transfer Rate[kg/s]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedDeHumdificationMass, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
@@ -668,21 +607,11 @@ namespace EnergyPlus {//***************
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Moisture Transfer Rate[kg/s]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationMass, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Transfer Rate[W]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationLoad, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Tansfer Energy[J]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationEnergy, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-				
-				//add these !!!!
-				/*HVAC,Average,Zone Hybrid Unitary HVAC Supply Fan Electric Power [W]
-				HVAC,Sum,Zone Hybrid Unitary HVAC Supply Fan Electric Energy [J]
-				HVAC,Average,Zone Hybrid Unitary HVAC Secondary Fuel Consumption Rate [W]
-				HVAC,Sum,Zone Hybrid Unitary HVAC Secondary Fuel Consumption [J]
-				HVAC,Average,Zone Hybrid Unitary HVAC Third Fuel Consumption Rate [W]
-				HVAC,Sum,Zone Hybrid Unitary HVAC Third Fuel Consumption [J]
-				HVAC,Average,Zone Hybrid Unitary HVAC Water Consumption Rate [m3/hr]
-				HVAC,Sum,Zone Hybrid Unitary HVAC Water Consumption [m3]
-				*/
 					
 				list<CSetting*>::iterator iterOperatingSettings;
 				int index=0;
-				for (iterOperatingSettings = ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.begin(); iterOperatingSettings != ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.end(); ++iterOperatingSettings) {
+				for (iterOperatingSettings = ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.begin(); iterOperatingSettings != ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.end(); ++iterOperatingSettings)
+				{
 					CSetting* po = (*iterOperatingSettings);
 					std::ostringstream strs;
 					strs << "Zone Hybrid Unitary HVAC Runtime Fraction in Setting "<<index<<" []";

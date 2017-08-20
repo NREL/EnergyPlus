@@ -67,22 +67,16 @@
 #include <DataGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <HybridEvapCoolingModel.hh>
-//#include <DataZoneEnvironment.hh>
-//#include <HybridModelConfigFile.hh>
+
 namespace EnergyPlus {
 
 	namespace HybridUnitaryAirConditioners {
 
-		// Using/Aliasing
-
-		//using HybridEvapCoolingModel::ZoneHybridUnitaryACSystem;
 		using HybridEvapCoolingModel::Model;
 		using HybridEvapCoolingModel::CSetting;
-		//Array1D< Model > ZoneHybridUnitaryAirConditioner;
-		// Data
+		
 		// MODULE PARAMETER DEFINITIONS
-			void
-			SimZoneHybridUnitaryAirConditioners(
+		void SimZoneHybridUnitaryAirConditioners(
 				std::string const & CompName, // name of the packaged terminal heat pump
 				int const ZoneNum, // number of zone being served
 				Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
@@ -90,25 +84,21 @@ namespace EnergyPlus {
 				int & CompIndex // index to zone hvac unit
 				);
 
-		void
-			GetInputZoneHybridUnitaryAirConditioners(bool & Errors);
+		void GetInputZoneHybridUnitaryAirConditioners(bool & Errors);
 
-		void
-			InitZoneHybridUnitaryAirConditioners(
+		void InitZoneHybridUnitaryAirConditioners(
 				int const UnitNum, // unit number
 				int const ZoneNum // number of zone being served
 				);
 
-		void
-			CalcZoneHybridUnitaryAirConditioners(
+		void CalcZoneHybridUnitaryAirConditioners(
 				int const UnitNum, // unit number
 				int const ZoneNum, // number of zone being served
 				Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
 				Real64 & LatentOutputProvided // Latent add/removal  (kg/s), dehumid = negative
 				);
 
-		void
-			ReportZoneHybridUnitaryAirConditioners(int const UnitNum); // unit number
+		void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
 		double Sat_press(double Tdb);
 		double Part_press(double P, double W);
 		Model* HandelToHybridUnitaryAirConditioner(int UnitNum);
