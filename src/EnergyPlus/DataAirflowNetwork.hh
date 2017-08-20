@@ -180,6 +180,7 @@ namespace DataAirflowNetwork {
 
 	struct AirflowNetworkSimuProp // Basic parameters for AirflowNetwork simulation
 	{
+		enum class Solver {SkylineLU, ConjugateGradient};
 		// Members
 		std::string AirflowNetworkSimuName; // Provide a unique object name
 		std::string Control; // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
@@ -190,6 +191,7 @@ namespace DataAirflowNetwork {
 		int iWPCCntr; // Integer equivalent for WPCCntr field
 		std::string BldgType; // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
 		std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
+		Solver solver;
 		int MaxIteration; // Maximum number of iteration, default 500
 		int InitFlag; // Initialization flag
 		Real64 RelTol; // Relative airflow convergence
@@ -225,6 +227,7 @@ namespace DataAirflowNetwork {
 			OpenFactorErrCount( 0 ),
 			OpenFactorErrIndex( 0 ),
 			InitType( "ZeroNodePressures" ),
+			solver( Solver::SkylineLU ),
 			TExtHeightDep( false )
 		{}
 
@@ -250,6 +253,7 @@ namespace DataAirflowNetwork {
 			int const OpenFactorErrCount, // Large opening error count at Open factor > 1.0
 			int const OpenFactorErrIndex, // Large opening error error index at Open factor > 1.0
 			std::string const & InitType, // Initialization flag type:
+			Solver solver, // Solver type
 			bool const TExtHeightDep // Choice of height dependence of external node temperature
 		) :
 			AirflowNetworkSimuName( AirflowNetworkSimuName ),
@@ -272,6 +276,7 @@ namespace DataAirflowNetwork {
 			OpenFactorErrCount( OpenFactorErrCount ),
 			OpenFactorErrIndex( OpenFactorErrIndex ),
 			InitType( InitType ),
+			solver( solver ),
 			TExtHeightDep( TExtHeightDep )
 		{}
 	};
