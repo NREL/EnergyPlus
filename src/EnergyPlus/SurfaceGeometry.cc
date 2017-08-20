@@ -7135,12 +7135,7 @@ namespace SurfaceGeometry {
 		using namespace DataIPShortCuts;
 		using ScheduleManager::GetScheduleIndex;
 
-<<<<<<< HEAD
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-=======
 		std::string const RoutineName("GetWindowGapAirflowControlData");
->>>>>>> NREL/develop
 		int IOStat; // IO Status when calling get input subroutine
 		int ControlNumAlpha; // Number of control alpha names being passed
 		int ControlNumProp; // Number of control properties being passed

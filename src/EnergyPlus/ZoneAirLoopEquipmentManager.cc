@@ -280,12 +280,7 @@ namespace ZoneAirLoopEquipmentManager {
 		static Array1D< Real64 > NumArray( 2 ); //Tuned Made static
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
-<<<<<<< HEAD
-		static Array1D_string cAlphaFields( 4 ); // Alpha field names //Tuned Made static
-=======
-		bool IsBlank; // Flag for blank name
 		static Array1D_string cAlphaFields( 5 ); // Alpha field names //Tuned Made static
->>>>>>> NREL/develop
 		static Array1D_string cNumericFields( 2 ); // Numeric field names //Tuned Made static
 		static Array1D_bool lAlphaBlanks( 5 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
 		static Array1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
@@ -447,17 +442,8 @@ namespace ZoneAirLoopEquipmentManager {
 				} else if ( UtilityRoutines::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:UserDefined" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctUserDefined;
 				}
-<<<<<<< HEAD
 				else if ( UtilityRoutines::SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:Mixer" ) ) {
-					GetATMixerTypeNum( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerTypeNum );
-					if ( ATMixerTypeNum == ATMixer_InletSide ) AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctInletATMixer;
-					if ( ATMixerTypeNum == ATMixer_SupplySide ) AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctSupplyATMixer;
-					GetATMixerPriNode( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerPriNode );
-					AirDistUnit( AirDistUnitNum ).InletNodeNum = ATMixerPriNode;
-=======
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:Mixer" ) ) {					
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctATMixer;
->>>>>>> NREL/develop
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
 						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );

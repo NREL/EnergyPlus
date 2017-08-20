@@ -1536,7 +1536,6 @@ namespace EnergyPlus {
 		eat_comment( "  !- Name\n    0.0000", index );
 		EXPECT_EQ( 10ul, index );
 
-<<<<<<< HEAD
 		index = 0;
 		eat_comment( "  !- Name\n\r    0.0000", index );
 		EXPECT_EQ( 10ul, index );
@@ -1581,16 +1580,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0ul, index );
 		EXPECT_TRUE( success );
 	}
-=======
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 2 ).Name );
-			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
-
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 3 ).Name );
-			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
-
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 1 ).Name );
-			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
->>>>>>> NREL/develop
 
 	TEST_F (InputProcessorFixture, parse_value) {
 		size_t index = 0;
@@ -2191,7 +2180,6 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 1, IOStatus );
 
-<<<<<<< HEAD
 	}
 
 	TEST_F( InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields )
@@ -2327,16 +2315,6 @@ namespace EnergyPlus {
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
-=======
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 2 ).Name );
-			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
-
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 3 ).Name );
-			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
-
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 1 ).Name );
-			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
->>>>>>> NREL/develop
 
 	TEST_F( InputProcessorFixture, getObjectItem_truncated_autosize_fields )
 	{

@@ -391,18 +391,9 @@ namespace ZoneTempPredictorCorrector {
 		using General::CheckCreatedZoneItemName;
 		using WeatherManager::NumDaysInYear;
 
-<<<<<<< HEAD
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneAirSetpoints: " );
 
-=======
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "GetZoneAirSetpoints: " );
-
-		// DERIVED TYPE DEFINITIONS:
-
->>>>>>> NREL/develop
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TempControlledZoneNum; // The Splitter that you are currently loading input into
 		int NumAlphas;
@@ -5590,20 +5581,9 @@ namespace ZoneTempPredictorCorrector {
 		// This function verifies that a zone (by name) has a Zone Control:Thermostatic
 		// object entered.
 
-<<<<<<< HEAD
 		// Return value
 		bool HasThermostat; // True if does, false if not.
 
-=======
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Return value
-		bool HasThermostat; // True if does, false if not.
-
-		// Locals
-
->>>>>>> NREL/develop
 		if ( GetZoneAirStatsInputFlag ) {
 			GetZoneAirSetPoints();
 			GetZoneAirStatsInputFlag = false;
@@ -5639,15 +5619,7 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::EquipConfiguration;
 
-<<<<<<< HEAD
 		return ( UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName ) > 0 );
-=======
-		// Return value
-
-		// Locals
-
-		return ( FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName ) > 0 );
->>>>>>> NREL/develop
 	}
 
 	void
@@ -6656,7 +6628,7 @@ namespace ZoneTempPredictorCorrector {
 		int const firstTimeStep = 1;
 		int weekSchIndexSelect = ScheduleManager::Schedule( scheduleIndex ).WeekSchedulePointer( jdateSelect );
 		int daySchIndexSelect = ScheduleManager::WeekSchedule( weekSchIndexSelect ).DaySchedulePointer( dayOfWeek );
-		Real64 valueAtSelectTime = ScheduleManager::DaySchedule( daySchIndexSelect ).TSValue( firstTimeStep, hourSelect ); 
+		Real64 valueAtSelectTime = ScheduleManager::DaySchedule( daySchIndexSelect ).TSValue( firstTimeStep, hourSelect );
 		int countOfSame = 0;
 
 		// count the number of times with that same value

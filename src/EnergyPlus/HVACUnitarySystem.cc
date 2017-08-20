@@ -2999,20 +2999,8 @@ namespace HVACUnitarySystem {
 
 			for ( DesignSpecNum = 1; DesignSpecNum <= NumDesignSpecMultiSpeedHP; ++DesignSpecNum ) {
 
-<<<<<<< HEAD
-			inputProcessor->getObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
-=======
-				GetObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), DesignSpecMSHP, DesignSpecNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
->>>>>>> NREL/develop
+				inputProcessor->getObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				DesignSpecMSHP( DesignSpecNum ).Name = Alphas( 1 );
 
@@ -3022,24 +3010,11 @@ namespace HVACUnitarySystem {
 				DesignSpecMSHP( DesignSpecNum ).NumOfSpeedCooling = Numbers( 2 );
 				NumOfSpeedCooling = DesignSpecMSHP( DesignSpecNum ).NumOfSpeedCooling;
 
-<<<<<<< HEAD
-			if ( !lAlphaBlanks( 2 ) ) {
-				if ( UtilityRoutines::SameString( Alphas( 2 ), "Yes" ) ) {
-					DesignSpecMSHP( DesignSpecNum ).SingleModeFlag = true;
-				}
-				else if ( UtilityRoutines::SameString( Alphas( 2 ), "No" ) ) {
-					DesignSpecMSHP( DesignSpecNum ).SingleModeFlag = false;
-				}
-				else {
-					ShowSevereError( CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" illegal key." );
-					ShowContinueError( "Valid keys are: Yes or No" );
-					ErrorsFound = true;
-=======
 				if ( !lAlphaBlanks( 2 ) ) {
-					if ( SameString( Alphas( 2 ), "Yes" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 2 ), "Yes" ) ) {
 						DesignSpecMSHP( DesignSpecNum ).SingleModeFlag = true;
 					}
-					else if ( SameString( Alphas( 2 ), "No" ) ) {
+					else if ( UtilityRoutines::SameString( Alphas( 2 ), "No" ) ) {
 						DesignSpecMSHP( DesignSpecNum ).SingleModeFlag = false;
 					}
 					else {
@@ -3047,7 +3022,6 @@ namespace HVACUnitarySystem {
 						ShowContinueError( "Valid keys are: Yes or No" );
 						ErrorsFound = true;
 					}
->>>>>>> NREL/develop
 				}
 				DesignSpecMSHP( DesignSpecNum ).NoLoadAirFlowRateRatio = Numbers( 3 );
 
@@ -5141,53 +5115,6 @@ namespace HVACUnitarySystem {
 			ZoneEquipmentFound = false;
 			ZoneInletNodeFound = false;
 
-<<<<<<< HEAD
-			// check if the UnitarySystem is connected to an air loop
-			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-				for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
-					for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-						if ( UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( iNameAlphaNum ) ) && UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) {
-							AirLoopNumber = AirLoopNum;
-							AirLoopFound = true;
-							for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-								if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
-								//             Find the controlled zone number for the specified thermostat location
-								UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
-								UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
-								//             Determine if system is on air loop served by the thermostat location specified
-								if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == AirLoopNumber ) {
-									++TotalZonesOnAirLoop;
-									TotalFloorAreaOnAirLoop += Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
-								}
-								for ( TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum ) {
-									if ( TempControlledZone( TstatZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
-									AirNodeFound = true;
-								}
-								for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
-									if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
-									AirNodeFound = true;
-								}
-							break;
-							}
-						}
-					}
-				}
-			}
-
-			// check if the UnitarySystem is connected to an outside air system
-			if ( !AirLoopFound && CurOASysNum > 0 ) {
-				for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
-					for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum ) {
-						if ( ! UtilityRoutines::SameString( OutsideAirSys( OASysNum ).ComponentName( OACompNum ), Alphas( iNameAlphaNum ) ) || ! UtilityRoutines::SameString( OutsideAirSys( OASysNum ).ComponentType( OACompNum ), CurrentModuleObject ) ) continue;
-						AirLoopNumber = OASysNum;
-						OASysFound = true;
-						break;
-					}
-				}
-			}
-
-=======
->>>>>>> NREL/develop
 			// Get AirTerminal mixer data
 			GetATMixer( UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ATMixerName, UnitarySystem( UnitarySysNum ).ATMixerIndex, UnitarySystem( UnitarySysNum ).ATMixerType, UnitarySystem( UnitarySysNum ).ATMixerPriNode, UnitarySystem( UnitarySysNum ).ATMixerSecNode, UnitarySystem( UnitarySysNum ).ATMixerOutNode, UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum );
 			if ( UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_InletSide || UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_SupplySide ) {
@@ -5367,7 +5294,7 @@ namespace HVACUnitarySystem {
 				}
 			}
 
-			if ( !ZoneEquipmentFound ) { 
+			if ( !ZoneEquipmentFound ) {
 				// check if the UnitarySystem is connected to an air loop
 				for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 					for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
@@ -5415,7 +5342,7 @@ namespace HVACUnitarySystem {
 						}
 					}
 				}
-			}			 
+			}
 
 			if ( !AirLoopFound && !ZoneEquipmentFound && !OASysFound && !DataHVACGlobals::GetAirPathDataDone ) {
 				// Unsucessful attempt
@@ -6427,19 +6354,11 @@ namespace HVACUnitarySystem {
 				SetupOutputVariable( "Unitary System Latent Heating Rate [W]", UnitarySystem( UnitarySysNum ).LatHeatEnergyRate, "System", "Average", UnitarySystem( UnitarySysNum ).Name );
 				SetupOutputVariable( "Unitary System Ancillary Electric Power [W]", UnitarySystem( UnitarySysNum ).TotalAuxElecPower, "System", "Average", UnitarySystem( UnitarySysNum ).Name );
 
-<<<<<<< HEAD
-			// report predicted load as determined by Unitary System for load control only
-			if ( UnitarySystem( UnitarySysNum ).ControlType != SetPointBased ) {
-				SetupOutputVariable( "Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate [W]", UnitarySystem( UnitarySysNum ).SensibleLoadPredicted, "System", "Average", UnitarySystem( UnitarySysNum ).Name );
-				SetupOutputVariable( "Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate [W]", UnitarySystem( UnitarySysNum ).MoistureLoadPredicted, "System", "Average", UnitarySystem( UnitarySysNum ).Name );
-			}
-=======
-				// report predicted load as determined by Unitary System for load control only 
+				// report predicted load as determined by Unitary System for load control only
 				if ( UnitarySystem( UnitarySysNum ).ControlType != SetPointBased ) {
 					SetupOutputVariable( "Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate [W]", UnitarySystem( UnitarySysNum ).SensibleLoadPredicted, "System", "Average", UnitarySystem( UnitarySysNum ).Name );
 					SetupOutputVariable( "Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate [W]", UnitarySystem( UnitarySysNum ).MoistureLoadPredicted, "System", "Average", UnitarySystem( UnitarySysNum ).Name );
 				}
->>>>>>> NREL/develop
 
 				//        IF(UnitarySystem(UnitarySysNum)%DehumidControlType_Num .EQ. DehumidControl_CoolReheat)THEN
 				SetupOutputVariable( "Unitary System Dehumidification Induced Heating Demand Rate [W]", UnitarySystem( UnitarySysNum ).DehumidInducedHeatingDemandRate, "System", "Average", UnitarySystem( UnitarySysNum ).Name );

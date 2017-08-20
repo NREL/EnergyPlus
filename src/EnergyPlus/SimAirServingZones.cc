@@ -586,11 +586,6 @@ namespace SimAirServingZones {
 			AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum.allocate( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes );
 			// fill the return air node arrays with node numbers
 			AirToZoneNodeInfo( AirSysNum ).AirLoopReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-<<<<<<< HEAD
-			AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
-			// work on unique nodes
-			test = UtilityRoutines::FindItemInList( Alphas( 6 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
-=======
 			if ( ! lAlphaBlanks( 7 ) ){
 				AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 			} else {
@@ -599,8 +594,7 @@ namespace SimAirServingZones {
 			}
 
 				// work on unique nodes
-			test = FindItemInList( Alphas( 6 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
->>>>>>> NREL/develop
+			test = UtilityRoutines::FindItemInList( Alphas( 6 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
 				++TestUniqueNodesNum;
 				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 6 );
@@ -613,22 +607,8 @@ namespace SimAirServingZones {
 				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
 				ErrorsFound = true;
 			}
-<<<<<<< HEAD
-			test = UtilityRoutines::FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
-			if ( test == 0 ) {
-				++TestUniqueNodesNum;
-				TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 7 );
-				TestUniqueNodes( TestUniqueNodesNum ).AirLoopName = Alphas( 1 );
-				TestUniqueNodes( TestUniqueNodesNum ).FieldName = cAlphaFields( 7 );
-				TestUniqueNodes( TestUniqueNodesNum ).NodeNameUsed = true;
-			} else {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate node name." );
-				ShowContinueError( "...used for " + cAlphaFields( 7 ) + "=\"" + Alphas( 7 ) + "\"" );
-				ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
-				ErrorsFound = true;
-=======
 			if ( ! lAlphaBlanks( 7 ) ){
-				test = FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
+				test = UtilityRoutines::FindItemInList( Alphas( 7 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 				if ( test == 0 ) {
 					++TestUniqueNodesNum;
 					TestUniqueNodes( TestUniqueNodesNum ).NodeName = Alphas( 7 );
@@ -641,7 +621,6 @@ namespace SimAirServingZones {
 					ShowContinueError( "...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes( test ).AirLoopName + "\" for " + TestUniqueNodes( test ).FieldName );
 					ErrorsFound = true;
 				}
->>>>>>> NREL/develop
 			}
 			test = UtilityRoutines::FindItemInList( Alphas( 8 ), TestUniqueNodes, &AirUniqueNodes::NodeName, TestUniqueNodesNum );
 			if ( test == 0 ) {
@@ -6463,7 +6442,7 @@ namespace SimAirServingZones {
 					}
 				} else if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == CapacityPerFloorArea ) {
 					TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
-				} 
+				}
 				CalcSysSizing( AirLoopNum ).InpDesCoolAirFlow = TempSize;
 				FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow = TempSize;
 			}}
@@ -6530,7 +6509,7 @@ namespace SimAirServingZones {
 					}
 				} else if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == CapacityPerFloorArea ) {
 					TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
-				} 
+				}
 				CalcSysSizing( AirLoopNum ).InpDesHeatAirFlow = TempSize;
 				FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow = TempSize;
 			}}
@@ -6560,7 +6539,7 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = 0.0; // autosized, set to zero initially
 				}
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				// even for heating capacity we use cooled zones floor area ( *.FloorAreaOnAirLoopCooled ) served by the airloop 
+				// even for heating capacity we use cooled zones floor area ( *.FloorAreaOnAirLoopCooled ) served by the airloop
 				FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity ) {
 				FinalSysSizing( AirLoopNum ).FractionOfAutosizedHeatingCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity;
@@ -6767,15 +6746,9 @@ namespace SimAirServingZones {
 		// METHODOLOGY EMPLOYED:
 		// Ventilation Rate Procedure for single pass system
 
-<<<<<<< HEAD
-=======
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace OutputReportPredefined;
 
->>>>>>> NREL/develop
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ZoneOAFrac( 0.0 ); // ratio of Voz to available zone supply air flow
 		Real64 AvailSAFlow( 0.0 ); // available zone supply air flow [m3/s]

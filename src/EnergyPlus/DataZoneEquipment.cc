@@ -1138,7 +1138,7 @@ namespace DataZoneEquipment {
 	GetReturnAirNodeForZone(
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
 		std::string const & NodeName  // Return air node name to match (may be blank)
-	) 
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -1148,24 +1148,12 @@ namespace DataZoneEquipment {
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the return air node number for the indicated
-<<<<<<< HEAD
-		// zone.  Returns 0 if the Zone is not a controlled zone.
-=======
 		// zone and node name.  If NodeName is blank, return the first return node number,
-		// otherwise return the node number of the matching return node name.  
+		// otherwise return the node number of the matching return node name.
 		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
->>>>>>> NREL/develop
 
 		// Return value
 		int ReturnAirNodeNumber; // Return Air node number for controlled zone
-
-<<<<<<< HEAD
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-=======
->>>>>>> NREL/develop
 		int ControlledZoneIndex;
 
 		if ( ! ZoneEquipInputsFilled ) {

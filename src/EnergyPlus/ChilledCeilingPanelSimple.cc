@@ -1005,13 +1005,13 @@ namespace CoolingPanelSimple {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   June 2017
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine sizes UA value for the simple chilled ceiling panel.
 
 		// Return value
 		bool SizeCoolingPanelUA;
-		
+
 		// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
 		Real64 Cp;
 		Real64 MDot;
@@ -1061,11 +1061,8 @@ namespace CoolingPanelSimple {
 			}
 		}
 
-<<<<<<< HEAD
-=======
 		return SizeCoolingPanelUA;
 
->>>>>>> NREL/develop
 	}
 
 	void

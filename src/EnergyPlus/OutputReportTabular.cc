@@ -7693,53 +7693,16 @@ namespace OutputReportTabular {
 				}
 			}
 
-<<<<<<< HEAD
-			//complete the LEED end use table using the same values
-			// for certain rows in the LEED table the subcategories are necessary so first compute those values
-			leedFansParkFromFan = 0.0;
-			leedFansParkFromExtFuelEquip = 0.0;
-			leedIntLightProc = 0.0;
-			leedCook = 0.0;
-			leedIndProc = 0.0;
-			leedElevEsc = 0.0;
-
-			for ( iResource = 1; iResource <= 5; ++iResource ) { // don't bother with water
-				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
-					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
-						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-							subCatName = EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub );
-							if ( UtilityRoutines::SameString( subCatName, "Fans - Parking Garage" ) || UtilityRoutines::SameString( subCatName, "Fans-Parking Garage" ) ) {
-								if ( jEndUse == 7 ) { //fans
-									leedFansParkFromFan( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-								} else {
-									leedFansParkFromExtFuelEquip( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-								}
-							} else if ( UtilityRoutines::SameString( subCatName, "Interior Lighting - Process" ) || UtilityRoutines::SameString( subCatName, "Interior Lighting-Process" ) ) {
-								leedIntLightProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( UtilityRoutines::SameString( subCatName, "Cooking" ) ) {
-								leedCook( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( UtilityRoutines::SameString( subCatName, "Industrial Process" ) ) {
-								leedIndProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( UtilityRoutines::SameString( subCatName, "Elevators and Escalators" ) ) {
-								leedElevEsc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							}
-						}
-					}
-				}
-			}
-
-=======
->>>>>>> NREL/develop
 			unconvert = largeConversionFactor / 1000000000.0; //to avoid double converting, the values for the LEED report should be in GJ
 			//  Energy Use Intensities
 			if ( buildingGrossFloorArea > 0 ) {
-				PreDefTableEntry( pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal( colElectricity, 3 ) / buildingGrossFloorArea, 2 ); 
+				PreDefTableEntry( pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal( colElectricity, 3 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal( colElectricity, 1 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal( colElectricity, 2 ) / buildingGrossFloorArea, 2 );
-				PreDefTableEntry( pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal( colElectricity, 7 ) / buildingGrossFloorArea, 2 );  
+				PreDefTableEntry( pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal( colElectricity, 7 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Service Water Heating", unconvert * 1000 * useVal( colElectricity, 12 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Receptacle Equipment", unconvert * 1000 * useVal( colElectricity, 5 ) / buildingGrossFloorArea, 2 );
-				PreDefTableEntry( pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * ( useVal( colElectricity, 15 ) ) / buildingGrossFloorArea, 2 ); 
+				PreDefTableEntry( pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * ( useVal( colElectricity, 15 ) ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Subtotal", unconvert * 1000 * useVal( colElectricity, 15 ) / buildingGrossFloorArea, 2 );
 			}
 
@@ -7758,7 +7721,7 @@ namespace OutputReportTabular {
 			if ( buildingGrossFloorArea > 0 ) {
 				PreDefTableEntry( pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal( colGas, 1 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal( colGas, 12 ) / buildingGrossFloorArea, 2 );
-				PreDefTableEntry( pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal( colGas, 15 ) / buildingGrossFloorArea, 2 ); 
+				PreDefTableEntry( pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal( colGas, 15 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiNatG, "Subtotal", unconvert * 1000 * useVal( colGas, 15 ) / buildingGrossFloorArea, 2 );
 			}
 			PreDefTableEntry( pdchLeedEusTotal, "Natural Gas", unconvert * useVal( colGas, 15 ), 2 );
@@ -7795,10 +7758,10 @@ namespace OutputReportTabular {
 			leedSiteRecept = 0.0;
 			leedSiteTotal = 0.0;
 			for ( iResource = 1; iResource <= 5; ++iResource ) { // don't bother with water
-				leedSiteIntLite += useVal( iResource, 3 ); 
+				leedSiteIntLite += useVal( iResource, 3 );
 				leedSiteSpHeat += useVal( iResource, 1 );
 				leedSiteSpCool += useVal( iResource, 2 );
-				leedSiteFanInt += useVal( iResource, 7 ); 
+				leedSiteFanInt += useVal( iResource, 7 );
 				leedSiteSrvWatr += useVal( iResource, 12 );
 				leedSiteRecept += useVal( iResource, 5 );
 				leedSiteTotal += useVal( iResource, 15 );
@@ -8979,42 +8942,6 @@ namespace OutputReportTabular {
 			}
 
 			//complete the LEED end use table using the same values
-<<<<<<< HEAD
-			// for certain rows in the LEED table the subcategories are necessary so first compute those values
-			leedFansParkFromFan = 0.0;
-			leedFansParkFromExtFuelEquip = 0.0;
-			leedIntLightProc = 0.0;
-			leedCook = 0.0;
-			leedIndProc = 0.0;
-			leedElevEsc = 0.0;
-			for ( iResource = 1; iResource <= 5; ++iResource ) { // don't bother with water
-				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
-					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
-						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-							subCatName = EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub );
-							if ( UtilityRoutines::SameString( subCatName, "Fans - Parking Garage" ) || UtilityRoutines::SameString( subCatName, "Fans-Parking Garage" ) ) {
-								if ( jEndUse == 7 ) { //fans
-									leedFansParkFromFan( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-								} else {
-									leedFansParkFromExtFuelEquip( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-								}
-							} else if ( UtilityRoutines::SameString( subCatName, "Interior Lighting - Process" ) || UtilityRoutines::SameString( subCatName, "Interior Lighting-Process" ) ) {
-								leedIntLightProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( UtilityRoutines::SameString( subCatName, "Cooking" ) ) {
-								leedCook( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( UtilityRoutines::SameString( subCatName, "Industrial Process" ) ) {
-								leedIndProc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							} else if ( UtilityRoutines::SameString( subCatName, "Elevators and Escalators" ) ) {
-								leedElevEsc( iResource ) += collapsedEndUseSub( kEndUseSub, jEndUse, iResource );
-							}
-						}
-					}
-				}
-			}
-
-			//complete the LEED end use table using the same values
-=======
->>>>>>> NREL/develop
 			unconvert = 1 / powerConversion;
 
 			WriteSubtitle( "End Uses" );

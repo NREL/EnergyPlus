@@ -927,21 +927,12 @@ namespace HVACSingleDuctInduc {
 			TermUnitSizing( CurTermUnitSizingNum ).DesCoolingLoad = IndUnit( IUNum ).DesCoolingLoad;
 			TermUnitSizing( CurTermUnitSizingNum ).DesHeatingLoad = IndUnit( IUNum ).DesHeatingLoad;
 			// save the induction ratio for use in subsequent sizing calcs
-<<<<<<< HEAD
-			TermUnitSizing( CurZoneEqNum ).InducRat = IndUnit( IUNum ).InducRatio;
-			if ( UtilityRoutines::SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
-				SetCoilDesFlow( IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
-			}
-			if ( UtilityRoutines::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
-				SetCoilDesFlow( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
-=======
 			TermUnitSizing( CurTermUnitSizingNum ).InducRat = IndUnit( IUNum ).InducRatio;
-			if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
+			if ( UtilityRoutines::SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 				SetCoilDesFlow( IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow, ErrorsFound );
 			}
-			if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+			if ( UtilityRoutines::SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 				SetCoilDesFlow( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow, ErrorsFound );
->>>>>>> NREL/develop
 			}
 		}
 

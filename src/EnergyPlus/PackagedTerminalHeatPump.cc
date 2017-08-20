@@ -210,11 +210,8 @@ namespace PackagedTerminalHeatPump {
 	clear_state()
 	{
 		MyOneTimeFlag = true;
-<<<<<<< HEAD
 		PTUnitUniqueNames.clear();
-=======
 		PTUnit.deallocate();
->>>>>>> NREL/develop
 	}
 
 
