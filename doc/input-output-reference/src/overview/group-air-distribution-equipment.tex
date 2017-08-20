@@ -36,6 +36,10 @@ This field allows modifying the behavior of this air terminal so that it is modu
 
 This field specifies how the outdoor air ventilation rates are calculated when based on a rate per person. It can be either based on the current number of people as affected by time-varying occupancy schedules, or on the constant value for the maximum number of people.~~ Enter the key CurrentOccupancy for the former and DesignOccupancy for the later.
 
+\paragraph{Field: Design Specification Air Terminal Sizing Name}\label{design-specification-air-terminal-sizing-name1}
+
+This optional input field is the name of a DesignSpecification:AirTerminal:Sizing object which specifies sizing adjustments to be made for this terminal unit. The terminal unit is initially sized according to the inputs in the corresponding Sizing:Zone object. Then the adjustment factors in the DesignSpecification:AirTerminal:Sizing object are applied. See DesignSpecification:AirTerminal:Sizing for more details. If left blank, then no adjustments are made.
+
 An example input follows.
 
 \begin{lstlisting}
