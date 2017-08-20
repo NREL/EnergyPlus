@@ -166,7 +166,7 @@ namespace EnergyPlus {
 		InitZoneHybridUnitaryAirConditioners(1, 1);
 		Model * pZoneHybridUnitaryAirConditioner = HandelToHybridUnitaryAirConditioner(1);
 
-		double  Tosa, Tra, Wra, Wosa, RHosa, RHra, RequestedLoad, DesignMinVR, Requestedheating, Requested_Humidification, Requested_Dehumidification;
+		double  Tosa, Tra, Wra, Wosa, RHosa, RHra, RequestedLoad, DesignMinVR, Requestedheating, RequestedCooling,Requested_Humidification, Requested_Dehumidification;
 		RHosa = 0;
 		std::string TimeDate;
 		int modenumber = 0;
@@ -174,9 +174,9 @@ namespace EnergyPlus {
 		MsaRatio = OSAF = 1;
 		int lineN = 0;
 
-		Requestedheating = Requested_Humidification = Requested_Dehumidification = 0;
+		Requestedheating = RequestedCooling= Requested_Humidification = Requested_Dehumidification = 0;
 
-		std::vector<std::string> lines = getAllLinesInFile2(configured_source_directory() + "/datasets/InputData_cool.csv"); // configured_source_directory()																									 //line input format: time, Outside Air Temperature(C),	Outside Air Relative Humidity(1 - 100 % ),	Outside Air Humidity Ratio(-)
+		std::vector<std::string> lines = getAllLinesInFile2(configured_source_directory() + "/datasets/InputData_mixed.csv"); // configured_source_directory()																									 //line input format: time, Outside Air Temperature(C),	Outside Air Relative Humidity(1 - 100 % ),	Outside Air Humidity Ratio(-)
 		double NormalizationReference = 3.0176;
 		int Msa = NormalizationReference* MsaRatio;
 		int scaler = pZoneHybridUnitaryAirConditioner->ScalingFactor;
@@ -203,6 +203,10 @@ namespace EnergyPlus {
 			double RHosa = atof((linesplit.at(2)).c_str());
 			Wosa = atof((linesplit.at(3)).c_str());//humidity ratio
 			RequestedLoad = 1000 * atof((linesplit.at(4)).c_str());
+			Requestedheating = RequestedCooling = 0;
+			if (RequestedLoad > 0) Requestedheating = RequestedLoad; //load in W
+			if (RequestedLoad<0) RequestedCooling= RequestedLoad;
+
 			double ExpectedSupplyAirTemperature, ExpectedSupplyAirHumidityRatio, ExpectedTotalElectricPower, ExpectedFanPower;
 			ExpectedSupplyAirTemperature = atof((linesplit.at(5)).c_str());
 			ExpectedSupplyAirHumidityRatio = atof((linesplit.at(7)).c_str());
@@ -238,7 +242,7 @@ namespace EnergyPlus {
 			pZoneHybridUnitaryAirConditioner->Initialize(1);
 
 			// Main simulation step
-			pZoneHybridUnitaryAirConditioner->doStep(Tosa, Tra, RHosa / 100, RHra / 100, RequestedLoad, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
+			pZoneHybridUnitaryAirConditioner->doStep(Tosa, Tra, RHosa / 100, RHra / 100, RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 			// output results
 			modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
 			double primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
