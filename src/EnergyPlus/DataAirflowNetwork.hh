@@ -191,9 +191,9 @@ namespace DataAirflowNetwork {
 		int iWPCCntr; // Integer equivalent for WPCCntr field
 		std::string BldgType; // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
 		std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-		Solver solver;
 		int MaxIteration; // Maximum number of iteration, default 500
 		int InitFlag; // Initialization flag
+		Solver solver;
 		Real64 RelTol; // Relative airflow convergence
 		Real64 AbsTol; // Absolute airflow convergence
 		Real64 ConvLimit; // Convergence acceleration limit
