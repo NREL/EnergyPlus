@@ -171,7 +171,7 @@ namespace EnergyPlus {//***************
 			}
 			catch (int e)
 			{
-				cout << "An exception occurred in InitZoneHybridUnitaryAirConditioners. Exception Nr. " << e << '\n';
+				ShowFatalError("An exception occurred in InitZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName + ", stored unit name for that index=" + ZoneHybridUnitaryAirConditioner(CompNum).Name+ ". Please check idf.");
 				return;
 			}
 			try
@@ -180,7 +180,7 @@ namespace EnergyPlus {//***************
 			}
 			catch (int e)
 			{
-				cout << "An exception occurred in CalcZoneHybridUnitaryAirConditioners. Exception Nr. " << e << '\n';
+				ShowFatalError("An exception occurred in CalcZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName + ", stored unit name for that index=" + ZoneHybridUnitaryAirConditioner(CompNum).Name + ". Please check idf.");
 				return;
 			}
 			try
@@ -189,11 +189,11 @@ namespace EnergyPlus {//***************
 			}
 			catch (int e)
 			{
-				cout << "An exception occurred in ReportZoneHybridUnitaryAirConditioners. Exception Nr. " << e << '\n';
+				ShowFatalError("An exception occurred in ReportZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName + ", stored unit name for that index=" + ZoneHybridUnitaryAirConditioner(CompNum).Name + ". Please check idf.");
 				return;
 			}
 		}
-		Model* HandelToHybridUnitaryAirConditioner(int UnitNum)
+		Model* HandleToHybridUnitaryAirConditioner(int UnitNum)
 		{
 			Model*p = &(ZoneHybridUnitaryAirConditioner(UnitNum));
 			return &(ZoneHybridUnitaryAirConditioner(UnitNum));

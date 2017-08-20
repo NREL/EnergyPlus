@@ -101,7 +101,7 @@ namespace EnergyPlus {
 		void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
 		double Sat_press(double Tdb);
 		double Part_press(double P, double W);
-		Model* HandelToHybridUnitaryAirConditioner(int UnitNum);
+		Model* HandleToHybridUnitaryAirConditioner(int UnitNum);
 
 	}
 }

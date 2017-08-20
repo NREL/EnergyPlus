@@ -1421,8 +1421,6 @@ namespace DataZoneEquipment {
 		} else if ( ( SELECT_CASE_var == OAFlowSum ) || ( SELECT_CASE_var == OAFlowMax ) ) {
 			// Use sum or max of per person and the following
 			DSOAFlowPerZone = OARequirements( DSOAPtr ).OAFlowPerZone;
-			double FA = Zone(ActualZoneNum).FloorArea;
-			double Requirements = OARequirements(DSOAPtr).OAFlowPerArea;
 			DSOAFlowPerArea = OARequirements( DSOAPtr ).OAFlowPerArea * Zone( ActualZoneNum ).FloorArea;
 			DSOAFlowACH = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.0;
 			if ( OARequirements( DSOAPtr ).OAFlowMethod == OAFlowMax ) {
