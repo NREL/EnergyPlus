@@ -172,29 +172,6 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-!  RunPeriod,
-!    1,                       !- Begin Month
-!    14,                      !- Begin Day Of Month
-!    1,                       !- End Month
-!    14,                      !- End Day Of Month
-!    Tuesday,                 !- Day Of Week For Start Day
-!    Yes,                     !- Use WeatherFile Holidays/Special Days
-!    Yes,                     !- Use WeatherFile DaylightSavingPeriod
-!    No,                      !- Apply Weekend Holiday Rule
-!    Yes,                     !- Use WeatherFile Rain Indicators
-!    Yes;                     !- Use WeatherFile Snow Indicators
-!  RunPeriod,
-!    7,                       !- Begin Month
-!    7,                       !- Begin Day Of Month
-!    7,                       !- End Month
-!    7,                       !- End Day Of Month
-!    Tuesday,                 !- Day Of Week For Start Day
-!    Yes,                     !- Use WeatherFile Holidays/Special Days
-!    Yes,                     !- Use WeatherFile DaylightSavingPeriod
-!    No,                      !- Apply Weekend Holiday Rule
-!    Yes,                     !- Use WeatherFile Rain Indicators
-!    Yes;                     !- Use WeatherFile Snow Indicators
-
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
     41.78,                   !- Latitude {deg}
@@ -390,25 +367,9 @@
     0.7500000;               !- Visible Absorptance
 
   Material:NoMass,
-    MAT-SB-U,                !- Name
-    Rough,                   !- Roughness
-    0.117406666,             !- Thermal Resistance {m2-K/W}
-    0.65,                    !- Thermal Absorptance
-    0.65,                    !- Solar Absorptance
-    0.65;                    !- Visible Absorptance
-
-  Material:NoMass,
     MAT-CLNG-1,              !- Name
     Rough,                   !- Roughness
     0.652259290,             !- Thermal Resistance {m2-K/W}
-    0.65,                    !- Thermal Absorptance
-    0.65,                    !- Solar Absorptance
-    0.65;                    !- Visible Absorptance
-
-  Material:NoMass,
-    MAT-FLOOR-1,             !- Name
-    Rough,                   !- Roughness
-    3.522199631,             !- Thermal Resistance {m2-K/W}
     0.65,                    !- Thermal Absorptance
     0.65,                    !- Solar Absorptance
     0.65;                    !- Visible Absorptance
@@ -440,14 +401,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -458,18 +411,8 @@
     GP02;                    !- Layer 3
 
   WindowMaterial:Gas,
-    AIR 6MM,                 !- Name
-    Air,                     !- Gas Type
-    0.0063;                  !- Thickness {m}
-
-  WindowMaterial:Gas,
     AIR 13MM,                !- Name
     Air,                     !- Gas Type
-    0.0127;                  !- Thickness {m}
-
-  WindowMaterial:Gas,
-    ARGON 13MM,              !- Name
-    Argon,                   !- Gas Type
     0.0127;                  !- Thickness {m}
 
   WindowMaterial:Glazing,
@@ -504,38 +447,6 @@
     0.84,                    !- Back Side Infrared Hemispherical Emissivity
     0.9;                     !- Conductivity {W/m-K}
 
-  WindowMaterial:Glazing,
-    CLEAR 6MM,               !- Name
-    SpectralAverage,         !- Optical Data Type
-    ,                        !- Window Glass Spectral Data Set Name
-    0.006,                   !- Thickness {m}
-    0.775,                   !- Solar Transmittance at Normal Incidence
-    0.071,                   !- Front Side Solar Reflectance at Normal Incidence
-    0.071,                   !- Back Side Solar Reflectance at Normal Incidence
-    0.881,                   !- Visible Transmittance at Normal Incidence
-    0.080,                   !- Front Side Visible Reflectance at Normal Incidence
-    0.080,                   !- Back Side Visible Reflectance at Normal Incidence
-    0.0,                     !- Infrared Transmittance at Normal Incidence
-    0.84,                    !- Front Side Infrared Hemispherical Emissivity
-    0.84,                    !- Back Side Infrared Hemispherical Emissivity
-    0.9;                     !- Conductivity {W/m-K}
-
-  WindowMaterial:Glazing,
-    LoE CLEAR 6MM,           !- Name
-    SpectralAverage,         !- Optical Data Type
-    ,                        !- Window Glass Spectral Data Set Name
-    0.006,                   !- Thickness {m}
-    0.600,                   !- Solar Transmittance at Normal Incidence
-    0.170,                   !- Front Side Solar Reflectance at Normal Incidence
-    0.220,                   !- Back Side Solar Reflectance at Normal Incidence
-    0.840,                   !- Visible Transmittance at Normal Incidence
-    0.055,                   !- Front Side Visible Reflectance at Normal Incidence
-    0.078,                   !- Back Side Visible Reflectance at Normal Incidence
-    0.0,                     !- Infrared Transmittance at Normal Incidence
-    0.84,                    !- Front Side Infrared Hemispherical Emissivity
-    0.10,                    !- Back Side Infrared Hemispherical Emissivity
-    0.9;                     !- Conductivity {W/m-K}
-
   Construction,
     Dbl Clr 3mm/13mm Air,    !- Name
     CLEAR 3MM,               !- Outside Layer
@@ -543,26 +454,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     OCCUPY-1,                !- Name
