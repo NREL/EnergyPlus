@@ -6,7 +6,7 @@
 ! Basic file description:  1 story building divided into 3 conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Window air conditioners serve each zone.
 !
-! Highlights:              illustrates use of Window air conditioners with autosizing. 
+! Highlights:              illustrates use of Window air conditioners with autosizing.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file

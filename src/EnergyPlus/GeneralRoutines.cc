@@ -1979,7 +1979,22 @@ TestReturnAirPathIntegrity(
 					WAirLoop = Count2;
 					ValRetAPaths( _, WAirLoop ) = 0;
 					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
-					break;
+					for ( int RetPathNode = 1; RetPathNode <= CountNodes; ++RetPathNode ){
+						bool RetNodeFound = false;
+						for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+							for ( int ZoneOutNum = 1; ZoneOutNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++ZoneOutNum ) {
+								if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNode( ZoneOutNum ) == AllNodes( RetPathNode ) ) {
+									ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( ZoneOutNum ) = WAirLoop;
+									RetNodeFound = true;
+									break; // leave zone return node loop
+								}
+							if ( RetNodeFound ) break; // leave controlled zone loop
+							}
+						}
+
+					}
+					break; // leave air loops loop
 				}
 			} else {
 				ShowWarningError( "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + AirToZoneNodeInfo( Count2 ).AirLoopName );

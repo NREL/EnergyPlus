@@ -103,6 +103,7 @@
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
 #include <ZonePlenum.hh>
+#include <ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -311,6 +312,7 @@ namespace OutputReportTabular {
 	Array1D< Real64 > gatherDemandTotal( numResourceTypes, 0.0 );
 	Array2D< Real64 > gatherDemandEndUse( numResourceTypes, NumEndUses, 0.0 );
 	Array3D< Real64 > gatherDemandEndUseSub;
+	Array3D< Real64 > gatherDemandIndEndUseSub;
 	Array1D_int gatherDemandTimeStamp( numResourceTypes, 0 );
 	// to keep track of hours for the BEPS report gathering
 	Real64 gatherElapsedTimeBEPS( 0.0 );
@@ -590,6 +592,7 @@ namespace OutputReportTabular {
 		gatherDemandTotal = Array1D< Real64 > ( numResourceTypes, 0.0 );
 		gatherDemandEndUse = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
 		gatherDemandEndUseSub.deallocate();
+		gatherDemandIndEndUseSub.deallocate();
 		gatherDemandTimeStamp = Array1D_int ( numResourceTypes, 0 );
 		gatherElapsedTimeBEPS = 0.0;
 		buildingGrossFloorArea = 0.0;
@@ -2259,6 +2262,8 @@ namespace OutputReportTabular {
 			gatherEndUseSubBEPS = 0.0;
 			gatherDemandEndUseSub.allocate( MaxNumSubcategories, NumEndUses, numResourceTypes );
 			gatherDemandEndUseSub = 0.0;
+			gatherDemandIndEndUseSub.allocate( MaxNumSubcategories, NumEndUses, numResourceTypes );
+			gatherDemandIndEndUseSub = 0.0;
 
 			// get meter numbers for other meters relating to electric load components
 			meterNumPowerFuelFireGen = GetMeterIndex( "Cogeneration:ElectricityProduced" );
@@ -4664,6 +4669,26 @@ namespace OutputReportTabular {
 				}
 			}
 		}
+
+		// gather the peak demands of each individual enduse subcategory for the LEED report
+		if ( ( displayLEEDSummary ) && ( IndexTypeKey == stepTypeZone ) ) {
+			// loop through all of the resources and end uses for the entire facility
+			for ( iResource = 1; iResource <= numResourceTypes; ++iResource ) {
+				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
+					for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
+						curMeterNumber = meterNumEndUseSubBEPS( kEndUseSub, jEndUse, iResource );
+						if ( curMeterNumber > 0 ) {
+							curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
+							// check if current value is greater than existing peak demand value
+							if ( curDemandValue > gatherDemandIndEndUseSub( kEndUseSub, jEndUse, iResource ) ) {
+								gatherDemandIndEndUseSub( kEndUseSub, jEndUse, iResource ) = curDemandValue;
+							}
+						}
+					}
+				}
+			}
+		}
+
 	}
 
 	void
@@ -6363,6 +6388,17 @@ namespace OutputReportTabular {
 		} else {
 			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", "-" );
 		}
+		// LEED schedule sub table
+		for ( long iSch = 1; iSch <= ScheduleManager::NumSchedules; ++iSch ) {
+			std::string curSchName = ScheduleManager::Schedule(iSch).Name;
+			std::string curSchType = ScheduleManager::GetScheduleType( iSch );
+			if ( SameString( curSchType, "FRACTION" ) ) {
+				PreDefTableEntry( pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours( iSch, StartOfWeek, CurrentYearIsLeapYear ), 0 );
+				PreDefTableEntry( pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc( iSch, StartOfWeek, CurrentYearIsLeapYear ), 0 );
+			}
+		}
+		// fill the LEED setpoint table
+		ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints();
 	}
 
 	void
@@ -7073,14 +7109,7 @@ namespace OutputReportTabular {
 		Real64 processGasCost;
 		Real64 processOthrCost;
 
-		Array1D< Real64 > leedFansParkFromFan( 6 );
-		Array1D< Real64 > leedFansParkFromExtFuelEquip( 6 );
-		Array1D< Real64 > leedIntLightProc( 6 );
-		Array1D< Real64 > leedCook( 6 );
-		Array1D< Real64 > leedIndProc( 6 );
-		Array1D< Real64 > leedElevEsc( 6 );
 		std::string subCatName;
-		Real64 nonMisc;
 		static Real64 leedSiteIntLite( 0.0 );
 		static Real64 leedSiteSpHeat( 0.0 );
 		static Real64 leedSiteSpCool( 0.0 );
@@ -7664,6 +7693,7 @@ namespace OutputReportTabular {
 				}
 			}
 
+<<<<<<< HEAD
 			//complete the LEED end use table using the same values
 			// for certain rows in the LEED table the subcategories are necessary so first compute those values
 			leedFansParkFromFan = 0.0;
@@ -7698,33 +7728,18 @@ namespace OutputReportTabular {
 				}
 			}
 
+=======
+>>>>>>> NREL/develop
 			unconvert = largeConversionFactor / 1000000000.0; //to avoid double converting, the values for the LEED report should be in GJ
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Interior Lighting", unconvert * ( useVal( colElectricity, 3 ) - leedIntLightProc( colElectricity ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting", unconvert * useVal( colElectricity, 4 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Space Heating", unconvert * useVal( colElectricity, 1 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Space Cooling", unconvert * useVal( colElectricity, 2 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Pumps", unconvert * useVal( colElectricity, 8 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Heat Rejection", unconvert * useVal( colElectricity, 9 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Fans-Interior", unconvert * ( useVal( colElectricity, 7 ) - leedFansParkFromFan( colElectricity ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colElectricity ) + leedFansParkFromExtFuelEquip( colElectricity ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Service Water Heating", unconvert * useVal( colElectricity, 12 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Receptacle Equipment", unconvert * ( useVal( colElectricity, 5 ) - ( leedCook( colElectricity ) + leedElevEsc( colElectricity ) + leedIndProc( colElectricity ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Interior Lighting-Process", unconvert * leedIntLightProc( colElectricity ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Refrigeration Equipment", unconvert * useVal( colElectricity, 13 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Cooking", unconvert * leedCook( colElectricity ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Industrial Process", unconvert * leedIndProc( colElectricity ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Elevators and Escalators", unconvert * leedElevEsc( colElectricity ), 2 );
-			PreDefTableEntry( pdchLeedPerfElEneUse, "Total Line", unconvert * useVal( colElectricity, 15 ), 2 );
 			//  Energy Use Intensities
 			if ( buildingGrossFloorArea > 0 ) {
-				PreDefTableEntry( pdchLeedEuiElec, "Interior Lighting", unconvert * 1000 * ( useVal( colElectricity, 3 ) - leedIntLightProc( colElectricity ) ) / buildingGrossFloorArea, 2 );
+				PreDefTableEntry( pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal( colElectricity, 3 ) / buildingGrossFloorArea, 2 ); 
 				PreDefTableEntry( pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal( colElectricity, 1 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal( colElectricity, 2 ) / buildingGrossFloorArea, 2 );
-				PreDefTableEntry( pdchLeedEuiElec, "Fans-Interior", unconvert * 1000 * ( useVal( colElectricity, 7 ) - leedFansParkFromFan( colElectricity ) ) / buildingGrossFloorArea, 2 );
+				PreDefTableEntry( pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal( colElectricity, 7 ) / buildingGrossFloorArea, 2 );  
 				PreDefTableEntry( pdchLeedEuiElec, "Service Water Heating", unconvert * 1000 * useVal( colElectricity, 12 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Receptacle Equipment", unconvert * 1000 * useVal( colElectricity, 5 ) / buildingGrossFloorArea, 2 );
-				nonMisc = useVal( colElectricity, 3 ) - leedIntLightProc( colElectricity ) + useVal( colElectricity, 1 ) + useVal( colElectricity, 2 ) + useVal( colElectricity, 7 ) - leedFansParkFromFan( colElectricity ) + useVal( colElectricity, 12 ) + useVal( colElectricity, 5 );
-				PreDefTableEntry( pdchLeedEuiElec, "Miscellaneous", unconvert * 1000 * ( useVal( colElectricity, 15 ) - nonMisc ) / buildingGrossFloorArea, 2 );
+				PreDefTableEntry( pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * ( useVal( colElectricity, 15 ) ) / buildingGrossFloorArea, 2 ); 
 				PreDefTableEntry( pdchLeedEuiElec, "Subtotal", unconvert * 1000 * useVal( colElectricity, 15 ) / buildingGrossFloorArea, 2 );
 			}
 
@@ -7739,28 +7754,11 @@ namespace OutputReportTabular {
 			PreDefTableEntry( pdchLeedEcsProc, "Electricity", processElecCost, 2 );
 			addFootNoteSubTable( pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy." );
 
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Interior Lighting", unconvert * ( useVal( colGas, 3 ) - leedIntLightProc( colGas ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Exterior Lighting", unconvert * useVal( colGas, 4 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Space Heating", unconvert * useVal( colGas, 1 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Space Cooling", unconvert * useVal( colGas, 2 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Pumps", unconvert * useVal( colGas, 8 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Heat Rejection", unconvert * useVal( colGas, 9 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Fans-Interior", unconvert * ( useVal( colGas, 7 ) - leedFansParkFromFan( colGas ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colGas ) + leedFansParkFromExtFuelEquip( colGas ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Service Water Heating", unconvert * useVal( colGas, 12 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Receptacle Equipment", unconvert * ( useVal( colGas, 5 ) - ( leedCook( colGas ) + leedElevEsc( colGas ) + leedIndProc( colGas ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Interior Lighting-Process", unconvert * leedIntLightProc( colGas ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Refrigeration Equipment", unconvert * useVal( colGas, 13 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Cooking", unconvert * leedCook( colGas ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Industrial Process", unconvert * leedIndProc( colGas ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Elevators and Escalators", unconvert * leedElevEsc( colGas ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasEneUse, "Total Line", unconvert * useVal( colGas, 15 ), 2 );
 			//  Energy Use Intensities
 			if ( buildingGrossFloorArea > 0 ) {
 				PreDefTableEntry( pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal( colGas, 1 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal( colGas, 12 ) / buildingGrossFloorArea, 2 );
-				nonMisc = useVal( colGas, 1 ) + useVal( colGas, 12 );
-				PreDefTableEntry( pdchLeedEuiNatG, "Miscellaneous", unconvert * 1000 * ( useVal( colGas, 15 ) - nonMisc ) / buildingGrossFloorArea, 2 );
+				PreDefTableEntry( pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal( colGas, 15 ) / buildingGrossFloorArea, 2 ); 
 				PreDefTableEntry( pdchLeedEuiNatG, "Subtotal", unconvert * 1000 * useVal( colGas, 15 ) / buildingGrossFloorArea, 2 );
 			}
 			PreDefTableEntry( pdchLeedEusTotal, "Natural Gas", unconvert * useVal( colGas, 15 ), 2 );
@@ -7773,22 +7771,6 @@ namespace OutputReportTabular {
 			}
 			PreDefTableEntry( pdchLeedEcsProc, "Natural Gas", processGasCost, 2 );
 
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Interior Lighting", unconvert * ( useVal( colAdditionalFuel, 3 ) + useVal( colPurchCool, 3 ) + useVal( colPurchHeat, 3 ) - ( leedIntLightProc( colAdditionalFuel ) + leedIntLightProc( colPurchCool ) + leedIntLightProc( colPurchHeat ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Exterior Lighting", unconvert * ( useVal( colAdditionalFuel, 4 ) + useVal( colPurchCool, 4 ) + useVal( colPurchHeat, 4 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Space Heating", unconvert * ( useVal( colAdditionalFuel, 1 ) + useVal( colPurchCool, 1 ) + useVal( colPurchHeat, 1 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Space Cooling", unconvert * ( useVal( colAdditionalFuel, 2 ) + useVal( colPurchCool, 2 ) + useVal( colPurchHeat, 2 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Pumps", unconvert * ( useVal( colAdditionalFuel, 8 ) + useVal( colPurchCool, 8 ) + useVal( colPurchHeat, 8 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Heat Rejection", unconvert * ( useVal( colAdditionalFuel, 9 ) + useVal( colPurchCool, 9 ) + useVal( colPurchHeat, 9 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Fans-Interior", unconvert * ( useVal( colAdditionalFuel, 7 ) + useVal( colPurchCool, 7 ) + useVal( colPurchHeat, 7 ) - ( leedFansParkFromFan( colAdditionalFuel ) + leedFansParkFromFan( colPurchCool ) + leedFansParkFromFan( colPurchHeat ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colAdditionalFuel ) + leedFansParkFromFan( colPurchCool ) + leedFansParkFromFan( colPurchHeat ) + leedFansParkFromExtFuelEquip( colAdditionalFuel ) + leedFansParkFromExtFuelEquip( colPurchCool ) + leedFansParkFromExtFuelEquip( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Service Water Heating", unconvert * ( useVal( colAdditionalFuel, 12 ) + useVal( colPurchCool, 12 ) + useVal( colPurchHeat, 12 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Receptacle Equipment", unconvert * ( ( useVal( colAdditionalFuel, 5 ) + useVal( colPurchCool, 5 ) + useVal( colPurchHeat, 5 ) ) - ( leedCook( colAdditionalFuel ) + leedElevEsc( colAdditionalFuel ) + leedIndProc( colAdditionalFuel ) + leedCook( colPurchCool ) + leedElevEsc( colPurchCool ) + leedIndProc( colPurchCool ) + leedCook( colPurchHeat ) + leedElevEsc( colPurchHeat ) + leedIndProc( colPurchHeat ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Interior Lighting-Process", unconvert * ( leedIntLightProc( colAdditionalFuel ) + leedIntLightProc( colPurchCool ) + leedIntLightProc( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Refrigeration Equipment", unconvert * ( useVal( colAdditionalFuel, 13 ) + useVal( colPurchCool, 13 ) + useVal( colPurchHeat, 13 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Cooking", unconvert * ( leedCook( colAdditionalFuel ) + leedCook( colPurchCool ) + leedCook( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Industrial Process", unconvert * ( leedIndProc( colAdditionalFuel ) + leedIndProc( colPurchCool ) + leedIndProc( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Elevators and Escalators", unconvert * ( leedElevEsc( colAdditionalFuel ) + leedElevEsc( colPurchCool ) + leedElevEsc( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthEneUse, "Total Line", unconvert * ( useVal( colAdditionalFuel, 15 ) + useVal( colPurchCool, 15 ) + useVal( colPurchHeat, 15 ) ), 2 );
 			//  Energy Use Intensities
 			if ( buildingGrossFloorArea > 0 ) {
 				PreDefTableEntry( pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useVal( colAdditionalFuel, 15 ) / buildingGrossFloorArea, 2 );
@@ -7813,19 +7795,19 @@ namespace OutputReportTabular {
 			leedSiteRecept = 0.0;
 			leedSiteTotal = 0.0;
 			for ( iResource = 1; iResource <= 5; ++iResource ) { // don't bother with water
-				leedSiteIntLite += useVal( iResource, 3 ) - leedIntLightProc( iResource );
+				leedSiteIntLite += useVal( iResource, 3 ); 
 				leedSiteSpHeat += useVal( iResource, 1 );
 				leedSiteSpCool += useVal( iResource, 2 );
-				leedSiteFanInt += useVal( iResource, 7 ) - leedFansParkFromFan( iResource );
+				leedSiteFanInt += useVal( iResource, 7 ); 
 				leedSiteSrvWatr += useVal( iResource, 12 );
 				leedSiteRecept += useVal( iResource, 5 );
 				leedSiteTotal += useVal( iResource, 15 );
 			}
 			if ( leedSiteTotal != 0 ) {
-				PreDefTableEntry( pdchLeedEupPerc, "Interior Lighting", 100 * leedSiteIntLite / leedSiteTotal, 2 );
+				PreDefTableEntry( pdchLeedEupPerc, "Interior Lighting (All)", 100 * leedSiteIntLite / leedSiteTotal, 2 );
 				PreDefTableEntry( pdchLeedEupPerc, "Space Heating", 100 * leedSiteSpHeat / leedSiteTotal, 2 );
 				PreDefTableEntry( pdchLeedEupPerc, "Space Cooling", 100 * leedSiteSpCool / leedSiteTotal, 2 );
-				PreDefTableEntry( pdchLeedEupPerc, "Fans-Interior", 100 * leedSiteFanInt / leedSiteTotal, 2 );
+				PreDefTableEntry( pdchLeedEupPerc, "Fans (All)", 100 * leedSiteFanInt / leedSiteTotal, 2 );
 				PreDefTableEntry( pdchLeedEupPerc, "Service Water Heating", 100 * leedSiteSrvWatr / leedSiteTotal, 2 );
 				PreDefTableEntry( pdchLeedEupPerc, "Receptacle Equipment", 100 * leedSiteRecept / leedSiteTotal, 2 );
 				PreDefTableEntry( pdchLeedEupPerc, "Miscellaneous", 100 * ( leedSiteTotal - ( leedSiteIntLite + leedSiteSpHeat + leedSiteSpCool + leedSiteFanInt + leedSiteSrvWatr + leedSiteRecept ) ) / leedSiteTotal, 2 );
@@ -7983,6 +7965,39 @@ namespace OutputReportTabular {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
 				}
 			}
+
+
+			// EAp2-4/5. Performance Rating Method Compliance
+			// repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
+
+			Array1D_int resource_entry_map;
+			resource_entry_map.allocate(5);
+			resource_entry_map( 1 ) = pdchLeedPerfElEneUse;   //electricity
+			resource_entry_map( 2 ) = pdchLeedPerfGasEneUse;  //natural gas
+			resource_entry_map( 3 ) = pdchLeedPerfAddFuelEneUse;  //additional fuel
+			resource_entry_map( 4 ) = pdchLeedPerfDisClEneUse;  //district cooling
+			resource_entry_map( 5 ) = pdchLeedPerfDisHtEneUse;  //district heating
+
+			for ( iResource = 1; iResource <= 5; ++iResource ) {
+				i = 1;
+				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
+					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
+						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
+							PreDefTableEntry( resource_entry_map(iResource) , EndUseCategory( jEndUse ).DisplayName + " -- " + EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub ), RealToStr( collapsedEndUseSub( kEndUseSub, jEndUse, iResource ), 2 ));
+							++i;
+						}
+						//put other
+						if ( needOtherRow( jEndUse ) ) {
+							PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- Other", RealToStr( endUseSubOther( iResource, jEndUse ), 2 ) );
+							++i;
+						}
+					} else {
+						PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- Not Subdivided", RealToStr( collapsedEndUse( iResource, jEndUse ), 2 ) );
+						++i;
+					}
+				}
+			}
+
 			//---- Normalized by Conditioned Area Sub-Table
 			// Calculations for both normalized tables are first
 			rowHead.allocate( 4 );
@@ -8677,11 +8692,6 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const colElectricity( 1 );
-		int const colGas( 2 );
-		int const colAdditionalFuel( 3 );
-		int const colPurchCool( 4 );
-		int const colPurchHeat( 5 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -8703,6 +8713,7 @@ namespace OutputReportTabular {
 		Array2D< Real64 > collapsedEndUse( 6, NumEndUses );
 		Array1D_int collapsedTimeStep( 6 );
 		Array3D< Real64 > collapsedEndUseSub( MaxNumSubcategories, NumEndUses, 6 );
+		Array3D< Real64 > collapsedIndEndUseSub( MaxNumSubcategories, NumEndUses, 6 );
 		int iResource;
 		int jEndUse;
 		int kEndUseSub;
@@ -8717,12 +8728,6 @@ namespace OutputReportTabular {
 		Real64 powerConversion;
 		Real64 flowConversion;
 
-		Array1D< Real64 > leedFansParkFromFan( 6 );
-		Array1D< Real64 > leedFansParkFromExtFuelEquip( 6 );
-		Array1D< Real64 > leedIntLightProc( 6 );
-		Array1D< Real64 > leedCook( 6 );
-		Array1D< Real64 > leedIndProc( 6 );
-		Array1D< Real64 > leedElevEsc( 6 );
 		Real64 unconvert;
 		std::string subCatName;
 
@@ -8842,6 +8847,19 @@ namespace OutputReportTabular {
 					collapsedEndUseSub( kEndUseSub, jEndUse, 6 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 7 ) * flowConversion; //water
 				}
 			}
+			// collapse the individual peaks for the end use subcategories for the LEED report
+			for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
+				for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 1 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 1 ) * powerConversion; //electricity
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 2 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 2 ) * powerConversion; //natural gas
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 3 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, additionalFuelSelected ) * powerConversion; //additional fuel
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 4 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 3 ) * powerConversion; //purch cooling
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 5 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, distrHeatSelected ) * powerConversion; //district heating
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 6 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 7 ) * flowConversion; //water
+				}
+			}
+
+
 			//convert totals
 			collapsedTotal( 1 ) *= powerConversion; //electricity
 			collapsedTotal( 2 ) *= powerConversion; //natural gas
@@ -8961,6 +8979,7 @@ namespace OutputReportTabular {
 			}
 
 			//complete the LEED end use table using the same values
+<<<<<<< HEAD
 			// for certain rows in the LEED table the subcategories are necessary so first compute those values
 			leedFansParkFromFan = 0.0;
 			leedFansParkFromExtFuelEquip = 0.0;
@@ -8994,58 +9013,9 @@ namespace OutputReportTabular {
 			}
 
 			//complete the LEED end use table using the same values
+=======
+>>>>>>> NREL/develop
 			unconvert = 1 / powerConversion;
-			PreDefTableEntry( pdchLeedPerfElDem, "Interior Lighting", unconvert * ( useVal( colElectricity, 3 ) - leedIntLightProc( colElectricity ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Exterior Lighting", unconvert * useVal( colElectricity, 4 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Space Heating", unconvert * useVal( colElectricity, 1 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Space Cooling", unconvert * useVal( colElectricity, 2 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Pumps", unconvert * useVal( colElectricity, 8 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Heat Rejection", unconvert * useVal( colElectricity, 9 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Fans-Interior", unconvert * ( useVal( colElectricity, 7 ) - leedFansParkFromFan( colElectricity ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colElectricity ) + leedFansParkFromExtFuelEquip( colElectricity ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Service Water Heating", unconvert * useVal( colElectricity, 12 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Receptacle Equipment", unconvert * useVal( colElectricity, 5 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Receptacle Equipment", unconvert * ( useVal( colElectricity, 5 ) - ( leedCook( colElectricity ) + leedElevEsc( colElectricity ) + leedIndProc( colElectricity ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Interior Lighting-Process", unconvert * leedIntLightProc( colElectricity ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Refrigeration Equipment", unconvert * useVal( colElectricity, 13 ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Cooking", unconvert * leedCook( colElectricity ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Industrial Process", unconvert * leedIndProc( colElectricity ), 2 );
-			PreDefTableEntry( pdchLeedPerfElDem, "Elevators and Escalators", unconvert * leedElevEsc( colElectricity ), 2 );
-			//CALL PreDefTableEntry(pdchLeedPerfElDem,'Total',useVal(15,colElectricity),2)
-
-			PreDefTableEntry( pdchLeedPerfGasDem, "Interior Lighting", unconvert * ( useVal( colGas, 3 ) - leedIntLightProc( colGas ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Exterior Lighting", unconvert * useVal( colGas, 4 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Space Heating", unconvert * useVal( colGas, 1 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Space Cooling", unconvert * useVal( colGas, 2 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Pumps", unconvert * useVal( colGas, 8 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Heat Rejection", unconvert * useVal( colGas, 9 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Fans-Interior", unconvert * ( useVal( colGas, 7 ) - leedFansParkFromFan( colGas ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colGas ) + leedFansParkFromExtFuelEquip( colGas ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Service Water Heating", unconvert * useVal( colGas, 12 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Receptacle Equipment", unconvert * ( useVal( colGas, 5 ) - ( leedCook( colGas ) + leedElevEsc( colGas ) + leedIndProc( colGas ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Interior Lighting-Process", unconvert * leedIntLightProc( colGas ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Refrigeration Equipment", unconvert * useVal( colGas, 13 ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Cooking", unconvert * leedCook( colGas ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Industrial Process", unconvert * leedIndProc( colGas ), 2 );
-			PreDefTableEntry( pdchLeedPerfGasDem, "Elevators and Escalators", unconvert * leedElevEsc( colGas ), 2 );
-			//CALL PreDefTableEntry(pdchLeedPerfGasDem,'Total',useVal(15,colGas),2)
-
-			PreDefTableEntry( pdchLeedPerfOthDem, "Interior Lighting", unconvert * ( useVal( colAdditionalFuel, 3 ) + useVal( colPurchCool, 3 ) + useVal( colPurchHeat, 3 ) - ( leedIntLightProc( colAdditionalFuel ) + leedIntLightProc( colPurchCool ) + leedIntLightProc( colPurchHeat ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Exterior Lighting", unconvert * ( useVal( colAdditionalFuel, 4 ) + useVal( colPurchCool, 4 ) + useVal( colPurchHeat, 4 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Space Heating", unconvert * ( useVal( colAdditionalFuel, 1 ) + useVal( colPurchCool, 1 ) + useVal( colPurchHeat, 1 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Space Cooling", unconvert * ( useVal( colAdditionalFuel, 2 ) + useVal( colPurchCool, 2 ) + useVal( colPurchHeat, 2 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Pumps", unconvert * ( useVal( colAdditionalFuel, 8 ) + useVal( colPurchCool, 8 ) + useVal( colPurchHeat, 8 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Heat Rejection", unconvert * ( useVal( colAdditionalFuel, 9 ) + useVal( colPurchCool, 9 ) + useVal( colPurchHeat, 9 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Fans-Interior", unconvert * ( useVal( colAdditionalFuel, 7 ) + useVal( colPurchCool, 7 ) + useVal( colPurchHeat, 7 ) - ( leedFansParkFromFan( colAdditionalFuel ) + leedFansParkFromFan( colPurchCool ) + leedFansParkFromFan( colPurchHeat ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Fans-Parking Garage", unconvert * ( leedFansParkFromFan( colAdditionalFuel ) + leedFansParkFromFan( colPurchCool ) + leedFansParkFromFan( colPurchHeat ) + leedFansParkFromExtFuelEquip( colAdditionalFuel ) + leedFansParkFromExtFuelEquip( colPurchCool ) + leedFansParkFromExtFuelEquip( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Service Water Heating", unconvert * ( useVal( colAdditionalFuel, 12 ) + useVal( colPurchCool, 12 ) + useVal( colPurchHeat, 12 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Receptacle Equipment", unconvert * ( ( useVal( colAdditionalFuel, 5 ) + useVal( colPurchCool, 5 ) + useVal( colPurchHeat, 5 ) ) - ( leedCook( colAdditionalFuel ) + leedElevEsc( colAdditionalFuel ) + leedIndProc( colAdditionalFuel ) + leedCook( colPurchCool ) + leedElevEsc( colPurchCool ) + leedIndProc( colPurchCool ) + leedCook( colPurchHeat ) + leedElevEsc( colPurchHeat ) + leedIndProc( colPurchHeat ) ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Interior Lighting-Process", unconvert * ( leedIntLightProc( colAdditionalFuel ) + leedIntLightProc( colPurchCool ) + leedIntLightProc( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Refrigeration Equipment", unconvert * ( useVal( colAdditionalFuel, 13 ) + useVal( colPurchCool, 13 ) + useVal( colPurchHeat, 13 ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Cooking", unconvert * ( leedCook( colAdditionalFuel ) + leedCook( colPurchCool ) + leedCook( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Industrial Process", unconvert * ( leedIndProc( colAdditionalFuel ) + leedIndProc( colPurchCool ) + leedIndProc( colPurchHeat ) ), 2 );
-			PreDefTableEntry( pdchLeedPerfOthDem, "Elevators and Escalators", unconvert * ( leedElevEsc( colAdditionalFuel ) + leedElevEsc( colPurchCool ) + leedElevEsc( colPurchHeat ) ), 2 );
-			//CALL PreDefTableEntry(pdchLeedPerfOthDem,'Total',useVal(15,colAdditionalFuel) + useVal(15,colPurchCool) + useVal(15,colPurchHeat),2)
 
 			WriteSubtitle( "End Uses" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
@@ -9172,6 +9142,34 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
 			}
+
+			// EAp2-4/5. Performance Rating Method Compliance
+			// repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
+
+			Array1D_int resource_entry_map;
+			resource_entry_map.allocate( 5 );
+			resource_entry_map( 1 ) = pdchLeedPerfElDem;   //electricity
+			resource_entry_map( 2 ) = pdchLeedPerfGasDem;  //natural gas
+			resource_entry_map( 3 ) = pdchLeedPerfAddFuelDem;  //additional fuel
+			resource_entry_map( 4 ) = pdchLeedPerfDisClDem;  //district cooling
+			resource_entry_map( 5 ) = pdchLeedPerfDisHtDem;  //district heating
+
+			for ( iResource = 1; iResource <= 5; ++iResource ) {
+				i = 1;
+				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
+					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
+						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
+							PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- " + EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub ), RealToStr( collapsedEndUseSub( kEndUseSub, jEndUse, iResource ), 2 ) );
+							++i;
+						}
+					} else {
+						PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- Not Subdivided", RealToStr( collapsedEndUse( iResource, jEndUse ), 2 ) );
+						++i;
+					}
+				}
+			}
+
+
 		}
 	}
 

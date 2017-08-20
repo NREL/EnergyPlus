@@ -191,6 +191,10 @@ namespace DataEnvironment {
 	extern bool CurrentYearIsLeapYear; // true when current year is leap year (convoluted logic dealing with
 	// whether weather file allows leap years, runperiod inputs.
 
+	extern int varyingLocationSchedIndexLat;
+	extern int varyingLocationSchedIndexLong;
+	extern int varyingOrientationSchedIndex;
+	
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataEnvironment:
 	//PUBLIC OutBaroPressAt
 	//PUBLIC OutAirDensityAt

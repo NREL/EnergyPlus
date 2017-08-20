@@ -874,6 +874,11 @@ namespace PlantChillers {
 					ShowWarningError( cCurrentModuleObject + ", \"" + ElectricChiller( ChillerNum ).Base.Name + "\" TRIM(cAlphaFieldNames(10)) \"" + cAlphaArgs( 10 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
+			if ( NumAlphas > 12 ) {
+				ElectricChiller( ChillerNum ).EndUseSubcategory = cAlphaArgs( 13 );
+			} else {
+				ElectricChiller( ChillerNum ).EndUseSubcategory = "General";
+			}
 
 		}
 
@@ -883,7 +888,7 @@ namespace PlantChillers {
 
 		for ( ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum ) {
 			SetupOutputVariable( "Chiller Electric Power [W]", ElectricChillerReport( ChillerNum ).Base.Power, "System", "Average", ElectricChiller( ChillerNum ).Base.Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricChillerReport( ChillerNum ).Base.Energy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricChillerReport( ChillerNum ).Base.Energy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ELECTRICITY", "Cooling", ElectricChiller( ChillerNum ).EndUseSubcategory, "Plant" );
 
 			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", ElectricChillerReport( ChillerNum ).Base.QEvap, "System", "Average", ElectricChiller( ChillerNum ).Base.Name );
 			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", ElectricChillerReport( ChillerNum ).Base.EvapEnergy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );

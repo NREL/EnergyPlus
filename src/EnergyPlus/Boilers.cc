@@ -490,6 +490,11 @@ namespace Boilers {
 				Boiler( BoilerNum ).FlowMode = NotModulated;
 			}}
 
+			if ( NumAlphas > 7 ) {
+				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 8 );
+			} else {
+				Boiler( BoilerNum ).EndUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since it appears this way in existing output files.
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -504,7 +509,7 @@ namespace Boilers {
 			} else {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", "Boiler", "Plant" );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", Boiler( BoilerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Boiler Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );

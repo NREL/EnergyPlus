@@ -782,7 +782,11 @@ namespace SteamCoils {
 				if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
 					// if coil is part of a terminal unit just use the terminal unit value
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
-						SteamCoil( CoilNum ).MaxSteamVolFlowRate = TermUnitSizing( CurZoneEqNum ).MaxSTVolFlow;
+						if ( CurTermUnitSizingNum > 0 ) {
+							SteamCoil( CoilNum ).MaxSteamVolFlowRate = TermUnitSizing( CurTermUnitSizingNum ).MaxSTVolFlow;
+						} else {
+							SteamCoil( CoilNum ).MaxSteamVolFlowRate = 0.0;
+						}
 						// if coil is part of a zonal unit, calc coil load to get hot Steam flow rate
 					} else {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;

@@ -880,7 +880,7 @@ namespace CrossVentMgr {
 
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
-			SumAllReturnAirConvectionGains( ZoneNum, RetAirConvGain );
+			SumAllReturnAirConvectionGains( ZoneNum, RetAirConvGain, 0 );
 			ConvGains += RetAirConvGain;
 		}
 

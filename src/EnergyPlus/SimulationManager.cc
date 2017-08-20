@@ -124,10 +124,12 @@ extern "C" {
 #include <PlantPipingSystemsManager.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
+#include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SizingManager.hh>
 #include <SolarShading.hh>
 #include <SQLiteProcedures.hh>
+#include <SurfaceGeometry.hh>
 #include <SystemReports.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
@@ -135,6 +137,7 @@ extern "C" {
 #include <ZoneTempPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
+#include <Vectors.hh>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -287,6 +290,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
+		using WeatherManager::CheckIfAnyUnderwaterBoundaries;
 		using OutputProcessor::isFinalYear;
 
 		// Locals
@@ -305,11 +309,8 @@ namespace SimulationManager {
 		static bool TerminalError( false );
 		bool SimsDone;
 		bool ErrFound;
-		//  REAL(r64) :: t0,t1,st0,st1
-
-		//  CHARACTER(len=70) :: tdstring
-		//  CHARACTER(len=138) :: tdstringlong
-
+		bool oneTimeUnderwaterBoundaryCheck = true;
+		bool AnyUnderwaterBoundaries = false;
 		int EnvCount;
 
 		// Formats
@@ -446,7 +447,10 @@ namespace SimulationManager {
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
-
+		
+		// check for variable latitude/location/etc
+		WeatherManager::ReadVariableLocationOrientation();
+		
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
@@ -543,6 +547,14 @@ namespace SimulationManager {
 							SimulateGroundDomains( false );
 						}
 
+						if ( AnyUnderwaterBoundaries ) {
+						    WeatherManager::UpdateUnderwaterBoundaries();
+						}
+
+						if ( DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 || DataEnvironment::varyingOrientationSchedIndex > 0 ) {
+							WeatherManager::UpdateLocationAndOrientation();
+						}
+
 						BeginTimeStepFlag = true;
 						ExternalInterfaceExchangeVariables();
 
@@ -569,6 +581,21 @@ namespace SimulationManager {
 
 						ManageHeatBalance();
 
+<<<<<<< HEAD
+=======
+						//  After the first iteration of HeatBalance, all the 'input' has been gotten
+						if ( BeginFullSimFlag ) {
+							if ( GetNumRangeCheckErrorsFound() > 0 ) {
+								ShowFatalError( "Out of \"range\" values found in input" );
+							}
+						}
+
+						if ( oneTimeUnderwaterBoundaryCheck ) {
+						    AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+						    oneTimeUnderwaterBoundaryCheck = false;
+						}
+
+>>>>>>> NREL/develop
 						BeginHourFlag = false;
 						BeginDayFlag = false;
 						BeginEnvrnFlag = false;

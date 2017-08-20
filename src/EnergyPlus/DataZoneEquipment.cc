@@ -134,6 +134,10 @@ namespace DataZoneEquipment {
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
 
+	// Per Person Ventilation Rate Mode
+	int const PerPersonDCVByCurrentLevel( 1 );
+	int const PerPersonByDesignLevel( 2 );
+
 	int const NumValidSysAvailZoneComponents( 13 );
 	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit" } );
 
@@ -286,6 +290,7 @@ namespace DataZoneEquipment {
 		int IOStat;
 		std::string InletNodeListName;
 		std::string ExhaustNodeListName;
+		std::string ReturnNodeListName;
 		std::string ReturnFlowBasisNodeListName;
 		Array1D_string AlphArray;
 		Array1D< Real64 > NumArray;
@@ -334,6 +339,7 @@ namespace DataZoneEquipment {
 
 		ExhaustNodeListName = "";
 		InletNodeListName = "";
+		ReturnNodeListName = "";
 		ReturnFlowBasisNodeListName = "";
 
 		// Look in the input file for zones with air loop and zone equipment attached
@@ -398,6 +404,7 @@ namespace DataZoneEquipment {
 		InitUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
 
 		overallEquipCount = 0;
+		int locTermUnitSizingCounter = 0; // will increment for every zone inlet node
 
 		for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop ) {
 
@@ -453,16 +460,7 @@ namespace DataZoneEquipment {
 				Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 			} // This error already detected and program will be terminated.
 
-			ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = GetOnlySingleNode( AlphArray( 6 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneReturn, 1, ObjectIsNotParent ); // all return air state variables are
-			// assigned to this node
-			if ( ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode != 0 ) {
-				UniqueNodeError = false;
-				CheckUniqueNodes( cAlphaFields( 6 ), "NodeName", UniqueNodeError, AlphArray( 6 ), _, AlphArray( 1 ) );
-				if ( UniqueNodeError ) {
-					//ShowContinueError( "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
-					GetZoneEquipmentDataErrorsFound = true;
-				}
-			}
+			ReturnNodeListName = AlphArray( 6 );
 			if ( lAlphaBlanks( 7 ) ) {
 				ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 			} else {
@@ -683,6 +681,7 @@ namespace DataZoneEquipment {
 				ZoneEquipConfig( ControlledZoneNum ).NumInletNodes = NumNodes;
 
 				ZoneEquipConfig( ControlledZoneNum ).InletNode.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat.allocate( NumNodes );
 
@@ -691,16 +690,19 @@ namespace DataZoneEquipment {
 					UniqueNodeError = false;
 					CheckUniqueNodes( "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 					if ( UniqueNodeError ) {
-						//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
 						GetZoneEquipmentDataErrorsFound = true;
 					}
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( NodeNum ) = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).OutNode = 0;
+					++locTermUnitSizingCounter;
+					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).TermUnitSizingIndex = locTermUnitSizingCounter;
+					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).TermUnitSizingIndex = locTermUnitSizingCounter;
 				}
 			} else {
-				ShowContinueError( "Invalid inlet node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				ShowContinueError( "Invalid Zone Air Inlet Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 				GetZoneEquipmentDataErrorsFound = true;
 			}
 
@@ -722,7 +724,33 @@ namespace DataZoneEquipment {
 					}
 				}
 			} else {
-				ShowContinueError( "Invalid exhaust node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				ShowContinueError( "Invalid Zone Air Exhaust Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				GetZoneEquipmentDataErrorsFound = true;
+			}
+
+			NodeListError = false;
+			GetNodeNums( ReturnNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_ZoneReturn, 1, ObjectIsNotParent );
+
+			if ( !NodeListError ) {
+				ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes = NumNodes;
+
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNode.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum.allocate( NumNodes );
+
+				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
+					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );
+					ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
+					// Save the first return air node number for now in ReturnAirNode (this wil be removed later)
+					if ( NodeNum == 1 ) ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = NodeNums( NodeNum );
+					UniqueNodeError = false;
+					CheckUniqueNodes( "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+					if ( UniqueNodeError ) {
+						//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
+						GetZoneEquipmentDataErrorsFound = true;
+					}
+				}
+			} else {
+				ShowContinueError( "Invalid Zone Return Air Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 				GetZoneEquipmentDataErrorsFound = true;
 			}
 
@@ -738,12 +766,23 @@ namespace DataZoneEquipment {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnFlowBasisNode( NodeNum ) = NodeNums( NodeNum );
 				}
 			} else {
-				ShowContinueError( "Invalid return air flow rate basis node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				ShowContinueError( "Invalid Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 				GetZoneEquipmentDataErrorsFound = true;
 			}
 
 		} // end loop over controlled zones
 
+		// Allocate TermUnitSizing array and set zone number
+		if ( locTermUnitSizingCounter > 0 ) {
+			DataSizing::NumAirTerminalUnits = locTermUnitSizingCounter;
+			DataSizing::TermUnitSizing.allocate( DataSizing::NumAirTerminalUnits );
+			for ( int loopZoneNum = 1; loopZoneNum <= NumOfZones; ++loopZoneNum ) {
+				{ auto & thisZoneEqConfig( ZoneEquipConfig( loopZoneNum ) );
+				for ( int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum ) {
+					DataSizing::TermUnitSizing( thisZoneEqConfig.AirDistUnitCool( loopNodeNum ).TermUnitSizingIndex ).CtrlZoneNum = loopZoneNum;
+				}}
+			}
+		}
 		if ( GetZoneEquipmentDataErrorsFound ) {
 			ShowWarningError( RoutineName + CurrentModuleObject + ", duplicate items NOT CHECKED due to previous errors." );
 			overallEquipCount = 0;
@@ -1096,23 +1135,37 @@ namespace DataZoneEquipment {
 	}
 
 	int
-	GetReturnAirNodeForZone( std::string const & ZoneName ) // Zone name to match into Controlled Zone structure
+	GetReturnAirNodeForZone(
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	) 
 	{
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   March 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       MODIFIED       Feb 2017 expanded for multiple return nodes in a zone
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the return air node number for the indicated
+<<<<<<< HEAD
 		// zone.  Returns 0 if the Zone is not a controlled zone.
+=======
+		// zone and node name.  If NodeName is blank, return the first return node number,
+		// otherwise return the node number of the matching return node name.  
+		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+>>>>>>> NREL/develop
 
 		// Return value
 		int ReturnAirNodeNumber; // Return Air node number for controlled zone
 
+<<<<<<< HEAD
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+=======
+>>>>>>> NREL/develop
 		int ControlledZoneIndex;
 
 		if ( ! ZoneEquipInputsFilled ) {
@@ -1124,7 +1177,17 @@ namespace DataZoneEquipment {
 		ReturnAirNodeNumber = 0; // default is not found
 		if ( ControlledZoneIndex > 0 ) {
 			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
-				ReturnAirNodeNumber = ZoneEquipConfig( ControlledZoneIndex ).ReturnAirNode;
+				if ( NodeName == "" ) {
+					// If NodeName is blank, return first return node number
+					ReturnAirNodeNumber = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( 1 );
+				} else {
+					for ( int nodeCount = 1; nodeCount <= ZoneEquipConfig( ControlledZoneIndex ).NumReturnNodes; ++nodeCount ) {
+						int curNodeNum = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( nodeCount );
+						if ( NodeName == DataLoopNode::NodeID( curNodeNum ) ) {
+							ReturnAirNodeNumber = curNodeNum;
+						}
+					}
+				}
 			}
 		}
 

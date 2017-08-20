@@ -420,6 +420,11 @@ namespace BoilerSteam {
 
 			Boiler( BoilerNum ).FluidIndex = SteamFluidIndex;
 
+			if ( NumAlphas > 4 ) {
+				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 5 );
+			} else {
+				Boiler( BoilerNum ).EndUseSubcategory = "General"; 
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -434,7 +439,7 @@ namespace BoilerSteam {
 			} else {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", _, "Plant" );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", Boiler( BoilerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Boiler Steam Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Steam Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Steam Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );

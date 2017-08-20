@@ -1117,6 +1117,21 @@ namespace InternalHeatGains {
 						Lights( Loop ).FractionReturnAirIsCalculated = ( AlphaName( 6 ) == "YES" );
 					}
 
+					// Set return air node number
+					Lights( Loop ).ReturnNodePtr = 0;
+					std::string retNodeName = "";
+					if ( !lAlphaFieldBlanks( 7 ) ) {
+						if ( LightsObjects( Item ).ZoneListActive ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Lights( Loop ).Name + "\": " + cAlphaFieldNames( 7 ) + " must be blank when using a ZoneList." );
+							ErrorsFound = true;
+						} else {
+							retNodeName = AlphaName( 7 );
+						}
+					}
+					if ( Lights( Loop ).ZonePtr > 0 ) {
+						Lights( Loop ).ReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Zone( Lights( Loop ).ZonePtr ).Name, retNodeName );
+					}
+
 					if ( Lights( Loop ).ZonePtr <= 0 ) continue; // Error, will be caught and terminated later
 
 					// Object report variables
@@ -1156,7 +1171,7 @@ namespace InternalHeatGains {
 						SetupEMSInternalVariable( "Lighting Power Design Level", Lights( Loop ).Name, "[W]", Lights( Loop ).DesignLevel );
 					} // EMS
 					//setup internal gains
-					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate );
+					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, Lights(Loop).ReturnNodePtr );
 
 					// send values to predefined lighting summary report
 					liteName = Lights( Loop ).Name;
@@ -4621,41 +4636,18 @@ namespace InternalHeatGains {
 	void
 	SumAllReturnAirConvectionGains(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumReturnAirGainRate
+		Real64 & SumReturnAirGainRate,
+		int const ReturnNodeNum // return air node number
 	)
 	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   Dec. 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// worker routine for summing all the internal gain types
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 tmpSumRetAirGainRate;
 		int DeviceNum;
 
@@ -4667,7 +4659,10 @@ namespace InternalHeatGains {
 		}
 
 		for ( DeviceNum = 1; DeviceNum <= ZoneIntGain( ZoneNum ).NumberOfDevices; ++DeviceNum ) {
-			tmpSumRetAirGainRate += ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirConvGainRate;
+			// If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
+			if ( ( ReturnNodeNum == 0 ) || ( ReturnNodeNum == ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirNodeNum ) ) {
+				tmpSumRetAirGainRate += ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirConvGainRate;
+			}
 		}
 
 		SumReturnAirGainRate = tmpSumRetAirGainRate;
@@ -4993,7 +4988,8 @@ namespace InternalHeatGains {
 	void
 	SumAllReturnAirLatentGains(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumRetAirLatentGainRate
+		Real64 & SumRetAirLatentGainRate,
+		int const ReturnNodeNum // return air node number
 	)
 	{
 
@@ -5039,7 +5035,10 @@ namespace InternalHeatGains {
 		}
 
 		for ( DeviceNum = 1; DeviceNum <= ZoneIntGain( ZoneNum ).NumberOfDevices; ++DeviceNum ) {
-			tmpSumLatentGainRate += ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirLatentGainRate;
+			// If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
+			if ( ( ReturnNodeNum == 0 ) || ( ReturnNodeNum == ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirNodeNum ) ) {
+				tmpSumLatentGainRate += ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirLatentGainRate;
+			}
 		}
 
 		SumRetAirLatentGainRate = tmpSumLatentGainRate;

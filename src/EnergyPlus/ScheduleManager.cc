@@ -4561,6 +4561,45 @@ namespace ScheduleManager {
 
 	}
 
+	// returns the annual full load hours for a schedule - essentially the sum of the hourly values
+	Real64
+	ScheduleAnnualFullLoadHours(
+		int const ScheduleIndex, // Which Schedule being tested
+		int const StartDayOfWeek, // Day of week for start of year
+		bool const isItLeapYear // true if it is a leap year containing February 29
+	)
+	{
+		// J. Glazer - July 2017
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+
+		int DaysInYear;
+
+		if ( isItLeapYear ) {
+			DaysInYear = 366;
+		} else {
+			DaysInYear = 365;
+		}
+
+		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
+			ShowFatalError( "ScheduleAnnualFullLoadHours called with ScheduleIndex out of range" );
+		}
+
+		int DayT = StartDayOfWeek;
+		Real64 TotalHours = 0.0;
+
+		if ( DayT == 0 ) return TotalHours;
+
+		for ( int Loop = 1; Loop <= DaysInYear; ++Loop ) {
+			int WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
+			TotalHours += sum( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue ) / double( NumOfTimeStepInHour );
+			++DayT;
+			if ( DayT > 7 ) DayT = 1;
+		}
+
+		return TotalHours;
+	}
+
+	// returns the average number of hours per week based on the schedule index provided
 	Real64
 	ScheduleAverageHoursPerWeek(
 		int const ScheduleIndex, // Which Schedule being tested
@@ -4579,42 +4618,13 @@ namespace ScheduleManager {
 		// This function returns the "average" hours per week for a schedule over
 		// the entire year.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
-		Real64 AverageHoursPerWeek; // Average Hours Per Week
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int WkSch;
-		int DayT;
-		int Loop;
-		Real64 TotalHours;
 		Real64 WeeksInYear;
-		int DaysInYear;
 
 		if ( isItLeapYear ) {
-			DaysInYear = 366;
 			WeeksInYear = 366.0 / 7.0;
 		} else {
-			DaysInYear = 365;
 			WeeksInYear = 365.0 / 7.0;
 		}
 
@@ -4622,26 +4632,57 @@ namespace ScheduleManager {
 			ShowFatalError( "ScheduleAverageHoursPerWeek called with ScheduleIndex out of range" );
 		}
 
-		DayT = StartDayOfWeek;
-		AverageHoursPerWeek = 0.0;
-		TotalHours = 0.0;
+		Real64 TotalHours = ScheduleAnnualFullLoadHours( ScheduleIndex , StartDayOfWeek, isItLeapYear );
 
-		if ( DayT == 0 ) return AverageHoursPerWeek;
+		return TotalHours / WeeksInYear; // Ok to return a fraction since WeeksInYear we know is always non-zero
 
-		for ( Loop = 1; Loop <= DaysInYear; ++Loop ) {
-			WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
-			TotalHours += sum( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue ) / double( NumOfTimeStepInHour );
+	}
+
+	// returns the annual hours greater than 1% for a schedule - essentially the number of hours with any operation
+	Real64
+	ScheduleHoursGT1perc(
+			int const ScheduleIndex, // Which Schedule being tested
+			int const StartDayOfWeek, // Day of week for start of year
+			bool const isItLeapYear // true if it is a leap year containing February 29
+		)
+	{
+		// J. Glazer - July 2017
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+
+		int DaysInYear;
+
+		if ( isItLeapYear ) {
+			DaysInYear = 366;
+		} else {
+			DaysInYear = 365;
+		}
+
+		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
+			ShowFatalError( "ScheduleHoursGT1perc called with ScheduleIndex out of range" );
+		}
+
+		int DayT = StartDayOfWeek;
+		Real64 TotalHours = 0.0;
+
+		if ( DayT == 0 ) return TotalHours;
+
+		for ( int Loop = 1; Loop <= DaysInYear; ++Loop ) {
+			int WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
+			for ( int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay ) {
+				for ( int TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+					if ( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue( TS, hrOfDay  ) ) {
+						TotalHours += DataGlobals::TimeStepZone;
+					}
+				}
+			}
+
 			++DayT;
 			if ( DayT > 7 ) DayT = 1;
 		}
 
-		//  Total hours for year have been set.
-
-		AverageHoursPerWeek = TotalHours / WeeksInYear;
-
-		return AverageHoursPerWeek;
-
+		return TotalHours;
 	}
+
 
 	int
 	GetNumberOfSchedules()

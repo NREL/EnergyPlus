@@ -375,10 +375,13 @@
 !      years
 ! **************************************************************************
 
+<<<<<<< HEAD
 ! Lead Input;
 
 ! Simulation Data;
 
+=======
+>>>>>>> NREL/develop
 \group Simulation Parameters
 
 Version,
@@ -838,7 +841,7 @@ Site:Location,
        \min-fields 5
   A1 , \field Name
        \required-field
-       \type  alpha
+       \type alpha
   N1 , \field Latitude
        \units deg
        \minimum -90.0
@@ -867,6 +870,32 @@ Site:Location,
        \maximum< 8900.0
        \default 0.0
        \type real
+
+Site:VariableLocation,
+       \memo Captures the scheduling of a moving/reorienting building, or more likely a vessel
+       \unique-object
+       \min-fields 1
+  A1 , \field Name
+       \required-field
+       \type alpha
+  A2 , \field Building Location Latitude Schedule
+       \note The name of a schedule that defines the latitude of the building at any time.
+       \note If not entered, the latitude defined in the Site:Location, or the default
+       \note latitude, will be used for the entirety of the simulation
+       \type object-list
+       \object-list ScheduleNames
+  A3 , \field Building Location Longitude Schedule
+       \note The name of a schedule that defines the longitude of the building at any time.
+       \note If not entered, the longitude defined in the Site:Location, or the default
+       \note longitude, will be used for the entirety of the simulation
+       \type object-list
+       \object-list ScheduleNames
+  A4 ; \field Building Location Orientation Schedule
+       \note The name of a schedule that defines the orientation of the building at any time.
+       \note This orientation is based on a change from the original orientation. -- NEED TO REFINE THIS
+       \note If not entered, the original orientation will be used for the entirety of the simulation
+       \type object-list
+       \object-list ScheduleNames
 
 SizingPeriod:DesignDay,
       \memo The design day object creates the parameters for the program to create
@@ -7053,7 +7082,7 @@ MaterialProperty:PhaseChangeHysteresis,
   N2 , \field Liquid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully liquid
        \required-field
-       \units W/mK
+       \units W/m-K
        \type real
        \minimum> 0
   N3 , \field Liquid State Density
@@ -7089,7 +7118,7 @@ MaterialProperty:PhaseChangeHysteresis,
   N8 , \field Solid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully solid
        \required-field
-       \units W/mK
+       \units W/m-K
        \type real
        \minimum> 0
   N9 , \field Solid State Density
@@ -12306,6 +12335,7 @@ WindowProperty:AirflowControl,
        \key OutdoorAir
        \default IndoorAir
   A3 , \field Airflow Destination
+       \note If ReturnAir is selected, the name of the Return Air Node may be specified below.
        \type choice
        \key IndoorAir
        \key OutdoorAir
@@ -12331,11 +12361,15 @@ WindowProperty:AirflowControl,
        \key No
        \default No
        \note If Yes, then Airflow Multiplier Schedule Name must be specified
-  A6 ; \field Airflow Multiplier Schedule Name
+  A6 , \field Airflow Multiplier Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Required if Airflow Is Scheduled = Yes.
        \note Schedule values are 0.0 or 1.0 and multiply Maximum Air Flow.
+  A7 ; \field Airflow Return Air Node Name
+       \note Name of the return air node for this airflow window if the Airflow Destination is ReturnAir. 
+       \note If left blank, defaults to the first return air node for the zone of the window surface.
+       \type node
 
 WindowProperty:StormWindow,
        \min-fields 7
@@ -16108,9 +16142,9 @@ SurfaceControl:MovableInsulation,
       \type object-list
       \object-list MaterialName
   A4; \field Schedule Name
-       \required-field
-       \type object-list
-       \object-list ScheduleNames
+      \required-field
+      \type object-list
+      \object-list ScheduleNames
 
 SurfaceProperty:OtherSideCoefficients,
       \memo This object sets the other side conditions for a surface in a variety of ways.
@@ -16193,6 +16227,7 @@ SurfaceProperty:OtherSideConditionsModel,
       \key GapConvectionRadiation
       \key UndergroundPipingSystemSurface
       \key GroundCoupledSurface
+      \key ConvectiveUnderwater
       \note GapConvectionRadiation provides boundary conditions for convection
       \note  and linearized thermal radiation across a gap or cavity
       \note  on the other side of the surface that are modeled separately.
@@ -16200,7 +16235,36 @@ SurfaceProperty:OtherSideConditionsModel,
       \note  surfaces in contact with PipingSystem:Underground domains
       \note GroundCoupledSurface provides boundary conditions for surfaces
       \note  in contact with GroundDomain objects
+      \note ConvectiveUnderwater provides a connection between a surface and
+      \note  an underwater boundary condition defined using a
+      \note  SurfaceProperty:Underwater object
       \default GapConvectionRadiation
+
+SurfaceProperty:Underwater,
+       \memo This object sets up a convective water boundary condition for a surface
+       \memo The free stream temperature and velocity are scheduled. If the free stream
+       \memo velocity is zero, the surface will naturally convect with the surrounding water.
+       \min-fields 3
+  A1,  \field Name
+       \required-field
+       \reference SurfacePropUnderWaterNames
+       \type alpha
+  N1,  \field Distance from Surface Centroid to Leading Edge of Boundary Layer
+       \note This is the distance from the leading edge of the boundary layer development 
+       \note to the centroid of the surface of interest.  The value of this field is used
+       \note as the distance in the Reynolds number for evaluating the local convection coefficient.
+       \type real
+       \units m
+       \required-field
+  A2,  \field Free Stream Water Temperature Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \units C
+  A3;  \field Free Stream Water Velocity Schedule
+       \type object-list
+       \object-list ScheduleNames
+       \units m/s
 
 Foundation:Kiva,
        \memo Refined definition of the foundation surface construction used to
@@ -20512,9 +20576,6 @@ Lights,
        \default 1.0
   A5 , \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20529,13 +20590,19 @@ Lights,
        \type real
        \minimum 0.0
        \default 0.0
-  N9 ; \field Return Air Fraction Function of Plenum Temperature Coefficient 2
+  N9 , \field Return Air Fraction Function of Plenum Temperature Coefficient 2
        \note Used only if Return Air Fraction Is Calculated from Plenum Temperature = Yes
        \note Equation is Return Air Fraction = Coefficient#1 - Coefficient#2 X PlenumTemp(degC)
        \type real
        \units 1/K
        \minimum 0.0
        \default 0.0
+  A7 ; \field Return Air Heat Gain Node Name
+       \note Name of the return air node for this heat gain.
+       \note If left blank, defaults to the first return air node for the zone.
+       \note Leave this field blank when using a ZoneList name.
+       \type node
+
 
 ElectricEquipment,
    \memo Sets internal gains for electric equipment in the zone.
@@ -20598,9 +20665,6 @@ ElectricEquipment,
        \default 0
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20647,7 +20711,7 @@ GasEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20678,9 +20742,6 @@ GasEquipment,
        \note The maximum value assumes to be 10 times of the recommended value.
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20727,7 +20788,7 @@ HotWaterEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20746,9 +20807,6 @@ HotWaterEquipment,
        \default 0
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20794,7 +20852,7 @@ SteamEquipment,
   N3 , \field Power per Person
        \type real
        \minimum 0
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20813,9 +20871,6 @@ SteamEquipment,
        \default 0
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20876,7 +20931,7 @@ OtherEquipment,
        \ip-units Btu/h-ft2
   N3 , \field Power per Person
        \type real
-       \units W/Person
+       \units W/person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
        \type real
@@ -20904,9 +20959,6 @@ OtherEquipment,
        \note The default value assumes the equipment is fully vented.
   A6 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -21075,14 +21127,17 @@ ElectricEquipment:ITE:AirCooled,
        \maximum 1.0
        \default 1.0
   A16, \field CPU End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-CPU
   A17, \field Fan End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-Fans
   A18; \field Electric Power Supply End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-UPS
@@ -21126,6 +21181,7 @@ ZoneBaseboard:OutdoorTemperatureControlled,
        \maximum 1.0
        \default 0
   A4 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -25028,9 +25084,6 @@ Exterior:Lights,
        \key AstronomicalClock
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -25071,9 +25124,6 @@ Exterior:FuelEquipment,
        \ip-units W
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -25100,9 +25150,6 @@ Exterior:WaterEquipment,
        \minimum 0
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -32236,6 +32283,49 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the
       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
 
+DesignSpecification:AirTerminal:Sizing,
+  \min-fields 1
+  \memo This object is used to scale the sizing of air terminal units.
+  A1, \field Name
+      \note This name may be referenced by a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled object.
+      \required-field
+      \type alpha
+      \reference DesignSpecificationAirTerminalSizingName
+  N1, \field Fraction of Design Cooling Load
+      \note The fraction of the design sensible cooling load to be met by this terminal unit. 
+      \note This fraction is applied after the Zone Cooling Sizing Factor (see Sizing:Zone).
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \default 1.0
+  N2, \field Cooling Design Supply Air Temperature Difference Ratio
+      \note This ratio adjusts the supply air temperature difference used to calculate 
+      \note the cooling design supply air flow rate for this terminal unit.
+      \type real
+      \units dimensionless
+      \minimum> 0.0
+      \default 1.0
+  N3, \field Fraction of Design Heating Load
+      \note The fraction of the design sensible heating load to be met by this terminal unit. 
+      \note This fraction is applied after the Zone Heating Sizing Factor (see Sizing:Zone).
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \default 1.0
+  N4, \field Heating Design Supply Air Temperature Difference Ratio
+      \note This ratio adjusts the supply air temperature difference used to calculate 
+      \note the heating design supply air flow rate for this terminal unit.
+      \type real
+      \units dimensionless
+      \minimum> 0.0
+      \default 1.0
+  N5; \field Fraction of Minimum Outdoor Air Flow
+      \note The fraction of the zone minimum outdoor air requirement to be met by this terminal unit.
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \default 1.0
+
 Sizing:System,
       \memo Specifies the input needed to perform sizing calculations for a central forced air
       \memo system. System design air flow, heating capacity, and cooling capacity will be calculated
@@ -35076,7 +35166,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \type real
        \maximum 10.0
        \minimum> 0.0
-       \units Kg/s
+       \units kg/s
        \default 0.063
   A5,  \field Heating Design Capacity Method
        \type choice
@@ -40324,7 +40414,7 @@ AirTerminal:SingleDuct:Uncontrolled,
        \units m3/s
        \minimum 0.0
        \autosizable
-   A4; \field Design Specification Outdoor Air Object Name
+   A4, \field Design Specification Outdoor Air Object Name
        \type object-list
        \object-list DesignSpecificationOutdoorAirNames
        \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
@@ -40333,6 +40423,18 @@ AirTerminal:SingleDuct:Uncontrolled,
        \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
        \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate.
        \note If this field is blank, then the terminal unit will not be controlled for outdoor air flow.
+   A5, \field Per Person Ventilation Rate Mode
+       \type choice
+       \key CurrentOccupancy
+       \key DesignOccupancy
+       \default CurrentOccupancy
+       \note CurrentOccupancy models demand controlled ventilation using the current number of people
+       \note DesignOccupancy uses the total Number of People in the zone and is constant
+   A6; \field Design Specification Air Terminal Sizing Object Name
+       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object 
+       \note which specifies sizing adjustments to be made for this terminal unit. 
+       \type object-list
+       \object-list DesignSpecificationAirTerminalSizingName
 
 AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \memo Central air system terminal unit, single duct, constant volume, with reheat coil (hot
@@ -41320,7 +41422,7 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
 
 AirTerminal:SingleDuct:Mixer,
        \memo The mixer air terminal unit provides a means of supplying central system
-       \memo air to the air inlet or outlet side of a zoneHAC equipment such as a four
+       \memo air to the air inlet or outlet side of a zoneHVAC equipment such as a four
        \memo pipe fan coil unit. Normally the central air would be ventilation air from
        \memo a dedicated outdoor air system (DOAS).
    A1, \field Name
@@ -41373,15 +41475,22 @@ AirTerminal:SingleDuct:Mixer,
        \note type selected is InletSide, then the mixer is connected on the inlet side of the
        \note ZoneHVAC equipment, or else if the mixer connection type selected is SupplySide, then
        \note the mixer is connected at the outlet side of the ZoneHVAC equipment.
-   A8; \field Design Specification Outdoor Air Object Name
+   A8, \field Design Specification Outdoor Air Object Name
        \type object-list
        \object-list DesignSpecificationOutdoorAirNames
        \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
-       \note unit will adjust flow to meet this outdoor air requirement. 
+       \note unit will adjust flow to meet this outdoor air requirement.
        \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
        \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
-       \note If this field is blank, then the terminal unit will be controlled using the  
-       \note DesignSpecification:OutdoorAir objec referenced in the Sizing:Zone object.   
+       \note If this field is blank, then the terminal unit will be controlled using the
+       \note DesignSpecification:OutdoorAir objec referenced in the Sizing:Zone object.
+   A9; \field Per Person Ventilation Rate Mode
+       \type choice
+       \key CurrentOccupancy
+       \key DesignOccupancy
+       \default CurrentOccupancy
+       \note CurrentOccupancy models demand controlled ventilation using the current number of people
+       \note DesignOccupancy uses the total Number of People in the zone and is constant
 
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.
@@ -41537,11 +41646,16 @@ ZoneHVAC:AirDistributionUnit,
        \minimum 0
        \maximum 0.3
        \default 0
-  N2 ; \field Constant Downstream Leakage Fraction
+  N2 , \field Constant Downstream Leakage Fraction
        \type real
        \minimum 0
        \maximum 0.3
        \default 0
+  A5 ; \field Design Specification Air Terminal Sizing Object Name
+       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object 
+       \note which specifies sizing adjustments to be made for this terminal unit. 
+       \type object-list
+       \object-list DesignSpecificationAirTerminalSizingName
 
 \group Zone HVAC Equipment Connections
 
@@ -42455,17 +42569,16 @@ ZoneHVAC:EquipmentConnections,
   A5 , \field Zone Air Node Name
        \required-field
        \type node
-  A6 , \field Zone Return Air Node Name
-       \required-field
+  A6 , \field Zone Return Air Node or NodeList Name
        \type node
-  A7 , \field Zone Return Air Flow Rate Fraction Schedule Name
+  A7 , \field Zone Return Air Node 1 Flow Rate Fraction Schedule Name
        \note This schedule is multiplied times the base return air flow rate.
        \note If this field is left blank, the schedule defaults to 1.0 at all times.
        \type object-list
        \object-list ScheduleNames
-  A8 ; \field Zone Return Air Flow Rate Basis Node or NodeList Name
+  A8 ; \field Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name
        \note The optional basis node(s) used to calculate the base return air flow
-       \note rate for this zone. The return air flow rate is the sum of the flow rates
+       \note rate for the first return air node in this zone. The return air flow rate is the sum of the flow rates
        \note at the basis node(s) multiplied by the Zone Return Air Flow Rate Fraction Schedule.
        \note If this  field is blank, then the base return air flow rate is the total supply
        \note inlet flow rate to the zone less the total exhaust node flow rate from the zone.
@@ -42584,6 +42697,7 @@ Fan:SystemModel,
         \minimum 0.0
         \maximum 1.0
   A9 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -42680,6 +42794,7 @@ Fan:ConstantVolume,
        \type node
        \required-field
   A5 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -42757,6 +42872,7 @@ Fan:VariableVolume,
        \type node
        \required-field
   A6 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -42817,6 +42933,7 @@ Fan:OnOff,
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
   A7 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -42852,6 +42969,7 @@ Fan:ZoneExhaust,
        \type node
        \required-field
   A5 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -43138,6 +43256,7 @@ Fan:ComponentModel,
         \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes constant VFD efficiency (0.97)
   A19 ; \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -44639,7 +44758,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note must be lower than or equal to the highest speed number
    N3,  \field Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -44730,7 +44849,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note throughout the entire simulation.
    N13, \field Speed 1 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -44795,7 +44914,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N19, \field Speed 2 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N20, \field Speed 2 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44850,7 +44969,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N25, \field Speed 3 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N26, \field Speed 3 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44905,7 +45024,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N31, \field Speed 4 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N32, \field Speed 4 Reference Unit Gross Rated Sensible Heat Ratio
@@ -44960,7 +45079,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N37, \field Speed 5 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N38, \field Speed 5 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45015,7 +45134,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N43, \field Speed 6 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N44, \field Speed 6 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45070,7 +45189,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N49, \field Speed 7 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N50, \field Speed 7 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45125,7 +45244,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N55, \field Speed 8 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N56, \field Speed 8 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45180,7 +45299,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N61, \field Speed 9 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N62, \field Speed 9 Reference Unit Gross Rated Sensible Heat Ratio
@@ -45237,7 +45356,7 @@ Coil:Cooling:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N67, \field Speed 10 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N68, \field Speed 10 Reference Unit Gross Rated Sensible Heat Ratio
@@ -47248,7 +47367,7 @@ Coil:Heating:DX:VariableSpeed,
         \default 2
         \note must be lower than or equal to the highest speed number
    N3,  \field Rated Heating Capacity At Selected Nominal Speed Level
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -47330,7 +47449,7 @@ Coil:Heating:DX:VariableSpeed,
         \ip-units W
    N12, \field Speed 1 Reference Unit Gross Rated Heating Capacity
        \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -47378,7 +47497,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N15, \field Speed 2 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N16, \field Speed 2 Reference Unit Gross Rated Heating COP
@@ -47419,7 +47538,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N18, \field Speed 3 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N19, \field Speed 3 Reference Unit Gross Rated Heating COP
@@ -47460,7 +47579,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N21, \field Speed 4 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 4 Reference Unit Gross Rated Heating COP
@@ -47501,7 +47620,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N24, \field Speed 5 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N25, \field Speed 5 Reference Unit Gross Rated Heating COP
@@ -47542,7 +47661,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N27, \field Speed 6 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N28, \field Speed 6 Reference Unit Gross Rated Heating COP
@@ -47583,7 +47702,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N30, \field Speed 7 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N31, \field Speed 7 Reference Unit Gross Rated Heating COP
@@ -47624,7 +47743,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N33, \field Speed 8 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N34, \field Speed 8 Reference Unit Gross Rated Heating COP
@@ -47665,7 +47784,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N36, \field Speed 9 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N37, \field Speed 9 Reference Unit Gross Rated Heating COP
@@ -47706,7 +47825,7 @@ Coil:Heating:DX:VariableSpeed,
         \note ffa = Fraction of the full load Air Flow
    N39, \field Speed 10 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N40, \field Speed 10 Reference Unit Gross Rated Heating COP
@@ -48228,7 +48347,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note must be lower than or equal to the highest speed number
    N3,  \field Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -48269,7 +48388,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note PLR = part load ratio (cooling load/steady state capacity)
    N9,  \field Speed 1 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -48358,7 +48477,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N15, \field Speed 2 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N16, \field Speed 2 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48434,7 +48553,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N21, \field Speed 3 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 3 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48517,7 +48636,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N27, \field Speed 4 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N28, \field Speed 4 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48600,7 +48719,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N33, \field Speed 5 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N34, \field Speed 5 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48683,7 +48802,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N39, \field Speed 6 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N40, \field Speed 6 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48766,7 +48885,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N45, \field Speed 7 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N46, \field Speed 7 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48849,7 +48968,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N51, \field Speed 8 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N52, \field Speed 8 Reference Unit Gross Rated Sensible Heat Ratio
@@ -48932,7 +49051,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N57, \field Speed 9 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N58, \field Speed 9 Reference Unit Gross Rated Sensible Heat Ratio
@@ -49015,7 +49134,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the condenser (C)
    N63, \field Speed 10 Reference Unit Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N64, \field Speed 10 Reference Unit Gross Rated Sensible Heat Ratio
@@ -49210,7 +49329,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \default 2
         \note must be lower than or equal to the highest speed number
    N3,  \field Rated Heating Capacity At Selected Nominal Speed Level
-        \units w
+        \units W
         \type real
         \autosizable
         \default autosize
@@ -49235,7 +49354,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note PLR = part load ratio (heating load/steady state capacity)
    N6,  \field Speed 1 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
         \required-field
@@ -49318,7 +49437,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N11, \field Speed 2 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N12, \field Speed 2 Reference Unit Gross Rated Heating COP
@@ -49390,7 +49509,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N16, \field Speed 3 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N17, \field Speed 3 Reference Unit Gross Rated Heating COP
@@ -49468,7 +49587,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N21, \field Speed 4 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N22, \field Speed 4 Reference Unit Gross Rated Heating COP
@@ -49546,7 +49665,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N26, \field Speed 5 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N27, \field Speed 5 Reference Unit Gross Rated Heating COP
@@ -49624,7 +49743,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N31, \field Speed 6 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N32, \field Speed 6 Reference Unit Gross Rated Heating COP
@@ -49702,7 +49821,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N36, \field Speed 7 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N37, \field Speed 7 Reference Unit Gross Rated Heating COP
@@ -49780,7 +49899,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N41, \field Speed 8 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N42, \field Speed 8 Reference Unit Gross Rated Heating COP
@@ -49858,7 +49977,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N46, \field Speed 9 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N47, \field Speed 9 Reference Unit Gross Rated Heating COP
@@ -49936,7 +50055,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note ewt = water entering temperature seen by the evaporator (C)
    N51, \field Speed 10 Reference Unit Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
-        \units w
+        \units W
         \type real
         \minimum 0
    N52, \field Speed 10 Reference Unit Gross Rated Heating COP
@@ -58354,21 +58473,29 @@ AirLoopHVAC,
        \type object-list
        \object-list ConnectorLists
    A6, \field Supply Side Inlet Node Name
-       \note Name of inlet node where return air enters the supply side of the air loop
+       \note Name of inlet node where air enters the supply side of the air loop.
+       \note If this air loop has a return path, then this node is where return air enters the supply side.
+       \note If this air loop has no return path, then this node is where outdoor air or other air enters the supply side.
        \required-field
        \type node
    A7, \field Demand Side Outlet Node Name
        \note Name of outlet node where return air leaves the demand side and enters the supply side.
-       \required-field
+       \note Required if this air loop has a return path. Leave this field blank if there is no return.
        \type node
    A8, \field Demand Side Inlet Node Names
        \note Name of a Node or NodeList containing the inlet node(s) supplying air to zone equipment.
        \required-field
        \type node
-   A9; \field Supply Side Outlet Node Names
+   A9, \field Supply Side Outlet Node Names
        \note Name of a Node or NodeList containing the outlet node(s) supplying air to the demand side.
        \required-field
        \type node
+   N2; \field Design Return Air Flow Fraction of Supply Air Flow
+       \note The design return air flow rate as a fraction of supply air flow rate with no exhaust.
+       \note This can be used to model a pressurized system or set to zero to model a DOAS with no return flow.
+       \note Use ZoneAirMassFlowConservation to balance zone infiltration and mixing flows.
+       \minimum 0.0
+       \default 1.0
 
 AirLoopHVAC:OutdoorAirSystem:EquipmentList,
        \memo List equipment in simulation order
@@ -63396,11 +63523,16 @@ Boiler:HotWater,
        \type real
        \units W
        \minimum 0.0
-  N10; \field Sizing Factor
+  N10, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A8 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Boiler:Steam,
        \memo This boiler model is an adaptation of the empirical model from the Building
@@ -63457,11 +63589,16 @@ Boiler:Steam,
        \type node
   A4 , \field Steam Outlet Node Name
        \type node
-  N11; \field Sizing Factor
+  N11, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A5 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Chiller:Electric:EIR,
 \min-fields 23
@@ -63665,11 +63802,16 @@ Chiller:Electric:EIR,
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A15; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A15, \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
        \type node
+  A16; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Chiller:Electric:ReformulatedEIR,
 \min-fields 22
@@ -63862,11 +64004,16 @@ Chiller:Electric:ReformulatedEIR,
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A14; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A14, \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
        \type node
+  A15; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Chiller:Electric,
     \min-fields 27
@@ -64005,11 +64152,16 @@ Chiller:Electric,
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A12; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A12, \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
        \type node
+  A13; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 Chiller:Absorption:Indirect,
    \min-fields 17
@@ -66410,11 +66562,16 @@ CoolingTower:SingleSpeed,
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N25; \field Sizing Factor
+  N25, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A13; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 CoolingTower:TwoSpeed,
        \min-fields 24
@@ -66715,11 +66872,16 @@ CoolingTower:TwoSpeed,
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N33; \field Sizing Factor
+  N33, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A12; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 CoolingTower:VariableSpeed:Merkel,
        \min-fields 24
@@ -67028,11 +67190,16 @@ CoolingTower:VariableSpeed:Merkel,
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N29; \field Sizing Factor
+  N29, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A16; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 CoolingTower:VariableSpeed,
        \min-fields 15
@@ -67232,11 +67399,16 @@ CoolingTower:VariableSpeed,
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N17; \field Sizing Factor
+  N17, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  A14; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 CoolingTowerPerformance:CoolTools,
        \min-fields 44
@@ -69116,7 +69288,7 @@ HeatExchanger:FluidToFluid,
         \default Ideal
    N3 , \field Heat Exchanger U-Factor Times Area Value
         \type real
-        \units W/k
+        \units W/K
         \minimum> 0.0
         \autosizable
         \required-field
@@ -69413,10 +69585,15 @@ WaterHeater:Mixed,
        \note StorageTank mode always requests flow unless tank is at its Maximum Temperature Limit
        \note IndirectHeatPrimarySetpoint mode requests flow whenever primary setpoint calls for heat
        \note IndirectHeatAlternateSetpoint mode requests flow whenever alternate indirect setpoint calls for heat
-  A19; \field Indirect Alternate Setpoint Temperature Schedule Name
+  A19, \field Indirect Alternate Setpoint Temperature Schedule Name
        \note This field is only used if the previous is set to IndirectHeatAlternateSetpoint
        \type object-list
        \object-list ScheduleNames
+  A20; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \type alpha
+       \retaincase
+       \default General
 
 WaterHeater:Stratified,
        \memo Water heater with stratified, multi-node water tank. May be used to model a tankless
@@ -69434,6 +69611,7 @@ WaterHeater:Stratified,
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
   A2 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General
@@ -73681,8 +73859,10 @@ EnergyManagementSystem:MeteredOutputVariable,
        \key HeatRecoveryForCooling
        \key HeatRecoveryForHeating
   A8 , \field End-Use Subcategory
-       \type alpha
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note enter a user-defined subcategory for this metered output
+       \type alpha
+       \retaincase
   A9 ; \field Units
        \note optional but will result in dimensionless units for blank
        \note EnergyPlus units are standard SI units
@@ -76105,10 +76285,14 @@ Refrigeration:Case,
         \minimum -70.0
         \maximum 40.0
         \note Default is 5 C less than case operating temperature
-  N21;  \field Average Refrigerant Charge Inventory
+  N21,  \field Average Refrigerant Charge Inventory
         \units kg/m
         \type real
         \default 0.0
+  A15; \field Under Case HVAC Return Air Node Name
+       \note Name of the return air node for this case. 
+       \note If left blank, defaults to the first return air node for this zone.
+       \type node
 
 Refrigeration:CompressorRack,
         \memo Works in conjunction with the refrigeration case and walk-in objects to simulate the
@@ -76257,6 +76441,7 @@ Refrigeration:CompressorRack,
         \note conditions are the outdoor air conditions for the current timestep
         \note (e.g., no adjustment for height above ground).
   A13 , \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76495,6 +76680,7 @@ Refrigeration:Condenser:AirCooled,
         \note (e.g., no adjustment for height above ground).
         \note If the condenser rejects heat to a conditioned zone, enter the zone name here.
   A5 ,  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76638,6 +76824,7 @@ Refrigeration:Condenser:EvaporativeCooled,
         \note shutdown/draining of the water cooling system in cold climate applications.
         \note For periods with schedule values of 0, the condenser operates as Air Cooled.
   A6,   \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76730,6 +76917,7 @@ Refrigeration:Condenser:WaterCooled,
         \default 10.0
         \note related to the minimum allowed refrigeration system condensing temperature
   A6 ,  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -76860,6 +77048,7 @@ Refrigeration:GasCooler:AirCooled,
         \note conditions are the outdoor air conditions for the current timestep
         \note (e.g., no adjustment for height above ground).
   A5 ,  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -77045,6 +77234,7 @@ Refrigeration:Compressor,
         \note This is used if the compressor rating is based upon
         \note degrees of subcooling
    A4 , \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -77314,6 +77504,7 @@ Refrigeration:System,
         \type object-list
         \object-list ZoneNames
   A11,  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -77416,6 +77607,7 @@ Refrigeration:TranscriticalSystem,
         \type object-list
         \object-list ZoneNames
   A11;  \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -77577,7 +77769,8 @@ Refrigeration:SecondarySystem,
         \note This value refers to the refrigerant circulating within the primary system providing
         \note    cooling to the chiller for the secondary loop, not to the fluid circulating
         \note    within the secondary loop itself.
-  A9;  \field End-Use Subcategory
+  A9;   \field End-Use Subcategory
+        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
         \type alpha
         \retaincase
         \default General
@@ -79101,7 +79294,7 @@ Generator:CombustionTurbine,
        \note typical value .9
        \maximum 2
   N7, \field Maximum Exhaust Flow per Unit of Power Output
-      \units (Kg/s)/W
+      \units (kg/s)/W
   N8, \field Design Minimum Exhaust Temperature
        \units C
   N9, \field Design Air Inlet Temperature
@@ -81982,6 +82175,7 @@ WaterUse:Equipment,
        \type alpha
        \reference WaterUseEquipmentNames
   A2 , \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default General

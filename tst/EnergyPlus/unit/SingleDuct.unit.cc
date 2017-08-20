@@ -1311,8 +1311,11 @@ TEST_F( EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir ) {
 	SingleDuct::Sys( 1 ).ActualZoneNum = 1;
 	SingleDuct::Sys( 1 ).NoOAFlowInputFromUser = false;
 	SingleDuct::Sys( 1 ).OARequirementsPtr = 1;
+	SingleDuct::Sys( 1 ).AirLoopNum = 1;
 
 	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
+ 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;	
 	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 0.4;
 	DataAirLoop::AirLoopControlInfo( 1 ).AirLoopDCVFlag = true;
 
@@ -2480,6 +2483,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing )
 TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 
 	// Address #6205
+	// Address #6241
 
 	using SingleDuct::SysATMixer;
 	int ATMixerNum = 1;
@@ -2520,8 +2524,18 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 
 	DataEnvironment::StdRhoAir = 1.20;
 	SysATMixer( 1 ).MassFlowRateMaxAvail = 1.0;
-	SingleDuct::InitATMixer( 1, true );
+	// No airloop data exists, so skip these parts of the init
+	SysATMixer( 1 ).OneTimeInitFlag = false;
+	SysATMixer( 1 ).OneTimeInitFlag2 = false;
+	// Current occupancy
+	SysATMixer( 1 ).OAPerPersonMode = 1;
+	SysATMixer( 1 ).InitATMixer( true );
 	EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 0.72, 0.0001 );
+	// Design occupancy
+	SysATMixer( 1 ).OAPerPersonMode = 2;
+	Zone( 1 ).TotOccupants = 10;
+	SysATMixer(1).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 1.32, 0.0001 );
 
 	SysATMixer.deallocate( );
 	DataZoneEquipment::ZoneEquipConfig.deallocate( );

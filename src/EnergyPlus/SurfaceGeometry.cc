@@ -68,6 +68,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
+#include <DataZoneEquipment.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
@@ -2947,6 +2948,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				SurfaceTmp( SurfNum ).Vertex.allocate( SurfaceTmp( SurfNum ).Sides );
+				SurfaceTmp( SurfNum ).NewVertex.allocate( SurfaceTmp( SurfNum ).Sides );
 				GetVertices( SurfNum, SurfaceTmp( SurfNum ).Sides, rNumericArgs( {3,_} ) );
 				if ( SurfaceTmp( SurfNum ).Area <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Surface Area <= 0.0; Entered Area=" + TrimSigDigits( SurfaceTmp( SurfNum ).Area, 2 ) );
@@ -7133,8 +7135,12 @@ namespace SurfaceGeometry {
 		using namespace DataIPShortCuts;
 		using ScheduleManager::GetScheduleIndex;
 
+<<<<<<< HEAD
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
+=======
+		std::string const RoutineName("GetWindowGapAirflowControlData");
+>>>>>>> NREL/develop
 		int IOStat; // IO Status when calling get input subroutine
 		int ControlNumAlpha; // Number of control alpha names being passed
 		int ControlNumProp; // Number of control properties being passed
@@ -7243,6 +7249,21 @@ namespace SurfaceGeometry {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_OutdoorAir;
 				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "ReturnAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_ReturnAir;
+					int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex( Surface( SurfNum ).ZoneName );
+					if( controlledZoneNum > 0 ) DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+					// Set return air node number
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = 0;
+					std::string retNodeName = "";
+					if ( !lAlphaFieldBlanks( 7 ) ) {
+						retNodeName = cAlphaArgs( 7 );
+					}
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName );
+					if ( SurfaceWindow(SurfNum).AirflowReturnNodePtr == 0 ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Surface( SurfNum ).Name + "\", airflow window return air node not found for " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+						if ( !lAlphaFieldBlanks( 7 ) ) ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" did not find a matching return air node." );
+						ShowContinueError( "..Airflow windows with Airflow Destination = ReturnAir must reference a controlled Zone (appear in a ZoneHVAC:EquipmentConnections object) with at least one return air node." );
+						ErrorsFound = true;
+					}
 				}
 				if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "AlwaysOnAtMaximumFlow" ) ) {
 					SurfaceWindow( SurfNum ).AirflowControlType = AirFlowWindow_ControlType_MaxFlow;
