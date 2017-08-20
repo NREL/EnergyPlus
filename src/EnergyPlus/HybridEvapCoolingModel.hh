@@ -175,8 +175,9 @@ namespace EnergyPlus {
 			std::string Schedule; // Availability Schedule Name
 			int SchedPtr; // Pointer to the correct schedule
 	
-			Real64 SystemMaximumSupplyAirFlowRate;
-			Real64 ScalingFactor;
+			Real64 SystemMaximumSupplyAirFlowRate; //taken from IDF N1, the system max supply flow rate in m3/s.
+			Real64 ScalingFactor;  //taken from IDF N3, linear scaling factor.
+			Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the actual scaling factor used to multiply the 
 			
 			int UnitOn; //feels like it should be a bool but its an output and I couldn't get it to work as a bool 
 			Real64 UnitTotalCoolingRate;       // unit output to zone, total cooling rate [W]
@@ -266,7 +267,7 @@ namespace EnergyPlus {
 			Real64 SecOutletEnthalpy;
 			Real64 SecOutletPressure;
 			Real64 SecOutletRH;
-			Real64 ScaledSystemMaximumSupplyAirMassFlowRate;
+			
 			int OARequirementsPtr; // Index to DesignSpecification:OutdoorAir object
 			bool OutdoorAir;
 			Real64 MinOA_Msa;

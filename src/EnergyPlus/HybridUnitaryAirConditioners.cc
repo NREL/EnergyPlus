@@ -69,7 +69,7 @@
 #include <HybridUnitaryAirConditioners.hh>
 // EnergyPlus Headers
 #include <HybridEvapCoolingModel.hh>
-
+#include <DataEnvironment.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataAirSystems.hh>
@@ -488,9 +488,17 @@ namespace EnergyPlus {//***************
 					//TableValue * SysMaxSupply * ScalingFactor
 						//N3, \field Scaling Factor
 					ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(3);
+					// the two numbers above are used to generate a overal scaling factor 
+					if (DataEnvironment::StdRhoAir > 1)
+					{
+						ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = Numbers(1)*Numbers(3)*DataEnvironment::StdRhoAir;
+					}
+					else
+					{
+						ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = Numbers(1)*Numbers(3)*1.225;  
+					}
 					
-					ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = Numbers(1)*Numbers(3)*1.2041;
-					CMode* pMode;// = ZoneHybridUnitaryAirConditioner(UnitLoop).AddNewOperatingMode();
+					CMode* pMode;
 						//N4, \field Number of Operating Modes
 					int Numberofoperatingmodes = 0;
 					if (lNumericBlanks(4)) {
