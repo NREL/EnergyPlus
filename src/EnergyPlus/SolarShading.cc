@@ -251,18 +251,18 @@ namespace SolarShading {
 	Array1D< Real64 > YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
 	int maxNumberOfFigures( 0 );
 
-	int const NPhi( 6 ); // Number of altitude angle steps for sky integration
-	int const NTheta( 24 ); // Number of azimuth angle steps for sky integration
-	Real64 const Eps( 1.e-10 ); // Small number
-	Real64 const DPhi( PiOvr2 / NPhi ); // Altitude step size
-	Real64 const DTheta( 2.0 * Pi / NTheta ); // Azimuth step size
-	Real64 const DThetaDPhi( DTheta * DPhi ); // Product of DTheta and DPhi
-	Real64 const PhiMin( 0.5 * DPhi ); // Minimum altitude
+	int const NPhi = 6; // Number of altitude angle steps for sky integration
+	int const NTheta = 24; // Number of azimuth angle steps for sky integration
+	Real64 const Eps = 1.e-10; // Small number
+	Real64 const DPhi = PiOvr2 / NPhi; // Altitude step size
+	Real64 const DTheta = 2.0 * Pi / NTheta; // Azimuth step size
+	Real64 const DThetaDPhi = DTheta * DPhi; // Product of DTheta and DPhi
+	Real64 const PhiMin = 0.5 * DPhi; // Minimum altitude
 
-	std::vector< Real64 > SinPhi;
-	std::vector< Real64 > CosPhi;
-	std::vector< Real64 > SinTheta;
-	std::vector< Real64 > CosTheta;
+	std::vector< Real64 > sin_Phi;
+	std::vector< Real64 > cos_Phi;
+	std::vector< Real64 > sin_Theta;
+	std::vector< Real64 > cos_Theta;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
 
@@ -538,14 +538,14 @@ namespace SolarShading {
 		// Initialize these once
 		for( int IPhi = 1; IPhi <= NPhi; ++IPhi ) { // Loop over patch altitude values
 			Real64 Phi = PhiMin + ( IPhi - 1 ) * DPhi; // 7.5,22.5,37.5,52.5,67.5,82.5 for NPhi = 6
-			SinPhi.push_back( std::sin( Phi ) );
-			CosPhi.push_back( std::cos( Phi ) );
+			sin_Phi.push_back( std::sin( Phi ) );
+			cos_Phi.push_back( std::cos( Phi ) );
 		}
 
 		for( int ITheta = 1; ITheta <= NTheta; ++ITheta ) { // Loop over patch azimuth values
 			Real64 Theta = ( ITheta - 1 ) * DTheta; // 0,15,30,....,330,345 for NTheta = 24
-			SinTheta.push_back( std::sin( Theta ) );
-			CosTheta.push_back( std::cos( Theta ) );
+			sin_Theta.push_back( std::sin( Theta ) );
+			cos_Theta.push_back( std::cos( Theta ) );
 		}
 
 		firstTime = false;
@@ -3692,11 +3692,11 @@ namespace SolarShading {
 			WoShdgHoriz = 0.;
 
 			for ( int IPhi = 0; IPhi < NPhi; ++IPhi ) { // Loop over patch altitude values
-				SUNCOS( 3 ) = SinPhi[IPhi];
+				SUNCOS( 3 ) = sin_Phi[IPhi];
 
 				for ( int ITheta = 0; ITheta < NTheta; ++ITheta ) { // Loop over patch azimuth values
-					SUNCOS( 1 ) = CosPhi[IPhi] * CosTheta[ITheta];
-					SUNCOS( 2 ) = CosPhi[IPhi] * SinTheta[ITheta];
+					SUNCOS( 1 ) = cos_Phi[IPhi] * cos_Theta[ITheta];
+					SUNCOS( 2 ) = cos_Phi[IPhi] * sin_Theta[ITheta];
 
 					for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 						if ( !Surface( SurfNum ).ShadowingSurf && !Surface( SurfNum ).HeatTransSurf ) continue;
@@ -3711,7 +3711,7 @@ namespace SolarShading {
 
 						if ( CTHETA( SurfNum ) < 0.0 ) continue;
 
-						Fac1WoShdg = CosPhi[IPhi] * DThetaDPhi * CTHETA( SurfNum );
+						Fac1WoShdg = cos_Phi[IPhi] * DThetaDPhi * CTHETA( SurfNum );
 						SurfArea = Surface( SurfNum ).NetAreaShadowCalc;
 						if ( SurfArea > Eps ) {
 							FracIlluminated = SAREA( SurfNum ) / SurfArea;
@@ -8443,11 +8443,11 @@ namespace SolarShading {
 		}
 
 		for ( int IPhi = 0; IPhi < NPhi; ++IPhi ) { // Loop over patch altitude values
-			SUNCOS( 3 ) = SinPhi[IPhi];
+			SUNCOS( 3 ) = sin_Phi[IPhi];
 
 			for ( int ITheta = 0; ITheta < NTheta; ++ITheta ) { // Loop over patch azimuth values
-				SUNCOS( 1 ) = CosPhi[IPhi] * CosTheta[ITheta];
-				SUNCOS( 2 ) = CosPhi[IPhi] * SinTheta[ITheta];
+				SUNCOS( 1 ) = cos_Phi[IPhi] * cos_Theta[ITheta];
+				SUNCOS( 2 ) = cos_Phi[IPhi] * sin_Theta[ITheta];
 
 				for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) { // Cosine of angle of incidence on surface of solar
 					// radiation from patch
@@ -8467,7 +8467,7 @@ namespace SolarShading {
 
 					if ( CTHETA( SurfNum ) < 0.0 ) continue;
 
-					Fac1WoShdg = CosPhi[IPhi] * DThetaDPhi * CTHETA( SurfNum );
+					Fac1WoShdg = cos_Phi[IPhi] * DThetaDPhi * CTHETA( SurfNum );
 					SurfArea = Surface( SurfNum ).NetAreaShadowCalc;
 					if ( SurfArea > Eps ) {
 						FracIlluminated = SAREA( SurfNum ) / SurfArea;
@@ -8587,8 +8587,8 @@ namespace SolarShading {
 		ElevSun = PiOvr2 - std::acos( SolCosVec.z );
 		AzimSun = std::atan2( SolCosVec.x, SolCosVec.y );
 
-		Real64 const cos_ElevSun( std::cos( ElevSun ) );
-		Real64 const sin_ElevSun( std::sin( ElevSun ) );
+		Real64 const cos_ElevSun = std::cos( ElevSun );
+		Real64 const sin_ElevSun = std::sin( ElevSun );
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 

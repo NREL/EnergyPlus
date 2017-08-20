@@ -53,6 +53,9 @@
 ! their specific case. Following the example, only the curve fits of DX cooling and heating coils are provided.
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   AirLoopHVAC:UnitaryHeatPump:AirToAir,
     RooftopPackagedHeatpumpExample,  !- Name
     HVACAvailSched,          !- Availability Schedule Name

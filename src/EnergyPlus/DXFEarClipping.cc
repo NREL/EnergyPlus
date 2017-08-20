@@ -756,8 +756,8 @@ namespace DXFEarClipping {
 
 		Real64 const alpha180 = 180.0 - alpha; // amount to rotate
 		Real64 const alphrad = alpha180 / RadToDeg;
-		Real64 const cos_alphrad( std::cos( alphrad ) );
-		Real64 const sin_alphrad( std::sin( alphrad ) );
+		Real64 const cos_alphrad = std::cos( alphrad );
+		Real64 const sin_alphrad = std::sin( alphrad );
 
 		for ( int i = 1; i <= nsides; ++i ) {
 			xvt( i ) = cos_alphrad * polygon( i ).x + sin_alphrad * polygon( i ).y;
@@ -820,8 +820,8 @@ namespace DXFEarClipping {
 
 		Real64 const alpha = -surftilt;
 		Real64 const alphrad = alpha / RadToDeg;
-		Real64 const cos_alphrad( std::cos( alphrad ) );
-		Real64 const sin_alphrad( std::sin( alphrad ) );
+		Real64 const cos_alphrad = std::cos( alphrad );
+		Real64 const sin_alphrad = std::sin( alphrad );
 
 		for ( int i = 1; i <= nsides; ++i ) {
 			xvt( i ) = polygon( i ).x;

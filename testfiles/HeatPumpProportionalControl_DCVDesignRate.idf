@@ -968,14 +968,14 @@
     Until: 24:00,900.0;      !- Field 3
 
   Schedule:Compact,
-    CO2MinSchedule,     !- Name
+    CO2MinSchedule,          !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,300.0;      !- Field 3
 
   Schedule:Compact,
-    CO2MaxSchedule,     !- Name
+    CO2MaxSchedule,          !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
@@ -996,12 +996,12 @@
     Until: 24:00,1.0;        !- Field 3
 
   Schedule:Compact,
-    Minimum Outdoor Air Flow Rate Schedule,     !- Name
+    Minimum Outdoor Air Flow Rate Schedule,  !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,0.01;        !- Field 3
- 
+    Until: 24:00,0.01;       !- Field 3
+
   People,
     WestPeople,              !- Name
     West Zone,               !- Zone or ZoneList Name
@@ -1435,11 +1435,11 @@
     Sum,                     !- Outdoor Air Method
     0.002952,                !- Outdoor Air Flow per Person {m3/s-person}
     0.000381,                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow per Zone
-    ,                        !- Outdoor Air Flow Air Changes per Hour
+    ,                        !- Outdoor Air Flow per Zone {m3/s}
+    ,                        !- Outdoor Air Flow Air Changes per Hour {1/hr}
     ,                        !- Outdoor Air Schedule Name
     Minimum Outdoor Air Flow Rate Schedule;  !- Proportional Control Minimum Outdoor Air Flow Rate Schedule Name
-    
+
   DesignSpecification:OutdoorAir,
     CM DSOA DCV Zone List,   !- Name
     Sum,                     !- Outdoor Air Method

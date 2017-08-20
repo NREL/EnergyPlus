@@ -2605,17 +2605,17 @@ namespace WindowComplexManager {
 
 		UnitVect = Vector( 0.0, 0.0, 0.0 );
 
-		Real64 const sin_Phi( std::sin( Phi ) );
-		Real64 const cos_Phi( std::cos( Phi ) );
+		Real64 const sin_Phi = std::sin( Phi );
+		Real64 const cos_Phi = std::cos( Phi );
 
-		Real64 const sin_Gamma( std::sin( Gamma ) );
-		Real64 const cos_Gamma( std::cos( Gamma ) );
+		Real64 const sin_Gamma = std::sin( Gamma );
+		Real64 const cos_Gamma = std::cos( Gamma );
 
-		Real64 const sin_Alpha( std::sin( Alpha ) );
-		Real64 const cos_Alpha( std::cos( Alpha ) );
+		Real64 const sin_Alpha = std::sin( Alpha );
+		Real64 const cos_Alpha = std::cos( Alpha );
 
-		Real64 const sin_Theta( std::sin( Theta ) );
-		Real64 const cos_Theta( std::cos( Theta ) );
+		Real64 const sin_Theta = std::sin( Theta );
+		Real64 const cos_Theta = std::cos( Theta );
 
 		{ auto const SELECT_CASE_var( RadType );
 		if ( SELECT_CASE_var == Front_Incident ) { //W6 vector will point in direction of propagation, must reverse to get world vector

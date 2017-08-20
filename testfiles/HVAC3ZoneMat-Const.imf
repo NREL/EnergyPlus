@@ -1,8 +1,12 @@
 !  Version,
 !    8.3;                    !- Version Identifier
-
 !  Version,
 !    8.6;                    !- Version Identifier
+!  Version,
+!    8.7;                    !- Version Identifier
+
+!  Version,
+!    8.8;                    !- Version Identifier
 
   Material,
     A1 - 1 IN STUCCO,        !- Name

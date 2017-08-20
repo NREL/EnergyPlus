@@ -9,7 +9,6 @@ import fnmatch
 import os
 import subprocess
 import time
-import re
 
 # provide a nice usage function
 def usage():
@@ -24,7 +23,7 @@ if not len(sys.argv) == 4:
     usage()
     sys.exit(1)
 
-transition_exe_name = "Transition-V8-5-0-to-V8-6-0.exe"
+transition_exe_name = "Transition-V8-6-0-to-V8-7-0.exe"
 eplus_exe_name = "energyplus.exe"
 
 err_file = open("error.txt", 'w')
@@ -43,34 +42,30 @@ for ext in ['*.idf']:
             try:
                 # copy to transition
                 src_file_path = os.path.abspath(os.path.join(root,file))
-                shutil.copy(src_file_path, path_to_build)
-
-                # run transition
-                test_file_path = os.path.abspath(os.path.join(path_to_build, file))
-                transition_run = subprocess.Popen(["" + transition_exe_name, os.path.basename(test_file_path)], shell=True, cwd=path_to_build, stderr=subprocess.STDOUT)
-                transition_run.communicate()
-
-                time.sleep(.200)
 
                 # copy files to test file dir
                 base_test_file_name = file.split(".")[0]
                 test_file_dir = os.path.join(path_to_output, base_test_file_name)
-                try:
-                    if os.path.exists(test_file_dir):
-                        shutil.rmtree(test_file_dir)
+                test_file_path = os.path.abspath(os.path.join(test_file_dir, file))
 
-                    os.makedirs(test_file_dir)
-                except:
-                    pass
+                if os.path.exists(test_file_dir):
+                    shutil.rmtree(test_file_dir)
 
-                for _,_, copyfiles in os.walk(path_to_build):
-                    for copyfile in fnmatch.filter(copyfiles, base_test_file_name + ".*"):
-                        shutil.move(os.path.join(path_to_build, copyfile), test_file_dir)
+                os.makedirs(test_file_dir)
+
+                shutil.copy(src_file_path, test_file_dir)
+
+                # run transition
+                transition_run = subprocess.Popen(["" + transition_exe_name, test_file_path], shell=True, cwd=path_to_build, stderr=subprocess.STDOUT)
+                transition_run.communicate()
 
                 time.sleep(.200)
 
+                run_file_path = os.path.join(path_to_build, 'in.idf')
+                shutil.copy(test_file_path, run_file_path)
+
                 # run e+
-                eplus_run = subprocess.Popen(["" + eplus_exe_name, "-D", "-x", "-d", test_file_dir, os.path.join(test_file_dir, file)], shell=True, cwd=path_to_build, stderr=subprocess.STDOUT)
+                eplus_run = subprocess.Popen(["" + eplus_exe_name, "-D", "-x", "-d", test_file_dir], shell=True, cwd=path_to_build, stderr=subprocess.STDOUT)
                 eplus_run.communicate()
 
             except:

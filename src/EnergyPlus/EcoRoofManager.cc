@@ -596,7 +596,7 @@ namespace EcoRoofManager {
 			if ( Vfluxf < 0.0 ) Vfluxf = 0.0; // According to FASST Veg. Models p. 11, eqn 26-27, if Qfsat > qaf the actual
 			if ( Vfluxg < 0.0 ) Vfluxg = 0.0; // evaporative fluxes should be set to zero (delta_c = 1 or 0).
 
-			// P1, P2, P3 corespond to first, second and third terms of equation 37 in the main report.
+			// P1, P2, P3 correspond to first, second and third terms of equation 37 in the main report.
 
 			//   Note: the FASST model has a term -gamma_p*(1.0-exp...) in first line for P1 (c1_f) where gamma_p is
 			//   a precipitation variable. So, if we assume no precip this term vanishes. We should
@@ -606,21 +606,26 @@ namespace EcoRoofManager {
 			LeafTK = Tf + KelvinConv;
 			SoilTK = Tg + KelvinConv;
 
+			Real64 const pow_3_SoilTK( pow_3( SoilTK ) );
+			Real64 const pow_4_SoilTK( pow_4( SoilTK ) );
+			Real64 const pow_3_LeafTK( pow_3( LeafTK ) );
+			Real64 const pow_4_LeafTK( pow_4( LeafTK ) );
+
 			for ( EcoLoop = 1; EcoLoop <= 3; ++EcoLoop ) {
-				P1 = sigmaf * ( RS * ( 1.0 - Alphaf ) + epsilonf * Latm ) - 3.0 * sigmaf * epsilonf * epsilong * Sigma * pow_4( SoilTK ) / EpsilonOne - 3.0 * ( -sigmaf * epsilonf * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_4( LeafTK ) + sheatf * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * ( qsf - LeafTK * dqf ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 0.1 * sigmaf * Mg ) / dOne ) * ( qsg - SoilTK * dqg );
-				P2 = 4.0 * ( sigmaf * epsilonf * epsilong * Sigma ) * pow_3( SoilTK ) / EpsilonOne + 0.1 * sigmaf * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( 0.1 * sigmaf * Mg ) / dOne * dqg;
-				P3 = 4.0 * ( -sigmaf * epsilonf * Sigma - ( sigmaf * epsilonf * Sigma * epsilong ) / EpsilonOne ) * pow_3( LeafTK ) + ( 0.6 * sigmaf - 1.0 ) * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * dqf;
+				P1 = sigmaf * ( RS * ( 1.0 - Alphaf ) + epsilonf * Latm ) - 3.0 * sigmaf * epsilonf * epsilong * Sigma * pow_4_SoilTK / EpsilonOne - 3.0 * ( -sigmaf * epsilonf * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_4_LeafTK + sheatf * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * ( qsf - LeafTK * dqf ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 0.1 * sigmaf * Mg ) / dOne ) * ( qsg - SoilTK * dqg );
+				P2 = 4.0 * ( sigmaf * epsilonf * epsilong * Sigma ) * pow_3_SoilTK / EpsilonOne + 0.1 * sigmaf * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( 0.1 * sigmaf * Mg ) / dOne * dqg;
+				P3 = 4.0 * ( -sigmaf * epsilonf * Sigma - ( sigmaf * epsilonf * Sigma * epsilong ) / EpsilonOne ) * pow_3_LeafTK + ( 0.6 * sigmaf - 1.0 ) * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * dqf;
 
 				//T1G, T2G, & T3G corresponds to first, second & third terms of equation 38
 				//in the main report.
 				//  as with the equations for vegetation the first term in the ground eqn in FASST has a
 				//  term starting with gamma_p --- if no precip this vanishes. Again, revisit this issue later.
 
-				T1G = ( 1.0 - sigmaf ) * ( RS * ( 1.0 - Alphag ) + epsilong * Latm ) - ( 3.0 * ( sigmaf * epsilonf * epsilong * Sigma ) / EpsilonOne ) * pow_4( LeafTK ) - 3.0 * ( -( 1.0 - sigmaf ) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_4( SoilTK ) + sheatg * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + Rhoag * Ce * Leg * Waf * Mg * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + Rhoag * Ce * Leg * Waf * Mg * ( 0.1 * sigmaf * Mg / dOne - Mg ) * ( qsg - SoilTK * dqg ) + Rhoag * Ce * Leg * Waf * Mg * ( 0.6 * sigmaf * rn / dOne ) * ( qsf - LeafTK * dqf ) + Qsoilpart1 + Qsoilpart2 * ( KelvinConv ); //finished by T1G
+				T1G = ( 1.0 - sigmaf ) * ( RS * ( 1.0 - Alphag ) + epsilong * Latm ) - ( 3.0 * ( sigmaf * epsilonf * epsilong * Sigma ) / EpsilonOne ) * pow_4_LeafTK - 3.0 * ( -( 1.0 - sigmaf ) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_4_SoilTK + sheatg * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + Rhoag * Ce * Leg * Waf * Mg * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + Rhoag * Ce * Leg * Waf * Mg * ( 0.1 * sigmaf * Mg / dOne - Mg ) * ( qsg - SoilTK * dqg ) + Rhoag * Ce * Leg * Waf * Mg * ( 0.6 * sigmaf * rn / dOne ) * ( qsf - LeafTK * dqf ) + Qsoilpart1 + Qsoilpart2 * ( KelvinConv ); //finished by T1G
 
-				T2G = 4.0 * ( -( 1.0 - sigmaf ) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_3( SoilTK ) + ( 0.1 * sigmaf - 1.0 ) * sheatg + Rhoag * Ce * Leg * Waf * Mg * ( 0.1 * sigmaf * Mg / dOne - Mg ) * dqg - Qsoilpart2;
+				T2G = 4.0 * ( -( 1.0 - sigmaf ) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_3_SoilTK + ( 0.1 * sigmaf - 1.0 ) * sheatg + Rhoag * Ce * Leg * Waf * Mg * ( 0.1 * sigmaf * Mg / dOne - Mg ) * dqg - Qsoilpart2;
 
-				T3G = ( 4.0 * ( sigmaf * epsilong * epsilonf * Sigma ) / EpsilonOne ) * pow_3( LeafTK ) + 0.6 * sigmaf * sheatg + Rhoag * Ce * Leg * Waf * Mg * ( 0.6 * sigmaf * rn / dOne ) * dqf;
+				T3G = ( 4.0 * ( sigmaf * epsilong * epsilonf * Sigma ) / EpsilonOne ) * pow_3_LeafTK + 0.6 * sigmaf * sheatg + Rhoag * Ce * Leg * Waf * Mg * ( 0.6 * sigmaf * rn / dOne ) * dqf;
 
 				LeafTK = 0.5 * ( LeafTK + ( P1 * T2G - P2 * T1G ) / ( -P3 * T2G + T3G * P2 ) ); // take avg of old and new each iteration
 				SoilTK = 0.5 * ( SoilTK + ( P1 * T3G - P3 * T1G ) / ( -P2 * T3G + P3 * T2G ) ); // take avg of old and new each iteration
@@ -653,7 +658,7 @@ namespace EcoRoofManager {
 		Real64 const SoilThickness,
 		Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
 		Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-		int & ConstrNum, // Indicator for contruction index for the current surface
+		int & ConstrNum, // Indicator for construction index for the current surface
 		Real64 & Alphag,
 		int const EP_UNUSED( unit ), // unused1208
 		Real64 const EP_UNUSED( Tg ), // unused1208
