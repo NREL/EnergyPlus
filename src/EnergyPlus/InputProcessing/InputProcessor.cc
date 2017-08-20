@@ -180,7 +180,21 @@ namespace EnergyPlus {
 
 	void
 	InputProcessor::clear_state()
-	{}
+	{
+		idf_parser = std::unique_ptr< IdfParser >( new IdfParser() );
+		data = std::unique_ptr< DataStorage >( new DataStorage() );
+		epJSON = json::object();
+		objectCacheMap.clear();
+		unusedInputs.clear();
+
+		state = std::unique_ptr< State >( new State() );
+		state->initialize( & schema );
+		const auto state_ptr = state.get();
+		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed ) -> bool {
+			state_ptr->traverse( event, parsed, 999999999, 999999999 );
+			return true;
+		};
+	}
 
 	std::vector < std::string > const & InputProcessor::validationErrors() {
 		return state->validationErrors();

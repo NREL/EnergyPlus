@@ -1131,12 +1131,12 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 		DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate( 1 );
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 10000.0;
 
-		EXPECT_EQ( DataLoopNode::NodeID( 2 ), "SPACE1-1 IN NODE" );
+		EXPECT_EQ( DataLoopNode::NodeID( 4 ), "SPACE1-1 IN NODE" );
 		EXPECT_EQ( DataLoopNode::NodeID( 5 ), "SPACE1-1 NODE" );
 
-		DataLoopNode::Node( 2 ).MassFlowRateMax = 1.0; // zone inlet node air flow rate, kg/s
-		DataLoopNode::Node( 2 ).HumRat = 0.075; // zone inlet node air hum ratio, kg/kg
-		DataLoopNode::Node( 2 ).Temp = 40.0; // zone inlet node air temperature, deg C
+		DataLoopNode::Node( 4 ).MassFlowRateMax = 1.0; // zone inlet node air flow rate, kg/s
+		DataLoopNode::Node( 4 ).HumRat = 0.075; // zone inlet node air hum ratio, kg/kg
+		DataLoopNode::Node( 4 ).Temp = 40.0; // zone inlet node air temperature, deg C
 		DataLoopNode::Node( 5 ).Temp = 21.0; // zone air node temperature set to 21.0 deg C
 
 		SetPointManager::SimSetPointManagers();
@@ -1148,8 +1148,8 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 		Real64 CpAir( 0.0 );
 		Real64 ZoneSetPointTemp( 0.0 );
 
-		CpAir = Psychrometrics::PsyCpAirFnWTdb( DataLoopNode::Node( 2 ).HumRat, DataLoopNode::Node( 2 ).Temp );
-		ZoneSetPointTemp = DataLoopNode::Node( 5 ).Temp + DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired / ( CpAir * DataLoopNode::Node( 2 ).MassFlowRateMax );
+		CpAir = Psychrometrics::PsyCpAirFnWTdb( DataLoopNode::Node( 4 ).HumRat, DataLoopNode::Node( 4 ).Temp );
+		ZoneSetPointTemp = DataLoopNode::Node( 5 ).Temp + DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired / ( CpAir * DataLoopNode::Node( 4 ).MassFlowRateMax );
 		// check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
 		EXPECT_EQ( DataLoopNode::NodeID( 12 ), "HCOIL OUTLET NODE" );
 		EXPECT_DOUBLE_EQ( ZoneSetPointTemp, SetPointManager::ColdestSetPtMgr( 1 ).SetPt ); // 29.74 deg C

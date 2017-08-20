@@ -81,12 +81,6 @@ namespace EnergyPlus {
 
 		InputProcessor();
 
-		// Clears the global data in InputProcessor.
-		// Needed for unit tests, should not be normally called.
-		static
-		void
-		clear_state();
-
 		static
 		std::unique_ptr< InputProcessor >
 		factory();
@@ -265,6 +259,9 @@ namespace EnergyPlus {
 			}
 			return s;
 		}
+
+		void
+		clear_state();
 
 		using UnorderedObjectTypeMap = std::unordered_map < std::string, std::string >;
 		using UnorderedObjectCacheMap = std::unordered_map< std::string, ObjectCache >;

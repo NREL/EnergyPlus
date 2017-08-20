@@ -225,14 +225,14 @@ using json = nlohmann::json;
 
 namespace EnergyPlus {
 
-	void EnergyPlusFixture::SetUpTestCase() {}
+	void EnergyPlusFixture::SetUpTestCase() {
+		EnergyPlus::inputProcessor = InputProcessor::factory();
+	}
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
 
 		show_message();
-
-		EnergyPlus::inputProcessor = InputProcessor::factory();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->eio_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -368,7 +368,7 @@ namespace EnergyPlus {
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		HybridModel::clear_state();
-		InputProcessor::clear_state();
+		EnergyPlus::inputProcessor->clear_state();
 		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();

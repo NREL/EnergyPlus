@@ -336,7 +336,8 @@ TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 )
 
 	EXPECT_TRUE( process_idf( idf_objects, false ) );
 
-	EXPECT_ANY_THROW( ( EnergyPlus::inputProcessor->objectFactory< GroundHeatExchangers::GLHEVert >( "Vertical GHE JL2015" ) ) );
+	// This should not throw since number of data pairs will now automatically be set to the actual number of gfunctions if they don't match.
+	EXPECT_NO_THROW( ( EnergyPlus::inputProcessor->objectFactory< GroundHeatExchangers::GLHEVert >( "Vertical GHE JL2015" ) ) );
 
 }
 
