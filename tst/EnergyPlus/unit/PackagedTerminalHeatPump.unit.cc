@@ -525,6 +525,24 @@ namespace EnergyPlus {
 		EXPECT_EQ( Fan( 1 ).MaxAirFlowRate, max( VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate, VariableSpeedCoils::VarSpeedCoil( 2 ).RatedAirVolFlowRate ) );
 		EXPECT_EQ( Fan( 1 ).MaxAirFlowRate, max( PTUnit( 1 ).MaxCoolAirVolFlow, PTUnit( 1 ).MaxHeatAirVolFlow ) );
 
+		// Initialize the packaged terminal heat pump
+		Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor ON airflow to average airflow over timestep
+		Real64 ZoneLoad( 0.0 );// cooling or heating needed by zone [watts]
+
+		InitPTUnit( 1, DataSizing::CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad );
+
+		// check that an intermediate speed has the correct flow ratio
+		Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
+		Real64 expectedAirFlowRate = refAirflowRatio * PTUnit( 1 ).MaxCoolAirVolFlow;
+		EXPECT_NEAR( expectedAirFlowRate, PTUnit( 1 ).CoolVolumeFlowRate( 4 ), 0.00001 );
+		EXPECT_NEAR( expectedAirFlowRate, 3.9343830134190632, 0.00001 );
+
+		refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference heating data and full flow rate at speed 9
+		expectedAirFlowRate = refAirflowRatio * PTUnit( 1 ).MaxHeatAirVolFlow;
+		EXPECT_NEAR( expectedAirFlowRate, PTUnit( 1 ).HeatVolumeFlowRate( 4 ), 0.00001 );
+		EXPECT_NEAR( expectedAirFlowRate, 3.0302392264439715, 0.00001 );
+
+
 		// #6028 child components not sizing correctly on air flow rate
 		// VS coils set SystemAirFlow to true and AirVolFlow to a value, all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and HeatingAirVolFlow
 		EXPECT_TRUE( ZoneEqSizing( 1 ).SystemAirFlow );
@@ -885,3 +903,4 @@ namespace EnergyPlus {
 
 	}
 }
+

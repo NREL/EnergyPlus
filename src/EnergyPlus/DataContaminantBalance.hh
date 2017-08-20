@@ -404,6 +404,11 @@ namespace DataContaminantBalance {
 	extern Array1D< ZoneContamGenericDataDVS > ZoneContamGenericDVS;
 	extern Array1D< ZoneContamGenericDataDRS > ZoneContamGenericDRS;
 
+	// Clears the global data in DataContaminantBalance.
+	// Needed for unit tests, should not be normally called.
+	void
+		clear_state();
+
 } // DataContaminantBalance
 
 } // EnergyPlus

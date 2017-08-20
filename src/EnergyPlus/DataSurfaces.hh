@@ -670,6 +670,7 @@ namespace DataSurfaces {
 		bool MovInsulIntPresent; // True when movable insulation is present
 		bool MovInsulIntPresentPrevTS; // True when movable insulation was present during the previous time step
 		// Vertices
+		Array1D< Vector > NewVertex;
 		Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
 		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
 		Vector lcsx;
@@ -1103,6 +1104,7 @@ namespace DataSurfaces {
 		Real64 GlTsolDifDif; // Time-step value of glass diffuse-diffuse solar transmittance (-)
 		int AirflowSource; // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
 		int AirflowDestination; // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
+		int AirflowReturnNodePtr; // Return node pointer for destination = ReturnAir
 		Real64 MaxAirflow; // Maximum gap airflow (m3/s per m of glazing width)
 		int AirflowControlType; // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
 		bool AirflowHasSchedule; // True if gap airflow is scheduled
@@ -1284,6 +1286,7 @@ namespace DataSurfaces {
 			GlTsolDifDif( 0.0 ),
 			AirflowSource( 0 ),
 			AirflowDestination( 0 ),
+			AirflowReturnNodePtr( 0 ),
 			MaxAirflow( 0.0 ),
 			AirflowControlType( 0 ),
 			AirflowHasSchedule( false ),

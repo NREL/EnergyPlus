@@ -15,6 +15,9 @@
 !===============================================================================
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Construction,
     Light Exterior Wall,     !- Name
     F08 Metal surface,       !- Outside Layer
