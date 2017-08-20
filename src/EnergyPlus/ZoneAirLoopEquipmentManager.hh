@@ -89,9 +89,9 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	InitZoneAirLoopEquipment(
-		bool const FirstHVACIteration, // unused1208
 		int const AirDistUnitNum,
-		int const ZoneNum
+		int const ControlledZoneNum,
+		int const ActualZoneNum
 	);
 
 	void

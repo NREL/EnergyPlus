@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <HVACInterfaceManager.hh>
+#include <DataAirLoop.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
@@ -136,8 +137,6 @@ namespace HVACInterfaceManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   October 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages any generic HVAC loop interface.
@@ -147,34 +146,49 @@ namespace HVACInterfaceManager {
 		// from the outlet of one side of the loop get transfered directly
 		// to the inlet node of the corresponding other side of the loop.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using DataLoopNode::Node;
 		using namespace DataConvergParams;
 		using DataContaminantBalance::Contaminant;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
 		Real64 DeltaEnergy;
-		// FLOW:
+
+		if ( ( CalledFrom == CalledFromAirSystemDemandSide ) && ( OutletNode == 0 ) ) {
+			// Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
+			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 1 ) = false;
+
+			Real64 totDemandSideMassFlow = 0.0;
+			Real64 totDemandSideMinAvail = 0.0;
+			Real64 totDemandSideMaxAvail = 0.0;
+			for ( int demIn = 1; demIn <= DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumSupplyNodes; ++demIn ) {
+				int demInNode =  DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).ZoneEquipSupplyNodeNum( demIn );
+				totDemandSideMassFlow +=  Node( demInNode ).MassFlowRate;
+				totDemandSideMinAvail +=  Node( demInNode ).MassFlowRateMinAvail;
+				totDemandSideMaxAvail +=  Node( demInNode ).MassFlowRateMaxAvail;
+			}
+			TmpRealARR = AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue;
+			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) = std::abs( totDemandSideMassFlow - Node( InletNode ).MassFlowRate );
+			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
+			if ( AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) > HVACFlowRateToler ) {
+				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = true;
+				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+			}
+
+			Node( InletNode ).MassFlowRate = totDemandSideMassFlow;
+			Node( InletNode ).MassFlowRateMinAvail = totDemandSideMinAvail;
+			Node( InletNode ).MassFlowRateMaxAvail = totDemandSideMaxAvail;
+			return;
+		}
 
 		//Calculate the approximate energy difference across interface for comparison
 		DeltaEnergy = HVACCpApprox * ( ( Node( OutletNode ).MassFlowRate * Node( OutletNode ).Temp ) - ( Node( InletNode ).MassFlowRate * Node( InletNode ).Temp ) );
 
-		if ( CalledFrom == CalledFromAirSystemDemandSide ) {
+		if ( ( CalledFrom == CalledFromAirSystemDemandSide ) && ( OutletNode > 0 ) ) {
 
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
 			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = false;
