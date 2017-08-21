@@ -265,7 +265,7 @@ namespace EnergyPlus {
 		std::string line;
 		while (std::getline(input_stream, line))
 		{
-			input_file.append(line + NL);
+			input_file.append(line + DataStringGlobals::NL);
 		}
 		// std::ifstream::pos_type size = input_stream.tellg();
 		// char *memblock = new char[(size_t) size + 1];
