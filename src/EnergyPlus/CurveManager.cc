@@ -6941,10 +6941,10 @@ Label999: ;
 			TableLookup( Tables( TableNum ) ).NumX2Vars = size( PerfCurveTableData( Tables( TableNum ) ).X2 );
 			TableLookup( Tables( TableNum ) ).X1Var.allocate( TableLookup( Tables( TableNum ) ).NumX1Vars );
 			TableLookup( Tables( TableNum ) ).X2Var.allocate( TableLookup( Tables( TableNum ) ).NumX2Vars );
-			TableLookup( Tables( TableNum ) ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( Tables( TableNum ) ).Y( _, 1 ) ), size( PerfCurveTableData( Tables( TableNum ) ).Y( 1, _ ) ) );
+			TableLookup( Tables( TableNum ) ).TableLookupZData.allocate( 1, 1, 1, 1, size( PerfCurveTableData( Tables( TableNum ) ).Y( _, 1 ) ), size( PerfCurveTableData( Tables( TableNum ) ).Y( 1, _ ) ) );
 			TableLookup( Tables( TableNum ) ).X1Var = PerfCurveTableData( Tables( TableNum ) ).X1;
 			TableLookup( Tables( TableNum ) ).X2Var = PerfCurveTableData( Tables( TableNum ) ).X2;
-			TableLookup( Tables( TableNum ) ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( Tables( TableNum ) ).Y( _, _ );
+			TableLookup( Tables( TableNum ) ).TableLookupZData( 1, 1, 1, 1, _, _ ) = PerfCurveTableData( Tables( TableNum ) ).Y( _, _ );
 		}
 
 		XX1.deallocate( );
@@ -7119,10 +7119,10 @@ Label999: ;
 				TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars = size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2 );
 				TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var.allocate( TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars );
 				TableLookup( PerfCurve( TableNum ).TableIndex ).X2Var.allocate( TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars );
-				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, 1 ) ), size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( 1, _ ) ) );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData.allocate( 1, 1, 1, 1, size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, 1 ) ), size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( 1, _ ) ) );
 				TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1;
 				TableLookup( PerfCurve( TableNum ).TableIndex ).X2Var = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2;
-				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, _ );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData( 1, 1, 1, 1, _, _ ) = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, _ );
 			}
 		}
 
