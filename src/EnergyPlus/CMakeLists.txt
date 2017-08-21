@@ -591,6 +591,7 @@ add_custom_target( GenerateEmbeddedEpJSONSchema
                            -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
                            -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}"
                            -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
+                           -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddedable_epJSON_schema>"
                            -P "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    DEPENDS generate_embeddedable_epJSON_schema )

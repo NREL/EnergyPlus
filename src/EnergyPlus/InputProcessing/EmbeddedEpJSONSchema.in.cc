@@ -46,10 +46,18 @@
 
 #include <InputProcessing/EmbeddedEpJSONSchema.hh>
 
+#include <array>
+
 namespace EnergyPlus {
 
-const std::vector<uint8_t> embeddedEpJSONSchema = {
+namespace EmbeddedEpJSONSchema {
+
 ${embedded_epJSON_schema}
-};
+
+	std::pair< std::uint8_t const *, size_t > embeddedEpJSONSchema() {
+		return std::make_pair( embeddedSchema.data(), embeddedSchema.size() );
+	}
+
+}
 
 }
