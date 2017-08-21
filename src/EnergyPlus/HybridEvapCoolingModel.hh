@@ -43,6 +43,7 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
+
 #ifndef HybridEvapCoolingModel_hh_INCLUDED
 #define HybridEvapCoolingModel_hh_INCLUDED
 #include <iostream>  
@@ -123,23 +124,23 @@ namespace EnergyPlus {
 			Real64 Maximum_Return_Air_Relative_Humidity;
 			Real64 NormalizationReference;
 			Real64 Correction;
-			bool CMode::ValidPointer(int curve_pointer);
-			bool CMode::ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
-			bool CMode::ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
-			bool CMode::ParseMode0(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
+			bool ValidPointer(int curve_pointer);
+			bool ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
+			bool ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
+			bool ParseMode0(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
 		
-			void CMode::InitializeCurve( int curveType, int CurveID);
-			Real64 CMode::CalculateCurveVal(Real64 X_0, Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int mode_number, int curve_ID);
-			bool CMode::InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
-			bool CMode::InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
-			bool CMode::InitializeOutsideAirTemperatureConstraints(Real64 min, Real64 max);
-			bool CMode::InitializeOutsideAirHumidityRatioConstraints(Real64 min, Real64 max);
-			bool CMode::InitializeOutsideAirRelativeHumidityConstraints(Real64 min, Real64 max);
-			bool CMode::InitializeReturnAirTemperatureConstraints(Real64 min, Real64 max);
-			bool CMode::InitializeReturnAirHumidityRatioConstraints(Real64 min, Real64 max);
-			bool CMode::InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max); 
-			bool CMode::GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
-			bool CMode::MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
+			void InitializeCurve( int curveType, int CurveID);
+			Real64 CalculateCurveVal(Real64 X_0, Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
+			bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
+			bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
+			bool InitializeOutsideAirTemperatureConstraints(Real64 min, Real64 max);
+			bool InitializeOutsideAirHumidityRatioConstraints(Real64 min, Real64 max);
+			bool InitializeOutsideAirRelativeHumidityConstraints(Real64 min, Real64 max);
+			bool InitializeReturnAirTemperatureConstraints(Real64 min, Real64 max);
+			bool InitializeReturnAirHumidityRatioConstraints(Real64 min, Real64 max);
+			bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max); 
+			bool GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
+			bool MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
 		private:
 		
 		};
@@ -261,7 +262,7 @@ namespace EnergyPlus {
 			Real64 averageOSAF;
 			int CurrentPrimaryMode();
 			Real64 CurrentPrimaryRuntimeFraction();
-			Real64 Model::CalculatePartRuntimeFraction(Real64 MinOA_Msa, Real64 Mvent, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 SensibleRoomORZone, Real64 RequestedDehumidificationLoad, Real64 RequestedMoistureLoad, Real64 LatentRoomORZone);
+			Real64 CalculatePartRuntimeFraction(Real64 MinOA_Msa, Real64 Mvent, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 SensibleRoomORZone, Real64 RequestedDehumidificationLoad, Real64 RequestedMoistureLoad, Real64 LatentRoomORZone);
 			int ErrorCode;
 			int InletNode;
 			int OutletNode;
@@ -313,24 +314,24 @@ namespace EnergyPlus {
 			bool OutdoorAir;
 			Real64 MinOA_Msa;
 
-			int Model::GetID();            // accessor function
-			void Model::SetID(int vID) { ID = vID; };    // accessor function
-			void Model::doStep(Real64 Tosa, Real64 Tra, Real64 RHosa, Real64 RHra, Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
-			void Model::Initialize(int ZoneNumber);
-			CMode* Model::AddNewOperatingMode(Real64 correction);
-			void Model::InitializeModelParams();
-			void Model::ResetOutputs();
-			void Model::ModelLog(std::string fmuLocation);
-			Real64 Model::CalcHum_ratio_W(Real64 Tdb, Real64 RH, Real64 P);
-			bool Model::MeetsSupplyAirTOC(Real64 Tosa);
-			bool Model::MeetsSupplyAirRHOC(Real64 Wosa);
-			Real64 Model::CheckVal_T(Real64 T);
-			Real64 Model::CheckVal_W(Real64 W);
-			bool Model::SetStandByMode(CMode* pMode0, CSetting *pStandBy, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
-			Real64 Model::CalculateTimeStepAverage(SYSTEMOUTPUTS val);
-			int Model::SetOperatingSetting(CStepInputs StepIns);
-			Real64 Model::Sat_press(Real64 Tdb);
-			Real64 Model::Part_press(Real64 P, Real64 W);
+			int GetID();            // accessor function
+			void SetID(int vID) { ID = vID; };    // accessor function
+			void doStep(Real64 Tosa, Real64 Tra, Real64 RHosa, Real64 RHra, Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
+			void Initialize(int ZoneNumber);
+			CMode* AddNewOperatingMode(Real64 correction);
+			void InitializeModelParams();
+			void ResetOutputs();
+			void ModelLog(std::string fmuLocation);
+			Real64 CalcHum_ratio_W(Real64 Tdb, Real64 RH, Real64 P);
+			bool MeetsSupplyAirTOC(Real64 Tosa);
+			bool MeetsSupplyAirRHOC(Real64 Wosa);
+			Real64 CheckVal_T(Real64 T);
+			Real64 CheckVal_W(Real64 W);
+			bool SetStandByMode(CMode* pMode0, CSetting *pStandBy, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
+			Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
+			int SetOperatingSetting(CStepInputs StepIns);
+			Real64 Sat_press(Real64 Tdb);
+			Real64 Part_press(Real64 P, Real64 W);
 			
 			Real64 Tsa;
 			Real64 Wsa;

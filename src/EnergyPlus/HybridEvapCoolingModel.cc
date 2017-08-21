@@ -1,10 +1,7 @@
-//EnergyPlus, Copyright(c) 1996 - 2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,16 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
-
 
 // C++ Headers
 #include <HybridEvapCoolingModel.hh>
@@ -183,7 +170,7 @@ namespace EnergyPlus {//***************
 			if (curve_pointer >= 0) return true;
 			else  return false;
 		}
-		Real64 CMode::CalculateCurveVal(Real64 X_0, Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int mode_number, int curveType)
+		Real64 CMode::CalculateCurveVal(Real64 X_0, Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curveType)
 		{
 			Real64 Y_val = 0;
 
@@ -297,7 +284,7 @@ namespace EnergyPlus {//***************
 
 			bool ErrorsFound = false;
 			int inter_Alpha = BLOCK_HEADER_OFFSET_Alpha + MODE_BLOCK_OFFSET_Alpha * ModeID;
-			int inter_Number = BLOCK_HEADER_OFFSET_Number + MODE_BLOCK_OFFSET_Number* ModeID;
+			
 			std::ostringstream strs;
 			strs << ModeID;
 
@@ -606,9 +593,9 @@ namespace EnergyPlus {//***************
 			RHsaMin_schedule_pointer(0),
 			RHsaMax_schedule_pointer(0),
 			ZoneNum(0),
-			SystemMaximumSupplyAirFlowRate(0),
-			ScaledSystemMaximumSupplyAirMassFlowRate(0),
-			ScalingFactor(0),
+			SystemMaximumSupplyAirFlowRate(0.0),
+			ScaledSystemMaximumSupplyAirMassFlowRate(0.0),
+			ScalingFactor(0.0),
 			SchedPtr(0),
 			UnitTotalCoolingRate(0.0),
 			UnitTotalCoolingEnergy(0.0),
@@ -915,7 +902,6 @@ namespace EnergyPlus {//***************
 
 		bool Model::SetStandByMode(CMode* pMode0, CSetting *pStandBy, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra)
 		{
-			bool error;
 			CModeSolutionSpace* solutionspace = &(pMode0->sol);
 			int solution_map_sizeX = solutionspace->PointX.size();
 			Real64 NormalizationReference = GetNormalPoint(1);// assumes the model has at least 1 curve and that all are set the same, this is explained in the IO reference
@@ -925,7 +911,7 @@ namespace EnergyPlus {//***************
 				Real64 MsaRatio = solutionspace->PointX[0];
 				Real64 Msa = NormalizationReference * MsaRatio;
 				Real64 OSAF = solutionspace->PointY[0];
-				Real64 ElectricalPower = pMode0->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, Msa, OSAF, 0, POWER_CURVE);
+				Real64 ElectricalPower = pMode0->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, Msa, OSAF, POWER_CURVE);
 				pStandBy->ElectricalPower = ElectricalPower;
 				pStandBy->Supply_Air_Mass_Flow_Rate = Msa;
 				pStandBy->Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
@@ -956,13 +942,27 @@ namespace EnergyPlus {//***************
 				// add up part runtime fractions
 				switch (val)
 				{
-					case SYSTEMOUTPUTS::VENTILATION_AIR_V:  value = po->Supply_Air_Ventilation_Volume; break;
-					case SYSTEMOUTPUTS::SYSTEM_FUEL_USE:  value = po->ElectricalPower; break;
-					case SYSTEMOUTPUTS::SUPPLY_AIR_TEMP:  value = po->SupplyAirTemperature * po->Supply_Air_Mass_Flow_Rate; break;
-					case SYSTEMOUTPUTS::MIXED_AIR_TEMP:  value = po->Mixed_Air_Temperature * po->Supply_Air_Mass_Flow_Rate; break;
-					case SYSTEMOUTPUTS::SUPPLY_MASS_FLOW:  value = po->Supply_Air_Mass_Flow_Rate; break;
-					case SYSTEMOUTPUTS::SUPPLY_AIR_HR:  value = po->SupplyAirW * po->Supply_Air_Mass_Flow_Rate; break;
-					case SYSTEMOUTPUTS::MIXED_AIR_HR:  value = po->Mixed_Air_W * po->Supply_Air_Mass_Flow_Rate; break;
+					case SYSTEMOUTPUTS::VENTILATION_AIR_V:  
+						value = po->Supply_Air_Ventilation_Volume;
+						break;
+					case SYSTEMOUTPUTS::SYSTEM_FUEL_USE:  
+						value = po->ElectricalPower;
+						break;
+					case SYSTEMOUTPUTS::SUPPLY_AIR_TEMP: 
+						value = po->SupplyAirTemperature * po->Supply_Air_Mass_Flow_Rate; 
+						break;
+					case SYSTEMOUTPUTS::MIXED_AIR_TEMP:  
+						value = po->Mixed_Air_Temperature * po->Supply_Air_Mass_Flow_Rate;
+						break;
+					case SYSTEMOUTPUTS::SUPPLY_MASS_FLOW:  
+						value = po->Supply_Air_Mass_Flow_Rate; 
+						break;
+					case SYSTEMOUTPUTS::SUPPLY_AIR_HR:  
+						value = po->SupplyAirW * po->Supply_Air_Mass_Flow_Rate; 
+						break;
+					case SYSTEMOUTPUTS::MIXED_AIR_HR:  
+						value = po->Mixed_Air_W * po->Supply_Air_Mass_Flow_Rate; 
+						break;
 						
 				}
 				Real64 part_run = po->Runtime_Fraction;
@@ -1064,7 +1064,6 @@ namespace EnergyPlus {//***************
 			Real64 Msa = 0;
 			Real64 Mvent = 0;
 			Real64 pOptimal_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
-			Real64 pVentOnly_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
 			Real64 EIR;
 			Real64 ElectricalPower;
 			Real64 SHR;
@@ -1109,9 +1108,6 @@ namespace EnergyPlus {//***************
 			{
 				HumidificationRequested = true;
 			}
-			//RequestedHumdification = StepIns.ZoneMoistureLoad;
-			//RequestedDeHumdification = StepIns.ZoneDehumidificationLoad;
-			Real64 averaged_requestedLoad = 0;
 
 			std::list<CMode*>::const_iterator iterator;
 			iterator = OperatingModes.begin();
@@ -1124,7 +1120,7 @@ namespace EnergyPlus {//***************
 				bool SAT_OC_MetinMode = false;
 				int solution_map_sizeX = solutionspace->PointX.size() - 1;
 				int solution_map_sizeY = solutionspace->PointY.size() - 1;
-				int solution_map_sizeM = solutionspace->PointMeta.size() - 1;
+				
 				if (solution_map_sizeX != solution_map_sizeY)
 				{
 					ShowWarningError("Error in solution space mapping, suggest adjusting operating constraints.");
@@ -1177,7 +1173,7 @@ namespace EnergyPlus {//***************
 							//all these points meet the minimum VR requirement
 							solutionspace->PointMeta[point_number] = 1;
 							// Calculate prospective supply air temperature
-							Tsa = pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, modenumber, TEMP_CURVE);
+							Tsa = pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, TEMP_CURVE);
 							// Check it meets constraints
 							if (MeetsSupplyAirTOC(Tsa))
 							{
@@ -1188,7 +1184,7 @@ namespace EnergyPlus {//***************
 								SAT_OC_Met = false;
 							}
 							// Calculate prospective supply air Humidity Ratio
-							Wsa = pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, modenumber, W_CURVE);
+							Wsa = pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, W_CURVE);
 							//Return Air Relative Humidity(0 - 100 % ) //Return Air Humidity Ratio(g / g)
 							if (MeetsSupplyAirRHOC(Wsa))
 							{
@@ -1274,15 +1270,15 @@ namespace EnergyPlus {//***************
 				Real64 latentRoomORZone = 2257 * MsaDry*(Wra - Wsa);
 				// Total room cooling
 				Real64 TotalRoomORZone = (Hra - Hsa) * Msa / 1000;     
-				//Perform latent check
-				Real64 LatentRoomORZone = TotalRoomORZone - SensibleRoomORZone;
+				//Perform latent check 
+				Real64 latentRoomORZoneCheck = TotalRoomORZone - SensibleRoomORZone;
 
 				pSetting->TotalSystem = TotalSystem;
 				pSetting->SensibleSystem = SensibleSystem;
 				pSetting->LatentSystem = LatentSystem;
 				pSetting->TotalZone = TotalRoomORZone;
 				pSetting->SensibleZone = SensibleRoomORZone;
-				pSetting->LatentZone = LatentRoomORZone;
+				pSetting->LatentZone = latentRoomORZone;
 
 				bool Conditioning_load_met = false;
 				if (CoolingRequested && (SensibleRoomORZone > StepIns.RequestedCoolingLoad))
@@ -1301,11 +1297,11 @@ namespace EnergyPlus {//***************
 				bool Humidification_load_met = false;
 				//bool Humidification_load_met = false;
 				Real64 RequestedHumdificationLoad_kw = RequestedHumdificationLoad / 1000;
-				if (DehumidificationRequested && LatentRoomORZone > RequestedHumdificationLoad_kw)
+				if (DehumidificationRequested && latentRoomORZone > RequestedHumdificationLoad_kw)
 				{
 					Humidification_load_met = true;
 				}
-				if (HumidificationRequested && LatentRoomORZone < RequestedHumdificationLoad_kw)
+				if (HumidificationRequested && latentRoomORZone < RequestedHumdificationLoad_kw)
 				{
 					Humidification_load_met = true;
 				}
@@ -1315,7 +1311,7 @@ namespace EnergyPlus {//***************
 					Humidification_load_met = true;
 				}
 	
-				Real64 Y_val = pSetting->pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, modenumber, POWER_CURVE); //fix modenumber not set
+				Real64 Y_val = pSetting->pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, POWER_CURVE); //fix modenumber not set
 				ElectricalPower = Y_val;  // [Kw] calculations for fuel in Kw
 				pSetting->ElectricalPower = ElectricalPower;
 
@@ -1325,7 +1321,7 @@ namespace EnergyPlus {//***************
 
 				// Calculate partload fraction required to meet all requirements
 				Real64 PartRuntimeFraction = 0;
-				PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa, pSetting->Supply_Air_Ventilation_Volume*StdRhoAir, StepIns.RequestedCoolingLoad, StepIns.RequestedHeatingLoad, SensibleRoomORZone, StepIns.ZoneDehumidificationLoad, StepIns.ZoneMoistureLoad, LatentRoomORZone);//
+				PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa, pSetting->Supply_Air_Ventilation_Volume*StdRhoAir, StepIns.RequestedCoolingLoad, StepIns.RequestedHeatingLoad, SensibleRoomORZone, StepIns.ZoneDehumidificationLoad, StepIns.ZoneMoistureLoad, latentRoomORZone);//
 			
 				Real64 RunFractionTotalFuel = ElectricalPower*PartRuntimeFraction; // fraction can be above 1 meaning its not able to do it completely in a time step.
 				pSetting->Runtime_Fraction=PartRuntimeFraction;
@@ -1350,17 +1346,17 @@ namespace EnergyPlus {//***************
 						if (Conditioning_load_met)
 						{
 							DidWeMeetLoad = true; 
-							if (HumidificationRequested && (LatentRoomORZone < PreviousMaxiumHumidOrDehumidOutput))
+							if (HumidificationRequested && (latentRoomORZone < PreviousMaxiumHumidOrDehumidOutput))
 							{
 								store_best_attempt = true;
 							}
-							if (DehumidificationRequested && (LatentRoomORZone > PreviousMaxiumHumidOrDehumidOutput))
+							if (DehumidificationRequested && (latentRoomORZone > PreviousMaxiumHumidOrDehumidOutput))
 							{
 								store_best_attempt = true;
 							}
 							if (store_best_attempt)
 							{
-								PreviousMaxiumHumidOrDehumidOutput = LatentRoomORZone;
+								PreviousMaxiumHumidOrDehumidOutput = latentRoomORZone;
 							}
 						}
 						else
@@ -1415,7 +1411,7 @@ namespace EnergyPlus {//***************
 				list<CSetting*>::iterator iterOperatingSettings = CurrentOperatingSettings.begin();
 				CSetting* pSetting = *iterOperatingSettings;
 				*pSetting = *pOptimal;
-				Real64 SecondaryRunFraction = 0;
+				
 				PrimaryModeRuntimeFraction=pOptimal->Runtime_Fraction;
 				iterOperatingSettings++;
 				pStandBy->Runtime_Fraction = (1 - PrimaryModeRuntimeFraction );
@@ -1454,7 +1450,7 @@ namespace EnergyPlus {//***************
 					count_DidWeNotMeetLoad++;
 				}
 			}
-			bool foundwarnings = false;
+			
 			Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + SysTimeElapsed;
 
 			// Use the elapsed time to only give a summary of warnings related to the number of Timesteps environmental conditions, or supply air temperature constraints were not met for a given day.

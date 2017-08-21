@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 
 // C++ Headers
@@ -195,7 +183,6 @@ namespace EnergyPlus {//***************
 		}
 		Model* HandleToHybridUnitaryAirConditioner(int UnitNum)
 		{
-			Model*p = &(ZoneHybridUnitaryAirConditioner(UnitNum));
 			return &(ZoneHybridUnitaryAirConditioner(UnitNum));
 		}
 
@@ -225,16 +212,10 @@ namespace EnergyPlus {//***************
 			static Array1D_bool MyEnvrnFlag;
 			static Array1D_bool MyFanFlag;
 			static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
-			int Loop;
-			static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
-			Real64 TimeElapsed;
+		
 
 			int InletNode;
-			int SecInletNode; // local index for secondary inlet node.
-			Real64 RhoAir; // Air Density
-			int ControlNode;
-			int OutNode;
-			int EvapUnitNum;
+			
 
 			if (HybridCoolOneTimeFlag) {
 				MySizeFlag.dimension(NumZoneHybridEvap, true);
@@ -287,7 +268,6 @@ namespace EnergyPlus {//***************
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
 			Real64 RHosa = ZoneHybridUnitaryAirConditioner(UnitNum).Part_press(101.325, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat) / ZoneHybridUnitaryAirConditioner(UnitNum).Sat_press(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp);
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure, "InitZoneHybridUnitaryAirConditioners");
-
 		}
 	
 
@@ -307,9 +287,7 @@ namespace EnergyPlus {//***************
 			using namespace Psychrometrics;
 			using DataEnvironment::StdRhoAir;
 
-			Real64 QTotUnitOut = 0;
-			Real64 QSensUnitOut=0;
-			Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, RemainQ, DesignMinVR, returnQSensible, returnQLatent, returnSupplyAirMassFlow, returnSupplyAirTemp, returnSupplyAirRelHum, returnVentilationAir, ElectricalPowerUse;
+			Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, DesignMinVR;
 		
 			Real64 ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
 			Real64 ZoneHeatingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
@@ -331,11 +309,15 @@ namespace EnergyPlus {//***************
 			using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 			DesignMinVR = CalcDesignSpecificationOutdoorAir(ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag); //[m3/s]
 			Real64 DesignMinVRMassFlow = 0;
-			if (StdRhoAir>1) 	DesignMinVRMassFlow = DesignMinVR * StdRhoAir;
-			else DesignMinVRMassFlow = DesignMinVR *  1.225;
+			if (StdRhoAir > 1)
+			{
+				DesignMinVRMassFlow = DesignMinVR * StdRhoAir;
+			}
+			else
+			{
+				DesignMinVRMassFlow = DesignMinVR *  1.225;
+			}
 			ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
-
-
 		}
 
 		void
@@ -384,11 +366,7 @@ namespace EnergyPlus {//***************
 			static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 			bool IsNotOK; // Flag to verify name
 			bool IsBlank; // Flag for blank name
-			bool errFlag;
-			Real64 FanVolFlow;
 			int UnitLoop;
-			int CtrlZone; // index to loop counter
-			int NodeNum; // index to loop counter
 
 						 // SUBROUTINE PARAMETER DEFINITIONS:
 			static std::string const RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
