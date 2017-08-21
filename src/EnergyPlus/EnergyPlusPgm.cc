@@ -438,7 +438,7 @@ EnergyPlusPgm( std::string const & filepath )
 	DisplayString( "EnergyPlus Starting" );
 	DisplayString( VerString );
 
-	// try {
+	try {
 		EnergyPlus::inputProcessor = InputProcessor::factory();
 		EnergyPlus::inputProcessor->processInput();
 
@@ -516,10 +516,10 @@ EnergyPlusPgm( std::string const & filepath )
 			moveFile("readvars.audit", outputRvauditFileName);
 		}
 
-	// }
-	// catch( const std::exception& e ) {
-	// 	AbortEnergyPlus();
-	// }
+	}
+	catch( const std::exception& e ) {
+		AbortEnergyPlus();
+	}
 
 	EndEnergyPlus();
 }

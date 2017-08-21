@@ -1465,7 +1465,7 @@ namespace GroundHeatExchangers {
 		auto const undisturbed_ground_temp_model_type = fields.at( "undisturbed_ground_temperature_model_type" );
 		auto const undisturbed_ground_temp_model_name = fields.at( "undisturbed_ground_temperature_model_name" );
 
-		groundTempModel = GetGroundTempModelAndInit( undisturbed_ground_temp_model_type , undisturbed_ground_temp_model_name );
+		groundTempModel = GetGroundTempModelAndInit( undisturbed_ground_temp_model_type , UtilityRoutines::MakeUPPERCase( undisturbed_ground_temp_model_name ) );
 		if ( groundTempModel ) {
 			errorsFound = groundTempModel->errorsFound;
 		}

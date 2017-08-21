@@ -249,12 +249,12 @@ ProcessArgs(int argc, const char * argv[])
 	std::transform( inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper );
 
 	// TODO: figure out better logic for determining input file type
-	if ( inputFileExt == "EPJSON" ) {
+	if ( inputFileExt == "EPJSON" || inputFileExt == "JSON" ) {
 		isEpJSON = true;
-	} else if ( inputFileExt == "IDF" ) {
+	} else if ( inputFileExt == "IDF" || inputFileExt == "IMF" ) {
 		isEpJSON = false;
 	} else {
-		DisplayString("ERROR: Input file must have IDF or epJSON extension.");
+		DisplayString("ERROR: Input file must have IDF, IMF, or epJSON extension.");
 		exit(EXIT_FAILURE);
 	}
 
