@@ -645,23 +645,28 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance ) {
 	// sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
 
+	auto unitarySystemAirInletNodeIndex = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
+	auto coolingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList( "COOLING COIL AIR INLET NODE", DataLoopNode::NodeID );
+	auto heatingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList( "ZONE 2 INLET NODE", DataLoopNode::NodeID );
+	auto coolingCoilAirInletNodeIndex = UtilityRoutines::FindItemInList( "HEATING COIL AIR INLET NODE", DataLoopNode::NodeID );
+
 	// set up node conditions to test UnitarySystem set point based control
 	// Unitary system air inlet node = 1
-	Node( 1 ).MassFlowRate = UnitarySystem( 1 ).DesignMassFlowRate;
-	Node( 1 ).MassFlowRateMaxAvail = UnitarySystem( 1 ).DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+	Node( unitarySystemAirInletNodeIndex ).MassFlowRate = UnitarySystem( 1 ).DesignMassFlowRate;
+	Node( unitarySystemAirInletNodeIndex ).MassFlowRateMaxAvail = UnitarySystem( 1 ).DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
 	// test COOLING condition
-	Node( 1 ).Temp = 24.0; // 24C db
-	Node( 1 ).HumRat = 0.00922; // 17C wb
-	Node( 1 ).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+	Node( unitarySystemAirInletNodeIndex ).Temp = 24.0; // 24C db
+	Node( unitarySystemAirInletNodeIndex ).HumRat = 0.00922; // 17C wb
+	Node( unitarySystemAirInletNodeIndex ).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
 	// Cooling coil air inlet node = 3
-	Node( 3 ).MassFlowRateMax = UnitarySystem( 1 ).DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+	Node( coolingCoilAirInletNodeIndex ).MassFlowRateMax = UnitarySystem( 1 ).DesignMassFlowRate; // max at fan outlet so fan won't limit flow
 	// Cooling coil air outlet node = 4
-	Node( 4 ).TempSetPoint = 20.0;
+	Node( coolingCoilAirOutletNodeIndex ).TempSetPoint = 20.0;
 	// Heating coil air inlet node = 4
 	// Heating coil air outlet node = 2
-	Node( 2 ).TempSetPoint = 16.0;
+	Node( heatingCoilAirOutletNodeIndex ).TempSetPoint = 16.0;
 
 	Schedule( 1 ).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -671,27 +676,27 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance ) {
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
 
 	// check that cooling coil air outlet node is at set point
-	EXPECT_NEAR( Node( 4 ).Temp, Node( 4 ).TempSetPoint, 0.001 );
+	EXPECT_NEAR( Node( coolingCoilAirOutletNodeIndex ).Temp, Node( coolingCoilAirOutletNodeIndex ).TempSetPoint, 0.001 );
 	// cooling coil air inlet node temp is greater than cooling coil air outlet node temp
-	EXPECT_GT( Node( 3 ).Temp, Node( 4 ).Temp );
+	EXPECT_GT( Node( coolingCoilAirInletNodeIndex ).Temp, Node( coolingCoilAirOutletNodeIndex ).Temp );
 	// heating coil air inlet and outlet nodes are at same temp since the heating coil is off
-	EXPECT_EQ( Node( 4 ).MassFlowRate, Node( 2 ).MassFlowRate );
+	EXPECT_EQ( Node( heatingCoilAirOutletNodeIndex ).MassFlowRate, Node( heatingCoilAirOutletNodeIndex ).MassFlowRate );
 	// expect heating coil outlet air temp to be greater than heating coil outlet air temp set point
-	EXPECT_GT( Node( 2 ).Temp, Node( 2 ).TempSetPoint );
+	EXPECT_GT( Node( heatingCoilAirOutletNodeIndex ).Temp, Node( heatingCoilAirOutletNodeIndex ).TempSetPoint );
 
 	// HEATING mode
 	// Unitary system air inlet node = 1
-	Node( 1 ).Temp = 14.0; // 14C db
-	Node( 1 ).HumRat = 0.00693; // 11C wb
-	Node( 1 ).Enthalpy = 31598.76;
+	Node( unitarySystemAirInletNodeIndex ).Temp = 14.0; // 14C db
+	Node( unitarySystemAirInletNodeIndex ).HumRat = 0.00693; // 11C wb
+	Node( unitarySystemAirInletNodeIndex ).Enthalpy = 31598.76;
 
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
 
 	// cooling coil air inlet node temp is equal to cooling coil air outlet node temp since cooling coil is off
-	EXPECT_EQ( Node( 3 ).Temp, Node( 4 ).Temp );
+	EXPECT_EQ( Node( coolingCoilAirInletNodeIndex ).Temp, Node( coolingCoilAirOutletNodeIndex ).Temp );
 	// check that heating coil outlet node is at set point
-	EXPECT_NEAR( Node( 2 ).Temp, Node( 2 ).TempSetPoint, 0.001 );
-	EXPECT_NEAR( Node( 2 ).Temp, 16.0, 0.001 );
+	EXPECT_NEAR( Node( heatingCoilAirOutletNodeIndex ).Temp, Node( heatingCoilAirOutletNodeIndex ).TempSetPoint, 0.001 );
+	EXPECT_NEAR( Node( heatingCoilAirOutletNodeIndex ).Temp, 16.0, 0.001 );
 
 	// expect design spec data to match inputs
 	EXPECT_NEAR( HVACUnitarySystem::DesignSpecMSHP( 1 ).CoolingVolFlowRatio( 1 ), 0.1000, 0.00001 );

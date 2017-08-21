@@ -170,7 +170,7 @@ namespace GroundHeatExchangers {
 
 		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
 
-		static PlantComponent * factory( int const objectType, std::string objectName );
+		// static PlantComponent * factory( int const objectType, std::string objectName );
 
 	};
 

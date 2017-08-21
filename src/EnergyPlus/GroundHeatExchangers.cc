@@ -207,29 +207,29 @@ namespace GroundHeatExchangers {
 		this->updateGHX();
 	}
 
-	PlantComponent * GLHEBase::factory( int const objectType, std::string objectName ) {
-		// if ( GetInput ) {
-		// 	GetGroundHeatExchangerInput();
-		// 	GetInput = false;
-		// }
-		// if ( objectType == DataPlant::TypeOf_GrndHtExchgVertical ) {
-		// 	for ( auto & ghx : verticalGLHE ) {
-		// 		if ( ghx.Name == objectName ) {
-		// 			return &ghx;
-		// 		}
-		// 	}
-		// } else if ( objectType == DataPlant::TypeOf_GrndHtExchgSlinky ) {
-		// 	for ( auto & ghx : slinkyGLHE ) {
-		// 		if ( ghx.Name == objectName ) {
-		// 			return &ghx;
-		// 		}
-		// 	}
-		// }
-		// If we didn't find it, fatal
-		ShowFatalError( "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );
-		// Shut up the compiler
-		return nullptr;
-	}
+	// PlantComponent * GLHEBase::factory( int const objectType, std::string objectName ) {
+	// 	// if ( GetInput ) {
+	// 	// 	GetGroundHeatExchangerInput();
+	// 	// 	GetInput = false;
+	// 	// }
+	// 	// if ( objectType == DataPlant::TypeOf_GrndHtExchgVertical ) {
+	// 	// 	for ( auto & ghx : verticalGLHE ) {
+	// 	// 		if ( ghx.Name == objectName ) {
+	// 	// 			return &ghx;
+	// 	// 		}
+	// 	// 	}
+	// 	// } else if ( objectType == DataPlant::TypeOf_GrndHtExchgSlinky ) {
+	// 	// 	for ( auto & ghx : slinkyGLHE ) {
+	// 	// 		if ( ghx.Name == objectName ) {
+	// 	// 			return &ghx;
+	// 	// 		}
+	// 	// 	}
+	// 	// }
+	// 	// If we didn't find it, fatal
+	// 	ShowFatalError( "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );
+	// 	// Shut up the compiler
+	// 	return nullptr;
+	// }
 
 	//******************************************************************************
 
@@ -1342,7 +1342,10 @@ namespace GroundHeatExchangers {
 		QnHr.dimension( 730 + AGG + SubAGG, 0.0 );
 		QnSubHr.dimension( ( SubAGG + 1 ) * maxTSinHr + 1, 0.0 );
 		LastHourN.dimension( SubAGG + 1, 0 );
-		prevTimeSteps.dimension( ( SubAGG + 1 ) * maxTSinHr + 1, 0 );
+
+		if ( ! prevTimeSteps.allocated() ) {
+			prevTimeSteps.dimension( ( SubAGG + 1 ) * maxTSinHr + 1, 0 );
+		}
 
 		LNTTS.reserve( NPairs );
 		GFNC.reserve( NPairs );
@@ -1368,6 +1371,118 @@ namespace GroundHeatExchangers {
 
 	GLHESlinky::GLHESlinky( std::string const & name, json const & fields )
 	{
+		bool errorsFound = false;
+		std::string const cCurrentModuleObject = "GroundHeatExchanger:Slinky";
+
+		Name = name;
+		UtilityRoutines::IsNameEmpty( Name, cCurrentModuleObject, errorsFound );
+
+		auto const inletNodeName = UtilityRoutines::MakeUPPERCase( fields.at( "inlet_node_name" ) );
+		auto const outletNodeName = UtilityRoutines::MakeUPPERCase( fields.at( "outlet_node_name" ) );
+
+		//get inlet node num
+		inletNodeNum = NodeInputManager::GetOnlySingleNode( inletNodeName, errorsFound, cCurrentModuleObject, Name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+		//get outlet node num
+		outletNodeNum = NodeInputManager::GetOnlySingleNode( outletNodeName, errorsFound, cCurrentModuleObject, Name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+
+		available = true;
+		on = true;
+
+		BranchNodeConnections::TestCompSet( cCurrentModuleObject, Name, inletNodeName, outletNodeName, "Condenser Water Nodes" );
+
+		//load data
+		designFlow = fields.at( "design_flow_rate" );
+		PlantUtilities::RegisterPlantCompDesignFlow( inletNodeNum, designFlow );
+
+		kGround = fields.at( "soil_thermal_conductivity" );
+		cpRhoGround = fields.at( "soil_density" ).get< Real64 >() * fields.at( "soil_specific_heat" ).get< Real64 >();
+		kPipe = fields.at( "pipe_thermal_conductivity" );
+		rhoPipe = fields.at( "pipe_density" );
+		cpPipe = fields.at( "pipe_specific_heat" );
+		pipeOutDia = fields.at( "pipe_outer_diameter" );
+		pipeThick = fields.at( "pipe_thickness" );
+		coilDiameter = fields.at( "coil_diameter" );
+		coilPitch = fields.at( "coil_pitch" );
+		trenchDepth = fields.at( "trench_depth" );
+		trenchLength = fields.at( "trench_length" );
+		numTrenches = fields.at( "number_of_trenches" );
+		trenchSpacing = fields.at( "horizontal_spacing_between_pipes" );
+		maxSimYears = fields.at( "maximum_length_of_simulation" );
+
+		auto const configuration = fields.at( "heat_exchanger_configuration" );
+		if ( configuration == "Vertical" ) {
+			verticalConfig = true;
+		}
+
+		// Number of coils
+		numCoils = trenchLength / coilPitch;
+
+		// Total tube length
+		totalTubeLength = Pi * coilDiameter * trenchLength * numTrenches / coilPitch;
+
+		// Get Gfunction data
+		SubAGG = 15;
+		AGG = 192;
+
+		// Average coil depth
+		if ( verticalConfig ) {
+			// Vertical configuration
+			if ( ( trenchDepth - coilDiameter ) < 0.0 ) {
+				// Error: part of the coil is above ground
+				ShowSevereError( cCurrentModuleObject + "=\"" + Name + "\", invalid value in field." );
+				ShowContinueError( "...trench_length=[" + General::RoundSigDigits( trenchDepth, 3 ) + "]." );
+				ShowContinueError( "...coil_diameter=[" + General::RoundSigDigits( coilDiameter, 3 ) + "]." );
+				ShowContinueError( "...Average coil depth will be <=0." );
+				errorsFound = true;
+
+			} else {
+				// Entire coil is below ground
+				coilDepth = trenchDepth - ( coilDiameter / 2.0 );
+			}
+
+		} else {
+			// Horizontal configuration
+			coilDepth = trenchDepth;
+		}
+
+		// Thermal diffusivity of the ground
+		diffusivityGround = kGround / cpRhoGround;
+
+		if ( ! prevTimeSteps.allocated() ) {
+			prevTimeSteps.dimension( ( SubAGG + 1 ) * maxTSinHr + 1, 0 );
+		}
+
+		//   Not many checks
+		if ( pipeThick >= pipeOutDia / 2.0 ) {
+			ShowSevereError( cCurrentModuleObject + "=\"" + Name + "\", invalid value in field." );
+			ShowContinueError( "...pipe_thickness=[" + General::RoundSigDigits( pipeThick, 3 ) + "]." );
+			ShowContinueError( "...pipe_outer_diameter=[" + General::RoundSigDigits( pipeOutDia, 3 ) + "]." );
+			ShowContinueError( "...Radius will be <=0." );
+			errorsFound = true;
+		}
+
+		// Initialize ground temperature model and get pointer reference
+		auto const undisturbed_ground_temp_model_type = fields.at( "undisturbed_ground_temperature_model_type" );
+		auto const undisturbed_ground_temp_model_name = fields.at( "undisturbed_ground_temperature_model_name" );
+
+		groundTempModel = GetGroundTempModelAndInit( undisturbed_ground_temp_model_type , undisturbed_ground_temp_model_name );
+		if ( groundTempModel ) {
+			errorsFound = groundTempModel->errorsFound;
+		}
+
+		//Set up report variables
+		SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", boreholeTemp, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", QGLHE, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", inletTemp, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", outletTemp, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", massFlowRate, "System", "Average", Name );
+		SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", aveFluidTemp, "System", "Average", Name );
+
+		//Check for Errors
+		if ( errorsFound ) {
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+		}
+		numSlinkyGLHEs++;
 	}
 
 	// void

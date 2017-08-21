@@ -1,4 +1,4 @@
-.!-Generator IDFEditor 1.44
+!-Generator IDFEditor 1.44
 !-Option SortedOrder
 !
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
@@ -15,7 +15,7 @@
 !                          terminal units for zones: SPACE4-1 and SPACE5-1.
 !
 ! Highlights:              DOAS ducted to inlet and supply side of ZoneHVAC:PackagedTerminalHeatPump using AirTerminal:SingleDuct:Mixer.
-!                          Each AirTerminal:SingleDuct:Mixers specifies outdoor air flow rate for each zone with OutDoor Air Method = IndoorAirQualityProcedure  
+!                          Each AirTerminal:SingleDuct:Mixers specifies outdoor air flow rate for each zone with OutDoor Air Method = IndoorAirQualityProcedure
 !                          in DesignSpecification:OutdoorAir to control indoor CO2 level below the setpoint.
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods.
@@ -3368,7 +3368,7 @@
   Output:Variable,SPACE4-1 Supply Inlet,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE5-1 Supply Inlet,System Node Mass Flow Rate,hourly;
-  
+
   Output:Variable, *,Zone Air CO2 Concentration,hourly;
 
 

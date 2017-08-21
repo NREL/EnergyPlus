@@ -2553,9 +2553,8 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
  }
 
 
-TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_SimpleBox_test )
+TEST_F( EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test )
 {
-	 ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_SimpleBox_test" );
 	 using DataGlobals::NumOfZones;
 
 	 bool foundError;
@@ -2631,9 +2630,8 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_SimpleBox_test )
 
  }
 
-TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxOneWallMissing_test )
+TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test )
 {
-	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxOneWallMissing_test" );
 	using DataGlobals::NumOfZones;
 
 	bool foundError;
@@ -2704,9 +2702,8 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxOneWallMissing_test )
 }
 
 
-TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeiling_test )
+TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test )
 {
-	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeiling_test" );
 	using DataGlobals::NumOfZones;
 
 	bool foundError;
@@ -2777,9 +2774,8 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeiling_test )
 
 }
 
-TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test )
+TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test )
 {
-	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test" );
 	using DataGlobals::NumOfZones;
 
 	bool foundError;
@@ -2848,9 +2844,8 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test )
 	EXPECT_FALSE( foundError );
 }
 
-TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeilingFloor_test )
+TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test )
 {
-	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test" );
 	using DataGlobals::NumOfZones;
 
 	bool foundError;
@@ -2867,7 +2862,7 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeilingFloor_test )
 	Surface( 1 ).Vertex.dimension( 4 );
 	Surface( 1 ).Class = SurfaceClass_Wall;
 	Surface( 1 ).Tilt = 90.;
-	Surface( 1 ).Azimuth = 180.; 
+	Surface( 1 ).Azimuth = 180.;
 	Surface( 1 ).Area = 30.;
 	Surface( 1 ).Vertex( 1 ) = Vector( 0., 0., 3. );
 	Surface( 1 ).Vertex( 2 ) = Vector( 0., 0., 0. );

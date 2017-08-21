@@ -332,6 +332,7 @@ namespace EnergyPlus {
 		// METHODOLOGY EMPLOYED:
 		// Look up section in list of sections.  If there, return the
 		// number of sections of that kind found in the current input.  If not, return -1.
+		// if ( epJSON.is_null() ) return -1;
 		auto const & SectionWord_iter = epJSON.find( SectionWord );
 		if ( SectionWord_iter == epJSON.end() ) return -1;
 		return static_cast< int >( SectionWord_iter.value().size() );
@@ -508,62 +509,65 @@ namespace EnergyPlus {
 
 		auto const & legacy_idd_alphas_extension_iter = legacy_idd_alphas.find( "extensions" );
 		if ( legacy_idd_alphas_extension_iter != legacy_idd_alphas.end() ) {
-			auto const & legacy_idd_alphas_extensions = legacy_idd_alphas_extension_iter.value();
-			auto const & epJSON_extensions_array = obj.value()[ extension_key];
-			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
-			int alphas_index = static_cast <int> ( legacy_idd_alphas_fields.size() );
+			auto const epJSON_extensions_array_itr = obj.value().find( extension_key );
+			if ( epJSON_extensions_array_itr != obj.value().end() ) {
+				auto const & legacy_idd_alphas_extensions = legacy_idd_alphas_extension_iter.value();
+				auto const & epJSON_extensions_array = epJSON_extensions_array_itr.value();
+				auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
+				int alphas_index = static_cast <int> ( legacy_idd_alphas_fields.size() );
 
-			for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
-				auto const & epJSON_extension_obj = it.value();
+				for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
+					auto const & epJSON_extension_obj = it.value();
 
-				for ( size_t i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
-					std::string const & field_name = legacy_idd_alphas_extensions[ i ];
-					auto const & epJSON_obj_field_iter = epJSON_extension_obj.find( field_name );
+					for ( size_t i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
+						std::string const & field_name = legacy_idd_alphas_extensions[ i ];
+						auto const & epJSON_obj_field_iter = epJSON_extension_obj.find( field_name );
 
-					if ( epJSON_obj_field_iter != epJSON_extension_obj.end() ) {
-						auto const & epJSON_field_val = epJSON_obj_field_iter.value();
-						if ( epJSON_field_val.is_string() ) {
-							auto const & schema_field = schema_extension_fields[ field_name ];
-							std::string val = epJSON_field_val;
-							auto const & tmp_find_default_iter = schema_field.find( "default" );
-							if ( val.empty() and tmp_find_default_iter != schema_field.end() ) {
-								auto const & field_default_val = tmp_find_default_iter.value();
-								if ( field_default_val.is_string() ) {
-									val = field_default_val.get < std::string >();
-								} else {
-									if ( field_default_val.is_number_integer() ) {
-										i64toa( field_default_val.get < int >(), s );
+						if ( epJSON_obj_field_iter != epJSON_extension_obj.end() ) {
+							auto const & epJSON_field_val = epJSON_obj_field_iter.value();
+							if ( epJSON_field_val.is_string() ) {
+								auto const & schema_field = schema_extension_fields[ field_name ];
+								std::string val = epJSON_field_val;
+								auto const & tmp_find_default_iter = schema_field.find( "default" );
+								if ( val.empty() and tmp_find_default_iter != schema_field.end() ) {
+									auto const & field_default_val = tmp_find_default_iter.value();
+									if ( field_default_val.is_string() ) {
+										val = field_default_val.get < std::string >();
 									} else {
-										dtoa( field_default_val.get < double >(), s );
+										if ( field_default_val.is_number_integer() ) {
+											i64toa( field_default_val.get < int >(), s );
+										} else {
+											dtoa( field_default_val.get < double >(), s );
+										}
+										val = s;
 									}
-									val = s;
+									if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
+								} else {
+									if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = val.empty();
 								}
-								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
+								if ( schema_field.find("retaincase") != schema_field.end() ) {
+									Alphas( alphas_index + 1 ) = val;
+								} else {
+									// Alphas( alphas_index + 1 ) = val;
+									Alphas( alphas_index + 1 ) = UtilityRoutines::MakeUPPERCase( val );
+								}
 							} else {
-								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = val.empty();
+								if ( epJSON_field_val.is_number_integer() ) {
+									i64toa( epJSON_field_val.get < int >(), s );
+								} else {
+									dtoa( epJSON_field_val.get < double >(), s );
+								}
+								Alphas( alphas_index + 1 ) = s;
+								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = false;
 							}
-							if ( schema_field.find("retaincase") != schema_field.end() ) {
-								Alphas( alphas_index + 1 ) = val;
-							} else {
-								// Alphas( alphas_index + 1 ) = val;
-								Alphas( alphas_index + 1 ) = UtilityRoutines::MakeUPPERCase( val );
-							}
+							NumAlphas++;
 						} else {
-							if ( epJSON_field_val.is_number_integer() ) {
-								i64toa( epJSON_field_val.get < int >(), s );
-							} else {
-								dtoa( epJSON_field_val.get < double >(), s );
-							}
-							Alphas( alphas_index + 1 ) = s;
-							if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = false;
+							Alphas( alphas_index + 1 ) = "";
+							if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
 						}
-						NumAlphas++;
-					} else {
-						Alphas( alphas_index + 1 ) = "";
-						if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
+						if ( is_AlphaFieldNames ) AlphaFieldNames()( alphas_index + 1 ) = field_name;
+						alphas_index++;
 					}
-					if ( is_AlphaFieldNames ) AlphaFieldNames()( alphas_index + 1 ) = field_name;
-					alphas_index++;
 				}
 			}
 		}

@@ -683,6 +683,7 @@ namespace PackagedTerminalHeatPump {
 			inputProcessor->getObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex;
+			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 
 			PTUnitUNumericFields( PTUnitNum ).FieldNames.allocate( NumNumbers );
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
@@ -1367,6 +1368,7 @@ namespace PackagedTerminalHeatPump {
 			inputProcessor->getObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex + NumPTHP;
+			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 
 			PTUnitUNumericFields( PTUnitNum ).FieldNames.allocate( NumNumbers );
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
@@ -1988,6 +1990,7 @@ namespace PackagedTerminalHeatPump {
 			inputProcessor->getObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex + NumPTHP + NumPTAC;
+			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 
 			PTUnitUNumericFields( PTUnitNum ).FieldNames.allocate( NumNumbers );
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
