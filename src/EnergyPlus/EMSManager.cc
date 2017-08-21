@@ -2150,20 +2150,6 @@ namespace EMSManager {
 		using DataHeatBalance::Zone;
 		using DataGlobals::NumOfZones;
 
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum; // local loop index.
 

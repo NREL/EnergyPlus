@@ -102,6 +102,7 @@
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
 #include <PhaseChangeModeling/HysteresisModel.hh>
+#include <OutAirNodeManager.hh>
 
 namespace EnergyPlus {
 

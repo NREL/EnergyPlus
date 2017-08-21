@@ -259,13 +259,13 @@ namespace DataLoopNode {
 			Real64 const TempSetPointLo, // {C}
 			Real64 const Height, // {m}
 			bool   const SchedOutAirDryBulb, // if true, dry bulb temp of the outdoor air node is overwritten by sched value
-		    int    const OutAirDryBulbSchedNum, // schedule value in {C}
-		    bool   const SchedOutAirWetBulb, // if true, wet bulb temp of the outdoor air node is overwritten by sched value
-		    int    const OutAirWetBulbSchedNum, // schedule value in {C}
-		    bool   const SchedOutAirWindSpeed, // if true, wind direction of the outdoor air node is overwritten by sched value
-		    int    const OutAirWindSpeedSchedNum, // schedule value in {m/s}
-		    bool   const SchedOutAirWindDir, // if true, dry bulb temp of the outdoor air node is overwritten by sched value
-		    int    const OutAirWindDirSchedNum, // schedule value in {degree}
+			int    const OutAirDryBulbSchedNum, // schedule value in {C}
+			bool   const SchedOutAirWetBulb, // if true, wet bulb temp of the outdoor air node is overwritten by sched value
+			int    const OutAirWetBulbSchedNum, // schedule value in {C}
+			bool   const SchedOutAirWindSpeed, // if true, wind direction of the outdoor air node is overwritten by sched value
+			int    const OutAirWindSpeedSchedNum, // schedule value in {m/s}
+			bool   const SchedOutAirWindDir, // if true, dry bulb temp of the outdoor air node is overwritten by sched value
+			int    const OutAirWindDirSchedNum, // schedule value in {degree}
 			Real64 const OutAirDryBulb, // {C}
 			bool   const EMSOverrideOutAirDryBulb, // if true, the EMS is calling to override outdoor air node drybulb setting
 			Real64 const EMSValueForOutAirDryBulb, // value EMS is directing to use for outdoor air node's drybulb {C}

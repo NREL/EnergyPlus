@@ -426,9 +426,6 @@ namespace HeatBalanceSurfaceManager {
 		// Initialize zone outdoor environmental variables
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the zone, modify the zone  Dry/Wet BulbTemps
-		//SetZoneOutBulbTempAt();
-		//CheckZoneOutBulbTempAt();		
-		//SetZoneWindSpeedAt();
 
 		//  DO ZoneNum = 1, NumOfZones
 		//    Zone(ZoneNum)%WindSpeed = WindSpeedAt(Zone(ZoneNum)%Centroid%z)

@@ -17859,7 +17859,7 @@ ZoneProperty:LocalEnvironment,
 SurfaceProperty:SurroundingSurfaces,
        \min-fields 8
        \memo This object defines a list of surrounding surfaces for an exterior surface.
-       \extensible: -- duplicate last set of surrounding surface properties (the last three fields), remembering to remove ; from "inner" fields.
+       \extensible:3 -- duplicate last set of surrounding surface properties (the last three fields), remembering to remove ; from "inner" fields.
    A1, \field Name
        \required-field
        \type alpha
@@ -17884,7 +17884,8 @@ SurfaceProperty:SurroundingSurfaces,
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
        \note optional
-   A4, \field Surrounding Surface 1 Name       
+   A4, \field Surrounding Surface 1 Name    
+       \begin-extensible   
        \required-field
        \type alpha 
    N3, \field Surrounding Surface 1 View Factor
@@ -61549,12 +61550,12 @@ NodeList,
   A492,A493,A494,A495,A496,A497,A498,A499,A500,A501; \note fields as indicated
 
 OutdoorAir:Node,
-      \memo This object sets the temperature and humidity conditions
-	  \memo for an outdoor air node.  It allows the height above ground to be
-	  \memo specified.  This object may be used more than once.
-	  \memo The same node name may not appear in both an OutdoorAir:Node object and
-	  \memo an OutdoorAir:NodeList object.
-	  \memo This object defines local outdoor air environmental conditions.
+       \memo This object sets the temperature and humidity conditions
+       \memo for an outdoor air node.  It allows the height above ground to be
+       \memo specified.  This object may be used more than once.
+       \memo The same node name may not appear in both an OutdoorAir:Node object and
+       \memo an OutdoorAir:NodeList object.
+       \memo This object defines local outdoor air environmental conditions.
   A1,  \field Name
        \required-field
        \type node

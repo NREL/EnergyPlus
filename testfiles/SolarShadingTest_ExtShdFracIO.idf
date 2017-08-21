@@ -678,6 +678,1420 @@
     eplusshading_test.csv,
     2,
     1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:WEST SIDE TREE,
+    WEST SIDE TREE,
+    ExtShadingSch:WEST SIDE TREE,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:WEST SIDE TREE,
+    Fraction,
+    eplusshading_test.csv,
+    3,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL001:SHADE001,
+    ZN001:WALL001:SHADE001,
+    ExtShadingSch:ZN001:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    4,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN002:WALL001:SHADE001,
+    ZN002:WALL001:SHADE001,
+    ExtShadingSch:ZN002:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN002:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    5,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL001:SHADE001,
+    ZN003:WALL001:SHADE001,
+    ExtShadingSch:ZN003:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    6,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL001:SHADE001,
+    ZN004:WALL001:SHADE001,
+    ExtShadingSch:ZN004:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    7,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL001:SHADE001,
+    ZN005:WALL001:SHADE001,
+    ExtShadingSch:ZN005:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    8,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN006:WALL001:SHADE001,
+    ZN006:WALL001:SHADE001,
+    ExtShadingSch:ZN006:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN006:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    9,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL001:SHADE001,
+    ZN007:WALL001:SHADE001,
+    ExtShadingSch:ZN007:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    10,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN008:WALL001:SHADE001,
+    ZN008:WALL001:SHADE001,
+    ExtShadingSch:ZN008:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN008:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    11,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL001:SHADE001,
+    ZN009:WALL001:SHADE001,
+    ExtShadingSch:ZN009:WALL001:SHADE001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL001:SHADE001,
+    Fraction,
+    eplusshading_test.csv,
+    12,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL001,
+    ZN001:WALL001,
+    ExtShadingSch:ZN001:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    13,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL001:WIN001,
+    ZN001:WALL001:WIN001,
+    ExtShadingSch:ZN001:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    14,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL002,
+    ZN001:WALL002,
+    ExtShadingSch:ZN001:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    15,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL002:WIN001,
+    ZN001:WALL002:WIN001,
+    ExtShadingSch:ZN001:WALL002:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL002:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    16,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL003,
+    ZN001:WALL003,
+    ExtShadingSch:ZN001:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    17,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL004,
+    ZN001:WALL004,
+    ExtShadingSch:ZN001:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    18,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL005,
+    ZN001:WALL005,
+    ExtShadingSch:ZN001:WALL005,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL005,
+    Fraction,
+    eplusshading_test.csv,
+    19,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL005:WIN001,
+    ZN001:WALL005:WIN001,
+    ExtShadingSch:ZN001:WALL005:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL005:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    20,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:WALL006,
+    ZN001:WALL006,
+    ExtShadingSch:ZN001:WALL006,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:WALL006,
+    Fraction,
+    eplusshading_test.csv,
+    21,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:FLR001,
+    ZN001:FLR001,
+    ExtShadingSch:ZN001:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    22,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN001:ROOF001,
+    ZN001:ROOF001,
+    ExtShadingSch:ZN001:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN001:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    23,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN002:WALL001,
+    ZN002:WALL001,
+    ExtShadingSch:ZN002:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN002:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    24,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN002:WALL001:WIN001,
+    ZN002:WALL001:WIN001,
+    ExtShadingSch:ZN002:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN002:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    25,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN002:WALL002,
+    ZN002:WALL002,
+    ExtShadingSch:ZN002:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN002:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    26,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN002:WALL003,
+    ZN002:WALL003,
+    ExtShadingSch:ZN002:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN002:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    27,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN002:WALL004,
+    ZN002:WALL004,
+    ExtShadingSch:ZN002:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN002:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    28,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN002:FLR001,
+    ZN002:FLR001,
+    ExtShadingSch:ZN002:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN002:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    29,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN002:ROOF001,
+    ZN002:ROOF001,
+    ExtShadingSch:ZN002:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN002:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    30,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL001,
+    ZN003:WALL001,
+    ExtShadingSch:ZN003:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    31,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL001:WIN001,
+    ZN003:WALL001:WIN001,
+    ExtShadingSch:ZN003:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    32,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL002,
+    ZN003:WALL002,
+    ExtShadingSch:ZN003:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    33,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL002:WIN001,
+    ZN003:WALL002:WIN001,
+    ExtShadingSch:ZN003:WALL002:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL002:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    34,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL003,
+    ZN003:WALL003,
+    ExtShadingSch:ZN003:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    35,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL004,
+    ZN003:WALL004,
+    ExtShadingSch:ZN003:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    36,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL005,
+    ZN003:WALL005,
+    ExtShadingSch:ZN003:WALL005,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL005,
+    Fraction,
+    eplusshading_test.csv,
+    37,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL006,
+    ZN003:WALL006,
+    ExtShadingSch:ZN003:WALL006,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL006,
+    Fraction,
+    eplusshading_test.csv,
+    38,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL007,
+    ZN003:WALL007,
+    ExtShadingSch:ZN003:WALL007,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL007,
+    Fraction,
+    eplusshading_test.csv,
+    39,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL007:WIN001,
+    ZN003:WALL007:WIN001,
+    ExtShadingSch:ZN003:WALL007:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL007:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    40,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:WALL008,
+    ZN003:WALL008,
+    ExtShadingSch:ZN003:WALL008,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:WALL008,
+    Fraction,
+    eplusshading_test.csv,
+    41,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:FLR001,
+    ZN003:FLR001,
+    ExtShadingSch:ZN003:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    42,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN003:ROOF001,
+    ZN003:ROOF001,
+    ExtShadingSch:ZN003:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN003:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    43,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL001,
+    ZN004:WALL001,
+    ExtShadingSch:ZN004:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    44,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL001:WIN001,
+    ZN004:WALL001:WIN001,
+    ExtShadingSch:ZN004:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    45,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL002,
+    ZN004:WALL002,
+    ExtShadingSch:ZN004:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    46,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL002:WIN001,
+    ZN004:WALL002:WIN001,
+    ExtShadingSch:ZN004:WALL002:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL002:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    47,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL003,
+    ZN004:WALL003,
+    ExtShadingSch:ZN004:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    48,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL004,
+    ZN004:WALL004,
+    ExtShadingSch:ZN004:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    49,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL005,
+    ZN004:WALL005,
+    ExtShadingSch:ZN004:WALL005,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL005,
+    Fraction,
+    eplusshading_test.csv,
+    50,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL006,
+    ZN004:WALL006,
+    ExtShadingSch:ZN004:WALL006,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL006,
+    Fraction,
+    eplusshading_test.csv,
+    51,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:WALL006:WIN001,
+    ZN004:WALL006:WIN001,
+    ExtShadingSch:ZN004:WALL006:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:WALL006:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    52,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:FLR001,
+    ZN004:FLR001,
+    ExtShadingSch:ZN004:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    53,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN004:ROOF001,
+    ZN004:ROOF001,
+    ExtShadingSch:ZN004:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN004:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    54,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL001,
+    ZN005:WALL001,
+    ExtShadingSch:ZN005:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    55,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL001:WIN001,
+    ZN005:WALL001:WIN001,
+    ExtShadingSch:ZN005:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    56,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL002,
+    ZN005:WALL002,
+    ExtShadingSch:ZN005:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    57,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL002:WIN001,
+    ZN005:WALL002:WIN001,
+    ExtShadingSch:ZN005:WALL002:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL002:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    58,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL003,
+    ZN005:WALL003,
+    ExtShadingSch:ZN005:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    59,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL004,
+    ZN005:WALL004,
+    ExtShadingSch:ZN005:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    60,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL005,
+    ZN005:WALL005,
+    ExtShadingSch:ZN005:WALL005,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL005,
+    Fraction,
+    eplusshading_test.csv,
+    61,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL005:WIN001,
+    ZN005:WALL005:WIN001,
+    ExtShadingSch:ZN005:WALL005:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL005:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    62,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:WALL006,
+    ZN005:WALL006,
+    ExtShadingSch:ZN005:WALL006,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:WALL006,
+    Fraction,
+    eplusshading_test.csv,
+    63,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:FLR001,
+    ZN005:FLR001,
+    ExtShadingSch:ZN005:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    64,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN005:ROOF001,
+    ZN005:ROOF001,
+    ExtShadingSch:ZN005:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN005:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    65,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN006:WALL001,
+    ZN006:WALL001,
+    ExtShadingSch:ZN006:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN006:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    66,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN006:WALL001:WIN001,
+    ZN006:WALL001:WIN001,
+    ExtShadingSch:ZN006:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN006:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    67,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN006:WALL002,
+    ZN006:WALL002,
+    ExtShadingSch:ZN006:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN006:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    68,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN006:WALL003,
+    ZN006:WALL003,
+    ExtShadingSch:ZN006:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN006:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    69,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN006:WALL004,
+    ZN006:WALL004,
+    ExtShadingSch:ZN006:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN006:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    70,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN006:FLR001,
+    ZN006:FLR001,
+    ExtShadingSch:ZN006:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN006:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    71,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN006:ROOF001,
+    ZN006:ROOF001,
+    ExtShadingSch:ZN006:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN006:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    72,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL001,
+    ZN007:WALL001,
+    ExtShadingSch:ZN007:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    73,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL001:WIN001,
+    ZN007:WALL001:WIN001,
+    ExtShadingSch:ZN007:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    74,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL002,
+    ZN007:WALL002,
+    ExtShadingSch:ZN007:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    75,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL002:WIN001,
+    ZN007:WALL002:WIN001,
+    ExtShadingSch:ZN007:WALL002:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL002:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    76,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL003,
+    ZN007:WALL003,
+    ExtShadingSch:ZN007:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    77,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL004,
+    ZN007:WALL004,
+    ExtShadingSch:ZN007:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    78,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL005,
+    ZN007:WALL005,
+    ExtShadingSch:ZN007:WALL005,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL005,
+    Fraction,
+    eplusshading_test.csv,
+    79,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL006,
+    ZN007:WALL006,
+    ExtShadingSch:ZN007:WALL006,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL006,
+    Fraction,
+    eplusshading_test.csv,
+    80,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL006:WIN001,
+    ZN007:WALL006:WIN001,
+    ExtShadingSch:ZN007:WALL006:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL006:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    81,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL007,
+    ZN007:WALL007,
+    ExtShadingSch:ZN007:WALL007,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL007,
+    Fraction,
+    eplusshading_test.csv,
+    82,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:WALL008,
+    ZN007:WALL008,
+    ExtShadingSch:ZN007:WALL008,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:WALL008,
+    Fraction,
+    eplusshading_test.csv,
+    83,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:FLR001,
+    ZN007:FLR001,
+    ExtShadingSch:ZN007:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    84,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN007:ROOF001,
+    ZN007:ROOF001,
+    ExtShadingSch:ZN007:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN007:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    85,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN008:WALL001,
+    ZN008:WALL001,
+    ExtShadingSch:ZN008:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN008:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    86,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN008:WALL001:WIN001,
+    ZN008:WALL001:WIN001,
+    ExtShadingSch:ZN008:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN008:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    87,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN008:WALL002,
+    ZN008:WALL002,
+    ExtShadingSch:ZN008:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN008:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    88,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN008:WALL003,
+    ZN008:WALL003,
+    ExtShadingSch:ZN008:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN008:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    89,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN008:WALL004,
+    ZN008:WALL004,
+    ExtShadingSch:ZN008:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN008:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    90,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN008:FLR001,
+    ZN008:FLR001,
+    ExtShadingSch:ZN008:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN008:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    91,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN008:ROOF001,
+    ZN008:ROOF001,
+    ExtShadingSch:ZN008:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN008:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    92,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL001,
+    ZN009:WALL001,
+    ExtShadingSch:ZN009:WALL001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL001,
+    Fraction,
+    eplusshading_test.csv,
+    93,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL001:WIN001,
+    ZN009:WALL001:WIN001,
+    ExtShadingSch:ZN009:WALL001:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL001:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    94,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL002,
+    ZN009:WALL002,
+    ExtShadingSch:ZN009:WALL002,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL002,
+    Fraction,
+    eplusshading_test.csv,
+    95,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL002:WIN001,
+    ZN009:WALL002:WIN001,
+    ExtShadingSch:ZN009:WALL002:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL002:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    96,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL003,
+    ZN009:WALL003,
+    ExtShadingSch:ZN009:WALL003,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL003,
+    Fraction,
+    eplusshading_test.csv,
+    97,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL004,
+    ZN009:WALL004,
+    ExtShadingSch:ZN009:WALL004,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL004,
+    Fraction,
+    eplusshading_test.csv,
+    98,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL005,
+    ZN009:WALL005,
+    ExtShadingSch:ZN009:WALL005,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL005,
+    Fraction,
+    eplusshading_test.csv,
+    99,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL005:WIN001,
+    ZN009:WALL005:WIN001,
+    ExtShadingSch:ZN009:WALL005:WIN001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL005:WIN001,
+    Fraction,
+    eplusshading_test.csv,
+    100,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:WALL006,
+    ZN009:WALL006,
+    ExtShadingSch:ZN009:WALL006,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:WALL006,
+    Fraction,
+    eplusshading_test.csv,
+    101,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:FLR001,
+    ZN009:FLR001,
+    ExtShadingSch:ZN009:FLR001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:FLR001,
+    Fraction,
+    eplusshading_test.csv,
+    102,
+    1;
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:ZN009:ROOF001,
+    ZN009:ROOF001,
+    ExtShadingSch:ZN009:ROOF001,
+    ,
+    ;
+
+  Schedule:File,
+    ExtShadingSch:ZN009:ROOF001,
+    Fraction,
+    eplusshading_test.csv,
+    103,
+    1;
 	
   Shading:Site:Detailed,
     EAST SIDE TREE,          !- Name

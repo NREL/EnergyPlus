@@ -907,9 +907,6 @@ namespace DataSurfaces {
 		SurfIncSolSSG.deallocate();
 		FenLayAbsSSG.deallocate();
 		SurfLocalEnvironment.deallocate();
-		for ( auto & srdSurfProp : SurroundingSurfsProperty ) {
-			srdSurfProp.SurroundingSurfs.deallocate();
-		}
 		SurroundingSurfsProperty.deallocate();
 	}
 

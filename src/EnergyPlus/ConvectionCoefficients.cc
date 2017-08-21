@@ -7483,7 +7483,6 @@ namespace ConvectionCoefficients {
 			ThetaRad = Theta * DegToRadians;
 			windVel = std::cos( ThetaRad ) * WindSpeed;
 		} else if ( SELECT_CASE_var == RefWindParallCompAtZ ) {
-			// TODO: note
 			// Surface WindSpeed , Surface WindDir, surface Azimuth
 			Theta = Surface( SurfNum ).WindDir - Surface( SurfNum ).Azimuth - 90.0; //TODO double check theta
 			ThetaRad = Theta * DegToRadians;

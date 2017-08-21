@@ -54,11 +54,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
-#include <DataLoopNode.hh>
 #include <DataVectorTypes.hh>
 #include <HeatBalanceKivaManager.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
 
 // C++ Headers
 #include <map>

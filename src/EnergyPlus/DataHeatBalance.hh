@@ -1449,7 +1449,7 @@ namespace DataHeatBalance {
 			WindDirEMSOverrideOn( false ),
 			WindDirEMSOverrideValue( 0.0 ),
 			HasLinkedOutAirNode( false ),
-		    LinkedOutAirNode( 0.0 ),
+			LinkedOutAirNode( 0.0 ),
 			isPartOfTotalArea( true ),
 			isNominalOccupied( false ),
 			isNominalControlled( false ),

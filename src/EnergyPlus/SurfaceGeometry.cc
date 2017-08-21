@@ -79,6 +79,9 @@
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
 #include <WeatherManager.hh>
+#include <DataLoopNode.hh>
+#include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 
 namespace EnergyPlus {
 

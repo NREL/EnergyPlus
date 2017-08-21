@@ -862,11 +862,11 @@ namespace DataSurfaces {
 
 
 			SchedExternalShadingFrac( false ), 
-		    ExternalShadingSchInd( 0 ),
-		    HasSurroundingSurfProperties( false ),
-		    SurroundingSurfacesNum( 0 ),
-		    HasLinkedOutAirNode ( false ),
-		    LinkedOutAirNode( 0 ),
+			ExternalShadingSchInd( 0 ),
+			HasSurroundingSurfProperties( false ),
+			SurroundingSurfacesNum( 0 ),
+			HasLinkedOutAirNode ( false ),
+			LinkedOutAirNode( 0 ),
 
 			UNomWOFilm( "-              " ),
 			UNomFilm( "-              " ),

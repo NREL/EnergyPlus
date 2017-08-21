@@ -729,7 +729,7 @@ namespace SolarShading {
 		}
 
 		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm";
-		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
+		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + cAlphaArgs( 4 ) + ',' + cAlphaArgs( 5 );
 
 	}
 
@@ -3676,7 +3676,7 @@ namespace SolarShading {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const NPhi( 6 ); // Number of altitude angle steps for sky integration
 		int const NTheta( 24 ); // Number of azimuth angle steps for sky integration
-		Real64 const Eps( 1.e-10 ); // Small number		
+		Real64 const Eps( 1.e-10 ); // Small number
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
