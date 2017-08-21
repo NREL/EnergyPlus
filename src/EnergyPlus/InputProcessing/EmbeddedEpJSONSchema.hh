@@ -47,12 +47,16 @@
 #ifndef InputProcessing_EmbeddedEpJSONSchema_HH
 #define InputProcessing_EmbeddedEpJSONSchema_HH
 
-#include <vector>
 #include <cstdint>
+#include <utility>
 
 namespace EnergyPlus {
 
-	extern const std::vector<uint8_t> embeddedEpJSONSchema;
+namespace EmbeddedEpJSONSchema {
+
+	std::pair< std::uint8_t const *, size_t > embeddedEpJSONSchema();
+
+}
 
 }
 

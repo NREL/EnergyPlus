@@ -253,7 +253,6 @@ namespace ZoneAirLoopEquipmentManager {
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;
 		using BranchNodeConnections::SetUpCompSets;
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DualDuct::GetDualDuctOutdoorAirRecircUse;
 
 		// Locals
