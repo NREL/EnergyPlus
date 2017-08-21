@@ -215,6 +215,7 @@ namespace DataAirflowNetwork {
 			WPCCntr( "Input" ),
 			MaxIteration( 500 ),
 			InitFlag( 0 ),
+			solver( Solver::SkylineLU ),
 			RelTol( 1.0e-5 ),
 			AbsTol( 1.0e-5 ),
 			ConvLimit( -0.5 ),
@@ -227,7 +228,6 @@ namespace DataAirflowNetwork {
 			OpenFactorErrCount( 0 ),
 			OpenFactorErrIndex( 0 ),
 			InitType( "ZeroNodePressures" ),
-			solver( Solver::SkylineLU ),
 			TExtHeightDep( false )
 		{}
 
@@ -264,6 +264,7 @@ namespace DataAirflowNetwork {
 			HeightOption( HeightOption ),
 			MaxIteration( MaxIteration ),
 			InitFlag( InitFlag ),
+			solver( solver ),
 			RelTol( RelTol ),
 			AbsTol( AbsTol ),
 			ConvLimit( ConvLimit ),
@@ -276,7 +277,6 @@ namespace DataAirflowNetwork {
 			OpenFactorErrCount( OpenFactorErrCount ),
 			OpenFactorErrIndex( OpenFactorErrIndex ),
 			InitType( InitType ),
-			solver( solver ),
 			TExtHeightDep( TExtHeightDep )
 		{}
 	};
