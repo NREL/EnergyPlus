@@ -71,6 +71,7 @@
 #include <General.hh>
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
+#include <DisplayRoutines.hh>
 
 
 namespace EnergyPlus {
@@ -244,6 +245,65 @@ namespace EnergyPlus {
 				}
 				tableRowIndex++;
 			}
+		}
+
+		void
+		checkAggregationOrderForAnnual( )
+		{
+			std::vector<AnnualTable>::iterator annualTableIt;
+			bool invalidAggregationOrderFound = false;
+			if ( !DataGlobals::DoWeathSim ) {// if no weather simulation than no reading of MonthlyInput array
+				return;
+			}
+			for ( annualTableIt = annualTables.begin( ); annualTableIt != annualTables.end( ); ++annualTableIt ) {
+				if ( annualTableIt->invalidAggregationOrder( ) ) {
+					invalidAggregationOrderFound = true;
+				}
+			}
+			if ( invalidAggregationOrderFound ) {
+				ShowFatalError( "OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed." );
+			}
+		}
+
+		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017 
+		bool
+		AnnualTable::invalidAggregationOrder( )
+		{
+			std::vector<AnnualFieldSet>::iterator fldStIt;
+			bool foundMinOrMax = false;
+			bool foundHourAgg = false;
+			bool missingMaxOrMinError = false;
+			bool missingHourAggError = false;
+			for ( fldStIt = m_annualFields.begin( ); fldStIt != m_annualFields.end( ); ++fldStIt ) {
+				if ( ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum ) ||
+					 ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum ) ) {
+					foundMinOrMax = true;
+				} else if ( ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNonZero ) ||
+					        ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursZero ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursPositive ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNonPositive ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNegative ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::hoursNonNegative ) ){
+					foundHourAgg = true;
+				} else if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::valueWhenMaxMin ){
+					if ( !foundMinOrMax ) {
+						missingMaxOrMinError = true;
+					}
+				} else if ( ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::sumOrAverageHoursShown ) ||
+					        ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ) ||
+							( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimumDuringHoursShown ) ){
+					if ( !foundHourAgg ) {
+						missingHourAggError = true;
+					}
+				}
+			}
+			if ( missingMaxOrMinError ) {
+				ShowSevereError( "The Output:Table:Annual report named=\"" + m_name + "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or maximum aggregation types. The report will not be generated." );
+			}
+			if ( missingHourAggError ) {
+				ShowSevereError( "The Output:Table:Annual report named=\"" + m_name + "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- aggregation types. The report will not be generated." );
+			}
+			return ( missingHourAggError || missingMaxOrMinError );
 		}
 
 

@@ -188,7 +188,6 @@ namespace DataAirflowNetwork {
 		// and NO MULTIZONE OR DISTRIBUTION
 		std::string WPCCntr; // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
 		int iWPCCntr; // Integer equivalent for WPCCntr field
-		std::string CpArrayName; // CP Array name at WPCCntr = "INPUT"
 		std::string BldgType; // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
 		std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
 		int MaxIteration; // Maximum number of iteration, default 500
@@ -199,7 +198,6 @@ namespace DataAirflowNetwork {
 		Real64 MaxPressure; // Maximum pressure change in an element [Pa]
 		Real64 Azimuth; // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
 		Real64 AspectRatio; // Ratio of Building Width Along Short Axis to Width Along Long Axis
-		int NWind; // Number of wind directions
 		Real64 DiffP; // Minimum pressure difference
 		int ExtLargeOpeningErrCount; // Exterior large opening error count during HVAC system operation
 		int ExtLargeOpeningErrIndex; // Exterior large opening error index during HVAC system operation
@@ -221,7 +219,6 @@ namespace DataAirflowNetwork {
 			MaxPressure( 500.0 ),
 			Azimuth( 0.0 ),
 			AspectRatio( 1.0 ),
-			NWind( 0 ),
 			DiffP( 1.0e-4 ),
 			ExtLargeOpeningErrCount( 0 ),
 			ExtLargeOpeningErrIndex( 0 ),
@@ -237,7 +234,6 @@ namespace DataAirflowNetwork {
 			std::string const & Control, // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
 			std::string const & WPCCntr, // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
 			int const iWPCCntr, // Integer equivalent for WPCCntr field
-			std::string const & CpArrayName, // CP Array name at WPCCntr = "INPUT"
 			std::string const & BldgType, // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATION"
 			std::string const & HeightOption, // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
 			int const MaxIteration, // Maximum number of iteration, default 500
@@ -248,7 +244,6 @@ namespace DataAirflowNetwork {
 			Real64 const MaxPressure, // Maximum pressure change in an element [Pa]
 			Real64 const Azimuth, // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
 			Real64 const AspectRatio, // Ratio of Building Width Along Short Axis to Width Along Long Axis
-			int const NWind, // Number of wind directions
 			Real64 const DiffP, // Minimum pressure difference
 			int const ExtLargeOpeningErrCount, // Exterior large opening error count during HVAC system operation
 			int const ExtLargeOpeningErrIndex, // Exterior large opening error index during HVAC system operation
@@ -261,7 +256,6 @@ namespace DataAirflowNetwork {
 			Control( Control ),
 			WPCCntr( WPCCntr ),
 			iWPCCntr( iWPCCntr ),
-			CpArrayName( CpArrayName ),
 			BldgType( BldgType ),
 			HeightOption( HeightOption ),
 			MaxIteration( MaxIteration ),
@@ -272,7 +266,6 @@ namespace DataAirflowNetwork {
 			MaxPressure( MaxPressure ),
 			Azimuth( Azimuth ),
 			AspectRatio( AspectRatio ),
-			NWind( NWind ),
 			DiffP( DiffP ),
 			ExtLargeOpeningErrCount( ExtLargeOpeningErrCount ),
 			ExtLargeOpeningErrIndex( ExtLargeOpeningErrIndex ),
@@ -652,7 +645,6 @@ namespace DataAirflowNetwork {
 		Real64 azimuth; // Azimuthal angle of the associated surface
 		Real64 height; // Nodal height
 		int ExtNum; // External node number
-		int CPVNum; // CP Value number
 		int facadeNum; // Facade number
 		int curve; // Curve ID, replace with pointer after curve refactor
 		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
@@ -663,38 +655,10 @@ namespace DataAirflowNetwork {
 			azimuth( 0.0 ),
 			height( 0.0 ),
 			ExtNum( 0 ),
-			//CPVNum( 0 ),
 			facadeNum( 0 ),
 			curve( 0 ),
 			symmetricCurve( false ),
 			useRelativeAngle( false )
-		{}
-
-	};
-
-	struct MultizoneCPArrayProp // CP Array
-	{
-		// Members
-		std::string Name; // Name of CP array
-		int NumWindDir; // Number of wind directions
-		Array1D< Real64 > WindDir; // Wind direction
-
-		// Default Constructor
-		MultizoneCPArrayProp() :
-			NumWindDir( 0 )
-		{}
-
-	};
-
-	struct MultizoneCPValueProp // CP Value
-	{
-		// Members
-		std::string Name; // Name of CP Value
-		std::string CPArrayName; // CP array Name
-		Array1D< Real64 > CPValue; // CP Value
-
-		// Default Constructor
-		MultizoneCPValueProp()
 		{}
 
 	};
@@ -1425,17 +1389,15 @@ namespace DataAirflowNetwork {
 		Real64 DuctEmittance;
 		Array1D< LinkageSurfaceProp > LinkageSurfaceData;
 		int ObjectNum;
-		Real64 UThermalRad;
 		Real64 QRad;
-		Real64 TSurr;
+		Real64 QConv;
 
 		AirflowNetworkLinkageViewFactorProp() :
 			DuctExposureFraction( 0.0 ),
 			DuctEmittance( 0.0 ),
 			ObjectNum( 0 ),
-			UThermalRad( 0.0 ),
 			QRad( 0.0 ),
-			TSurr( 0.0 )
+			QConv( 0.0 )
 		{}
 	};
 
@@ -1460,11 +1422,6 @@ namespace DataAirflowNetwork {
 	extern Array1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
 	extern Array1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
 	extern Array1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
-	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayData;
-	extern Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
-	extern Array1D< MultizoneCPValueProp > MultizoneCPValueData;
-	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	extern Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modification factor
 	extern Array1D< DeltaCpProp > DeltaCp;
 	extern Array1D< DeltaCpProp > EPDeltaCP;
 	extern Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;

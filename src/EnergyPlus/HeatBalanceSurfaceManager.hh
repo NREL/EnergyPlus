@@ -72,7 +72,6 @@ namespace HeatBalanceSurfaceManager {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	// na
 
 	// Subroutine Specifications for the Heat Balance Module
 	// Driver Routines

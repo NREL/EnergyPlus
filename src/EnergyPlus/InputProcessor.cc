@@ -1195,7 +1195,7 @@ namespace InputProcessor {
 		}
 
 		if ( errFlag ) {
-			ShowContinueError( "IP: Errors occured in ObjectDefinition for Class=" + ObjectDef( NumObjectDefs ).Name + ", Object not available for IDF processing.", EchoInputFile );
+			ShowContinueError( "IP: Errors occurred in ObjectDefinition for Class=" + ObjectDef( NumObjectDefs ).Name + ", Object not available for IDF processing.", EchoInputFile );
 			ObjectDef( NumObjectDefs ).AlphaOrNumeric.deallocate();
 			ObjectDef( NumObjectDefs ).NumRangeChks.deallocate();
 			ObjectDef( NumObjectDefs ).AlphFieldChks.deallocate();

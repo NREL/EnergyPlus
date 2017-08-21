@@ -963,12 +963,13 @@ void SQLite::initializeZoneSizingTable()
 void SQLite::initializeSystemSizingTable()
 {
 	const std::string systemSizesTableSQL =
-		"CREATE TABLE SystemSizes (SystemSizesIndex INTEGER PRIMARY KEY, SystemName TEXT, Description TEXT, Value REAL, Units TEXT);";
+		"CREATE TABLE SystemSizes (SystemSizesIndex INTEGER PRIMARY KEY, SystemName TEXT, LoadType TEXT, PeakLoadType TEXT, "
+        "UserDesCap REAL, CalcDesVolFlow REAL, UserDesVolFlow REAL, DesDayName TEXT, PeakHrMin TEXT);";
 
 	sqliteExecuteCommand(systemSizesTableSQL);
 
 	const std::string systemSizingInsertSQL =
-		"INSERT INTO SystemSizes VALUES(?,?,?,?,?);";
+		"INSERT INTO SystemSizes VALUES(?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_systemSizingInsertStmt,systemSizingInsertSQL);
 }
@@ -1772,29 +1773,35 @@ void SQLite::addSQLiteZoneSizingRecord(
 	}
 }
 
-void SQLite::addSQLiteSystemSizingRecord(
-	std::string const & sysName, // the name of the system
-	std::string const & varDesc, // the description of the input variable
-	Real64 const varValue // the value from the sizing calculation
+void SQLite::addSQLiteSystemSizingRecord (
+	std::string const & SysName, // the name of the system
+	std::string const & LoadType, // either "Cooling" or "Heating"
+	std::string const & PeakLoadType, // either "Sensible" or "Total"
+	Real64 const & UserDesCap, // User  Design Capacity
+	Real64 const & CalcDesVolFlow, // Calculated Cooling Design Air Flow Rate
+	Real64 const & UserDesVolFlow, // User Cooling Design Air Flow Rate
+	std::string const & DesDayName, // the name of the design day that produced the peak
+	std::string const & PeakHrMin // time stamp of the peak
 )
 {
 	if ( m_writeOutputToSQLite ) {
 		++m_systemSizingIndex;
-		std::string description;
-		std::string units;
+		sqliteBindInteger( m_systemSizingInsertStmt, 1, m_systemSizingIndex );
+		sqliteBindText( m_systemSizingInsertStmt, 2, SysName );
+		sqliteBindText( m_systemSizingInsertStmt, 3, LoadType );
+		sqliteBindText( m_systemSizingInsertStmt, 4, PeakLoadType );
 
-		parseUnitsAndDescription(varDesc,units,description);
+		sqliteBindDouble( m_systemSizingInsertStmt, 5, UserDesCap );
+		sqliteBindDouble( m_systemSizingInsertStmt, 6, CalcDesVolFlow );
+		sqliteBindDouble( m_systemSizingInsertStmt, 7, UserDesVolFlow );
+		sqliteBindText( m_systemSizingInsertStmt, 8, DesDayName );
+		sqliteBindText( m_systemSizingInsertStmt, 9, PeakHrMin );
 
-		sqliteBindInteger(m_systemSizingInsertStmt, 1, m_systemSizingIndex);
-		sqliteBindText(m_systemSizingInsertStmt, 2, sysName);
-		sqliteBindText(m_systemSizingInsertStmt, 3, description);
-		sqliteBindDouble(m_systemSizingInsertStmt, 4, varValue);
-		sqliteBindText(m_systemSizingInsertStmt, 5, units);
-
-		sqliteStepCommand(m_systemSizingInsertStmt);
-		sqliteResetCommand(m_systemSizingInsertStmt);
+		sqliteStepCommand( m_systemSizingInsertStmt );
+		sqliteResetCommand( m_systemSizingInsertStmt );
 	}
 }
+
 
 void SQLite::addSQLiteComponentSizingRecord(
 	std::string const & compType, // the type of the component

@@ -2266,7 +2266,7 @@ namespace EvaporativeCoolers {
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutBaroPress;
 		using CurveManager::CurveValue;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using Psychrometrics::PsyHfgAirFnWTdb;
 		using DataHVACGlobals::SmallLoad;
@@ -2358,7 +2358,7 @@ namespace EvaporativeCoolers {
 			Par( 4 ) = InletDryBulbTempSec;
 			Par( 5 ) = InletWetBulbTempSec;
 			Par( 6 ) = InletHumRatioSec;
-			SolveRegulaFalsi( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
+			SolveRoot( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
 			// if the numerical inversion failed, issue error messages.
 			if ( SolFla == -1 ) {
 				if ( !WarmupFlag ) {
@@ -2409,7 +2409,7 @@ namespace EvaporativeCoolers {
 			Par( 6 ) = InletHumRatioSec;
 			// get dry operation performance first
 			Par( 2 ) = double( DryModulated );
-			SolveRegulaFalsi( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
+			SolveRoot( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
 			// if the numerical inversion failed, issue error messages.
 			if ( SolFla == -1 ) {
 				if ( !WarmupFlag ) {
@@ -2448,7 +2448,7 @@ namespace EvaporativeCoolers {
 			EvapCoolerTotalElectricPowerDry = IndEvapCoolerPower( EvapCoolNum, DryModulated, FlowRatioSecDry );
 			// get wet operation performance
 			Par( 2 ) = double( WetModulated );
-			SolveRegulaFalsi( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
+			SolveRoot( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
 			// if the numerical inversion failed, issue error messages.
 			if ( SolFla == -1 ) {
 				if ( !WarmupFlag ) {
@@ -2508,7 +2508,7 @@ namespace EvaporativeCoolers {
 			Par( 4 ) = InletDryBulbTempSec;
 			Par( 5 ) = InletWetBulbTempSec;
 			Par( 6 ) = InletHumRatioSec;
-			SolveRegulaFalsi( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
+			SolveRoot( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
 			// if the numerical inversion failed, issue error messages.
 			if ( SolFla == -1 ) {
 				if ( !WarmupFlag ) {
@@ -4437,7 +4437,7 @@ namespace EvaporativeCoolers {
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::ZoneCompTurnFansOn;
 		using DataHVACGlobals::ZoneCompTurnFansOff;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -4509,7 +4509,7 @@ namespace EvaporativeCoolers {
 			Par( 5 ) = ZoneCoolingLoad;
 			FanSpeedRatio = 1.0;
 
-			SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, FanSpeedRatio, VSEvapUnitLoadResidual, 0.0, 1.0, Par );
+			SolveRoot( ErrorToler, MaxIte, SolFla, FanSpeedRatio, VSEvapUnitLoadResidual, 0.0, 1.0, Par );
 			if ( SolFla == -1 ) {
 				if ( ZoneEvapUnit( UnitNum ).UnitVSControlMaxIterErrorIndex == 0 ) {
 					ShowWarningError( "Iteration limit exceeded calculating variable speed evap unit fan speed ratio, for unit=" + ZoneEvapUnit( UnitNum ).Name );

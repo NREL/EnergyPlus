@@ -122,7 +122,7 @@ namespace HeatRecovery {
 
 	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
-	using General::SolveRegulaFalsi;
+	using General::SolveRoot;
 	using General::RoundSigDigits;
 	using namespace Psychrometrics;
 
@@ -3283,7 +3283,7 @@ namespace HeatRecovery {
 		Par( 1 ) = Eps;
 		Par( 2 ) = Z;
 
-		SolveRegulaFalsi( Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par );
+		SolveRoot( Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par );
 
 		if ( SolFla == -2 ) {
 			ShowFatalError( "HeatRecovery: Bad initial bounds for NTU in GetNTUforCrossFlowBothUnmixed" );

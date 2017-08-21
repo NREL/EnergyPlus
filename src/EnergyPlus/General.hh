@@ -88,7 +88,7 @@ namespace General {
 	// Functions
 
 	void
-	SolveRegulaFalsi(
+	SolveRoot(
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
@@ -100,7 +100,22 @@ namespace General {
 	);
 
 	void
-	SolveRegulaFalsi(
+	SolveRoot(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x [,Par]) = 0
+		std::function< Real64( Real64 const, Array1< Real64 > const & ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1, // 2nd bound of interval that contains the solution
+		Array1< Real64 > const & Par, // array with additional parameters used for function evaluation
+		int const AlgorithmTypeNum, // ALgorithm selection
+		Real64 & XX_0, // Low bound obtained with maximum number of allowed iterations
+		Real64 & XX_1 // Hign bound obtained with maximum number of allowed iterations
+	);
+
+	void
+	SolveRoot(
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
@@ -108,6 +123,20 @@ namespace General {
 		std::function< Real64( Real64 const ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1 // 2nd bound of interval that contains the solution
+	);
+
+	void
+	SolveRoot(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x) = 0
+		std::function< Real64( Real64 const ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1, // 2nd bound of interval that contains the solution
+		int const AlgorithmTypeNum, // ALgorithm selection
+		Real64 & XX_0, // Low bound obtained with maximum number of allowed iterations
+		Real64 & XX_1 // Hign bound obtained with maximum number of allowed iterations
 	);
 
 	Real64
@@ -286,6 +315,13 @@ namespace General {
 	std::string
 	CreateSysTimeIntervalString();
 
+	int
+	nthDayOfWeekOfMonth(
+		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
+		int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
+		int const & monthNumber // January = 1
+	);
+
 	Real64
 	SafeDivide(
 		Real64 const a,
@@ -450,6 +486,8 @@ namespace General {
 		for ( std::size_t i = 0, e = Items.size(); i < e; ++i ) ItemNames[ i ] = Items[ i ].Name;
 		CheckCreatedZoneItemName( calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag );
 	}
+
+	std::vector <std::string> splitString( const std::string &string, char delimiter );
 
 } // General
 

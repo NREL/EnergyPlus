@@ -1940,33 +1940,30 @@ EAp2-4/5. Performance Rating Method Compliance
 
 \begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
 \toprule 
- & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Energy Use [GJ] & Other Demand [W] \tabularnewline
+ & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Fuel Use [GJ] & Other Fuel Demand [W] \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
- & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Energy Use [GJ] & Other Demand [W] \tabularnewline
+ & Electric Energy Use [GJ] & Electric Demand [W] & Natural Gas Energy Use [GJ] & Natural Gas Demand [W] & Other Fuel Use [GJ] & Other Fuel Demand [W] \tabularnewline
 \midrule
 \endhead
 
-Interior Lighting & 81.24 & 7125.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Space Heating & 0.00 & 0.00 & 103.92 & 62499.99 & 0.00 & 0.00 \tabularnewline
-Space Cooling & 17.63 & 9523.66 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Pumps & 1.54 & 319.57 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Fans-Interior & 7.01 & 609.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Fans-Parking Garage & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Service Water Heating & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Receptacle Equipment & 47.70 & 4500.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Interior Lighting (process) & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Refrigeration Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Cooking & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Industrial Process & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Elevators and Escalators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Total Line & 155.12 & ~ & 274.01 & ~ & 0.00 & ~ \tabularnewline
+Heating -- Not Subdivided  & 0.00 & 0.00 & 103.92 & 62499.99 & 0.00 & 0.00 \tabularnewline
+Cooling -- Not Subdivided  & 17.63 & 9523.66 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting -- General & 81.24 & 7125.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting -- Process & 81.24 & 7125.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting -- General  & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps -- Not Subdivided  & 1.54 & 319.57 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection -- Not Subdivided  & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans -- Interior  & 7.01 & 609.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans -- Garage  & 7.01 & 609.44 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Service Water Heating  -- Not Subdivided & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Receptacle Equipment - Not Subdivided& 47.70 & 4500.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration Equipment -- Not Subdivided & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
 \bottomrule
 \end{longtable}
+
 
 EAp2-6. Energy Use Summary
 
@@ -2112,6 +2109,56 @@ Receptacle Equipment & 11.11 \tabularnewline
 Miscellaneous & 39.99 \tabularnewline
 \bottomrule
 \end{longtable}
+
+Schedules-Equivalent Full Load Hours (Schedule Type=Fraction)
+\begin{longtable}[c]{@{}lll@{}}
+
+\toprule 
+ & Equivalent Full Load Hours of Operation Per Year [hr] & Hours > 1\% [hr] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Equivalent Full Load Hours of Operation Per Year [hr] & Hours > 1\% [hr] \tabularnewline
+\midrule
+\endhead
+
+    OCCUPY-1              &        2532.                                          &        3393.     \tabularnewline
+    LIGHTS-1              &        3009.                                          &        8760.     \tabularnewline
+    EQUIP-1               &        2650.                                          &        8760.     \tabularnewline
+    INFIL-SCH             &        3624.                                          &        3624.     \tabularnewline
+    SHADETRANSSCH         &           0.                                          &           0.     \tabularnewline
+    MIN OA SCHED          &        3245.                                          &        8760.     \tabularnewline
+    FANAVAILSCHED         &        5678.                                          &        5678.     \tabularnewline
+    COOLINGCOILAVAILSCHED &        1310.                                          &        1310.     \tabularnewline
+    REHEATCOILAVAILSCHED  &        5678.                                          &        5678.     \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+Schedules-SetPoints (Schedule Type=Temperature)
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+ & First Object Used     & Month Assumed & 11am First Wednesday [C] & Days with Same 11am Value & 11pm First Wednesday [C] & Days with Same 11pm Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & First Object Used     & Month Assumed & 11am First Wednesday [C] & Days with Same 11am Value & 11pm First Wednesday [C] & Days with Same 11pm Value \tabularnewline
+\midrule
+\endhead
+
+    HTG-SETP-SCH       & HEATING SETPOINT       & January       &        21.10             &          365              &        12.80             &          365              \tabularnewline
+    PLENUM-HTG-SETP-SCH & PLENUM HEATING SETPOINT & January       &        12.80             &          365              &        12.80             &          365              \tabularnewline
+    CLG-SETP-SCH3      & COOLING SETPOINT       & July          &        25.00             &          122              &        25.00             &          122              \tabularnewline
+    PLENUM-CLG-SETP-SCH & PLENUM COOLING SETPOINT & July          &        40.00             &          365              &        40.00             &          365              \tabularnewline
+    CLG-SETP-SCH       & DUAL SETPOINT          & July          &        23.90             &          365              &        40.00             &          365              \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+
 
 \subsection{Initialization Summary}\label{initializatin-summary}
 
@@ -2589,9 +2636,9 @@ VAV SYS 1 & 1.05 & 1.05 & 1.05 & 0.18+309 & 0.0000 & 1.000 \tabularnewline
 \bottomrule
 \end{longtable}}
 
-\subsection{Zone Component Loads Summary}\label{zone-component-loads-summary}
+\subsection{Component Loads Summary}\label{component-loads-summary}
 
-The Zone Component Loads Summary provides an estimate of the heating and cooling peak loads for each zone broken down into various components. This report may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. The Sensible-Delayed column of the summary is only an estimate based on a procedure described in the Engineering Reference documentation. An intermediate calculation in this procedure is the decay curves that are shown in the the EIO file when Output:Surfaces:List is set to show DecayCurvesFromZoneComponentLoads. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the \emph{Peak Conditions} subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.~ The key used to obtain this report is ZoneComponentLoadSummary.
+Three different Component Loads Summary reports can be generated. The Zone Component Loads Summary, the AirLoop Component Loads Summary and the Facility Component Loads Summary. Each provides an estimate of the heating and cooling peak loads for each zone broken down into various components. This report may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. The Sensible-Delayed column of the summary is only an estimate based on a procedure described in the Engineering Reference documentation. An intermediate calculation in this procedure is the decay curves that are shown in the the EIO file when Output:Surfaces:List is set to show DecayCurvesFromComponentLoadsSummary. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the \emph{Peak Conditions} subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. Engineering checks have been added showing some ratios that may be useful in checking the results. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.~ The key used to obtain these reports are ZoneComponentLoadSummary, AirLoopComponentLoadSummary, FacilityComponentLoadSummary.
 
 Report: ZoneComponentLoadSummary
 
@@ -2600,48 +2647,52 @@ For: SPACE1-1
 Timestamp: 2012-09-21 15:48:46
 
 Estimated Cooling Peak Load Components
+{\scriptsize
 
-\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\begin{longtable}[c]{>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}}
 \toprule 
- & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total \tabularnewline
+ & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total & Related Area {[}m2{]} & Total per Area {[}W/m2{]} \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
- & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total \tabularnewline
+ & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total & Related Area {[}m2{]} & Total per Area {[}W/m2{]} \tabularnewline
 \midrule
 \endhead
 
-People & 533.03 & 272.38 & ~ & 528.17 & 1333.58 & 30.78 \tabularnewline
-Lights & 15.84 & 1424.81 & 316.80 & ~ & 1757.45 & 40.57 \tabularnewline
-Equipment & 517.44 & 318.36 & ~ & 0.00 & 835.80 & 19.29 \tabularnewline
-Refrigeration & 0.00 & ~ & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Water Use Equipment & 0.00 & ~ & ~ & ~ & 0.00 & 0.00 \tabularnewline
-HVAC Equipment Losses & 0.00 & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Power Generation Equipment & 0.00 & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Infiltration & 34.65 & ~ & ~ & 69.37 & 104.03 & 2.40 \tabularnewline
-Zone Ventilation & 0.00 & ~ & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
-Interzone Mixing & 0.00 & ~ & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
-Roof & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Interzone Ceiling & ~ & 132.59 & ~ & ~ & 132.59 & 3.06 \tabularnewline
-Other Roof & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Exterior Wall & ~ & 451.39 & ~ & ~ & 451.39 & 10.42 \tabularnewline
-Interzone Wall & ~ & -511.9 & ~ & ~ & -511.9 & -11.8 \tabularnewline
-Ground Contact Wall & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Other Wall & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Exterior Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Interzone Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Ground Contact Floor & ~ & -1745.4 & ~ & ~ & -1745.4 & -40.3 \tabularnewline
-Other Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Fenestration Conduction & 655.17 & ~ & ~ & ~ & 655.17 & 15.12 \tabularnewline
-Fenestration Solar & - & 1319.55 & ~ & ~ & 1319.55 & 30.46 \tabularnewline
-Opaque Door & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Grand Total & 1756.13 & 1661.76 & 316.80 & 597.54 & 4332.24 & ~ \tabularnewline
+People & 536.56 & 258.31 &  & 523.12 & 1317.99 & 35.33 & 99.16 & 13.29 \tabularnewline
+Lights & 15.84 & 1335.72 & 316.80 &  & 1668.36 & 44.72 & 99.16 & 16.82 \tabularnewline
+Equipment & 535.92 & 316.37 &  & 0.00 & 852.29 & 22.84 & 99.16 & 8.60 \tabularnewline
+Refrigeration & 0.00 &  & 0.00 & 0.00 & 0.00 & 0.00 & 99.16 & 0.00 \tabularnewline
+Water Use Equipment & 0.00 &  &  & 0.00 & 0.00 & 0.00 & 99.16 & 0.00 \tabularnewline
+HVAC Equipment Losses & 0.00 & 0.00 &  &  & 0.00 & 0.00 &  &  \tabularnewline
+Power Generation Equipment & 0.00 & 0.00 &  &  & 0.00 & 0.00 &  &  \tabularnewline
+DOAS Direct to Zone & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  &  \tabularnewline
+Infiltration & 0.00 &  &  & 0.00 & 0.00 & 0.00 & 73.20 & 0.00 \tabularnewline
+Zone Ventilation & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  &  \tabularnewline
+Interzone Mixing & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  &  \tabularnewline
+Roof &  & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  \tabularnewline
+Interzone Ceiling &  & 467.30 &  &  & 467.30 & 12.53 & 99.16 & 4.71 \tabularnewline
+Other Roof &  & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  \tabularnewline
+Exterior Wall &  & 374.68 &  &  & 374.68 & 10.04 & 73.20 & 5.12 \tabularnewline
+Interzone Wall &  & -645.5 &  &  & -645.5 & -17.3 & 80.56 & -8.0 \tabularnewline
+Ground Contact Wall &  & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  \tabularnewline
+Other Wall &  & 0.00 &  &  & 0.00 & 0.00 & 73.20 & 0.00 \tabularnewline
+Exterior Floor &  & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  \tabularnewline
+Interzone Floor &  & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  \tabularnewline
+Ground Contact Floor &  & -2177.1 &  &  & -2177.1 & -58.4 & 99.16 & -22.0 \tabularnewline
+Other Floor &  & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  \tabularnewline
+Fenestration Conduction & 782.86 &  &  &  & 782.86 & 20.98 & 21.81 & 35.89 \tabularnewline
+Fenestration Solar &  & 1089.93 &  &  & 1089.93 & 29.21 & 21.81 & 49.97 \tabularnewline
+Opaque Door &  & 0.00 &  &  & 0.00 & 0.00 & 0.00 &  \tabularnewline
+Grand Total & 1871.18 & 1019.70 & 316.80 & 523.12 & 3730.80 &  &  &  \tabularnewline
+
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Cooling Peak Conditions
 
+{\scriptsize
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
  & Value \tabularnewline
@@ -2653,62 +2704,100 @@ Cooling Peak Conditions
 \midrule
 \endhead
 
-Time of Peak Load & 7/21 16:00:00 \tabularnewline
-Outside Dry Bulb Temperature [C] & 30.86 \tabularnewline
-Outside Wet Bulb Temperature [C] & 23.10 \tabularnewline
-Outside Humidity Ratio at Peak [kgWater/kgAir] & 0.01459 \tabularnewline
-Zone Dry Bulb Temperature [C] & 24.00 \tabularnewline
-Zone Relative Humdity [\%] & 47.16 \tabularnewline
-Zone Humidity Ratio at Peak [kgWater/kgAir] & 0.00876 \tabularnewline
-Peak Design Sensible Load [W] & 3187.17 \tabularnewline
-Estimated Instant + Delayed Sensible Load [W] & 3417.89 \tabularnewline
-Difference [W] & -230.7 \tabularnewline
+Time of Peak Load & 7/21 15:45:00 \tabularnewline
+Outside Dry Bulb Temperature {[}C{]} & 31.02 \tabularnewline
+Outside Wet Bulb Temperature {[}C{]} & 23.14 \tabularnewline
+Outside Humidity Ratio at Peak {[}kgWater/kgAir{]} & 0.01459 \tabularnewline
+Zone Dry Bulb Temperature {[}C{]} & 23.90 \tabularnewline
+Zone Relative Humidity {[}\%{]} & 52.91 \tabularnewline
+Zone Humidity Ratio at Peak {[}kgWater/kgAir{]} & 0.00979 \tabularnewline
+Supply Air Temperature {[}C{]} & 14.00 \tabularnewline
+Mixed Air Temperature {[}C{]} &  \tabularnewline
+Main Fan Air Flow {[}m3/s{]} & 0.22 \tabularnewline
+Outside Air Flow {[}m3/s{]} & 0.06 \tabularnewline
+Peak Sensible Load with Sizing Factor {[}W{]} & 2647.21 \tabularnewline
+Difference Due to Sizing Factor {[}W{]} & 0.00 \tabularnewline
+Peak Sensible Load {[}W{]} & 2647.21 \tabularnewline
+Estimated Instant + Delayed Sensible Load {[}W{]} & 2890.88 \tabularnewline
+Difference Between Peak and Estimated Sensible Load {[}W{]} & -243.7 \tabularnewline
 \bottomrule
-\end{longtable}
+\end{longtable}}
+
+Engineering Checks for Cooling
+
+{\scriptsize
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Value \tabularnewline
+\midrule
+\endhead
+
+
+Outside Air (\%) & 0.2524 \tabularnewline
+Airflow per Floor Area {[}m3/s-m2{]} & 0.0022 \tabularnewline
+Airflow per Total Capacity {[}m3/s-W{]} & 0.0001 \tabularnewline
+Floor Area per Total Capacity {[}m2/W{]} & 0.0375 \tabularnewline
+Total Capacity per Floor Area {[}W/m2{]} & 26.6963 \tabularnewline
+Number of People & 11.0 \tabularnewline
+
+\bottomrule
+\end{longtable}}
+
 
 Estimated Heating Peak Load Components
 
-\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+
+{\scriptsize
+
+\begin{longtable}[c]{>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}>{\raggedright}p{0.65in}}
 \toprule 
- & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total \tabularnewline
+ & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total & Related Area {[}m2{]} & Total per Area {[}W/m2{]} \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
- & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total \tabularnewline
+ & Sensible - Instant [W] & Sensible - Delayed [W] & Sensible - Return Air [W] & Latent [W] & Total [W] & \%Grand Total & Related Area {[}m2{]} & Total per Area {[}W/m2{]} \tabularnewline
 \midrule
 \endhead
 
-People & 0.00 & 0.00 & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
-Lights & 0.79 & 85.74 & 15.84 & ~ & 102.37 & -3.3 \tabularnewline
-Equipment & 14.78 & 9.37 & ~ & 0.00 & 24.15 & -0.8 \tabularnewline
-Refrigeration & 0.00 & ~ & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
-Water Use Equipment & 0.00 & ~ & ~ & ~ & 0.00 & 0.00 \tabularnewline
-HVAC Equipment Losses & 0.00 & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Power Generation Equipment & 0.00 & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Infiltration & -222.8 & ~ & ~ & -93.8 & -316.6 & 10.07 \tabularnewline
-Zone Ventilation & 0.00 & ~ & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
-Interzone Mixing & 0.00 & ~ & ~ & 0.00 & 0.00 & 0.00 \tabularnewline
-Roof & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Interzone Ceiling & ~ & -1027.9 & ~ & ~ & -1027.9 & 32.70 \tabularnewline
-Other Roof & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Exterior Wall & ~ & -762.5 & ~ & ~ & -762.5 & 24.26 \tabularnewline
-Interzone Wall & ~ & 102.80 & ~ & ~ & 102.80 & -3.3 \tabularnewline
-Ground Contact Wall & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Other Wall & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Exterior Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Interzone Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Ground Contact Floor & ~ & 889.07 & ~ & ~ & 889.07 & -28.3 \tabularnewline
-Other Floor & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Fenestration Conduction & -2155.0 & ~ & ~ & ~ & -2155.0 & 68.55 \tabularnewline
-Fenestration Solar & - & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Opaque Door & ~ & 0.00 & ~ & ~ & 0.00 & 0.00 \tabularnewline
-Grand Total & -2362.2 & -703.3 & 15.84 & -93.8 & -3143.5 & ~ \tabularnewline
+People & 0.00 & 0.00 &  & 0.00 & 0.00 & -0.00 & 99.16 & 0.00 \tabularnewline
+Lights & 0.79 & 87.93 & 15.84 &  & 104.57 & -2.7 & 99.16 & 1.05 \tabularnewline
+Equipment & 147.84 & 95.40 &  & 0.00 & 243.24 & -6.2 & 99.16 & 2.45 \tabularnewline
+Refrigeration & 0.00 &  & 0.00 & 0.00 & 0.00 & -0.00 & 99.16 & 0.00 \tabularnewline
+Water Use Equipment & 0.00 &  &  & 0.00 & 0.00 & -0.00 & 99.16 & 0.00 \tabularnewline
+HVAC Equipment Losses & 0.00 & 0.00 &  &  & 0.00 & -0.00 &  &  \tabularnewline
+Power Generation Equipment & 0.00 & 0.00 &  &  & 0.00 & -0.00 &  &  \tabularnewline
+DOAS Direct to Zone & 0.00 &  &  & 0.00 & 0.00 & -0.00 &  &  \tabularnewline
+Infiltration & -418.4 &  &  & -76.3 & -494.7 & 12.68 & 73.20 & -6.8 \tabularnewline
+Zone Ventilation & 0.00 &  &  & 0.00 & 0.00 & -0.00 &  &  \tabularnewline
+Interzone Mixing & 0.00 &  &  & 0.00 & 0.00 & -0.00 &  &  \tabularnewline
+Roof &  & 0.00 &  &  & 0.00 & -0.00 & 0.00 &  \tabularnewline
+Interzone Ceiling &  & -937.7 &  &  & -937.7 & 24.03 & 99.16 & -9.5 \tabularnewline
+Other Roof &  & 0.00 &  &  & 0.00 & -0.00 & 0.00 &  \tabularnewline
+Exterior Wall &  & -735.5 &  &  & -735.5 & 18.85 & 73.20 & -10.0 \tabularnewline
+Interzone Wall &  & 82.11 &  &  & 82.11 & -2.1 & 80.56 & 1.02 \tabularnewline
+Ground Contact Wall &  & 0.00 &  &  & 0.00 & -0.00 & 0.00 &  \tabularnewline
+Other Wall &  & 0.00 &  &  & 0.00 & -0.00 & 73.20 & 0.00 \tabularnewline
+Exterior Floor &  & 0.00 &  &  & 0.00 & -0.00 & 0.00 &  \tabularnewline
+Interzone Floor &  & 0.00 &  &  & 0.00 & -0.00 & 0.00 &  \tabularnewline
+Ground Contact Floor &  & 437.67 &  &  & 437.67 & -11.2 & 99.16 & 4.41 \tabularnewline
+Other Floor &  & 0.00 &  &  & 0.00 & -0.00 & 0.00 &  \tabularnewline
+Fenestration Conduction & -2601.7 &  &  &  & -2601.7 & 66.68 & 21.81 & -119.3 \tabularnewline
+Fenestration Solar &  & 0.00 &  &  & 0.00 & -0.00 & 21.81 & 0.00 \tabularnewline
+Opaque Door &  & 0.00 &  &  & 0.00 & -0.00 & 0.00 &  \tabularnewline
+Grand Total & -2871.5 & -970.1 & 15.84 & -76.3 & -3902.1 &  &  & \tabularnewline
+
 \bottomrule
-\end{longtable}
+\end{longtable}}
 
 Heating Peak Conditions
 
+{\scriptsize
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
  & Value \tabularnewline
@@ -2720,18 +2809,50 @@ Heating Peak Conditions
 \midrule
 \endhead
 
-Time of Peak Load & 1/21 20:15:00 \tabularnewline
-Outside Dry Bulb Temperature [C] & -17.3 \tabularnewline
-Outside Wet Bulb Temperature [C] & -19.0 \tabularnewline
-Outside Humidity Ratio at Peak [kgWater/kgAir] & 0.00084 \tabularnewline
-Zone Dry Bulb Temperature [C] & 23.00 \tabularnewline
-Zone Relative Humdity [\%] & 43.89 \tabularnewline
-Zone Humidity Ratio at Peak [kgWater/kgAir] & 0.00766 \tabularnewline
-Peak Design Sensible Load [W] & -3077.1 \tabularnewline
-Estimated Instant + Delayed Sensible Load [W] & -3065.5 \tabularnewline
-Difference [W] & -11.6 \tabularnewline
+Time of Peak Load & 1/21 24:00:00 \tabularnewline
+Outside Dry Bulb Temperature {[}C{]} & -17.3 \tabularnewline
+Outside Wet Bulb Temperature {[}C{]} & -17.3 \tabularnewline
+Outside Humidity Ratio at Peak {[}kgWater/kgAir{]} & 0.00084 \tabularnewline
+Zone Dry Bulb Temperature {[}C{]} & 22.20 \tabularnewline
+Zone Relative Humidity {[}\%{]} & 22.83 \tabularnewline
+Zone Humidity Ratio at Peak {[}kgWater/kgAir{]} & 0.00377 \tabularnewline
+Supply Air Temperature {[}C{]} & 50.00 \tabularnewline
+Mixed Air Temperature {[}C{]} &  \tabularnewline
+Main Fan Air Flow {[}m3/s{]} & 0.12 \tabularnewline
+Outside Air Flow {[}m3/s{]} & 0.06 \tabularnewline
+Peak Sensible Load with Sizing Factor {[}W{]} & -3860.8 \tabularnewline
+Difference Due to Sizing Factor {[}W{]} & 0.00 \tabularnewline
+Peak Sensible Load {[}W{]} & -3860.8 \tabularnewline
+Estimated Instant + Delayed Sensible Load {[}W{]} & -3841.6 \tabularnewline
+Difference Between Peak and Estimated Sensible Load {[}W{]} & -19.2 \tabularnewline
+
 \bottomrule
-\end{longtable}
+\end{longtable}}
+
+Engineering Checks for Heating
+
+{\scriptsize
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+ & Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Value \tabularnewline
+\midrule
+\endhead
+
+Outside Air (\%) & 0.4817 \tabularnewline
+Airflow per Floor Area {[}m3/s-m2{]} & 0.0012 \tabularnewline
+Airflow per Total Capacity {[}m3/s-W{]} & -0.000 \tabularnewline
+Floor Area per Total Capacity {[}m2/W{]} & -0.026 \tabularnewline
+Total Capacity per Floor Area {[}W/m2{]} & -38.935 \tabularnewline
+Number of People & 11.0 \tabularnewline
+
+\bottomrule
+\end{longtable}}
+
 
 \subsection{Output:Table:TimeBins}\label{outputtabletimebins}
 

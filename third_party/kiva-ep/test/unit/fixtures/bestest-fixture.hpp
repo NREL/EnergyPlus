@@ -49,6 +49,7 @@ protected:
     fnd.exteriorConvectiveCoefficient = 99999;
 
     fnd.numericalScheme = Foundation::NS_STEADY_STATE;
+    fnd.mesh.maxNearGrowthCoeff = 1.0;
 
     bcs.localWindSpeed = 0;
     bcs.outdoorTemp = 283.15;

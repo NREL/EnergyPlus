@@ -87,7 +87,7 @@ namespace TARCOGMain {
 	//  Revision: 7.0.09  (November/15/2011), Simon Vidanovic
 	//   - imrovement: Added error message tolerance (This is necessary to handle error messages in correct way)
 	//  Revision: 7.0.08  (November/15/2011), Simon Vidanovic
-	//   - bug fix: Fixed program crashing when warrning message 1007 occured (output could not fit in string)
+	//   - bug fix: Fixed program crashing when warrning message 1007 occurred (output could not fit in string)
 	//   - feature: relaxation parameter changed
 	//  Revision: 7.0.07  (November/08/2011), Simon Vidanovic
 	//   - feature: Error message (as string) is now return from tarcog

@@ -128,6 +128,8 @@
 ! Nominal Cooling Power Input = 9.63 (Cooling COP = 3.2917)
 ! Nominal Heating Capacity = 35.2 kW
 ! Nominal Power Input = 9.92 kW (Heating COP = 3.5484)
+! Note: Capacity performance curves are normalized to capacity at 16C indoor wet-bulb temperature
+!       For this reason, the similation will report that capacity as a function of temperature curves are not 1 at the rating point
 
   AirConditioner:VariableRefrigerantFlow,
     VRF Heat Pump,           !- Heat Pump Name
@@ -2482,7 +2484,7 @@
   Sizing:Zone,
     SPACE1-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    12.0,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}

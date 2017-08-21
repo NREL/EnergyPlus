@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
@@ -246,6 +245,13 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
 	HydrRadSys( RadSysNum ).TubeLength = AutoSize;
 	HydrRadSys( RadSysNum ).TotalSurfaceArea = 1500.0;
 	ExpectedResult3 = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+	HydrRadSys( RadSysNum ).SurfacePtr.allocate( 1 );
+	HydrRadSys( RadSysNum ).SurfacePtr( 1 ) = 1;
+	Surface.allocate( 1 );
+	Surface( 1 ).Construction = 1;
+	Surface( 1 ).Area = 1500.0;
+	Construct.allocate( 1 );
+	Construct( 1 ).ThicknessPerpend = 0.075;
 
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat, 0.1 );
@@ -320,6 +326,14 @@ TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow )
 	FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad = 2200.0;
 	ExpectedResult2 = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
 
+	HydrRadSys( RadSysNum ).SurfacePtr.allocate( 1 );
+	HydrRadSys( RadSysNum ).SurfacePtr( 1 ) = 1;
+	Surface.allocate( 1 );
+	Surface( 1 ).Construction = 1;
+	Surface( 1 ).Area = 1500.0;
+	Construct.allocate( 1 );
+	Construct( 1 ).ThicknessPerpend = 0.075;
+	
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).ScaledHeatingCapacity, 0.1 );
 	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).ScaledCoolingCapacity, 0.1 );
@@ -380,6 +394,15 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow )
 	ExpectedResult1 = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 	ExpectedResult1 = ExpectedResult1 / ( PlantSizData( 1 ).DeltaT * RhoWater * CpWater );
 
+	CFloRadSys( RadSysNum ).SurfacePtr.allocate( 1 );
+	CFloRadSys( RadSysNum ).SurfacePtr( 1 ) = 1;
+	Surface.allocate( 1 );
+	Surface( 1 ).Construction = 1;
+	Surface( 1 ).Area = 150.0;
+	Construct.allocate( 1 );
+	Construct( 1 ).ThicknessPerpend = 0.075;
+	
+	
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
 
@@ -448,7 +471,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 		"    0.0000000E+00,           !- Z Origin {m}",
 		"    1,                       !- Type",
 		"    1,                       !- Multiplier",
-		"    autocalculate,           !- Ceiling Height {m}",
+		"    2.5,                     !- Ceiling Height {m}",
 		"    autocalculate;           !- Volume {m3}",
 
 		"  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
@@ -1147,7 +1170,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 	ChilledWaterFlowRate = CoolingCapacity / ( PlantSizData( 2 ).DeltaT * Cp * Density );
 	// tuble length sizing calculation
 	HydrRadSys( RadSysNum ).TotalSurfaceArea = Surface( HydrRadSys( RadSysNum ).SurfacePtr( 1 ) ).Area;
-	TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+	TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.1524; // tube length uses the construction perpendicular spacing
 
 	// do autosize calculations
 	SizeLowTempRadiantSystem( RadSysNum, RadSysTypes( 1 ).SystemType );
@@ -1561,4 +1584,111 @@ TEST_F( LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode )
 	Schedule.deallocate( );
 	DataHeatBalFanSys::MAT.deallocate( );
 
+}
+
+TEST_F( LowTempRadiantSystemTest, SizeRadSysTubeLengthTest )
+{
+	// # Low Temperature Radiant System (variable and constant flow) autosizing tube length issue #6202
+	Real64 FuncCalc;
+	int RadSysType;
+	
+	RadSysNum = 1;
+	LowTempRadiantSystem::clear_state( );
+
+	HydrRadSys.allocate( 3 );
+	CFloRadSys.allocate( 3 );
+	
+	HydrRadSys( 1 ).NumOfSurfaces = 1;
+	HydrRadSys( 1 ).SurfacePtr.allocate( 1 );
+	HydrRadSys( 1 ).SurfacePtr( 1 ) = 1;
+	HydrRadSys( 2 ).NumOfSurfaces = 2;
+	HydrRadSys( 2 ).SurfacePtr.allocate( 2 );
+	HydrRadSys( 2 ).SurfacePtr( 1 ) = 1;
+	HydrRadSys( 2 ).SurfacePtr( 2 ) = 2;
+	HydrRadSys( 3 ).NumOfSurfaces = 1;
+	HydrRadSys( 3 ).SurfacePtr.allocate( 1 );
+	HydrRadSys( 3 ).SurfacePtr( 1 ) = 3;
+
+	
+	CFloRadSys( 1 ).NumOfSurfaces = 1;
+	CFloRadSys( 1 ).SurfacePtr.allocate( 1 );
+	CFloRadSys( 1 ).SurfacePtr( 1 ) = 1;
+	CFloRadSys( 2 ).NumOfSurfaces = 2;
+	CFloRadSys( 2 ).SurfacePtr.allocate( 2 );
+	CFloRadSys( 2 ).SurfacePtr( 1 ) = 1;
+	CFloRadSys( 2 ).SurfacePtr( 2 ) = 2;
+	CFloRadSys( 3 ).NumOfSurfaces = 1;
+	CFloRadSys( 3 ).SurfacePtr.allocate( 1 );
+	CFloRadSys( 3 ).SurfacePtr( 1 ) = 3;
+	
+	Surface.allocate( 3 );
+	Surface( 1 ).Construction = 1;
+	Surface( 1 ).Area = 100.0;
+	Surface( 2 ).Construction = 2;
+	Surface( 2 ).Area = 200.0;
+	Surface( 3 ).Construction = 3;
+	Surface( 3 ).Area = 300.0;
+	
+	Construct.allocate( 3 );
+	Construct( 1 ).ThicknessPerpend = 0.05;
+	Construct( 2 ).ThicknessPerpend = 0.125;
+	
+	// Test 1: Hydronic radiant system 1 (one surface)
+	RadSysType = HydronicSystem;
+	RadSysNum = 1;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 1000.0, 0.1 );
+
+	// Test 2: Hydronic radiant system 2 (two surfaces)
+	RadSysType = HydronicSystem;
+	RadSysNum = 2;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 1800.0, 0.1 );
+
+	// Test 3: Constant flow radiant system 1 (one surface)
+	RadSysType = ConstantFlowSystem;
+	RadSysNum = 1;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 1000.0, 0.1 );
+	
+	// Test 4: Constant flow radiant system 2 (two surfaces)
+	RadSysType = ConstantFlowSystem;
+	RadSysNum = 2;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 1800.0, 0.1 );
+	
+	// Test 5: Hydronic radiant system 3 (thickness out of range, low side)
+	RadSysType = HydronicSystem;
+	RadSysNum = 3;
+	Construct( 3 ).ThicknessPerpend = 0.004;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 2000.0, 0.1 );
+
+	// Test 6: Hydronic radiant system 3 (thickness out of range, high side)
+	RadSysType = HydronicSystem;
+	RadSysNum = 3;
+	Construct( 3 ).ThicknessPerpend = 0.6;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 2000.0, 0.1 );
+	
+	// Test 7: Constant flow radiant system 3 (thickness out of range, low side)
+	RadSysType = ConstantFlowSystem;
+	RadSysNum = 3;
+	Construct( 3 ).ThicknessPerpend = 0.004;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 2000.0, 0.1 );
+	
+	// Test 8: Constant flow radiant system 3 (thickness out of range, high side)
+	RadSysType = ConstantFlowSystem;
+	RadSysNum = 3;
+	Construct( 3 ).ThicknessPerpend = 0.6;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 2000.0, 0.1 );
+	
+	// Test 9: Wrong system type
+	RadSysType = 0;
+	RadSysNum = 1;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 60.0, 0.1 );
+	
 }

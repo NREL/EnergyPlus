@@ -32,7 +32,7 @@ int debug = 0;  // Control for debug information
 /// Translate the double variable to string variable.
 ///
 ///\param buffer String variable.
-///\param r Double varaible.
+///\param r Double variable.
 ///////////////////////////////////////////////////////////////////////////////
 void doubleToCommaString(char* buffer, double r){
     char* comma;

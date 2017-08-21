@@ -1561,7 +1561,6 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Zone1PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone1PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -1590,7 +1589,6 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Zone2PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -1619,7 +1617,6 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Zone3PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone3PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}

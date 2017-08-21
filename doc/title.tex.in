@@ -1,4 +1,4 @@
-% Reference for making your own Title Page: 
+% Reference for making your own Title Page:
 % http://tex.stackexchange.com/questions/10130/use-the-values-of-title-author-and-date-on-a-custom-title-page
 \makeatletter
 \begin{titlepage}
@@ -15,6 +15,7 @@
     % Bottom of the page
     {\large \@date \par}
     \vspace{1.5cm}
+    {\large Build: ${CMAKE_VERSION_BUILD} \par}
   \end{center}
   {\small
 COPYRIGHT (c) 1996-2016 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.

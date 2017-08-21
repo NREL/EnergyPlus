@@ -86310,6 +86310,7 @@
     FAN-SCHED,               !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     4.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200.;                   !- Cycling Run Time {s}
 
   SetpointManager:SingleZone:Reheat,
@@ -86364,11 +86365,11 @@
     WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Latent Capacity Time Constant {s}
-    ;                        !- Condenser Air Inlet Node Name
+    ;                        !- Latent Capacity Time Constant {s}
 
   Coil:Heating:Fuel,
     SYS-1 Heating Coil,      !- Name
