@@ -389,7 +389,6 @@ namespace HeatBalanceManager {
 		if ( ! WarmupFlag && EndDayFlag && DayOfSim == 1 && ! DoingSizing ) {
 			ReportWarmupConvergence();
 		}
-
 	}
 
 	// Get Input Section of the Module
@@ -4584,11 +4583,6 @@ namespace HeatBalanceManager {
 
 		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";		
 		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
-		if ( NumAlpha != 3 ) {
-			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates wroung number of Alpha Objects (requires 3)." );
-			ErrorsFound = true;
-		}
 
 		if ( TotZoneEnv > 0 ) {
 			// Check if IDD definition is correct
@@ -4604,6 +4598,7 @@ namespace HeatBalanceManager {
 				IsBlank = false;
 				VerifyName( cAlphaArgs( 1 ), ZoneLocalEnvironment, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 					ShowContinueError( "...each ZoneProperty:LocalEnvironment name must not duplicate other SurfaceProperty:LocalEnvironment name" );
 					ErrorsFound = true;
 					continue;
@@ -4837,7 +4832,6 @@ namespace HeatBalanceManager {
 		using namespace WindowManager;
 		using namespace SolarShading;
 		using DataLoopNode::Node;
-		using DataSurfaces::Surface;
 		using OutAirNodeManager::SetOutAirNodes;
 		using DaylightingDevices::InitDaylightingDevices;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -4862,9 +4856,6 @@ namespace HeatBalanceManager {
 		int SurfNum; // Surface number
 		int ZoneNum;
 		static bool ChangeSet( true ); // Toggle for checking storm windows
-
-		static gio::Fmt ShdFracFmtName( "(A, A)" );
-		static gio::Fmt fmtN( "('\n')" );
 
 		// FLOW:
 
@@ -4929,11 +4920,7 @@ namespace HeatBalanceManager {
 		}
 
 		if ( BeginSimFlag && DataSystemVariables::ReportExtShadingSunlitFrac ) {
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, fmtA, flags ) << "Surface Name,"; }
-			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, ShdFracFmtName, flags ) << Surface( SurfNum ).Name << ","; }
-			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, fmtN, flags ); }
+			OpenShadingFile();
 		}
 
 		if ( BeginDayFlag ) {
@@ -4960,34 +4947,31 @@ namespace HeatBalanceManager {
 		SetZoneOutBulbTempAt();
 		CheckZoneOutBulbTempAt();
 
-		// X Luo Added 07/19/2017
 		// set zone level wind dir to global value
 		SetZoneWindSpeedAt();
 		SetZoneWindDirAt();
 
-		// X Luo Added 07/30/2017
 		// Set zone data to linked air node value if defined.
 		if ( AnyLocalEnvironmentsInModel ) {
 			SetOutAirNodes();
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum != 0 ) {
 						Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
 					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWetBulb ) {
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum != 0 ) {
 						Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
 					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWindSpeed ) {
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum != 0 ) {
 						Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
 					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).SchedOutAirWindDir ) {
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum != 0 ) {
 						Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
 					}
 				}
 			}
 		}
 
-		// X Luo Added 07/19/2017
 		// Overwriting surface and zone level environmental data with EMS override value 
 		if ( AnyEnergyManagementSystemInModel ) {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -5546,7 +5530,6 @@ namespace HeatBalanceManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  LOGICAL, SAVE :: PrintEnvrnStamp=.FALSE.
-		int write_stat;
 		// FLOW:
 
 		// Time step level reporting:
@@ -5602,6 +5585,41 @@ namespace HeatBalanceManager {
 
 	//        End of Reporting subroutines for the HB Module
 
+	void
+	OpenShadingFile()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X Luo
+		//       DATE WRITTEN   August 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Open and set up headers for a external shading fraction export file.
+
+		// Using/Aliasing
+		using DataSurfaces::Surface;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int write_stat;
+		int SurfNum;
+		static gio::Fmt ShdFracFmtName("(A, A)");
+		static gio::Fmt fmtN("('\n')");
+
+		OutputFileShadingFrac = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags ); write_stat = flags.ios(); }
+		if ( write_stat != 0 ) {
+			ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write)." );
+		}
+		gio::write( OutputFileShadingFrac, fmtA ) << "This file contains external shading fractions for all shading surfaces of all zones.";
+		{ IOFlags flags; flags.ADVANCE("No"); gio::write( OutputFileShadingFrac, fmtA, flags ) << "Surface Name,"; }
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			{ IOFlags flags; flags.ADVANCE("No"); gio::write( OutputFileShadingFrac, ShdFracFmtName, flags ) << Surface( SurfNum ).Name << ","; }
+		}
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, fmtN, flags ); }
+
+	}
 	void
 	GetFrameAndDividerData( bool & ErrorsFound ) // set to true if errors found in input
 	{

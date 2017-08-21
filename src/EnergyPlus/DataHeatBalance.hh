@@ -1346,12 +1346,10 @@ namespace DataHeatBalance {
 		Real64 WindSpeed; // Zone outside wind speed (m/s)
 		bool WindSpeedEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind speed
 		Real64 WindSpeedEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
-		// X Luo added 07/20/2017
 		Real64 WindDir; // Zone outside wind direction (degree)
 		bool WindDirEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind direction
 		Real64 WindDirEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
 
-		// X Luo added 07/28/2017
 		bool HasLinkedOutAirNode; // true if an OutdoorAir::Node is linked to the surface
 		int LinkedOutAirNode; // Index of the an OutdoorAir:Node
 

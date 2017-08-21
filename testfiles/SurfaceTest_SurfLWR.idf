@@ -2343,20 +2343,12 @@
   Output:VariableDictionary,Regular;
   
   Output:Variable,Zn005:Roof001,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
-
-  Output:Variable,Zn005:Roof001,Surface Outside Face Net Long Wave Radiation Heat Gain Rate,hourly;
   
   Output:Variable,Zn005:Wall002,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
 
-  Output:Variable,Zn005:Wall002,Surface Outside Face Net Long Wave Radiation Heat Gain Rate,hourly;
-
   Output:Variable,Zn005:Wall003,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
- 
-  Output:Variable,Zn005:Wall003,Surface Outside Face Net Long Wave Radiation Heat Gain Rate,hourly;
   
   Output:Variable,Zn005:Wall002:Win001,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
-
-  Output:Variable,Zn005:Wall002:Win001,Surface Outside Face Net Long Wave Radiation Heat Gain Rate,hourly;  
   
   Output:Variable,Zn005:Roof001,Surface Outside Face Temperature,hourly;
 

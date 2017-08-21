@@ -352,22 +352,18 @@ namespace OutAirNodeManager {
 				//	\note Schedule values are real numbers, 0.0 to 360.0, units degree
 
 				if ( NumAlphas > 1 ) {
-					Node( NodeNums( 1 ) ).SchedOutAirDryBulb = true;
 					Node( NodeNums( 1 ) ).OutAirDryBulbSchedNum = GetScheduleIndex( Alphas( 2 ) );
 				}
 
 				if ( NumAlphas > 2 ) {
-					Node( NodeNums( 1 ) ).SchedOutAirWetBulb = true;
 					Node( NodeNums( 1 ) ).OutAirWetBulbSchedNum = GetScheduleIndex( Alphas( 3 ) );
 				}
 
 				if ( NumAlphas > 3 ) {
-					Node( NodeNums( 1 ) ).SchedOutAirWindSpeed = true;
 					Node( NodeNums( 1 ) ).OutAirWindSpeedSchedNum = GetScheduleIndex( Alphas( 4 ) );
 				}
 
 				if ( NumAlphas > 4 ) {
-					Node( NodeNums( 1 ) ).SchedOutAirWindDir = true;
 					Node( NodeNums( 1 ) ).OutAirWindDirSchedNum = GetScheduleIndex( Alphas( 5 ) );
 				}
 
@@ -429,7 +425,6 @@ namespace OutAirNodeManager {
 		// Do the begin time step initialization
 		for ( OutsideAirNodeNum = 1; OutsideAirNodeNum <= NumOutsideAirNodes; ++OutsideAirNodeNum ) {
 			NodeNum = OutsideAirNodeList( OutsideAirNodeNum );
-			// X Luo modified 08/01/2017
 			// Set node data to global values
 			if ( Node( NodeNum ).Height < 0.0 ) {
 				// Note -- this setting is different than the DataEnvironment "AT" settings.
@@ -443,10 +438,18 @@ namespace OutAirNodeManager {
 			Node( NodeNum ).OutAirWindDir = WindDir;
 
 			// Set node data to local air node values if defined
-			if ( Node( NodeNum ).SchedOutAirDryBulb ) Node( NodeNum ).OutAirDryBulb = GetCurrentScheduleValue( Node( NodeNum ).OutAirDryBulbSchedNum );
-			if ( Node( NodeNum ).SchedOutAirWetBulb ) Node( NodeNum ).OutAirWetBulb = GetCurrentScheduleValue( Node( NodeNum ).OutAirWetBulbSchedNum );
-			if ( Node( NodeNum ).SchedOutAirWindSpeed ) Node( NodeNum ).OutAirWindSpeed = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindSpeedSchedNum );
-			if ( Node( NodeNum ).SchedOutAirWindDir ) Node( NodeNum ).OutAirWindDir = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindDirSchedNum );
+			if ( Node( NodeNum ).OutAirDryBulbSchedNum != 0 ) {
+				Node( NodeNum ).OutAirDryBulb = GetCurrentScheduleValue( Node( NodeNum ).OutAirDryBulbSchedNum );
+			}
+			if ( Node( NodeNum ).OutAirWetBulbSchedNum != 0 ) {
+				Node( NodeNum ).OutAirWetBulb = GetCurrentScheduleValue( Node( NodeNum ).OutAirWetBulbSchedNum );
+			}
+			if ( Node( NodeNum ).OutAirWindSpeedSchedNum != 0 ) {
+				Node( NodeNum ).OutAirWindSpeed = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindSpeedSchedNum );
+			}
+			if ( Node( NodeNum ).OutAirWindDirSchedNum != 0 ) {
+				Node( NodeNum ).OutAirWindDir = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindDirSchedNum );
+			}
 
 			// Set node data to EMS overwritten values if defined
 			if ( Node( NodeNum ).EMSOverrideOutAirDryBulb ) Node( NodeNum ).OutAirDryBulb = Node( NodeNum ).EMSValueForOutAirDryBulb;
@@ -455,7 +458,7 @@ namespace OutAirNodeManager {
 			if ( Node( NodeNum ).EMSOverrideOutAirWindDir ) Node( NodeNum ).OutAirWindDir = Node( NodeNum ).EMSValueForOutAirWindDir;
 
 			Node( NodeNum ).Temp = Node( NodeNum ).OutAirDryBulb;
-			if ( Node( NodeNum ).SchedOutAirDryBulb || Node( NodeNum ).SchedOutAirWetBulb ) {
+			if ( Node( NodeNum ).OutAirDryBulbSchedNum != 0 || Node( NodeNum ).OutAirWetBulbSchedNum != 0 ) {
 				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );				
 			}
 			else {
@@ -608,7 +611,7 @@ namespace OutAirNodeManager {
 				Node( NodeNumber ).OutAirWindDir = WindDir;
 
 				Node( NodeNumber ).Temp = Node( NodeNumber ).OutAirDryBulb;
-				if ( Node( NodeNumber ).SchedOutAirDryBulb || Node( NodeNumber ).SchedOutAirWetBulb ) {
+				if ( Node( NodeNumber ).OutAirDryBulbSchedNum != 0  || Node( NodeNumber ).OutAirWetBulbSchedNum != 0 ) {
 					Node( NodeNumber ).HumRat = PsyHFnTdbW( Node( NodeNumber ).OutAirDryBulb, Node( NodeNumber ).OutAirWetBulb );
 				}
 				else {

@@ -3419,7 +3419,6 @@ namespace WindowComplexManager {
 				outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QCoolingPanelSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
-			    // X Luo added Aug 2017
 				// Calculate LWR from surrounding surfaces if defined for an exterior window
 				QRadLWOutSrdSurfs( SurfNum ) = 0;
 				if ( AnyLocalEnvironmentsInModel ) {

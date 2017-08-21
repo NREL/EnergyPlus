@@ -6164,7 +6164,6 @@ namespace ConvectionCoefficients {
 			SurfWindDir = Surface(SurfNum).WindDir;
 			Hf = CalcClearRoof( SurfNum, TH( 1, 1, SurfNum ), Surface( SurfNum ).OutDryBulbTemp, SurfWindSpeed, SurfWindDir, Surface( SurfNum ).OutConvFaceArea, Surface( SurfNum ).OutConvFacePerimeter );
 		} else if ( SELECT_CASE_var == HcExt_BlockenWindward ) {
-			//TODO: check if suppose to use global here
 			Hf = CalcBlockenWindward( WindSpeed, WindDir, Surface( SurfNum ).Azimuth );
 		} else if ( SELECT_CASE_var == HcExt_EmmelVertical ) {
 			Hf = CalcEmmelVertical( WindSpeed, WindDir, Surface( SurfNum ).Azimuth, SurfNum );

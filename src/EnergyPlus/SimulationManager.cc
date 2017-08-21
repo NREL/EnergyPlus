@@ -1351,14 +1351,6 @@ namespace SimulationManager {
 		}
 		gio::write( OutputFileBNDetails, fmtA ) << "Program Version," + VerString;
 
-
-		OutputFileShadingFrac = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags ); write_stat = flags.ios(); }
-		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+ DataStringGlobals::outputExtShdFracFileName +" for output (write)." );
-		}
-		gio::write( OutputFileShadingFrac, fmtA ) << "Program Version," + VerString;
-
 	}
 
 	void
@@ -1555,14 +1547,11 @@ namespace SimulationManager {
 		}
 		mtr_stream = nullptr;
 
-		if ( ReportExtShadingSunlitFrac ) {
-			gio::write( OutputFileShadingFrac, EndOfDataFormat );
+		// Close the External Shading Output File
+
+		if ( OutputFileShadingFrac > 0 ) {
 			gio::close( OutputFileShadingFrac );
 		}
-		else {
-			{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileShadingFrac, flags ); }
-		}
-
 	}
 
 	void

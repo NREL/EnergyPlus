@@ -417,11 +417,6 @@ namespace HeatBalanceSurfaceManager {
 
 		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Outdoor environment for Surfaces" );
 
-		// X Luo Deleted 08/01/2017
-		// Zone levelset up were moved to subroutine InitHeatBalance() in HeatBalanceManager.cc
-		// This subroutine - InitSurfaceHeatBalance() is executed right after InitHeatBalance() and is suggest to handle surface level input only as the name suggested
-		// The test shows identical results with the original implementation
-
 		// set zone level wind dir to global value
 		// Initialize zone outdoor environmental variables
 		// Bulk Initialization for Temperatures & WindSpeed
@@ -445,16 +440,16 @@ namespace HeatBalanceSurfaceManager {
 		if ( AnyLocalEnvironmentsInModel) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).HasLinkedOutAirNode ) {
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirDryBulb ) {
+					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum != 0 ) {
 						Surface( SurfNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
 					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWetBulb ) {
+					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum != 0 ) {
 						Surface( SurfNum ).OutWetBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
 					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWindSpeed ) {
+					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum != 0 ) {
 						Surface( SurfNum ).WindSpeed = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
 					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).SchedOutAirWindDir ) {
+					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDirSchedNum != 0 ) {
 						Surface( SurfNum ).WindDir = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
 					}
 				}
@@ -470,7 +465,6 @@ namespace HeatBalanceSurfaceManager {
 			}
 		}
 
-		// X Luo Added 07/19/2017
 		// Overwriting surface and zone level environmental data with EMS override value 
 		if ( AnyEnergyManagementSystemInModel ) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -6270,7 +6264,6 @@ CalcOutsideSurfTemp(
 
 		// Outside heat balance case: No movable insulation, slow conduction
 	} else if ( ( ! MovInsulPresent ) && ( ! QuickConductionSurf ) ) {
-		// X Luo Modified Aug 2017
 		// Add LWR from surrounding surfaces
 		if ( Surface( SurfNum ).OSCMPtr == 0 ) {
 			if ( construct.SourceSinkPresent ) {

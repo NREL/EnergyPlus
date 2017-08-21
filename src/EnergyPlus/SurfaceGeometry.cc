@@ -6014,14 +6014,9 @@ namespace SurfaceGeometry {
 
 		cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
 		TotSurfLocalEnv = GetNumObjectsFound( cCurrentModuleObject );
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
-		if ( NumAlpha < 3 || NumAlpha > 5 ) {
-			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates more that 5 or less than 3 Alpha Objects." );
-			ErrorsFound = true;
-		}
 
 		if ( TotSurfLocalEnv > 0 ) {
-			// Check if IDD definition is correct
+
 			AnyLocalEnvironmentsInModel = true;
 
 			if ( !allocated( SurfLocalEnvironment ) ) {
@@ -6053,7 +6048,7 @@ namespace SurfaceGeometry {
 				}
 
 				// Assign External Shading Schedule number
-				if ( !cAlphaArgs( 3 ).empty() ) {
+				if ( !lAlphaFieldBlanks( 3 ) ) {
 					ExtShadingSchedNum = GetScheduleIndex( cAlphaArgs( 3 ) );
 					if ( ExtShadingSchedNum == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 3 ) + " has been found." );
@@ -6066,7 +6061,7 @@ namespace SurfaceGeometry {
 				}
 
 				//Assign surrounding surfaces object number;
-				if ( !cAlphaArgs( 4 ).empty() ) {
+				if ( !lAlphaFieldBlanks( 4 ) ) {
 					SurroundingSurfsNum = FindItemInList( cAlphaArgs( 4 ), SurroundingSurfsProperty );
 					if ( SurroundingSurfsNum == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 4 ) + " has been found." );
@@ -6079,7 +6074,7 @@ namespace SurfaceGeometry {
 				}
 
 				//Assign outdoor air node number;
-				if ( !cAlphaArgs( 5 ).empty() ) {
+				if ( !lAlphaFieldBlanks( 5 ) ) {
 					NodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 					if ( NodeNum == 0 && CheckOutAirNodeNumber( NodeNum ) ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 5 ) + " has been found." );
@@ -6180,12 +6175,6 @@ namespace SurfaceGeometry {
 
 		cCurrentModuleObject = "SurfaceProperty:SurroundingSurfaces";
 		TotSrdSurfProperties = GetNumObjectsFound( cCurrentModuleObject );
-		// Check if IDD definition is correct
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric );
-		if ( NumArgs < 8 ) {
-			ShowSevereError( RoutineName + cCurrentModuleObject + ": Object Definition indicates less than 8 Objects." );
-			ErrorsFound = true;
-		}
 
 		if ( TotSrdSurfProperties > 0 ) {
 

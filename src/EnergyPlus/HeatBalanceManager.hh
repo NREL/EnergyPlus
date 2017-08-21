@@ -247,6 +247,10 @@ namespace HeatBalanceManager {
 
 	//        End of Reporting subroutines for the HB Module
 
+
+	void
+	OpenShadingFile();
+
 	void
 	GetFrameAndDividerData( bool & ErrorsFound ); // set to true if errors found in input
 

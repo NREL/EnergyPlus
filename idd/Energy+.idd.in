@@ -17821,6 +17821,9 @@ SurfaceProperty:SolarIncidentInside,
        \object-list ScheduleNames
 	   
 SurfaceProperty:LocalEnvironment,
+       \min-fields 3
+       \memo This object defines the local environment properties of an exterior surface.
+       \memo One or more environment properties have to be defined and linked to the exterior surface.
    A1, \field Name
        \required-field
        \type alpha
@@ -17843,6 +17846,9 @@ SurfaceProperty:LocalEnvironment,
        \note Enter the name of an OutdoorAir:Node object
 
 ZoneProperty:LocalEnvironment,
+       \min-fields 3
+       \memo This object defines the local environment properties of a zone object.
+       \memo A corresponding outdoor air node should be defined and linked to the zone object.
    A1, \field Name
        \required-field
        \type alpha
@@ -61576,10 +61582,32 @@ OutdoorAir:Node,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, 0.0 to 40.0, units m/s
-  A5 ; \field Wind Direction Schedule Name 
+  A5 , \field Wind Direction Schedule Name 
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, 0.0 to 360.0, units degree
+  A6 , \field Wind Pressure Coefficient Curve Name
+       \type object-list
+       \object-list WPCValueNames
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+       \note The name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues, curve, or table object specifying the wind pressure coefficient.
+  A7 , \field Symmetric Wind Pressure Coefficient Curve
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note Specify whether the pressure curve is symmetric or not.
+       \note Specify Yes for curves that should be evaluated from 0 to 180 degrees
+       \note Specify No for curves that should be evaluated from 0 to 360 degrees
+  A8 ; \field Wind Angle Type
+       \type choice
+       \key Absolute
+       \key Relative
+       \default Absolute
+       \note Specify whether the angle used to compute the wind pressure coefficient is absolute or relative
+       \note Specify Relative to compute the angle between the wind direction and the surface azimuth
+       \note Specify Absolute to use the wind direction angle directly
 
 OutdoorAir:NodeList,
        \extensible:1 Just duplicate last field and comments (changing numbering, please)

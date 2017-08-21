@@ -4598,7 +4598,6 @@ namespace ZoneEquipmentManager {
 		}
 
 		for ( j = 1; j <= TotVentilation; ++j ) {
-			// X Luo Modified 08/02/2017
 			// Use air node information linked to the zone if defined
 			NZ = Ventilation( j ).ZonePtr;
 			Ventilation( j ).FanPower = 0.0;
@@ -5185,11 +5184,14 @@ namespace ZoneEquipmentManager {
 			TempExt = Zone( NZ ).OutDryBulbTemp;
 			WindSpeedExt = Zone( NZ ).WindSpeed;
 
-			// X Luo Modified 08/02/2017
 			// Use air node information linked to the zone if defined
 			
-			if ( Zone( NZ ).HasLinkedOutAirNode ) HumRatExt = Node( Zone( NZ ).LinkedOutAirNode ).HumRat;
-			else HumRatExt = OutHumRat;
+			if ( Zone( NZ ).HasLinkedOutAirNode ) {
+				HumRatExt = Node( Zone( NZ ).LinkedOutAirNode ).HumRat;
+				}
+			else {
+				HumRatExt = OutHumRat;
+			}
 
 			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, HumRatExt, RoutineNameInfiltration );
 			CpAir = PsyCpAirFnWTdb( HumRatExt, TempExt );
