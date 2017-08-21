@@ -1670,6 +1670,7 @@ namespace DataHeatBalance {
 		bool FractionReturnAirIsCalculated;
 		Real64 FractionReturnAirPlenTempCoeff1;
 		Real64 FractionReturnAirPlenTempCoeff2;
+		int ReturnNodePtr;
 		Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
 		Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
 		bool ManageDemand; // Flag to indicate whether to use demand limiting
@@ -1706,6 +1707,7 @@ namespace DataHeatBalance {
 			FractionReturnAirIsCalculated( false ),
 			FractionReturnAirPlenTempCoeff1( 0.0 ),
 			FractionReturnAirPlenTempCoeff2( 0.0 ),
+			ReturnNodePtr( 1 ),
 			NomMinDesignLevel( 0.0 ),
 			NomMaxDesignLevel( 0.0 ),
 			ManageDemand( false ),
@@ -2344,6 +2346,7 @@ namespace DataHeatBalance {
 		Real64 CarbonDioxideGainRate; // current timestep value of carbon dioxide gain rate for device
 		Reference< Real64 > PtrGenericContamGainRate; // fortan POINTER to value of generic contaminant gain rate for device
 		Real64 GenericContamGainRate; // current timestep value of generic contaminant gain rate for device
+		int ReturnAirNodeNum; // return air node number for retrun air convection heat gain
 
 		// Default Constructor
 		GenericComponentZoneIntGainStruct() :
@@ -2354,7 +2357,8 @@ namespace DataHeatBalance {
 			LatentGainRate( 0.0 ),
 			ReturnAirLatentGainRate( 0.0 ),
 			CarbonDioxideGainRate( 0.0 ),
-			GenericContamGainRate( 0.0 )
+			GenericContamGainRate( 0.0 ),
+			ReturnAirNodeNum( 0 )
 		{}
 
 	};
