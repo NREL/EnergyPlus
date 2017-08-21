@@ -54,7 +54,7 @@
 #include <DataLoopNode.hh>
 #include <ScheduleManager.hh>
 #include <Psychrometrics.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <HWBaseboardRadiator.hh>
 #include <FluidProperties.hh>
 #include <DataPlant.hh>

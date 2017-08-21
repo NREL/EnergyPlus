@@ -64,7 +64,7 @@
 #include <DataHVACGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -165,7 +165,7 @@ namespace WindTurbine {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			WindTurbineNum = InputProcessor::FindItemInList( GeneratorName, WindTurbineSys );
+			WindTurbineNum = UtilityRoutines::FindItemInList( GeneratorName, WindTurbineSys );
 			if ( WindTurbineNum == 0 ) {
 				ShowFatalError( "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName );
 			}
@@ -279,7 +279,7 @@ namespace WindTurbine {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// Initializations and allocations
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -287,15 +287,15 @@ namespace WindTurbine {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 
-		NumWindTurbines = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumWindTurbines = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		WindTurbineSys.allocate( NumWindTurbines );
 
 		// Flow
 		for ( WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound);
 
 			WindTurbineSys( WindTurbineNum ).Name = cAlphaArgs( 1 ); // Name of wind turbine
 

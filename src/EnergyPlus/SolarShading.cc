@@ -81,7 +81,7 @@
 #include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
@@ -559,7 +559,7 @@ namespace SolarShading {
 		cAlphaArgs( 1 ) = "";
 		cAlphaArgs( 2 ) = "";
 		cCurrentModuleObject = "ShadowCalculation";
-		NumItems = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumItems = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		NumAlphas = 0;
 		NumNumbers = 0;
 		if ( NumItems > 1 ) {
@@ -567,7 +567,7 @@ namespace SolarShading {
 		}
 
 		if ( NumItems != 0 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ShadowingCalcFrequency = rNumericArgs( 1 );
 		}
 
@@ -587,10 +587,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 1 ) {
-			if ( InputProcessor::SameString( cAlphaArgs( 1 ), "AverageOverDaysInFrequency" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "AverageOverDaysInFrequency" ) ) {
 				DetailedSolarTimestepIntegration = false;
 				cAlphaArgs( 1 ) = "AverageOverDaysInFrequency";
-			} else if ( InputProcessor::SameString( cAlphaArgs( 1 ), "TimestepFrequency" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "TimestepFrequency" ) ) {
 				DetailedSolarTimestepIntegration = true;
 				cAlphaArgs( 1 ) = "TimestepFrequency";
 			} else {
@@ -605,10 +605,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 2 ) {
-			if ( InputProcessor::SameString( cAlphaArgs( 2 ), "SutherlandHodgman" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "SutherlandHodgman" ) ) {
 				SutherlandHodgman = true;
 				cAlphaArgs( 2 ) = "SutherlandHodgman";
-			} else if ( InputProcessor::SameString( cAlphaArgs( 2 ), "ConvexWeilerAtherton" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "ConvexWeilerAtherton" ) ) {
 				SutherlandHodgman = false;
 				cAlphaArgs( 2 ) = "ConvexWeilerAtherton";
 			} else if ( lAlphaFieldBlanks( 2 ) ) {
@@ -634,10 +634,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 3 ) {
-			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "SimpleSkyDiffuseModeling" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "SimpleSkyDiffuseModeling" ) ) {
 				DetailedSkyDiffuseAlgorithm = false;
 				cAlphaArgs( 3 ) = "SimpleSkyDiffuseModeling";
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "DetailedSkyDiffuseModeling" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DetailedSkyDiffuseModeling" ) ) {
 				DetailedSkyDiffuseAlgorithm = true;
 				cAlphaArgs( 3 ) = "DetailedSkyDiffuseModeling";
 			} else if ( lAlphaFieldBlanks( 3 ) ) {
@@ -925,6 +925,7 @@ namespace SolarShading {
 		DisplayString( "Initializing Surface (Shading) Report Variables" );
 		// CurrentModuleObject='Surfaces'
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
+			SetupOutputVariable( "Surface Outside Normal Azimuth Angle [rad]", Surface( SurfLoop ).Azimuth, "Zone", "Average", Surface( SurfLoop ).Name );
 			if ( Surface( SurfLoop ).ExtSolar ) {
 				SetupOutputVariable( "Surface Outside Face Sunlit Area [m2]", SurfSunlitArea( SurfLoop ), "Zone", "State", Surface( SurfLoop ).Name );
 				SetupOutputVariable( "Surface Outside Face Sunlit Fraction []", SurfSunlitFrac( SurfLoop ), "Zone", "State", Surface( SurfLoop ).Name );
@@ -7806,6 +7807,8 @@ namespace SolarShading {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataDaylighting::ZoneDaylight;
 		using General::POLYF;
+		using DataWindowEquivalentLayer::CFS;
+		using WindowEquivalentLayer::lscNONE;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -7862,7 +7865,16 @@ namespace SolarShading {
 			SurfaceWindow( ISurf ).ExtIntShadePrevTS = SurfaceWindow( ISurf ).ShadingFlag;
 			SurfaceWindow( ISurf ).ShadingFlag = NoShade;
 			SurfaceWindow( ISurf ).FracTimeShadingDeviceOn = 0.0;
-
+			if ( SurfaceWindow( ISurf ).WindowModelType == WindowEQLModel ) {
+				int EQLNum = Construct( Surface( ISurf ).Construction ).EQLConsPtr;
+				if ( CFS( EQLNum ).VBLayerPtr > 0 ) {
+					if ( CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).CNTRL == lscNONE ) {
+						SurfaceWindow( ISurf ).SlatAngThisTSDeg = CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).PHI_DEG;
+					} else {
+						SurfaceWindow( ISurf ).SlatAngThisTSDeg = 0.0;
+					}
+				}				
+			}
 			if ( Surface( ISurf ).Class != SurfaceClass_Window ) continue;
 			if ( Surface( ISurf ).ExtBoundCond != ExternalEnvironment ) continue;
 			if ( Surface( ISurf ).WindowShadingControlPtr == 0 ) continue;

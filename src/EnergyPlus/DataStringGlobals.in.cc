@@ -161,7 +161,7 @@ namespace DataStringGlobals {
 	std::string outputTblXmlFileName("eplustbl.xml");
 	std::string inputFileName;
 	std::string inputIddFileName;
-	std::string inputJddFileName;
+	std::string inputEpJSONSchemaFileName;
 	std::string inputWeatherFileName;
 	std::string outputAdsFileName("eplusADS.out");
 	std::string outputDfsFileName("eplusout.dfs");

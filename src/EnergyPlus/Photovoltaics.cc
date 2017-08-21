@@ -66,7 +66,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <PhotovoltaicThermalCollectors.hh>
 #include <ScheduleManager.hh>
@@ -180,7 +180,7 @@ namespace Photovoltaics {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			PVnum = InputProcessor::FindItemInList( GeneratorName, PVarray );
+			PVnum = UtilityRoutines::FindItemInList( GeneratorName, PVarray );
 			if ( PVnum == 0 ) {
 				ShowFatalError( "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName );
 			}
@@ -329,10 +329,10 @@ namespace Photovoltaics {
 		Array1D< SNLModuleParamsStuct > tmpSNLModuleParams; // temporary, for processing input data
 
 		// count how many photovoltaic arrays of different types are in the .idf
-		NumPVs = InputProcessor::GetNumObjectsFound( cPVGeneratorObjectName );
-		NumSimplePVModuleTypes = InputProcessor::GetNumObjectsFound( cPVSimplePerfObjectName );
-		Num1DiodePVModuleTypes = InputProcessor::GetNumObjectsFound( cPVEquiv1DiodePerfObjectName );
-		NumSNLPVModuleTypes = InputProcessor::GetNumObjectsFound( cPVSandiaPerfObjectName );
+		NumPVs = inputProcessor->getNumObjectsFound( cPVGeneratorObjectName );
+		NumSimplePVModuleTypes = inputProcessor->getNumObjectsFound( cPVSimplePerfObjectName );
+		Num1DiodePVModuleTypes = inputProcessor->getNumObjectsFound( cPVEquiv1DiodePerfObjectName );
+		NumSNLPVModuleTypes = inputProcessor->getNumObjectsFound( cPVSandiaPerfObjectName );
 
 		if ( NumPVs <= 0 ) {
 			ShowSevereError( "Did not find any " + cPVGeneratorObjectName );
@@ -344,12 +344,12 @@ namespace Photovoltaics {
 
 		cCurrentModuleObject = cPVGeneratorObjectName;
 		for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			PVarray( PVnum ).Name = cAlphaArgs( 1 );
 
 			PVarray( PVnum ).SurfaceName = cAlphaArgs( 2 );
-			PVarray( PVnum ).SurfacePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Surface );
+			PVarray( PVnum ).SurfacePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 			// required-surface
 			if ( lAlphaFieldBlanks( 2 ) ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -382,11 +382,11 @@ namespace Photovoltaics {
 			}
 
 			PVarray( PVnum ).PVModelType = iNotYetSetPVModel;
-			if ( InputProcessor::SameString( cAlphaArgs( 3 ), cPVSimplePerfObjectName ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), cPVSimplePerfObjectName ) ) {
 				PVarray( PVnum ).PVModelType = iSimplePVModel;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), cPVEquiv1DiodePerfObjectName ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), cPVEquiv1DiodePerfObjectName ) ) {
 				PVarray( PVnum ).PVModelType = iTRNSYSPVModel;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), cPVSandiaPerfObjectName ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), cPVSandiaPerfObjectName ) ) {
 				PVarray( PVnum ).PVModelType = iSandiaPVModel;
 			} else { // throw error, did not find module performance type
 				if ( lAlphaFieldBlanks( 3 ) ) {
@@ -404,17 +404,17 @@ namespace Photovoltaics {
 			PVarray( PVnum ).PerfObjName = cAlphaArgs( 4 ); // check later once perf objects are loaded
 
 			PVarray( PVnum ).CellIntegrationMode = iNotYetSetCellIntegration;
-			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "Decoupled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Decoupled" ) ) {
 				PVarray( PVnum ).CellIntegrationMode = iDecoupledCellIntegration;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "DecoupledUllebergDynamic" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "DecoupledUllebergDynamic" ) ) {
 				PVarray( PVnum ).CellIntegrationMode = iDecoupledUllebergDynamicCellIntegration;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "IntegratedSurfaceOutsideFace" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "IntegratedSurfaceOutsideFace" ) ) {
 				PVarray( PVnum ).CellIntegrationMode = iSurfaceOutsideFaceCellIntegration;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "IntegratedTranspiredCollector" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "IntegratedTranspiredCollector" ) ) {
 				PVarray( PVnum ).CellIntegrationMode = iTranspiredCollectorCellIntegration;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "IntegratedExteriorVentedCavity" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "IntegratedExteriorVentedCavity" ) ) {
 				PVarray( PVnum ).CellIntegrationMode = iExteriorVentedCavityCellIntegration;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "PhotovoltaicThermalSolarCollector" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "PhotovoltaicThermalSolarCollector" ) ) {
 				PVarray( PVnum ).CellIntegrationMode = iPVTSolarCollectorCellIntegration;
 			} else {
 				if ( lAlphaFieldBlanks( 5 ) ) {
@@ -440,7 +440,7 @@ namespace Photovoltaics {
 			{ auto const SELECT_CASE_var( PVarray( PVnum ).CellIntegrationMode );
 
 			if ( ( SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration ) || ( SELECT_CASE_var == iTranspiredCollectorCellIntegration ) || ( SELECT_CASE_var == iExteriorVentedCavityCellIntegration ) ) {
-				dupPtr = InputProcessor::FindItemInList( PVarray( PVnum ).SurfaceName, PVarray( {PVnum + 1,NumPVs} ), &PVArrayStruct::SurfaceName );
+				dupPtr = UtilityRoutines::FindItemInList( PVarray( PVnum ).SurfaceName, PVarray( {PVnum + 1,NumPVs} ), &PVArrayStruct::SurfaceName );
 				if ( dupPtr != 0 ) dupPtr += PVnum; // to correct for shortened array in find item
 				if ( dupPtr != 0 ) {
 					if ( PVarray( dupPtr ).CellIntegrationMode == iSurfaceOutsideFaceCellIntegration ) {
@@ -467,16 +467,16 @@ namespace Photovoltaics {
 			tmpSimpleModuleParams.allocate( NumSimplePVModuleTypes );
 			cCurrentModuleObject = cPVSimplePerfObjectName;
 			for ( ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				inputProcessor->getObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
 				tmpSimpleModuleParams( ModNum ).Name = cAlphaArgs( 1 );
 				tmpSimpleModuleParams( ModNum ).ActiveFraction = rNumericArgs( 1 );
 
-				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Fixed" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "Fixed" ) ) {
 					tmpSimpleModuleParams( ModNum ).EfficencyInputMode = FixedEfficiency;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Scheduled" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "Scheduled" ) ) {
 					tmpSimpleModuleParams( ModNum ).EfficencyInputMode = ScheduledEfficiency;
 				} else {
 					if ( lAlphaFieldBlanks( 2 ) ) {
@@ -507,14 +507,14 @@ namespace Photovoltaics {
 			tmpTNRSYSModuleParams.allocate( Num1DiodePVModuleTypes );
 			cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
 			for ( ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				inputProcessor->getObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
 				tmpTNRSYSModuleParams( ModNum ).Name = cAlphaArgs( 1 );
-				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "CrystallineSilicon" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "CrystallineSilicon" ) ) {
 					tmpTNRSYSModuleParams( ModNum ).CellType = CrystallineSiPVCells;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 2 ), "AmorphousSilicon" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "AmorphousSilicon" ) ) {
 					tmpTNRSYSModuleParams( ModNum ).CellType = AmorphousSiPVCells;
 				} else {
 					if ( lAlphaFieldBlanks( 2 ) ) {
@@ -557,8 +557,8 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVSandiaPerfObjectName;
 			for ( ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				inputProcessor->getObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
 
@@ -613,7 +613,7 @@ namespace Photovoltaics {
 
 			if ( SELECT_CASE_var == iSimplePVModel ) {
 
-				ThisParamObj = InputProcessor::FindItemInList( PVarray( PVnum ).PerfObjName, tmpSimpleModuleParams );
+				ThisParamObj = UtilityRoutines::FindItemInList( PVarray( PVnum ).PerfObjName, tmpSimpleModuleParams );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SimplePVModule = tmpSimpleModuleParams( ThisParamObj ); //entire structure assignment
 
@@ -627,7 +627,7 @@ namespace Photovoltaics {
 
 			} else if ( SELECT_CASE_var == iTRNSYSPVModel ) {
 
-				ThisParamObj = InputProcessor::FindItemInList( PVarray( PVnum ).PerfObjName, tmpTNRSYSModuleParams );
+				ThisParamObj = UtilityRoutines::FindItemInList( PVarray( PVnum ).PerfObjName, tmpTNRSYSModuleParams );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).TRNSYSPVModule = tmpTNRSYSModuleParams( ThisParamObj ); //entire structure assignment
 				} else {
@@ -638,7 +638,7 @@ namespace Photovoltaics {
 
 			} else if ( SELECT_CASE_var == iSandiaPVModel ) {
 
-				ThisParamObj = InputProcessor::FindItemInList( PVarray( PVnum ).PerfObjName, tmpSNLModuleParams, &SNLModuleParamsStuct::name );
+				ThisParamObj = UtilityRoutines::FindItemInList( PVarray( PVnum ).PerfObjName, tmpSNLModuleParams, &SNLModuleParamsStuct::name );
 				if ( ThisParamObj > 0 ) {
 					PVarray( PVnum ).SNLPVModule = tmpSNLModuleParams( ThisParamObj ); //entire structure assignment
 				} else {

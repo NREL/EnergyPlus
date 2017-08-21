@@ -69,7 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -206,7 +206,7 @@ namespace Boilers {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			BoilerNum = InputProcessor::FindItemInList( BoilerName, Boiler );
+			BoilerNum = UtilityRoutines::FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
 				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
 			}
@@ -291,7 +291,7 @@ namespace Boilers {
 
 		//GET NUMBER OF ALL EQUIPMENT
 		cCurrentModuleObject = "Boiler:HotWater";
-		NumBoilers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumBoilers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBoilers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " Equipment specified in input file" );
@@ -311,8 +311,8 @@ namespace Boilers {
 		//LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			inputProcessor->getObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueBoilerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -490,6 +490,11 @@ namespace Boilers {
 				Boiler( BoilerNum ).FlowMode = NotModulated;
 			}}
 
+			if ( NumAlphas > 7 ) {
+				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 8 );
+			} else {
+				Boiler( BoilerNum ).EndUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since it appears this way in existing output files.
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -499,12 +504,12 @@ namespace Boilers {
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
 			SetupOutputVariable( "Boiler Heating Rate [W]", BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Heating Energy [J]", BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
-			if ( InputProcessor::SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
+			if ( UtilityRoutines::SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			} else {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", "Boiler", "Plant" );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", Boiler( BoilerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Boiler Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );

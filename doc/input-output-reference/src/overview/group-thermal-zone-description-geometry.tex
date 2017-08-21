@@ -3170,7 +3170,7 @@ For an exterior window of arbitrary tilt, it is defined as the angle between the
 
 If the sun is behind the window, the horizontal profile angle is not defined and is reported as 0.0.
 
-Note that in most texts what we call ``horizontal profile angle'' is called ``vertical profile angle.''
+Note that in most texts and in window equivalent layer model what we call ``horizontal profile angle'' is called ``vertical profile angle.''
 
 \subsubsection{Surface Window Solar Vertical Profile Angle {[}deg{]}}\label{surface-window-solar-vertical-profile-angle-deg}
 
@@ -3180,7 +3180,7 @@ For an exterior window of arbitrary tilt, it is defined as the angle between the
 
 If the sun is behind the window, the vertical profile angle is not defined and is reported as 0.0.
 
-Note that in most texts what we call ``vertical profile angle'' is called ``horizontal profile angle.''
+Note that in most texts and in window equivalent layer model what we call ``vertical profile angle'' is called ``horizontal profile angle.''
 
 \begin{figure}[hbtp] % fig 32
 \centering
@@ -3248,6 +3248,9 @@ For a time interval longer a timestep, this is the fraction of the time interval
 \subsubsection{Surface Window Blind Slat Angle {[}deg{]}}\label{surface-window-blind-slat-angle-deg}
 
 For an exterior window with a blind, this is the angle in degrees between the glazing outward normal and the blind slat angle outward normal, where the outward normal points away from the front face of the slat. The slat angle varies from 0 to 180 deg. If the slat angle is 0 deg or 180 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 90 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. See illustrations under WindowMaterial:Blind. For blinds with a fixed slat angle, the value reported here will be constant.
+
+For WindowMaterial:Blind:EquivalentLayer blinds the slat angle varies from -90 to 90 deg. If the slat angle is -90 deg or 90 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 0 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. For blinds with a fixed slat angle, the value reported here will be constant.
+
 
 \subsubsection{Surface Window Blind Beam to Beam Solar Transmittance {[]}}\label{surface-window-blind-beam-to-beam-solar-transmittance}
 
@@ -4593,7 +4596,7 @@ This is where the gap air goes after passing through the window. The choices are
 
 \emph{OutdoorAir}: The gap air goes to the outside air.
 
-\emph{ReturnAir}. The gap air goes to the return air for the window's zone. This choice is allowed only if Airflow Source = InsideAir. If the return air flow is zero, the gap air goes to the indoor air of the window's zone. If the sum of the gap airflow for all of the windows in a zone with Airflow Destination = ReturnAir exceeds the return airflow, then the difference between this sum and the return airflow goes to the indoor air.
+\emph{ReturnAir}. The gap air goes to the return air for the window's zone. This choice is allowed only if Airflow Source = InsideAir. If the return air flow is zero, the gap air goes to the indoor air of the window's zone. If the sum of the gap airflow for all of the windows in a zone with Airflow Destination = ReturnAir exceeds the return airflow, then the difference between this sum and the return airflow goes to the indoor air. The name of the Return Air Node may be specified below.
 
 Figure~\ref{fig:gap-airflow-configurations-for-airflow} shows the allowed combinations of Airflow Source and Airflow Destination. The allowed combinations of Airflow Source and Airflow Destination are:
 
@@ -4639,6 +4642,10 @@ If Yes, Airflow Multiplier Schedule Name is required.
 
 The name of a schedule with values between 0.0 and 1.0. The timestep value of the airflow is Maximum Airflow times the schedule value. Required if Airflow Is Scheduled = Yes. Unused if Airflow Is Scheduled = No. This schedule should have a ScheduleType with Numeric Type = Continuous and Range = 0.0 : 1.0.
 
+\paragraph{Field: Airflow Return Air Node Name}\label{field-airflow-return-air-node-name}
+
+The name of the return air node for this airflow window if the Airflow Destination is ReturnAir. If left blank, this defaults to the first return air node for the zone containing the window surface.
+
 \begin{figure}[hbtp] % fig 39
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image065.png}
@@ -4648,14 +4655,15 @@ The name of a schedule with values between 0.0 and 1.0. The timestep value of th
 An IDF example: window with a constant airflow from inside to outside at 0.008 m\(^{3}\)/s-m.
 
 \begin{lstlisting}
-WindowProperty:AirflowControl,   !- Used to control forced airflow through a gap between glass layers
-      Zn001:Wall001:Win002,   !- Name of Associated Window
+WindowProperty:AirflowControl,
+      Zn001:Wall001:Win002,   !- Name
       InsideAir,              !- Airflow Source
       OutsideAir,             !- Airflow Destination
-      0.008,                  !- Maximum Airflow (m3/s per m of glazing width)
+      0.008,                  !- Maximum Flow Rate {m3/s-m}
       AlwaysOnAtMaxFlow,      !- Airflow Control Type
-      No,                     !- Airflow Has Multiplier Schedule?
-      ;                       !- Name of Airflow Multiplier Schedule
+      No,                     !- Airflow Is Scheduled
+      ;                       !- Airflow Multiplier Schedule Name
+      ,                       !- Airflow Return Air Node Name
 \end{lstlisting}
 
 \subsection{WindowProperty:StormWindow}\label{windowpropertystormwindow}

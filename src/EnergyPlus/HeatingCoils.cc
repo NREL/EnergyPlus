@@ -72,7 +72,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -230,7 +230,7 @@ namespace HeatingCoils {
 		// Find the correct HeatingCoilNumber with the Coil Name
 		if ( present( CompIndex ) ) {
 			if ( CompIndex == 0 ) {
-				CoilNum = InputProcessor::FindItemInList( CompName, HeatingCoil );
+				CoilNum = UtilityRoutines::FindItemInList( CompName, HeatingCoil );
 				if ( CoilNum == 0 ) {
 					ShowFatalError( "SimulateHeatingCoilComponents: Coil not found=" + CompName );
 				}
@@ -368,11 +368,11 @@ namespace HeatingCoils {
 		bool errFlag;
 		// Flow
 
-		NumElecCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Electric" );
-		NumElecCoilMultiStage = InputProcessor::GetNumObjectsFound( "Coil:Heating:Electric:MultiStage" );
-		NumFuelCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Fuel" );
-		NumGasCoilMultiStage = InputProcessor::GetNumObjectsFound( "Coil:Heating:Gas:MultiStage" );
-		NumDesuperheaterCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Desuperheater" );
+		NumElecCoil = inputProcessor->getNumObjectsFound( "Coil:Heating:Electric" );
+		NumElecCoilMultiStage = inputProcessor->getNumObjectsFound( "Coil:Heating:Electric:MultiStage" );
+		NumFuelCoil = inputProcessor->getNumObjectsFound( "Coil:Heating:Fuel" );
+		NumGasCoilMultiStage = inputProcessor->getNumObjectsFound( "Coil:Heating:Gas:MultiStage" );
+		NumDesuperheaterCoil = inputProcessor->getNumObjectsFound( "Coil:Heating:Desuperheater" );
 		NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
 		if ( NumHeatingCoils > 0 ) {
 			HeatingCoil.allocate( NumHeatingCoils );
@@ -381,19 +381,19 @@ namespace HeatingCoils {
 			CheckEquipName.dimension( NumHeatingCoils, true );
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Electric", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Electric", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Electric:MultiStage", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Electric:MultiStage", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Fuel", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Fuel", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Gas:MultiStage", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Gas:MultiStage", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Desuperheater", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:Desuperheater", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -412,13 +412,13 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Electric";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -471,13 +471,13 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -540,13 +540,13 @@ namespace HeatingCoils {
 
 			CurrentModuleObject = "Coil:Heating:Fuel";
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -620,13 +620,13 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Natural_Gas;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -705,13 +705,13 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Desuperheater";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DesuperheaterCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, DesuperheaterCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -758,27 +758,27 @@ namespace HeatingCoils {
 			// Find the DX equipment index associated with the desuperheater heating coil.
 			// The CoilNum may not be found here when zone heating equip. exists. Check again in InitHeatingCoil.
 			// (when zone equipment heating coils are included in the input, the air loop DX equipment has not yet been read in)
-			if ( InputProcessor::SameString( Alphas( 5 ), "Refrigeration:CompressorRack" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 5 ), "Refrigeration:CompressorRack" ) ) {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COMPRESSORRACK_REFRIGERATEDCASE;
 				GetRefrigeratedRackIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, RefrigSystemTypeRack, DXCoilErrFlag, Alphas( 5 ) );
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
-			} else if ( ( InputProcessor::SameString( Alphas( 5 ), "Refrigeration:Condenser:AirCooled" ) ) || ( InputProcessor::SameString( Alphas( 5 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( InputProcessor::SameString( Alphas( 5 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
+			} else if ( ( UtilityRoutines::SameString( Alphas( 5 ), "Refrigeration:Condenser:AirCooled" ) ) || ( UtilityRoutines::SameString( Alphas( 5 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( UtilityRoutines::SameString( Alphas( 5 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = CONDENSER_REFRIGERATION;
 				GetRefrigeratedRackIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, RefrigSystemTypeDetailed, DXCoilErrFlag, Alphas( 5 ) );
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
-			} else if ( InputProcessor::SameString( Alphas( 5 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_COOLING;
 				GetDXCoilIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas( 5 ) );
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
-			} else if ( InputProcessor::SameString( Alphas( 5 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
 				HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( Alphas( 5 ), Alphas( 6 ), DXCoilErrFlag );
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
-			} else if ( InputProcessor::SameString( Alphas( 5 ), "Coil:Cooling:DX:TwoSpeed" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), "Coil:Cooling:DX:TwoSpeed" ) ) {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_MULTISPEED;
 				GetDXCoilIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas( 5 ) );
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
-			} else if ( InputProcessor::SameString( Alphas( 5 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_MULTIMODE;
 				GetDXCoilIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas( 5 ) );
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
@@ -1047,28 +1047,28 @@ namespace HeatingCoils {
 			++ValidSourceTypeCounter;
 			if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COMPRESSORRACK_REFRIGERATEDCASE ) {
 				for ( RackNum = 1; RackNum <= NumRefrigeratedRacks; ++RackNum ) {
-					if ( ! InputProcessor::SameString( HeatReclaimRefrigeratedRack( RackNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
+					if ( ! UtilityRoutines::SameString( HeatReclaimRefrigeratedRack( RackNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
 					HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = RackNum;
 					if ( allocated( HeatReclaimRefrigeratedRack ) ) ValidSourceType( CoilNum ) = true;
 					break;
 				}
 			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == CONDENSER_REFRIGERATION ) {
 				for ( CondNum = 1; CondNum <= NumRefrigCondensers; ++CondNum ) {
-					if ( ! InputProcessor::SameString( HeatReclaimRefrigCondenser( CondNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
+					if ( ! UtilityRoutines::SameString( HeatReclaimRefrigCondenser( CondNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
 					HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = CondNum;
 					if ( allocated( HeatReclaimRefrigCondenser ) ) ValidSourceType( CoilNum ) = true;
 					break;
 				}
 			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_COOLING || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTISPEED || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 				for ( DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum ) {
-					if ( ! InputProcessor::SameString( HeatReclaimDXCoil( DXCoilNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
+					if ( ! UtilityRoutines::SameString( HeatReclaimDXCoil( DXCoilNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
 					HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
 					if ( allocated( HeatReclaimDXCoil ) ) ValidSourceType( CoilNum ) = true;
 					break;
 				}
 			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
 				for ( DXCoilNum = 1; DXCoilNum <= VariableSpeedCoils::NumVarSpeedCoils; ++DXCoilNum ) {
-					if ( ! InputProcessor::SameString( DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
+					if ( ! UtilityRoutines::SameString( DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
 					HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
 					if ( allocated( DataHeatBalance::HeatReclaimVS_DXCoil ) ) ValidSourceType( CoilNum ) = true;
 					break;
@@ -1099,7 +1099,7 @@ namespace HeatingCoils {
 
 		// METHODOLOGY EMPLOYED:
 		// Obtains heating capacities from the zone or system sizing arrays or parent object as necessary.
-		// heating coil or other routine sets up any required data varaibles (e.g., DataCoilIsSuppHeater, TermUnitPIU, etc.),
+		// heating coil or other routine sets up any required data variables (e.g., DataCoilIsSuppHeater, TermUnitPIU, etc.),
 		// sizing variable (e.g., HeatingCoil( CoilNum ).NominalCapacity in this routine since it can be multi-staged and new routine
 		// currently only handles single values) and associated string representing that sizing variable.
 		// RequestSizing functions handles the actual sizing and reporting.
@@ -2459,7 +2459,7 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		HeatingCoilIndex = InputProcessor::FindItem( HeatingCoilName, HeatingCoil );
+		HeatingCoilIndex = UtilityRoutines::FindItem( HeatingCoilName, HeatingCoil );
 		if ( HeatingCoilIndex == 0 ) {
 			ShowSevereError( "GetCoilIndex: Heating coil not found=" + HeatingCoilName );
 			ErrorsFound = true;
@@ -2500,11 +2500,11 @@ namespace HeatingCoils {
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = InputProcessor::FindItem( CompName, HeatingCoil );
+			CoilNum = UtilityRoutines::FindItem( CompName, HeatingCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckHeatingCoilSchedule: Coil not found=\"" + CompName + "\"." );
 			}
-			if ( ! InputProcessor::SameString( CompType, cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) ) ) {
+			if ( ! UtilityRoutines::SameString( CompType, cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) ) ) {
 				ShowSevereError( "CheckHeatingCoilSchedule: Coil=\"" + CompName + "\"" );
 				ShowContinueError( "...expected type=\"" + CompType + "\", actual type=\"" + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "\"." );
 				ShowFatalError( "Program terminates due to preceding conditions." );
@@ -2558,14 +2558,14 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		FoundType = UtilityRoutines::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = HeatingCoil( WhichCoil ).NominalCapacity;
 			}
 		} else if ( FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas_MultiStage ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = HeatingCoil( WhichCoil ).MSNominalCapacity( HeatingCoil( WhichCoil ).NumOfStages );
 			}
@@ -2623,9 +2623,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		AvailSchIndex = 0;
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		FoundType = UtilityRoutines::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = HeatingCoil( WhichCoil ).SchedPtr;
 			}
@@ -2676,9 +2676,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		FoundType = UtilityRoutines::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirInletNodeNum;
 			}
@@ -2730,9 +2730,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		FoundType = UtilityRoutines::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirOutletNodeNum;
 			}
@@ -2788,7 +2788,7 @@ namespace HeatingCoils {
 		CoilFound = 0;
 
 		//This function only used for dessicant regeneration and refrigeration desuperheat not a valid source
-		//IF (InputProcessor::SameString(CoilType,'REFRIGERATION:COMPRESSORRACK')) THEN
+		//IF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:COMPRESSORRACK')) THEN
 		//    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeRack, GetCoilErrFlag, CoilType, SuppressWarning)
 		//    DO NumCoil = 1, NumHeatingCoils
 		//      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. COMPRESSORRACK_REFRIGERATEDCASE .AND. &
@@ -2796,7 +2796,7 @@ namespace HeatingCoils {
 		//      CoilFound = CoilNum
 		//      EXIT
 		//    END DO
-		// ELSEIF (InputProcessor::SameString(CoilType,'REFRIGERATION:CONDENSER')) THEN   bbb
+		// ELSEIF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:CONDENSER')) THEN   bbb
 		//    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeDetailed, GetCoilErrFlag, CoilType, SuppressWarning)
 		//    DO NumCoil = 1, NumHeatingCoils
 		//      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. CONDENSER_REFRIGERATION .AND. &
@@ -2806,14 +2806,14 @@ namespace HeatingCoils {
 		//    END DO
 		// ELSEIF
 		//note should eventually get rid of this string comparison
-		if ( InputProcessor::SameString( CoilType, "COIL:COOLING:DX:SINGLESPEED" ) || InputProcessor::SameString( CoilType, "COIL:COOLING:DX:TWOSPEED" ) || InputProcessor::SameString( CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) ) {
+		if ( UtilityRoutines::SameString( CoilType, "COIL:COOLING:DX:SINGLESPEED" ) || UtilityRoutines::SameString( CoilType, "COIL:COOLING:DX:TWOSPEED" ) || UtilityRoutines::SameString( CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) ) {
 			GetDXCoilIndex( CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning );
 			for ( NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil ) {
 				if ( HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_MULTISPEED && HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil( NumCoil ).ReclaimHeatingCoilName != CoilName ) continue;
 				CoilFound = CoilNum;
 				break;
 			}
-		} else if ( InputProcessor::SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+		} else if ( UtilityRoutines::SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
 			CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( CoilType, CoilName, GetCoilErrFlag );
 			for ( NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil ) {
 				if ( HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil( NumCoil ).ReclaimHeatingCoilName != CoilName ) continue;
@@ -2864,9 +2864,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		FoundType = UtilityRoutines::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).TempSetPointNodeNum;
 			}
@@ -2918,9 +2918,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		TypeNum = 0;
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		FoundType = UtilityRoutines::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				TypeNum = HeatingCoil( WhichCoil ).HCoilType_Num;
 			}
@@ -2970,9 +2970,9 @@ namespace HeatingCoils {
 		}
 
 		WhichCoil = 0;
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		FoundType = UtilityRoutines::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -3019,9 +3019,9 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		FoundType = UtilityRoutines::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				IndexNum = HeatingCoil( WhichCoil ).PLFCurveIndex;
 			} else {
@@ -3067,7 +3067,7 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = InputProcessor::FindItemInList( CoilName, HeatingCoil );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, HeatingCoil );
 		if ( WhichCoil != 0 ) {
 			NumberOfStages = HeatingCoil( WhichCoil ).NumOfStages;
 		} else {

@@ -54,7 +54,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -166,7 +166,7 @@ namespace SplitterComponent {
 
 		// Find the correct SplitterNumber
 		if ( CompIndex == 0 ) {
-			SplitterNum = InputProcessor::FindItemInList( CompName, SplitterCond, &SplitterConditions::SplitterName );
+			SplitterNum = UtilityRoutines::FindItemInList( CompName, SplitterCond, &SplitterConditions::SplitterName );
 			if ( SplitterNum == 0 ) {
 				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + CompName );
 			}
@@ -249,12 +249,12 @@ namespace SplitterComponent {
 
 		// Flow
 		CurrentModuleObject = "AirLoopHVAC:ZoneSplitter";
-		NumSplitters = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumSplitters = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumSplitters > 0 ) SplitterCond.allocate( NumSplitters );
 		CheckEquipName.dimension( NumSplitters, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		lAlphaBlanks.dimension( NumAlphas, true );
@@ -263,8 +263,8 @@ namespace SplitterComponent {
 		NumArray.dimension( NumNums, 0.0 );
 
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 			SplitterCond( SplitterNum ).SplitterName = AlphArray( 1 );
 			SplitterCond( SplitterNum ).InletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
@@ -744,7 +744,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = InputProcessor::FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
+			WhichSplitter = UtilityRoutines::FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}
@@ -796,7 +796,7 @@ namespace SplitterComponent {
 		}
 
 		if ( SplitterNum == 0 ) {
-			WhichSplitter = InputProcessor::FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
+			WhichSplitter = UtilityRoutines::FindItemInList( SplitterName, SplitterCond, &SplitterConditions::SplitterName );
 		} else {
 			WhichSplitter = SplitterNum;
 		}

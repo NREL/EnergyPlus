@@ -47,7 +47,7 @@
 // EnergyPlus Headers
 #include <GlobalNames.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -208,7 +208,7 @@ namespace GlobalNames {
 			ShowContinueError( "...Current entry is Chiller Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
 		} else {
-			ChillerNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
+			ChillerNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
 			NumChillers = static_cast< int >( ChillerNames.size() );
 		}
 
@@ -240,7 +240,7 @@ namespace GlobalNames {
             ShowContinueError( "...Current entry is Baseboard Type=\"" + TypeToVerify + "\"." );
             ErrorFound = true;
         } else {
-            BaseboardNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
+            BaseboardNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
             NumBaseboards = static_cast< int >( BaseboardNames.size() );
         }
 
@@ -272,7 +272,7 @@ namespace GlobalNames {
             ShowContinueError( "...Current entry is Boiler Type=\"" + TypeToVerify + "\"." );
             ErrorFound = true;
         } else {
-            BoilerNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
+            BoilerNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
             NumBoilers = static_cast< int >( BoilerNames.size() );
         }
 
@@ -311,7 +311,7 @@ namespace GlobalNames {
             ShowContinueError( "...Current entry is Coil Type=\"" + TypeToVerify + "\"." );
             ErrorFound = true;
         } else {
-            CoilNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
+            CoilNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
             NumCoils = static_cast< int >( CoilNames.size() );
         }
 
@@ -332,7 +332,7 @@ namespace GlobalNames {
             ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
             ErrorFound = true;
         } else {
-            aDUNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
+            aDUNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
             numAirDistUnits = static_cast< int >( aDUNames.size() );
         }
 

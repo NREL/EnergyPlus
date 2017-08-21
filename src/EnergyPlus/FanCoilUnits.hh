@@ -217,10 +217,10 @@ namespace FanCoilUnits {
 		Real64 QUnitOutNoHC; // unit output with coils off [W]
 		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
 		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
-		int LimitErrCountH; // count of SolveRegulaFalsi limit errors
-		int LimitErrCountC; // count of SolveRegulaFalsi limit errors
-		int ConvgErrCountH; // count of SolveRegulaFalsi iteration limit errors
-		int ConvgErrCountC; // count of SolveRegulaFalsi iteration limit errors
+		int LimitErrCountH; // count of SolveRoot limit errors
+		int LimitErrCountC; // count of SolveRoot limit errors
+		int ConvgErrCountH; // count of SolveRoot iteration limit errors
+		int ConvgErrCountC; // count of SolveRoot iteration limit errors
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
 		Real64 HeatEnergy; // unit heating output in J

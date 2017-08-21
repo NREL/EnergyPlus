@@ -1067,10 +1067,10 @@
     12.19200,6.096000,3.048;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Surface_20,              !- Name
+    Surface_20_T,            !- Name
     ROOF,                    !- Surface Type
     ROOF34,                  !- Construction Name
-    NORTH_ZONE,              !- Zone Name
+    NORTH_ZONE_T,            !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1957,22 +1957,22 @@
   AirflowNetwork:MultiZone:ExternalNode,
     NFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    NFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    NFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     EFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    EFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    EFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     SFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    SFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     WFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    WFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:Wind Pressure Coefficient Array ===========
 

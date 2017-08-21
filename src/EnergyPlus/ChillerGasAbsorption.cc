@@ -68,7 +68,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -186,7 +186,7 @@ namespace ChillerGasAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = InputProcessor::FindItemInList( AbsorberName, GasAbsorber );
+			ChillNum = UtilityRoutines::FindItemInList( AbsorberName, GasAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -303,7 +303,7 @@ namespace ChillerGasAbsorption {
 
 		//FLOW
 		cCurrentModuleObject = "ChillerHeater:Absorption:DirectFired";
-		NumGasAbsorbers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumGasAbsorbers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGasAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
@@ -321,8 +321,8 @@ namespace ChillerGasAbsorption {
 		//LOAD ARRAYS
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, Get_ErrorsFound );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, Get_ErrorsFound );
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), Get_ErrorsFound, cCurrentModuleObject + " Name" );
 
 			GasAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
@@ -364,7 +364,7 @@ namespace ChillerGasAbsorption {
 			if ( GasAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
 				GasAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
 			}
-			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
 			} else {
 				GasAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 13 );
@@ -388,9 +388,9 @@ namespace ChillerGasAbsorption {
 				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				Get_ErrorsFound = false;
 			}
-			if ( InputProcessor::SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = false;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
@@ -399,9 +399,9 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
 			// Assign Other Parameters
-			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = false;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;

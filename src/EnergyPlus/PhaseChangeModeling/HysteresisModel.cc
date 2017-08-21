@@ -51,7 +51,7 @@
 #include <PhaseChangeModeling/HysteresisModel.hh>
 #include <DataIPShortCuts.hh>
 #include <UtilityRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -323,11 +323,34 @@ namespace EnergyPlus {
 
 		}
 
+		Real64
+		HysteresisPhaseChange::getConductivity( Real64 T ) {
+			if ( T < this->peakTempMelting ) {
+				return this->fullySolidThermalConductivity;
+			} else if ( T > this->peakTempFreezing ) {
+				return this->fullyLiquidThermalConductivity;
+			} else {
+				return ( this->fullySolidThermalConductivity + this->fullyLiquidThermalConductivity ) / 2.0;
+			}
+		}
+
+		Real64
+		HysteresisPhaseChange::getDensity( Real64 T ) {
+			if ( T < this->peakTempMelting ) {
+				return this->fullySolidDensity;
+			} else if ( T > this->peakTempFreezing ) {
+				return this->fullyLiquidDensity;
+			} else {
+				return ( this->fullySolidDensity + this->fullyLiquidDensity ) / 2.0;
+			}
+		}
+
+
 		void readAllHysteresisModels() {
 
 			// convenience variables
 			DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-			numHysteresisModels = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
+			numHysteresisModels = inputProcessor->getNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 
 			// loop over all hysteresis input instances, if zero, this will simply not do anything
 			for ( int hmNum = 1; hmNum <= numHysteresisModels; ++hmNum ) {
@@ -338,7 +361,7 @@ namespace EnergyPlus {
 				int numNumbers;
 
 				// get the input data and store it in the Shortcuts structures
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, hmNum,
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, hmNum,
 											   DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs,
 											   numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
 											   DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
@@ -363,15 +386,19 @@ namespace EnergyPlus {
 				// now build out a new hysteresis instance and add it to the vector
 				HysteresisPhaseChange thisHM;
 				thisHM.name = DataIPShortCuts::cAlphaArgs( 1 );
-				thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs( 2 );
-				thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs( 3 );
-				thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs( 4 );
-				thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs( 5 );
-				thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs( 6 );
-				thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs( 7 );
-				thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs( 8 );
-				thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs( 9 );
-				thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs( 10 );
+				thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs( 1 );
+				thisHM.fullyLiquidThermalConductivity = DataIPShortCuts::rNumericArgs( 2 );
+				thisHM.fullyLiquidDensity = DataIPShortCuts::rNumericArgs( 3 );
+				thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs( 4 );
+				thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs( 5 );
+				thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs( 6 );
+				thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs( 7 );
+				thisHM.fullySolidThermalConductivity = DataIPShortCuts::rNumericArgs( 8 );
+				thisHM.fullySolidDensity = DataIPShortCuts::rNumericArgs( 9 );
+				thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs( 10 );
+				thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs( 11 );
+				thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs( 12 );
+				thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs( 13 );
 				thisHM.specHeatTransition = ( thisHM.specificHeatSolid + thisHM.specificHeatLiquid ) / 2.0;
 				thisHM.CpOld = thisHM.specificHeatSolid;
 				hysteresisPhaseChangeModels.push_back( thisHM );

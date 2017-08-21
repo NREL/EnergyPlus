@@ -60,7 +60,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -150,7 +150,7 @@ namespace PlantValves {
 
 		// Find the correct Equipment
 		if ( CompNum == 0 ) {
-			EqNum = InputProcessor::FindItemInList( CompName, TemperValve );
+			EqNum = UtilityRoutines::FindItemInList( CompName, TemperValve );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimPlantValves: Unit not found=" + CompName );
 			}
@@ -217,14 +217,14 @@ namespace PlantValves {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "TemperingValve";
-		NumTemperingValves = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumTemperingValves = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		TemperValve.allocate( NumTemperingValves );
 		CheckEquipName.dimension( NumTemperingValves, true );
 
 		for ( Item = 1; Item <= NumTemperingValves; ++Item ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus );
 			//  <process, noting errors>
 			TemperValve( Item ).Name = Alphas( 1 );
 			// Get Plant Inlet Node
@@ -346,7 +346,7 @@ namespace PlantValves {
 
 										if ( ( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).TypeOf_Num == CompTypeNum ) && ( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).CompNum == CompNum ) ) { // we found it.
 
-											if ( ! InputProcessor::SameString( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).Name, TemperValve( CompNum ).Name ) ) {
+											if ( ! UtilityRoutines::SameString( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).Name, TemperValve( CompNum ).Name ) ) {
 												// why not, maybe plant loop structures not completely filled with available data?
 												//write(*,*) 'Temper Valve names', PlantLoop(i)%LoopSide(j)%Branch(k)%Comp(l)%Name, TemperValve(CompNum)%Name
 											}

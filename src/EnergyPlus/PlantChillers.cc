@@ -71,7 +71,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -318,7 +318,7 @@ namespace PlantChillers {
 
 			// Find the correct Chiller
 			if ( CompIndex == 0 ) {
-				ChillNum = InputProcessor::FindItemInList( ChillerName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
+				ChillNum = UtilityRoutines::FindItemInList( ChillerName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
 					ShowFatalError( "SimElectricChiller: Specified Chiller not one of Valid Electric Chillers=" + ChillerName );
 				}
@@ -380,7 +380,7 @@ namespace PlantChillers {
 
 			// Find the correct Chiller
 			if ( CompIndex == 0 ) {
-				ChillNum = InputProcessor::FindItemInList( ChillerName, EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ) );
+				ChillNum = UtilityRoutines::FindItemInList( ChillerName, EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
 					ShowFatalError( "SimEngineDrivenChiller: Specified Chiller not one of Valid EngineDriven Chillers=" + ChillerName );
 				}
@@ -439,7 +439,7 @@ namespace PlantChillers {
 			}
 
 			if ( CompIndex == 0 ) {
-				ChillNum = InputProcessor::FindItemInList( ChillerName, GTChiller.ma( &GTChillerSpecs::Base ) );
+				ChillNum = UtilityRoutines::FindItemInList( ChillerName, GTChiller.ma( &GTChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
 					ShowFatalError( "SimGTChiller: Specified Chiller not one of Valid Gas Turbine Chillers=" + ChillerName );
 				}
@@ -502,7 +502,7 @@ namespace PlantChillers {
 
 			// Find the correct Chiller
 			if ( CompIndex == 0 ) {
-				ChillNum = InputProcessor::FindItemInList( ChillerName, ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ) );
+				ChillNum = UtilityRoutines::FindItemInList( ChillerName, ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
 					ShowFatalError( "SimConstCOPChiller: Specified Chiller not one of Valid Constant COP Chillers=" + ChillerName );
 				}
@@ -599,7 +599,7 @@ namespace PlantChillers {
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:Electric";
-		NumElectricChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumElectricChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumElectricChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " Equipment specified in input file" );
@@ -615,8 +615,8 @@ namespace PlantChillers {
 
 		//LOAD ARRAYS WITH Electric CURVE FIT CHILLER DATA
 		for ( ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,  cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,  cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
@@ -874,6 +874,11 @@ namespace PlantChillers {
 					ShowWarningError( cCurrentModuleObject + ", \"" + ElectricChiller( ChillerNum ).Base.Name + "\" TRIM(cAlphaFieldNames(10)) \"" + cAlphaArgs( 10 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
+			if ( NumAlphas > 12 ) {
+				ElectricChiller( ChillerNum ).EndUseSubcategory = cAlphaArgs( 13 );
+			} else {
+				ElectricChiller( ChillerNum ).EndUseSubcategory = "General";
+			}
 
 		}
 
@@ -883,7 +888,7 @@ namespace PlantChillers {
 
 		for ( ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum ) {
 			SetupOutputVariable( "Chiller Electric Power [W]", ElectricChillerReport( ChillerNum ).Base.Power, "System", "Average", ElectricChiller( ChillerNum ).Base.Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricChillerReport( ChillerNum ).Base.Energy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricChillerReport( ChillerNum ).Base.Energy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ELECTRICITY", "Cooling", ElectricChiller( ChillerNum ).EndUseSubcategory, "Plant" );
 
 			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", ElectricChillerReport( ChillerNum ).Base.QEvap, "System", "Average", ElectricChiller( ChillerNum ).Base.Name );
 			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", ElectricChillerReport( ChillerNum ).Base.EvapEnergy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
@@ -967,7 +972,7 @@ namespace PlantChillers {
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:EngineDriven";
-		NumEngineDrivenChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumEngineDrivenChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumEngineDrivenChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -982,8 +987,8 @@ namespace PlantChillers {
 
 		//LOAD ARRAYS WITH EngineDriven CURVE FIT CHILLER DATA
 		for ( ChillerNum = 1; ChillerNum <= NumEngineDrivenChillers; ++ChillerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
@@ -1411,7 +1416,7 @@ namespace PlantChillers {
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:CombustionTurbine";
-		NumGTChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumGTChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGTChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -1425,8 +1430,8 @@ namespace PlantChillers {
 		GTChillerReport.allocate( NumGTChillers );
 
 		for ( ChillerNum = 1; ChillerNum <= NumGTChillers; ++ChillerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
@@ -1835,7 +1840,7 @@ namespace PlantChillers {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "Chiller:ConstantCOP";
-		NumConstCOPChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumConstCOPChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumConstCOPChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -1850,8 +1855,8 @@ namespace PlantChillers {
 
 		//LOAD ARRAYS WITH BLAST ConstCOP CHILLER DATA
 		for ( ChillerNum = 1; ChillerNum <= NumConstCOPChillers; ++ChillerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {

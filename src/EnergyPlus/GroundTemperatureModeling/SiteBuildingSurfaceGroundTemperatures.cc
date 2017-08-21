@@ -56,7 +56,8 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -101,7 +102,7 @@ namespace EnergyPlus {
 		std::shared_ptr< SiteBuildingSurfaceGroundTemps > thisModel( new SiteBuildingSurfaceGroundTemps() );
 
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp );
-		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrObjects = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		thisModel->objectType = objectType;
 		thisModel->objectName = objectName;
@@ -109,7 +110,7 @@ namespace EnergyPlus {
 		if ( numCurrObjects == 1 ) {
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( NumNums < 12 ) {
 				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
@@ -139,7 +140,10 @@ namespace EnergyPlus {
 		// Write Final Ground Temp Information to the initialization output file
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:BuildingSurface>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:BuildingSurface";
-		for ( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->buildingSurfaceGroundTemps( i ); gio::write( OutputFileInits );
+		for ( int i = 1; i <= 12; ++i ) {
+			gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->buildingSurfaceGroundTemps( i );
+		}
+		gio::write( OutputFileInits );
 
 		found = true;
 

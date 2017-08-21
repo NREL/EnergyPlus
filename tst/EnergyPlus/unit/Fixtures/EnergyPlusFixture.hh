@@ -53,7 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
 #include <ostream>
@@ -109,8 +109,6 @@ namespace EnergyPlus {
 		virtual void TearDown();
 
 		void clear_all_states();
-
-		static json::parser_callback_t call_back;
 
 		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
 		// Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
@@ -180,13 +178,6 @@ namespace EnergyPlus {
 		// Will return true if string matches the stream and false if it does not
 		bool compare_mtr_stream( std::string const & expected_string, bool reset_stream = true );
 
-		// Compare an expected string against the ECHO stream. The default is to reset the ECHO stream after every call.
-		// It is easier to test successive functions if the ECHO stream is 'empty' before the next call.
-		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-		// if it makes sense for the unit test to continue after returning from function.
-		// Will return true if string matches the stream and false if it does not
-		bool compare_echo_stream( std::string const & expected_string, bool reset_stream = true );
-
 		// Compare an expected string against the ERR stream. The default is to reset the ERR stream after every call.
 		// It is easier to test successive functions if the ERR stream is 'empty' before the next call.
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -227,9 +218,6 @@ namespace EnergyPlus {
 		// Check if MTR stream has any output. Useful to make sure there are or are not outputs to MTR.
 		bool has_mtr_output( bool reset_stream = true );
 
-		// Check if ECHO stream has any output. Useful to make sure there are or are not outputs to ECHO.
-		bool has_echo_output( bool reset_stream = true );
-
 		// Check if ERR stream has any output. Useful to make sure there are or are not outputs to ERR.
 		bool has_err_output( bool reset_stream = true );
 
@@ -244,7 +232,7 @@ namespace EnergyPlus {
 
 		// This function processes an idf snippet and defaults to using the idd cache for the fixture.
 		// The cache should be used for nearly all calls to this function.
-		// This more or less replicates InputProcessor::ProcessInput() but in a more usable fashion for unit testing
+		// This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return false if no errors found and true if errors found
@@ -269,8 +257,8 @@ namespace EnergyPlus {
 	private:
 		friend class InputProcessorFixture;
 
-		// Function to process the Energy+.jdd, should not normally be called.
-		// This will always grab the Energy+.jdd that is part of the Products folder
+		// Function to process the Energy+.schema.epJSON, should not normally be called.
+		// This will always grab the Energy+.schema.epJSON that is part of the Products folder
 		// This function should be called by process_idf() so unit tests can take advantage of caching
 		// To test this function use InputProcessorFixture
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -283,7 +271,6 @@ namespace EnergyPlus {
 		std::unique_ptr< std::ostringstream > eso_stream;
 		std::unique_ptr< std::ostringstream > eio_stream;
 		std::unique_ptr< std::ostringstream > mtr_stream;
-		std::unique_ptr< std::ostringstream > echo_stream;
 		std::unique_ptr< std::ostringstream > err_stream;
 		std::unique_ptr< std::ostringstream > m_cout_buffer;
 		std::unique_ptr< std::ostringstream > m_cerr_buffer;

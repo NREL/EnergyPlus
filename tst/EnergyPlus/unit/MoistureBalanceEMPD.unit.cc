@@ -55,7 +55,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -120,7 +120,7 @@ TEST_F( EnergyPlusFixture, CheckEMPDCalc )
 	DataHeatBalance::Construct.allocate(1);
 	DataHeatBalance::ConstructionData & construction = DataHeatBalance::Construct(1);
 	construction.TotLayers = 1;
-	construction.LayerPoint(construction.TotLayers) = InputProcessor::FindItemInList( "CONCRETE", DataHeatBalance::Material );
+	construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList( "CONCRETE", DataHeatBalance::Material );
 
 	// Initialize and get inputs
 	MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();
@@ -250,7 +250,7 @@ TEST_F( EnergyPlusFixture, EMPDRcoating ) {
 	DataHeatBalance::Construct.allocate(1);
 	DataHeatBalance::ConstructionData & construction = DataHeatBalance::Construct(1);
 	construction.TotLayers = 1;
-	construction.LayerPoint(construction.TotLayers) = InputProcessor::FindItemInList( "CONCRETE", DataHeatBalance::Material );
+	construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList( "CONCRETE", DataHeatBalance::Material );
 
 	// Initialize and get inputs
 	MoistureBalanceEMPDManager::InitMoistureBalanceEMPD();

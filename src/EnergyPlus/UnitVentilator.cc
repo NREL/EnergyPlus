@@ -71,7 +71,7 @@
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -229,7 +229,7 @@ namespace UnitVentilator {
 
 		// Find the correct Unit Ventilator Equipment
 		if ( CompIndex == 0 ) {
-			UnitVentNum = InputProcessor::FindItemInList( CompName, UnitVent );
+			UnitVentNum = UtilityRoutines::FindItemInList( CompName, UnitVent );
 			if ( UnitVentNum == 0 ) {
 				ShowFatalError( "SimUnitVentilator: Unit not found=" + CompName );
 			}
@@ -348,8 +348,8 @@ namespace UnitVentilator {
 		// Figure out how many unit ventilators there are in the input file
 
 		CurrentModuleObject = cMO_UnitVentilator;
-		NumOfUnitVents = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumOfUnitVents = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -368,12 +368,12 @@ namespace UnitVentilator {
 
 		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) { // Begin looping over all of the unit ventilators found in the input file...
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, UnitVentNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, UnitVentNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			UnitVentNumericFields( UnitVentNum ).FieldNames.allocate (NumNumbers );
 			UnitVentNumericFields( UnitVentNum ).FieldNames = "";
 			UnitVentNumericFields( UnitVentNum ).FieldNames = cNumericFields;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitVent( UnitVentNum ).Name = Alphas( 1 );
 			UnitVent( UnitVentNum ).SchedName = Alphas( 2 );
@@ -446,12 +446,6 @@ namespace UnitVentilator {
 				ShowContinueError( "Illegal " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
 			}}
 
-			// Get AirTerminal mixer data
-			GetATMixer( UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).ATMixerName, UnitVent( UnitVentNum ).ATMixerIndex, UnitVent( UnitVentNum ).ATMixerType, UnitVent( UnitVentNum ).ATMixerPriNode, UnitVent( UnitVentNum ).ATMixerSecNode, UnitVent( UnitVentNum ).ATMixerOutNode );
-			if (UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide || UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide) {
-				UnitVent( UnitVentNum ).ATMixerExists = true;
-			}
-
 			// Main air nodes (except outside air node):
 			// For node connections, this object is both a parent and a non-parent, because the
 			// OA mixing box is not called out as a separate component, its nodes must be connected
@@ -469,6 +463,11 @@ namespace UnitVentilator {
 			}
 			UnitVent( UnitVentNum ).AirOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
+			// Get AirTerminal mixer data
+			GetATMixer( UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).ATMixerName, UnitVent( UnitVentNum ).ATMixerIndex, UnitVent( UnitVentNum ).ATMixerType, UnitVent( UnitVentNum ).ATMixerPriNode, UnitVent( UnitVentNum ).ATMixerSecNode, UnitVent( UnitVentNum ).ATMixerOutNode, UnitVent( UnitVentNum ).AirOutNode );
+			if (UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide || UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide) {
+				UnitVent( UnitVentNum ).ATMixerExists = true;
+			}
 
 			UnitVent( UnitVentNum ).FanType = Alphas( 11 );
 			UnitVent( UnitVentNum ).FanName = Alphas( 12 );
@@ -478,7 +477,7 @@ namespace UnitVentilator {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( ! InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( ! UtilityRoutines::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
 					GetFanType( UnitVent( UnitVentNum ).FanName, UnitVent( UnitVentNum ).FanType_Num, errFlag, CurrentModuleObject, UnitVent( UnitVentNum ).Name );
 
 					{ auto const SELECT_CASE_var( UnitVent( UnitVentNum ).FanType_Num );
@@ -521,7 +520,7 @@ namespace UnitVentilator {
 						ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume." );
 						ErrorsFound = true;
 					}}
-				} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+				} else if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
 					UnitVent( UnitVentNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitVent( UnitVentNum ).FanName ) ); // call constructor
 					UnitVent( UnitVentNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitVent( UnitVentNum ).FanName ); //zero-based
@@ -600,7 +599,7 @@ namespace UnitVentilator {
 
 			UnitVent( UnitVentNum ).HVACSizingIndex = 0;
 			if (!lAlphaBlanks( 20 )) {
-				UnitVent( UnitVentNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
+				UnitVent( UnitVentNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (UnitVent( UnitVentNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found.");
 					ShowContinueError( "Occurs in " + cMO_UnitVentilator + " = " + UnitVent(UnitVentNum).Name );
@@ -774,9 +773,9 @@ namespace UnitVentilator {
 					} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 						UnitVent( UnitVentNum ).CCoilType = Cooling_CoilHXAssisted;
 						GetHXCoilTypeAndName( cCoolingCoilType, Alphas( 18 ), ErrorsFound, UnitVent( UnitVentNum ).CCoilPlantType, UnitVent( UnitVentNum ).CCoilPlantName );
-						if ( InputProcessor::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
+						if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 							UnitVent( UnitVentNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-						} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+						} else if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 							UnitVent( UnitVentNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\", invalid" );
@@ -2126,7 +2125,7 @@ namespace UnitVentilator {
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2482,7 +2481,7 @@ namespace UnitVentilator {
 								if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 								Par( 3 ) = double( OpMode );
 								// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-								SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
+								SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
 							}
 						}
 
@@ -2686,7 +2685,7 @@ namespace UnitVentilator {
 								if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 								Par( 3 ) = double( OpMode );
 								// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-								SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
+								SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
 							}
 						}
 						CalcUnitVentilatorComponents( UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac );
@@ -3386,7 +3385,7 @@ namespace UnitVentilator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the part-load ratio for the unit ventilator.
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 		// REFERENCES:
 		// na
 		// USE STATEMENTS:

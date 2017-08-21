@@ -67,7 +67,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -139,7 +139,7 @@ namespace ChillerAbsorption {
 	Real64 EvaporatorEnergy( 0.0 ); // J - heat transfer to the evaporator coil
 	Real64 QCondenser( 0.0 ); // W - rate of heat transfer to the condenser coil
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
-	
+
 	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	static std::string const BlankString;
@@ -209,7 +209,7 @@ namespace ChillerAbsorption {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			ChillNum = InputProcessor::FindItemInList( AbsorberName, BLASTAbsorber );
+			ChillNum = UtilityRoutines::FindItemInList( AbsorberName, BLASTAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimBLASTAbsorber: Specified Absorber not one of Valid Absorption Chillers=" + AbsorberName );
 			}
@@ -321,7 +321,7 @@ namespace ChillerAbsorption {
 		//FLOW
 		cCurrentModuleObject = moduleObjectType;
 
-		NumBLASTAbsorbers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumBLASTAbsorbers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBLASTAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -339,8 +339,8 @@ namespace ChillerAbsorption {
 
 		//LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
 		for ( AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -369,9 +369,9 @@ namespace ChillerAbsorption {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser (not tested) Nodes" );
 
 			if ( NumAlphas > 8 ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 9 ), "HotWater" ) || InputProcessor::SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "HotWater" ) || UtilityRoutines::SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Steam" ) || cAlphaArgs( 9 ).empty() ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "Steam" ) || cAlphaArgs( 9 ).empty() ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
@@ -1337,18 +1337,18 @@ namespace ChillerAbsorption {
 		LoopSideNum = BLASTAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( BLASTAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset ));
 			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		// If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
@@ -1479,7 +1479,7 @@ namespace ChillerAbsorption {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator

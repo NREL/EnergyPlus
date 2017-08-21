@@ -2341,21 +2341,21 @@
     77.419200000000,137.160000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
     0.000000000000,137.160000000000,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
 
-  BuildingSurface:Detailed,
-    Cooler_1_Wall_4,         !- Name
-    Wall,                    !- Surface Type
-    Cooler Wall Const,       !- Construction Name
-    Cooler_1,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    ,                        !- View Factor to Ground
-    4,                       !- Number of Vertices
-    77.419200000000,171.297600000000,10.693400000000,  !- X,Y,Z ==> Vertex 1 {m}
-    77.419200000000,171.297600000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,171.297600000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,171.297600000000,10.693400000000;  !- X,Y,Z ==> Vertex 4 {m}
+!  BuildingSurface:Detailed,
+!    Cooler_1_Wall_4,         !- Name
+!    Wall,                    !- Surface Type
+!    Cooler Wall Const,       !- Construction Name
+!    Cooler_1,                !- Zone Name
+!    Outdoors,                !- Outside Boundary Condition
+!    ,                        !- Outside Boundary Condition Object
+!    SunExposed,              !- Sun Exposure
+!    WindExposed,             !- Wind Exposure
+!    ,                        !- View Factor to Ground
+!    4,                       !- Number of Vertices
+!    77.419200000000,171.297600000000,10.693400000000,  !- X,Y,Z ==> Vertex 1 {m}
+!    77.419200000000,171.297600000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
+!    0.000000000000,171.297600000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
+!    0.000000000000,171.297600000000,10.693400000000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Cooler_1_Wall_1,         !- Name
@@ -5915,6 +5915,7 @@
     ,                        !- Availability Schedule Name
     NODE_11,                 !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     22.,                     !- Maximum Heating Supply Air Temperature {C}
     13.,                     !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -5971,6 +5972,7 @@
     ,                        !- Availability Schedule Name
     NODE_110,                !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     22.,                     !- Maximum Heating Supply Air Temperature {C}
     13.,                     !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -6027,6 +6029,7 @@
     ,                        !- Availability Schedule Name
     NODE_120,                !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     22.,                     !- Maximum Heating Supply Air Temperature {C}
     13.,                     !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -6083,6 +6086,7 @@
     ,                        !- Availability Schedule Name
     NODE_130,                !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     22.,                     !- Maximum Heating Supply Air Temperature {C}
     13.,                     !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

@@ -59,7 +59,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DisplayRoutines.hh>
 #include <EconomicTariff.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <ResultsSchema.hh>
 #include <SQLiteProcedures.hh>
@@ -389,13 +389,13 @@ namespace EconomicLifeCycleCost {
 		int NumObj; // count of objects
 
 		CurrentModuleObject = "LifeCycleCost:Parameters";
-		NumObj = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumObj = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumObj == 0 ) {
 			LCCparamPresent = false;
 		} else if ( NumObj == 1 ) {
 			LCCparamPresent = true;
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -413,11 +413,11 @@ namespace EconomicLifeCycleCost {
 			//      \key MidYear
 			//      \key BeginningOfYear
 			//      \default EndOfYear
-			if ( InputProcessor::SameString( AlphaArray( 2 ), "EndOfYear" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 2 ), "EndOfYear" ) ) {
 				discountConvension = disConvEndOfYear;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "MidYear" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "MidYear" ) ) {
 				discountConvension = disConvMidYear;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "BeginningOfYear" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "BeginningOfYear" ) ) {
 				discountConvension = disConvBeginOfYear;
 			} else {
 				discountConvension = disConvEndOfYear;
@@ -428,9 +428,9 @@ namespace EconomicLifeCycleCost {
 			//      \key ConstantDollar
 			//      \key CurrentDollar
 			//      \default ConstantDollar
-			if ( InputProcessor::SameString( AlphaArray( 3 ), "ConstantDollar" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 3 ), "ConstantDollar" ) ) {
 				inflationApproach = inflAppConstantDollar;
-			} else if ( InputProcessor::SameString( AlphaArray( 3 ), "CurrentDollar" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 3 ), "CurrentDollar" ) ) {
 				inflationApproach = inflAppCurrentDollar;
 			} else {
 				inflationApproach = inflAppConstantDollar;
@@ -550,27 +550,27 @@ namespace EconomicLifeCycleCost {
 			//      \key StraightLine-40year
 			//      \key None
 			//      \default None
-			if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-3year" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-3year" ) ) {
 				depreciationMethod = depMethMACRS3;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-5year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-5year" ) ) {
 				depreciationMethod = depMethMACRS5;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-7year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-7year" ) ) {
 				depreciationMethod = depMethMACRS7;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-10year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-10year" ) ) {
 				depreciationMethod = depMethMACRS10;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-15year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-15year" ) ) {
 				depreciationMethod = depMethMACRS15;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-20year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "ModifiedAcceleratedCostRecoverySystem-20year" ) ) {
 				depreciationMethod = depMethMACRS20;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "StraightLine-27year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "StraightLine-27year" ) ) {
 				depreciationMethod = depMethStraight27;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "StraightLine-31year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "StraightLine-31year" ) ) {
 				depreciationMethod = depMethStraight31;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "StraightLine-39year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "StraightLine-39year" ) ) {
 				depreciationMethod = depMethStraight39;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "StraightLine-40year" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "StraightLine-40year" ) ) {
 				depreciationMethod = depMethStraight40;
-			} else if ( InputProcessor::SameString( AlphaArray( 6 ), "None" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 6 ), "None" ) ) {
 				depreciationMethod = depMethNone;
 			} else if ( lAlphaFieldBlanks( 6 ) ) {
 				depreciationMethod = depMethNone;
@@ -635,10 +635,10 @@ namespace EconomicLifeCycleCost {
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:RecurringCosts";
-		numRecurringCosts = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numRecurringCosts = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		RecurringCosts.allocate( numRecurringCosts );
 		for ( iInObj = 1; iInObj <= numRecurringCosts; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -660,19 +660,19 @@ namespace EconomicLifeCycleCost {
 			//        \key MajorOverhaul
 			//        \key OtherOperational
 			//        \default Maintenance
-			if ( InputProcessor::SameString( AlphaArray( 2 ), "Maintenance" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Maintenance" ) ) {
 				RecurringCosts( iInObj ).category = costCatMaintenance;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "Repair" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Repair" ) ) {
 				RecurringCosts( iInObj ).category = costCatRepair;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "Operation" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Operation" ) ) {
 				RecurringCosts( iInObj ).category = costCatOperation;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "Replacement" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Replacement" ) ) {
 				RecurringCosts( iInObj ).category = costCatReplacement;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "MinorOverhaul" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "MinorOverhaul" ) ) {
 				RecurringCosts( iInObj ).category = costCatMinorOverhaul;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "MajorOverhaul" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "MajorOverhaul" ) ) {
 				RecurringCosts( iInObj ).category = costCatMajorOverhaul;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "OtherOperational" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "OtherOperational" ) ) {
 				RecurringCosts( iInObj ).category = costCatOtherOperational;
 			} else {
 				RecurringCosts( iInObj ).category = costCatMaintenance;
@@ -686,9 +686,9 @@ namespace EconomicLifeCycleCost {
 			//        \key ServicePeriod
 			//        \key BasePeriod
 			//        \default ServicePeriod
-			if ( InputProcessor::SameString( AlphaArray( 3 ), "ServicePeriod" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 3 ), "ServicePeriod" ) ) {
 				RecurringCosts( iInObj ).startOfCosts = startServicePeriod;
-			} else if ( InputProcessor::SameString( AlphaArray( 3 ), "BasePeriod" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 3 ), "BasePeriod" ) ) {
 				RecurringCosts( iInObj ).startOfCosts = startBasePeriod;
 			} else {
 				RecurringCosts( iInObj ).startOfCosts = startServicePeriod;
@@ -803,15 +803,15 @@ namespace EconomicLifeCycleCost {
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:NonrecurringCost";
-		numNonrecurringCost = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		numComponentCostLineItems = InputProcessor::GetNumObjectsFound( "ComponentCost:LineItem" );
+		numNonrecurringCost = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		numComponentCostLineItems = inputProcessor->getNumObjectsFound( "ComponentCost:LineItem" );
 		if ( numComponentCostLineItems > 0 ) { //leave room for component cost total
 			NonrecurringCost.allocate( numNonrecurringCost + 1 ); //add a place for CostEstimate total
 		} else {
 			NonrecurringCost.allocate( numNonrecurringCost );
 		}
 		for ( iInObj = 1; iInObj <= numNonrecurringCost; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -829,11 +829,11 @@ namespace EconomicLifeCycleCost {
 			//      \key Salvage
 			//      \key OtherCapital
 			//      \default Construction
-			if ( InputProcessor::SameString( AlphaArray( 2 ), "Construction" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Construction" ) ) {
 				NonrecurringCost( iInObj ).category = costCatConstruction;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "Salvage" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "Salvage" ) ) {
 				NonrecurringCost( iInObj ).category = costCatSalvage;
-			} else if ( InputProcessor::SameString( AlphaArray( 2 ), "OtherCapital" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 2 ), "OtherCapital" ) ) {
 				NonrecurringCost( iInObj ).category = costCatOtherCapital;
 			} else {
 				NonrecurringCost( iInObj ).category = costCatConstruction;
@@ -847,9 +847,9 @@ namespace EconomicLifeCycleCost {
 			//      \key ServicePeriod
 			//      \key BasePeriod
 			//      \default ServicePeriod
-			if ( InputProcessor::SameString( AlphaArray( 3 ), "ServicePeriod" ) ) {
+			if ( UtilityRoutines::SameString( AlphaArray( 3 ), "ServicePeriod" ) ) {
 				NonrecurringCost( iInObj ).startOfCosts = startServicePeriod;
-			} else if ( InputProcessor::SameString( AlphaArray( 3 ), "BasePeriod" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphaArray( 3 ), "BasePeriod" ) ) {
 				NonrecurringCost( iInObj ).startOfCosts = startBasePeriod;
 			} else {
 				NonrecurringCost( iInObj ).startOfCosts = startServicePeriod;
@@ -929,14 +929,14 @@ namespace EconomicLifeCycleCost {
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:UsePriceEscalation";
-		numUsePriceEscalation = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numUsePriceEscalation = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		UsePriceEscalation.allocate( numUsePriceEscalation );
 		for ( iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj ) {
 			UsePriceEscalation( iInObj ).Escalation.allocate( lengthStudyYears );
 		}
 		if ( numUsePriceEscalation > 0 ) {
 			for ( iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				//check to make sure none of the values are another life cycle cost object
 				for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 					if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -1071,14 +1071,14 @@ namespace EconomicLifeCycleCost {
 
 		if ( ! LCCparamPresent ) return;
 		CurrentModuleObject = "LifeCycleCost:UseAdjustment";
-		numUseAdjustment = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numUseAdjustment = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		UseAdjustment.allocate( numUseAdjustment );
 		for ( iInObj = 1; iInObj <= numUseAdjustment; ++iInObj ) {
 			UseAdjustment( iInObj ).Adjustment.allocate( lengthStudyYears );
 		}
 		if ( numUseAdjustment > 0 ) {
 			for ( iInObj = 1; iInObj <= numUseAdjustment; ++iInObj ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				//check to make sure none of the values are another life cycle cost object
 				for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 					if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
@@ -1166,29 +1166,29 @@ namespace EconomicLifeCycleCost {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		if ( InputProcessor::SameString( inMonthString, "January" ) ) {
+		if ( UtilityRoutines::SameString( inMonthString, "January" ) ) {
 			MonthToMonthNumber = 1;
-		} else if ( InputProcessor::SameString( inMonthString, "February" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "February" ) ) {
 			MonthToMonthNumber = 2;
-		} else if ( InputProcessor::SameString( inMonthString, "March" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "March" ) ) {
 			MonthToMonthNumber = 3;
-		} else if ( InputProcessor::SameString( inMonthString, "April" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "April" ) ) {
 			MonthToMonthNumber = 4;
-		} else if ( InputProcessor::SameString( inMonthString, "May" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "May" ) ) {
 			MonthToMonthNumber = 5;
-		} else if ( InputProcessor::SameString( inMonthString, "June" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "June" ) ) {
 			MonthToMonthNumber = 6;
-		} else if ( InputProcessor::SameString( inMonthString, "July" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "July" ) ) {
 			MonthToMonthNumber = 7;
-		} else if ( InputProcessor::SameString( inMonthString, "August" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "August" ) ) {
 			MonthToMonthNumber = 8;
-		} else if ( InputProcessor::SameString( inMonthString, "September" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "September" ) ) {
 			MonthToMonthNumber = 9;
-		} else if ( InputProcessor::SameString( inMonthString, "October" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "October" ) ) {
 			MonthToMonthNumber = 10;
-		} else if ( InputProcessor::SameString( inMonthString, "November" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "November" ) ) {
 			MonthToMonthNumber = 11;
-		} else if ( InputProcessor::SameString( inMonthString, "December" ) ) {
+		} else if ( UtilityRoutines::SameString( inMonthString, "December" ) ) {
 			MonthToMonthNumber = 12;
 		} else {
 			MonthToMonthNumber = inDefaultMonth;

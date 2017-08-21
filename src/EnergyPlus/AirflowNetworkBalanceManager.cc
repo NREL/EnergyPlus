@@ -86,7 +86,7 @@
 #include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -579,88 +579,88 @@ namespace AirflowNetworkBalanceManager {
 		static gio::Fmt Format_120( "('AirflowNetwork Model:Control,',A)" );
 
 		// Set the maximum numbers of input fields
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:Zone", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:Zone", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:Surface", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:Surface", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:ReferenceCrackConditions", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:ReferenceCrackConditions", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:Surface:Crack", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:Surface:Crack", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:Component:DetailedOpening", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:Component:DetailedOpening", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:Component:SimpleOpening", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:Component:SimpleOpening", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:Component:ZoneExhaustFan", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:Component:ZoneExhaustFan", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:ExternalNode", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:ExternalNode", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientArray", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientArray", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientValues", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientValues", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Node", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Node", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Leak", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Leak", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:LeakageRatio", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:LeakageRatio", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Duct", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Duct", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Coil", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Coil", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:TerminalUnit", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:TerminalUnit", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:ConstantPressureDrop", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:ConstantPressureDrop", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Linkage", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Linkage", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:OccupantVentilationControl", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:OccupantVentilationControl", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:IntraZone:Node", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:IntraZone:Node", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:IntraZone:Linkage", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:IntraZone:Linkage", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:ZoneControl:PressureController", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:ZoneControl:PressureController", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:OutdoorAirFlow", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:OutdoorAirFlow", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:ReliefAirFlow", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:ReliefAirFlow", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -677,12 +677,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork OccupantVentilationControl before reading other AirflowNetwork objects, so that this object can be called by other simple ventilation objects
 		CurrentModuleObject = "AirflowNetwork:OccupantVentilationControl";
-		AirflowNetworkNumOfOccuVentCtrls = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfOccuVentCtrls = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfOccuVentCtrls > 0 ) {
 			OccupantVentilationControl.allocate( AirflowNetworkNumOfOccuVentCtrls );
 			for ( i = 1; i <= AirflowNetworkNumOfOccuVentCtrls; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				OccupantVentilationControl( i ).Name = Alphas( 1 ); // Name of object
 				OccupantVentilationControl( i ).MinOpeningTime = Numbers( 1 );
 				if ( OccupantVentilationControl( i ).MinOpeningTime < 0.0 ) {
@@ -768,9 +768,9 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 				if ( !lAlphaBlanks( 4 ) ) {
-					if ( InputProcessor::SameString( Alphas( 4 ), "Yes" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 4 ), "Yes" ) ) {
 						OccupantVentilationControl( i ).OccupancyCheck = true;
-					} else if ( InputProcessor::SameString( Alphas( 4 ), "No" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 4 ), "No" ) ) {
 						OccupantVentilationControl( i ).OccupancyCheck = false;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" illegal key." );
@@ -805,7 +805,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// *** Read AirflowNetwork simulation parameters
 		CurrentModuleObject = "AirflowNetwork:SimulationControl";
-		NumAirflowNetwork = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumAirflowNetwork = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumAirflowNetwork == 0 ) {
 			SimulateAirflowNetwork = AirflowNetworkControlSimple;
 			gio::write( OutputFileInits, Format_110 );
@@ -817,7 +817,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		SimObjectError = false;
-		InputProcessor::GetObjectItem( CurrentModuleObject, NumAirflowNetwork, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, NumAirflowNetwork, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		AirflowNetworkSimu.AirflowNetworkSimuName = Alphas( 1 );
 		AirflowNetworkSimu.Control = Alphas( 2 );
@@ -827,7 +827,7 @@ namespace AirflowNetworkBalanceManager {
 		AirflowNetworkSimu.BldgType = Alphas( 5 );
 
 		// Find a flag for possible combination of vent and distribution system
-		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( AirflowNetworkSimu.Control ) );
+		{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( AirflowNetworkSimu.Control ) );
 		if ( SELECT_CASE_var == "NOMULTIZONEORDISTRIBUTION" ) {
 			SimulateAirflowNetwork = AirflowNetworkControlSimple;
 			SimAirNetworkKey = "NoMultizoneOrDistribution";
@@ -850,7 +850,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Check the number of primary air loops
 		if ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ) {
-			NumAPL = InputProcessor::GetNumObjectsFound( "AirLoopHVAC" );
+			NumAPL = inputProcessor->getNumObjectsFound( "AirLoopHVAC" );
 			if ( NumAPL != 1 ) {
 				if ( NumAPL == 0 ) {
 					ShowSevereError( RoutineName + "No AirLoopHVAC is found when " + cAlphaFields( 2 ) + " = " + SimAirNetworkKey );
@@ -867,7 +867,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
 		if ( SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS ) {
-			if ( TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotZoneAirBalance + InputProcessor::GetNumObjectsFound( "ZoneEarthtube" ) + InputProcessor::GetNumObjectsFound( "ZoneThermalChimney" ) + InputProcessor::GetNumObjectsFound( "ZoneCoolTower:Shower" ) == 0 ) {
+			if ( TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotZoneAirBalance + inputProcessor->getNumObjectsFound( "ZoneEarthtube" ) + inputProcessor->getNumObjectsFound( "ZoneThermalChimney" ) + inputProcessor->getNumObjectsFound( "ZoneCoolTower:Shower" ) == 0 ) {
 				ShowWarningError( RoutineName + cAlphaFields( 2 ) + " = \"" + SimAirNetworkKey + "\"." );
 				ShowContinueError( "..but there are no Infiltration, Ventilation, Mixing, Cross Mixing or ZoneAirBalance objects. The simulation continues..." );
 			}
@@ -902,24 +902,24 @@ namespace AirflowNetworkBalanceManager {
 				ShowContinueError( "..Specified " + cAlphaFields( 2 ) + " = \"" + SimAirNetworkKey + "\" and ZoneAirBalance:OutdoorAir objects are present." );
 				ShowContinueError( "..ZoneAirBalance:OutdoorAir objects will not be simulated." );
 			}
-			if ( InputProcessor::GetNumObjectsFound( "ZoneEarthtube" ) > 0 ) {
+			if ( inputProcessor->getNumObjectsFound( "ZoneEarthtube" ) > 0 ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + " object, " );
 				ShowContinueError( "..Specified " + cAlphaFields( 2 ) + " = \"" + SimAirNetworkKey + "\" and ZoneEarthtube objects are present." );
 				ShowContinueError( "..ZoneEarthtube objects will not be simulated." );
 			}
-			if ( InputProcessor::GetNumObjectsFound( "ZoneThermalChimney" ) > 0 ) {
+			if ( inputProcessor->getNumObjectsFound( "ZoneThermalChimney" ) > 0 ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + " object, " );
 				ShowContinueError( "..Specified " + cAlphaFields( 2 ) + " = \"" + SimAirNetworkKey + "\" and ZoneThermalChimney objects are present." );
 				ShowContinueError( "..ZoneThermalChimney objects will not be simulated." );
 			}
-			if ( InputProcessor::GetNumObjectsFound( "ZoneCoolTower:Shower" ) > 0 ) {
+			if ( inputProcessor->getNumObjectsFound( "ZoneCoolTower:Shower" ) > 0 ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + " object, " );
 				ShowContinueError( "..Specified " + cAlphaFields( 2 ) + " = \"" + SimAirNetworkKey + "\" and ZoneCoolTower:Shower objects are present." );
 				ShowContinueError( "..ZoneCoolTower:Shower objects will not be simulated." );
 			}
 		}
 
-		if ( InputProcessor::SameString( AirflowNetworkSimu.WPCCntr, "Input" ) ) {
+		if ( UtilityRoutines::SameString( AirflowNetworkSimu.WPCCntr, "Input" ) ) {
 			AirflowNetworkSimu.iWPCCntr = iWPCCntr_Input;
 			if ( lAlphaBlanks( 4 ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 3 ) + " = INPUT." );
@@ -927,7 +927,7 @@ namespace AirflowNetworkBalanceManager {
 				ErrorsFound = true;
 				SimObjectError = true;
 			} else {
-				if ( ! ( InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) || InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) ) {
+				if ( ! ( UtilityRoutines::SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) || UtilityRoutines::SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) + " is invalid." );
 					ShowContinueError( "Valid choices are ExternalNode or OpeningHeight. " + CurrentModuleObject + ": " + cAlphaFields( 1 ) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 					ErrorsFound = true;
@@ -939,7 +939,7 @@ namespace AirflowNetworkBalanceManager {
 			//         ' Building type = '//TRIM(AirflowNetworkSimu%BldgType)//' was entered but will not be used.')
 			//        AirflowNetworkSimu%BldgType    = ' '
 			//     end if
-		} else if ( InputProcessor::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
+		} else if ( UtilityRoutines::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
 			AirflowNetworkSimu.iWPCCntr = iWPCCntr_SurfAvg;
 			//if ( ! lAlphaBlanks( 4 ) ) {
 				//AirflowNetworkSimu.CpArrayName = "";
@@ -947,7 +947,7 @@ namespace AirflowNetworkBalanceManager {
 				//             '= SURFACE-AVERAGE CALCULATION.'// &
 				//             ' CP ARRAY NAME was entered but will not be used. The simulation continues...')
 			//}
-			if ( ! ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) || InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) ) ) {
+			if ( ! ( UtilityRoutines::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) || UtilityRoutines::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) + " is invalid." );
 				ShowContinueError( "Valid choices are LowRise or HighRise. " + CurrentModuleObject + ": " + cAlphaFields( 1 ) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
 				ErrorsFound = true;
@@ -961,13 +961,13 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		AirflowNetworkSimu.InitType = Alphas( 6 );
-		if ( InputProcessor::SameString( AirflowNetworkSimu.InitType, "LinearInitializationMethod" ) ) {
+		if ( UtilityRoutines::SameString( AirflowNetworkSimu.InitType, "LinearInitializationMethod" ) ) {
 			AirflowNetworkSimu.InitFlag = 0;
-		} else if ( InputProcessor::SameString( AirflowNetworkSimu.InitType, "ZeroNodePressures" ) ) {
+		} else if ( UtilityRoutines::SameString( AirflowNetworkSimu.InitType, "ZeroNodePressures" ) ) {
 			AirflowNetworkSimu.InitFlag = 1;
-		} else if ( InputProcessor::SameString( AirflowNetworkSimu.InitType, "0" ) ) {
+		} else if ( UtilityRoutines::SameString( AirflowNetworkSimu.InitType, "0" ) ) {
 			AirflowNetworkSimu.InitFlag = 0;
-		} else if ( InputProcessor::SameString( AirflowNetworkSimu.InitType, "1" ) ) {
+		} else if ( UtilityRoutines::SameString( AirflowNetworkSimu.InitType, "1" ) ) {
 			AirflowNetworkSimu.InitFlag = 1;
 		} else {
 			ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) + " is invalid." );
@@ -976,7 +976,7 @@ namespace AirflowNetworkBalanceManager {
 			SimObjectError = true;
 		}
 
-		if ( !lAlphaBlanks( 7 ) && InputProcessor::SameString( Alphas( 7 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
+		if ( !lAlphaBlanks( 7 ) && UtilityRoutines::SameString( Alphas( 7 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
 
 		if ( SimObjectError ) {
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
@@ -992,13 +992,13 @@ namespace AirflowNetworkBalanceManager {
 
 		// *** Read AirflowNetwork simulation zone data
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Zone";
-		AirflowNetworkNumOfZones = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfZones = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfZones > 0 ) {
 			MultizoneZoneData.allocate( AirflowNetworkNumOfZones );
 			AirflowNetworkZoneFlag.dimension( NumOfZones, false ); // AirflowNetwork zone flag
 			for ( i = 1; i <= AirflowNetworkNumOfZones; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				MultizoneZoneData( i ).ZoneName = Alphas( 1 ); // Name of Associated EnergyPlus Thermal Zone
 				if ( ! lAlphaBlanks( 2 ) ) MultizoneZoneData( i ).VentControl = Alphas( 2 ); // Ventilation Control Mode: "Temperature", "Enthalpy",
 				// "ASHRAE55ADAPTIVE", "CEN15251AdaptiveComfort,
@@ -1020,19 +1020,19 @@ namespace AirflowNetworkBalanceManager {
 
 				if ( !lAlphaBlanks( 6 ) ) {
 					MultizoneZoneData( i ).OccupantVentilationControlName = Alphas( 6 );
-					MultizoneZoneData( i ).OccupantVentilationControlNum = InputProcessor::FindItemInList( MultizoneZoneData( i ).OccupantVentilationControlName, OccupantVentilationControl );
+					MultizoneZoneData( i ).OccupantVentilationControlNum = UtilityRoutines::FindItemInList( MultizoneZoneData( i ).OccupantVentilationControlName, OccupantVentilationControl );
 					if ( MultizoneZoneData( i ).OccupantVentilationControlNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " not found = " + MultizoneZoneData( i ).OccupantVentilationControlName );
 						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
 						ErrorsFound = true;
 					}
 				}
-				if ( InputProcessor::SameString( MultizoneZoneData( i ).VentControl, "Temperature" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Temp;
-				if ( InputProcessor::SameString( MultizoneZoneData( i ).VentControl, "Enthalpy" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Enth;
-				if ( InputProcessor::SameString( MultizoneZoneData( i ).VentControl, "Constant" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Const;
-				if ( InputProcessor::SameString( MultizoneZoneData( i ).VentControl, "ASHRAE55Adaptive" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_ASH55;
-				if ( InputProcessor::SameString( MultizoneZoneData( i ).VentControl, "CEN15251Adaptive" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_CEN15251;
-				if ( InputProcessor::SameString( MultizoneZoneData( i ).VentControl, "NoVent" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Novent;
+				if ( UtilityRoutines::SameString( MultizoneZoneData( i ).VentControl, "Temperature" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Temp;
+				if ( UtilityRoutines::SameString( MultizoneZoneData( i ).VentControl, "Enthalpy" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Enth;
+				if ( UtilityRoutines::SameString( MultizoneZoneData( i ).VentControl, "Constant" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Const;
+				if ( UtilityRoutines::SameString( MultizoneZoneData( i ).VentControl, "ASHRAE55Adaptive" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_ASH55;
+				if ( UtilityRoutines::SameString( MultizoneZoneData( i ).VentControl, "CEN15251Adaptive" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_CEN15251;
+				if ( UtilityRoutines::SameString( MultizoneZoneData( i ).VentControl, "NoVent" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Novent;
 
 				if ( MultizoneZoneData( i ).VentCtrNum < NumOfVentCtrTypes ) {
 					if ( NumAlphas >= 4 && ( ! lAlphaBlanks( 4 ) ) ) {
@@ -1057,7 +1057,7 @@ namespace AirflowNetworkBalanceManager {
 		// ==> Zone data validation
 		for ( i = 1; i <= AirflowNetworkNumOfZones; ++i ) {
 			// Zone name validation
-			MultizoneZoneData( i ).ZoneNum = InputProcessor::FindItemInList( MultizoneZoneData( i ).ZoneName, Zone );
+			MultizoneZoneData( i ).ZoneNum = UtilityRoutines::FindItemInList( MultizoneZoneData( i ).ZoneName, Zone );
 			if ( MultizoneZoneData( i ).ZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields( 1 ) + " given." );
 				ShowContinueError( "..invalid " + cAlphaFields( 1 ) + " = \"" + MultizoneZoneData( i ).ZoneName + "\"" );
@@ -1072,10 +1072,10 @@ namespace AirflowNetworkBalanceManager {
 				ShowContinueError( ".. in " + cAlphaFields( 1 ) + " = \"" + MultizoneZoneData( i ).ZoneName + "\"" );
 				ErrorsFound = true;
 			}
-			if ( InputProcessor::SameString( MultizoneZoneData( i ).VentControl, "Temperature" ) || InputProcessor::SameString( MultizoneZoneData( i ).VentControl, "Enthalpy" ) ) {
+			if ( UtilityRoutines::SameString( MultizoneZoneData( i ).VentControl, "Temperature" ) || UtilityRoutines::SameString( MultizoneZoneData( i ).VentControl, "Enthalpy" ) ) {
 				// .or. &
-				//InputProcessor::SameString(MultizoneZoneData(i)%VentControl,'ASHRAE55Adaptive') .or. &
-				//InputProcessor::SameString(MultizoneZoneData(i)%VentControl,'CEN15251Adaptive')) then
+				//UtilityRoutines::SameString(MultizoneZoneData(i)%VentControl,'ASHRAE55Adaptive') .or. &
+				//UtilityRoutines::SameString(MultizoneZoneData(i)%VentControl,'CEN15251Adaptive')) then
 				MultizoneZoneData( i ).VentSchNum = GetScheduleIndex( MultizoneZoneData( i ).VentSchName );
 				if ( MultizoneZoneData( i ).VentSchName == BlankString ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " object, No " + cAlphaFields( 3 ) + " was found, but is required when " + cAlphaFields( 2 ) + " is Temperature or Enthalpy." );
@@ -1103,7 +1103,7 @@ namespace AirflowNetworkBalanceManager {
 				MultizoneZoneData( i ).OpenFactor = 1.0;
 			}
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( MultizoneZoneData( i ).VentControl ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( MultizoneZoneData( i ).VentControl ) );
 			if ( SELECT_CASE_var == "TEMPERATURE" ) { // checks on Temperature control
 				if ( MultizoneZoneData( i ).LowValueTemp < 0.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cNumericFields( 2 ) + " < 0.0" );
@@ -1175,15 +1175,15 @@ namespace AirflowNetworkBalanceManager {
 		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
 			// Wind coefficient == Surface-Average does not need inputs of external nodes
 			CurrentModuleObject = "AirflowNetwork:MultiZone:ExternalNode";
-			AirflowNetworkNumOfExtNode = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+			AirflowNetworkNumOfExtNode = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 			if ( AirflowNetworkNumOfExtNode > 0 ) {
 				MultizoneExternalNodeData.allocate( AirflowNetworkNumOfExtNode );
 				for ( i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
-					InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-					InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+					inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+					UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 					MultizoneExternalNodeData( i ).Name = Alphas( 1 ); // Name of external node
 					MultizoneExternalNodeData( i ).height = Numbers( 1 ); // Nodal height
-					if ( InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) && lNumericBlanks( 1 ) ) {
+					if ( UtilityRoutines::SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) && lNumericBlanks( 1 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + " object =" + Alphas( 1 ) + ". The input of " + cNumericFields( 1 ) + " is required, but a blank is found." );
 						ShowContinueError( "The default value is assigned as " + RoundSigDigits( Numbers( 1 ), 1 ) );
 					}
@@ -1195,17 +1195,17 @@ namespace AirflowNetworkBalanceManager {
 						ErrorsFound = true;
 					}
 					if ( NumAlphas >= 3 && !lAlphaBlanks( 3 ) ) { // Symmetric curve
-						if ( InputProcessor::SameString( Alphas( 3 ), "Yes" ) ) {
+						if ( UtilityRoutines::SameString( Alphas( 3 ), "Yes" ) ) {
 							MultizoneExternalNodeData( i ).symmetricCurve = true;
-						} else if ( !InputProcessor::SameString(Alphas( 3 ), "No" ) ) {
+						} else if ( !UtilityRoutines::SameString(Alphas( 3 ), "No" ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 							ShowContinueError( "The default value is assigned as No." );
 						}
 					}
 					if ( NumAlphas == 4 && !lAlphaBlanks( 4 ) ) { // Relative or absolute wind angle
-						if ( InputProcessor::SameString( Alphas( 4 ), "Relative" ) ) {
+						if ( UtilityRoutines::SameString( Alphas( 4 ), "Relative" ) ) {
 							MultizoneExternalNodeData( i ).useRelativeAngle = true;
-						} else if ( !InputProcessor::SameString(Alphas( 4 ), "Absolute" ) ) {
+						} else if ( !UtilityRoutines::SameString(Alphas( 4 ), "Absolute" ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
 							ShowContinueError( "The default value is assigned as Absolute." );
 						}
@@ -1219,12 +1219,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// *** Read AirflowNetwork simulation surface data
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";
-		AirflowNetworkNumOfSurfaces = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfSurfaces = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfSurfaces > 0 ) {
 			MultizoneSurfaceData.allocate( AirflowNetworkNumOfSurfaces );
 			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				MultizoneSurfaceData( i ).SurfName = Alphas( 1 ); // Name of Associated EnergyPlus surface
 				MultizoneSurfaceData( i ).OpeningName = Alphas( 2 ); // Name of crack or opening component,
 				// either simple or detailed large opening, or crack
@@ -1243,7 +1243,7 @@ namespace AirflowNetworkBalanceManager {
 					if ( ! lAlphaBlanks( 4 ) ) MultizoneSurfaceData( i ).VentControl = Alphas( 4 );
 					// Name of ventilation temperature control schedule
 					if ( ! lAlphaBlanks( 5 ) ) MultizoneSurfaceData( i ).VentSchName = Alphas( 5 );
-					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( MultizoneSurfaceData( i ).VentControl ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( MultizoneSurfaceData( i ).VentControl ) );
 					if ( SELECT_CASE_var == "TEMPERATURE" ) {
 						MultizoneSurfaceData( i ).VentSurfCtrNum = VentCtrNum_Temp;
 						MultizoneSurfaceData( i ).IndVentControl = true;
@@ -1290,7 +1290,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 				if ( !lAlphaBlanks( 7 ) ) {
 					MultizoneSurfaceData( i ).OccupantVentilationControlName = Alphas( 7 );
-					MultizoneSurfaceData( i ).OccupantVentilationControlNum = InputProcessor::FindItemInList( MultizoneSurfaceData( i ).OccupantVentilationControlName, OccupantVentilationControl );
+					MultizoneSurfaceData( i ).OccupantVentilationControlNum = UtilityRoutines::FindItemInList( MultizoneSurfaceData( i ).OccupantVentilationControlName, OccupantVentilationControl );
 					if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 7 ) + " not found = " + MultizoneSurfaceData( i ).OccupantVentilationControlName );
 						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
@@ -1330,7 +1330,7 @@ namespace AirflowNetworkBalanceManager {
 		NumOfExtNodes = 0;
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
 			// Check a valid surface defined earlier
-			MultizoneSurfaceData( i ).SurfNum = InputProcessor::FindItemInList( MultizoneSurfaceData( i ).SurfName, Surface );
+			MultizoneSurfaceData( i ).SurfNum = UtilityRoutines::FindItemInList( MultizoneSurfaceData( i ).SurfName, Surface );
 			if ( MultizoneSurfaceData( i ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, Invalid " + cAlphaFields( 1 ) + " given = " + MultizoneSurfaceData( i ).SurfName );
 				ErrorsFound = true;
@@ -1470,7 +1470,7 @@ namespace AirflowNetworkBalanceManager {
 					if ( AirflowNetworkNumOfExtNode > 0 ) {
 						found = false;
 						for ( j = 1; j <= AirflowNetworkNumOfExtNode; ++j ) {
-							if ( InputProcessor::SameString( MultizoneSurfaceData( i ).ExternalNodeName, MultizoneExternalNodeData( j ).Name ) ) {
+							if ( UtilityRoutines::SameString( MultizoneSurfaceData( i ).ExternalNodeName, MultizoneExternalNodeData( j ).Name ) ) {
 								MultizoneSurfaceData( i ).NodeNums( 2 ) = MultizoneExternalNodeData( j ).ExtNum;
 								found = true;
 								break;
@@ -1508,7 +1508,7 @@ namespace AirflowNetworkBalanceManager {
 					continue;
 				}
 			}
-			if ( InputProcessor::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
+			if ( UtilityRoutines::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
 				n = Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond;
 				if ( n >= 1 ) { // exterior boundary condition is a surface
 					found = false;
@@ -1572,7 +1572,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		// Ensure the number of external node = the number of external surface with HeightOption choice = OpeningHeight
-		if ( InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
+		if ( UtilityRoutines::SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
 			if ( AirflowNetworkNumOfExtSurfaces != AirflowNetworkNumOfExtNode ) {
 				ShowSevereError( RoutineName + "When the choice of Height Selection for Local Wind Speed Calculation is OpeningHeight, the number of external surfaces defined in " + CurrentModuleObject + " objects " );
 				ShowContinueError( "has to be equal to the number of AirflowNetwork:MultiZone:ExternalNode objects." );
@@ -1583,19 +1583,19 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork simulation detailed openings
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Component:DetailedOpening";
-		AirflowNetworkNumOfDetOpenings = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfDetOpenings = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfDetOpenings > 0 ) {
 			MultizoneCompDetOpeningData.allocate( AirflowNetworkNumOfDetOpenings );
 			for ( i = 1; i <= AirflowNetworkNumOfDetOpenings; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				MultizoneCompDetOpeningData( i ).Name = Alphas( 1 ); // Name of large detailed opening component
 				MultizoneCompDetOpeningData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient When Window or Door Is Closed
 				MultizoneCompDetOpeningData( i ).FlowExpo = Numbers( 2 ); // Air Mass Flow exponent When Window or Door Is Closed
 				MultizoneCompDetOpeningData( i ).TypeName = Alphas( 2 ); // Large vertical opening type
-				if ( InputProcessor::SameString( Alphas( 2 ), "NonPivoted" ) || InputProcessor::SameString( Alphas( 2 ), "1" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 2 ), "NonPivoted" ) || UtilityRoutines::SameString( Alphas( 2 ), "1" ) ) {
 					MultizoneCompDetOpeningData( i ).LVOType = 1; // Large vertical opening type number
-				} else if ( InputProcessor::SameString( Alphas( 2 ), "HorizontallyPivoted" ) || InputProcessor::SameString( Alphas( 2 ), "2" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 2 ), "HorizontallyPivoted" ) || UtilityRoutines::SameString( Alphas( 2 ), "2" ) ) {
 					MultizoneCompDetOpeningData( i ).LVOType = 2; // Large vertical opening type number
 				} else {
 					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + "in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -1816,12 +1816,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork simulation simple openings
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Component:SimpleOpening";
-		AirflowNetworkNumOfSimOpenings = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfSimOpenings = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfSimOpenings > 0 ) {
 			MultizoneCompSimpleOpeningData.allocate( AirflowNetworkNumOfSimOpenings );
 			for ( i = 1; i <= AirflowNetworkNumOfSimOpenings; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				MultizoneCompSimpleOpeningData( i ).Name = Alphas( 1 ); // Name of large simple opening component
 				MultizoneCompSimpleOpeningData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient When Window or Door Is Closed
 				MultizoneCompSimpleOpeningData( i ).FlowExpo = Numbers( 2 ); // Air Mass Flow exponent When Window or Door Is Closed
@@ -1832,12 +1832,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork simulation horizontal openings
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Component:HorizontalOpening";
-		AirflowNetworkNumOfHorOpenings = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfHorOpenings = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfHorOpenings > 0 ) {
 			MultizoneCompHorOpeningData.allocate( AirflowNetworkNumOfHorOpenings );
 			for ( i = 1; i <= AirflowNetworkNumOfHorOpenings; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				MultizoneCompHorOpeningData( i ).Name = Alphas( 1 ); // Name of large simple opening component
 				MultizoneCompHorOpeningData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient When Window or Door Is Closed
 				if ( Numbers( 1 ) <= 0.0 ) {
@@ -1871,8 +1871,8 @@ namespace AirflowNetworkBalanceManager {
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
 			if ( MultizoneSurfaceData( i ).SurfNum == 0 ) continue;
-			if ( AirflowNetworkNumOfDetOpenings > 0 ) j = InputProcessor::FindItemInList( MultizoneSurfaceData( i ).OpeningName, MultizoneCompDetOpeningData );
-			if ( j == 0 && AirflowNetworkNumOfSimOpenings > 0 ) j = InputProcessor::FindItemInList( MultizoneSurfaceData( i ).OpeningName, MultizoneCompSimpleOpeningData );
+			if ( AirflowNetworkNumOfDetOpenings > 0 ) j = UtilityRoutines::FindItemInList( MultizoneSurfaceData( i ).OpeningName, MultizoneCompDetOpeningData );
+			if ( j == 0 && AirflowNetworkNumOfSimOpenings > 0 ) j = UtilityRoutines::FindItemInList( MultizoneSurfaceData( i ).OpeningName, MultizoneCompSimpleOpeningData );
 			// Obtain schedule number and check surface shape
 			if ( j > 0 ) {
 				if ( Surface( MultizoneSurfaceData( i ).SurfNum ).Sides == 3 ) {
@@ -1995,12 +1995,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// *** Read AirflowNetwork simulation reference crack conditions
 		CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
-		AirflowNetworkNumOfStdCndns = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfStdCndns = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfStdCndns > 0 ) {
 			MultizoneSurfaceStdConditionsCrackData.allocate( {0,AirflowNetworkNumOfStdCndns} );
 			for ( i = 1; i <= AirflowNetworkNumOfStdCndns; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				if ( InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound ) ) {
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				if ( UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
 				MultizoneSurfaceStdConditionsCrackData( i ).Name = Alphas( 1 );
@@ -2027,12 +2027,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// *** Read AirflowNetwork simulation surface crack component
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
-		AirflowNetworkNumOfSurCracks = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfSurCracks = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfSurCracks > 0 ) {
 			MultizoneSurfaceCrackData.allocate( AirflowNetworkNumOfSurCracks );
 			for ( i = 1; i <= AirflowNetworkNumOfSurCracks; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				MultizoneSurfaceCrackData( i ).Name = Alphas( 1 ); // Name of surface crack component
 				MultizoneSurfaceCrackData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient
 				MultizoneSurfaceCrackData( i ).FlowExpo = Numbers( 2 ); // Air Mass Flow exponent
@@ -2047,7 +2047,7 @@ namespace AirflowNetworkBalanceManager {
 						MultizoneSurfaceCrackData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW;
 					}
 				} else {
-					j = InputProcessor::FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( {1,AirflowNetworkNumOfStdCndns} ), AirflowNetworkNumOfStdCndns );
+					j = UtilityRoutines::FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( {1,AirflowNetworkNumOfStdCndns} ), AirflowNetworkNumOfStdCndns );
 					if ( j == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + Alphas( 1 ) + ". Specified " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
 						ErrorsFound = true;
@@ -2062,12 +2062,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// *** Read AirflowNetwork simulation surface effective leakage area component
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea";
-		AirflowNetworkNumOfSurELA = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		AirflowNetworkNumOfSurELA = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfSurELA > 0 ) {
 			MultizoneSurfaceELAData.allocate( AirflowNetworkNumOfSurELA );
 			for ( i = 1; i <= AirflowNetworkNumOfSurELA; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				MultizoneSurfaceELAData( i ).Name = Alphas( 1 ); // Name of surface effective leakage area component
 				MultizoneSurfaceELAData( i ).ELA = Numbers( 1 ); // Effective leakage area
 				MultizoneSurfaceELAData( i ).DischCoeff = Numbers( 2 ); // Discharge coefficient
@@ -2080,13 +2080,13 @@ namespace AirflowNetworkBalanceManager {
 
 		// *** Read AirflowNetwork simulation zone exhaust fan component
 		CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
-		AirflowNetworkNumOfExhFan = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		NumOfExhaustFans = InputProcessor::GetNumObjectsFound( "Fan:ZoneExhaust" );
+		AirflowNetworkNumOfExhFan = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		NumOfExhaustFans = inputProcessor->getNumObjectsFound( "Fan:ZoneExhaust" );
 		if ( AirflowNetworkNumOfExhFan > 0 ) {
 			MultizoneCompExhaustFanData.allocate( AirflowNetworkNumOfExhFan );
 			for ( i = 1; i <= AirflowNetworkNumOfExhFan; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				MultizoneCompExhaustFanData( i ).Name = Alphas( 1 ); // Name of zone exhaust fan component
 				MultizoneCompExhaustFanData( i ).FlowCoef = Numbers( 1 ); // flow coefficient
 				MultizoneCompExhaustFanData( i ).FlowExpo = Numbers( 2 ); // Flow exponent
@@ -2116,7 +2116,7 @@ namespace AirflowNetworkBalanceManager {
 						MultizoneCompExhaustFanData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW;
 					}
 				} else {
-					j = InputProcessor::FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( {1,AirflowNetworkNumOfStdCndns} ), AirflowNetworkNumOfStdCndns );
+					j = UtilityRoutines::FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( {1,AirflowNetworkNumOfStdCndns} ), AirflowNetworkNumOfStdCndns );
 					if ( j == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + Alphas( 1 ) + ". Specified " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
 						ErrorsFound = true;
@@ -2130,7 +2130,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		// Calculate CP values
-		if ( InputProcessor::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
+		if ( UtilityRoutines::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
 			CalcWindPressureCoeffs();
 			// Ensure automatic generation is OK
 			n = 0;
@@ -2160,11 +2160,11 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		// Assign external node height
-		if ( InputProcessor::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) || InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) {
+		if ( UtilityRoutines::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) || UtilityRoutines::SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) {
 			for ( i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
 				for ( j = 1; j <= AirflowNetworkNumOfSurfaces; ++j ) {
 					if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( j ).SurfNum ).ExtWind ) ) {
-						if ( InputProcessor::SameString( MultizoneSurfaceData( j ).ExternalNodeName, MultizoneExternalNodeData( i ).Name ) ) {
+						if ( UtilityRoutines::SameString( MultizoneSurfaceData( j ).ExternalNodeName, MultizoneExternalNodeData( i ).Name ) ) {
 							MultizoneExternalNodeData( i ).height = Surface( MultizoneSurfaceData( j ).SurfNum ).Centroid.z;
 							break;
 						}
@@ -2177,7 +2177,7 @@ namespace AirflowNetworkBalanceManager {
 		for (i = 1; i <= AirflowNetworkNumOfExtNode; ++i) {
 			for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
 				if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == ExternalEnvironment || (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt && Surface(MultizoneSurfaceData(j).SurfNum).ExtWind)) {
-					if (InputProcessor::SameString(MultizoneSurfaceData(j).ExternalNodeName, MultizoneExternalNodeData(i).Name)) {
+					if (UtilityRoutines::SameString(MultizoneSurfaceData(j).ExternalNodeName, MultizoneExternalNodeData(i).Name)) {
 						MultizoneExternalNodeData(i).azimuth = Surface(MultizoneSurfaceData(j).SurfNum).Azimuth;
 						break;
 					}
@@ -2348,12 +2348,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Intra zone node
 		CurrentModuleObject = "AirflowNetwork:IntraZone:Node";
-		IntraZoneNumOfNodes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		IntraZoneNumOfNodes = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( IntraZoneNumOfNodes > 0 ) {
 			IntraZoneNodeData.allocate( IntraZoneNumOfNodes );
 			for ( i = 1; i <= IntraZoneNumOfNodes; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				IntraZoneNodeData( i ).Name = Alphas( 1 );       // Name of node
 				IntraZoneNodeData( i ).RAFNNodeName = Alphas( 2 ); // Name of RoomAir node
 				IntraZoneNodeData( i ).Height = Numbers( 1 ); // Nodal height
@@ -2364,7 +2364,7 @@ namespace AirflowNetworkBalanceManager {
 					ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "' invalid name " + cAlphaFields( 2 ) + "='" + Alphas( 2 ) );
 					ErrorsFound = true;
 			}
-				IntraZoneNodeData( i ).AFNZoneNum = InputProcessor::FindItemInList( Alphas( 3 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
+				IntraZoneNodeData( i ).AFNZoneNum = UtilityRoutines::FindItemInList( Alphas( 3 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 				if ( MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).RAFNNodeNum == 0 ) {
 					GetRAFNNodeNum( MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).ZoneName, IntraZoneNodeData( i ).ZoneNum, MultizoneZoneData( IntraZoneNodeData( i ).AFNZoneNum ).RAFNNodeNum, Errorfound1 );
 		}
@@ -2377,7 +2377,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// check model compatibility
 		if ( IntraZoneNumOfNodes > 0 ) {
-			if ( !InputProcessor::SameString( SimAirNetworkKey, "MultizoneWithoutDistribution" ) ) {
+			if ( !UtilityRoutines::SameString( SimAirNetworkKey, "MultizoneWithoutDistribution" ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " model requires Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey + "." );
 				ErrorsFound = true;
 				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object." " Previous error(s) cause program termination." );
@@ -2397,13 +2397,13 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Intra linkage
 		CurrentModuleObject = "AirflowNetwork:IntraZone:Linkage";
-		IntraZoneNumOfLinks = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		IntraZoneNumOfLinks = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( IntraZoneNumOfLinks > 0 ) {
 			IntraZoneLinkageData.allocate( IntraZoneNumOfLinks );
 			UniqueAirflowNetworkSurfaceName.reserve( IntraZoneNumOfLinks );
 			for ( i = 1; i <= IntraZoneNumOfLinks; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				IntraZoneLinkageData( i ).Name = Alphas( 1 ); // Name of linkage
 				IntraZoneLinkageData( i ).NodeNames( 1 ) = Alphas( 2 );
 				IntraZoneLinkageData( i ).NodeHeights( 1 ) = 0.0;
@@ -2414,21 +2414,21 @@ namespace AirflowNetworkBalanceManager {
 					// Perform simple test first.The comprehensive input validation will occur later
 					// Check valid surface name
 					IntraZoneLinkageData( i ).SurfaceName = Alphas( 5 );
-					IntraZoneLinkageData(i).LinkNum = InputProcessor::FindItemInList( Alphas( 5 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName, AirflowNetworkNumOfSurfaces );
+					IntraZoneLinkageData(i).LinkNum = UtilityRoutines::FindItemInList( Alphas( 5 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName, AirflowNetworkNumOfSurfaces );
 					if ( IntraZoneLinkageData( i ).LinkNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "': Invalid " + cAlphaFields( 5 ) + " given = " + Alphas( 5 ) + " in AirflowNetwork:MultiZone:Surface objects" );
 						ErrorsFound = true;
 					}
 					GlobalNames::VerifyUniqueInterObjectName( UniqueAirflowNetworkSurfaceName, Alphas( 5 ), CurrentModuleObject, cAlphaFields( 5 ), ErrorsFound );
 				}
-				if ( InputProcessor::SameString( Alphas( 2 ), Alphas( 3 ) ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 2 ), Alphas( 3 ) ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "': Invalid inputs of both node name with " + Alphas( 2 ) + " = " + Alphas( 3 ) );
 					ErrorsFound = true;
 				}
 				// Check valid node names
-				IntraZoneLinkageData( i ).NodeNums( 1 ) = InputProcessor::FindItemInList( Alphas( 2 ), IntraZoneNodeData, IntraZoneNumOfNodes );
+				IntraZoneLinkageData( i ).NodeNums( 1 ) = UtilityRoutines::FindItemInList( Alphas( 2 ), IntraZoneNodeData, IntraZoneNumOfNodes );
 				if ( IntraZoneLinkageData( i ).NodeNums( 1 ) == 0 ) {
-					IntraZoneLinkageData( i ).NodeNums( 1 ) = InputProcessor::FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
+					IntraZoneLinkageData( i ).NodeNums( 1 ) = UtilityRoutines::FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 					IntraZoneLinkageData( i ).NodeHeights( 1 ) = Zone( MultizoneZoneData( IntraZoneLinkageData( i ).NodeNums( 1 ) ).ZoneNum ).Centroid.z;
 					if ( IntraZoneLinkageData( i ).NodeNums( 1 ) == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "': Invalid " + cAlphaFields( 2 ) + " given = " + Alphas( 2 ) +
@@ -2439,9 +2439,9 @@ namespace AirflowNetworkBalanceManager {
 					IntraZoneLinkageData( i ).NodeHeights( 1 ) = IntraZoneNodeData( IntraZoneLinkageData( i ).NodeNums( 1 ) ).Height;
 					IntraZoneLinkageData( i ).NodeNums( 1 ) = IntraZoneLinkageData( i ).NodeNums( 1 ) + AirflowNetworkNumOfZones + AirflowNetworkNumOfExtNode;
 				}
-				IntraZoneLinkageData( i ).NodeNums( 2 ) = InputProcessor::FindItemInList( Alphas( 3 ), IntraZoneNodeData, IntraZoneNumOfNodes );
+				IntraZoneLinkageData( i ).NodeNums( 2 ) = UtilityRoutines::FindItemInList( Alphas( 3 ), IntraZoneNodeData, IntraZoneNumOfNodes );
 				if ( IntraZoneLinkageData( i ).NodeNums( 2 ) == 0 ) {
-					IntraZoneLinkageData( i ).NodeNums( 2 ) = InputProcessor::FindItemInList( Alphas( 3 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
+					IntraZoneLinkageData( i ).NodeNums( 2 ) = UtilityRoutines::FindItemInList( Alphas( 3 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 					if ( IntraZoneLinkageData( i ).NodeNums( 2 ) > 0 ){
 						IntraZoneLinkageData( i ).NodeHeights( 2 ) = Zone( MultizoneZoneData( IntraZoneLinkageData( i ).NodeNums( 2 ) ).ZoneNum ).Centroid.z;
 					} else {
@@ -2573,19 +2573,19 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Distribution system node
 		CurrentModuleObject = "AirflowNetwork:Distribution:Node";
-		DisSysNumOfNodes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfNodes = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfNodes > 0 ) {
 			DisSysNodeData.allocate( DisSysNumOfNodes );
 			for ( i = 1; i <= DisSysNumOfNodes; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysNodeData( i ).Name = Alphas( 1 ); // Name of node
 				DisSysNodeData( i ).EPlusName = Alphas( 2 ); // Name of associated EnergyPlus node
 				DisSysNodeData( i ).EPlusType = Alphas( 3 ); // Name of associated EnergyPlus type
 				DisSysNodeData( i ).Height = Numbers( 1 ); // Nodal height
 				DisSysNodeData( i ).EPlusNodeNum = 0; // EPlus node number
 				// verify EnergyPlus object type
-				if ( InputProcessor::SameString( Alphas( 3 ), "AirLoopHVAC:ZoneMixer" ) || InputProcessor::SameString( Alphas( 3 ), "AirLoopHVAC:ZoneSplitter" ) || InputProcessor::SameString( Alphas( 3 ), "AirLoopHVAC:OutdoorAirSystem" ) || InputProcessor::SameString( Alphas( 3 ), "OAMixerOutdoorAirStreamNode" ) || InputProcessor::SameString( Alphas( 3 ), "OutdoorAir:NodeList" ) || InputProcessor::SameString( Alphas( 3 ), "OutdoorAir:Node" ) || InputProcessor::SameString( Alphas( 3 ), "Other" ) || lAlphaBlanks( 3 ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 3 ), "AirLoopHVAC:ZoneMixer" ) || UtilityRoutines::SameString( Alphas( 3 ), "AirLoopHVAC:ZoneSplitter" ) || UtilityRoutines::SameString( Alphas( 3 ), "AirLoopHVAC:OutdoorAirSystem" ) || UtilityRoutines::SameString( Alphas( 3 ), "OAMixerOutdoorAirStreamNode" ) || UtilityRoutines::SameString( Alphas( 3 ), "OutdoorAir:NodeList" ) || UtilityRoutines::SameString( Alphas( 3 ), "OutdoorAir:Node" ) || UtilityRoutines::SameString( Alphas( 3 ), "Other" ) || lAlphaBlanks( 3 ) ) {
 					continue;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" invalid " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\" illegal key." );
@@ -2602,12 +2602,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Distribution system component: duct leakage
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:Leak";
-		DisSysNumOfLeaks = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfLeaks = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfLeaks > 0 ) {
 			DisSysCompLeakData.allocate( DisSysNumOfLeaks );
 			for ( i = 1; i <= DisSysNumOfLeaks; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompLeakData( i ).Name = Alphas( 1 ); // Name of duct leak component
 				DisSysCompLeakData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient
 				DisSysCompLeakData( i ).FlowExpo = Numbers( 2 ); // Air Mass Flow exponent
@@ -2619,12 +2619,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Distribution system component: duct effective leakage ratio
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:LeakageRatio";
-		DisSysNumOfELRs = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfELRs = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfELRs > 0 ) {
 			DisSysCompELRData.allocate( DisSysNumOfELRs );
 			for ( i = 1; i <= DisSysNumOfELRs; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompELRData( i ).Name = Alphas( 1 ); // Name of duct effective leakage ratio component
 				DisSysCompELRData( i ).ELR = Numbers( 1 ); // Value of effective leakage ratio
 				DisSysCompELRData( i ).FlowRate = Numbers( 2 ); // Maximum airflow rate
@@ -2639,12 +2639,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Distribution system component: duct
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
-		DisSysNumOfDucts = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfDucts = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfDucts > 0 ) {
 			DisSysCompDuctData.allocate( DisSysNumOfDucts );
 			for ( i = 1; i <= DisSysNumOfDucts; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompDuctData( i ).Name = Alphas( 1 ); // Name of duct effective leakage ratio component
 				DisSysCompDuctData( i ).L = Numbers( 1 ); // Duct length [m]
 				DisSysCompDuctData( i ).D = Numbers( 2 ); // Hydraulic diameter [m]
@@ -2674,12 +2674,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork distribution system component: DuctViewFactors
 		CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
-		DisSysNumOfDuctViewFactors = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfDuctViewFactors = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfDuctViewFactors > 0 ) {
 			AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
 			for ( i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
 
@@ -2720,7 +2720,7 @@ namespace AirflowNetworkBalanceManager {
 				for ( int surfNum = 1; surfNum < NumAlphas; ++surfNum )
 				{
 					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceName = Alphas( surfNum + 1 ); // Surface name
-					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum = InputProcessor::FindItemInList( Alphas( surfNum + 1 ), Surface );
+					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum = UtilityRoutines::FindItemInList( Alphas( surfNum + 1 ), Surface );
 
 					if ( this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum == 0 ) {
 						ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
@@ -2748,11 +2748,11 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Distribution system component: constant volume fan
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
-		DisSysNumOfCVFs = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfCVFs = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfCVFs > 0 ) {
 			DisSysCompCVFData.allocate( DisSysNumOfCVFs );
 			for ( i = 1; i <= DisSysNumOfCVFs; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				DisSysCompCVFData( i ).Name = Alphas( 1 ); // Name of duct effective leakage ratio component
 				DisSysCompCVFData( i ).Ctrl = 1.0; // Control ratio
 				FanErrorFound = false;
@@ -2773,12 +2773,12 @@ namespace AirflowNetworkBalanceManager {
 					ShowContinueError( "Valid fan types are  Fan:ConstantVolume or Fan:OnOff" );
 					ErrorsFound = true;
 				} else {
-					if ( InputProcessor::SameString( Alphas( 2 ), "Fan:ConstantVolume" ) && FanType_Num == FanType_SimpleOnOff ) {
+					if ( UtilityRoutines::SameString( Alphas( 2 ), "Fan:ConstantVolume" ) && FanType_Num == FanType_SimpleOnOff ) {
 						ShowSevereError( "The " + cAlphaFields( 2 ) + " defined in " + CurrentModuleObject + " is " + Alphas( 2 ) );
 						ShowContinueError( "The " + cAlphaFields( 2 ) + " defined in an AirLoopHVAC is Fan:OnOff" );
 						ErrorsFound = true;
 					}
-					if ( InputProcessor::SameString( Alphas( 2 ), "Fan:OnOff" ) && FanType_Num == FanType_SimpleConstVolume ) {
+					if ( UtilityRoutines::SameString( Alphas( 2 ), "Fan:OnOff" ) && FanType_Num == FanType_SimpleConstVolume ) {
 						ShowSevereError( "The " + cAlphaFields( 2 ) + " defined in " + CurrentModuleObject + " is " + Alphas( 2 ) );
 						ShowContinueError( "The " + cAlphaFields( 2 ) + " defined in an AirLoopHVAC is Fan:ConstantVolume" );
 						ErrorsFound = true;
@@ -2813,7 +2813,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Check AirTerminal:SingleDuct:Uncontrolled. This object is not allowed
 		if ( VAVSystem ) {
-			i = InputProcessor::GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" );
+			i = inputProcessor->getNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" );
 			if ( i > 0 ) {
 				ShowSevereError( RoutineName + "Invalid terminal type for a VAV system = AirTerminal:SingleDuct:Uncontrolled" );
 				ShowContinueError( "A VAV system requires all terminal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
@@ -2827,12 +2827,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Distribution system component: coil
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:Coil";
-		DisSysNumOfCoils = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfCoils = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfCoils > 0 ) {
 			DisSysCompCoilData.allocate( DisSysNumOfCoils );
 			for ( i = 1; i <= DisSysNumOfCoils; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompCoilData( i ).Name = Alphas( 1 ); // Name of associated EPlus coil component
 				DisSysCompCoilData( i ).EPlusType = Alphas( 2 ); // coil type
 				DisSysCompCoilData( i ).L = Numbers( 1 ); // Air path length
@@ -2846,12 +2846,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Distribution system component: heat exchanger
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:HeatExchanger";
-		DisSysNumOfHXs = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfHXs = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfHXs > 0 ) {
 			DisSysCompHXData.allocate( DisSysNumOfHXs );
 			for ( i = 1; i <= DisSysNumOfHXs; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompHXData( i ).Name = Alphas( 1 ); // Name of associated EPlus heat exchange component
 				DisSysCompHXData( i ).EPlusType = Alphas( 2 ); // coil type
 				DisSysCompHXData( i ).L = Numbers( 1 ); // Air path length
@@ -2862,12 +2862,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork Distribution system component: terminal unit
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:TerminalUnit";
-		DisSysNumOfTermUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfTermUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfTermUnits > 0 ) {
 			DisSysCompTermUnitData.allocate( DisSysNumOfTermUnits );
 			for ( i = 1; i <= DisSysNumOfTermUnits; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompTermUnitData( i ).Name = Alphas( 1 ); // Name of associated EPlus coil component
 				DisSysCompTermUnitData( i ).EPlusType = Alphas( 2 ); // Terminal unit type
 				DisSysCompTermUnitData( i ).L = Numbers( 1 ); // Air path length
@@ -2879,12 +2879,12 @@ namespace AirflowNetworkBalanceManager {
 
 		// Get input data of constant pressure drop component
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:ConstantPressureDrop";
-		DisSysNumOfCPDs = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfCPDs = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfCPDs > 0 ) {
 			DisSysCompCPDData.allocate( DisSysNumOfCPDs );
 			for ( i = 1; i <= DisSysNumOfCPDs; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompCPDData( i ).Name = Alphas( 1 ); // Name of constant pressure drop component
 				DisSysCompCPDData( i ).A = 1.0; // cross section area
 				DisSysCompCPDData( i ).DP = Numbers( 1 ); // Pressure difference across the component
@@ -2897,7 +2897,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read Outdoor Airflow object
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:OutdoorAirFlow";
-		NumOfOAFans = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfOAFans = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumOfOAFans > 1 ) {
 			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
@@ -2905,8 +2905,8 @@ namespace AirflowNetworkBalanceManager {
 		if ( NumOfOAFans > 0 ) {
 			DisSysCompOutdoorAirData.allocate( NumOfOAFans );
 			for ( i = 1; i <= NumOfOAFans; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompOutdoorAirData( i ).Name = Alphas( 1 ); // Name of zone exhaust fan component
 				DisSysCompOutdoorAirData( i ).FlowCoef = Numbers( 1 ); // flow coefficient
 				DisSysCompOutdoorAirData( i ).FlowExpo = Numbers( 2 ); // Flow exponent
@@ -2922,7 +2922,7 @@ namespace AirflowNetworkBalanceManager {
 						DisSysCompOutdoorAirData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW;
 					}
 				} else {
-					j = InputProcessor::FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( { 1, AirflowNetworkNumOfStdCndns } ), AirflowNetworkNumOfStdCndns );
+					j = UtilityRoutines::FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( { 1, AirflowNetworkNumOfStdCndns } ), AirflowNetworkNumOfStdCndns );
 					if ( j == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + Alphas( 1 ) + ". Specified " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
 						ErrorsFound = true;
@@ -2937,7 +2937,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read Relief Airflow object
 		CurrentModuleObject = "AirflowNetwork:Distribution:Component:ReliefAirFlow";
-		NumOfReliefFans = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfReliefFans = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumOfReliefFans > 1 ) {
 			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
@@ -2945,8 +2945,8 @@ namespace AirflowNetworkBalanceManager {
 		if ( NumOfReliefFans > 0 ) {
 			DisSysCompReliefAirData.allocate( NumOfReliefFans );
 			for ( i = 1; i <= NumOfReliefFans; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				DisSysCompReliefAirData( i ).Name = Alphas( 1 ); // Name of zone exhaust fan component
 				DisSysCompReliefAirData( i ).FlowCoef = Numbers( 1 ); // flow coefficient
 				DisSysCompReliefAirData( i ).FlowExpo = Numbers( 2 ); // Flow exponent
@@ -2962,7 +2962,7 @@ namespace AirflowNetworkBalanceManager {
 						DisSysCompReliefAirData( i ).StandardW = MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW;
 					}
 				} else {
-					j = InputProcessor::FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( { 1, AirflowNetworkNumOfStdCndns } ), AirflowNetworkNumOfStdCndns );
+					j = UtilityRoutines::FindItemInList( Alphas( 2 ), MultizoneSurfaceStdConditionsCrackData( { 1, AirflowNetworkNumOfStdCndns } ), AirflowNetworkNumOfStdCndns );
 					if ( j == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + Alphas( 1 ) + ". Specified " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) + " not found." );
 						ErrorsFound = true;
@@ -2977,7 +2977,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read PressureController
 		CurrentModuleObject = "AirflowNetwork:ZoneControl:PressureController";
-		NumOfPressureControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfPressureControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumOfPressureControllers > 1 ) {
 			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
@@ -2986,12 +2986,12 @@ namespace AirflowNetworkBalanceManager {
 		if ( NumOfPressureControllers > 0 ) {
 			PressureControllerData.allocate( NumOfPressureControllers );
 			for ( i = 1; i <= NumOfPressureControllers; ++i ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				PressureControllerData( i ).Name = Alphas( 1 ); // Object Name
 				PressureControllerData( i ).ZoneName = Alphas( 2 ); // Zone name
-				PressureControllerData( i ).ZoneNum = InputProcessor::FindItemInList( Alphas( 2 ), Zone );
-				PressureControllerData( i ).AFNNodeNum = InputProcessor::FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
+				PressureControllerData( i ).ZoneNum = UtilityRoutines::FindItemInList( Alphas( 2 ), Zone );
+				PressureControllerData( i ).AFNNodeNum = UtilityRoutines::FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
 				if ( PressureControllerData( i ).ZoneNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields( 2 ) + " given." );
 					ShowContinueError( "..invalid " + cAlphaFields( 2 ) + " = \"" + PressureControllerData( i ).ZoneName + "\"" );
@@ -3001,7 +3001,7 @@ namespace AirflowNetworkBalanceManager {
 				PressureControllerData( i ).ControlObjectType = Alphas( 3 ); // Control Object Type
 				PressureControllerData( i ).ControlObjectName = Alphas( 4 ); // Control Object Name
 
-				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( Alphas( 3 ) ) );
+				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( Alphas( 3 ) ) );
 				if ( SELECT_CASE_var == "AIRFLOWNETWORK:MULTIZONE:COMPONENT:ZONEEXHAUSTFAN" ) {
 					PressureControllerData( i ).ControlTypeSet = PressureCtrlExhaust;
 				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:RELIEFAIRFLOW" ) {
@@ -3014,14 +3014,14 @@ namespace AirflowNetworkBalanceManager {
 				}}
 
 				if ( PressureControllerData( i ).ControlTypeSet == PressureCtrlExhaust ) {
-					if ( InputProcessor::FindItemInList( Alphas( 4 ), MultizoneCompExhaustFanData ) == 0 ) {
+					if ( UtilityRoutines::FindItemInList( Alphas( 4 ), MultizoneCompExhaustFanData ) == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, an invalid name is given:" );
 						ShowContinueError( ".. invalid " + cAlphaFields( 4 ) + " = \"" + Alphas( 4 ) + "\"." );
 						ErrorsFound = true;
 					}
 				}
 				if ( PressureControllerData( i ).ControlTypeSet == PressureCtrlRelief ) {
-					if ( InputProcessor::FindItemInList( Alphas( 4 ), DisSysCompReliefAirData ) == 0 ) {
+					if ( UtilityRoutines::FindItemInList( Alphas( 4 ), DisSysCompReliefAirData ) == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, an invalid name is given:" );
 						ShowContinueError( ".. invalid " + cAlphaFields( 4 ) + " = \"" + Alphas( 4 ) + "\"." );
 						ErrorsFound = true;
@@ -3114,13 +3114,13 @@ namespace AirflowNetworkBalanceManager {
 			// Search node types: OAMixerOutdoorAirStreamNode, OutdoorAir:NodeList, and OutdoorAir:Node
 			j = 0;
 			for ( i = NumOfNodesMultiZone + 1; i <= AirflowNetworkNumOfNodes; ++i ) {
-				if ( InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
 					++j;
 				}
-				if ( InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OutdoorAir:NodeList" ) ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OutdoorAir:NodeList" ) ) {
 					++j;
 				}
-				if ( InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OutdoorAir:Node" ) ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OutdoorAir:Node" ) ) {
 					++j;
 				}
 			}
@@ -3132,24 +3132,24 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkNodeData( i ).NodeHeight = DisSysNodeData( i - NumOfNodesMultiZone ).Height;
 				AirflowNetworkNodeData( i ).EPlusNodeNum = DisSysNodeData( i - NumOfNodesMultiZone ).EPlusNodeNum;
 				// Get mixer information
-				if ( InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:ZoneMixer" ) ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:ZoneMixer" ) ) {
 					AirflowNetworkNodeData( i ).EPlusTypeNum = EPlusTypeNum_MIX;
 				}
 				// Get splitter information
-				if ( InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:ZoneSplitter" ) ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:ZoneSplitter" ) ) {
 					AirflowNetworkNodeData( i ).EPlusTypeNum = EPlusTypeNum_SPL;
 				}
 				// Get outside air system information
-				if ( InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
 					AirflowNetworkNodeData( i ).EPlusTypeNum = EPlusTypeNum_OAN;
 				}
 				// Get OA system inlet information 'OAMixerOutdoorAirStreamNode' was specified as an outdoor air node implicitly
-				if ( InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) && j == 1 ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) && j == 1 ) {
 					AirflowNetworkNodeData( i ).EPlusTypeNum = EPlusTypeNum_EXT;
 					AirflowNetworkNodeData( i ).ExtNodeNum = AirflowNetworkNumOfExtNode + 1;
 					AirflowNetworkNodeData( i ).NodeTypeNum = 1;
 				}
-				if ( InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OutdoorAir:NodeList" ) || InputProcessor::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OutdoorAir:Node" ) ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OutdoorAir:NodeList" ) || UtilityRoutines::SameString( DisSysNodeData( i - NumOfNodesMultiZone ).EPlusType, "OutdoorAir:Node" ) ) {
 					if ( j > 1 ) {
 						AirflowNetworkNodeData( i ).EPlusTypeNum = EPlusTypeNum_EXT;
 						AirflowNetworkNodeData( i ).ExtNodeNum = AirflowNetworkNumOfExtNode + 1;
@@ -3390,7 +3390,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Read AirflowNetwork linkage data
 		CurrentModuleObject = "AirflowNetwork:Distribution:Linkage";
-		DisSysNumOfLinks = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		DisSysNumOfLinks = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) { // Multizone + Distribution
 			AirflowNetworkNumOfLinks = NumOfLinksMultiZone + DisSysNumOfLinks;
 			AirflowNetworkLinkageData.allocate( DisSysNumOfLinks + AirflowNetworkNumOfSurfaces );
@@ -3584,8 +3584,8 @@ namespace AirflowNetworkBalanceManager {
 
 			for ( count = AirflowNetworkNumOfSurfaces + 1; count <= AirflowNetworkNumOfLinks; ++count ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, count - AirflowNetworkNumOfSurfaces, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, count - AirflowNetworkNumOfSurfaces, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				AirflowNetworkLinkageData( count ).Name = Alphas( 1 );
 				AirflowNetworkLinkageData( count ).NodeNames( 1 ) = Alphas( 2 );
 				AirflowNetworkLinkageData( count ).NodeHeights( 1 ) = 0.0;
@@ -3603,7 +3603,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 
 				if ( ! lAlphaBlanks( 5 ) ) {
-					AirflowNetworkLinkageData( count ).ZoneNum = InputProcessor::FindItemInList( AirflowNetworkLinkageData( count ).ZoneName, Zone );
+					AirflowNetworkLinkageData( count ).ZoneNum = UtilityRoutines::FindItemInList( AirflowNetworkLinkageData( count ).ZoneName, Zone );
 					if ( AirflowNetworkLinkageData( count ).ZoneNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 5 ) + " given = " + AirflowNetworkLinkageData( count ).ZoneName );
 						ErrorsFound = true;
@@ -3666,7 +3666,7 @@ namespace AirflowNetworkBalanceManager {
 		// Ensure no duplicated names in AirflowNetwork component objects
 		for ( i = 1; i <= AirflowNetworkNumOfComps; ++i ) {
 			for ( j = i + 1; j <= AirflowNetworkNumOfComps; ++j ) {
-				if ( InputProcessor::SameString( AirflowNetworkCompData( i ).Name, AirflowNetworkCompData( j ).Name ) ) {
+				if ( UtilityRoutines::SameString( AirflowNetworkCompData( i ).Name, AirflowNetworkCompData( j ).Name ) ) {
 					// SurfaceAirflowLeakageNames
 					if ( i <= 4 && j <= 4 ) {
 						if ( AirflowNetworkCompData( i ).CompTypeNum == CompTypeNum_DOP ) CompName( 1 ) = "AirflowNetwork:MultiZone:Component:DetailedOpening";
@@ -3837,7 +3837,7 @@ namespace AirflowNetworkBalanceManager {
 			for ( i = 1; i <= DisSysNumOfHXs; ++i ) {
 				count = 0;
 				for ( j = 1; j <= AirflowNetworkNumOfLinks; ++j ) {
-					if ( InputProcessor::SameString( AirflowNetworkLinkageData( j ).CompName, DisSysCompHXData( i ).Name ) ) {
+					if ( UtilityRoutines::SameString( AirflowNetworkLinkageData( j ).CompName, DisSysCompHXData( i ).Name ) ) {
 						++count;
 					}
 				}
@@ -3864,12 +3864,12 @@ namespace AirflowNetworkBalanceManager {
 			k = AirflowNetworkLinkageData( count ).NodeNums( 2 );
 
 			if ( AirflowNetworkCompData( i ).CompTypeNum == CompTypeNum_OAF ) {
-				if ( !InputProcessor::SameString( DisSysNodeData( j - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
+				if ( !UtilityRoutines::SameString( DisSysNodeData( j - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
 					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( j ).Name + "," );
 					ShowContinueError( "the component type in the first node should be OAMixerOutdoorAirStreamNode at " + AirflowNetworkNodeData( j ).Name );
 					ErrorsFound = true;
 				}
-				if ( !InputProcessor::SameString( DisSysNodeData( k - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
+				if ( !UtilityRoutines::SameString( DisSysNodeData( k - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
 					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( k ).Name + "," );
 					ShowContinueError( "the component object type in the second node should be AirLoopHVAC:OutdoorAirSystem at " + AirflowNetworkNodeData( k ).Name );
 					ErrorsFound = true;
@@ -3877,12 +3877,12 @@ namespace AirflowNetworkBalanceManager {
 			}
 
 			if ( AirflowNetworkCompData( i ).CompTypeNum == CompTypeNum_REL ) {
-				if ( !InputProcessor::SameString( DisSysNodeData( j - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
+				if ( !UtilityRoutines::SameString( DisSysNodeData( j - NumOfNodesMultiZone ).EPlusType, "AirLoopHVAC:OutdoorAirSystem" ) ) {
 					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( j ).Name + "," );
 					ShowContinueError( "the component object type in the first node should be AirLoopHVAC:OutdoorAirSystem at " + AirflowNetworkNodeData( j ).Name );
 					ErrorsFound = true;
 				}
-				if ( !InputProcessor::SameString( DisSysNodeData( k - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
+				if ( !UtilityRoutines::SameString( DisSysNodeData( k - NumOfNodesMultiZone ).EPlusType, "OAMixerOutdoorAirStreamNode" ) ) {
 					ShowSevereError( RoutineName + "AirflowNetwork:Distribution:Linkage: When the component type is AirflowNetwork:Distribution:Component:OutdoorAirFlow at " + AirflowNetworkNodeData( k ).Name + "," );
 					ShowContinueError( "the component type in the second node should be OAMixerOutdoorAirStreamNode at " + AirflowNetworkNodeData( k ).Name );
 					ErrorsFound = true;
@@ -4334,7 +4334,7 @@ namespace AirflowNetworkBalanceManager {
 		// Using/Aliasing
 		using DataHVACGlobals::TurnFansOn;
 		using DataHVACGlobals::VerySmallMassFlow;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using DataAirLoop::LoopFanOperationMode;
 		using DataAirLoop::LoopOnOffFanPartLoadRatio;
 		// Locals
@@ -4541,7 +4541,7 @@ namespace AirflowNetworkBalanceManager {
 				} else {
 					//	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
 					Par( 1 ) = PressureSet;
-					SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par );
+					SolveRoot( ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par );
 					if ( SolFla == -1 ) {
 						if ( !WarmupFlag ) {
 							if ( ErrCountVar == 0 ) {
@@ -4601,7 +4601,7 @@ namespace AirflowNetworkBalanceManager {
 				} else {
 					//	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
 					Par( 1 ) = PressureSet;
-					SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par );
+					SolveRoot( ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par );
 					if ( SolFla == -1 ) {
 						if ( !WarmupFlag ) {
 							if ( ErrCountVar == 0 ) {
@@ -4899,7 +4899,7 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) { //do the standard surface average coefficient calculation
 			// Create the array of wind directions
-			
+
 
 			// Create a curve for each facade
 			for ( FacadeNum = 1; FacadeNum <= 5; ++FacadeNum ) {
@@ -4908,7 +4908,7 @@ namespace AirflowNetworkBalanceManager {
 				} else { // FacadeNum = 2 or 4
 					SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
 				}
-				if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
+				if ( UtilityRoutines::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
 					SideRatio = 1.0 / SideRatio;
 				}
 				SideRatioFac = std::log( SideRatio );
@@ -4923,7 +4923,7 @@ namespace AirflowNetworkBalanceManager {
 
 					// Wind-pressure coefficients for vertical facades, low-rise building
 
-					if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) && FacadeNum <= 4 ) {
+					if ( UtilityRoutines::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) && FacadeNum <= 4 ) {
 						IncRad = IncAng * DegToRadians;
 						Real64 const cos_IncRad_over_2( std::cos( IncRad / 2.0 ) );
 						vals[ WindDirNum - 1 ] = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * cos_IncRad_over_2 + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( cos_IncRad_over_2 ) );
@@ -4931,7 +4931,7 @@ namespace AirflowNetworkBalanceManager {
 
 					// Wind-pressure coefficients for vertical facades, high-rise building
 
-					else if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum <= 4 ) {
+					else if ( UtilityRoutines::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum <= 4 ) {
 						SR = min( max( SideRatio, 0.25 ), 4.0 );
 						if ( SR >= 0.25 && SR < 1.0 ) {
 							ISR = 1;
@@ -4945,7 +4945,7 @@ namespace AirflowNetworkBalanceManager {
 
 					// Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
 
-					else if ( ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) || InputProcessor::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) ) && FacadeNum == 5 ) {
+					else if ( ( UtilityRoutines::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) || UtilityRoutines::SameString( AirflowNetworkSimu.BldgType, "LowRise" ) ) && FacadeNum == 5 ) {
 						SR = min( max( SideRatio, 0.25 ), 1.0 );
 						if ( SR >= 0.25 && SR < 0.5 ) {
 							ISR = 1;
@@ -4967,7 +4967,7 @@ namespace AirflowNetworkBalanceManager {
 
 			// Calculate the wind pressure coefficients vs. wind direction for each external node
 			// The wind pressure coeffients are stored temporarily in the "valsByFacade" vector and then
-			// converted into a table near the end of this else. There will be at least seven profiles 
+			// converted into a table near the end of this else. There will be at least seven profiles
 			// (four sides plus one roof plus two for each pair of windows). The name is thus a little
 			// misleading, as it isn't really the values by facade once you get beyond the first five.
 			std::vector< std::vector< Real64 > > valsByFacade( 5 );
@@ -4982,7 +4982,7 @@ namespace AirflowNetworkBalanceManager {
 				} else { // FacadeNum = 2 or 4
 					SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
 				}
-				if ( InputProcessor::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
+				if ( UtilityRoutines::SameString( AirflowNetworkSimu.BldgType, "HighRise" ) && FacadeNum != 5 ) {
 					SideRatio = 1.0 / SideRatio;
 				}
 				SideRatioFac = std::log( SideRatio );
@@ -7784,7 +7784,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 			// Validate EPlus Node names and types
 			for ( i = 1; i <= DisSysNumOfNodes; ++i ) {
-				if ( InputProcessor::SameString( DisSysNodeData( i ).EPlusName, "" ) || InputProcessor::SameString( DisSysNodeData( i ).EPlusName, "Other" ) ) continue;
+				if ( UtilityRoutines::SameString( DisSysNodeData( i ).EPlusName, "" ) || UtilityRoutines::SameString( DisSysNodeData( i ).EPlusName, "Other" ) ) continue;
 				LocalError = false;
 				for ( j = 1; j <= NumOfNodes; ++j ) { // NodeID
 					if ( DisSysNodeData( i ).EPlusName == NodeID( j ) ) {
@@ -7796,7 +7796,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 				// Check outdoor air node
-				if ( InputProcessor::SameString( DisSysNodeData( i ).EPlusType, "OutdoorAir:NodeList" ) || InputProcessor::SameString( DisSysNodeData( i ).EPlusType, "OutdoorAir:Node" ) ) {
+				if ( UtilityRoutines::SameString( DisSysNodeData( i ).EPlusType, "OutdoorAir:NodeList" ) || UtilityRoutines::SameString( DisSysNodeData( i ).EPlusType, "OutdoorAir:Node" ) ) {
 					if ( ! LocalError ) {
 						ShowSevereError( RoutineName + "The Node or Component Name defined in " + DisSysNodeData( i ).Name + " is not found in the " + DisSysNodeData( i ).EPlusType );
 						ShowContinueError( "The entered name is " + DisSysNodeData( i ).EPlusName + " in an AirflowNetwork:Distribution:Node object." );
@@ -7925,7 +7925,7 @@ namespace AirflowNetworkBalanceManager {
 			CurrentModuleObject = "AirflowNetwork:Distribution:Component:Coil";
 			MultiSpeedHPIndicator = 0;
 			for ( i = 1; i <= DisSysNumOfCoils; ++i ) {
-				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( DisSysCompCoilData( i ).EPlusType ) );
+				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( DisSysCompCoilData( i ).EPlusType ) );
 
 				if ( SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED" ) {
 					ValidateComponent( "Coil:Cooling:DX:SingleSpeed", DisSysCompCoilData( i ).Name, IsNotOK, RoutineName + CurrentModuleObject );
@@ -8009,13 +8009,13 @@ namespace AirflowNetworkBalanceManager {
 
 			// Validate terminal unit name and type
 			for ( i = 1; i <= DisSysNumOfTermUnits; ++i ) {
-				if ( InputProcessor::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) || InputProcessor::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
+				if ( UtilityRoutines::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) || UtilityRoutines::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
 					LocalError = false;
-					if ( InputProcessor::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) ) GetHVACSingleDuctSysIndex( DisSysCompTermUnitData( i ).Name, n, LocalError, "AirflowNetwork:Distribution:Component:TerminalUnit" );
-					if ( InputProcessor::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) GetHVACSingleDuctSysIndex( DisSysCompTermUnitData( i ).Name, n, LocalError, "AirflowNetwork:Distribution:Component:TerminalUnit", DisSysCompTermUnitData( i ).DamperInletNode, DisSysCompTermUnitData( i ).DamperOutletNode );
+					if ( UtilityRoutines::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) ) GetHVACSingleDuctSysIndex( DisSysCompTermUnitData( i ).Name, n, LocalError, "AirflowNetwork:Distribution:Component:TerminalUnit" );
+					if ( UtilityRoutines::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) GetHVACSingleDuctSysIndex( DisSysCompTermUnitData( i ).Name, n, LocalError, "AirflowNetwork:Distribution:Component:TerminalUnit", DisSysCompTermUnitData( i ).DamperInletNode, DisSysCompTermUnitData( i ).DamperOutletNode );
 					if ( LocalError ) ErrorsFound = true;
 					if ( VAVSystem ) {
-						if ( ! InputProcessor::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
+						if ( ! UtilityRoutines::SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " Invalid terminal type for a VAV system = " + DisSysCompTermUnitData( i ).Name );
 							ShowContinueError( "The input type = " + DisSysCompTermUnitData( i ).EPlusType );
 							ShowContinueError( "A VAV system requires all terminal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
@@ -8031,7 +8031,7 @@ namespace AirflowNetworkBalanceManager {
 			// Validate heat exchanger name and type
 			CurrentModuleObject = "AirflowNetwork:Distribution:Component:HeatExchanger";
 			for ( i = 1; i <= DisSysNumOfHXs; ++i ) {
-				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( DisSysCompHXData( i ).EPlusType ) );
+				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( DisSysCompHXData( i ).EPlusType ) );
 
 				if ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) {
 					ValidateComponent( "HeatExchanger:AirToAir:FlatPlate", DisSysCompHXData( i ).Name, IsNotOK, RoutineName + CurrentModuleObject );
@@ -8268,7 +8268,7 @@ namespace AirflowNetworkBalanceManager {
 				// Ensure a surface using zone exhaust fan to expose to the same zone
 				found = false;
 				for ( j = 1; j <= AirflowNetworkNumOfSurfaces; ++j ) {
-					if ( InputProcessor::SameString( MultizoneSurfaceData( j ).OpeningName, MultizoneCompExhaustFanData( i ).Name ) ) {
+					if ( UtilityRoutines::SameString( MultizoneSurfaceData( j ).OpeningName, MultizoneCompExhaustFanData( i ).Name ) ) {
 						found = true;
 						if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond != ExternalEnvironment && ! ( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) {
 							ShowSevereError( RoutineName + "The surface using " + CurrentModuleObject + " is not an exterior surface: " + MultizoneSurfaceData( j ).SurfName );
@@ -8525,14 +8525,14 @@ namespace AirflowNetworkBalanceManager {
 			if ( MultizoneZoneData( AFNZnNum ).SingleSidedCpType == "ADVANCED" ) {
 				for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {
 					if ( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ExtBoundCond == ExternalEnvironment ) { //check if outdoor boundary condition
-						MZDZoneNum = InputProcessor::FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
+						MZDZoneNum = UtilityRoutines::FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 						if ( MZDZoneNum == AFNZnNum ) {
-							DetOpenNum = InputProcessor::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
+							DetOpenNum = UtilityRoutines::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
 							if ( DetOpenNum > 0 ) {
 								++AFNNumOfExtOpenings;
 								++NumofExtSurfInZone( AFNZnNum );
 							} else {
-								SimOpenNum = InputProcessor::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
+								SimOpenNum = UtilityRoutines::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
 								if ( SimOpenNum > 0 ) {
 									++AFNNumOfExtOpenings;
 									++NumofExtSurfInZone( AFNZnNum );
@@ -8572,14 +8572,14 @@ namespace AirflowNetworkBalanceManager {
 		// Recount the number of detailed and simple exterior openings in zones with "ADVANCED" single sided wind pressure coefficients
 		AFNNumOfExtOpenings = 0;
 		for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {
-			MZDZoneNum = InputProcessor::FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
+			MZDZoneNum = UtilityRoutines::FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 			if ( MultizoneZoneData( MZDZoneNum ).SingleSidedCpType == "ADVANCED" ) {
 				if ( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ExtBoundCond == ExternalEnvironment ) { //check if outdoor boundary condition
-					DetOpenNum = InputProcessor::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
+					DetOpenNum = UtilityRoutines::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
 					if ( DetOpenNum > 0 ) {
 						++AFNNumOfExtOpenings;
 					} else {
-						SimOpenNum = InputProcessor::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
+						SimOpenNum = UtilityRoutines::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
 						if ( SimOpenNum > 0 ) {
 							++AFNNumOfExtOpenings;
 						}
@@ -8593,8 +8593,8 @@ namespace AirflowNetworkBalanceManager {
 		for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {
 			if ( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ExtBoundCond == ExternalEnvironment ) {
 				if ( AirflowNetworkNumOfDetOpenings > 0 ) {
-					DetOpenNum = InputProcessor::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
-					MZDZoneNum = InputProcessor::FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
+					DetOpenNum = UtilityRoutines::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompDetOpeningData );
+					MZDZoneNum = UtilityRoutines::FindItemInList( Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 					if ( MultizoneZoneData( MZDZoneNum ).SingleSidedCpType == "ADVANCED" ) {
 						if ( DetOpenNum > 0 ) {
 							AFNExtSurfaces( ExtOpenNum ).MSDNum = SrfNum;
@@ -8603,7 +8603,7 @@ namespace AirflowNetworkBalanceManager {
 							AFNExtSurfaces( ExtOpenNum ).SurfName = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).Name;
 							AFNExtSurfaces( ExtOpenNum ).ZoneNum = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).Zone;
 							AFNExtSurfaces( ExtOpenNum ).ZoneName = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName;
-							AFNExtSurfaces( ExtOpenNum ).MZDZoneNum = InputProcessor::FindItemInList( AFNExtSurfaces( ExtOpenNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
+							AFNExtSurfaces( ExtOpenNum ).MZDZoneNum = UtilityRoutines::FindItemInList( AFNExtSurfaces( ExtOpenNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 							AFNExtSurfaces( ExtOpenNum ).CompTypeNum = CompTypeNum_DOP;
 							AFNExtSurfaces( ExtOpenNum ).Height = MultizoneSurfaceData( SrfNum ).Height;
 							AFNExtSurfaces( ExtOpenNum ).Width = MultizoneSurfaceData( SrfNum ).Width;
@@ -8616,14 +8616,14 @@ namespace AirflowNetworkBalanceManager {
 						}
 					}
 				} else if ( AirflowNetworkNumOfSimOpenings > 0 ) {
-					SimOpenNum = InputProcessor::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
+					SimOpenNum = UtilityRoutines::FindItemInList( MultizoneSurfaceData( SrfNum ).OpeningName, MultizoneCompSimpleOpeningData );
 					if ( SimOpenNum > 0 ) {
 						AFNExtSurfaces( ExtOpenNum ).MSDNum = SrfNum;
 						AFNExtSurfaces( ExtOpenNum ).SurfNum = MultizoneSurfaceData( SrfNum ).SurfNum;
 						AFNExtSurfaces( ExtOpenNum ).SurfName = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).Name;
 						AFNExtSurfaces( ExtOpenNum ).ZoneNum = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).Zone;
 						AFNExtSurfaces( ExtOpenNum ).ZoneName = Surface( MultizoneSurfaceData( SrfNum ).SurfNum ).ZoneName;
-						AFNExtSurfaces( ExtOpenNum ).MZDZoneNum = InputProcessor::FindItemInList( AFNExtSurfaces( ExtOpenNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
+						AFNExtSurfaces( ExtOpenNum ).MZDZoneNum = UtilityRoutines::FindItemInList( AFNExtSurfaces( ExtOpenNum ).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName );
 						AFNExtSurfaces( ExtOpenNum ).CompTypeNum = CompTypeNum_SOP;
 						AFNExtSurfaces( ExtOpenNum ).Height = MultizoneSurfaceData( SrfNum ).Height;
 						AFNExtSurfaces( ExtOpenNum ).Width = MultizoneSurfaceData( SrfNum ).Width;
@@ -8686,7 +8686,7 @@ namespace AirflowNetworkBalanceManager {
 					WindAng = ( WindDirNum - 1 ) * 10.0;
 					IncAng = std::abs( WindAng - ZoneAng( ZnNum ) );
 					if ( std::abs( IncAng ) > 180.0 ) IncAng -= 360.0;
-					if ( InputProcessor::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
+					if ( UtilityRoutines::SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) ) {
 						if ( std::abs( IncAng ) <= 67.5 ) {
 							PiFormula( WindDirNum ) = 0.44 * sign( std::sin( 2.67 * std::abs( IncAng ) * Pi / 180.0 ), IncAng );
 						} else if ( std::abs( IncAng ) <= 180.0 ) {

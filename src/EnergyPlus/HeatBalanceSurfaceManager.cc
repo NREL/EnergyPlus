@@ -101,7 +101,7 @@
 #include <HeatBalFiniteDiffManager.hh>
 #include <HighTempRadiantSystem.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
 #include <MoistureBalanceEMPDManager.hh>
@@ -1159,10 +1159,10 @@ namespace HeatBalanceSurfaceManager {
 			}
 		}
 		// for fins and overhangs just add them explicitly since not otherwise classified
-		int totOverhangs = InputProcessor::GetNumObjectsFound( "Shading:Overhang" ) + InputProcessor::GetNumObjectsFound( "Shading:Overhang:Projection" );
+		int totOverhangs = inputProcessor->getNumObjectsFound( "Shading:Overhang" ) + inputProcessor->getNumObjectsFound( "Shading:Overhang:Projection" );
 		numSurfaces( SurfaceClass_Overhang ) = totOverhangs;
 		numExtSurfaces( SurfaceClass_Overhang ) = totOverhangs;
-		int totFins = InputProcessor::GetNumObjectsFound( "Shading:Fin" ) + InputProcessor::GetNumObjectsFound( "Shading:Fin:Projection" );
+		int totFins = inputProcessor->getNumObjectsFound( "Shading:Fin" ) + inputProcessor->getNumObjectsFound( "Shading:Fin:Projection" );
 		numSurfaces( SurfaceClass_Fin ) = totFins;
 		numExtSurfaces( SurfaceClass_Fin ) = totFins;
 		// go through all the surfaces again and this time insert the net area results

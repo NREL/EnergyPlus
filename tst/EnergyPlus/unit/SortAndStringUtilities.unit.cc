@@ -55,7 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -95,7 +95,7 @@ TEST_F( EnergyPlusFixture, SortAndStringUtilitiesTest_findItemInSortedListUnders
 	iListOfObjects.allocate(NumObjectDefs);
 	SetupAndSort(ListOfObjects, iListOfObjects);		//list is resorted
 
-	auto index = InputProcessor::FindItemInSortedList("SYSTEM NODE TEMPERATURE", ListOfObjects, NumObjectDefs);
+	auto index = UtilityRoutines::FindItemInSortedList("SYSTEM NODE TEMPERATURE", ListOfObjects, NumObjectDefs);
 
 	EXPECT_EQ(3, index);
 

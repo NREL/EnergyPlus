@@ -66,7 +66,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -192,7 +192,7 @@ namespace SolarCollectors {
 		}
 
 		if ( CompIndex == 0 ) {
-			CollectorNum = InputProcessor::FindItemInList( CompName, Collector );
+			CollectorNum = UtilityRoutines::FindItemInList( CompName, Collector );
 			if ( CollectorNum == 0 ) {
 				ShowFatalError( "SimSolarCollector: Specified solar collector not Valid =" + CompName );
 			}
@@ -304,26 +304,26 @@ namespace SolarCollectors {
 		MaxAlphas = 0;
 
 		CurrentModuleParamObject = "SolarCollectorPerformance:FlatPlate";
-		NumOfFlatPlateParam = InputProcessor::GetNumObjectsFound( CurrentModuleParamObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
+		NumOfFlatPlateParam = inputProcessor->getNumObjectsFound( CurrentModuleParamObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "SolarCollector:FlatPlate:Water";
-		NumFlatPlateUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumFlatPlateUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleParamObject = "SolarCollectorPerformance:IntegralCollectorStorage";
-		NumOfICSParam = InputProcessor::GetNumObjectsFound( CurrentModuleParamObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
+		NumOfICSParam = inputProcessor->getNumObjectsFound( CurrentModuleParamObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-		NumOfICSUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumOfICSUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -345,7 +345,7 @@ namespace SolarCollectors {
 			for ( FlatPlateParamNum = 1; FlatPlateParamNum <= NumOfFlatPlateParam; ++FlatPlateParamNum ) {
 
 				ParametersNum = FlatPlateParamNum;
-				InputProcessor::GetObjectItem( CurrentModuleParamObject, ParametersNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleParamObject, ParametersNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector module parameters name
 				GlobalNames::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
@@ -419,7 +419,7 @@ namespace SolarCollectors {
 
 				CollectorNum = FlatPlateUnitsNum;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				inputProcessor->getObjectItem( CurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 				// Collector name
 				GlobalNames::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
@@ -427,7 +427,7 @@ namespace SolarCollectors {
 				Collector( CollectorNum ).TypeNum = TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
 
 				// Get parameters object
-				ParametersNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Parameters );
+				ParametersNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Parameters );
 
 				if ( ParametersNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + CurrentModuleParamObject + " object called " + cAlphaArgs( 2 ) + " not found." );
@@ -437,7 +437,7 @@ namespace SolarCollectors {
 				}
 
 				// Get surface object
-				SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " not found." );
@@ -511,14 +511,14 @@ namespace SolarCollectors {
 
 				ParametersNum = ICSParamNum + NumOfFlatPlateParam;
 
-				InputProcessor::GetObjectItem( CurrentModuleParamObject, ICSParamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleParamObject, ICSParamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector module parameters name
 				GlobalNames::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				Parameters( ParametersNum ).Name = cAlphaArgs( 1 );
 				// NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
 				//        added
-				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "RectangularTank" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "RectangularTank" ) ) {
 					Parameters( ParametersNum ).ICSType_Num = ICSRectangularTank;
 				} else {
 					ShowSevereError( cAlphaFieldNames( 2 ) + " not found=" + cAlphaArgs( 2 ) + " in " + CurrentModuleParamObject + " =" + Parameters( ParametersNum ).Name );
@@ -593,7 +593,7 @@ namespace SolarCollectors {
 
 				CollectorNum = ICSUnitsNum + NumFlatPlateUnits;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, ICSUnitsNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, ICSUnitsNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector name
 				GlobalNames::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
@@ -603,7 +603,7 @@ namespace SolarCollectors {
 				Collector( CollectorNum ).InitICS = true;
 
 				// Get parameters object
-				ParametersNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Parameters );
+				ParametersNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Parameters );
 
 				if ( ParametersNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + CurrentModuleParamObject + " object called " + cAlphaArgs( 2 ) + " not found." );
@@ -625,7 +625,7 @@ namespace SolarCollectors {
 					Collector( CollectorNum ).AreaRatio = Collector( CollectorNum ).SideArea / Collector( CollectorNum ).Area;
 				}
 				// Get surface object
-				SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Surface " + cAlphaArgs( 3 ) + " not found." );
@@ -669,12 +669,12 @@ namespace SolarCollectors {
 				}
 
 				Collector( CollectorNum ).BCType = cAlphaArgs( 4 );
-				if ( InputProcessor::SameString( cAlphaArgs( 4 ), "AmbientAir" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "AmbientAir" ) ) {
 					Collector( CollectorNum ).OSCMName = "";
-				} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "OtherSideConditionsModel" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "OtherSideConditionsModel" ) ) {
 					Collector( CollectorNum ).OSCMName = cAlphaArgs( 5 );
 					Collector( CollectorNum ).OSCM_ON = true;
-					Found = InputProcessor::FindItemInList( Collector( CollectorNum ).OSCMName, OSCM );
+					Found = UtilityRoutines::FindItemInList( Collector( CollectorNum ).OSCMName, OSCM );
 					if ( Found == 0 ) {
 						ShowSevereError( cAlphaFieldNames( 5 ) + " not found=" + Collector( CollectorNum ).OSCMName + " in " + CurrentModuleObject + " =" + Collector( CollectorNum ).Name );
 						ErrorsFound = true;

@@ -66,7 +66,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
@@ -458,19 +458,19 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Tubular";
-		NumOfTDDPipes = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfTDDPipes = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfTDDPipes > 0 ) {
 			TDDPipe.allocate( NumOfTDDPipes );
 
 			for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Pipe name
 				TDDPipe( PipeNum ).Name = cAlphaArgs( 1 );
 
 				// Get TDD:DOME object
-				SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " not found." );
@@ -515,7 +515,7 @@ namespace DaylightingDevices {
 				}
 
 				// Get TDD:DIFFUSER object
-				SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " not found." );
@@ -574,7 +574,7 @@ namespace DaylightingDevices {
 				}
 
 				// Construction
-				TDDPipe( PipeNum ).Construction = InputProcessor::FindItemInList( cAlphaArgs( 4 ), Construct );
+				TDDPipe( PipeNum ).Construction = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), Construct );
 
 				if ( TDDPipe( PipeNum ).Construction == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Pipe construction " + cAlphaArgs( 4 ) + " not found." );
@@ -635,7 +635,7 @@ namespace DaylightingDevices {
 
 					for ( TZoneNum = 1; TZoneNum <= TDDPipe( PipeNum ).NumOfTZones; ++TZoneNum ) {
 						TZoneName = cAlphaArgs( TZoneNum + 4 );
-						TDDPipe( PipeNum ).TZone( TZoneNum ) = InputProcessor::FindItemInList( TZoneName, Zone );
+						TDDPipe( PipeNum ).TZone( TZoneNum ) = UtilityRoutines::FindItemInList( TZoneName, Zone );
 						if ( TDDPipe( PipeNum ).TZone( TZoneNum ) == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Transition zone " + TZoneName + " not found." );
 							ErrorsFound = true;
@@ -686,19 +686,19 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Shelf";
-		NumOfShelf = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfShelf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfShelf > 0 ) {
 			Shelf.allocate( NumOfShelf );
 
 			for ( ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject , ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( cCurrentModuleObject , ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Shelf name
 				Shelf( ShelfNum ).Name = cAlphaArgs( 1 );
 
 				// Get window object
-				SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " not found." );
@@ -739,7 +739,7 @@ namespace DaylightingDevices {
 
 				// Get inside shelf heat transfer surface (optional)
 				if ( cAlphaArgs( 3 ) != "" ) {
-					SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Surface );
+					SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Inside shelf " + cAlphaArgs( 3 ) + " not found." );
@@ -763,7 +763,7 @@ namespace DaylightingDevices {
 
 				// Get outside shelf attached shading surface (optional)
 				if ( cAlphaArgs( 4 ) != "" ) {
-					SurfNum = InputProcessor::FindItemInList( cAlphaArgs( 4 ), Surface );
+					SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf " + cAlphaArgs( 4 ) + " not found." );
@@ -788,7 +788,7 @@ namespace DaylightingDevices {
 
 						// Get outside shelf construction (required if outside shelf is specified)
 						if ( cAlphaArgs( 5 ) != "" ) {
-							ConstrNum = InputProcessor::FindItemInList( cAlphaArgs( 5 ), Construct );
+							ConstrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Construct );
 
 							if ( ConstrNum == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " not found." );
@@ -1319,7 +1319,7 @@ namespace DaylightingDevices {
 		// Given the TDD:DOME or TDD:DIFFUSER object number, returns TDD pipe number.
 
 		// METHODOLOGY EMPLOYED:
-		// Similar to InputProcessor::FindItemInList( defined in InputProcessor.
+		// Similar to UtilityRoutines::FindItemInList( defined in InputProcessor.
 
 		// REFERENCES: na
 		// Using/Aliasing

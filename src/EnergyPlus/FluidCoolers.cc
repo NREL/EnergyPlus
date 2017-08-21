@@ -69,7 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -223,7 +223,7 @@ namespace FluidCoolers {
 		// INITIALIZE
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			FluidCoolerNum = InputProcessor::FindItemInList( FluidCoolerName, SimpleFluidCooler );
+			FluidCoolerNum = UtilityRoutines::FindItemInList( FluidCoolerName, SimpleFluidCooler );
 			if ( FluidCoolerNum == 0 ) {
 				ShowFatalError( "SimFluidCoolers: Unit not found = " + FluidCoolerName );
 			}
@@ -334,8 +334,8 @@ namespace FluidCoolers {
 		//! LKL - still more renaming stuff to go.
 
 		// Get number of all Fluid Coolers specified in the input data file (idf)
-		NumSingleSpeedFluidCoolers = InputProcessor::GetNumObjectsFound( "FluidCooler:SingleSpeed" );
-		NumTwoSpeedFluidCoolers = InputProcessor::GetNumObjectsFound( "FluidCooler:TwoSpeed" );
+		NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound( "FluidCooler:SingleSpeed" );
+		NumTwoSpeedFluidCoolers = inputProcessor->getNumObjectsFound( "FluidCooler:TwoSpeed" );
 		NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
 		if ( NumSimpleFluidCoolers <= 0 ) ShowFatalError( "No fluid cooler objects found in input, however, a branch object has specified a fluid cooler. Search the input for fluid cooler to determine the cause for this error." );
@@ -355,7 +355,7 @@ namespace FluidCoolers {
 		cCurrentModuleObject = cFluidCooler_SingleSpeed;
 		for ( SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = SingleSpeedFluidCoolerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
@@ -402,7 +402,7 @@ namespace FluidCoolers {
 		cCurrentModuleObject = cFluidCooler_TwoSpeed;
 		for ( TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
@@ -570,14 +570,14 @@ namespace FluidCoolers {
 		}
 
 		//   Check various inputs for both the performance input methods
-		if ( InputProcessor::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
+		if ( UtilityRoutines::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
 			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA != AutoSize ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 1 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
 				ErrorsFound = true;
 			}
 		}
-		else if ( InputProcessor::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
+		else if ( UtilityRoutines::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 			if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity <= 0.0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 2 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -696,7 +696,7 @@ namespace FluidCoolers {
 			ErrorsFound = true;
 		}
 
-		if ( InputProcessor::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
+		if ( UtilityRoutines::SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
 			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA <= 0.0 && ! SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUAWasAutoSized ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 1 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -710,7 +710,7 @@ namespace FluidCoolers {
 				ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Fluid cooler UA at low fan speed must be less than the fluid cooler UA at high fan speed." );
 				ErrorsFound = true;
 			}
-		} else if ( InputProcessor::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
+		} else if ( UtilityRoutines::SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
 			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
 			if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity <= 0.0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 4 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + "= \"" + AlphArray( 4 ) + "\"." );
@@ -958,7 +958,7 @@ namespace FluidCoolers {
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -1201,7 +1201,7 @@ namespace FluidCoolers {
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, CalledFrom );
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 						ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1289,7 +1289,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1416,7 +1416,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, CalledFrom );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );

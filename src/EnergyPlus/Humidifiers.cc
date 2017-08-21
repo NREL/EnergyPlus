@@ -64,7 +64,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -187,7 +187,7 @@ namespace Humidifiers {
 
 		// Get the humidifier unit index
 		if ( CompIndex == 0 ) {
-			HumNum = InputProcessor::FindItemInList( CompName, Humidifier );
+			HumNum = UtilityRoutines::FindItemInList( CompName, Humidifier );
 			if ( HumNum == 0 ) {
 				ShowFatalError( "SimHumidifier: Unit not found=" + CompName );
 			}
@@ -288,14 +288,14 @@ namespace Humidifiers {
 		//  certain object in the input file
 
 		CurrentModuleObject = "Humidifier:Steam:Electric";
-		NumElecSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumElecSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = NumNumbers;
 		MaxAlphas = NumAlphas;
 		CurrentModuleObject = "Humidifier:Steam:Gas";
-		NumGasSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumGasSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumHumidifiers = NumElecSteamHums + NumGasSteamHums;
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -314,7 +314,7 @@ namespace Humidifiers {
 		// loop over electric steam humidifiers and load the input data
 		CurrentModuleObject = "Humidifier:Steam:Electric";
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumElecSteamHums; ++HumidifierIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = HumidifierIndex;
 			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
@@ -351,7 +351,7 @@ namespace Humidifiers {
 		// loop over gas fired steam humidifiers and load the input data
 		CurrentModuleObject = "Humidifier:Steam:Gas";
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumGasSteamHums; ++HumidifierIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = NumElecSteamHums + HumidifierIndex;
 			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );

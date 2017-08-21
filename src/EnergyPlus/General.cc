@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <General.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -63,7 +64,7 @@
 #include <DataRuntimeLanguage.hh>
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 #if defined( _WIN32 ) && _MSC_VER < 1900
@@ -95,6 +96,8 @@ namespace General {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
+	using DataHVACGlobals::HVACSystemRootFinding;
+	using DataHVACGlobals::Bisection;
 
 	// Data
 	// This module should not contain variables in the module sense as it is
@@ -119,7 +122,7 @@ namespace General {
 	// Functions
 
 	void
-	SolveRegulaFalsi(
+	SolveRoot(
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
@@ -135,6 +138,187 @@ namespace General {
 		//       AUTHOR         Michael Wetter
 		//       DATE WRITTEN   March 1999
 		//       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+		//                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Find the value of x between x0 and x1 such that f(x,Par)
+		// is equal to zero.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses the Regula Falsi (false position) method (similar to secant method)
+
+		// REFERENCES:
+		// See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+		// 2nd edition, 1992. Page 347 ff.
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// = -2: f(x0) and f(x1) have the same sign
+		// = -1: no convergence
+		// >  0: number of iterations performed
+		// optional
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		Real64 const SMALL( 1.e-10 );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 X0; // present 1st bound
+		Real64 X1; // present 2nd bound
+		Real64 XTemp; // new estimate
+		Real64 Y0; // f at X0
+		Real64 Y1; // f at X1
+		Real64 YTemp; // f at XTemp
+		Real64 DY; // DY = Y0 - Y1
+		bool Conv; // flag, true if convergence is achieved
+		bool StopMaxIte; // stop due to exceeding of maximum # of iterations
+		bool Cont; // flag, if true, continue searching
+		int NIte; // number of interations
+		int AltIte; // an accounter used for Alternation choice
+
+		X0 = X_0;
+		X1 = X_1;
+		Conv = false;
+		StopMaxIte = false;
+		Cont = true;
+		NIte = 0;
+		AltIte = 0;
+
+		Y0 = f( X0, Par );
+		Y1 = f( X1, Par );
+		// check initial values
+		if ( Y0 * Y1 > 0 ) {
+			Flag = -2;
+			XRes = X0;
+			return;
+		}
+
+		while ( Cont ) {
+
+			DY = Y0 - Y1;
+			if ( std::abs( DY ) < SMALL ) DY = SMALL;
+			// new estimation
+			switch ( HVACSystemRootFinding.HVACSystemRootSolver )
+			{
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
+				XTemp = ( X1 + X0 ) / 2.0;
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+				if ( NIte > HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+				} else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+				if ( NIte <= HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+				}
+				else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
+				if ( AltIte > HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+					if ( AltIte >= 2 * HVACSystemRootFinding.NumOfIter ) AltIte = 0;
+				} else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			default: {
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+
+			} }
+
+			YTemp = f( XTemp, Par );
+
+			++NIte;
+			++AltIte;
+
+			// check convergence
+			if ( std::abs( YTemp ) < Eps ) Conv = true;
+
+			if ( NIte > MaxIte ) StopMaxIte = true;
+
+			if ( ( ! Conv ) && ( ! StopMaxIte ) ) {
+				Cont = true;
+			} else {
+				Cont = false;
+			}
+
+			if ( Cont ) {
+
+				// reassign values (only if further iteration required)
+				if ( Y0 < 0.0 ) {
+					if ( YTemp < 0.0 ) {
+						X0 = XTemp;
+						Y0 = YTemp;
+					} else {
+						X1 = XTemp;
+						Y1 = YTemp;
+					}
+				} else {
+					if ( YTemp < 0.0 ) {
+						X1 = XTemp;
+						Y1 = YTemp;
+					} else {
+						X0 = XTemp;
+						Y0 = YTemp;
+					}
+				} // ( Y0 < 0 )
+
+			} // (Cont)
+
+		} // Cont
+
+		if ( Conv ) {
+			Flag = NIte;
+		} else {
+			Flag = -1;
+		}
+		XRes = XTemp;
+
+	}
+
+	void
+	SolveRoot(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x,Par) = 0
+		std::function< Real64( Real64 const, Array1< Real64 > const & ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1, // 2nd bound of interval that contains the solution
+		Array1< Real64 > const & Par, // array with additional parameters used for function evaluation
+		int const AlgorithmTypeNum, // ALgorithm selection
+		Real64 & XX_0, // Low bound obtained with maximum number of allowed iterations
+		Real64 & XX_1 // Hign bound obtained with maximum number of allowed iterations
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   March 1999
+		//       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+		//                      L. Gu, May 2017 - selcte an algorithm and output both bounds
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -201,10 +385,206 @@ namespace General {
 			DY = Y0 - Y1;
 			if ( std::abs( DY ) < SMALL ) DY = SMALL;
 			// new estimation
-			XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+			if ( AlgorithmTypeNum == Bisection ) {
+				// Bisection
+				XTemp = ( X1 + X0 ) / 2.0;
+			}
+			else {
+				// Regula Falsi
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+			}
 			YTemp = f( XTemp, Par );
 
 			++NIte;
+
+			// check convergence
+			if ( std::abs( YTemp ) < Eps ) Conv = true;
+
+			if ( NIte > MaxIte ) StopMaxIte = true;
+
+			if ( ( !Conv ) && ( !StopMaxIte ) ) {
+				Cont = true;
+			}
+			else {
+				Cont = false;
+			}
+
+			if ( Cont ) {
+
+				// reassign values (only if further iteration required)
+				if ( Y0 < 0.0 ) {
+					if ( YTemp < 0.0 ) {
+						X0 = XTemp;
+						Y0 = YTemp;
+					}
+					else {
+						X1 = XTemp;
+						Y1 = YTemp;
+					}
+				}
+				else {
+					if ( YTemp < 0.0 ) {
+						X1 = XTemp;
+						Y1 = YTemp;
+					}
+					else {
+						X0 = XTemp;
+						Y0 = YTemp;
+					}
+				} // ( Y0 < 0 )
+
+			} // (Cont)
+
+		} // Cont
+
+		if ( Conv ) {
+			Flag = NIte;
+		}
+		else {
+			Flag = -1;
+		}
+		XRes = XTemp;
+		XX_0 = X0;
+		XX_1 = X1;
+
+	}
+
+	void
+	SolveRoot(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x) = 0
+		std::function< Real64( Real64 const ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1 // 2nd bound of interval that contains the solution
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   March 1999
+		//       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+		//                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Find the value of x between x0 and x1 such that f(x)
+		// is equal to zero.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses the Regula Falsi (false position) method (similar to secant method)
+
+		// REFERENCES:
+		// See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+		// 2nd edition, 1992. Page 347 ff.
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// = -2: f(x0) and f(x1) have the same sign
+		// = -1: no convergence
+		// >  0: number of iterations performed
+		// optional
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		Real64 const SMALL( 1.e-10 );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 X0; // present 1st bound
+		Real64 X1; // present 2nd bound
+		Real64 XTemp; // new estimate
+		Real64 Y0; // f at X0
+		Real64 Y1; // f at X1
+		Real64 YTemp; // f at XTemp
+		Real64 DY; // DY = Y0 - Y1
+		bool Conv; // flag, true if convergence is achieved
+		bool StopMaxIte; // stop due to exceeding of maximum # of iterations
+		bool Cont; // flag, if true, continue searching
+		int NIte; // number of interations
+		int AltIte; // used for Alternation choice
+
+		static gio::Fmt OpticalFormat( "(i3,',',f10.6,',',f10.6)" ); // Format descriptor for environ stamp
+
+		static int fileNum( 0 );
+
+		X0 = X_0;
+		X1 = X_1;
+		Conv = false;
+		StopMaxIte = false;
+		Cont = true;
+		NIte = 0;
+		AltIte = 0;
+
+		Y0 = f( X0 );
+		Y1 = f( X1 );
+		// check initial values
+		if ( Y0 * Y1 > 0 ) {
+			Flag = -2;
+			XRes = X0;
+			return;
+		}
+
+		while ( Cont ) {
+
+			DY = Y0 - Y1;
+			if ( std::abs( DY ) < SMALL ) DY = SMALL;
+			// new estimation
+			switch ( HVACSystemRootFinding.HVACSystemRootSolver )
+			{
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
+				XTemp = ( X1 + X0 ) / 2.0;
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+				if ( NIte > HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+				}
+				else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+				if ( NIte <= HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+				}
+				else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
+				if ( AltIte > HVACSystemRootFinding.NumOfIter ) {
+					XTemp = ( X1 + X0 ) / 2.0;
+					if ( AltIte >= 2 * HVACSystemRootFinding.NumOfIter ) AltIte = 0;
+				}
+				else {
+					XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+				}
+				break;
+			}
+			default: {
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+
+			} }
+
+			YTemp = f( XTemp );
+
+			++NIte;
+			++AltIte;
 
 			// check convergence
 			if ( std::abs( YTemp ) < Eps ) Conv = true;
@@ -240,7 +620,15 @@ namespace General {
 
 			} // (Cont)
 
+			if ( fileNum == 0 ) {
+				fileNum = GetNewUnitNumber( );
+			}
+			if ( fileNum > 0 ) {
+				gio::write( fileNum, OpticalFormat ) << NIte << X0 << X1;
+			}
+
 		} // Cont
+
 
 		if ( Conv ) {
 			Flag = NIte;
@@ -252,14 +640,17 @@ namespace General {
 	}
 
 	void
-	SolveRegulaFalsi(
+	SolveRoot(
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
 		Real64 & XRes, // value of x that solves f(x) = 0
 		std::function< Real64( Real64 const ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
-		Real64 const X_1 // 2nd bound of interval that contains the solution
+		Real64 const X_1, // 2nd bound of interval that contains the solution
+		int const AlgorithmTypeNum, // ALgorithm selection
+		Real64 & XX_0, // Low bound obtained with maximum number of allowed iterations
+		Real64 & XX_1 // Hign bound obtained with maximum number of allowed iterations
 	)
 	{
 
@@ -267,6 +658,7 @@ namespace General {
 		//       AUTHOR         Michael Wetter
 		//       DATE WRITTEN   March 1999
 		//       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+		//                      L. Gu, May 2017 - selcte an algorithm and output both bounds
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -312,6 +704,10 @@ namespace General {
 		bool Cont; // flag, if true, continue searching
 		int NIte; // number of interations
 
+		static gio::Fmt OpticalFormat( "(i3,',',f10.6,',',f10.6)" ); // Format descriptor for environ stamp
+
+		static int fileNum( 0 );
+
 		X0 = X_0;
 		X1 = X_1;
 		Conv = false;
@@ -333,7 +729,14 @@ namespace General {
 			DY = Y0 - Y1;
 			if ( std::abs( DY ) < SMALL ) DY = SMALL;
 			// new estimation
-			XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+			if ( AlgorithmTypeNum == Bisection ) {
+				// Bisection
+				XTemp = ( X1 + X0 ) / 2.0;
+			}
+			else {
+				// Regula Falsi
+				XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+			}
 			YTemp = f( XTemp );
 
 			++NIte;
@@ -343,9 +746,10 @@ namespace General {
 
 			if ( NIte > MaxIte ) StopMaxIte = true;
 
-			if ( ( ! Conv ) && ( ! StopMaxIte ) ) {
+			if ( ( !Conv ) && ( !StopMaxIte ) ) {
 				Cont = true;
-			} else {
+			}
+			else {
 				Cont = false;
 			}
 
@@ -356,15 +760,18 @@ namespace General {
 					if ( YTemp < 0.0 ) {
 						X0 = XTemp;
 						Y0 = YTemp;
-					} else {
+					}
+					else {
 						X1 = XTemp;
 						Y1 = YTemp;
 					}
-				} else {
+				}
+				else {
 					if ( YTemp < 0.0 ) {
 						X1 = XTemp;
 						Y1 = YTemp;
-					} else {
+					}
+					else {
 						X0 = XTemp;
 						Y0 = YTemp;
 					}
@@ -372,14 +779,25 @@ namespace General {
 
 			} // (Cont)
 
+			if ( fileNum == 0 ) {
+				fileNum = GetNewUnitNumber( );
+			}
+			if ( fileNum > 0 ) {
+				gio::write( fileNum, OpticalFormat ) << NIte << X0 << X1;
+			}
+
 		} // Cont
+
 
 		if ( Conv ) {
 			Flag = NIte;
-		} else {
+		}
+		else {
 			Flag = -1;
 		}
 		XRes = XTemp;
+		XX_0 = X0;
+		XX_1 = X1;
 
 	}
 
@@ -1547,7 +1965,7 @@ namespace General {
 		int TokenMonth;
 		int TokenWeekday;
 
-		FstNum = int( InputProcessor::ProcessNumber( String, errFlag ) );
+		FstNum = int( UtilityRoutines::ProcessNumber( String, errFlag ) );
 		DateType = -1;
 		if ( ! errFlag ) {
 			// Entered single number, do inverse JDay
@@ -1681,17 +2099,17 @@ namespace General {
 			} else if ( Loop == 2 ) {
 				// Field must be Day Month or Month Day (if both numeric, mon / day)
 				InternalError = false;
-				NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
+				NumField1 = int( UtilityRoutines::ProcessNumber( Fields( 1 ), errFlag ) );
 				if ( errFlag ) {
 					// Month day, but first field is not numeric, 2nd must be
-					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField2 = int( UtilityRoutines::ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( errFlag ) {
 						ShowSevereError( "Invalid date field=" + String );
 						InternalError = true;
 					} else {
 						TokenDay = NumField2;
 					}
-					TokenMonth = InputProcessor::FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
+					TokenMonth = UtilityRoutines::FindItemInList( Fields( 1 ).substr( 0, 3 ), Months, 12 );
 					ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 					if ( ! InternalError ) {
 						DateType = 1;
@@ -1700,7 +2118,7 @@ namespace General {
 					}
 				} else {
 					// Month Day, first field was numeric, if 2nd is, then it's month<num> day<num>
-					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField2 = int( UtilityRoutines::ProcessNumber( Fields( 2 ), errFlag ) );
 					if ( ! errFlag ) {
 						TokenMonth = NumField1;
 						TokenDay = NumField2;
@@ -1712,7 +2130,7 @@ namespace General {
 						}
 					} else { // 2nd field was not numeric.  Must be Month
 						TokenDay = NumField1;
-						TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+						TokenMonth = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
 						ValidateMonthDay( String, TokenDay, TokenMonth, InternalError );
 						if ( ! InternalError ) {
 							DateType = 1;
@@ -1725,16 +2143,16 @@ namespace General {
 			} else if ( Loop == 3 ) {
 				// Field must be some combination of <num> Weekday Month (if WkDayInMonth true)
 				if ( WkDayInMonth ) {
-					NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
+					NumField1 = int( UtilityRoutines::ProcessNumber( Fields( 1 ), errFlag ) );
 					if ( ! errFlag ) { // the expected result
 						TokenDay = NumField1;
-						TokenWeekday = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
+						TokenWeekday = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 						if ( TokenWeekday == 0 ) {
-							TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
-							TokenWeekday = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
+							TokenMonth = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+							TokenWeekday = UtilityRoutines::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 						} else {
-							TokenMonth = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
+							TokenMonth = UtilityRoutines::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 							if ( TokenMonth == 0 ) InternalError = true;
 						}
 						DateType = 2;
@@ -1744,13 +2162,13 @@ namespace General {
 						if ( Fields( 1 ) == "LA" ) {
 							DateType = 3;
 							NumTokens = 3;
-							TokenWeekday = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
+							TokenWeekday = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Weekdays, 7 );
 							if ( TokenWeekday == 0 ) {
-								TokenMonth = InputProcessor::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
-								TokenWeekday = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
+								TokenMonth = UtilityRoutines::FindItemInList( Fields( 2 ).substr( 0, 3 ), Months, 12 );
+								TokenWeekday = UtilityRoutines::FindItemInList( Fields( 3 ).substr( 0, 3 ), Weekdays, 7 );
 								if ( TokenMonth == 0 || TokenWeekday == 0 ) InternalError = true;
 							} else {
-								TokenMonth = InputProcessor::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
+								TokenMonth = UtilityRoutines::FindItemInList( Fields( 3 ).substr( 0, 3 ), Months, 12 );
 								if ( TokenMonth == 0 ) InternalError = true;
 							}
 						} else { // error....
@@ -1758,9 +2176,9 @@ namespace General {
 						}
 					}
 				} else { // mm/dd/yyyy or yyyy/mm/dd
-					NumField1 = int( InputProcessor::ProcessNumber( Fields( 1 ), errFlag ) );
-					NumField2 = int( InputProcessor::ProcessNumber( Fields( 2 ), errFlag ) );
-					NumField3 = int( InputProcessor::ProcessNumber( Fields( 3 ), errFlag ) );
+					NumField1 = int( UtilityRoutines::ProcessNumber( Fields( 1 ), errFlag ) );
+					NumField2 = int( UtilityRoutines::ProcessNumber( Fields( 2 ), errFlag ) );
+					NumField3 = int( UtilityRoutines::ProcessNumber( Fields( 3 ), errFlag ) );
 					DateType = 1;
 					// error detection later..
 					if ( NumField1 > 100 ) {
@@ -2098,6 +2516,26 @@ namespace General {
 
 		return OutputString;
 
+	}
+
+	// returns the Julian date for the first, second, etc. day of week for a given month 
+	int
+	nthDayOfWeekOfMonth(
+		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
+		int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
+		int const & monthNumber // January = 1
+	)
+	{
+		// J. Glazer - August 2017
+		int firstDayOfMonth = JulianDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear );
+		int dayOfWeekForFirstDay = (DataEnvironment::RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7 ;
+		int jdatForNth;
+		if ( dayOfWeek >= dayOfWeekForFirstDay ) {
+			jdatForNth = firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay ) + 7 * ( nthTime - 1 );
+		} else {
+			jdatForNth = firstDayOfMonth + ( (dayOfWeek + 7) - dayOfWeekForFirstDay ) + 7 * ( nthTime - 1 );
+		}
+		return jdatForNth;
 	}
 
 	Real64
@@ -3043,9 +3481,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:Surfaces:List";
 
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
@@ -3086,9 +3524,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 
@@ -3118,7 +3556,7 @@ namespace General {
 				}}
 			}
 
-			RepNum = InputProcessor::GetNumSectionsFound( "Report Variable Dictionary" );
+			RepNum = inputProcessor->getNumSectionsFound( "Report Variable Dictionary" );
 			if ( RepNum > 0 ) {
 				VarDict = true;
 				VarDictOption1 = "REGULAR";
@@ -3127,9 +3565,9 @@ namespace General {
 
 			cCurrentModuleObject = "Output:VariableDictionary";
 
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				VarDict = true;
 				VarDictOption1 = cAlphaArgs( 1 );
 				VarDictOption2 = cAlphaArgs( 2 );
@@ -3137,9 +3575,9 @@ namespace General {
 			}
 
 			cCurrentModuleObject = "Output:Constructions";
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( has_prefix( cAlphaArgs( 1 ), "CONSTRUCT" ) ) {
 					Constructions = true;
 				} else if ( has_prefix( cAlphaArgs( 1 ), "MAT" ) ) {
@@ -3155,9 +3593,9 @@ namespace General {
 			}
 
 			cCurrentModuleObject = "Output:EnergyManagementSystem";
-			NumReports = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			for ( RepNum = 1; RepNum <= NumReports; ++RepNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, RepNum, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				EMSoutput = true;
 
@@ -3234,9 +3672,9 @@ namespace General {
 			}
 
 			//    cCurrentModuleObject='Output:Schedules'
-			//    NumReports=InputProcessor::GetNumObjectsFound(cCurrentModuleObject)
+			//    NumReports=inputProcessor->getNumObjectsFound(cCurrentModuleObject)
 			//    DO RepNum=1,NumReports
-			//      CALL InputProcessor::GetObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
+			//      CALL inputProcessor->getObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
 			//                     AlphaBlank=lAlphaFieldBlanks,NumBlank=lNumericFieldBlanks,  &
 			//                     AlphaFieldNames=cAlphaFieldNames,NumericFieldNames=cNumericFieldNames)
 			//      SchRpt=.TRUE.
@@ -3250,11 +3688,11 @@ namespace General {
 		// Process the Scan Request
 		DoReport = false;
 
-		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( reportName ) );
+		{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( reportName ) );
 		if ( SELECT_CASE_var == "CONSTRUCTIONS" ) {
 			if ( present( ReportKey ) ) {
-				if ( InputProcessor::SameString( ReportKey, "Constructions" ) ) DoReport = Constructions;
-				if ( InputProcessor::SameString( ReportKey, "Materials" ) ) DoReport = Materials;
+				if ( UtilityRoutines::SameString( ReportKey, "Constructions" ) ) DoReport = Constructions;
+				if ( UtilityRoutines::SameString( ReportKey, "Materials" ) ) DoReport = Materials;
 			}
 		} else if ( SELECT_CASE_var == "VIEWFACTORINFO" ) {
 			DoReport = ViewFactorInfo;
@@ -3267,7 +3705,7 @@ namespace General {
 			//     DoReport=SchRpt
 			//      IF (PRESENT(Option1)) Option1=SchRptOption
 		} else if ( SELECT_CASE_var == "SURFACES" ) {
-			{ auto const SELECT_CASE_var1( InputProcessor::MakeUPPERCase( ReportKey ) ); //Autodesk:OPTIONAL ReportKey used without PRESENT check
+			{ auto const SELECT_CASE_var1( UtilityRoutines::MakeUPPERCase( ReportKey ) ); //Autodesk:OPTIONAL ReportKey used without PRESENT check
 			if ( SELECT_CASE_var1 == "COSTINFO" ) {
 				DoReport = CostInfo;
 			} else if ( SELECT_CASE_var1 == "DXF" ) {
@@ -3365,7 +3803,7 @@ namespace General {
 			TooLong = true;
 		}
 
-		int FoundItem = InputProcessor::FindItemInList( ResultName, ItemNames, NumItems );
+		int FoundItem = UtilityRoutines::FindItemInList( ResultName, ItemNames, NumItems );
 
 		if ( FoundItem != 0 ) {
 			ShowSevereError( calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered." );
@@ -3375,6 +3813,23 @@ namespace General {
 			errFlag = true;
 		}
 
+	}
+
+	// This is from OpenStudio
+	std::vector <std::string> splitString( const std::string &string, char delimiter )
+	{
+		std::vector<std::string> results;
+		if ( !string.empty( ) ) { // Only do work if there is work to do
+			std::stringstream stream( string );
+			std::string substring;
+			while ( std::getline( stream, substring, delimiter ) ) { // Loop and fill the results vector
+				results.push_back( substring );
+			}
+			if ( *( string.end( ) - 1 ) == ',' ) { // Add an empty string if the last char is the delimiter
+				results.push_back( std::string( ) );
+			}
+		}
+		return results;
 	}
 
 } // General

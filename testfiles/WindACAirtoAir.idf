@@ -2,7 +2,7 @@
 ! Basic file description:  1 story building divided into 3 conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Window air conditioners serve each zone.
 !
-! Highlights:              Illustrates use of Window air conditioners with autosizing, using the DX coil model in Coil:Cooling:DX:VariableSpeed. 
+! Highlights:              Illustrates use of Window air conditioners with autosizing, using the DX coil model in Coil:Cooling:DX:VariableSpeed.
 !                          derived from WindACAuto.idf
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -1576,7 +1576,7 @@
     Fan:OnOff,               !- Supply Air Fan Object Type
     Zone1WindACFan,          !- Supply Air Fan Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
-    Zone1WindAC_VS_DXCoil,       !- DX Cooling Coil Name
+    Zone1WindAC_VS_DXCoil,   !- DX Cooling Coil Name
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
     BlowThrough,             !- Fan Placement
     0.001;                   !- Cooling Convergence Tolerance
@@ -1600,9 +1600,9 @@
     Zone1WindACFanOutletNode;!- Air Outlet Node Name
 
   Coil:Cooling:DX:VariableSpeed,
-    Zone1WindAC_VS_DXCoil,    !- Name
-    Zone1WindACFanOutletNode,  !- Indoor Air Inlet Node Name
-    Zone1WindACAirOutletNode,  !- Indoor Air Outlet Node Name
+    Zone1WindAC_VS_DXCoil,   !- Name
+    Zone1WindACFanOutletNode,!- Indoor Air Inlet Node Name
+    Zone1WindACAirOutletNode,!- Indoor Air Outlet Node Name
     1.0,                     !- Number of Speeds {dimensionless}
     1.0,                     !- Nominal Speed Level {dimensionless}
     AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
@@ -1613,8 +1613,9 @@
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
-    0.0,                   !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
@@ -1630,15 +1631,15 @@
     HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp4,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF;                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-   
-   Curve:Quadratic,
+
+  Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
-    1.0,                    !- Coefficient1 Constant
-    0.0,                    !- Coefficient2 x
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.5,                     !- Minimum Value of x
-    1.5;                     !- Maximum Value of x  
-   
+    1.5;                     !- Maximum Value of x
+
   Curve:Cubic,
     HPACFFF,                 !- Name
     1.0,                     !- Coefficient1 Constant
@@ -1647,7 +1648,7 @@
     0.0,                     !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
-    
+
   Curve:Biquadratic,
     HPCoolingEIRFTemp4,      !- Name
     0.0001514017,            !- Coefficient1 Constant

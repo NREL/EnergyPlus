@@ -68,7 +68,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -185,7 +185,7 @@ namespace HVACCooledBeam {
 
 		// Get the  unit index
 		if ( CompIndex == 0 ) {
-			CBNum = InputProcessor::FindItemInList( CompName, CoolBeam );
+			CBNum = UtilityRoutines::FindItemInList( CompName, CoolBeam );
 			if ( CBNum == 0 ) {
 				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + CompName );
 			}
@@ -206,6 +206,7 @@ namespace HVACCooledBeam {
 			ShowFatalError( "Cool Beam Unit not found = " + CompName );
 		}
 
+		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( CoolBeam( CBNum ).ADUNum ).TermUnitSizingNum;
 		// initialize the unit
 		InitCoolBeam( CBNum, FirstHVACIteration );
 
@@ -272,12 +273,12 @@ namespace HVACCooledBeam {
 
 		// find the number of cooled beam units
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
-		NumCB = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCB = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		// allocate the data structures
 		CoolBeam.allocate( NumCB );
 		CheckEquipName.dimension( NumCB, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		NumAlphas = 7;
 		NumNumbers = 16;
 		TotalArgs = 23;
@@ -292,17 +293,17 @@ namespace HVACCooledBeam {
 		// loop over cooled beam units; get and load the input data
 		for ( CBIndex = 1; CBIndex <= NumCB; ++CBIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CBIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, CBIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			CBNum = CBIndex;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			CoolBeam( CBNum ).Name = Alphas( 1 );
 			CoolBeam( CBNum ).UnitType = CurrentModuleObject;
 			CoolBeam( CBNum ).UnitType_Num = 1;
 			CoolBeam( CBNum ).CBType = Alphas( 3 );
-			if ( InputProcessor::SameString( CoolBeam( CBNum ).CBType, "Passive" ) ) {
+			if ( UtilityRoutines::SameString( CoolBeam( CBNum ).CBType, "Passive" ) ) {
 				CoolBeam( CBNum ).CBType_Num = Passive_Cooled_Beam;
-			} else if ( InputProcessor::SameString( CoolBeam( CBNum ).CBType, "Active" ) ) {
+			} else if ( UtilityRoutines::SameString( CoolBeam( CBNum ).CBType, "Active" ) ) {
 				CoolBeam( CBNum ).CBType_Num = Active_Cooled_Beam;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFields( 3 ) + " = " + CoolBeam( CBNum ).CBType + '.' );
@@ -354,28 +355,6 @@ namespace HVACCooledBeam {
 			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Energy [J]", CoolBeam( CBNum ).SupAirHeatingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
 			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Rate [W]", CoolBeam( CBNum ).SupAirHeatingRate, "System", "Average", CoolBeam( CBNum ).Name );
 
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( CoolBeam( CBNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = CoolBeam( CBNum ).AirInNode;
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = CoolBeam( CBNum ).AirOutNode;
-						AirNodeFound = true;
-						break;
-					}
-				}
-			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + CoolBeam( CBNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 5 ) );
-				ErrorsFound = true;
-			}
-
-		}
-
-		for ( CBNum = 1; CBNum <= NumCB; ++CBNum ) {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( CoolBeam( CBNum ).AirOutNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					CoolBeam( CBNum ).ADUNum = ADUNum;
@@ -385,8 +364,31 @@ namespace HVACCooledBeam {
 			if ( CoolBeam( CBNum ).ADUNum == 0 ) {
 				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' + CoolBeam( CBNum ).Name + "]." );
 				ShowContinueError( "...should have outlet node=" + NodeID( CoolBeam( CBNum ).AirOutNode ) );
-				//          ErrorsFound=.TRUE.
+				ErrorsFound = true;
+			} else {
+
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				AirNodeFound = false;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( CoolBeam( CBNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = CoolBeam( CBNum ).AirInNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = CoolBeam( CBNum ).AirOutNode;
+							AirDistUnit( CoolBeam( CBNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+							AirDistUnit( CoolBeam( CBNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							AirNodeFound = true;
+							break;
+						}
+					}
+				}
 			}
+			if ( ! AirNodeFound ) {
+				ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + CoolBeam( CBNum ).Name );
+				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 5 ) );
+				ErrorsFound = true;
+			}
+
 		}
 
 		Alphas.deallocate();
@@ -629,10 +631,10 @@ namespace HVACCooledBeam {
 
 		if ( CoolBeam( CBNum ).MaxAirVolFlow == AutoSize ) {
 
-			if ( CurZoneEqNum > 0 ) {
+			if ( CurTermUnitSizingNum > 0 ) {
 
 				CheckZoneSizing( CoolBeam( CBNum ).UnitType, CoolBeam( CBNum ).Name );
-				CoolBeam( CBNum ).MaxAirVolFlow = max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+				CoolBeam( CBNum ).MaxAirVolFlow = max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow );
 				if ( CoolBeam( CBNum ).MaxAirVolFlow < SmallAirVolFlow ) {
 					CoolBeam( CBNum ).MaxAirVolFlow = 0.0;
 				}
@@ -790,7 +792,7 @@ namespace HVACCooledBeam {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -868,7 +870,7 @@ namespace HVACCooledBeam {
 					Par( 4 ) = QMin;
 					Par( 5 ) = QMax;
 					ErrTolerance = 0.01;
-					SolveRegulaFalsi( ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
+					SolveRoot( ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						ShowWarningError( "Cold water control failed in cooled beam unit " + CoolBeam( CBNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating cold water mass flow rate" );

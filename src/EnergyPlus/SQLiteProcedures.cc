@@ -55,7 +55,7 @@
 #include "DataHeatBalance.hh"
 #include "DataPrecisionGlobals.hh"
 #include "DataRoomAirModel.hh"
-#include "InputProcessor.hh"
+#include "InputProcessing/InputProcessor.hh"
 #include "UtilityRoutines.hh"
 #include "General.hh"
 #include "ScheduleManager.hh"
@@ -84,7 +84,7 @@ std::unique_ptr<SQLite> sqlite;
 std::unique_ptr<SQLite> CreateSQLiteDatabase()
 {
 	try {
-		int numberOfSQLiteObjects = InputProcessor::GetNumObjectsFound("Output:SQLite");
+		int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound("Output:SQLite");
 		bool writeOutputToSQLite = false;
 		bool writeTabularDataToSQLite = false;
 
@@ -95,13 +95,13 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
 			int numNumbers;
 			int status;
 
-			InputProcessor::GetObjectItem("Output:SQLite",1,alphas,numAlphas,numbers,numNumbers,status);
+			inputProcessor->getObjectItem("Output:SQLite",1,alphas,numAlphas,numbers,numNumbers,status);
 			if ( numAlphas > 0 ) {
 				std::string option = alphas(1);
-				if ( InputProcessor::SameString(option,"SimpleAndTabular") ) {
+				if ( UtilityRoutines::SameString(option,"SimpleAndTabular") ) {
 					writeTabularDataToSQLite = true;
 					writeOutputToSQLite = true;
-				} else if ( InputProcessor::SameString(option,"Simple") ) {
+				} else if ( UtilityRoutines::SameString(option,"Simple") ) {
 					writeOutputToSQLite = true;
 				}
 			}

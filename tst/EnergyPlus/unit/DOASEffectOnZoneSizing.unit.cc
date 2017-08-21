@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 #include <ZoneEquipmentManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <DataStringGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataSizing.hh>
@@ -212,6 +212,8 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	ZoneEquipConfig( 2 ).ExhaustNode( 1 ) = 8;
 	ZoneEquipConfig( 1 ).ReturnAirNode = 0;
 	ZoneEquipConfig( 2 ).ReturnAirNode = 0;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 0;
+	ZoneEquipConfig( 2 ).NumReturnNodes = 0;
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 	ZoneEquipConfig( 2 ).ActualZoneNum = 2;
 	CalcZoneSizing( CurOverallSimDay, 1 ).DOASHighSetpoint = 14.4;

@@ -204,7 +204,10 @@
 #include <DisplayRoutines.hh>
 #include <FileSystem.hh>
 #include <FluidProperties.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/IdfParser.hh>
+#include <InputProcessing/InputValidation.hh>
+#include <InputProcessing/DataStorage.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ResultsSchema.hh>
@@ -441,10 +444,16 @@ EnergyPlusPgm( std::string const & filepath )
 	DisplayString( VerString );
 
 	try {
+<<<<<<< HEAD
 
 		InputProcessor::InitFiles();
 		InputProcessor::ProcessInput();
 		ResultsFramework::OutputSchema->setupOutputOptions();
+=======
+		EnergyPlus::inputProcessor = InputProcessor::factory();
+		EnergyPlus::inputProcessor->processInput();
+
+>>>>>>> input_processor_refactor
 		ManageSimulation();
 
 		ShowMessage( "Simulation Error Summary *************" );
@@ -453,7 +462,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 		ShowPsychrometricSummary();
 
-		InputProcessor::ReportOrphanRecordObjects();
+		EnergyPlus::inputProcessor->reportOrphanRecordObjects();
 		ReportOrphanFluids();
 		ReportOrphanSchedules();
 

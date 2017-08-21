@@ -68,7 +68,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -200,7 +200,7 @@ namespace BaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = InputProcessor::FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
+			BaseboardNum = UtilityRoutines::FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimBaseboard: Unit not found=" + EquipName );
 			}
@@ -318,7 +318,7 @@ namespace BaseboardRadiator {
 
 		cCurrentModuleObject = cCMO_BBRadiator_Water;
 
-		NumConvHWBaseboards = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumConvHWBaseboards = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// Calculate total number of baseboard units
 		NumBaseboards = NumConvHWBaseboards;
@@ -331,13 +331,13 @@ namespace BaseboardRadiator {
 			BaseboardNum = 0;
 			for ( ConvHWBaseboardNum = 1; ConvHWBaseboardNum <= NumConvHWBaseboards; ++ConvHWBaseboardNum ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames.allocate(NumNums);
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = cNumericFieldNames;
 
-				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
@@ -365,7 +365,7 @@ namespace BaseboardRadiator {
 				TestCompSet( cCMO_BBRadiator_Water, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Hot Water Nodes" );
 
 				// Determine steam baseboard radiator system heating design capacity sizing method
-				if ( InputProcessor::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity" ) ) {
 					Baseboard(BaseboardNum).HeatingCapMethod = HeatingDesignCapacity;
 					if ( !lNumericFieldBlanks(iHeatDesignCapacityNumericNum) ) {
 						Baseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
@@ -380,7 +380,7 @@ namespace BaseboardRadiator {
 						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
 					if ( !lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -401,7 +401,7 @@ namespace BaseboardRadiator {
 						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 					if ( !lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -611,7 +611,7 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -823,7 +823,7 @@ namespace BaseboardRadiator {
 						UA1 = DesCoilLoad;
 						// Invert the baseboard model: given the design inlet conditions and the design load,
 						// find the design UA.
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
+						SolveRoot( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
 						// if the numerical inversion failed, issue error messages.
 						if ( SolFla == -1 ) {
 							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
@@ -1242,7 +1242,7 @@ namespace BaseboardRadiator {
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = InputProcessor::FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
+			BaseboardNum = UtilityRoutines::FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"" );
 			}

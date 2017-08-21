@@ -67,7 +67,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -177,7 +177,7 @@ namespace BoilerSteam {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subrountine controls the boiler component simulation
+		// This subroutine controls the boiler component simulation
 
 		// METHODOLOGY EMPLOYED: na
 
@@ -207,7 +207,7 @@ namespace BoilerSteam {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			BoilerNum = InputProcessor::FindItemInList( BoilerName, Boiler );
+			BoilerNum = UtilityRoutines::FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
 				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
 			}
@@ -289,7 +289,7 @@ namespace BoilerSteam {
 
 		SteamFluidIndex = 0;
 		cCurrentModuleObject = "Boiler:Steam";
-		NumBoilers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumBoilers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBoilers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -308,8 +308,8 @@ namespace BoilerSteam {
 
 		//LOAD ARRAYS WITH CURVE FIT Boiler DATA
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			inputProcessor->getObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueBoilerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -369,6 +369,10 @@ namespace BoilerSteam {
 
 			// INPUTS from the IDF file
 			Boiler( BoilerNum ).BoilerMaxOperPress = rNumericArgs( 1 );
+			if ( Boiler( BoilerNum ).BoilerMaxOperPress < 1e5 ) {
+				ShowWarningMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
+				ShowContinueError( "Field: Maximum Operation Pressure units are Pa. Verify units." );
+			}
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			Boiler( BoilerNum ).TempUpLimitBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).NomCap = rNumericArgs( 4 );
@@ -416,6 +420,11 @@ namespace BoilerSteam {
 
 			Boiler( BoilerNum ).FluidIndex = SteamFluidIndex;
 
+			if ( NumAlphas > 4 ) {
+				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 5 );
+			} else {
+				Boiler( BoilerNum ).EndUseSubcategory = "General"; 
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -425,12 +434,12 @@ namespace BoilerSteam {
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
 			SetupOutputVariable( "Boiler Heating Rate [W]", BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Heating Energy [J]", BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
-			if ( InputProcessor::SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
+			if ( UtilityRoutines::SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			} else {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", _, "Plant" );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", Boiler( BoilerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Boiler Steam Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Steam Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Steam Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );

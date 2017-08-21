@@ -64,7 +64,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -208,7 +208,7 @@ namespace MoistureBalanceEMPDManager {
 
 		// Load the additional EMPD Material properties
 		cCurrentModuleObject = "MaterialProperty:MoisturePenetrationDepth:Settings";
-		EMPDMat = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		EMPDMat = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( EMPDMat == 0 ) {
 			ShowSevereError( "EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found." );
@@ -218,10 +218,10 @@ namespace MoistureBalanceEMPDManager {
 		for ( Loop = 1; Loop <= EMPDMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			//Load the material derived type from the input data.
-			MaterNum = InputProcessor::FindItemInList( MaterialNames( 1 ), Material );
+			MaterNum = UtilityRoutines::FindItemInList( MaterialNames( 1 ), Material );
 			if ( MaterNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 				ErrorsFound = true;

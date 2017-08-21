@@ -62,7 +62,7 @@
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -221,7 +221,7 @@ namespace ZoneDehumidifier {
 
 		// Find the correct zone dehumidifier
 		if ( CompIndex == 0 ) {
-			ZoneDehumidNum = InputProcessor::FindItemInList( CompName, ZoneDehumid );
+			ZoneDehumidNum = UtilityRoutines::FindItemInList( CompName, ZoneDehumid );
 			if ( ZoneDehumidNum == 0 ) {
 				ShowFatalError( "SimZoneDehumidifier: Unit not found= " + CompName );
 			}
@@ -312,12 +312,12 @@ namespace ZoneDehumidifier {
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max)
 		Real64 CurveVal; // Output from curve object (water removal or energy factor curves)
 
-		NumDehumidifiers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDehumidifiers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		ZoneDehumid.allocate( NumDehumidifiers );
 		CheckEquipName.dimension( NumDehumidifiers, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -328,8 +328,8 @@ namespace ZoneDehumidifier {
 
 		for ( ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, ZoneDehumidIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, ZoneDehumidIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			// A1,  \field Name
 			ZoneDehumid( ZoneDehumidIndex ).Name = Alphas( 1 );

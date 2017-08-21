@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array5D.hh>
 #include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -292,6 +293,7 @@ namespace CurveManager {
 		Array1D< TriQuadraticCurveDataStruct > Tri2ndOrder; // structure for triquadratic curve data
 		bool EMSOverrideOn; // if TRUE, then EMS is calling to override curve value
 		Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
+		bool OpticalProperty; // if TRUE, this table is used to store optical property
 		// report variables
 		Real64 CurveOutput; // curve output or result
 		Real64 CurveInput1; // curve input #1 (e.g., x or X1 variable)
@@ -350,6 +352,7 @@ namespace CurveManager {
 			Var5MaxPresent( false ),
 			EMSOverrideOn( false ),
 			EMSOverrideCurveValue( 0.0 ),
+			OpticalProperty( false ),
 			CurveOutput( 0.0 ),
 			CurveInput1( 0.0 ),
 			CurveInput2( 0.0 ),
@@ -583,6 +586,31 @@ namespace CurveManager {
 		Optional< Real64 const > Var3 = _,    // 3rd independent variable
 		Optional< Real64 const > Var4 = _,    // 4th independent variable
 		Optional< Real64 const > Var5 = _     // 5th independent variable
+	);
+
+	int
+	GetCurveInterpolationMethodNum( int const CurveIndex ); // index of curve in curve array
+
+	void
+	ReadTwoVarTableDataFromFile(
+		int const CurveNum,
+		std::string & FileName,
+		int & lineNum
+	);
+
+	void
+	SetSameIndeVariableValues(
+		int const TransCurveIndex,
+		int const FRefleCurveIndex,
+		int const BRefleCurveIndex
+	);
+
+	void
+	SetCommonIncidentAngles(
+		int const ConstrNum,  // Construction number
+		int const NGlass,     // The number of glass layers in the construction with index = ConstrNum
+		int & TotalIPhi,      // The number of incident angles
+		Array1A_int const Tables // Store construction layer number for SpectralAndAngleGlassLayer glass only. Otherwise = 0 for other layers.
 	);
 
 	//=================================================================================================!

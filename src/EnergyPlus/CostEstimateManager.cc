@@ -61,7 +61,7 @@
 #include <DataSurfaces.hh>
 #include <DXCoils.hh>
 #include <HeatingCoils.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <PlantChillers.hh>
 #include <UtilityRoutines.hh>
 
@@ -193,7 +193,7 @@ namespace CostEstimateManager {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 
-		NumLineItems = InputProcessor::GetNumObjectsFound( "ComponentCost:LineItem" );
+		NumLineItems = inputProcessor->getNumObjectsFound( "ComponentCost:LineItem" );
 
 		if ( NumLineItems == 0 ) {
 			DoCostEstimate = false;
@@ -210,7 +210,7 @@ namespace CostEstimateManager {
 		cCurrentModuleObject = "ComponentCost:LineItem";
 
 		for ( Item = 1; Item <= NumLineItems; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			CostLineItem( Item ).LineName = cAlphaArgs( 1 );
 			CostLineItem( Item ).LineType = cAlphaArgs( 2 );
 			CostLineItem( Item ).ParentObjType = cAlphaArgs( 3 );
@@ -236,9 +236,9 @@ namespace CostEstimateManager {
 		//most input error checking to be performed later within Case construct in Calc routine.
 
 		cCurrentModuleObject = "ComponentCost:Adjustments";
-		NumCostAdjust = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumCostAdjust = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumCostAdjust == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			CurntBldg.MiscCostperSqMeter = rNumericArgs( 1 );
 			CurntBldg.DesignFeeFrac = rNumericArgs( 2 );
 			CurntBldg.ContractorFeeFrac = rNumericArgs( 3 );
@@ -253,9 +253,9 @@ namespace CostEstimateManager {
 		}
 
 		cCurrentModuleObject = "ComponentCost:Reference";
-		NumRefAdjust = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumRefAdjust = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumRefAdjust == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 			RefrncBldg.LineItemTot = rNumericArgs( 1 );
 			RefrncBldg.MiscCostperSqMeter = rNumericArgs( 2 );
 			RefrncBldg.DesignFeeFrac = rNumericArgs( 3 );
@@ -345,7 +345,7 @@ namespace CostEstimateManager {
 				}
 
 				ThisConstructStr = CostLineItem( Item ).ParentObjName;
-				ThisConstructID = InputProcessor::FindItem( ThisConstructStr, Construct );
+				ThisConstructID = UtilityRoutines::FindItem( ThisConstructStr, Construct );
 				if ( ThisConstructID == 0 ) { // do any surfaces have the specified construction? If not issue warning.
 					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\" Construction=\"" + CostLineItem( Item ).ParentObjName + "\", no surfaces have the Construction specified" );
 					ShowContinueError( "No costs will be calculated for this Construction." );
@@ -378,7 +378,7 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
-					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
+					thisCoil = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
 					if ( thisCoil == 0 ) {
 						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX, invalid coil specified" );
 						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
@@ -411,7 +411,7 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
-					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
+					thisCoil = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
 					if ( thisCoil == 0 ) {
 						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, invalid coil specified" );
 						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
@@ -424,7 +424,7 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 				}
 
-				thisChil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
+				thisChil = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( thisChil == 0 ) {
 					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Chiller:Electric, invalid chiller specified." );
 					ShowContinueError( "Chiller Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
@@ -439,7 +439,7 @@ namespace CostEstimateManager {
 					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Daylighting:Controls, need to specify a Reference Object Name" );
 					ErrorsFound = true;
 				} else {
-					ThisZoneID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Zone );
+					ThisZoneID = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, Zone );
 					if ( ThisZoneID > 0 ) {
 						CostLineItem( Item ).Qty = ZoneDaylight( ThisZoneID ).TotalDaylRefPoints;
 					} else {
@@ -451,9 +451,9 @@ namespace CostEstimateManager {
 
 			} else if ( SELECT_CASE_var == "SHADING:ZONE:DETAILED" ) {
 				if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisSurfID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Surface );
+					ThisSurfID = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, Surface );
 					if ( ThisSurfID > 0 ) {
-						ThisZoneID = InputProcessor::FindItem( Surface( ThisSurfID ).ZoneName, Zone );
+						ThisZoneID = UtilityRoutines::FindItem( Surface( ThisSurfID ).ZoneName, Zone );
 						if ( ThisZoneID == 0 ) {
 							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Shading:Zone:Detailed, need to specify a valid zone name" );
 							ShowContinueError( "Zone specified=\"" + Surface( ThisSurfID ).ZoneName + "\"." );
@@ -478,7 +478,7 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						ThisZoneID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Zone );
+						ThisZoneID = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, Zone );
 						if ( ThisZoneID == 0 ) {
 							ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Lights, need to specify a valid zone name" );
 							ShowContinueError( "Zone specified=\"" + CostLineItem( Item ).ParentObjName + "\"." );
@@ -494,9 +494,9 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						thisPV = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, PVarray );
+						thisPV = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, PVarray );
 						if ( thisPV > 0 ) {
-							ThisZoneID = InputProcessor::FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
+							ThisZoneID = UtilityRoutines::FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
 							if ( ThisZoneID == 0 ) {
 								Multipliers = 1.0;
 							} else {
@@ -593,7 +593,7 @@ namespace CostEstimateManager {
 			} else if ( SELECT_CASE_var == "CONSTRUCTION" ) {
 
 				ThisConstructStr = CostLineItem( Item ).ParentObjName;
-				ThisConstructID = InputProcessor::FindItem( ThisConstructStr, Construct );
+				ThisConstructID = UtilityRoutines::FindItem( ThisConstructStr, Construct );
 				// need to determine unique surfacs... some surfaces are shared by zones and hence doubled
 				uniqueSurfMask.dimension( TotSurfaces, true ); //init to true and change duplicates to false
 				SurfMultipleARR.dimension( TotSurfaces, 1.0 );
@@ -632,7 +632,7 @@ namespace CostEstimateManager {
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
+					thisCoil = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, DXCoil );
 				}
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
@@ -682,7 +682,7 @@ namespace CostEstimateManager {
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
+					thisCoil = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
 				}
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
@@ -726,7 +726,7 @@ namespace CostEstimateManager {
 				}
 
 			} else if ( SELECT_CASE_var == "CHILLER:ELECTRIC" ) {
-				thisChil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
+				thisChil = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( ( thisChil > 0 ) && ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) ) {
 					CostLineItem( Item ).Qty = ElectricChiller( thisChil ).Base.NomCap / 1000.0;
 					CostLineItem( Item ).Units = "kW (tot cool cap.)";
@@ -753,7 +753,7 @@ namespace CostEstimateManager {
 					WildcardObjNames = true;
 					CostLineItem( Item ).Qty = sum( ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints );
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisZoneID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Zone );
+					ThisZoneID = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, Zone );
 					if ( ThisZoneID > 0 ) {
 						CostLineItem( Item ).Qty = ZoneDaylight( ThisZoneID ).TotalDaylRefPoints;
 					}
@@ -765,9 +765,9 @@ namespace CostEstimateManager {
 
 			} else if ( SELECT_CASE_var == "SHADING:ZONE:DETAILED" ) {
 				if ( CostLineItem( Item ).ParentObjName != "" ) {
-					ThisSurfID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Surface );
+					ThisSurfID = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, Surface );
 					if ( ThisSurfID > 0 ) {
-						ThisZoneID = InputProcessor::FindItem( Surface( ThisSurfID ).ZoneName, Zone );
+						ThisZoneID = UtilityRoutines::FindItem( Surface( ThisSurfID ).ZoneName, Zone );
 						if ( ThisZoneID > 0 ) {
 							CostLineItem( Item ).Qty = Surface( ThisSurfID ).Area * Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier;
 							CostLineItem( Item ).Units = "m2";
@@ -788,7 +788,7 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						ThisZoneID = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, Zone );
+						ThisZoneID = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, Zone );
 						if ( ThisZoneID > 0 ) {
 							Real64 Qty( 0.0 ); for ( auto const & e : Lights ) if ( e.ZonePtr == ThisZoneID ) Qty += e.DesignLevel;
 							CostLineItem( Item ).Qty = ( Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier / 1000.0 ) * Qty; // this handles more than one light object per zone.
@@ -803,9 +803,9 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap != 0.0 ) {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
-						thisPV = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, PVarray );
+						thisPV = UtilityRoutines::FindItem( CostLineItem( Item ).ParentObjName, PVarray );
 						if ( thisPV > 0 ) {
-							ThisZoneID = InputProcessor::FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
+							ThisZoneID = UtilityRoutines::FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone );
 							if ( ThisZoneID == 0 ) {
 								Multipliers = 1.0;
 							} else {

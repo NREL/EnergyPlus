@@ -70,7 +70,7 @@
 #include <DataSystemVariables.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -553,7 +553,7 @@ namespace RuntimeLanguageProcessor {
 			} else {
 				Remainder = stripped( Line.substr( Pos + 1 ) );
 			}
-			//    Keyword = InputProcessor::MakeUPPERCase(Line(1:Pos-1))
+			//    Keyword = UtilityRoutines::MakeUPPERCase(Line(1:Pos-1))
 			Keyword = Line.substr( 0, Pos );
 
 			{ auto const SELECT_CASE_var( Keyword );
@@ -599,8 +599,8 @@ namespace RuntimeLanguageProcessor {
 				} else {
 					Pos = scan( Remainder, ' ' );
 					if ( Pos == std::string::npos ) Pos = Remainder.length();
-					Variable = InputProcessor::MakeUPPERCase( stripped( Remainder.substr( 0, Pos ) ) ); // really the subroutine, or reference to instruction set
-					StackNum2 = InputProcessor::FindItemInList( Variable, ErlStack );
+					Variable = UtilityRoutines::MakeUPPERCase( stripped( Remainder.substr( 0, Pos ) ) ); // really the subroutine, or reference to instruction set
+					StackNum2 = UtilityRoutines::FindItemInList( Variable, ErlStack );
 					if ( StackNum2 == 0 ) {
 						AddError( StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction." );
 					} else {
@@ -1300,7 +1300,7 @@ namespace RuntimeLanguageProcessor {
 					Token( NumTokens ).Type = TokenNumber;
 					Token( NumTokens ).String = StringToken;
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "Number=\"" + StringToken + "\"";
-					Token( NumTokens ).Number = InputProcessor::ProcessNumber( StringToken, ErrorFlag );
+					Token( NumTokens ).Number = UtilityRoutines::ProcessNumber( StringToken, ErrorFlag );
 					if ( DeveloperFlag && ErrorFlag ) gio::write( OutputFileDebug, fmtA ) << "Numeric error flagged";
 					if ( MinusFound ) {
 						Token( NumTokens ).Number = -Token( NumTokens ).Number;
@@ -1420,267 +1420,267 @@ namespace RuntimeLanguageProcessor {
 					// next check for builtin functions signaled by "@"
 				} else if ( String[ Pos ] == '@' ) {
 
-					if ( InputProcessor::SameString( String.substr( Pos, 6 ), "@Round" ) ) {
+					if ( UtilityRoutines::SameString( String.substr( Pos, 6 ), "@Round" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 6 ) + "\"";
 						Token( NumTokens ).Operator = FuncRound;
 						Token( NumTokens ).String = String.substr( Pos, 6 );
 						Pos += 5;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 4 ), "@Mod" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 4 ), "@Mod" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMod;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 4 ), "@Sin" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 4 ), "@Sin" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncSin;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 4 ), "@Cos" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 4 ), "@Cos" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncCos;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 7 ), "@ArcCos" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 7 ), "@ArcCos" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncArcCos;
 						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 7 ), "@ArcSin" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 7 ), "@ArcSin" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncArcSin;
 						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 9 ), "@DegToRad" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 9 ), "@DegToRad" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncDegToRad;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 9 ), "@RadToDeg" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 9 ), "@RadToDeg" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncRadToDeg;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 4 ), "@Exp" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 4 ), "@Exp" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncExp;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 3 ), "@Ln" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 3 ), "@Ln" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 3 ) + "\"";
 						Token( NumTokens ).Operator = FuncLn;
 						Token( NumTokens ).String = String.substr( Pos, 3 );
 						Pos += 2;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 4 ), "@Max" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 4 ), "@Max" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMax;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 4 ), "@Min" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 4 ), "@Min" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMin;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 4 ), "@Abs" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 4 ), "@Abs" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncABS;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 14 ), "@RANDOMUNIFORM" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 14 ), "@RANDOMUNIFORM" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 14 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandU;
 						Token( NumTokens ).String = String.substr( Pos, 14 );
 						Pos += 13;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 13 ), "@RANDOMNORMAL" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 13 ), "@RANDOMNORMAL" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandG;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 11 ), "@SEEDRANDOM" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 11 ), "@SEEDRANDOM" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandSeed;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 15 ), "@RhoAirFnPbTdbW" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 15 ), "@RhoAirFnPbTdbW" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 15 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhoAirFnPbTdbW;
 						Token( NumTokens ).String = String.substr( Pos, 15 );
 						Pos += 14;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 12 ), "@CpAirFnWTdb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 12 ), "@CpAirFnWTdb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpAirFnWTdb;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 13 ), "@HfgAirFnWTdb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 13 ), "@HfgAirFnWTdb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncHfgAirFnWTdb;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 12 ), "@HgAirFnWTdb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 12 ), "@HgAirFnWTdb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncHgAirFnWTdb;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 14 ), "@TdpFnTdbTwbPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 14 ), "@TdpFnTdbTwbPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 14 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdpFnTdbTwbPb;
 						Token( NumTokens ).String = String.substr( Pos, 14 );
 						Pos += 13;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 9 ), "@TdpFnWPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 9 ), "@TdpFnWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdpFnWPb;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 8 ), "@HFnTdbW" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 8 ), "@HFnTdbW" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncHFnTdbW;
 						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 11 ), "@HFnTdbRhPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 11 ), "@HFnTdbRhPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncHFnTdbRhPb;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 8 ), "@TdbFnHW" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 8 ), "@TdbFnHW" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdbFnHW;
 						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 18 ), "@RhovFnTdbRhLBnd0C" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 18 ), "@RhovFnTdbRhLBnd0C" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbRhLBnd0C;
 						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 12 ), "@RhovFnTdbRh" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 12 ), "@RhovFnTdbRh" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbRh;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 13 ), "@RhovFnTdbWPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 13 ), "@RhovFnTdbWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 18 ), "@RhFnTdbRhovLBnd0C" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 18 ), "@RhFnTdbRhovLBnd0C" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbRhovLBnd0C;
 						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 12 ), "@RhFnTdbRhov" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 12 ), "@RhFnTdbRhov" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbRhov;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 11 ), "@RhFnTdbWPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 11 ), "@RhFnTdbWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 12 ), "@TwbFnTdbWPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 12 ), "@TwbFnTdbWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncTwbFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 10 ), "@VFnTdbWPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 10 ), "@VFnTdbWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 10 ) + "\"";
 						Token( NumTokens ).Operator = FuncVFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 10 );
 						Pos += 9;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 9 ), "@WFnTdpPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 9 ), "@WFnTdpPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdpPb;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 8 ), "@WFnTdbH" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 8 ), "@WFnTdbH" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbH;
 						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 12 ), "@WFnTdbTwbPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 12 ), "@WFnTdbTwbPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbTwbPb;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 11 ), "@WFnTdbRhPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 11 ), "@WFnTdbRhPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbRhPb;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 11 ), "@PsatFnTemp" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 11 ), "@PsatFnTemp" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncPsatFnTemp;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 10 ), "@TsatFnHPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 10 ), "@TsatFnHPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 10 ) + "\"";
 						Token( NumTokens ).Operator = FuncTsatFnHPb;
 						Token( NumTokens ).String = String.substr( Pos, 10 );
 						Pos += 9;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 9 ), "@TsatFnPb" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 9 ), "@TsatFnPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTsatFnPb;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 5 ), "@CpCW" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 5 ), "@CpCW" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 5 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpCW;
 						Token( NumTokens ).String = String.substr( Pos, 5 );
 						Pos += 4;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 5 ), "@CpHW" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 5 ), "@CpHW" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 5 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpHW;
 						Token( NumTokens ).String = String.substr( Pos, 5 );
 						Pos += 4;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 7 ), "@RhoH2O" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 7 ), "@RhoH2O" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhoH2O;
 						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 12 ), "@FATALHALTEP" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 12 ), "@FATALHALTEP" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncFatalHaltEp;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 13 ), "@SEVEREWARNEP" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 13 ), "@SEVEREWARNEP" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncSevereWarnEp;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 7 ), "@WARNEP" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 7 ), "@WARNEP" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncWarnEp;
 						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 11 ), "@TRENDVALUE" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 11 ), "@TRENDVALUE" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendValue;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 13 ), "@TRENDAVERAGE" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 13 ), "@TRENDAVERAGE" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendAverage;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 9 ), "@TRENDMAX" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 9 ), "@TRENDMAX" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendMax;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 9 ), "@TRENDMIN" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 9 ), "@TRENDMIN" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendMin;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 15 ), "@TRENDDIRECTION" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 15 ), "@TRENDDIRECTION" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 15 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendDirection;
 						Token( NumTokens ).String = String.substr( Pos, 15 );
 						Pos += 14;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 9 ), "@TRENDSUM" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 9 ), "@TRENDSUM" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendSum;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
-					} else if ( InputProcessor::SameString( String.substr( Pos, 11 ), "@CURVEVALUE" ) ) {
+					} else if ( UtilityRoutines::SameString( String.substr( Pos, 11 ), "@CURVEVALUE" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncCurveValue;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
@@ -2695,67 +2695,67 @@ namespace RuntimeLanguageProcessor {
 			GetInput = false;
 
 			cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = NumNums;
 			MaxNumAlphas = NumAlphas;
 			cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:Program";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "ExternalInterface:Variable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "ExternalInterface:Actuator";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-			InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 			MaxNumNumbers = max(MaxNumNumbers, NumNums);
 			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-			InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 			MaxNumNumbers = max(MaxNumNumbers, NumNums);
 			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-			InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 			MaxNumNumbers = max(MaxNumNumbers, NumNums);
 			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-			InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+			inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 			MaxNumNumbers = max(MaxNumNumbers, NumNums);
 			MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 			//  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
-			//  CALL InputProcessor::GetObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
+			//  CALL inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
 			//  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
 			//  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
 			cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 			cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 			MaxNumNumbers = max( MaxNumNumbers, NumNums );
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
@@ -2779,19 +2779,19 @@ namespace RuntimeLanguageProcessor {
 					// name of the module object, and add an offset for the variable number
 					// This is done in the following IF/THEN section.
 					if ( GlobalNum <= NumUserGlobalVariables ) {
-						InputProcessor::GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
+						inputProcessor->getObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
 							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
 						cCurrentModuleObject = "ExternalInterface:Variable";
-						InputProcessor::GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
+						inputProcessor->getObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
 							rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-						InputProcessor::GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
+						inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
 					}
@@ -2801,7 +2801,7 @@ namespace RuntimeLanguageProcessor {
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-						InputProcessor::GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
+						inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
 							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 					}
@@ -2846,11 +2846,11 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-			NumEMSCurveIndices = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumEMSCurveIndices = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumEMSCurveIndices > 0 ) {
 				CurveIndexVariableNums.dimension( NumEMSCurveIndices, 0 );
 				for ( loop = 1; loop <= NumEMSCurveIndices; ++loop ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					// check if variable name is unique and well formed
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
@@ -2895,11 +2895,11 @@ namespace RuntimeLanguageProcessor {
 			} // NumEMSCurveIndices > 0
 
 			cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-			NumEMSConstructionIndices = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumEMSConstructionIndices = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumEMSConstructionIndices > 0 ) {
 				ConstructionIndexVariableNums.dimension( NumEMSConstructionIndices, 0 );
 				for ( loop = 1; loop <= NumEMSConstructionIndices; ++loop ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					// check if variable name is unique and well formed
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
@@ -2925,7 +2925,7 @@ namespace RuntimeLanguageProcessor {
 						continue;
 					}
 
-					ConstructNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Construct );
+					ConstructNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 					if ( ConstructNum == 0 ) {
 						if ( lAlphaFieldBlanks( 2 ) ) {
@@ -2953,7 +2953,7 @@ namespace RuntimeLanguageProcessor {
 			if ( NumErlPrograms > 0 ) {
 				cCurrentModuleObject = "EnergyManagementSystem:Program";
 				for ( StackNum = 1; StackNum <= NumErlPrograms; ++StackNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Programs", errFlag, ErrorsFound );
@@ -2973,7 +2973,7 @@ namespace RuntimeLanguageProcessor {
 			if ( NumErlSubroutines > 0 ) {
 				cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
 				for ( StackNum = NumErlPrograms + 1; StackNum <= NumErlStacks; ++StackNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum - NumErlPrograms, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, StackNum - NumErlPrograms, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Subroutines", errFlag, ErrorsFound );
@@ -2991,12 +2991,12 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
-			NumErlTrendVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumErlTrendVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumErlTrendVariables > 0 ) {
 				TrendVariable.allocate( NumErlTrendVariables );
 				for ( TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+					inputProcessor->getObjectItem( cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 					if ( ! errFlag ) {
@@ -3077,7 +3077,7 @@ namespace RuntimeLanguageProcessor {
 			if ( NumEMSOutputVariables > 0 ) {
 				cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
 				for ( RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables; ++RuntimeReportVarNum ) {
-					InputProcessor::GetObjectItem( cCurrentModuleObject, RuntimeReportVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, RuntimeReportVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					lbracket = index( cAlphaArgs( 1 ), '[' );
@@ -3210,7 +3210,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
 				for ( loop = 1; loop <= NumEMSMeteredOutputVariables; ++loop ) {
 					RuntimeReportVarNum = NumEMSOutputVariables + loop;
-					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
@@ -3737,7 +3737,7 @@ namespace RuntimeLanguageProcessor {
 
 		// FLOW:
 		Found = false;
-		std::string const UppercaseName = InputProcessor::MakeUPPERCase( VariableName );
+		std::string const UppercaseName = UtilityRoutines::MakeUPPERCase( VariableName );
 
 		// check in ErlVariables
 		for ( VariableNum = 1; VariableNum <= NumErlVariables; ++VariableNum ) {
@@ -3795,7 +3795,7 @@ namespace RuntimeLanguageProcessor {
 
 			// Add the new variable
 			VariableNum = NumErlVariables;
-			ErlVariable( VariableNum ).Name = InputProcessor::MakeUPPERCase( VariableName );
+			ErlVariable( VariableNum ).Name = UtilityRoutines::MakeUPPERCase( VariableName );
 			ErlVariable( VariableNum ).StackNum = StackNum;
 			ErlVariable( VariableNum ).Value.Type = ValueNumber; // ErlVariable values are numbers
 		}

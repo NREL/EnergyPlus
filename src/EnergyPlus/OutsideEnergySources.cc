@@ -65,7 +65,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <ReportSizingManager.hh>
@@ -177,7 +177,7 @@ namespace OutsideEnergySources {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			EqNum = InputProcessor::FindItemInList( EquipName, EnergySource );
+			EqNum = UtilityRoutines::FindItemInList( EquipName, EnergySource );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );
 			}
@@ -255,9 +255,9 @@ namespace OutsideEnergySources {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "DistrictHeating";
-		NumDistrictUnitsHeat = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "DistrictCooling";
-		NumDistrictUnitsCool = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumDistrictUnitsCool = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
 
 		if ( allocated( EnergySource ) ) return;
@@ -271,7 +271,7 @@ namespace OutsideEnergySources {
 		EnergySourceNum = 0;
 		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsHeat; ++IndexCounter ) {
 			++EnergySourceNum;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
 				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
@@ -328,7 +328,7 @@ namespace OutsideEnergySources {
 		EnergySourceNum = NumDistrictUnitsHeat; //To initialize counter
 		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsCool; ++IndexCounter ) {
 			++EnergySourceNum;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
 				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );

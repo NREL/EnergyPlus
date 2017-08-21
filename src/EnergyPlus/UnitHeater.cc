@@ -69,7 +69,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -218,7 +218,7 @@ namespace UnitHeater {
 
 		// Find the correct Unit Heater Equipment
 		if ( CompIndex == 0 ) {
-			UnitHeatNum = InputProcessor::FindItemInList( CompName, UnitHeat );
+			UnitHeatNum = UtilityRoutines::FindItemInList( CompName, UnitHeat );
 			if ( UnitHeatNum == 0 ) {
 				ShowFatalError( "SimUnitHeater: Unit not found=" + CompName );
 			}
@@ -322,8 +322,8 @@ namespace UnitHeater {
 
 		// Figure out how many unit heaters there are in the input file
 		CurrentModuleObject = cMO_UnitHeater;
-		NumOfUnitHeats = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumOfUnitHeats = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -342,12 +342,12 @@ namespace UnitHeater {
 
 		for ( UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum ) { // Begin looping over all of the unit heaters found in the input file...
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, UnitHeatNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, UnitHeatNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames.allocate( NumNumbers );
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = "";
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = cNumericFields;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitHeat( UnitHeatNum ).Name = Alphas( 1 );
 			UnitHeat( UnitHeatNum ).SchedName = Alphas( 2 );
@@ -377,7 +377,7 @@ namespace UnitHeater {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
+				if ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
 					GetFanType( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).FanType_Num, errFlag, CurrentModuleObject, UnitHeat( UnitHeatNum ).Name );
 
 					{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).FanType_Num );
@@ -415,7 +415,7 @@ namespace UnitHeater {
 						}
 						UnitHeat( UnitHeatNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag );
 					}
-				} else if ( InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
+				} else if ( UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
 					UnitHeat( UnitHeatNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitHeat( UnitHeatNum ).FanName ) ); // call constructor
 					UnitHeat( UnitHeatNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitHeat( UnitHeatNum ).FanName ); //zero-based
@@ -512,11 +512,11 @@ namespace UnitHeater {
 			}
 
 			UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating = Alphas( 10 );
-			if ( ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
+			if ( ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
 				ErrorsFound = true;
 				ShowSevereError( "Illegal " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + '=' + UnitHeat( UnitHeatNum ).Name );
-			} else if ( InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
+			} else if ( UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
 				UnitHeat( UnitHeatNum ).FanOffNoHeating = true;
 			}
 
@@ -537,7 +537,7 @@ namespace UnitHeater {
 
 			UnitHeat( UnitHeatNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 12 )) {
-				UnitHeat( UnitHeatNum ).HVACSizingIndex = InputProcessor::FindItemInList( Alphas( 12 ), ZoneHVACSizing );
+				UnitHeat( UnitHeatNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 12 ), ZoneHVACSizing );
 				if (UnitHeat( UnitHeatNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 12 ) + " = " + Alphas( 12 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
@@ -770,7 +770,7 @@ namespace UnitHeater {
 		InNode = UnitHeat( UnitHeatNum ).AirInNode;
 		OutNode = UnitHeat( UnitHeatNum ).AirOutNode;
 
-		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired; // zone load needed
+		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP; // zone load needed
 		if ( UnitHeat( UnitHeatNum ).FanSchedPtr > 0 ) {
 			if ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).FanSchedPtr ) == 0.0 && UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff ) {
 				UnitHeat( UnitHeatNum ).OpMode = CycFanCycCoil;
@@ -788,7 +788,7 @@ namespace UnitHeater {
 		SetMassFlowRateToZero = false;
 		if ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).SchedPtr ) > 0 ) {
 			if ( ( GetCurrentScheduleValue( UnitHeat( UnitHeatNum ).FanAvailSchedPtr ) > 0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) {
-				if ( UnitHeat( UnitHeatNum ).FanOffNoHeating && ( ( ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired < SmallLoad ) || ( CurDeadBandOrSetback( ZoneNum ) ) ) ) {
+				if ( UnitHeat( UnitHeatNum ).FanOffNoHeating && ( ( ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP < SmallLoad ) || ( CurDeadBandOrSetback( ZoneNum ) ) ) ) {
 					SetMassFlowRateToZero = true;
 				}
 			} else {
@@ -1243,7 +1243,7 @@ namespace UnitHeater {
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using DataZoneEquipment::UnitHeater_Num;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -1416,7 +1416,7 @@ namespace UnitHeater {
 						if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 						Par( 3 ) = double( UnitHeat( UnitHeatNum ).OpMode );
 						// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-						SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitHeaterResidual, 0.0, 1.0, Par );
+						SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitHeaterResidual, 0.0, 1.0, Par );
 					}
 				}
 
@@ -1696,7 +1696,7 @@ namespace UnitHeater {
 		// To calculate the part-load ratio for the unit heater
 
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 
 		// REFERENCES:
 		// na

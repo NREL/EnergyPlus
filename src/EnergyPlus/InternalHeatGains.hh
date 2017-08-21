@@ -154,7 +154,8 @@ namespace InternalHeatGains {
 	void
 	SumAllReturnAirConvectionGains(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumReturnAirGainRate
+		Real64 & SumReturnAirGainRate,
+		int const ReturnNodeNum // return air node number
 	);
 
 	void
@@ -193,7 +194,8 @@ namespace InternalHeatGains {
 	void
 	SumAllReturnAirLatentGains(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumRetAirLatentGainRate
+		Real64 & SumRetAirLatentGainRate,
+		int const ReturnNodeNum // return air node number
 	);
 
 	void

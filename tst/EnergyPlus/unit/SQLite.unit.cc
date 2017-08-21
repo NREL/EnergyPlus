@@ -55,18 +55,18 @@
 namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_sqliteWriteMessage ) {
-		sqlite_test->sqliteWriteMessage( "" );
+		EnergyPlus::sqlite->sqliteWriteMessage( "" );
 		EXPECT_EQ("SQLite3 message, \n", ss->str());
 		ss->str(std::string());
-		sqlite_test->sqliteWriteMessage("test message");
+		EnergyPlus::sqlite->sqliteWriteMessage("test message");
 		EXPECT_EQ("SQLite3 message, test message\n", ss->str());
 		ss->str(std::string());
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_initializeIndexes ) {
-		sqlite_test->sqliteBegin();
-		sqlite_test->initializeIndexes();
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->initializeIndexes();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		EXPECT_TRUE(indexExists("rddMTR"));
 		EXPECT_TRUE(indexExists("redRD"));
@@ -76,16 +76,16 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_simulationRecords ) {
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// There needs to be a simulation record otherwise updateSQLiteSimulationRecord will fail
-		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-		sqlite_test->createSQLiteSimulationsRecord( 2, "EnergyPlus Version", "Current Time" );
-		sqlite_test->createSQLiteSimulationsRecord( 3, "EnergyPlus Version", "Current Time" );
-		sqlite_test->updateSQLiteSimulationRecord( 1, 6 );
-		sqlite_test->updateSQLiteSimulationRecord( true, false, 2 );
-		sqlite_test->updateSQLiteSimulationRecord( true, true, 3 );
+		EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+		EnergyPlus::sqlite->createSQLiteSimulationsRecord( 2, "EnergyPlus Version", "Current Time" );
+		EnergyPlus::sqlite->createSQLiteSimulationsRecord( 3, "EnergyPlus Version", "Current Time" );
+		EnergyPlus::sqlite->updateSQLiteSimulationRecord( 1, 6 );
+		EnergyPlus::sqlite->updateSQLiteSimulationRecord( true, false, 2 );
+		EnergyPlus::sqlite->updateSQLiteSimulationRecord( true, true, 3 );
 		auto result = queryResult("SELECT * FROM Simulations;", "Simulations");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(3ul, result.size());
 		std::vector<std::string> testResult0 {"1", "EnergyPlus Version", "Current Time", "6", "FALSE", "FALSE"};
@@ -95,10 +95,10 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult1, result[1]);
 		EXPECT_EQ(testResult2, result[2]);
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->updateSQLiteSimulationRecord( true, true );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->updateSQLiteSimulationRecord( true, true );
 		result = queryResult("SELECT * FROM Simulations;", "Simulations");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(3ul, result.size());
 		std::vector<std::string> testResult3 {"1", "EnergyPlus Version", "Current Time", "6", "1", "1"};
@@ -106,15 +106,15 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord ) {
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
-		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-		sqlite_test->createSQLiteEnvironmentPeriodRecord( 1, "CHICAGO ANN HTG 99.6% CONDNS DB", 1 );
-		sqlite_test->createSQLiteEnvironmentPeriodRecord( 2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1 );
-		sqlite_test->createSQLiteEnvironmentPeriodRecord( 3, "CHICAGO ANN HTG 99.6% CONDNS DB", 2 );
-		sqlite_test->createSQLiteEnvironmentPeriodRecord( 4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 3, 1 );
+		EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+		EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord( 1, "CHICAGO ANN HTG 99.6% CONDNS DB", 1 );
+		EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord( 2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1 );
+		EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord( 3, "CHICAGO ANN HTG 99.6% CONDNS DB", 2 );
+		EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord( 4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 3, 1 );
 		auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(4ul, result.size());
 		std::vector<std::string> testResult0 {"1", "1", "CHICAGO ANN HTG 99.6% CONDNS DB", "1"};
@@ -126,45 +126,45 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult2, result[2]);
 		EXPECT_EQ(testResult3, result[3]);
 
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// This should fail to insert due to foreign key constraint
-		sqlite_test->createSQLiteEnvironmentPeriodRecord( 5, "CHICAGO ANN HTG 99.6% CONDNS DB", 1, 100 );
+		EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord( 5, "CHICAGO ANN HTG 99.6% CONDNS DB", 1, 100 );
 		// This should fail to insert due to duplicate primary key
-		sqlite_test->createSQLiteEnvironmentPeriodRecord( 4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1 );
+		EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord( 4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1 );
 		result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		EXPECT_EQ(4ul, result.size());
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_errorRecords ) {
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
-		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-		sqlite_test->createSQLiteErrorRecord( 1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1 );
+		EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+		EnergyPlus::sqlite->createSQLiteErrorRecord( 1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1 );
 		auto result = queryResult("SELECT * FROM Errors;", "Errors");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(1ul, result.size());
 		std::vector<std::string> testResult0 {"1", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.", "1"};
 		EXPECT_EQ(testResult0, result[0]);
 
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// updateSQLiteErrorRecord appends the message to the current error message of the last error in the table
-		sqlite_test->updateSQLiteErrorRecord( "New error message" );
+		EnergyPlus::sqlite->updateSQLiteErrorRecord( "New error message" );
 		result = queryResult("SELECT * FROM Errors;", "Errors");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(1ul, result.size());
 		std::vector<std::string> testResult1 {"1", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.  New error message", "1"};
 		EXPECT_EQ(testResult1, result[0]);
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteErrorRecord( 1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1 );
-		sqlite_test->createSQLiteErrorRecord( 1, 0, "This should be changed.", 1 );
-		sqlite_test->updateSQLiteErrorRecord( "Changed error message." );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteErrorRecord( 1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1 );
+		EnergyPlus::sqlite->createSQLiteErrorRecord( 1, 0, "This should be changed.", 1 );
+		EnergyPlus::sqlite->updateSQLiteErrorRecord( "Changed error message." );
 		result = queryResult("SELECT * FROM Errors;", "Errors");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(3ul, result.size());
 		std::vector<std::string> testResult2 {"1", "1", "0", "CheckUsedConstructions: There are 2 nominally unused constructions in input.  New error message", "1"};
@@ -174,35 +174,33 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult3, result[1]);
 		EXPECT_EQ(testResult4, result[2]);
 
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// This should fail to insert due to foreign key constraint
-		sqlite_test->createSQLiteErrorRecord( 100, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1 );
+		EnergyPlus::sqlite->createSQLiteErrorRecord( 100, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1 );
 		result = queryResult("SELECT * FROM Errors;", "Errors");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		EXPECT_EQ(3ul, result.size());
 	}
 
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_sqliteWithinTransaction ) {
-		EXPECT_FALSE( sqlite_test->sqliteWithinTransaction() );
-		sqlite_test->sqliteBegin();
-		EXPECT_TRUE( sqlite_test->sqliteWithinTransaction() );
-		sqlite_test->sqliteCommit();
-		EXPECT_FALSE( sqlite_test->sqliteWithinTransaction() );
+		EXPECT_FALSE( EnergyPlus::sqlite->sqliteWithinTransaction() );
+		EnergyPlus::sqlite->sqliteBegin();
+		EXPECT_TRUE( EnergyPlus::sqlite->sqliteWithinTransaction() );
+		EnergyPlus::sqlite->sqliteCommit();
+		EXPECT_FALSE( EnergyPlus::sqlite->sqliteWithinTransaction() );
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_informationalErrorRecords ) {
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// There needs to be a simulation record otherwise the foreign key constraint will fail
-		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+		EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
-		EnergyPlus::sqlite = std::move( sqlite_test );
 		ShowMessage( "This is an informational message" );
-		sqlite_test = std::move( EnergyPlus::sqlite );
 
 		auto result = queryResult("SELECT * FROM Errors;", "Errors");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(1ul, result.size());
 		std::vector<std::string> testResult0 {"1", "1", "-1", "This is an informational message", "0"};
@@ -218,14 +216,14 @@ namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord )
 	{
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-		sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
-		sqlite_test->createSQLiteReportDictionaryRecord( 3, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 3, true, _ );
-		sqlite_test->createSQLiteReportDictionaryRecord( 4, 1, "HVAC", "", "AHU-1", 2, "", 1, false, _ );
-		sqlite_test->createSQLiteReportDictionaryRecord( 5, 1, "HVAC", "", "AHU-1", 2, "", 1, false, "test schedule" );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 3, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 3, true, _ );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 4, 1, "HVAC", "", "AHU-1", 2, "", 1, false, _ );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 5, 1, "HVAC", "", "AHU-1", 2, "", 1, false, "test schedule" );
 		auto result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(5ul, result.size());
 		std::vector<std::string> testResult0 {"1", "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C"};
@@ -239,13 +237,13 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult3, result[3]);
 		EXPECT_EQ(testResult4, result[4]);
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteReportDictionaryRecord( 6, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-		sqlite_test->createSQLiteReportDictionaryRecord( 7, 2, "Facility:Electricity", "", "Facility:Electricity", 3, "J", 1, true, _ );
-		sqlite_test->createSQLiteReportDictionaryRecord( 8, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 7, true, _ );
-		sqlite_test->createSQLiteReportDictionaryRecord( 9, 1, "HVAC", "", "AHU-1", 2, "", -2, false, _ );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 6, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 7, 2, "Facility:Electricity", "", "Facility:Electricity", 3, "J", 1, true, _ );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 8, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 7, true, _ );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 9, 1, "HVAC", "", "AHU-1", 2, "", -2, false, _ );
 		result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(9ul, result.size());
 		std::vector<std::string> testResult5 {"6", "0", "Unknown!!!", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C"};
@@ -257,25 +255,25 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult7, result[7]);
 		EXPECT_EQ(testResult8, result[8]);
 
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// This should fail to insert due to duplicate primary key
-		sqlite_test->createSQLiteReportDictionaryRecord( 9, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 9, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 		result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 		EXPECT_EQ(9ul, result.size());
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord ) {
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 0, 1 );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 0, 1, 1, 1, _, _, 0, "WinterDesignDay" );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 0, 1, 2, 2, _, _, 0, "SummerDesignDay" );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 0, 1, 1, 1, 60, 0, 0, "WinterDesignDay" );
-		sqlite_test->createSQLiteTimeIndexRecord( -1, 1, 1, 0, 1, 2, 2, 60, 0, 0, "SummerDesignDay" );
-		sqlite_test->createSQLiteTimeIndexRecord( -1, 1, 1, 1, 1, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 3, 1, 1, 0, 1 );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 2, 1, 1, 0, 1, 1, 1, _, _, 0, "WinterDesignDay" );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 1, 1, 1, 0, 1, 2, 2, _, _, 0, "SummerDesignDay" );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 0, 1, 1, 0, 1, 1, 1, 60, 0, 0, "WinterDesignDay" );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( -1, 1, 1, 0, 1, 2, 2, 60, 0, 0, "SummerDesignDay" );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( -1, 1, 1, 1, 1, 3, 3, 60, 0, 0, "SummerDesignDay", true );
 		auto result = queryResult("SELECT * FROM Time;", "Time");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(7ul, result.size());
 		// some of these are odd.........
@@ -294,47 +292,47 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult5, result[5]);
 		EXPECT_EQ(testResult6, result[6]);
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteTimeIndexRecord( -999, 1, 1, 0 );
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( -999, 1, 1, 0 );
+		EnergyPlus::sqlite->sqliteCommit();
 		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteTimeIndexRecord: -999\n", ss->str());
 		ss->str(std::string());
 
 		EXPECT_EQ(7ul, result.size());
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, _, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, _, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, _, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, _, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 0, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 1, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 2, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 3, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		EnergyPlus::sqlite->sqliteCommit();
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord ) {
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-		sqlite_test->createSQLiteReportDataRecord( 1, 999.9 );
-		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, 2, 0, 1310459, 100, 7031530, 15 );
-		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, 0, 0, 1310459, 100, 7031530, 15 );
-		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, 2, 100, 1310459, 999, 7031530, _ );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+		EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+		EnergyPlus::sqlite->createSQLiteReportDataRecord( 1, 999.9 );
+		EnergyPlus::sqlite->createSQLiteReportDataRecord( 1, 999.9, 2, 0, 1310459, 100, 7031530, 15 );
+		EnergyPlus::sqlite->createSQLiteReportDataRecord( 1, 999.9, 0, 0, 1310459, 100, 7031530, 15 );
+		EnergyPlus::sqlite->createSQLiteReportDataRecord( 1, 999.9, 2, 100, 1310459, 999, 7031530, _ );
 		auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
 		auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(4ul, reportData.size());
 		std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
@@ -352,15 +350,15 @@ namespace EnergyPlus {
 		EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
 		EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, -999, 0, 1310459, 100, 7031530, 15 );
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteReportDataRecord( 1, 999.9, -999, 0, 1310459, 100, 7031530, 15 );
+		EnergyPlus::sqlite->sqliteCommit();
 		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -999\n", ss->str());
 		ss->str(std::string());
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, -100, 0, 1310459, 100, 7031530, _ );
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createSQLiteReportDataRecord( 1, 999.9, -100, 0, 1310459, 100, 7031530, _ );
+		EnergyPlus::sqlite->sqliteCommit();
 		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -100\n", ss->str());
 		ss->str(std::string());
 
@@ -369,10 +367,10 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteZoneSizingRecord ) {
-		sqlite_test->sqliteBegin();
-		sqlite_test->addSQLiteZoneSizingRecord( "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033, 416.7 );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->addSQLiteZoneSizingRecord( "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033, 416.7 );
 		auto result = queryResult("SELECT * FROM ZoneSizes;", "ZoneSizes");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(1ul, result.size());
 		std::vector<std::string> testResult0 {"1", "FLOOR 1 IT HALL", "Cooling", "175.0", "262.0", "0.013", "0.019", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", "20.7", "0.0157", "0.0033", "416.7" };
@@ -380,10 +378,10 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord ) {
-		sqlite_test->sqliteBegin();
-		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Cooling", "Sensible",23.3, 6.3, 6.03, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00" );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->addSQLiteSystemSizingRecord( "VAV_1", "Cooling", "Sensible",23.3, 6.3, 6.03, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00" );
 		auto result = queryResult("SELECT * FROM SystemSizes;", "SystemSizes");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(1ul, result.size());
 		std::vector<std::string> testResult0 {"1", "VAV_1", "Cooling", "Sensible","23.3", "6.3", "6.03", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00" };
@@ -391,11 +389,11 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_addSQLiteComponentSizingRecord ) {
-		sqlite_test->sqliteBegin();
-		sqlite_test->addSQLiteComponentSizingRecord( "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate [m3/s]", 3.23 );
-		sqlite_test->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->addSQLiteComponentSizingRecord( "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate [m3/s]", 3.23 );
+		EnergyPlus::sqlite->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
 		auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(2ul, result.size());
 		std::vector<std::string> testResult0 {"1", "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate", "3.23", "m3/s"};
@@ -454,17 +452,17 @@ namespace EnergyPlus {
 		Array1D< Real64 > YValue( { 50.1, 52.1 } );
 		Array2D< Real64 > IllumValue( 2, 2, { 1, 3, 2, 4 } );
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->addZoneData( 1, *zone );
-		sqlite_test->createZoneExtendedOutput();
-		sqlite_test->createSQLiteDaylightMapTitle( 1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8 );
-		sqlite_test->createSQLiteDaylightMap( 1, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue );
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->addZoneData( 1, *zone );
+		EnergyPlus::sqlite->createZoneExtendedOutput();
+		EnergyPlus::sqlite->createSQLiteDaylightMapTitle( 1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8 );
+		EnergyPlus::sqlite->createSQLiteDaylightMap( 1, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue );
 
 		auto zones = queryResult("SELECT * FROM Zones;", "Zones");
 		auto daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");
 		auto daylightMapHourlyData = queryResult("SELECT * FROM DaylightMapHourlyData;", "DaylightMapHourlyData");
 		auto daylightMapHourlyReports = queryResult("SELECT * FROM DaylightMapHourlyReports;", "DaylightMapHourlyReports");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(1ul, zones.size());
 		std::vector<std::string> zone0 { "1", "DAYLIT ZONE", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "1", "1.0", "1.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "3.0", "302.0", "1", "1", "0.0", "0.0", "0.0", "0.0", "1" };
@@ -488,17 +486,17 @@ namespace EnergyPlus {
 		EXPECT_EQ(daylightMapHourlyData2, daylightMapHourlyData[2]);
 		EXPECT_EQ(daylightMapHourlyData3, daylightMapHourlyData[3]);
 
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// this should fail due to missing foreign key
-		sqlite_test->createSQLiteDaylightMapTitle( 2, "test", "test", 2, "test", "test", 0.8 );
+		EnergyPlus::sqlite->createSQLiteDaylightMapTitle( 2, "test", "test", 2, "test", "test", 0.8 );
 		// this should fail due to duplicate primary key
-		sqlite_test->createSQLiteDaylightMapTitle( 1, "test", "test", 1, "test", "test", 0.8 );
+		EnergyPlus::sqlite->createSQLiteDaylightMapTitle( 1, "test", "test", 1, "test", "test", 0.8 );
 		// this should fail due to missing foreign key
-		sqlite_test->createSQLiteDaylightMap( 2, 7 , 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue );
+		EnergyPlus::sqlite->createSQLiteDaylightMap( 2, 7 , 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue );
 		daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");
 		daylightMapHourlyData = queryResult("SELECT * FROM DaylightMapHourlyData;", "DaylightMapHourlyData");
 		daylightMapHourlyReports = queryResult("SELECT * FROM DaylightMapHourlyReports;", "DaylightMapHourlyReports");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(1ul, daylightMaps.size());
 		ASSERT_EQ(1ul, daylightMapHourlyReports.size());
@@ -763,45 +761,45 @@ namespace EnergyPlus {
 		double const zero = 0.0;
 		double const two = 2.0;
 
-		sqlite_test->addScheduleData( 1, alwaysOn, onOff, one, one );
-		sqlite_test->addScheduleData( 2, alwaysOff, onOff, zero, zero );
-		sqlite_test->addZoneData( 1, *zoneData0 );
-		sqlite_test->addZoneData( 2, *zoneData1 );
-		sqlite_test->addZoneListData( 1, *zoneListData0 );
-		sqlite_test->addZoneListData( 2, *zoneListData1 );
-		sqlite_test->addZoneGroupData( 1, *zoneGroupData0 );
-		sqlite_test->addZoneGroupData( 2, *zoneGroupData1 );
-		sqlite_test->addMaterialData( 1, *materialData0 );
-		sqlite_test->addMaterialData( 2, *materialData1 );
-		sqlite_test->addConstructionData( 1, *constructData0, zero );
-		sqlite_test->addConstructionData( 2, *constructData1, two );
-		sqlite_test->addSurfaceData( 1, *surfaceData0, window );
-		sqlite_test->addSurfaceData( 2, *surfaceData1, wall );
-		sqlite_test->addNominalLightingData( 1, *lightingData0 );
-		sqlite_test->addNominalLightingData( 2, *lightingData1 );
-		sqlite_test->addNominalPeopleData( 1, *peopleData0 );
-		sqlite_test->addNominalPeopleData( 2, *peopleData1 );
-		sqlite_test->addNominalElectricEquipmentData( 1, *elecEquipData0 );
-		sqlite_test->addNominalElectricEquipmentData( 2, *elecEquipData1 );
-		sqlite_test->addNominalGasEquipmentData( 1, *gasEquipData0 );
-		sqlite_test->addNominalGasEquipmentData( 2, *gasEquipData1 );
-		sqlite_test->addNominalSteamEquipmentData( 1, *steamEquipData0 );
-		sqlite_test->addNominalSteamEquipmentData( 2, *steamEquipData1 );
-		sqlite_test->addNominalHotWaterEquipmentData( 1, *hwEquipData0 );
-		sqlite_test->addNominalHotWaterEquipmentData( 2, *hwEquipData1 );
-		sqlite_test->addNominalOtherEquipmentData( 1, *otherEquipData0 );
-		sqlite_test->addNominalOtherEquipmentData( 2, *otherEquipData1 );
-		sqlite_test->addNominalBaseboardData( 1, *baseboardData0 );
-		sqlite_test->addNominalBaseboardData( 2, *baseboardData1 );
-		sqlite_test->addInfiltrationData( 1, *infiltrationData0 );
-		sqlite_test->addInfiltrationData( 2, *infiltrationData1 );
-		sqlite_test->addVentilationData( 1, *ventilationData0 );
-		sqlite_test->addVentilationData( 2, *ventilationData1 );
-		sqlite_test->addRoomAirModelData( 1, *roomAirModelData0 );
-		sqlite_test->addRoomAirModelData( 2, *roomAirModelData1 );
+		EnergyPlus::sqlite->addScheduleData( 1, alwaysOn, onOff, one, one );
+		EnergyPlus::sqlite->addScheduleData( 2, alwaysOff, onOff, zero, zero );
+		EnergyPlus::sqlite->addZoneData( 1, *zoneData0 );
+		EnergyPlus::sqlite->addZoneData( 2, *zoneData1 );
+		EnergyPlus::sqlite->addZoneListData( 1, *zoneListData0 );
+		EnergyPlus::sqlite->addZoneListData( 2, *zoneListData1 );
+		EnergyPlus::sqlite->addZoneGroupData( 1, *zoneGroupData0 );
+		EnergyPlus::sqlite->addZoneGroupData( 2, *zoneGroupData1 );
+		EnergyPlus::sqlite->addMaterialData( 1, *materialData0 );
+		EnergyPlus::sqlite->addMaterialData( 2, *materialData1 );
+		EnergyPlus::sqlite->addConstructionData( 1, *constructData0, zero );
+		EnergyPlus::sqlite->addConstructionData( 2, *constructData1, two );
+		EnergyPlus::sqlite->addSurfaceData( 1, *surfaceData0, window );
+		EnergyPlus::sqlite->addSurfaceData( 2, *surfaceData1, wall );
+		EnergyPlus::sqlite->addNominalLightingData( 1, *lightingData0 );
+		EnergyPlus::sqlite->addNominalLightingData( 2, *lightingData1 );
+		EnergyPlus::sqlite->addNominalPeopleData( 1, *peopleData0 );
+		EnergyPlus::sqlite->addNominalPeopleData( 2, *peopleData1 );
+		EnergyPlus::sqlite->addNominalElectricEquipmentData( 1, *elecEquipData0 );
+		EnergyPlus::sqlite->addNominalElectricEquipmentData( 2, *elecEquipData1 );
+		EnergyPlus::sqlite->addNominalGasEquipmentData( 1, *gasEquipData0 );
+		EnergyPlus::sqlite->addNominalGasEquipmentData( 2, *gasEquipData1 );
+		EnergyPlus::sqlite->addNominalSteamEquipmentData( 1, *steamEquipData0 );
+		EnergyPlus::sqlite->addNominalSteamEquipmentData( 2, *steamEquipData1 );
+		EnergyPlus::sqlite->addNominalHotWaterEquipmentData( 1, *hwEquipData0 );
+		EnergyPlus::sqlite->addNominalHotWaterEquipmentData( 2, *hwEquipData1 );
+		EnergyPlus::sqlite->addNominalOtherEquipmentData( 1, *otherEquipData0 );
+		EnergyPlus::sqlite->addNominalOtherEquipmentData( 2, *otherEquipData1 );
+		EnergyPlus::sqlite->addNominalBaseboardData( 1, *baseboardData0 );
+		EnergyPlus::sqlite->addNominalBaseboardData( 2, *baseboardData1 );
+		EnergyPlus::sqlite->addInfiltrationData( 1, *infiltrationData0 );
+		EnergyPlus::sqlite->addInfiltrationData( 2, *infiltrationData1 );
+		EnergyPlus::sqlite->addVentilationData( 1, *ventilationData0 );
+		EnergyPlus::sqlite->addVentilationData( 2, *ventilationData1 );
+		EnergyPlus::sqlite->addRoomAirModelData( 1, *roomAirModelData0 );
+		EnergyPlus::sqlite->addRoomAirModelData( 2, *roomAirModelData1 );
 
-		sqlite_test->sqliteBegin();
-		sqlite_test->createZoneExtendedOutput();
+		EnergyPlus::sqlite->sqliteBegin();
+		EnergyPlus::sqlite->createZoneExtendedOutput();
 		auto zones = queryResult("SELECT * FROM Zones;", "Zones");
 		auto zoneLists = queryResult("SELECT * FROM ZoneLists;", "ZoneLists");
 		auto zoneGroups = queryResult("SELECT * FROM ZoneGroups;", "ZoneGroups");
@@ -822,7 +820,7 @@ namespace EnergyPlus {
 		auto infiltrations = queryResult("SELECT * FROM NominalInfiltration;", "NominalInfiltration");
 		auto ventilations = queryResult("SELECT * FROM NominalVentilation;", "NominalVentilation");
 		auto roomAirModels = queryResult("SELECT * FROM RoomAirModels;", "RoomAirModels");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(2ul, zones.size());
 		std::vector<std::string> zone0 { "1","test zone 1","0.0","0.0","0.0","0.0","0.0","0.0","0.0","1","1.0","1.0","0.0","0.0","0.0","0.0","0.0","0.0","1.0","1.0","1","1","0.0","0.0","0.0","0.0","1" };
@@ -955,15 +953,15 @@ namespace EnergyPlus {
 		Array1D_string const columnLabels2( { "Electricity", "Natural Gas" } );
 		Array2D_string const body2( 1, 2, { "815.19", "256.72" } );
 
-		sqlite_test->sqliteBegin();
+		EnergyPlus::sqlite->sqliteBegin();
 		// tabular data references simulation record... always checks for first simulation record only.
-		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-		sqlite_test->createSQLiteTabularDataRecords(body, rowLabels, columnLabels, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
-		sqlite_test->createSQLiteTabularDataRecords(body2, rowLabels2, columnLabels2, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
+		EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+		EnergyPlus::sqlite->createSQLiteTabularDataRecords(body, rowLabels, columnLabels, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
+		EnergyPlus::sqlite->createSQLiteTabularDataRecords(body2, rowLabels2, columnLabels2, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
 		auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
 		auto strings = queryResult("SELECT * FROM Strings;", "Strings");
 		auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-		sqlite_test->sqliteCommit();
+		EnergyPlus::sqlite->sqliteCommit();
 
 		ASSERT_EQ(6ul, tabularData.size());
 		// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value

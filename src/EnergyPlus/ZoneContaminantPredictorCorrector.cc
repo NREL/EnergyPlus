@@ -70,7 +70,7 @@
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -293,31 +293,31 @@ namespace ZoneContaminantPredictorCorrector {
 		MaxAlpha = -100;
 		MaxNumber = -100;
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		IHGNumbers.allocate( MaxNumber );
@@ -326,18 +326,18 @@ namespace ZoneContaminantPredictorCorrector {
 		AlphaName = "";
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-		TotGCGenConstant = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenConstant = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericConstant.allocate( TotGCGenConstant );
 
 		for ( Loop = 1; Loop <= TotGCGenConstant; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericConstant( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericConstant( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericConstant( Loop ).ActualZoneNum = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			ZoneContamGenericConstant( Loop ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericConstant( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -412,18 +412,18 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-		TotGCGenPDriven = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenPDriven = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericPDriven.allocate( TotGCGenPDriven );
 
 		for ( Loop = 1; Loop <= TotGCGenPDriven; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericPDriven( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericPDriven( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericPDriven( Loop ).SurfNum = InputProcessor::FindItemInList( AlphaName( 2 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName );
+			ZoneContamGenericPDriven( Loop ).SurfNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName );
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ShowContinueError( "which is not listed in AirflowNetwork:MultiZone:Surface." );
@@ -496,18 +496,18 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-		TotGCGenCutoff = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenCutoff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericCutoff.allocate( TotGCGenCutoff );
 
 		for ( Loop = 1; Loop <= TotGCGenCutoff; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericCutoff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericCutoff( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericCutoff( Loop ).ActualZoneNum = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			ZoneContamGenericCutoff( Loop ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericCutoff( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -565,18 +565,18 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-		TotGCGenDecay = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenDecay = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDecay.allocate( TotGCGenDecay );
 
 		for ( Loop = 1; Loop <= TotGCGenDecay; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDecay( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDecay( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericDecay( Loop ).ActualZoneNum = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			ZoneContamGenericDecay( Loop ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericDecay( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -635,18 +635,18 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-		TotGCBLDiff = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCBLDiff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericBLDiff.allocate( TotGCBLDiff );
 
 		for ( Loop = 1; Loop <= TotGCBLDiff; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericBLDiff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericBLDiff( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericBLDiff( Loop ).SurfNum = InputProcessor::FindItemInList( AlphaName( 2 ), Surface );
+			ZoneContamGenericBLDiff( Loop ).SurfNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Surface );
 			if ( ZoneContamGenericBLDiff( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -704,18 +704,18 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-		TotGCDVS = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCDVS = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDVS.allocate( TotGCDVS );
 
 		for ( Loop = 1; Loop <= TotGCDVS; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDVS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDVS( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericDVS( Loop ).SurfNum = InputProcessor::FindItemInList( AlphaName( 2 ), Surface );
+			ZoneContamGenericDVS( Loop ).SurfNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Surface );
 			if ( ZoneContamGenericDVS( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -766,18 +766,18 @@ namespace ZoneContaminantPredictorCorrector {
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-		TotGCDRS = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotGCDRS = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDRS.allocate( TotGCDRS );
 
 		for ( Loop = 1; Loop <= TotGCDRS; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDRS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDRS( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericDRS( Loop ).ActualZoneNum = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			ZoneContamGenericDRS( Loop ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericDRS( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -903,19 +903,19 @@ namespace ZoneContaminantPredictorCorrector {
 
 		// FLOW:
 		cCurrentModuleObject = "ZoneControl:ContaminantController";
-		NumContControlledZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumContControlledZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumContControlledZones > 0 ) {
 			ContaminantControlledZone.allocate( NumContControlledZones );
 		}
 
 		for ( ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			ContaminantControlledZone( ContControlledZoneNum ).Name = cAlphaArgs( 1 );
 			ContaminantControlledZone( ContControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
@@ -973,33 +973,48 @@ namespace ZoneContaminantPredictorCorrector {
 				}
 			}
 
-			if ( NumAlphas > 5 ) {
-				ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedule = cAlphaArgs( 6 );
-				if ( lAlphaFieldBlanks( 6 ) ) {
+			ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedName = cAlphaArgs( 6 );
+			ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex = GetScheduleIndex( cAlphaArgs( 6 ) );
+			if ( ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex > 0 ) {
+				// Check validity of control types.
+				ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex, ">=", 0.0, "<=", 2000.0 );
+				if ( !ValidScheduleType ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"" );
+					ShowContinueError( "..contains values outside of range [0,2000 ppm]." );
+					ErrorsFound = true;
+				}
+				else {
+					Zone( ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum ).ZoneMaxCO2SchedIndex = ContaminantControlledZone( ContControlledZoneNum ).ZoneMaxCO2SchedIndex;
+				}
+			}
+
+			if ( NumAlphas > 6 ) {
+				ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedule = cAlphaArgs( 7 );
+				if ( lAlphaFieldBlanks( 7 ) ) {
 					ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr = ScheduleAlwaysOn;
 				} else {
-					ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
+					ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) );
 					if ( ContaminantControlledZone( ContControlledZoneNum ).AvaiSchedPtr == 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
 						// Check validity of control types.
 						ValidScheduleType = CheckScheduleValueMinMax( ContaminantControlledZone( ContControlledZoneNum ).GCAvaiSchedPtr, ">=", 0.0, "<=", 1.0 );
 						if ( ! ValidScheduleType ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 6 ) + "\"" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid range " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 7 ) + "\"" );
 							ShowContinueError( "..contains values outside of range [0,1]." );
 							ErrorsFound = true;
 						}
 					}
 				}
-				if ( lAlphaFieldBlanks( 7 ) ) {
-					ShowSevereError( cCurrentModuleObject + " \"" + cAlphaArgs( 7 ) + "\" is required, but blank." );
+				if ( lAlphaFieldBlanks( 8 ) ) {
+					ShowSevereError( cCurrentModuleObject + " \"" + cAlphaArgs( 8 ) + "\" is required, but blank." );
 					ErrorsFound = true;
 				} else {
-					ContaminantControlledZone( ContControlledZoneNum ).GCSetPointSchedName = cAlphaArgs( 7 );
-					ContaminantControlledZone( ContControlledZoneNum ).GCSPSchedIndex = GetScheduleIndex( cAlphaArgs( 7 ) );
+					ContaminantControlledZone( ContControlledZoneNum ).GCSetPointSchedName = cAlphaArgs( 8 );
+					ContaminantControlledZone( ContControlledZoneNum ).GCSPSchedIndex = GetScheduleIndex( cAlphaArgs( 8 ) );
 					if ( ContaminantControlledZone( ContControlledZoneNum ).GCSPSchedIndex == 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
 						ErrorsFound = true;
 					}
 				}
@@ -1564,7 +1579,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum );
 						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of CO2 Load means that
@@ -1646,7 +1661,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum );
 						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds; 
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of GC Load means that
@@ -2133,13 +2148,13 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( ZoneMassFlowRate > 0.0 ) {
 				if ( Contaminant.CO2Simulation ) {
 					B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + ( CO2MassFlowRate ) + MixingMassFlowCO2( ZoneNum );
-					A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 						// Multizone airflow calculated in AirflowNetwork
 						B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
 						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 				}
 			} else if ( ZoneMassFlowRate <= 0.0 ) {
 				if ( Contaminant.CO2Simulation ) {
@@ -2194,7 +2209,7 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( ZoneMassFlowRate > 0.0 ) {
 				if ( Contaminant.GenericContamSimulation ) {
 					B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + ( GCMassFlowRate ) + MixingMassFlowGC( ZoneNum );
-					A = TotExitMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 						// Multizone airflow calculated in AirflowNetwork
 						B = GCGain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC ) + GCMassFlowRate;

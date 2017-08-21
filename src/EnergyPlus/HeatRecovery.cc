@@ -65,7 +65,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -122,7 +122,7 @@ namespace HeatRecovery {
 
 	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
-	using General::SolveRegulaFalsi;
+	using General::SolveRoot;
 	using General::RoundSigDigits;
 	using namespace Psychrometrics;
 
@@ -226,7 +226,7 @@ namespace HeatRecovery {
 		Optional_bool_const RegenInletIsOANode, // flag to determine if supply inlet is OA node, if so air flow cycles
 		Optional_bool_const EconomizerFlag, // economizer operation flag passed by airloop or OA sys
 		Optional_bool_const HighHumCtrlFlag, // high humidity control flag passed by airloop or OA sys
-		Optional_int_const CompanionCoilType_Num // cooling coil type of coil 
+		Optional_int_const CompanionCoilType_Num // cooling coil type of coil
 	)
 	{
 
@@ -257,7 +257,7 @@ namespace HeatRecovery {
 
 		// Find the correct unit index
 		if ( CompIndex == 0 ) {
-			HeatExchNum = InputProcessor::FindItemInList( CompName, ExchCond );
+			HeatExchNum = UtilityRoutines::FindItemInList( CompName, ExchCond );
 			if ( HeatExchNum == 0 ) {
 				ShowFatalError( "SimHeatRecovery: Unit not found=" + CompName );
 			}
@@ -372,10 +372,10 @@ namespace HeatRecovery {
 		static std::string HeatExchPerfType; // Desiccant balanced heat exchanger performance data type
 		static std::string const RoutineName( "GetHeatRecoveryInput: " ); // include trailing blank space
 
-		NumAirToAirPlateExchs = InputProcessor::GetNumObjectsFound( "HeatExchanger:AirToAir:FlatPlate" );
-		NumAirToAirGenericExchs = InputProcessor::GetNumObjectsFound( "HeatExchanger:AirToAir:SensibleAndLatent" );
-		NumDesiccantBalancedExchs = InputProcessor::GetNumObjectsFound( "HeatExchanger:Desiccant:BalancedFlow" );
-		NumDesBalExchsPerfDataType1 = InputProcessor::GetNumObjectsFound( "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1" );
+		NumAirToAirPlateExchs = inputProcessor->getNumObjectsFound( "HeatExchanger:AirToAir:FlatPlate" );
+		NumAirToAirGenericExchs = inputProcessor->getNumObjectsFound( "HeatExchanger:AirToAir:SensibleAndLatent" );
+		NumDesiccantBalancedExchs = inputProcessor->getNumObjectsFound( "HeatExchanger:Desiccant:BalancedFlow" );
+		NumDesBalExchsPerfDataType1 = inputProcessor->getNumObjectsFound( "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1" );
 		NumHeatExchangers = NumAirToAirPlateExchs + NumAirToAirGenericExchs + NumDesiccantBalancedExchs;
 
 		// allocate the data array
@@ -392,7 +392,7 @@ namespace HeatRecovery {
 		// loop over the air to air plate heat exchangers and load their input data
 		for ( ExchIndex = 1; ExchIndex <= NumAirToAirPlateExchs; ++ExchIndex ) {
 			cCurrentModuleObject = "HeatExchanger:AirToAir:FlatPlate";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ExchNum = ExchIndex;
 
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
@@ -455,7 +455,7 @@ namespace HeatRecovery {
 		// loop over the air to air generic heat exchangers and load their input data
 		for ( ExchIndex = 1; ExchIndex <= NumAirToAirGenericExchs; ++ExchIndex ) {
 			cCurrentModuleObject = "HeatExchanger:AirToAir:SensibleAndLatent";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ExchNum = ExchIndex + NumAirToAirPlateExchs;
 
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
@@ -507,19 +507,19 @@ namespace HeatRecovery {
 
 			ExchCond( ExchNum ).NomElecPower = rNumericArgs( 10 );
 
-			if ( InputProcessor::SameString( cAlphaArgs( 7 ), "Yes" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "Yes" ) ) {
 				ExchCond( ExchNum ).ControlToTemperatureSetPoint = true;
 			} else {
-				if ( ! InputProcessor::SameString( cAlphaArgs( 7 ), "No" ) ) {
+				if ( ! UtilityRoutines::SameString( cAlphaArgs( 7 ), "No" ) ) {
 					ShowSevereError( "Rotary HX Speed Modulation or Plate Bypass for Temperature Control for " );
 					ShowContinueError( ExchCond( ExchNum ).Name + " must be set to Yes or No" );
 					ErrorsFound = true;
 				}
 			}
 
-			if ( InputProcessor::SameString( cAlphaArgs( 8 ), "Plate" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "Plate" ) ) {
 				ExchCond( ExchNum ).ExchConfigNum = Plate;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), "Rotary" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "Rotary" ) ) {
 				ExchCond( ExchNum ).ExchConfigNum = Rotary;
 			} else {
 				ShowSevereError( cCurrentModuleObject + " configuration not found= " + cAlphaArgs( 8 ) );
@@ -529,10 +529,10 @@ namespace HeatRecovery {
 
 			// Added additional inputs for frost control
 			ExchCond( ExchNum ).FrostControlType = cAlphaArgs( 9 );
-			if ( ! InputProcessor::SameString( ExchCond( ExchNum ).FrostControlType, "None" ) ) {
-				if ( ! InputProcessor::SameString( ExchCond( ExchNum ).FrostControlType, "ExhaustOnly" ) ) {
-					if ( ! InputProcessor::SameString( ExchCond( ExchNum ).FrostControlType, "ExhaustAirRecirculation" ) ) {
-						if ( ! InputProcessor::SameString( ExchCond( ExchNum ).FrostControlType, "MinimumExhaustTemperature" ) ) {
+			if ( ! UtilityRoutines::SameString( ExchCond( ExchNum ).FrostControlType, "None" ) ) {
+				if ( ! UtilityRoutines::SameString( ExchCond( ExchNum ).FrostControlType, "ExhaustOnly" ) ) {
+					if ( ! UtilityRoutines::SameString( ExchCond( ExchNum ).FrostControlType, "ExhaustAirRecirculation" ) ) {
+						if ( ! UtilityRoutines::SameString( ExchCond( ExchNum ).FrostControlType, "MinimumExhaustTemperature" ) ) {
 							ShowSevereError( "Invalid Frost Control method for " + ExchCond( ExchNum ).Name + " =  " + cAlphaArgs( 9 ) );
 							ErrorsFound = true;
 						}
@@ -540,7 +540,7 @@ namespace HeatRecovery {
 				}
 			}
 
-			if ( ! InputProcessor::SameString( cAlphaArgs( 9 ), "None" ) ) {
+			if ( ! UtilityRoutines::SameString( cAlphaArgs( 9 ), "None" ) ) {
 				ExchCond( ExchNum ).ThresholdTemperature = rNumericArgs( 11 );
 				ExchCond( ExchNum ).InitialDefrostTime = rNumericArgs( 12 );
 				ExchCond( ExchNum ).RateofDefrostTimeIncrease = rNumericArgs( 13 );
@@ -566,7 +566,7 @@ namespace HeatRecovery {
 		// loop over the desiccant balanced heat exchangers and load their input data
 		for ( ExchIndex = 1; ExchIndex <= NumDesiccantBalancedExchs; ++ExchIndex ) {
 			cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ExchIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
 
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
@@ -599,7 +599,7 @@ namespace HeatRecovery {
 			TestCompSet( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name, NodeID( ExchCond( ExchNum ).SecInletNode ), NodeID( ExchCond( ExchNum ).SecOutletNode ), "Process Air Nodes" );
 
 			HeatExchPerfType = cAlphaArgs( 7 );
-			if ( InputProcessor::SameString( HeatExchPerfType, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1" ) ) {
+			if ( UtilityRoutines::SameString( HeatExchPerfType, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1" ) ) {
 				ExchCond( ExchNum ).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
 			} else {
 				ShowSevereError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\"" );
@@ -630,14 +630,14 @@ namespace HeatRecovery {
 
 		for ( PerfDataIndex = 1; PerfDataIndex <= NumDesBalExchsPerfDataType1; ++PerfDataIndex ) {
 			cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1";
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PerfDataIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PerfDataIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			PerfDataNum = PerfDataIndex;
 
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames.allocate( NumNumbers );
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames = "";
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames = cNumericFieldNames;
 
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			BalDesDehumPerfData( PerfDataNum ).Name = cAlphaArgs( 1 );
 			BalDesDehumPerfData( PerfDataNum ).PerfType = cCurrentModuleObject;
@@ -998,7 +998,7 @@ namespace HeatRecovery {
 		for ( ExchIndex = 1; ExchIndex <= NumDesiccantBalancedExchs; ++ExchIndex ) {
 			ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
 			for ( PerfDataNum = 1; PerfDataNum <= NumDesBalExchsPerfDataType1; ++PerfDataNum ) {
-				if ( InputProcessor::SameString( ExchCond( ExchNum ).HeatExchPerfName, BalDesDehumPerfData( PerfDataNum ).Name ) ) {
+				if ( UtilityRoutines::SameString( ExchCond( ExchNum ).HeatExchPerfName, BalDesDehumPerfData( PerfDataNum ).Name ) ) {
 					ExchCond( ExchNum ).PerfDataIndex = PerfDataNum;
 					break;
 				}
@@ -3226,7 +3226,7 @@ namespace HeatRecovery {
 		Par( 1 ) = Eps;
 		Par( 2 ) = Z;
 
-		SolveRegulaFalsi( Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par );
+		SolveRoot( Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par );
 
 		if ( SolFla == -2 ) {
 			ShowFatalError( "HeatRecovery: Bad initial bounds for NTU in GetNTUforCrossFlowBothUnmixed" );
@@ -4590,7 +4590,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = InputProcessor::FindItemInList( HXName, ExchCond );
+		WhichHX = UtilityRoutines::FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSupplyInletNode = ExchCond( WhichHX ).SupInletNode;
 		} else {
@@ -4632,7 +4632,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = InputProcessor::FindItemInList( HXName, ExchCond );
+		WhichHX = UtilityRoutines::FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSupplyOutletNode = ExchCond( WhichHX ).SupOutletNode;
 		} else {
@@ -4674,7 +4674,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = InputProcessor::FindItemInList( HXName, ExchCond );
+		WhichHX = UtilityRoutines::FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSecondaryInletNode = ExchCond( WhichHX ).SecInletNode;
 		} else {
@@ -4716,7 +4716,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = InputProcessor::FindItemInList( HXName, ExchCond );
+		WhichHX = UtilityRoutines::FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSecondaryOutletNode = ExchCond( WhichHX ).SecOutletNode;
 		} else {
@@ -4758,7 +4758,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = InputProcessor::FindItemInList( HXName, ExchCond );
+		WhichHX = UtilityRoutines::FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetSupplyAirFlowRate = ExchCond( WhichHX ).NomSupAirVolFlow;
 		} else {
@@ -4801,7 +4801,7 @@ namespace HeatRecovery {
 			GetInputFlag = false;
 		}
 
-		WhichHX = InputProcessor::FindItemInList( HXName, ExchCond );
+		WhichHX = UtilityRoutines::FindItemInList( HXName, ExchCond );
 		if ( WhichHX != 0 ) {
 			GetHeatExchangerObjectTypeNum = ExchCond( WhichHX ).ExchTypeNum;
 		} else {
@@ -4866,7 +4866,7 @@ namespace HeatRecovery {
 		}
 
 		if ( HXNum == 0 ) {
-			WhichHX = InputProcessor::FindItemInList( HXName, ExchCond );
+			WhichHX = UtilityRoutines::FindItemInList( HXName, ExchCond );
 		} else {
 			WhichHX = HXNum;
 		}

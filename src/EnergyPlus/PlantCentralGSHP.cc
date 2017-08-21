@@ -68,7 +68,7 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -197,7 +197,7 @@ namespace PlantCentralGSHP {
 
 		// Find the correct wrapper
 		if ( CompIndex == 0 ) {
-			WrapperNum = InputProcessor::FindItemInList( WrapperName, Wrapper );
+			WrapperNum = UtilityRoutines::FindItemInList( WrapperName, Wrapper );
 			if ( WrapperNum == 0 ) {
 				ShowFatalError( "SimCentralGroundSourceHeatPump: Specified Wrapper not one of Valid Wrappers=" + WrapperName );
 			}
@@ -623,7 +623,7 @@ namespace PlantCentralGSHP {
 
 		if ( AllocatedFlag ) return;
 		cCurrentModuleObject = "CentralHeatPumpSystem";
-		NumWrappers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumWrappers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWrappers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -638,13 +638,13 @@ namespace PlantCentralGSHP {
 
 		// Load arrays with electric EIR chiller data
 		for ( WrapperNum = 1; WrapperNum <= NumWrappers; ++WrapperNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, WrapperNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, WrapperNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			Wrapper( WrapperNum ).Name = cAlphaArgs( 1 );
 
 			// intialize nth chiller heater index (including identical units) for current wrapper
 			NumChHtrPerWrapper = 0;
-			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+			if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 				continue;
 			}
 
@@ -737,7 +737,7 @@ namespace PlantCentralGSHP {
 			for ( Comp = 1; Comp <= Wrapper( WrapperNum ).NumOfComp; ++Comp ) {
 				if ( Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR" ) {
 					CompName = Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperComponentName;
-					CompIndex = InputProcessor::FindItemInList( CompName, ChillerHeater );
+					CompIndex = UtilityRoutines::FindItemInList( CompName, ChillerHeater );
 					// User may enter invalid name rather than selecting one from the object list
 					if ( CompIndex <= 0 ) {
 						ShowSevereError( "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + CompName );
@@ -901,7 +901,7 @@ namespace PlantCentralGSHP {
 		static gio::Fmt Format_550( "('Curve Output = ',11(F7.2))" );
 
 		cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
-		NumChillerHeaters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumChillerHeaters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumChillerHeaters <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -916,10 +916,10 @@ namespace PlantCentralGSHP {
 
 		// Load arrays with electric EIR chiller data
 		for ( ChillerHeaterNum = 1; ChillerHeaterNum <= NumChillerHeaters; ++ChillerHeaterNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ChillerHeater( ChillerHeaterNum ).Name = cAlphaArgs( 1 );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, CHErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, CHErrorsFound);
 
 			ChillerHeater( ChillerHeaterNum ).CondModeCooling = cAlphaArgs( 4 );
 
@@ -992,7 +992,7 @@ namespace PlantCentralGSHP {
 				}
 			}
 
-			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "WaterCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "WaterCooled" ) ) {
 				ChillerHeater( ChillerHeaterNum ).CondenserType = WaterCooled;
 			} else {
 				ShowSevereError( "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );

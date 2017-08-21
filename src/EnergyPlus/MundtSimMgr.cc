@@ -59,7 +59,6 @@
 #include <DataRoomAirModel.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -370,7 +369,7 @@ namespace MundtSimMgr {
 
 						AirNodeFoundFlag = false;
 						for ( AirNodeNum = AirNodeBeginNum; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum ) {
-							if ( InputProcessor::SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
+							if ( UtilityRoutines::SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
 								LineNode( NodeNum, MundtZoneIndex ).ClassType = AirNode( AirNodeNum ).ClassType;
 								LineNode( NodeNum, MundtZoneIndex ).AirNodeName = AirNode( AirNodeNum ).Name;
 								LineNode( NodeNum, MundtZoneIndex ).Height = AirNode( AirNodeNum ).Height;
@@ -546,7 +545,7 @@ namespace MundtSimMgr {
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
-			SumAllReturnAirConvectionGains( ZoneNum, RetAirConvGain );
+			SumAllReturnAirConvectionGains( ZoneNum, RetAirConvGain, 0 );
 			ConvIntGain += RetAirConvGain;
 		}
 

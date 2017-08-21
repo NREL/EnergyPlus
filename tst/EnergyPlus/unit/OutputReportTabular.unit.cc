@@ -2201,6 +2201,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
 		"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
+		"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
 		"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
 		"	0.0,                   !- Maximum Cycling Rate",
@@ -2457,7 +2458,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+	//DataGlobals::DDOnlySimulation = true;
 
 	ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -3177,6 +3178,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 		"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
 		"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
 		"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
+		"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 		"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
 		"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
 		"	0.0,                   !- Maximum Cycling Rate",
@@ -3433,7 +3435,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+	//DataGlobals::DDOnlySimulation = true;
 
 	ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -4490,6 +4492,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"    ,                        !- Availability Schedule Name                                         ",
 		"    ZONE 1 INLETS,           !- Zone Supply Air Node Name                                          ",
 		"    ,                        !- Zone Exhaust Air Node Name                                         ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                         ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                         ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}       ",
@@ -4549,6 +4552,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"    ,                        !- Availability Schedule Name                                         ",
 		"    ZONE 2 INLETS,           !- Zone Supply Air Node Name                                          ",
 		"    ,                        !- Zone Exhaust Air Node Name                                         ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                         ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                         ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}       ",
@@ -4608,6 +4612,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"    ,                        !- Availability Schedule Name                                         ",
 		"    ZONE 3 INLETS,           !- Zone Supply Air Node Name                                          ",
 		"    ,                        !- Zone Exhaust Air Node Name                                         ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                         ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                         ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}       ",
@@ -4667,6 +4672,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 		"    ,                        !- Availability Schedule Name                                         ",
 		"    ZONE 4 INLETS,           !- Zone Supply Air Node Name                                          ",
 		"    ,                        !- Zone Exhaust Air Node Name                                         ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                         ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                         ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}       ",
@@ -4706,7 +4712,7 @@ TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+	//DataGlobals::DDOnlySimulation = true;
 
 	ManageSimulation();
 //	compare_err_stream( "" );
@@ -4815,20 +4821,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) ",
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (tau",
 		"    1.00;                    !- Sky Clearness                                             ",
-		"                                                                                          ",
-		"  RunPeriod,                                                                              ",
-		"    ,                        !- Name                                                      ",
-		"    1,                       !- Begin Month                                               ",
-		"    1,                       !- Begin Day of Month                                        ",
-		"    12,                      !- End Month                                                 ",
-		"    31,                      !- End Day of Month                                          ",
-		"    Tuesday,                 !- Day of Week for Start Day                                 ",
-		"    Yes,                     !- Use Weather File Holidays and Special Days                ",
-		"    Yes,                     !- Use Weather File Daylight Saving Period                   ",
-		"    No,                      !- Apply Weekend Holiday Rule                                ",
-		"    Yes,                     !- Use Weather File Rain Indicators                          ",
-		"    Yes;                     !- Use Weather File Snow Indicators                          ",
-		"                                                                                          ",
+			"                                                                                          ",
 		"  SimulationControl,                                                                      ",
 		"    NO,                      !- Do Zone Sizing Calculation                                ",
 		"    NO,                      !- Do System Sizing Calculation                              ",
@@ -5715,6 +5708,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    ,                        !- Availability Schedule Name                                ",
 		"    Daylit Zone Supply Node, !- Zone Supply Air Node Name                                 ",
 		"    ,                        !- Zone Exhaust Air Node Name                                ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAi",
@@ -5769,6 +5763,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 		"    ,                        !- Availability Schedule Name                                ",
 		"    Standard Zone Supply Node,  !- Zone Supply Air Node Name                              ",
 		"    ,                        !- Zone Exhaust Air Node Name                                ",
+		"    ,                        !- System Inlet Air Node Name                                         ",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}                ",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}                ",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAi",
@@ -5813,7 +5808,7 @@ TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
-	DataGlobals::DDOnlySimulation = true;
+	//DataGlobals::DDOnlySimulation = true;
 
 	ManageSimulation();
 	//compare_err_stream( "" );
@@ -5860,10 +5855,8 @@ TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 
 
 TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
-	sqlite_test->sqliteBegin();
-	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	EnergyPlus::sqlite->sqliteBegin();
+	EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 	displayTabularVeriSum = true;
 	Latitude = 12.3;
@@ -5935,12 +5928,10 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 
 	WriteVeriSumTable();
 
-	sqlite_test = std::move( EnergyPlus::sqlite );
-
 	auto tabularData = queryResult( "SELECT * FROM TabularData;", "TabularData" );
 	auto strings = queryResult( "SELECT * FROM Strings;", "Strings" );
 	auto stringTypes = queryResult( "SELECT * FROM StringTypes;", "StringTypes" );
-	sqlite_test->sqliteCommit();
+	EnergyPlus::sqlite->sqliteCommit();
 
 	EXPECT_EQ( 123ul, tabularData.size() );
 	// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value

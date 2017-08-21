@@ -60,7 +60,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -174,7 +174,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		int GSHPNum( 0 );
 		if ( CompIndex == 0 ) {
-			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
+			GSHPNum = UtilityRoutines::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterSimple: Specified heat pump not one of valid heat pumps. Heat pump = " + GSHPName );
 			}
@@ -291,8 +291,8 @@ namespace HeatPumpWaterToWaterSimple {
 		static bool ErrorsFound( false );
 		bool errFlag;
 
-		NumCoolCoil = InputProcessor::GetNumObjectsFound( HPEqFitCoolingUC );
-		NumHeatCoil = InputProcessor::GetNumObjectsFound( HPEqFitHeatingUC );
+		NumCoolCoil = inputProcessor->getNumObjectsFound( HPEqFitCoolingUC );
+		NumHeatCoil = inputProcessor->getNumObjectsFound( HPEqFitHeatingUC );
 		NumGSHPs = NumCoolCoil + NumHeatCoil;
 
 		if ( NumGSHPs <= 0 ) {
@@ -312,7 +312,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = HPNum;
 
-			InputProcessor::GetObjectItem( HPEqFitCoolingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
+			inputProcessor->getObjectItem( HPEqFitCoolingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
 			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs( 1 ), HPEqFitCoolingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
 			GSHP( GSHPNum ).Name = DataIPShortCuts::cAlphaArgs( 1 );
@@ -396,7 +396,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = NumCoolCoil + HPNum;
 
-			InputProcessor::GetObjectItem( HPEqFitHeatingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
+			inputProcessor->getObjectItem( HPEqFitHeatingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
 			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs( 1 ), HPEqFitHeatingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
 			GSHP( GSHPNum ).Name = DataIPShortCuts::cAlphaArgs( 1 );
@@ -480,7 +480,7 @@ namespace HeatPumpWaterToWaterSimple {
 		//now process companion coils, if any
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			if ( ! GSHP( GSHPNum ).companionName.empty() ) {
-				GSHP( GSHPNum ).companionIndex = InputProcessor::FindItemInList( GSHP( GSHPNum ).companionName, GSHP );
+				GSHP( GSHPNum ).companionIndex = UtilityRoutines::FindItemInList( GSHP( GSHPNum ).companionName, GSHP );
 				if ( GSHP( GSHPNum ).companionIndex == 0 ) {
 					ShowSevereError( "GetEquationFitWaterToWater Input: did not find companion heat pump named '" + GSHP( GSHPNum ).companionName + "' in heat pump called " + GSHP( GSHPNum ).Name );
 					ErrorsFound =  true;

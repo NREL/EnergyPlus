@@ -69,7 +69,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputReportPredefined.hh>
 #include <UtilityRoutines.hh>
@@ -270,7 +270,7 @@ namespace DElightManagerF {
 
 		for ( auto & znDayl : ZoneDaylight ) {
 			if ( znDayl.DaylightMethod == DElightDaylighting ){
-				int const izone = InputProcessor::FindItemInList( znDayl.ZoneName, Zone );
+				int const izone = UtilityRoutines::FindItemInList( znDayl.ZoneName, Zone );
 				if ( izone != 0 ) {
 
 					rLightLevel = GetDesignLightingLevelForZone( izone );
@@ -641,19 +641,19 @@ namespace DElightManagerF {
 
 		static std::string const cCurrentModuleObject( "Daylighting:DELight:ComplexFenestration" );
 
-		TotDElightCFS = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotDElightCFS = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		DElightComplexFene.allocate( TotDElightCFS );
 		for ( auto & cfs : DElightComplexFene ){
-			InputProcessor::GetObjectItem( cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			cfs.Name = cAlphaArgs( 1 );
 			cfs.ComplexFeneType = cAlphaArgs( 2 );
 			cfs.surfName = cAlphaArgs( 3 );
-			if ( InputProcessor::FindItemInList( cfs.surfName, Surface ) == 0 ){
+			if ( UtilityRoutines::FindItemInList( cfs.surfName, Surface ) == 0 ){
 				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cfs.surfName + "\"." );
 				ErrorsFound = true;
 			}
 			cfs.wndwName = cAlphaArgs( 4 );
-			if ( InputProcessor::FindItemInList( cfs.surfName, Surface ) == 0 ){
+			if ( UtilityRoutines::FindItemInList( cfs.surfName, Surface ) == 0 ){
 				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 4 ) + "=\"" + cfs.wndwName + "\"." );
 				ErrorsFound = true;
 			}
@@ -710,8 +710,8 @@ namespace DElightManagerF {
 		OldAspectRatio = 1.0;
 		NewAspectRatio = 1.0;
 
-		if ( InputProcessor::GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( inputProcessor->getNumObjectsFound( CurrentModuleObject ) == 1 ) {
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OldAspectRatio = rNumerics( 1 );
 			NewAspectRatio = rNumerics( 2 );
 			if ( cAlphas( 1 ) != "XY" ) {
@@ -734,7 +734,7 @@ namespace DElightManagerF {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Robert J. Hitchcock
 		//       DATE WRITTEN   August 2003
-		//       MODIFIED       From InputProcessor::MakeUPPERCase( function by Linda K. Lawrie
+		//       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:

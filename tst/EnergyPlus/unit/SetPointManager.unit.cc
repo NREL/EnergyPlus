@@ -1131,12 +1131,12 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 		DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate( 1 );
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 10000.0;
 
-		EXPECT_EQ( DataLoopNode::NodeID( 2 ), "SPACE1-1 IN NODE" );
+		EXPECT_EQ( DataLoopNode::NodeID( 4 ), "SPACE1-1 IN NODE" );
 		EXPECT_EQ( DataLoopNode::NodeID( 5 ), "SPACE1-1 NODE" );
 
-		DataLoopNode::Node( 2 ).MassFlowRateMax = 1.0; // zone inlet node air flow rate, kg/s
-		DataLoopNode::Node( 2 ).HumRat = 0.075; // zone inlet node air hum ratio, kg/kg
-		DataLoopNode::Node( 2 ).Temp = 40.0; // zone inlet node air temperature, deg C
+		DataLoopNode::Node( 4 ).MassFlowRateMax = 1.0; // zone inlet node air flow rate, kg/s
+		DataLoopNode::Node( 4 ).HumRat = 0.075; // zone inlet node air hum ratio, kg/kg
+		DataLoopNode::Node( 4 ).Temp = 40.0; // zone inlet node air temperature, deg C
 		DataLoopNode::Node( 5 ).Temp = 21.0; // zone air node temperature set to 21.0 deg C
 
 		SetPointManager::SimSetPointManagers();
@@ -1148,8 +1148,8 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 		Real64 CpAir( 0.0 );
 		Real64 ZoneSetPointTemp( 0.0 );
 
-		CpAir = Psychrometrics::PsyCpAirFnWTdb( DataLoopNode::Node( 2 ).HumRat, DataLoopNode::Node( 2 ).Temp );
-		ZoneSetPointTemp = DataLoopNode::Node( 5 ).Temp + DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired / ( CpAir * DataLoopNode::Node( 2 ).MassFlowRateMax );
+		CpAir = Psychrometrics::PsyCpAirFnWTdb( DataLoopNode::Node( 4 ).HumRat, DataLoopNode::Node( 4 ).Temp );
+		ZoneSetPointTemp = DataLoopNode::Node( 5 ).Temp + DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired / ( CpAir * DataLoopNode::Node( 4 ).MassFlowRateMax );
 		// check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
 		EXPECT_EQ( DataLoopNode::NodeID( 12 ), "HCOIL OUTLET NODE" );
 		EXPECT_DOUBLE_EQ( ZoneSetPointTemp, SetPointManager::ColdestSetPtMgr( 1 ).SetPt ); // 29.74 deg C
@@ -1157,3 +1157,120 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 
 }
 
+TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
+{
+	bool ErrorsFound = false;
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.7;",
+
+		"  SetpointManager:OutdoorAirReset,",
+		"    Hot Water Loop Setpoint Manager,  !- Name",
+		"    MaximumTemperature,      !- Control Variable",
+		"    80.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+		"    -17.778,                 !- Outdoor Low Temperature {C}",
+		"    40.0,                    !- Setpoint at Outdoor High Temperature {C}",
+		"    21.11,                   !- Outdoor High Temperature {C}",
+		"    HW Supply Outlet Node;   !- Setpoint Node or NodeList Name",
+
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
+
+	SetPointManager::GetSetPointManagerInputs();
+	// check Set Point Manager get inputs
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlVarType, "MAXIMUMTEMPERATURE" );
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlTypeMode, SetPointManager::iCtrlVarType_MaxTemp );
+	EXPECT_EQ( SetPointManager::AllSetPtMgr( 1 ).SPMType, SetPointManager::iSPMType_OutsideAir );
+	EXPECT_EQ( 80.0, SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 );
+	EXPECT_EQ( -17.778, SetPointManager::OutAirSetPtMgr( 1 ).OutLow1 );
+	EXPECT_EQ( 40.0, SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 );
+	EXPECT_EQ( 21.11, SetPointManager::OutAirSetPtMgr( 1 ).OutHigh1 );
+	// set out door dry bukb temp
+	DataEnvironment::OutDryBulbTemp = -20.0;
+	// do init
+	SetPointManager::InitSetPointManagers();
+	// check OA Reset Set Point Manager run
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPointHi );
+	// change the low outdoor air setpoint reset value to 60.0C
+	SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 = 60.0;
+	// re simulate OA Reset Set Point Manager
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check the new reset value is set
+	EXPECT_EQ( 60.0, DataLoopNode::Node( 1 ).TempSetPointHi );
+
+	// set out door dry bukb temp
+	DataEnvironment::OutDryBulbTemp = 2.0;
+	// check OA Reset Set Point Manager run
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	//SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp)/(OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
+	Real64 SetPt = 60.0 - ( ( 2.0 - -17.778 ) / ( 21.11 - -17.778 ) ) * ( 60.0 - 40.0 );
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( SetPt, DataLoopNode::Node( 1 ).TempSetPointHi );
+
+}
+
+TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest )
+{
+	bool ErrorsFound = false;
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.7;",
+
+		"  SetpointManager:OutdoorAirReset,",
+		"    Hot Water Loop Setpoint Manager,  !- Name",
+		"    MinimumTemperature,      !- Control Variable",
+		"    80.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+		"    -17.778,                 !- Outdoor Low Temperature {C}",
+		"    40.0,                    !- Setpoint at Outdoor High Temperature {C}",
+		"    21.11,                   !- Outdoor High Temperature {C}",
+		"    HW Supply Outlet Node;   !- Setpoint Node or NodeList Name",
+
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
+
+	SetPointManager::GetSetPointManagerInputs();
+	// check Set Point Manager get inputs
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlVarType, "MINIMUMTEMPERATURE" );
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlTypeMode, SetPointManager::iCtrlVarType_MinTemp );
+	EXPECT_EQ( SetPointManager::AllSetPtMgr( 1 ).SPMType, SetPointManager::iSPMType_OutsideAir );
+	EXPECT_EQ( 80.0, SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 );
+	EXPECT_EQ( -17.778, SetPointManager::OutAirSetPtMgr( 1 ).OutLow1 );
+	EXPECT_EQ( 40.0, SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 );
+	EXPECT_EQ( 21.11, SetPointManager::OutAirSetPtMgr( 1 ).OutHigh1 );
+	// set out door dry bukb temp
+	DataEnvironment::OutDryBulbTemp = 22.0;
+	// do init
+	SetPointManager::InitSetPointManagers();
+	// check OA Reset Set Point Manager run
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( 40.0, DataLoopNode::Node( 1 ).TempSetPointLo );
+	// change the low outdoor air setpoint reset value to 60.0C
+	SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 = 35.0;
+	// re simulate OA Reset Set Point Manager
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check the new reset value is set
+	EXPECT_EQ( 35.0, DataLoopNode::Node( 1 ).TempSetPointLo );
+
+	// set out door dry bulb temp
+	DataEnvironment::OutDryBulbTemp = 2.0;
+	// check OA Reset Set Point Manager run
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	//SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp)/(OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
+	Real64 SetPt = 80.0 - ( ( 2.0 - -17.778 ) / ( 21.11 - -17.778 ) ) * ( 80.0 - 35.0 );
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( SetPt, DataLoopNode::Node( 1 ).TempSetPointLo );
+
+}

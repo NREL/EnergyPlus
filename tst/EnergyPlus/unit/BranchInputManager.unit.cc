@@ -52,7 +52,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 using namespace EnergyPlus;
 using namespace BranchInputManager;
@@ -86,7 +86,7 @@ namespace EnergyPlus {
 
 		static std::string const RoutineName( "GetBranchInput: " );
 		CurrentModuleObject = "Branch";
-		int	NumOfBranches = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int	NumOfBranches = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		int NumParams;
 		int NumAlphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve numbers from IDF
@@ -105,9 +105,9 @@ namespace EnergyPlus {
 			Branch.allocate( NumOfBranches );
 			for ( auto & e : Branch ) e.AssignedLoopName.clear();
 			bool ErrFound = false;
-			InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 			NodeNums.dimension( NumParams, 0 );
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 			Alphas.allocate( NumAlphas );
 			Numbers.dimension( NumNumbers, 0.0 );
 			cAlphaFields.allocate( NumAlphas );
@@ -117,10 +117,10 @@ namespace EnergyPlus {
 			int BCount = 0;
 			for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				UtilityRoutines::VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrFound = true;
 					if ( IsBlank ) {
@@ -137,12 +137,12 @@ namespace EnergyPlus {
 
 			EXPECT_EQ( NumOfBranches, 1 );
 
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 1 ), "VAV Sys 1 Main Branch" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 1 ), "VAV Sys 1 Main Branch" ) );
 
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 3 ), "AirLoopHVAC:OutdoorAirSystem" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 4 ), "OA Sys 1" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 5 ), "VAV Sys 1 Inlet Node" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 6 ), "Mixed Air Node 1" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 3 ), "AirLoopHVAC:OutdoorAirSystem" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 4 ), "OA Sys 1" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 5 ), "VAV Sys 1 Inlet Node" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 6 ), "Mixed Air Node 1" ) );
 
 			NumOfBranches = BCount;
 			NodeNums.deallocate();
@@ -247,7 +247,7 @@ namespace EnergyPlus {
 
 		static std::string const RoutineName( "GetBranchInput: " );
 		CurrentModuleObject = "Branch";
-		int	NumOfBranches = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		int	NumOfBranches = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		int NumParams;
 		int NumAlphas; // Used to retrieve names from IDF
 		int NumNumbers; // Used to retrieve numbers from IDF
@@ -266,9 +266,9 @@ namespace EnergyPlus {
 			Branch.allocate( NumOfBranches );
 			for ( auto & e : Branch ) e.AssignedLoopName.clear();
 			bool ErrFound = false;
-			InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 			NodeNums.dimension( NumParams, 0 );
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 			Alphas.allocate( NumAlphas );
 			Numbers.dimension( NumNumbers, 0.0 );
 			cAlphaFields.allocate( NumAlphas );
@@ -278,10 +278,10 @@ namespace EnergyPlus {
 			int BCount = 0;
 			for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				UtilityRoutines::VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrFound = true;
 					if ( IsBlank ) {
@@ -298,27 +298,27 @@ namespace EnergyPlus {
 
 			EXPECT_EQ( NumOfBranches, 1 );
 
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 1 ), "VAV Sys 1 Main Branch" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 1 ), "VAV Sys 1 Main Branch" ) );
 
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 3 ), "AirLoopHVAC:OutdoorAirSystem" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 4 ), "OA Sys 1" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 5 ), "VAV Sys 1 Inlet Node" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 6 ), "Mixed Air Node 1" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 3 ), "AirLoopHVAC:OutdoorAirSystem" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 4 ), "OA Sys 1" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 5 ), "VAV Sys 1 Inlet Node" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 6 ), "Mixed Air Node 1" ) );
 
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 7 ), "Coil:Cooling:Water" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 8 ), "Main Cooling Coil 1" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 9 ), "Mixed Air Node 1" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 10 ), "Main Cooling Coil 1 Outlet Node" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 7 ), "Coil:Cooling:Water" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 8 ), "Main Cooling Coil 1" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 9 ), "Mixed Air Node 1" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 10 ), "Main Cooling Coil 1 Outlet Node" ) );
 
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 11 ), "Coil:Heating:Water" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 12 ), "Main Heating Coil 1" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 13 ), "Main Cooling Coil 1 Outlet Node" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 14 ), "Main Heating Coil 1 Outlet Node" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Heating:Water" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 12 ), "Main Heating Coil 1" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 13 ), "Main Cooling Coil 1 Outlet Node" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 14 ), "Main Heating Coil 1 Outlet Node" ) );
 
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 15 ), "Fan:VariableVolume" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 16 ), "Supply Fan 1" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 17 ), "Main Heating Coil 1 Outlet Node" ) );
-			EXPECT_TRUE( InputProcessor::SameString( Alphas( 18 ), "VAV Sys 1 Outlet Node" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 15 ), "Fan:VariableVolume" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 16 ), "Supply Fan 1" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 17 ), "Main Heating Coil 1 Outlet Node" ) );
+			EXPECT_TRUE( UtilityRoutines::SameString( Alphas( 18 ), "VAV Sys 1 Outlet Node" ) );
 
 			NumOfBranches = BCount;
 			NodeNums.deallocate();
@@ -338,20 +338,20 @@ namespace EnergyPlus {
 		TEST_F( EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
 	{
 
-		std::string const idf_objects = delimited_string( {
-			" Version,8.5;",
+			std::string const idf_objects = delimited_string({
+				" Version,8.5;",
 
-			"AirLoopHVAC,",
-			"  DOAS,                    !- Name",
-			"  ,                        !- Controller List Name",
-			"  DOAS Availability Managers,  !- Availability Manager List Name",
-			"  autosize,                !- Design Supply Air Flow Rate {m3/s}",
-			"  DOAS Branches,           !- Branch List Name",
-			"  ,                        !- Connector List Name",
-			"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
-			"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
-			"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
-			"  DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
+				"AirLoopHVAC,",
+				"  DOAS,                    !- Name",
+				"  ,                        !- Controller List Name",
+				"  DOAS Availability Managers,  !- Availability Manager List Name",
+				"  autosize,                !- Design Supply Air Flow Rate {m3/s}",
+				"  DOAS Branches,           !- Branch List Name",
+				"  ,                        !- Connector List Name",
+				"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
+				"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
+				"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
+				"  DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
 
 			"AirLoopHVAC,",
 			"  Air Loop 1,                    !- Name",

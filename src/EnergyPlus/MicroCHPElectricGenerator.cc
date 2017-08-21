@@ -72,7 +72,7 @@
 #include <GeneratorDynamicsManager.hh>
 #include <GeneratorFuelSupply.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -181,7 +181,7 @@ namespace MicroCHPElectricGenerator {
 		//  Call InitMicroCHPNoNormalizeGenerators
 
 		if ( GeneratorIndex == 0 ) {
-			GenNum = InputProcessor::FindItemInList( GeneratorName, MicroCHP );
+			GenNum = UtilityRoutines::FindItemInList( GeneratorName, MicroCHP );
 			if ( GenNum == 0 ) ShowFatalError( "SimMicroCHPGenerator: Specified Generator not one of Valid Micro CHP Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -269,7 +269,7 @@ namespace MicroCHPElectricGenerator {
 
 			// First get the Micro CHP Parameters so they can be nested in structure later
 			cCurrentModuleObject = "Generator:MicroCHP:NonNormalizedParameters";
-			NumMicroCHPParams = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumMicroCHPParams = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumMicroCHPParams <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -280,9 +280,9 @@ namespace MicroCHPElectricGenerator {
 			CheckEquipName.dimension( NumMicroCHPParams, true );
 
 			for ( CHPParamNum = 1; CHPParamNum <= NumMicroCHPParams; ++CHPParamNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				// Can't validate this name
-				//InputProcessor::IsNameEmpty(AlphArray(1),cCurrentModuleObject, ErrorsFound);
+				//UtilityRoutines::IsNameEmpty(AlphArray(1),cCurrentModuleObject, ErrorsFound);
 
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 
@@ -294,11 +294,11 @@ namespace MicroCHPElectricGenerator {
 				MicroCHPParamInput( CHPParamNum ).ElecEffCurveID = GetCurveCheck( AlphArray( 2 ), ErrorsFound, ObjMSGName ); //Electrical Eff. ID
 				MicroCHPParamInput( CHPParamNum ).ThermalEffCurveID = GetCurveCheck( AlphArray( 3 ), ErrorsFound, ObjMSGName ); //Thermal Efficiency
 
-				if ( InputProcessor::SameString( AlphArray( 4 ), "InternalControl" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 4 ), "InternalControl" ) ) {
 					MicroCHPParamInput( CHPParamNum ).InternalFlowControl = true; //  A4, \field Cooling Water Flow Rate Mode
 					MicroCHPParamInput( CHPParamNum ).PlantFlowControl = false;
 				}
-				if ( ( ! ( InputProcessor::SameString( AlphArray( 4 ), "InternalControl" ) ) ) && ( ! ( InputProcessor::SameString( AlphArray( 4 ), "PlantControl" ) ) ) ) {
+				if ( ( ! ( UtilityRoutines::SameString( AlphArray( 4 ), "InternalControl" ) ) ) && ( ! ( UtilityRoutines::SameString( AlphArray( 4 ), "PlantControl" ) ) ) ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 4 ) + " = " + AlphArray( 4 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
@@ -330,11 +330,11 @@ namespace MicroCHPElectricGenerator {
 				}
 				MicroCHPParamInput( CHPParamNum ).Pstandby = NumArray( 12 ); // N12 Standby Power [W]
 
-				if ( InputProcessor::SameString( AlphArray( 7 ), "TimeDelay" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 7 ), "TimeDelay" ) ) {
 					MicroCHPParamInput( CHPParamNum ).WarmUpByTimeDelay = true;
 					MicroCHPParamInput( CHPParamNum ).WarmUpByEngineTemp = false;
 				}
-				if ( ( ! ( InputProcessor::SameString( AlphArray( 7 ), "NominalEngineTemperature" ) ) ) && ( ! ( InputProcessor::SameString( AlphArray( 7 ), "TimeDelay" ) ) ) ) {
+				if ( ( ! ( UtilityRoutines::SameString( AlphArray( 7 ), "NominalEngineTemperature" ) ) ) && ( ! ( UtilityRoutines::SameString( AlphArray( 7 ), "TimeDelay" ) ) ) ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 7 ) + " = " + AlphArray( 7 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
@@ -349,11 +349,11 @@ namespace MicroCHPElectricGenerator {
 
 				MicroCHPParamInput( CHPParamNum ).CoolDownDelay = NumArray( 19 ); // N19 Cool Down Delay Time in seconds
 
-				if ( InputProcessor::SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) {
 					MicroCHPParamInput( CHPParamNum ).MandatoryFullCoolDown = true;
 					MicroCHPParamInput( CHPParamNum ).WarmRestartOkay = false;
 				}
-				if ( ( ! ( InputProcessor::SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) ) && ( ! ( InputProcessor::SameString( AlphArray( 8 ), "OptionalCoolDown" ) ) ) ) {
+				if ( ( ! ( UtilityRoutines::SameString( AlphArray( 8 ), "MandatoryCoolDown" ) ) ) && ( ! ( UtilityRoutines::SameString( AlphArray( 8 ), "OptionalCoolDown" ) ) ) ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ErrorsFound = true;
@@ -361,7 +361,7 @@ namespace MicroCHPElectricGenerator {
 			}
 
 			cCurrentModuleObject = "Generator:MicroCHP";
-			NumMicroCHPs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumMicroCHPs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumMicroCHPs <= 0 ) {
 				// shouldn't ever come here?
@@ -377,15 +377,15 @@ namespace MicroCHPElectricGenerator {
 
 			// load in Micro CHPs
 			for ( GeneratorNum = 1; GeneratorNum <= NumMicroCHPs; ++GeneratorNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				//GENERATOR:MICRO CHP,
 				MicroCHP( GeneratorNum ).Name = AlphArray( 1 ); //  A1 Generator name
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 				MicroCHP( GeneratorNum ).ParamObjName = AlphArray( 2 ); //  A2 Micro CHP Parameter Object Name
 				//find input structure
-				thisParamID = InputProcessor::FindItemInList( AlphArray( 2 ), MicroCHPParamInput );
+				thisParamID = UtilityRoutines::FindItemInList( AlphArray( 2 ), MicroCHPParamInput );
 				if ( thisParamID != 0 ) {
 					MicroCHP( GeneratorNum ).A42Model = MicroCHPParamInput( thisParamID ); // entire structure of input data assigned here!
 				} else {
@@ -396,7 +396,7 @@ namespace MicroCHPElectricGenerator {
 
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
 					MicroCHP( GeneratorNum ).ZoneName = AlphArray( 3 ); //  A3 Zone Name
-					MicroCHP( GeneratorNum ).ZoneID = InputProcessor::FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone );
+					MicroCHP( GeneratorNum ).ZoneID = UtilityRoutines::FindItemInList( MicroCHP( GeneratorNum ).ZoneName, Zone );
 					if ( MicroCHP( GeneratorNum ).ZoneID == 0 ) {
 						ShowSevereError( "Invalid, " + cAlphaFieldNames( 3 ) + " = " + AlphArray( 3 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -419,7 +419,7 @@ namespace MicroCHPElectricGenerator {
 				MicroCHP( GeneratorNum ).AirOutletNodeName = AlphArray( 7 ); //  A7 Air Outlet Node Name
 				MicroCHP( GeneratorNum ).AirOutletNodeID = GetOnlySingleNode( AlphArray( 7 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
-				MicroCHP( GeneratorNum ).FuelSupplyID = InputProcessor::FindItemInList( AlphArray( 8 ), FuelSupply ); // Fuel Supply ID
+				MicroCHP( GeneratorNum ).FuelSupplyID = UtilityRoutines::FindItemInList( AlphArray( 8 ), FuelSupply ); // Fuel Supply ID
 				if ( MicroCHP( GeneratorNum ).FuelSupplyID == 0 ) {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 8 ) + " = " + AlphArray( 8 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
@@ -1492,7 +1492,7 @@ namespace MicroCHPElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = InputProcessor::FindItemInList( CompName, MicroCHP );
+			CompNum = UtilityRoutines::FindItemInList( CompName, MicroCHP );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMicroCHPPlantHeatRecovery: MicroCHP Generator Unit not found=" + CompName );
 				return;

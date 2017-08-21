@@ -171,7 +171,7 @@ and the coil bypass factor is:
 
 If the iterative procedure doesn't converge, or the coil bypass factor is too large (greater than 0.5), or the apparatus dewpoint enthalpy is less than the saturated air enthalpy at the water inlet temperature, the design outlet air conditions are reset to 90\% relative humidity at the same outlet enthalpy. The above design calculations are then repeated.
 
-We are now ready to calculate the design coil UA. This will be accomplished by inverting the simple coil calculation routine \emph{CoolingCoil} using the Regula Falsi method. First we make an initial estimate of the coil UA.
+We are now ready to calculate the design coil UA. This will be accomplished by inverting the simple coil calculation routine \emph{CoolingCoil} using the root solver method. First we make an initial estimate of the coil UA.
 
 \begin{equation}
 \Delta {h_{lmd}} = (({h_{air,in}} - {h_{w,sat,out}}) - ({h_{air,out}} - {h_{w,sat,in}}))/log(({h_{air,in}} - {h_{w,sat,out}}) - ({h_{air,out}} - {h_{w,sat,in}}))
@@ -214,7 +214,7 @@ using the following assumptions:
   Airside combined heat and mass transfer coefficient = 140 (W/m2∙°C)
 \end{itemize}
 
-Interior and exterior U values (really UA's per unit exterior surface area) are calculated by dividing the above UA's by the area. The resulting U\(_{coil,ext}\) is assumed to be U\(_{coil,ext,wet}\); U\(_{coil,ext,dry}\) is set equal to U\(_{coil,ext,wet}\). We now have all the starting values needed for inverting the simple coil model using the chosen Regula Falsi iterative method. Once the iteration is completed, we have coil UA's and U's that yield the design outlet air and water enthalpies given the inlet design conditions and flow rates. Note that the simple coil model can not exactly match the specified design outlet air temperature and humidity ratio. It can only match the design air outlet enthalpy. Generally the simple coil model will yield outlet conditions near the saturation curve if any dehumidification is occuring. Typical outlet relative humidities are around 95\%.
+Interior and exterior U values (really UA's per unit exterior surface area) are calculated by dividing the above UA's by the area. The resulting U\(_{coil,ext}\) is assumed to be U\(_{coil,ext,wet}\); U\(_{coil,ext,dry}\) is set equal to U\(_{coil,ext,wet}\). We now have all the starting values needed for inverting the simple coil model using the chosen root solver iterative method. Once the iteration is completed, we have coil UA's and U's that yield the design outlet air and water enthalpies given the inlet design conditions and flow rates. Note that the simple coil model can not exactly match the specified design outlet air temperature and humidity ratio. It can only match the design air outlet enthalpy. Generally the simple coil model will yield outlet conditions near the saturation curve if any dehumidification is occuring. Typical outlet relative humidities are around 95\%.
 
 \subsubsection{Variable UA}\label{variable-ua}
 
@@ -854,7 +854,7 @@ The output of the coil in watts is:
 {\dot Q_{coil}} = {\dot C_{water}}\cdot ({T_{water,in}} - {T_{water,out}})
 \end{equation}
 
-The UA value is recalculated for each timestep.~ A nominal UA, \emph{UA\(_{0}\)}, at the rating point is calculated by the program using the input for rated conditions and a search routine called regula falsi.
+The UA value is recalculated for each timestep.~ A nominal UA, \emph{UA\(_{0}\)}, at the rating point is calculated by the program using the input for rated conditions and a search routine called root solver.
 
 User input for the ratio of convective heat transfers at the nominal or rated operating point, ``\emph{r},'' is used in the model.~ This ratio is defined as
 
@@ -2616,13 +2616,13 @@ Point & Net Capacity & Coil inlet wetbulb & Coil inlet drybulb & Condenser inlet
 \endhead
 
 A & 100\% & 19.4C & 26.7C & 35.0C & Rated High speed flow rate \tabularnewline
-B & 75\% & 19.4C & 26.7C & 27.5C & Regula falsi result where coil leaving drybulb matches Point A \tabularnewline
+B & 75\% & 19.4C & 26.7C & 27.5C & root solver result where coil leaving drybulb matches Point A \tabularnewline
 C & 50\% & 19.4C & 26.7C & 20.0C \tabularnewline
 D & 25\% & 19.4C & 26.7C & 18.3C \tabularnewline
 \bottomrule
 \end{longtable}
 
-The units are assumed to be VAV and Standard 340/360 is be applied as for VAV indoor supply fan.~ Because the standard stipulates ``the airflow rate at part load should be adjusted to maintain the full load measured leaving dry-bulb temperature,'' the part load rating test points ``B'', ``C'', and ``D'' are evaluated by using the entire DX coil model calculations to obtain the supply air conditions leaving the coil and iterating on supply air flow rate to find the supply air flow rate.~ The numerical method called Regula Falsi is used to find the supply flow rate at each of the part load test points.~ Once the supply air flow rate is known, the two-speed DX coil model results are used to determine EER at the part load test points.
+The units are assumed to be VAV and Standard 340/360 is be applied as for VAV indoor supply fan.~ Because the standard stipulates ``the airflow rate at part load should be adjusted to maintain the full load measured leaving dry-bulb temperature,'' the part load rating test points ``B'', ``C'', and ``D'' are evaluated by using the entire DX coil model calculations to obtain the supply air conditions leaving the coil and iterating on supply air flow rate to find the supply air flow rate.~ The numerical method called root solver is used to find the supply flow rate at each of the part load test points.~ Once the supply air flow rate is known, the two-speed DX coil model results are used to determine EER at the part load test points.
 
 When evaluating the two-speed DX coil model, the speed ratio and cycling ratio are specified based on the desired or target net capacity.~ When the low speed net capacity is lower than the target part load net capacity, the speed ratio is calculated using
 

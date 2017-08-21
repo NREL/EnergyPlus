@@ -70,7 +70,6 @@
 #include <DataSystemVariables.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <PierceSurface.hh>
 #include <Psychrometrics.hh>
 #include <TARCOGGassesParams.hh>

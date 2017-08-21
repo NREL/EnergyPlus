@@ -69,7 +69,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
@@ -1849,7 +1849,7 @@ namespace ThermalComfort {
 		int WhichAFList; // Used in validating AngleFactorList
 
 		cCurrentModuleObject = "ComfortViewFactorAngles";
-		NumOfAngleFactorLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfAngleFactorLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		AngleFactorList.allocate( NumOfAngleFactorLists );
 		for ( auto & e : AngleFactorList ) {
 			e.Name.clear();
@@ -1861,11 +1861,11 @@ namespace ThermalComfort {
 
 			AllAngleFacSummed = 0.0;
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			AngleFactorList( Item ).Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
 			AngleFactorList( Item ).ZoneName = cAlphaArgs( 2 );
-			AngleFactorList( Item ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			AngleFactorList( Item ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( AngleFactorList( Item ).ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - not found" );
 				ShowContinueError( "...invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -1884,7 +1884,7 @@ namespace ThermalComfort {
 
 			for ( SurfNum = 1; SurfNum <= AngleFactorList( Item ).TotAngleFacSurfaces; ++SurfNum ) {
 				AngleFactorList( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
-				AngleFactorList( Item ).SurfacePtr( SurfNum ) = InputProcessor::FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
+				AngleFactorList( Item ).SurfacePtr( SurfNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
 				AngleFactorList( Item ).AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
 				// Error trap for surfaces that do not exist or surfaces not in the zone
 				if ( AngleFactorList( Item ).SurfacePtr( SurfNum ) == 0 ) {
@@ -1918,7 +1918,7 @@ namespace ThermalComfort {
 
 		for ( Item = 1; Item <= TotPeople; ++Item ) {
 			if ( People( Item ).MRTCalcType != AngleFactor ) continue;
-			People( Item ).AngleFactorListPtr = InputProcessor::FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
+			People( Item ).AngleFactorListPtr = UtilityRoutines::FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
 			WhichAFList = People( Item ).AngleFactorListPtr;
 			if ( WhichAFList == 0 && ( People( Item ).Fanger || People( Item ).Pierce || People( Item ).KSU ) ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + People( Item ).AngleFactorListName + "\", invalid" );

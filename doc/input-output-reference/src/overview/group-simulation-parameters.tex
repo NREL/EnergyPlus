@@ -757,6 +757,32 @@ SimulationControl,
   2;                       !- Maximum Number of HVAC Sizing Simulation Passes
 \end{lstlisting}
 
+\subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
+
+The HVACSystemRootFindingAlgorithm object provides a way to select what type of solution
+algorithm will be used to find a part load ratio or mass flow rate at given equipment/system load in HVAC system simulations. This object is an optional object. If the default algorithm is used, this object is not required in an input file.
+
+
+\subsubsection{Inputs}\label{inputs-hvacystemrootfindingalgorithm}
+
+\paragraph{Field: Algorithm}\label{field-algorithm}
+
+Five choices are allowed to select which solution algorithm will be used: RegulaFalsi, Bisection,  BisectionThenRegulaFalsi, RegulaFalsiThenBisection, and Alternation. The RegulaFalsi
+selection is the default selection. Bisection selction will allow the program to use the bisection method to get a solution. The BisectionThenRegulaFalsi selection requires the program to apply the bisection method first. After the number of iteration is above the value defined in the next field, the RegulaFalsi algorithm will be applied. The RegulaFalsiThenBisection selection requires the program to apply the RegulaFalsi method first. After the number of iteration is above the value defined in the next field, the bisection algorithm will be applied. The Alternation selection forces number of iteration (defined in the next field) using RegulaFalsi first. Then Bisection and RegulaFalsi algorithm will be alternated after the number of iteration is above the value defined in the next field.  
+
+
+\paragraph{Field: Number of Iterations Before Algorithm Switch}\label{field-number-of-iteration-before-algorithm-switch}
+
+This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi or Alternation is entered. When the iteration number is greater than the value, algorithm switches either from RegulaFalsi to Bisection or from Bisection to RegulaFalsi with choices of RegulaFalsiThenBisection or BisectionThenRegulaFalsi. 
+
+An IDF example:
+
+\begin{lstlisting}
+HVACSystemRootFindingAlgorithm,
+  RegulaFalsiThenBisection, !- Algorithm
+  20;                      !- Number of Iteration Before Algorithm Switch
+\end{lstlisting}
+
 \subsection{Meter:Custom}\label{metercustom}
 
 A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar. A Meter:Custom cannot reference another Meter:Custom.

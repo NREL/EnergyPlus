@@ -72,7 +72,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -263,7 +263,7 @@ namespace ChillerElectricEIR {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			EIRChillNum = InputProcessor::FindItemInList( EIRChillerName, ElectricEIRChiller );
+			EIRChillNum = UtilityRoutines::FindItemInList( EIRChillerName, ElectricEIRChiller );
 			if ( EIRChillNum == 0 ) {
 				ShowFatalError( "SimElectricEIRChiller: Specified Chiller not one of Valid EIR Electric Chillers=" + EIRChillerName );
 			}
@@ -376,7 +376,7 @@ namespace ChillerElectricEIR {
 
 		if ( getInputAllocatedFlag ) return;
 		cCurrentModuleObject = "Chiller:Electric:EIR";
-		NumElectricEIRChillers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumElectricEIRChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumElectricEIRChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -391,8 +391,8 @@ namespace ChillerElectricEIR {
 
 		// Load arrays with electric EIR chiller data
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			inputProcessor->getObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
@@ -426,11 +426,11 @@ namespace ChillerElectricEIR {
 			ElectricEIRChiller( EIRChillerNum ).EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Chilled Water Nodes" );
 
-			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "WaterCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "WaterCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = WaterCooled;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "AirCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "AirCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = AirCooled;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "EvaporativelyCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "EvaporativelyCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = EvapCooled;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
@@ -743,6 +743,11 @@ namespace ChillerElectricEIR {
 				}
 			}
 
+			if ( NumAlphas > 15 ) {
+				ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory = cAlphaArgs( 16 );
+			} else {
+				ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory = "General";
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -753,7 +758,7 @@ namespace ChillerElectricEIR {
 			SetupOutputVariable( "Chiller Part Load Ratio []", ElectricEIRChillerReport( EIRChillerNum ).ChillerPartLoadRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Cycling Ratio []", ElectricEIRChillerReport( EIRChillerNum ).ChillerCyclingRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Electric Power [W]", ElectricEIRChillerReport( EIRChillerNum ).Power, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory, "Plant" );
 
 			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", ElectricEIRChillerReport( EIRChillerNum ).QEvap, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).EvapEnergy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
@@ -1375,7 +1380,7 @@ namespace ChillerElectricEIR {
 					}
 					tempHeatRecVolFlowRate = nomHeatRecVolFlowRateUser;
 				}
-			
+
 			}
 			if ( ! ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tempHeatRecVolFlowRate = ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 			PlantUtilities::RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).HeatRecInletNodeNum, tempHeatRecVolFlowRate );
@@ -1614,22 +1619,22 @@ namespace ChillerElectricEIR {
 		EvapOutletTemp = Node( ElectricEIRChiller( EIRChillNum ).EvapOutletNodeNum ).Temp;
 		TempLowLimitEout = ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElectricEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerRefCap;
 			Real64 ReferenceCOP_ff = ReferenceCOP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerRefCap = NomCap_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
 			ReferenceCOP = ReferenceCOP_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
 
 		}
-		
+
 		// Set mass flow rates
 		if ( ElectricEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
 			CondMassFlowRate = ElectricEIRChiller( EIRChillNum ).CondMassFlowRateMax;
@@ -1664,18 +1669,18 @@ namespace ChillerElectricEIR {
 		} else {
 			assert( false );
 		}}
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the EvapOutletTempSetPoint
 			EvapOutletTempSetPoint = max( ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTempSetPoint_ff - ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset ));
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
-			
+
 		}
 
 		// correct temperature if using heat recovery
@@ -1833,7 +1838,7 @@ namespace ChillerElectricEIR {
 			QEvaporator = max( 0.0, ( EvapMassFlowRate * Cp * EvapDeltaTemp ) );
 			EvapOutletTemp = EvapOutletTempSetPoint;
 		}
-		
+
 		//Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
 		if ( EvapOutletTemp < TempLowLimitEout ) {
 			if ( ( Node( EvapInletNode ).Temp - TempLowLimitEout ) > DeltaTempTol ) {

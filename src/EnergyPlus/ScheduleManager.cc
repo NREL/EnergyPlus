@@ -62,7 +62,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 
@@ -348,101 +348,101 @@ namespace ScheduleManager {
 		MaxAlps = 0;
 
 		CurrentModuleObject = "ScheduleTypeLimits";
-		NumScheduleTypes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumScheduleTypes = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumScheduleTypes > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:Hourly";
-		NumHrDaySchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumHrDaySchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumHrDaySchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:Interval";
-		NumIntDaySchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumIntDaySchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumIntDaySchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Day:List";
-		NumLstDaySchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumLstDaySchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumLstDaySchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Week:Daily";
-		NumRegWeekSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumRegWeekSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumRegWeekSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Week:Compact";
-		NumCptWeekSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCptWeekSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumCptWeekSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Year";
-		NumRegSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumRegSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumRegSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Compact";
-		NumCptSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCptSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumCptSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		CurrentModuleObject = "Schedule:File";
-		NumCommaFileSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCommaFileSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumCommaFileSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "Schedule:Constant";
-		NumConstantSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumConstantSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumConstantSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
 		CurrentModuleObject = "ExternalInterface:Schedule";
-		NumExternalInterfaceSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumExternalInterfaceSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		// added for FMI
 		if ( NumExternalInterfaceSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		// added for FMU Import
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
-		NumExternalInterfaceFunctionalMockupUnitImportSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitImportSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumExternalInterfaceFunctionalMockupUnitImportSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		// added for FMU Export
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
-		NumExternalInterfaceFunctionalMockupUnitExportSchedules = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitExportSchedules = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumExternalInterfaceFunctionalMockupUnitExportSchedules > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas + 1 );
 		}
 		CurrentModuleObject = "Output:Schedules";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Count, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlps = max( MaxAlps, NumAlphas );
 
@@ -459,7 +459,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Compact";
 		MaxNums1 = 0;
 		for ( LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status );
 			// # 'THROUGH" => Number of additional week schedules
 			// # 'FOR' => Number of additional day schedules
 			for ( Count = 3; Count <= NumAlphas; ++Count ) {
@@ -539,8 +539,8 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "ScheduleTypeLimits";
 		for ( LoopIndex = 1; LoopIndex <= NumScheduleTypes; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			ScheduleType( LoopIndex ).Name = Alphas( 1 );
 			if ( lNumericBlanks( 1 ) || lNumericBlanks( 2 ) ) {
@@ -567,7 +567,7 @@ namespace ScheduleManager {
 			}
 			if ( NumAlphas >= 3 ) {
 				if ( ! lAlphaBlanks( 3 ) ) {
-					ScheduleType( LoopIndex ).UnitType = InputProcessor::FindItem( Alphas( 3 ), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes );
+					ScheduleType( LoopIndex ).UnitType = UtilityRoutines::FindItem( Alphas( 3 ), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes );
 					if ( ScheduleType( LoopIndex ).UnitType == 0 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\" is invalid." );
 					}
@@ -593,13 +593,13 @@ namespace ScheduleManager {
 		Count = 0;
 		CurrentModuleObject = "Schedule:Day:Hourly";
 		for ( LoopIndex = 1; LoopIndex <= NumHrDaySchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+				CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -643,13 +643,13 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "Schedule:Day:Interval";
 		for ( LoopIndex = 1; LoopIndex <= NumIntDaySchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+				CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -721,13 +721,13 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "Schedule:Day:List";
 		for ( LoopIndex = 1; LoopIndex <= NumLstDaySchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+				CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -841,12 +841,12 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "Schedule:Week:Daily";
 		for ( LoopIndex = 1; LoopIndex <= NumRegWeekSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueWeekScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			WeekSchedule( LoopIndex ).Name = Alphas( 1 );
 			// Rest of Alphas are processed into Pointers
 			for ( InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex ) {
-				DayIndex = InputProcessor::FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ) );
+				DayIndex = UtilityRoutines::FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ) );
 				if ( DayIndex == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex + 1 ) + " \"" + Alphas( InLoopIndex + 1 ) + "\" not Found", UnitNumber );
 					ErrorsFound = true;
@@ -860,7 +860,7 @@ namespace ScheduleManager {
 		Count = NumRegWeekSchedules;
 		CurrentModuleObject = "Schedule:Week:Compact";
 		for ( LoopIndex = 1; LoopIndex <= NumCptWeekSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			if ( Count > 0 ) {
 				GlobalNames::VerifyUniqueInterObjectName( UniqueWeekScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			}
@@ -869,7 +869,7 @@ namespace ScheduleManager {
 			AllDays = false;
 			// Rest of Alphas are processed into Pointers
 			for ( InLoopIndex = 2; InLoopIndex <= NumAlphas; InLoopIndex += 2 ) {
-				DayIndex = InputProcessor::FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ) );
+				DayIndex = UtilityRoutines::FindItemInList( Alphas( InLoopIndex + 1 ), DaySchedule( {1,NumRegDaySchedules} ) );
 				if ( DayIndex == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex + 1 ) + " \"" + Alphas( InLoopIndex + 1 ) + "\" not Found", UnitNumber );
 					ShowContinueError( "ref: " + cAlphaFields( InLoopIndex ) + " \"" + Alphas( InLoopIndex ) + "\"" );
@@ -904,13 +904,13 @@ namespace ScheduleManager {
 
 		CurrentModuleObject = "Schedule:Year";
 		for ( LoopIndex = 1; LoopIndex <= NumRegSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Schedule( LoopIndex ).Name = Alphas( 1 );
 			Schedule( LoopIndex ).SchType = ScheduleInput_year;
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+				CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -925,7 +925,7 @@ namespace ScheduleManager {
 			DaysInYear = 0;
 			// Rest of Alphas (Weekschedules) are processed into Pointers
 			for ( InLoopIndex = 3; InLoopIndex <= NumAlphas; ++InLoopIndex ) {
-				WeekIndex = InputProcessor::FindItemInList( Alphas( InLoopIndex ), WeekSchedule( {1,NumRegWeekSchedules} ) );
+				WeekIndex = UtilityRoutines::FindItemInList( Alphas( InLoopIndex ), WeekSchedule( {1,NumRegWeekSchedules} ) );
 				if ( WeekIndex == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( InLoopIndex ) + "=\"" + Alphas( InLoopIndex ) + "\" not found.", UnitNumber );
 					ErrorsFound = true;
@@ -1001,13 +1001,13 @@ namespace ScheduleManager {
 		AddDaySch = NumRegDaySchedules;
 		CurrentModuleObject = "Schedule:Compact";
 		for ( LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_compact;
 			// Validate ScheduleType
-			CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+			CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1147,7 +1147,7 @@ namespace ScheduleManager {
 							++NumField;
 							++xxcount;
 							++NumNumbers;
-							Numbers( NumNumbers ) = InputProcessor::ProcessNumber( Alphas( NumField ), ErrorHere );
+							Numbers( NumNumbers ) = UtilityRoutines::ProcessNumber( Alphas( NumField ), ErrorHere );
 							if ( ErrorHere ) {
 								ShowSevereError( CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
 								ShowContinueError( "Until field=[" + Alphas( NumField - 1 ) + "] has illegal value field=[" + Alphas( NumField ) + "]." );
@@ -1283,7 +1283,7 @@ namespace ScheduleManager {
 		}
 		CurrentModuleObject = "Schedule:File";
 		for ( LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
@@ -1291,7 +1291,7 @@ namespace ScheduleManager {
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
 				CheckIndex = 0;
-				if ( ! lAlphaBlanks( 2 ) ) CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+				if ( ! lAlphaBlanks( 2 ) ) CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( "ProcessScheduleInput: For " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1316,14 +1316,14 @@ namespace ScheduleManager {
 				continue;
 			}
 
-			if ( lAlphaBlanks( 4 ) || InputProcessor::SameString( Alphas( 4 ), "comma" ) ) {
+			if ( lAlphaBlanks( 4 ) || UtilityRoutines::SameString( Alphas( 4 ), "comma" ) ) {
 				ColumnSep = CharComma;
 				Alphas( 4 ) = "comma";
-			} else if ( InputProcessor::SameString( Alphas( 4 ), "semicolon" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 4 ), "semicolon" ) ) {
 				ColumnSep = CharSemicolon;
-			} else if ( InputProcessor::SameString( Alphas( 4 ), "tab" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 4 ), "tab" ) ) {
 				ColumnSep = CharTab;
-			} else if ( InputProcessor::SameString( Alphas( 4 ), "space" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 4 ), "space" ) ) {
 				ColumnSep = CharSpace;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 4 ) + " illegal value=\"" + Alphas( 4 ) + "\"." );
@@ -1481,7 +1481,7 @@ namespace ScheduleManager {
 						if ( colCnt == curcolCount ) break;
 					}
 					if ( colCnt == curcolCount ) {
-						columnValue = InputProcessor::ProcessNumber( subString, errFlag );
+						columnValue = UtilityRoutines::ProcessNumber( subString, errFlag );
 						if ( errFlag ) {
 							++numerrors;
 							columnValue = 0.0;
@@ -1595,14 +1595,14 @@ namespace ScheduleManager {
 		// Constant Schedules
 		CurrentModuleObject = "Schedule:Constant";
 		for ( LoopIndex = 1; LoopIndex <= NumConstantSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_constant;
 			// Validate ScheduleType
 			if ( NumScheduleTypes > 0 ) {
-				CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+				CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 				if ( CheckIndex == 0 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1637,14 +1637,14 @@ namespace ScheduleManager {
 		CurrentModuleObject = "ExternalInterface:Schedule";
 		for ( LoopIndex = 1; LoopIndex <= NumExternalInterfaceSchedules; ++LoopIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_external;
 
 			// Validate ScheduleType
-			CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+			CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1680,7 +1680,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
 		for ( LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitImportSchedules; ++LoopIndex ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
 				GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport)", ErrorsFound );
@@ -1692,7 +1692,7 @@ namespace ScheduleManager {
 			Schedule( SchNum ).SchType = ScheduleInput_external;
 
 			// Validate ScheduleType
-			CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+			CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1728,7 +1728,7 @@ namespace ScheduleManager {
 		// added for FMU Export
 		CurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
 		for ( LoopIndex = 1; LoopIndex <= NumExternalInterfaceFunctionalMockupUnitExportSchedules; ++LoopIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
 				GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport)", ErrorsFound );
@@ -1741,7 +1741,7 @@ namespace ScheduleManager {
 			Schedule( SchNum ).SchType = ScheduleInput_external;
 
 			// Validate ScheduleType
-			CheckIndex = InputProcessor::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
+			CheckIndex = UtilityRoutines::FindItemInList( Alphas( 2 ), ScheduleType( {1,NumScheduleTypes} ) );
 			if ( CheckIndex == 0 ) {
 				if ( ! lAlphaBlanks( 2 ) ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" not found -- will not be validated" );
@@ -1790,12 +1790,12 @@ namespace ScheduleManager {
 
 		if ( NumScheduleTypes + NumDaySchedules + NumWeekSchedules + NumSchedules > 0 ) { // Report to EIO file
 			CurrentModuleObject = "Output:Schedules";
-			NumFields = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+			NumFields = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 			//    RptSchedule=.FALSE.
 			RptLevel = 1;
 			for ( Count = 1; Count <= NumFields; ++Count ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status );
+				inputProcessor->getObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status );
 				//      RptSchedule=.TRUE.
 
 				{ auto const SELECT_CASE_var( Alphas( 1 ) );
@@ -2481,7 +2481,7 @@ namespace ScheduleManager {
 		}
 
 		if ( NumSchedules > 0 ) {
-			GetScheduleIndex = InputProcessor::FindItemInList( ScheduleName, Schedule( {1,NumSchedules} ) );
+			GetScheduleIndex = UtilityRoutines::FindItemInList( ScheduleName, Schedule( {1,NumSchedules} ) );
 			if ( GetScheduleIndex > 0 ) {
 				if ( ! Schedule( GetScheduleIndex ).Used ) {
 					Schedule( GetScheduleIndex ).Used = true;
@@ -2582,7 +2582,7 @@ namespace ScheduleManager {
 		}
 
 		if ( NumDaySchedules > 0 ) {
-			GetDayScheduleIndex = InputProcessor::FindItemInList( ScheduleName, DaySchedule( {1,NumDaySchedules} ) );
+			GetDayScheduleIndex = UtilityRoutines::FindItemInList( ScheduleName, DaySchedule( {1,NumDaySchedules} ) );
 			if ( GetDayScheduleIndex > 0 ) {
 				DaySchedule( GetDayScheduleIndex ).Used = true;
 			}
@@ -4561,6 +4561,45 @@ namespace ScheduleManager {
 
 	}
 
+	// returns the annual full load hours for a schedule - essentially the sum of the hourly values
+	Real64
+	ScheduleAnnualFullLoadHours(
+		int const ScheduleIndex, // Which Schedule being tested
+		int const StartDayOfWeek, // Day of week for start of year
+		bool const isItLeapYear // true if it is a leap year containing February 29
+	)
+	{
+		// J. Glazer - July 2017
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+
+		int DaysInYear;
+
+		if ( isItLeapYear ) {
+			DaysInYear = 366;
+		} else {
+			DaysInYear = 365;
+		}
+
+		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
+			ShowFatalError( "ScheduleAnnualFullLoadHours called with ScheduleIndex out of range" );
+		}
+
+		int DayT = StartDayOfWeek;
+		Real64 TotalHours = 0.0;
+
+		if ( DayT == 0 ) return TotalHours;
+
+		for ( int Loop = 1; Loop <= DaysInYear; ++Loop ) {
+			int WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
+			TotalHours += sum( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue ) / double( NumOfTimeStepInHour );
+			++DayT;
+			if ( DayT > 7 ) DayT = 1;
+		}
+
+		return TotalHours;
+	}
+
+	// returns the average number of hours per week based on the schedule index provided
 	Real64
 	ScheduleAverageHoursPerWeek(
 		int const ScheduleIndex, // Which Schedule being tested
@@ -4579,42 +4618,13 @@ namespace ScheduleManager {
 		// This function returns the "average" hours per week for a schedule over
 		// the entire year.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
-		Real64 AverageHoursPerWeek; // Average Hours Per Week
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int WkSch;
-		int DayT;
-		int Loop;
-		Real64 TotalHours;
 		Real64 WeeksInYear;
-		int DaysInYear;
 
 		if ( isItLeapYear ) {
-			DaysInYear = 366;
 			WeeksInYear = 366.0 / 7.0;
 		} else {
-			DaysInYear = 365;
 			WeeksInYear = 365.0 / 7.0;
 		}
 
@@ -4622,26 +4632,57 @@ namespace ScheduleManager {
 			ShowFatalError( "ScheduleAverageHoursPerWeek called with ScheduleIndex out of range" );
 		}
 
-		DayT = StartDayOfWeek;
-		AverageHoursPerWeek = 0.0;
-		TotalHours = 0.0;
+		Real64 TotalHours = ScheduleAnnualFullLoadHours( ScheduleIndex , StartDayOfWeek, isItLeapYear );
 
-		if ( DayT == 0 ) return AverageHoursPerWeek;
+		return TotalHours / WeeksInYear; // Ok to return a fraction since WeeksInYear we know is always non-zero
 
-		for ( Loop = 1; Loop <= DaysInYear; ++Loop ) {
-			WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
-			TotalHours += sum( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue ) / double( NumOfTimeStepInHour );
+	}
+
+	// returns the annual hours greater than 1% for a schedule - essentially the number of hours with any operation
+	Real64
+	ScheduleHoursGT1perc(
+			int const ScheduleIndex, // Which Schedule being tested
+			int const StartDayOfWeek, // Day of week for start of year
+			bool const isItLeapYear // true if it is a leap year containing February 29
+		)
+	{
+		// J. Glazer - July 2017
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+
+		int DaysInYear;
+
+		if ( isItLeapYear ) {
+			DaysInYear = 366;
+		} else {
+			DaysInYear = 365;
+		}
+
+		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
+			ShowFatalError( "ScheduleHoursGT1perc called with ScheduleIndex out of range" );
+		}
+
+		int DayT = StartDayOfWeek;
+		Real64 TotalHours = 0.0;
+
+		if ( DayT == 0 ) return TotalHours;
+
+		for ( int Loop = 1; Loop <= DaysInYear; ++Loop ) {
+			int WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
+			for ( int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay ) {
+				for ( int TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+					if ( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue( TS, hrOfDay  ) ) {
+						TotalHours += DataGlobals::TimeStepZone;
+					}
+				}
+			}
+
 			++DayT;
 			if ( DayT > 7 ) DayT = 1;
 		}
 
-		//  Total hours for year have been set.
-
-		AverageHoursPerWeek = TotalHours / WeeksInYear;
-
-		return AverageHoursPerWeek;
-
+		return TotalHours;
 	}
+
 
 	int
 	GetNumberOfSchedules()

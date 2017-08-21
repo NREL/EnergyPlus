@@ -57,7 +57,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantComponent.hh>
@@ -199,8 +199,8 @@ namespace Pipes {
 		static bool ErrorsFound( false );
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
-		NumWaterPipes = InputProcessor::GetNumObjectsFound( "Pipe:Adiabatic" );
-		NumSteamPipes = InputProcessor::GetNumObjectsFound( "Pipe:Adiabatic:Steam" );
+		NumWaterPipes = inputProcessor->getNumObjectsFound( "Pipe:Adiabatic" );
+		NumSteamPipes = inputProcessor->getNumObjectsFound( "Pipe:Adiabatic:Steam" );
 		NumLocalPipes = NumWaterPipes + NumSteamPipes;
 		LocalPipe.allocate( NumLocalPipes );
 		LocalPipeUniqueNames.reserve( static_cast< unsigned >( NumLocalPipes ) );
@@ -208,7 +208,7 @@ namespace Pipes {
 		cCurrentModuleObject = "Pipe:Adiabatic";
 		for ( PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum ) {
 			PipeNum = PipeWaterNum;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 			GlobalNames::VerifyUniqueInterObjectName( LocalPipeUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			LocalPipe( PipeNum ).Name = cAlphaArgs( 1 );
 			LocalPipe( PipeNum ).TypeOf = TypeOf_Pipe;
@@ -223,7 +223,7 @@ namespace Pipes {
 
 		for ( PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum ) {
 			++PipeNum;
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 			GlobalNames::VerifyUniqueInterObjectName( LocalPipeUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			LocalPipe( PipeNum ).Name = cAlphaArgs( 1 );
 			LocalPipe( PipeNum ).TypeOf = TypeOf_PipeSteam;
