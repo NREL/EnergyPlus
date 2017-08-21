@@ -16004,6 +16004,19 @@ ShadingProperty:Reflectance,
   A2;  \field Glazing Construction Name
        \note Required if Fraction of Shading Surface That Is Glazed > 0.0
 
+SurfaceProperty:EvaporativeCoolingSurface,
+       \memo For evaporative cooling surfaces for Prof. Lei Zhang. By Rongpeng Zhang at LBNL.
+       \min-fields 2
+  A1 , \field Surface Name
+       \required-field
+       \type object-list
+       \object-list SurfaceNames
+  A2;  \field Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note Heat extract rate per surface area(W/m2)
+
 \group Advanced Construction, Surface, Zone Concepts
 
 SurfaceProperty:HeatTransferAlgorithm,

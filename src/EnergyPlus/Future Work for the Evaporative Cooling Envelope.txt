@@ -1,0 +1,7 @@
+Future Work for the Evaporative Cooling Envelope:
+Rongpeng ZHANG, Apr. 2017
+(This is a reminder to the following developer. Please delete this file before the final delivery of the feature.)
+
+1. Integrate the evaporative cooling model, instead of read in the evaporative heat transfer calculated separately.
+2. Allow the model to utilize the precipitation/wind/solar information in the weather file.
+3. Allow the model to utilize the customized schedules that the user provides.

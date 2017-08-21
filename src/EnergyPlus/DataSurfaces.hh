@@ -604,6 +604,9 @@ namespace DataSurfaces {
 		Real64 Width; // Width of the surface (m)
 		// Boundary conditions and interconnections
 		bool HeatTransSurf; // True if surface is a heat transfer surface,
+		// For evaporative cooling surfaces
+		bool FlagEvapCooling; // True if surface has evaporative cooling material
+		int PtrEvapCooling; // Pointer to the schedule of evaporative cooling rate
 		// False if a (detached) shadowing (sub)surface
 		int HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
 		std::string BaseSurfName; // Name of BaseSurf
@@ -769,6 +772,8 @@ namespace DataSurfaces {
 			Tilt( 0.0 ),
 			Width( 0.0 ),
 			HeatTransSurf( false ),
+			FlagEvapCooling( false ),
+			PtrEvapCooling( 0 ),
 			HeatTransferAlgorithm( HeatTransferModel_NotSet ),
 			BaseSurf( 0 ),
 			NumSubSurfaces( 0 ),

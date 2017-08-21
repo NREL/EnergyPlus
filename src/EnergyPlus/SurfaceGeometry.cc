@@ -6287,6 +6287,39 @@ namespace SurfaceGeometry {
 			}
 		}
 
+		
+		//For evaporative cooling surfaces_Rongpeng Zhang, Apr. 2017
+		cCurrentModuleObject = "SurfaceProperty:EvaporativeCoolingSurface";
+		int CountEvapCoolingSurf = GetNumObjectsFound( cCurrentModuleObject );
+		for ( Item = 1; Item <= CountEvapCoolingSurf; ++Item ) {
+			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			ErrorsFoundSingleSurf = false;
+
+			Found = FindItemInList(cAlphaArgs(1), Surface, TotSurfaces);
+
+			if ( Found == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
+				ErrorsFoundSingleSurf = true;
+
+			}
+
+			int PtrEvapCooling = EnergyPlus::ScheduleManager::GetScheduleIndex( cAlphaArgs( 2 ) );
+
+			if ( PtrEvapCooling == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 2 ) + "\", did not find matching surface." );
+				ErrorsFoundSingleSurf = true;
+
+			}
+
+			if ( ! ErrorsFoundSingleSurf ) {
+				Surface( Found ).FlagEvapCooling = true;
+				Surface( Found ).PtrEvapCooling = PtrEvapCooling;
+			} else {
+				ErrorsFound = true;
+			}
+		} // End_For evaporative cooling surfaces
+
+		
 		// Change algorithm for Kiva foundaiton surfaces
 		bool hasKivaHeatTransferAlgo = any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva );
 		for (auto& surf : Surface) {

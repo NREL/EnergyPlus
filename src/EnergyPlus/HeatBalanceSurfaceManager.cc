@@ -6168,6 +6168,16 @@ CalcOutsideSurfTemp(
 	// in the main loop.  Once the proper heat balance is done, the simulation goes on to
 	// the next SurfNum.
 
+	// @@ Calculate heat extract due to evaporative cooling_Rongpeng Zhang, Oct. 2015
+	Real64 QEvapCooling = 0.0; 
+	if( Surface( SurfNum ).FlagEvapCooling ) {
+		QEvapCooling = EnergyPlus::ScheduleManager::GetCurrentScheduleValue( Surface( SurfNum ).PtrEvapCooling ); // * Surface( SurfNum ).Area;
+		// Currently the value is read from a schedule provided by the user using the results calculated
+		// with the evaporative cooling model separately. 
+		// The future work should include the model in EnergyPlus. 
+		// The calculation can be put in a method which is called here.
+	}
+	
 	// Outside heat balance case: Tubular daylighting device
 	Real64 & TH11( TH( 1, 1, SurfNum ) );
 	if ( Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) {
@@ -6186,15 +6196,15 @@ CalcOutsideSurfTemp(
 		// *QsrcHist(1,SurfNum)                     &
 		//+Construct(ConstrNum)%CTFSourceIn(0) &   TDDs cannot be radiant systems
 		// *QsrcHist(1,SurfNum)                &
-		TH11 = ( QRadSWwinAbs( 1, SurfNum ) / 2.0 + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + F1 * ( QRadSWwinAbs( 1, SurfNum2 ) / 2.0 + QRadThermInAbs( SurfNum2 ) + HConvIn( SurfNum2 ) * MAT( ZoneNum2 ) + NetLWRadToSurf( SurfNum2 ) ) ) / ( Ueff + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * Ueff ); // Instead of QRadSWOutAbs(SurfNum) | ODB used to approx ground surface temp | Use TDD:DIFFUSER surface | Use TDD:DIFFUSER surface | Use TDD:DIFFUSER surface and zone | Use TDD:DIFFUSER surface
+		TH11 = ( QRadSWwinAbs( 1, SurfNum ) / 2.0 + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt - QEvapCooling + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + F1 * ( QRadSWwinAbs( 1, SurfNum2 ) / 2.0 + QRadThermInAbs( SurfNum2 ) + HConvIn( SurfNum2 ) * MAT( ZoneNum2 ) + NetLWRadToSurf( SurfNum2 ) ) ) / ( Ueff + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * Ueff ); // Instead of QRadSWOutAbs(SurfNum) | ODB used to approx ground surface temp | Use TDD:DIFFUSER surface | Use TDD:DIFFUSER surface | Use TDD:DIFFUSER surface and zone | Use TDD:DIFFUSER surface
 
 		// Outside heat balance case: No movable insulation, slow conduction
 	} else if ( ( ! MovInsulPresent ) && ( ! QuickConductionSurf ) ) {
 		if ( Surface( SurfNum ).OSCMPtr == 0 ) {
 			if ( construct.SourceSinkPresent ) {
-				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) + construct.CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ); // ODB used to approx ground surface temp
+				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt - QEvapCooling + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) + construct.CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ); // ODB used to approx ground surface temp
 			} else {
-				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ); // ODB used to approx ground surface temp
+				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt - QEvapCooling + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ); // ODB used to approx ground surface temp
 			}
 			// Outside Heat Balance case: Other Side Conditions Model
 		} else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
@@ -6213,9 +6223,9 @@ CalcOutsideSurfTemp(
 	} else if ( ( ! MovInsulPresent ) && ( QuickConductionSurf ) ) {
 		if ( Surface( SurfNum ).OSCMPtr == 0 ) {
 			if ( construct.SourceSinkPresent ) {
-				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
+				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt - QEvapCooling + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + construct.CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
 			} else {
-				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
+				TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt - QEvapCooling + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) ) / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
 			}
 			// Outside Heat Balance case: Other Side Conditions Model
 		} else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
@@ -6234,14 +6244,14 @@ CalcOutsideSurfTemp(
 
 		F2 = HMovInsul / ( HMovInsul + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) );
 
-		TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) + F2 * ( QRadSWOutMvIns( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) ) / ( construct.CTFOutside( 0 ) + HMovInsul - F2 * HMovInsul ); // ODB used to approx ground surface temp
+		TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + construct.CTFCross( 0 ) * TempSurfIn( SurfNum ) + F2 * ( QRadSWOutMvIns( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt - QEvapCooling + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) ) / ( construct.CTFOutside( 0 ) + HMovInsul - F2 * HMovInsul ); // ODB used to approx ground surface temp
 
 		// Outside heat balance case: Movable insulation, quick conduction
 	} else if ( ( MovInsulPresent ) && ( QuickConductionSurf ) ) {
 
 		F2 = HMovInsul / ( HMovInsul + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) );
 
-		TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) + F2 * ( QRadSWOutMvIns( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) ) / ( construct.CTFOutside( 0 ) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp
+		TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) ) + F2 * ( QRadSWOutMvIns( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt - QEvapCooling + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) ) / ( construct.CTFOutside( 0 ) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross( 0 ) ); // ODB used to approx ground surface temp
 
 	} // ...end of outside heat balance cases IF-THEN block
 
@@ -6265,7 +6275,7 @@ CalcOutsideSurfTemp(
 		} else {
 			Real64 const RadSysDiv( 1.0 / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ) );
 
-			RadSysToHBConstCoef( SurfNum ) = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) * RadSysDiv; // ODB used to approx ground surface temp
+			RadSysToHBConstCoef( SurfNum ) = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt - QEvapCooling + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp ) * RadSysDiv; // ODB used to approx ground surface temp
 
 			RadSysToHBTinCoef( SurfNum ) = construct.CTFCross( 0 ) * RadSysDiv;
 
