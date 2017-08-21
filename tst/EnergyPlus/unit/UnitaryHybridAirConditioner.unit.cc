@@ -1,4 +1,3 @@
-
 // EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
@@ -235,7 +234,6 @@ namespace EnergyPlus {
 
 		myfile << "Date" << ", Inputs, " << "Requested Sensible Heat Transfer Rate (W)," << "Tosa (C)" << ", " << "Wosa (kgW/kgDryAir)" << ", " << "Minimum OA requested" << ", Outputs" << ",Primary Mode ID" << ", " << "Primary Mode RF" << ", " << "Error code" << ", " << "Msa" << ", " << "Tsa" << ", " << "Wsa" << ", " << "Power" << "," << "Delivered Unit Sensible Cooling (W)" << "," << "Delivered Unit Sensible Heatinging (W)" << "," << "Expected Outputs:,ExpectedSupplyAirTemperature" << "," << "ExpectedSupplyAirHumidityRatio" << "," << "ExpectedTotalElectricPower" << "," << "ExpectedMode" << "," << "ExpectedSupplyAirMassFlowRate" << ", " << "ExpectedSupplyAirVolumeFlowRate" << ", " << "ExpectedSensibleSystemCoolingCapacity" << ", " << "ExpectedLatentSystemCoolingCapacity" << ", " << "ExpectedTotalSystemCoolingCapacity" << ", " << ",\n";
 
-
 		for (; iterator_line != lines.end(); ++iterator_line) // iterate though the modes.
 		{
 			std::ostringstream s;
@@ -268,7 +266,6 @@ namespace EnergyPlus {
 			Wra = Wosa; //Humidity Ratio kgw/kga)
 			RHra = 100 * PsyRhFnTdbWPb(Tra, Wra, 101325);
 			Real64 newRHosa = PsyRhFnTdbWPb(Tosa, Wosa, 101325);
-
 
 			s << TimeDate << ", Inputs," << RequestedLoad << ", " << Tosa << ", " << Wosa << "," << DesignMinVR << ",";
 
@@ -304,8 +301,6 @@ namespace EnergyPlus {
 			myfile << s.str();
 		}
 		myfile.close();
-
-
 	}
 
 }
