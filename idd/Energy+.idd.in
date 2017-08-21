@@ -23252,13 +23252,19 @@ AirflowNetwork:SimulationControl,
       \maximum 1.0
       \default 1.0
       \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
- A7 ; \field Height Dependence of External Node Temperature
+ A7 , \field Height Dependence of External Node Temperature
       \note If Yes, external node temperature is height dependent.
       \note If No, external node temperature is based on zero height.
       \type choice
       \key Yes
       \key No
       \default No
+ A8 ; \field Solver
+      \note Select the solver to use for the pressure network solution
+      \type choice
+      \key SkylineLU
+      \key ConjugateGradient
+      \default SkylineLU
 
 AirflowNetwork:MultiZone:Zone,
       \min-fields 8
