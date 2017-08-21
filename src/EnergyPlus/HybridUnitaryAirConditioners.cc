@@ -266,7 +266,6 @@ namespace EnergyPlus {//***************
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
-			Real64 RHosa = ZoneHybridUnitaryAirConditioner(UnitNum).Part_press(101.325, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat) / ZoneHybridUnitaryAirConditioner(UnitNum).Sat_press(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp);
 			ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure, "InitZoneHybridUnitaryAirConditioners");
 		}
 	

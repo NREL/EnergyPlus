@@ -211,9 +211,9 @@ namespace EnergyPlus {
 	
 			// Default Constructor
 			std::string Name; // user identifier
+			std::string Schedule; // Availability Schedule Name
 			bool Initialized; // initialization flag ensures the system object is initialized only once.
 			int ZoneNum; //stores the current zone associated with the system, this is currently not used but is expected to be used in the next set of functionality additions. 
-			std::string Schedule; // Availability Schedule Name
 			int SchedPtr; // Pointer to the correct schedule
 	
 			Real64 SystemMaximumSupplyAirFlowRate; //taken from IDF N1, the system max supply flow rate in m3/s.
@@ -260,24 +260,11 @@ namespace EnergyPlus {
 			int PrimaryMode;
 			Real64 PrimaryModeRuntimeFraction;
 			Real64 averageOSAF;
-			int CurrentPrimaryMode();
-			Real64 CurrentPrimaryRuntimeFraction();
-			Real64 CalculatePartRuntimeFraction(Real64 MinOA_Msa, Real64 Mvent, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 SensibleRoomORZone, Real64 RequestedDehumidificationLoad, Real64 RequestedMoistureLoad, Real64 LatentRoomORZone);
 			int ErrorCode;
 			int InletNode;
 			int OutletNode;
 			int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
 			int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan
-			vector<int> Tsa_curve_pointer;
-			vector<int>  HRsa_curve_pointer;
-			vector<int>  Psa_curve_pointer;
-			list<CMode*> OperatingModes; 
-			list<CSetting*> CurrentOperatingSettings;
-			
-			CSetting *pOptimal;
-			CSetting *pStandBy;
-
-			list<CSetting*> Settings;
 			Real64 FinalElectricalPower; // Output fuel use in W
 			Real64 FinalElectricalEnergy; // Output fuel energy use in J
 			Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
@@ -309,10 +296,36 @@ namespace EnergyPlus {
 			Real64 SecOutletEnthalpy;
 			Real64 SecOutletPressure;
 			Real64 SecOutletRH;
-			
-			int OARequirementsPtr; // Index to DesignSpecification:OutdoorAir object
+			Real64 Wsa;
+			Real64 SupplyVentilationAir;
+			Real64 SupplyVentilationVolume;
+		
 			bool OutdoorAir;
 			Real64 MinOA_Msa;
+			int OARequirementsPtr; // Index to DesignSpecification:OutdoorAir object
+			
+			Real64 Tsa;
+			int ModeCounter;
+			bool CoolingRequested;
+			bool HeatingRequested;
+			bool VentilationRequested;
+			bool DehumidificationRequested;
+			bool HumidificationRequested;
+			//non-initializer
+			vector<int> Tsa_curve_pointer;
+			vector<int>  HRsa_curve_pointer;
+			vector<int>  Psa_curve_pointer;
+			list<CMode*> OperatingModes;
+			list<CSetting*> CurrentOperatingSettings;
+
+			CSetting *pOptimal;
+			CSetting *pStandBy;
+
+			list<CSetting*> Settings;
+			//methods
+			int CurrentPrimaryMode();
+			Real64 CurrentPrimaryRuntimeFraction();
+			Real64 CalculatePartRuntimeFraction(Real64 MinOA_Msa, Real64 Mvent, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 SensibleRoomORZone, Real64 RequestedDehumidificationLoad, Real64 RequestedMoistureLoad, Real64 LatentRoomORZone);
 
 			int GetID();            // accessor function
 			void SetID(int vID) { ID = vID; };    // accessor function
@@ -333,20 +346,11 @@ namespace EnergyPlus {
 			Real64 Sat_press(Real64 Tdb);
 			Real64 Part_press(Real64 P, Real64 W);
 			
-			Real64 Tsa;
-			Real64 Wsa;
-			Real64 SupplyVentilationAir;
-			Real64 SupplyVentilationVolume; 
-			int ModeCounter;
-			bool CoolingRequested ;
-			bool HeatingRequested ;
-			bool VentilationRequested;
-			bool DehumidificationRequested;
-			bool HumidificationRequested;
+		
 		
 		private:                   // begin private section
 			int ID;              // member variable
-			char * string;
+			
 			//number of times in a day it failed to 
 			vector<int> SAT_OC_MetinMode_v;
 			vector<int> SAHR_OC_MetinMode_v;
@@ -362,23 +366,15 @@ namespace EnergyPlus {
 			int count_SAT_OC_MetOnce;
 			int count_DidWeMeetLoad;
 			int count_DidWeNotMeetLoad;
-
-			Real64 MsaRated;
-			Real64 RatedH;
 		
 			Real64 cp;
 			Real64 Lambna;
 			bool optimal_EnvCondMet;
 			bool RunningPeakCapacity_EnvCondMet;
 		
-			Real64 Minimum_Supply_Air_Temp;
-			Real64 RunningPeakCapacity_Wsa;
-			Real64 RunningPeakCapacity_Tsa;
-			Real64 RunningPeakCapacity_Point;
 			vector<Real64> PolygonXs;
 			vector<Real64> PolygonYs;
 
-			int NumberOfModes;
 		};
 
 	
