@@ -7902,23 +7902,30 @@ namespace WindowManager {
 		std::vector<Real64> cos_sunAzimuth;
 		std::vector<Real64> sunAltitude;
 		std::vector<Real64> sin_sunAltitude;
+		std::vector<Real64> cos_sunAltitude;
 		std::vector<Real64> skyArea; // Area of integration
 		std::vector<Real64> relativeAzimuth; // Relative azimuth angle of sun with respect to surface outward normal
 		std::vector<Real64> relativeAltitude; // Relative altitude angle of sun with respect to surface outward normal
 
 		for ( j = N - 1; j >= 0; --j ) {
-			sunAzimuth.push_back((90.0 / N) * j * DegToRadians); // Azimuth angle of sun during integration
-			sin_sunAzimuth.push_back(std::sin(sunAzimuth[j]));
-			cos_sunAzimuth.push_back(std::cos(sunAzimuth[j]));
+			sunAzimuth.push_back( ( 90.0 / ( N - 1 ) ) * j * DegToRadians ); // Azimuth angle of sun during integration
+			sin_sunAzimuth.push_back( std::sin( sunAzimuth[ j ] ) );
+			cos_sunAzimuth.push_back( std::cos( sunAzimuth[ j ] ) );
 		}
 
-		for (i = M - 1; i >= 0; --i) {
-			sunAltitude.push_back((90.0 / M) * i * DegToRadians); // Altitude angle of sun during integration
-			sin_sunAltitude.push_back(std::sin(sunAltitude[i]));
-			skyArea.push_back(sin_sunAltitude[i] * std::cos(sunAltitude[i]));
-			//         Integrate transmittance using coordinate transform
-			relativeAzimuth.push_back(std::asin(sin_sunAltitude[i] * cos_sunAzimuth[i])); // phi prime
-			relativeAltitude.push_back(std::atan(std::tan(sunAltitude[i]) * sin_sunAzimuth[i])); // alpha
+		for ( i = M - 1; i >= 0; --i ) {
+			sunAltitude.push_back( ( 90.0 / ( M - 1) ) * i * DegToRadians ); // Altitude angle of sun during integration
+			sin_sunAltitude.push_back( std::sin( sunAltitude[ i ] ) );
+			cos_sunAltitude.push_back( std::cos( sunAltitude[ i ] ) );
+		}
+
+		for ( j = N - 1; j >= 0; --j ) {
+			for ( i = M - 1; i >= 0; --i ) {
+				skyArea.push_back( sin_sunAltitude[ i ] * cos_sunAltitude[ i ] );
+				// Integrate transmittance using coordinate transform
+				relativeAzimuth.push_back( std::asin( sin_sunAltitude[ i ] * cos_sunAzimuth[ j ] ) ); // phi prime
+				relativeAltitude.push_back( std::atan( std::tan( sunAltitude[ i ] ) * sin_sunAzimuth[ j ] ) ); // alpha
+			}
 		}
 
 		PrintTransMap = false;
@@ -7964,15 +7971,15 @@ namespace WindowManager {
 					//     Integration over quarter hemisphere in polar coordinates and converting to rectangular to call screen model.
 					//     Proceed in reverse order such that the last calculation yields zero sun angle to window screen normal (angles=0,0).
 					//     The properties calculated at zero sun angle are then used elsewhere prior to the start of the actual simulation.
-					for ( j = N - 1; j >= 0; --j ) {
-						for ( i = M - 1; i >= 0; --i ) {
-							CalcScreenTransmittance( 0, relativeAltitude[i], relativeAzimuth[i], ScreenNum );
-							SumTrans += ( SurfaceScreens( ScreenNum ).BmBmTrans + SurfaceScreens( ScreenNum ).BmDifTrans ) * skyArea[i];
-							SumTransVis += ( SurfaceScreens( ScreenNum ).BmBmTransVis + SurfaceScreens( ScreenNum ).BmDifTransVis ) * skyArea[i];
-							SumReflect += SurfaceScreens( ScreenNum ).ReflectSolBeamFront * skyArea[i];
-							SumReflectVis += SurfaceScreens( ScreenNum ).ReflectVisBeamFront * skyArea[i];
-							SumArea += skyArea[i];
-						}
+
+					for ( i = M + N - 1; i >= 0; --i ) {
+						// Integrate transmittance using coordinate transform
+						CalcScreenTransmittance( 0, relativeAltitude[ i ], relativeAzimuth[ i ], ScreenNum );
+						SumTrans += ( SurfaceScreens( ScreenNum ).BmBmTrans + SurfaceScreens( ScreenNum ).BmDifTrans ) * skyArea[ i ];
+						SumTransVis += ( SurfaceScreens( ScreenNum ).BmBmTransVis + SurfaceScreens( ScreenNum ).BmDifTransVis ) * skyArea[ i ];
+						SumReflect += SurfaceScreens( ScreenNum ).ReflectSolBeamFront * skyArea[ i ];
+						SumReflectVis += SurfaceScreens( ScreenNum ).ReflectVisBeamFront * skyArea[ i ];
+						SumArea += skyArea[ i ];
 					}
 
 					// Reflectance of overall screen including openings and scattered transmittance
