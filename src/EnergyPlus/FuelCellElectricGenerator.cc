@@ -1981,8 +1981,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID;
@@ -2002,8 +2000,9 @@ namespace FuelCellElectricGenerator {
 		// two different themodynamic curve fits might be used
 
 		tempCp = 0.0;
-		Tkel = ( FluidTemp + KelvinConv );
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
+
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
 		Real64 const pow_2_Tsho( pow_2( Tsho ) );
 		Real64 const pow_3_Tsho( pow_3( Tsho ) );
@@ -2084,8 +2083,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHair;
 		Real64 HairI;
 		int thisConstit; // loop index
@@ -2104,8 +2101,9 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHair = 0.0;
@@ -2192,8 +2190,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2208,8 +2204,9 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
@@ -2291,8 +2288,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHfuel;
 		Real64 HfuelI;
 		int thisConstit; // loop index
@@ -2311,8 +2306,9 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHfuel = 0.0;
@@ -2399,8 +2395,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHprodGases;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2418,8 +2412,9 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHprodGases = 0.0;
@@ -2514,8 +2509,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2530,15 +2523,15 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
 
 		Real64 const pow_2_Tsho( pow_2( Tsho ) );
 		Real64 const pow_3_Tsho( pow_3( Tsho ) );
-		Real64 const pow_4_Tsho( pow_4( Tsho ) );
 		Real64 const pow_2_Tkel( pow_2( Tkel ) );
 		Real64 const pow_3_Tkel( pow_3( Tkel ) );
 		Real64 const pow_4_Tkel( pow_4( Tkel ) );
@@ -2628,8 +2621,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2644,15 +2635,15 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
 
 		Real64 const pow_2_Tsho( pow_2( Tsho ) );
 		Real64 const pow_3_Tsho( pow_3( Tsho ) );
-		Real64 const pow_4_Tsho( pow_4( Tsho ) );
 		Real64 const pow_2_Tkel( pow_2( Tkel ) );
 		Real64 const pow_3_Tkel( pow_3( Tkel ) );
 		Real64 const pow_4_Tkel( pow_4( Tkel ) );
@@ -2742,8 +2733,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2758,15 +2747,15 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
 
 		Real64 const pow_2_Tsho( pow_2( Tsho ) );
 		Real64 const pow_3_Tsho( pow_3( Tsho ) );
-		Real64 const pow_4_Tsho( pow_4( Tsho ) );
 		Real64 const pow_2_Tkel( pow_2( Tkel ) );
 		Real64 const pow_3_Tkel( pow_3( Tkel ) );
 		Real64 const pow_4_Tkel( pow_4( Tkel ) );
@@ -2842,23 +2831,15 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
-		Real64 F; // shomate coeff
+		Real64 const A = 29.0373; // shomate coeff
+		Real64 const B = 10.2573; // shomate coeff
+		Real64 const C = 2.81048; // shomate coeff
+		Real64 const D = -0.95914; // shomate coeff
+		Real64 const E = 0.11725; // shomate coeff
+		Real64 const F = -250.569; // shomate coeff
 		//  REAL(r64) :: H ! shomate coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = 29.0373;
-		B = 10.2573;
-		C = 2.81048;
-		D = -0.95914;
-		E = 0.11725;
-		F = -250.569;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
 		HGasWater = A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F; //- H
 
@@ -2902,24 +2883,15 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
-		Real64 F; // shomate coeff
-		Real64 H; // shomate coeff
+		Real64 const A = -203.606; // shomate coeff
+		Real64 const B = 1523.29; // shomate coeff
+		Real64 const C = -3196.413; // shomate coeff
+		Real64 const D = 2474.455; // shomate coeff
+		Real64 const E = 3.85533; // shomate coeff
+		Real64 const F = -256.5478; // shomate coeff
+        // Real64 const H = -285.8304; // shomate coeff (currently unused)
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = -203.606;
-		B = 1523.29;
-		C = -3196.413;
-		D = 2474.455;
-		E = 3.85533;
-		F = -256.5478;
-		H = -285.8304;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
 		HLiqWater = A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F; //- H
 
@@ -2976,20 +2948,13 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
+		Real64 const A = -203.606; // shomate coeff
+		Real64 const B = 1523.29; // shomate coeff
+		Real64 const C = -3196.413; // shomate coeff
+		Real64 const D = 2474.455; // shomate coeff
+		Real64 const E = 3.85533; // shomate coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = -203.606;
-		B = 1523.29;
-		C = -3196.413;
-		D = 2474.455;
-		E = 3.85533;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
 
 		Cp = A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho );
 

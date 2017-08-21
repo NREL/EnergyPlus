@@ -1469,9 +1469,9 @@ namespace AirflowNetworkSolver {
 					S2 = std::sqrt( 2.0 * RHOZ( n ) * PDROP ) * DisSysCompDuctData( CompNum ).A;
 					FTT = S2 / std::sqrt( ld / pow_2( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
 					if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << S2 << FTT << g;
-					B = ( 9.3 * VISCZ( n ) * DisSysCompDuctData( CompNum ).A ) / ( FT * DisSysCompDuctData( CompNum ).Rough );
 					while ( true ) {
 						FT = FTT;
+						B = ( 9.3 * VISCZ( n ) * DisSysCompDuctData( CompNum ).A ) / ( FT * DisSysCompDuctData( CompNum ).Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
 						FTT = S2 / std::sqrt( ld / pow_2( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
@@ -1503,9 +1503,9 @@ namespace AirflowNetworkSolver {
 					S2 = std::sqrt( -2.0 * RHOZ( M ) * PDROP ) * DisSysCompDuctData( CompNum ).A;
 					FTT = S2 / std::sqrt( ld / pow_2( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );
 					if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " dwt:" << i << S2 << FTT << g;
-					B = ( 9.3 * VISCZ( M ) * DisSysCompDuctData( CompNum ).A ) / ( FT * DisSysCompDuctData( CompNum ).Rough );
 					while ( true ) {
 						FT = FTT;
+						B = ( 9.3 * VISCZ( M ) * DisSysCompDuctData( CompNum ).A ) / ( FT * DisSysCompDuctData( CompNum ).Rough );
 						D = 1.0 + g * B;
 						g -= ( g - AA1 + C * std::log( D ) ) / ( 1.0 + C * B / D );
 						FTT = S2 / std::sqrt( ld / pow_2( g ) + DisSysCompDuctData( CompNum ).TurDynCoef );

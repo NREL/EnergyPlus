@@ -6093,6 +6093,7 @@ Label20: ;
 			for( IPhi = 1; IPhi <= 10; ++IPhi ) {
 				Phi = double( IPhi - 1 ) * 10.0;
 				CosPhi.push_back( std::cos( Phi * DegToRadians ) );
+				if ( std::abs( CosPhi[ IPhi - 1 ] ) < 0.0001 ) CosPhi[ IPhi - 1 ] = 0.0;
 			}
 
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
@@ -6285,7 +6286,6 @@ Label20: ;
 
 				// For comparing fitted vs. input distribution in incidence angle
 				for ( IPhi = 0; IPhi < 10; ++IPhi ) {
-					if ( std::abs( CosPhi[IPhi] ) < 0.0001 ) CosPhi[IPhi] = 0.0;
 					tsolFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).TransSolBeamCoef );
 					tvisFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).TransVisBeamCoef );
 					rfsolFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).ReflSolBeamFrontCoef );

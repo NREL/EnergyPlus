@@ -7886,9 +7886,6 @@ namespace WindowManager {
 		Real64 SumReflect; // Integration variable for reflectance
 		Real64 SumReflectVis; // Integration variable for visible reflectance
 		Real64 SumArea; // Integration variable for area of quarter hemisphere
-		Real64 SkyArea; // Area of integration
-		Real64 RelativeAzimuth; // Relative azimuth angle of sun with respect to surface outward normal
-		Real64 RelativeAltitude; // Relative altitude angle of sun with respect to surface outward normal
 		int ShadingType; // Type of shading device
 		int ScreenTransUnitNo; // Unit number of screen transmittance data file
 		bool FoundMaterial; // Flag to avoid printing screen transmittance data multiple times when Material:WindowScreen
@@ -7898,6 +7895,31 @@ namespace WindowManager {
 		SurfaceScreens.allocate( NumSurfaceScreens );
 		ScreenTrans.allocate( NumSurfaceScreens );
 		ScreenNum = 0;
+
+		// Pre-calculate these constants
+		std::vector<Real64> sunAzimuth;
+		std::vector<Real64> sin_sunAzimuth;
+		std::vector<Real64> cos_sunAzimuth;
+		std::vector<Real64> sunAltitude;
+		std::vector<Real64> sin_sunAltitude;
+		std::vector<Real64> skyArea; // Area of integration
+		std::vector<Real64> relativeAzimuth; // Relative azimuth angle of sun with respect to surface outward normal
+		std::vector<Real64> relativeAltitude; // Relative altitude angle of sun with respect to surface outward normal
+
+		for ( j = N - 1; j >= 0; --j ) {
+			sunAzimuth.push_back((90.0 / N) * j * DegToRadians); // Azimuth angle of sun during integration
+			sin_sunAzimuth.push_back(std::sin(sunAzimuth[j]));
+			cos_sunAzimuth.push_back(std::cos(sunAzimuth[j]));
+		}
+
+		for (i = M - 1; i >= 0; --i) {
+			sunAltitude.push_back((90.0 / M) * i * DegToRadians); // Altitude angle of sun during integration
+			sin_sunAltitude.push_back(std::sin(sunAltitude[i]));
+			skyArea.push_back(sin_sunAltitude[i] * std::cos(sunAltitude[i]));
+			//         Integrate transmittance using coordinate transform
+			relativeAzimuth.push_back(std::asin(sin_sunAltitude[i] * cos_sunAzimuth[i])); // phi prime
+			relativeAltitude.push_back(std::atan(std::tan(sunAltitude[i]) * sin_sunAzimuth[i])); // alpha
+		}
 
 		PrintTransMap = false;
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -7942,23 +7964,14 @@ namespace WindowManager {
 					//     Integration over quarter hemisphere in polar coordinates and converting to rectangular to call screen model.
 					//     Proceed in reverse order such that the last calculation yields zero sun angle to window screen normal (angles=0,0).
 					//     The properties calculated at zero sun angle are then used elsewhere prior to the start of the actual simulation.
-					for ( j = N; j >= 1; --j ) {
-						Real64 SunAzimuth = ( 90.0 / N ) * ( j - 1 ) * ( Pi / 180.0 ); // Azimuth angle of sun during integration
-						Real64 sin_SunAzimuth = std::sin( SunAzimuth );
-						Real64 cos_SunAzimuth = std::cos( SunAzimuth );
-						for ( i = M; i >= 1; --i ) {
-							Real64 SunAltitude = ( 90.0 / M ) * ( i - 1 ) * ( Pi / 180.0 ); // Altitude angle of sun during integration
-							Real64 sin_SunAltitude = std::sin( SunAltitude );
-							SkyArea = sin_SunAltitude * std::cos( SunAltitude );
-							//         Integrate transmittance using coordinate transform
-							RelativeAzimuth = std::asin( sin_SunAltitude * cos_SunAzimuth ); // phi prime
-							RelativeAltitude = std::atan( std::tan( SunAltitude ) * sin_SunAzimuth ); // alpha
-							CalcScreenTransmittance( 0, RelativeAltitude, RelativeAzimuth, ScreenNum );
-							SumTrans += ( SurfaceScreens( ScreenNum ).BmBmTrans + SurfaceScreens( ScreenNum ).BmDifTrans ) * SkyArea;
-							SumTransVis += ( SurfaceScreens( ScreenNum ).BmBmTransVis + SurfaceScreens( ScreenNum ).BmDifTransVis ) * SkyArea;
-							SumReflect += SurfaceScreens( ScreenNum ).ReflectSolBeamFront * SkyArea;
-							SumReflectVis += SurfaceScreens( ScreenNum ).ReflectVisBeamFront * SkyArea;
-							SumArea += SkyArea;
+					for ( j = N - 1; j >= 0; --j ) {
+						for ( i = M - 1; i >= 0; --i ) {
+							CalcScreenTransmittance( 0, relativeAltitude[i], relativeAzimuth[i], ScreenNum );
+							SumTrans += ( SurfaceScreens( ScreenNum ).BmBmTrans + SurfaceScreens( ScreenNum ).BmDifTrans ) * skyArea[i];
+							SumTransVis += ( SurfaceScreens( ScreenNum ).BmBmTransVis + SurfaceScreens( ScreenNum ).BmDifTransVis ) * skyArea[i];
+							SumReflect += SurfaceScreens( ScreenNum ).ReflectSolBeamFront * skyArea[i];
+							SumReflectVis += SurfaceScreens( ScreenNum ).ReflectVisBeamFront * skyArea[i];
+							SumArea += skyArea[i];
 						}
 					}
 
@@ -8008,8 +8021,8 @@ namespace WindowManager {
 					ScreenTrans( ScreenNum ).Scatt = 0.0;
 					for ( j = 90 / Material( MatNum ).ScreenMapResolution + 1; j >= 1; --j ) {
 						for ( i = 90 / Material( MatNum ).ScreenMapResolution + 1; i >= 1; --i ) {
-							Real64 SunAzimuth = Material( MatNum ).ScreenMapResolution * ( j - 1 ) * ( Pi / 180.0 );
-							Real64 SunAltitude = Material( MatNum ).ScreenMapResolution * ( i - 1 ) * ( Pi / 180.0 );
+							Real64 SunAzimuth = Material( MatNum ).ScreenMapResolution * ( j - 1 ) * DegToRadians;
+							Real64 SunAltitude = Material( MatNum ).ScreenMapResolution * ( i - 1 ) * DegToRadians;
 							CalcScreenTransmittance( 0, SunAltitude, SunAzimuth, ScreenNum );
 							ScreenTrans( ScreenNum ).Trans( i, j ) = SurfaceScreens( ScreenNum ).BmBmTrans;
 							ScreenTrans( ScreenNum ).Scatt( i, j ) = SurfaceScreens( ScreenNum ).BmDifTrans;
