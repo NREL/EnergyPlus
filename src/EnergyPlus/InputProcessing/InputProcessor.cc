@@ -261,20 +261,20 @@ namespace EnergyPlus {
 		}
 
 		// TODO: Check which file read approach works properly on windows
-		// std::string lines;
-		// std::string line;
-		// while (std::getline(infile, line))
-		// {
-		// 	lines.append(line + NL);
-		// }
-		std::ifstream::pos_type size = input_stream.tellg();
-		char *memblock = new char[(size_t) size + 1];
-		input_stream.seekg(0, std::ios::beg);
-		input_stream.read(memblock, size);
-		memblock[size] = '\0';
-		input_stream.close();
-		std::string input_file = memblock;
-		delete[] memblock;
+		std::string input_file;
+		std::string line;
+		while (std::getline(input_stream, line))
+		{
+			input_file.append(line + NL);
+		}
+		// std::ifstream::pos_type size = input_stream.tellg();
+		// char *memblock = new char[(size_t) size + 1];
+		// input_stream.seekg(0, std::ios::beg);
+		// input_stream.read(memblock, size);
+		// memblock[size] = '\0';
+		// input_stream.close();
+		// std::string input_file = memblock;
+		// delete[] memblock;
 
 		if ( ! DataGlobals::isEpJSON ) {
 			json const input_file_json = idf_parser->decode( input_file, schema );
