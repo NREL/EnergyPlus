@@ -995,14 +995,16 @@ namespace DaylightingDevices {
 		Real64 FluxInc = 0.0;    // Incident solar flux
 		Real64 FluxTrans = 0.0 ; // Transmitted solar flux
 		Real64 trans;            // Total beam solar transmittance of TDD
+		Real64 COSI; // Cosine of incident angle
+		Real64 SINI; // Sine of incident angle
 
 		Real64 const dPH = 90.0 * DegToRadians / NPH; // Altitude angle of sky element
 		Real64 PH = 0.5 * dPH;                        // Altitude angle increment
-		Real64 const COSI = std::cos( PiOvr2 - PH );  // Cosine of incident angle
-		Real64 const SINI = std::sin( PiOvr2 - PH );  // Sine of incident angle
 
 		// Integrate from 0 to Pi/2 altitude
 		for ( int N = 1; N <= NPH; ++N ) {
+			COSI = std::cos( PiOvr2 - PH );
+			SINI = std::sin( PiOvr2 - PH );
 
 			Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
@@ -1068,7 +1070,7 @@ namespace DaylightingDevices {
 		if ( CosPhi > 0.01 ) { // Dome has a view of the horizon
 			// Integrate over the semicircle
 			Real64 const THMIN = Theta - PiOvr2;            // Minimum azimuth integration limit
-			Real64 const THMAX = Theta + PiOvr2;            // Maximum azimuth integration limit
+			Real64 const EP_UNUSED(THMAX = Theta + PiOvr2); // Maximum azimuth integration limit
 			Real64 const dTH = 180.0 * DegToRadians / NTH ; // Azimuth angle increment
 			Real64 TH = THMIN + 0.5 * dTH;                  // Azimuth angle of sky horizon element
 

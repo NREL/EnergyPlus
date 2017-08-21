@@ -7904,27 +7904,32 @@ namespace WindowManager {
 		std::vector<Real64> sin_sunAltitude;
 		std::vector<Real64> cos_sunAltitude;
 		std::vector<Real64> skyArea; // Area of integration
-		std::vector<Real64> relativeAzimuth; // Relative azimuth angle of sun with respect to surface outward normal
-		std::vector<Real64> relativeAltitude; // Relative altitude angle of sun with respect to surface outward normal
+		Array2D<Real64> relativeAzimuth; // Relative azimuth angle of sun with respect to surface outward normal
+		Array2D<Real64> relativeAltitude; // Relative altitude angle of sun with respect to surface outward normal
 
-		for ( j = N - 1; j >= 0; --j ) {
-			sunAzimuth.push_back( ( 90.0 / ( N - 1 ) ) * j * DegToRadians ); // Azimuth angle of sun during integration
-			sin_sunAzimuth.push_back( std::sin( sunAzimuth[ j ] ) );
-			cos_sunAzimuth.push_back( std::cos( sunAzimuth[ j ] ) );
+		relativeAzimuth.allocate( N, M );
+		relativeAltitude.allocate( N, M );
+
+		for ( j = 0; j <= N - 1; ++j ) {
+			Real64 currAzimuth = ( 90.0 / N ) * j * DegToRadians;
+			sunAzimuth.push_back( currAzimuth ); // Azimuth angle of sun during integration
+			sin_sunAzimuth.push_back( std::sin( currAzimuth ) );
+			cos_sunAzimuth.push_back( std::cos( currAzimuth ) );
 		}
 
-		for ( i = M - 1; i >= 0; --i ) {
-			sunAltitude.push_back( ( 90.0 / ( M - 1) ) * i * DegToRadians ); // Altitude angle of sun during integration
-			sin_sunAltitude.push_back( std::sin( sunAltitude[ i ] ) );
-			cos_sunAltitude.push_back( std::cos( sunAltitude[ i ] ) );
+		for ( i = 0; i <= M - 1; ++i ) {
+			Real64 currAltitude = ( 90.0 / M ) * i * DegToRadians;
+			sunAltitude.push_back( currAltitude ); // Altitude angle of sun during integration
+			sin_sunAltitude.push_back( std::sin( currAltitude ) );
+			cos_sunAltitude.push_back( std::cos( currAltitude ) );
+			skyArea.push_back( sin_sunAltitude[ i ] * cos_sunAltitude[ i ] );
 		}
 
-		for ( j = N - 1; j >= 0; --j ) {
-			for ( i = M - 1; i >= 0; --i ) {
-				skyArea.push_back( sin_sunAltitude[ i ] * cos_sunAltitude[ i ] );
+		for ( j = 1; j <= N; ++j ) {
+			for ( i = 1; i <= M; ++i ) {
 				// Integrate transmittance using coordinate transform
-				relativeAzimuth.push_back( std::asin( sin_sunAltitude[ i ] * cos_sunAzimuth[ j ] ) ); // phi prime
-				relativeAltitude.push_back( std::atan( std::tan( sunAltitude[ i ] ) * sin_sunAzimuth[ j ] ) ); // alpha
+				relativeAzimuth( i, j ) = std::asin( sin_sunAltitude[ i - 1 ] * cos_sunAzimuth[ j - 1 ] ); // phi prime
+				relativeAltitude( i, j ) = std::atan( std::tan( sunAltitude[ i - 1 ] ) * sin_sunAzimuth[ j - 1 ] ); // alpha
 			}
 		}
 
@@ -7972,14 +7977,16 @@ namespace WindowManager {
 					//     Proceed in reverse order such that the last calculation yields zero sun angle to window screen normal (angles=0,0).
 					//     The properties calculated at zero sun angle are then used elsewhere prior to the start of the actual simulation.
 
-					for ( i = M + N - 1; i >= 0; --i ) {
-						// Integrate transmittance using coordinate transform
-						CalcScreenTransmittance( 0, relativeAltitude[ i ], relativeAzimuth[ i ], ScreenNum );
-						SumTrans += ( SurfaceScreens( ScreenNum ).BmBmTrans + SurfaceScreens( ScreenNum ).BmDifTrans ) * skyArea[ i ];
-						SumTransVis += ( SurfaceScreens( ScreenNum ).BmBmTransVis + SurfaceScreens( ScreenNum ).BmDifTransVis ) * skyArea[ i ];
-						SumReflect += SurfaceScreens( ScreenNum ).ReflectSolBeamFront * skyArea[ i ];
-						SumReflectVis += SurfaceScreens( ScreenNum ).ReflectVisBeamFront * skyArea[ i ];
-						SumArea += skyArea[ i ];
+					for ( j = N; j >= 1; --j ) {
+						for( i = M; i >= 1; --i ) {
+							// Integrate transmittance using coordinate transform
+							CalcScreenTransmittance( 0, relativeAltitude( i, j ), relativeAzimuth( i, j ), ScreenNum );
+							SumTrans += ( SurfaceScreens( ScreenNum ).BmBmTrans + SurfaceScreens( ScreenNum ).BmDifTrans ) * skyArea[ i - 1 ];
+							SumTransVis += ( SurfaceScreens( ScreenNum ).BmBmTransVis + SurfaceScreens( ScreenNum ).BmDifTransVis ) * skyArea[ i - 1 ];
+							SumReflect += SurfaceScreens( ScreenNum ).ReflectSolBeamFront * skyArea[ i - 1 ];
+							SumReflectVis += SurfaceScreens( ScreenNum ).ReflectVisBeamFront * skyArea[ i - 1 ];
+							SumArea += skyArea[ i - 1 ];
+						}
 					}
 
 					// Reflectance of overall screen including openings and scattered transmittance
