@@ -9,7 +9,6 @@
 ! Plant:    None.
 ! Modified: Conforms with Beta 4 input
 ! 2 design days to facilitate reverse DD testing.
- Lead Input;
 
   Version,8.7;
 
@@ -149,9 +148,6 @@
     LAYER 1,                 !- Outside Layer
     LAYER 2,                 !- Layer 2
     LAYER 3;                 !- Layer 3
-
- End Lead Input;
- Simulation Data;
 
   Timestep,6;
 
@@ -614,8 +610,6 @@
   Output:Meter:MeterFileOnly,DistrictHeating:Facility,runperiod;
 
   Output:Meter:MeterFileOnly,DistrictCooling:Facility,runperiod;
-
- End Simulation Data;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
