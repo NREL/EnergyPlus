@@ -9132,11 +9132,9 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
 			}
-<<<<<<< HEAD
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory" );
 			}
-=======
 
 			// EAp2-4/5. Performance Rating Method Compliance
 			// repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
@@ -9164,8 +9162,6 @@ namespace OutputReportTabular {
 				}
 			}
 
-
->>>>>>> input_processor_refactor
 		}
 	}
 

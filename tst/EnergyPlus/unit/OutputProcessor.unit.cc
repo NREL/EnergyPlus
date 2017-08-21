@@ -56,11 +56,8 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
-<<<<<<< HEAD
-=======
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
->>>>>>> input_processor_refactor
 #include <map>
 
 using namespace EnergyPlus::PurchasedAirManager;
@@ -396,14 +393,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportMNMeters )
 		{
-<<<<<<< HEAD
-
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
-=======
 			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
->>>>>>> input_processor_refactor
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -478,14 +469,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportSMMeters )
 		{
-<<<<<<< HEAD
-
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
-=======
 			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
->>>>>>> input_processor_refactor
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );

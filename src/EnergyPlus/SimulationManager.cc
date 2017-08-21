@@ -124,11 +124,8 @@ extern "C" {
 #include <PlantPipingSystemsManager.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
-<<<<<<< HEAD
 #include <ResultsSchema.hh>
-=======
 #include <ScheduleManager.hh>
->>>>>>> input_processor_refactor
 #include <SetPointManager.hh>
 #include <SizingManager.hh>
 #include <SolarShading.hh>

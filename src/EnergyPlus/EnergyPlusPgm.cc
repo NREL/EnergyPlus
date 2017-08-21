@@ -444,16 +444,11 @@ EnergyPlusPgm( std::string const & filepath )
 	DisplayString( VerString );
 
 	try {
-<<<<<<< HEAD
-
-		InputProcessor::InitFiles();
-		InputProcessor::ProcessInput();
-		ResultsFramework::OutputSchema->setupOutputOptions();
-=======
 		EnergyPlus::inputProcessor = InputProcessor::factory();
 		EnergyPlus::inputProcessor->processInput();
 
->>>>>>> input_processor_refactor
+		ResultsFramework::OutputSchema->setupOutputOptions();
+
 		ManageSimulation();
 
 		ShowMessage( "Simulation Error Summary *************" );
