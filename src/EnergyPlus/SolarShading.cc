@@ -3567,7 +3567,7 @@ namespace SolarShading {
 			if ( KindOfSim == ksRunPeriodWeather ) {
 				for ( iHour = 1; iHour <= 24; ++iHour ) { // Do for all hours.
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, ShdFracFmt1, flags ) << Month << DayOfMonth << iHour << ( 60 / NumOfTimeStepInHour ) * ( TS - 1 ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, ShdFracFmt1, flags ) << Month << DayOfMonth << iHour - 1 << ( 60 / NumOfTimeStepInHour ) * ( TS - 1 ); }
 						for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, ShdFracFmt2, flags ) << SunlitFrac( TS, iHour, SurfNum ); }
 						}

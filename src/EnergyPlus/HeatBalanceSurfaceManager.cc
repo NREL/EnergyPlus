@@ -337,7 +337,7 @@ namespace HeatBalanceSurfaceManager {
 		// heat balance.
 
 		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger record keeping events. 
+		// Uses the status flags to trigger record keeping events.
 
 		// REFERENCES:
 		// na

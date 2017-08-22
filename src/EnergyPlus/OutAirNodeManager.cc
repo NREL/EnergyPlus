@@ -333,24 +333,6 @@ namespace OutAirNodeManager {
 				// Set additional node properties
 				if ( NumNums > 0 ) Node( NodeNums( 1 ) ).Height = Numbers( 1 );
 
-				// X. Luo added 7/27/2017
-				//  A2, \field Drybulb Temperature Schedule Name
-				//	\type object - list
-				//	\object - list ScheduleNames
-				//	\note Schedule values are real numbers, -100.0 to 100.0, units C
-				//	A3, \field Wetbulb Schedule Name
-				//	\type object - list
-				//	\object - list ScheduleNames
-				//	\note Schedule values are real numbers, -100.0 to 100.0, units C
-				//	A4, \field Wind Speed Schedule Name
-				//	\type object - list
-				//	\object - list ScheduleNames
-				//	\note Schedule values are real numbers, 0.0 to 40.0, units m / s
-				//	A5; \field Wind Direction Schedule Name
-				//	\type object - list
-				//	\object - list ScheduleNames
-				//	\note Schedule values are real numbers, 0.0 to 360.0, units degree
-
 				if ( NumAlphas > 1 ) {
 					Node( NodeNums( 1 ) ).OutAirDryBulbSchedNum = GetScheduleIndex( Alphas( 2 ) );
 				}
@@ -617,6 +599,7 @@ namespace OutAirNodeManager {
 				else {
 					Node( NodeNumber ).HumRat = OutHumRat;
 				}
+				Node( NodeNumber ).Enthalpy = PsyHFnTdbW( Node( NodeNumber ).OutAirDryBulb, Node( NodeNumber ).HumRat );
 				Node( NodeNumber ).Press = OutBaroPress;
 				Node( NodeNumber ).Quality = 0.0;
 				// Add contaminants

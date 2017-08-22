@@ -6198,7 +6198,6 @@ namespace ConvectionCoefficients {
 
 		// Using/Aliasing
 		using DataHeatBalSurface::TH;
-		//using DataEnvironment::WindDir;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

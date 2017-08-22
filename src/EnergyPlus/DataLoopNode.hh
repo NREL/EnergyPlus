@@ -147,13 +147,9 @@ namespace DataLoopNode {
 
 
 		//  Following are for Outdoor Air Nodes Scheduled Properties
-		bool SchedOutAirDryBulb;
 		int  OutAirDryBulbSchedNum;
-		bool SchedOutAirWetBulb;
 		int  OutAirWetBulbSchedNum;
-		bool SchedOutAirWindSpeed;
 		int  OutAirWindSpeedSchedNum;
-		bool SchedOutAirWindDir;
 		int  OutAirWindDirSchedNum;
 
 
@@ -204,14 +200,10 @@ namespace DataLoopNode {
 			TempSetPointHi( SensedNodeFlagValue ),
 			TempSetPointLo( SensedNodeFlagValue ),
 			Height( -1.0 ),
-			SchedOutAirDryBulb( false ),
-		    OutAirDryBulbSchedNum( 0.0 ),
-		    SchedOutAirWetBulb( false ),
-		    OutAirWetBulbSchedNum( 0.0 ),
-		    SchedOutAirWindSpeed( false ),
-		    OutAirWindSpeedSchedNum( 0.0 ),
-		    SchedOutAirWindDir( false ),
-		    OutAirWindDirSchedNum( 0.0 ),
+			OutAirDryBulbSchedNum( 0.0 ),
+			OutAirWetBulbSchedNum( 0.0 ),
+			OutAirWindSpeedSchedNum( 0.0 ),
+			OutAirWindDirSchedNum( 0.0 ),
 			OutAirDryBulb( 0.0 ),
 			EMSOverrideOutAirDryBulb( false ),
 			EMSValueForOutAirDryBulb( 0.0 ),
@@ -258,13 +250,9 @@ namespace DataLoopNode {
 			Real64 const TempSetPointHi, // {C}
 			Real64 const TempSetPointLo, // {C}
 			Real64 const Height, // {m}
-			bool   const SchedOutAirDryBulb, // if true, dry bulb temp of the outdoor air node is overwritten by sched value
 			int    const OutAirDryBulbSchedNum, // schedule value in {C}
-			bool   const SchedOutAirWetBulb, // if true, wet bulb temp of the outdoor air node is overwritten by sched value
 			int    const OutAirWetBulbSchedNum, // schedule value in {C}
-			bool   const SchedOutAirWindSpeed, // if true, wind direction of the outdoor air node is overwritten by sched value
 			int    const OutAirWindSpeedSchedNum, // schedule value in {m/s}
-			bool   const SchedOutAirWindDir, // if true, dry bulb temp of the outdoor air node is overwritten by sched value
 			int    const OutAirWindDirSchedNum, // schedule value in {degree}
 			Real64 const OutAirDryBulb, // {C}
 			bool   const EMSOverrideOutAirDryBulb, // if true, the EMS is calling to override outdoor air node drybulb setting
@@ -273,11 +261,11 @@ namespace DataLoopNode {
 			bool   const EMSOverrideOutAirWetBulb, // if true, the EMS is calling to override outdoor air node wetbulb setting
 			Real64 const EMSValueForOutAirWetBulb, // value EMS is directing to use for outdoor air node's wetbulb {C}
 			Real64 const OutAirWindSpeed, // {m/s}
-		    bool   const EMSOverrideOutAirWindSpeed, // if true, the EMS is calling to override outdoor air node wind speed setting
-		    Real64 const EMSValueForOutAirWindSpeed, // value EMS is directing to use for outdoor air node's drybulb {m/s}
-		    Real64 const OutAirWindDir, // {degree}
-		    bool   const EMSOverrideOutAirWindDir, // if true, the EMS is calling to override outdoor air node wind direction setting
-		    Real64 const EMSValueForOutAirWindDir, // value EMS is directing to use for outdoor air node's wind directio {degree}
+			bool   const EMSOverrideOutAirWindSpeed, // if true, the EMS is calling to override outdoor air node wind speed setting
+			Real64 const EMSValueForOutAirWindSpeed, // value EMS is directing to use for outdoor air node's drybulb {m/s}
+			Real64 const OutAirWindDir, // {degree}
+			bool   const EMSOverrideOutAirWindDir, // if true, the EMS is calling to override outdoor air node wind direction setting
+			Real64 const EMSValueForOutAirWindDir, // value EMS is directing to use for outdoor air node's wind directio {degree}
 			Real64 const CO2, // {ppm}
 			Real64 const CO2SetPoint, // {ppm}
 			Real64 const GenContam, // {ppm}
@@ -309,13 +297,9 @@ namespace DataLoopNode {
 			TempSetPointHi( TempSetPointHi ),
 			TempSetPointLo( TempSetPointLo ),
 			Height( Height ),
-			SchedOutAirDryBulb ( SchedOutAirDryBulb ),
 			OutAirDryBulbSchedNum( OutAirDryBulbSchedNum ),
-			SchedOutAirWetBulb( SchedOutAirWetBulb ),
 			OutAirWetBulbSchedNum( OutAirWetBulbSchedNum ),
-			SchedOutAirWindSpeed( SchedOutAirWindSpeed ),
 			OutAirWindSpeedSchedNum( OutAirWindSpeedSchedNum ),
-			SchedOutAirWindDir( SchedOutAirWindDir ),
 			OutAirWindDirSchedNum( OutAirWindDirSchedNum ),
 			OutAirDryBulb( OutAirDryBulb ),
 			EMSOverrideOutAirDryBulb( EMSOverrideOutAirDryBulb ),
