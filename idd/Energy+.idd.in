@@ -61679,6 +61679,7 @@ OutdoorAir:Node,
        \memo This object defines local outdoor air environmental conditions.
   A1,  \field Name
        \required-field
+       \reference OutdoorAirNodeNames
        \type node
   N1,  \field Height Above Ground
        \note A value less than zero indicates that the height will be ignored and the weather file conditions will be used.
