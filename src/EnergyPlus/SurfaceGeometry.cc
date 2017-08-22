@@ -5983,7 +5983,6 @@ namespace SurfaceGeometry {
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfLocalEnv;
 		using DataSurfaces::SurfLocalEnvironment;
-		using DataLoopNode::Node;
 		using DataLoopNode::NodeType_Air;
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::ObjectIsParent;
@@ -5997,7 +5996,6 @@ namespace SurfaceGeometry {
 		// INTERFACE BLOCK SPECIFICATIONS:na
 		// DERIVED TYPE DEFINITIONS:na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumArgs;
 		int NumAlpha;
 		int NumNumeric;
 		int Loop;
@@ -6142,7 +6140,6 @@ namespace SurfaceGeometry {
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfLocalEnv;
 		using DataSurfaces::SurfLocalEnvironment;
-		using DataLoopNode::Node;
 		using DataLoopNode::NodeType_Air;
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::ObjectIsParent;
@@ -6156,7 +6153,6 @@ namespace SurfaceGeometry {
 		// INTERFACE BLOCK SPECIFICATIONS:na
 		// DERIVED TYPE DEFINITIONS:na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumArgs;
 		int NumAlpha;
 		int NumNumeric;
 		int Loop;

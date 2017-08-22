@@ -4564,7 +4564,6 @@ namespace HeatBalanceManager {
 		// INTERFACE BLOCK SPECIFICATIONS:na
 		// DERIVED TYPE DEFINITIONS:na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumArgs;
 		int NumAlpha;
 		int NumNumeric;
 
