@@ -2298,10 +2298,12 @@ namespace WindowManager {
 		using DataHeatBalSurface::QRadOutReport;
 		using DataHeatBalSurface::QdotRadOutRep;
 		using DataHeatBalSurface::QdotRadOutRepPerArea;
+		using DataHeatBalSurface::QRadLWOutSrdSurfs;
 		//unused0909  USE DataEnvironment, ONLY: CurMnDyHr
 		using InputProcessor::SameString;
 		using WindowComplexManager::CalcComplexWindowThermal;
 		using WindowEquivalentLayer::EQLWindowSurfaceHeatBalance;
+		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2358,6 +2360,11 @@ namespace WindowManager {
 		Real64 NodeTemp;
 		Real64 CpAir;
 		Real64 RefAirTemp; // reference air temperatures
+
+		int SrdSurfsNum; // Surrounding surfaces list number
+		int SrdSurfNum; // Surrounding surface number DO loop counter
+		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
+		Real64 SrdSurfViewFac; // View factor of a surrounding surface
 
 		// New variables for thermochromic windows calc
 		Real64 locTCSpecTemp; // The temperature corresponding to the specified optical properties of the TC layer
@@ -2746,8 +2753,26 @@ namespace WindowManager {
 
 				Outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
 
-			} else { // Exterior window (ExtBoundCond = 0)
-
+			} else { // Exterior window (Ext BoundCond = 0)
+				// Calculate LWR from surrounding surfaces if defined for an exterior window
+				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				if ( AnyLocalEnvironmentsInModel ) {
+					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+						// Real64 test = surface.ViewFactorSkyIR;
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							surface.ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+						}
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							surface.ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+						}					
+						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+							QRadLWOutSrdSurfs( SurfNum ) += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+						}
+					}
+				}
 				if ( surface.ExtWind ) { // Window is exposed to wind (and possibly rain)
 					if ( IsRain ) { // Raining: since wind exposed, outside window surface gets wet
 						tout = surface.OutWetBulbTemp + TKelvin;
@@ -2758,7 +2783,7 @@ namespace WindowManager {
 					tout = surface.OutDryBulbTemp + TKelvin;
 				}
 				Ebout = sigma * pow_4( tout );
-				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout;
+				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
 
 			}
 
@@ -2864,7 +2889,7 @@ namespace WindowManager {
 		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * TimeStepZoneSec;
 
 		Real64 const Tsout_4( pow_4( Tsout ) ); //Tuned To reduce pow calls and redundancies
-		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) ) );
+		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) + QRadLWOutSrdSurfs( SurfNum ) ) );
 		QdotRadOutRep( SurfNum ) = surface.Area * rad_out_per_area;
 		QdotRadOutRepPerArea( SurfNum ) = rad_out_per_area;
 

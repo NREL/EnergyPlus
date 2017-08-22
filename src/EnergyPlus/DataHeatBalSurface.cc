@@ -219,6 +219,7 @@ namespace DataHeatBalSurface {
 	// Variables that are used in both the Surface Heat Balance and the Moisture Balance
 	Array1D< Real64 > QRadSWOutAbs; // Short wave radiation absorbed on outside of opaque surface
 	Array1D< Real64 > QRadSWInAbs; // Short wave radiation absorbed on inside of opaque surface
+	Array1D< Real64 > QRadLWOutSrdSurfs;  // Long wave radiation absorbed on outside of exterior surface
 
 	Array1D< Real64 > InitialDifSolInAbs; // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
 	Array1D< Real64 > InitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]
@@ -322,6 +323,7 @@ namespace DataHeatBalSurface {
 		QRadSWLightsInAbs.deallocate();
 		QRadSWOutAbs.deallocate();
 		QRadSWInAbs.deallocate();
+		QRadLWOutSrdSurfs.deallocate();
 		InitialDifSolInAbs.deallocate();
 		InitialDifSolInTrans.deallocate();
 		TH.deallocate();
