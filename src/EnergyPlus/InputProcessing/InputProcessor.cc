@@ -108,7 +108,8 @@ namespace EnergyPlus {
 		state( std::unique_ptr< State >( new State() ) ),
 		data( std::unique_ptr< DataStorage >( new DataStorage() ) )
 	{
-		schema = json::from_cbor( embeddedEpJSONSchema );
+		auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();
+		schema = json::from_cbor( embeddedEpJSONSchema.first, embeddedEpJSONSchema.second );
 
 		const json & loc = schema[ "properties" ];
 		caseInsensitiveObjectMap.reserve( loc.size() );
@@ -254,7 +255,7 @@ namespace EnergyPlus {
 		// 	caseInsensitiveObjectMap.emplace( std::move( key ), it.key() );
 		// }
 
-		std::ifstream input_stream( DataStringGlobals::inputFileName , std::ifstream::in | std::ios::ate);
+		std::ifstream input_stream( DataStringGlobals::inputFileName , std::ifstream::in );
 		if ( !input_stream.is_open() ) {
 			ShowFatalError( "Input file path " + DataStringGlobals::inputFileName + " not found" );
 			return;
@@ -275,6 +276,11 @@ namespace EnergyPlus {
 		// input_stream.close();
 		// std::string input_file = memblock;
 		// delete[] memblock;
+
+		if (input_file.empty()) {
+			ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
+			return;
+		}
 
 		if ( ! DataGlobals::isEpJSON ) {
 			json const input_file_json = idf_parser->decode( input_file, schema );
