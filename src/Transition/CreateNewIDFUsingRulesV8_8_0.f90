@@ -399,6 +399,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      CALL GetObjectItem('SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER',xcount,Alphas,NumAlphas,Numbers,NumNumbers,Status)
                      IF ( SameString( TRIM(Alphas(1)), TRIM(InArgs(1)) ) ) THEN
                        PerimNum = xcount
+                       EXIT
                      ENDIF
                    ENDDO
                    IF ( PerimNum == 0 ) THEN
@@ -448,6 +449,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(2)='BySegment'  ! Add 1 New Input Field, "BySegment"
                  OutArgs(3:CurArgs+1)=InArgs(2:CurArgs)
                  CurArgs = CurArgs + 1
+
+             CASE ('FOUNDATION:KIVA:SETTINGS')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs=InArgs
+                 IF ( SameString(InArgs(8), 'Autocalculate' ) ) THEN
+                   OutArgs(8) = 'Autoselect'
+                 ENDIF
 
              CASE('UNITARYSYSTEMPERFORMANCE:MULTISPEED')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)

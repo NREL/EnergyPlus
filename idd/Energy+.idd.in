@@ -16605,7 +16605,6 @@ SurfaceProperty:ExposedFoundationPerimeter,
        \key No
   A5 , \field Surface Segment 3 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
   A6 , \field Surface Segment 4 Exposed
@@ -16614,12 +16613,10 @@ SurfaceProperty:ExposedFoundationPerimeter,
        \key No
   A7 , \field Surface Segment 5 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
   A8 , \field Surface Segment 6 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
   A9 , \field Surface Segment 7 Exposed
@@ -16631,7 +16628,7 @@ SurfaceProperty:ExposedFoundationPerimeter,
        \key Yes
        \key No
   A11, \field Surface Segment 9 Exposed
-       \ty choice
+       \type choice
        \key Yes
        \key No
   A12; \field Surface Segment 10 Exposed
