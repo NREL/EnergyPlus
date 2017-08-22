@@ -382,13 +382,12 @@ namespace EnergyPlus {//***************
 			cNumericFields.allocate(MaxNumbers);
 			lAlphaBlanks.dimension(MaxAlphas, true);
 			lNumericBlanks.dimension(MaxNumbers, true); 
-			vector<std::string> test;
-			vector<bool> blanks;
+			std::vector<std::string> test;
+			std::vector<bool> blanks;
 
 			if (NumZoneHybridEvap > 0) {
 				CheckZoneHybridEvapName.dimension(NumZoneHybridEvap, true);
 				ZoneHybridUnitaryAirConditioner.allocate(NumZoneHybridEvap);
-				//ZoneEvapCoolerUnitFields.allocate(NumZoneEvapUnits);
 
 				for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
 					GetObjectItem(CurrentModuleObject, UnitLoop, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
@@ -593,7 +592,7 @@ namespace EnergyPlus {//***************
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Transfer Rate[W]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationLoad, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Tansfer Energy[J]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationEnergy, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					
-				list<CSetting*>::iterator iterOperatingSettings;
+				std::list<CSetting*>::iterator iterOperatingSettings;
 				int index=0;
 				for (iterOperatingSettings = ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.begin(); iterOperatingSettings != ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.end(); ++iterOperatingSettings)
 				{

@@ -48,25 +48,15 @@
 #define HybridEvapCoolingModel_hh_INCLUDED
 #include <iostream>  
 
-using namespace std;
 #include <string>
 #include <list>
 #include <map>
 #include <vector>
-
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
-using namespace std;
 
-const int MODE_BLOCK_OFFSET_Alpha = 9;
-const int BLOCK_HEADER_OFFSET_Alpha =  19;
-
-const int MODE1_BLOCK_OFFSET_Number = 2;
-const int MODE_BLOCK_OFFSET_Number = 16;
-const int BLOCK_HEADER_OFFSET_Number = 6;
 #define MINIMUM_LOAD_TO_ACTIVATE 0.5 // (kw)_ should think about if this needs to be user defined!!!!!
 #define IMPLAUSIBLE_POWER 10000000
 #include <EnergyPlus.hh>
@@ -81,9 +71,9 @@ namespace EnergyPlus {
 		class CModeSolutionSpace
 		{
 		public:
-			vector<Real64> PointX;
-			vector<Real64> PointY;
-			vector<Real64> PointMeta;
+			std::vector<Real64> PointX;
+			std::vector<Real64> PointY;
+			std::vector<Real64> PointMeta;
 			void AddItem(Real64 X, Real64 Y, Real64 M)
 			{
 				PointX.push_back(X);
@@ -95,14 +85,13 @@ namespace EnergyPlus {
 		class CMode
 		{
 			public:
-			CMode() : ModeID(0.0), Max_Msa(0.0), Min_Msa(0.0),Min_OAF(0.0), Max_OAF(0.0), Minimum_Outside_Air_Temperature(0.0), Maximum_Outside_Air_Temperature(0.0)
-			,Minimum_Outside_Air_Humidity_Ratio(0.0), Maximum_Outside_Air_Humidity_Ratio(0.0), NormalizationReference(0.0), Correction (0.0) {}
+				CMode();
 			
 			//finish init above
 			~CMode();                  // destructor
 			int ModeID;
 			CModeSolutionSpace sol;
-			string ModeName;
+			std::string ModeName;
 			int Tsa_curve_pointer;
 			int HRsa_curve_pointer;
 			int Psa_curve_pointer;
@@ -124,6 +113,12 @@ namespace EnergyPlus {
 			Real64 Maximum_Return_Air_Relative_Humidity;
 			Real64 NormalizationReference;
 			Real64 Correction;
+			int MODE_BLOCK_OFFSET_Alpha;
+			int BLOCK_HEADER_OFFSET_Alpha;
+			int MODE1_BLOCK_OFFSET_Number;
+			int MODE_BLOCK_OFFSET_Number;
+			int BLOCK_HEADER_OFFSET_Number;
+
 			bool ValidPointer(int curve_pointer);
 			bool ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
 			bool ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
@@ -312,16 +307,16 @@ namespace EnergyPlus {
 			bool DehumidificationRequested;
 			bool HumidificationRequested;
 			//non-initializer
-			vector<int> Tsa_curve_pointer;
-			vector<int>  HRsa_curve_pointer;
-			vector<int>  Psa_curve_pointer;
-			list<CMode*> OperatingModes;
-			list<CSetting*> CurrentOperatingSettings;
+			std::vector<int> Tsa_curve_pointer;
+			std::vector<int>  HRsa_curve_pointer;
+			std::vector<int>  Psa_curve_pointer;
+			std::list<CMode*> OperatingModes;
+			std::list<CSetting*> CurrentOperatingSettings;
 
 			CSetting *pOptimal;
 			CSetting *pStandBy;
 
-			list<CSetting*> Settings;
+			std::list<CSetting*> Settings;
 			//methods
 			int CurrentPrimaryMode();
 			Real64 CurrentPrimaryRuntimeFraction();
@@ -352,11 +347,11 @@ namespace EnergyPlus {
 			int ID;              // member variable
 			
 			//number of times in a day it failed to 
-			vector<int> SAT_OC_MetinMode_v;
-			vector<int> SAHR_OC_MetinMode_v;
+			std::vector<int> SAT_OC_MetinMode_v;
+			std::vector<int> SAHR_OC_MetinMode_v;
 			bool WarnOnceFlag;
 			//holds the X and Y points of the possible sollutions within the operating conditions. Int is the mode number
-			list<CModeSolutionSpace*> SolutionSpaces;
+			std::list<CModeSolutionSpace*> SolutionSpaces;
 			
 			Real64 ResolutionMsa;
 			Real64 ResolutionOSA;
@@ -372,8 +367,8 @@ namespace EnergyPlus {
 			bool optimal_EnvCondMet;
 			bool RunningPeakCapacity_EnvCondMet;
 		
-			vector<Real64> PolygonXs;
-			vector<Real64> PolygonYs;
+			std::vector<Real64> PolygonXs;
+			std::vector<Real64> PolygonYs;
 
 		};
 
