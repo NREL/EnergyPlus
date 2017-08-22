@@ -3,9 +3,9 @@
 
 // Fortran Intrinsic-Compatible and General Math Functions
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -18,6 +18,7 @@
 #include <cassert>
 #include <cfloat>
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -28,7 +29,7 @@ namespace ObjexxFCL {
 
 typedef  std::intmax_t  SSize;
 
-// min Functions
+// min /////
 
 // min( short, short )
 inline
@@ -276,7 +277,7 @@ min( T const & a, T const & b, T const & c, T const & d, Ts const &... o )
 	return min( a < b ? a : b, c < d ? c : d, o... );
 }
 
-// max Functions
+// max /////
 
 // max( short, short )
 inline
@@ -524,7 +525,7 @@ max( T const & a, T const & b, T const & c, T const & d, Ts const &... o )
 	return max( a < b ? b : a, c < d ? d : c, o... );
 }
 
-// Math Functions
+// General /////
 
 // abs( x ) == | x |
 template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
@@ -552,6 +553,501 @@ CEILING( T const & x )
 {
 	return int( std::ceil( x ) );
 }
+
+// signum( x )
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+int
+signum( T const & x )
+{
+	return ( x > T( 0 ) ? +1 : ( x < T( 0 ) ? -1 : 0 ) );
+}
+
+// sign( x )
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+int
+sign( T const & x )
+{
+	return ( x >= T( 0 ) ? +1 : -1 );
+}
+
+// Sign Transfer from Second Argument to First Argument
+template< typename X, typename Y, class = typename std::enable_if< std::is_arithmetic< X >::value && std::is_arithmetic< Y >::value, X >::type >
+inline
+X
+sign( X const & x, Y const & y )
+{
+	return ( y >= Y( 0 ) ? abs( x ) : -abs( x ) );
+}
+
+// nint( x ): Nearest int
+template< typename T >
+inline
+int
+nint( T const & x )
+{
+	return static_cast< int >( x + ( sign( x ) * T( 0.5 ) ) );
+}
+
+// nsint( x ): Nearest short int
+template< typename T >
+inline
+short int
+nsint( T const & x )
+{
+	return static_cast< short int >( x + ( sign( x ) * T( 0.5 ) ) );
+}
+
+// nlint( x ): Nearest long int
+template< typename T >
+inline
+long int
+nlint( T const & x )
+{
+	return static_cast< long int >( x + ( sign( x ) * T( 0.5 ) ) );
+}
+
+// nlint( x ): Nearest long int
+template< typename T >
+inline
+int64_t
+nint64( T const & x )
+{
+	return static_cast< int64_t >( x + ( sign( x ) * T( 0.5 ) ) );
+}
+
+// Nearest function selector class for R non-integer or T integer
+template< typename R, typename T, bool >
+struct NearestSelector
+{
+	static
+	R
+	nearest( T const & x )
+	{
+		return R( x );
+	}
+};
+
+// Nearest function selector class for R integer and T non-integer
+template< typename R, typename T >
+struct NearestSelector< R, T, true >
+{
+	static
+	R
+	nearest( T const & x )
+	{
+		return R( x + ( sign( x ) * T( 0.5 ) ) );
+	}
+};
+
+// nearest< R >( x ): Nearest R
+template< typename R, typename T >
+inline
+R
+nearest( T const & x )
+{
+	return NearestSelector< R, T, ( ( std::numeric_limits< R >::is_integer ) && ( ! std::numeric_limits< T >::is_integer ) ) >::nearest( x );
+}
+
+// nearest_size( x ): Nearest std::size_t
+template< typename T >
+inline
+std::size_t
+nearest_size( T const & x )
+{
+	return std::size_t( x > T( 0 ) ? x + ( sign( x ) * T( 0.5 ) ) : 0 );
+}
+
+// nearest_ssize( x ): Nearest SSize
+template< typename T >
+inline
+SSize
+nearest_ssize( T const & x )
+{
+	return SSize( x + ( sign( x ) * T( 0.5 ) ) );
+}
+
+// nearest_int( x ): Nearest int
+template< typename T >
+inline
+int
+nearest_int( T const & x )
+{
+	return static_cast< int >( x + ( sign( x ) * T( 0.5 ) ) );
+}
+
+// Mod function selector class for non-integer types
+template< typename T, bool >
+struct ModSelector
+{
+	static
+	T
+	mod( T const & x, T const & y )
+	{
+		return ( y != T( 0 ) ? x - ( T( static_cast< SSize >( x / y ) ) * y ) : T( 0 ) );
+	}
+};
+
+// Mod function selector class for integer types
+//  When used with negative integer arguments this assumes integer division
+//   rounds towards zero (de facto and future C++ standard)
+template< typename T >
+struct ModSelector< T, true >
+{
+	static
+	T
+	mod( T const & x, T const & y )
+	{
+		return ( y != T( 0 ) ? x - ( ( x / y ) * y ) : T( 0 ) );
+	}
+};
+
+// x(mod y) computational modulo returning magnitude < | y | and sign of x
+//  When used with negative integer arguments this assumes integer division
+//   rounds towards zero (de facto and future C++ standard)
+template< typename T >
+inline
+T
+mod( T const & x, T const & y )
+{
+	return ModSelector< T, std::numeric_limits< T >::is_integer >::mod( x, y );
+}
+
+// i(mod n) : float Arguments
+inline
+float
+mod( float const i, float const n )
+{
+	return ( n != 0.0f ? std::fmod( i, n ) : 0.0f );
+}
+
+// i(mod n) : double Arguments
+inline
+double
+mod( double const i, double const n )
+{
+	return ( n != 0.0 ? std::fmod( i, n ) : 0.0 );
+}
+
+// i(mod n) : long double Arguments
+inline
+long double
+mod( long double const & i, long double const & n )
+{
+	return ( n != 0.0l ? std::fmod( i, n ) : 0.0l );
+}
+
+// Modulo function selector class for non-integer types
+template< typename T, bool >
+struct ModuloSelector
+{
+	static
+	T
+	modulo( T const & x, T const & y )
+	{
+		return ( y != T( 0 ) ? x - ( std::floor( x / y ) * y ) : x ); // Intel Fortran behavior if y==0
+	}
+};
+
+// Modulo function selector class for integer types
+template< typename T >
+struct ModuloSelector< T, true >
+{
+	static
+	T
+	modulo( T const & x, T const & y )
+	{
+		return ( y != T( 0 ) ? x - ( T( std::floor( static_cast< long double >( x ) / y ) ) * y ) : x ); // Intel Fortran behavior if y==0
+	}
+};
+
+// x(mod y) mathematical modulo returning magnitude < | y | and sign of y
+template< typename T >
+inline
+T
+modulo( T const & x, T const & y )
+{
+	return ModuloSelector< T, std::numeric_limits< T >::is_integer >::modulo( x, y );
+}
+
+// Positive Difference
+template< typename T >
+inline
+T
+dim( T const & x, T const & y )
+{
+	return max( x - y, T( 0 ) );
+}
+
+// Greatest Common Divisor
+template< typename T >
+inline
+T
+gcd( T const & m, T const & n )
+{
+	T lo( min( m, n ) );
+	T hi( max( m, n ) );
+	while ( lo > T( 0 ) ) {
+		T const rem( mod( hi, lo ) );
+		hi = lo;
+		lo = rem;
+	}
+	return hi;
+}
+
+// Complex /////
+
+// Real Part
+template< typename T >
+inline
+T
+REAL( std::complex< T > const & c )
+{
+	return c.real();
+}
+
+// Real Conversion
+template< typename T >
+inline
+T
+REAL( T const & x )
+{
+	return float( x );
+}
+
+// Complex Maker
+template< typename R, typename I, class = typename std::enable_if< std::is_integral< R >::value && std::is_integral< I >::value >::type >
+inline
+std::complex< float >
+make_complex( R const & r, I const & i )
+{
+	return std::complex< float >( r, i );
+}
+
+// Complex Maker
+template< typename R, typename I, class = typename std::enable_if< std::is_integral< R >::value && ( ! std::is_integral< I >::value ) >::type >
+inline
+std::complex< I >
+make_complex( R const & r, I const & i )
+{
+	return std::complex< I >( r, i );
+}
+
+// Complex Maker
+template< typename R, typename I, class = typename std::enable_if< ( ! std::is_integral< R >::value ) && std::is_integral< I >::value >::type >
+inline
+std::complex< R >
+make_complex( R const & r, I const & i )
+{
+	return std::complex< R >( r, i );
+}
+
+// Complex Maker
+template< typename R, typename I, class = typename std::enable_if< ( ! std::is_integral< R >::value ) && ( ! std::is_integral< I >::value ) && std::is_same< R, I >::value >::type, typename = void >
+inline
+std::complex< R >
+make_complex( R const & r, I const & i )
+{
+	return std::complex< R >( r, i );
+}
+
+// Complex Maker
+template< typename R, typename I, class = typename std::enable_if< ( ! std::is_integral< R >::value ) && ( ! std::is_integral< I >::value ) && ( ! std::is_same< R, I >::value ) >::type >
+inline
+std::complex< double >
+make_complex( R const & r, I const & i )
+{
+	return std::complex< double >( r, i );
+}
+
+// Trigonometric /////
+
+// pi
+template< typename T >
+inline
+T
+pi()
+{
+	static T const Pi( T( 4 ) * std::atan( T( 1 ) ) );
+	return Pi;
+}
+
+// pi/2
+template< typename T >
+inline
+T
+pi_over_2()
+{
+	static T const Pi__2( T( 2 ) * std::atan( T( 1 ) ) );
+	return Pi__2;
+}
+
+// pi/2
+template< typename T >
+inline
+T
+pi__2()
+{
+	static T const Pi__2( T( 2 ) * std::atan( T( 1 ) ) );
+	return Pi__2;
+}
+
+// Radians to Degrees
+template< typename T >
+inline
+T
+degrees( T const & r )
+{
+	static T const r2d( T( 180 ) / pi< T >() );
+	return r * r2d;
+}
+
+// Radians to Degrees
+template< typename T >
+inline
+T
+deg( T const & r )
+{
+	static T const r2d( T( 180 ) / pi< T >() );
+	return r * r2d;
+}
+
+// Degrees to Radians
+template< typename T >
+inline
+T
+radians( T const & d )
+{
+	static T const d2r( pi< T >() / T( 180 ) );
+	return d * d2r;
+}
+
+// Degrees to Radians
+template< typename T >
+inline
+T
+rad( T const & d )
+{
+	static T const d2r( pi< T >() / T( 180 ) );
+	return d * d2r;
+}
+
+// Cotangent
+template< typename T >
+inline
+T
+cot( T const & r )
+{
+	if ( r == T( 0 ) ) {
+		return std::numeric_limits< T >::infinity();
+	} else {
+		return std::tan( pi_over_2< T >() - r );
+	}
+}
+
+// Arccotangent
+template< typename T >
+inline
+T
+acot( T const & x )
+{
+	return pi_over_2< T >() - std::atan( x );
+}
+
+// Sine of Angle in Degrees
+template< typename T >
+inline
+T
+sind( T const & d )
+{
+	return std::sin( radians( d ) );
+}
+
+// Cosine of Angle in Degrees
+template< typename T >
+inline
+T
+cosd( T const & d )
+{
+	return std::cos( radians( d ) );
+}
+
+// Tangent of Angle in Degrees
+template< typename T >
+inline
+T
+tand( T const & d )
+{
+	return std::tan( radians( d ) );
+}
+
+// Cotangent of Angle in Degrees
+template< typename T >
+inline
+T
+cotd( T const & d )
+{
+	return cot( radians( d ) );
+}
+
+// Arcsine in Degrees
+template< typename T >
+inline
+T
+asind( T const & x )
+{
+	return degrees( std::asin( x ) );
+}
+
+// Arccosine in Degrees
+template< typename T >
+inline
+T
+acosd( T const & x )
+{
+	return degrees( std::acos( x ) );
+}
+
+// Arctangent in Degrees
+template< typename T >
+inline
+T
+atand( T const & x )
+{
+	return degrees( std::atan( x ) );
+}
+
+// Arccotangent in Degrees
+template< typename T >
+inline
+T
+acotd( T const & x )
+{
+	return degrees( acot( x ) );
+}
+
+// Two-Argument Arctangent in Degrees
+template< typename T >
+inline
+T
+atan2d( T const & y, T const & x )
+{
+	return degrees( std::atan2( y, x ) );
+}
+
+// Error Function /////
+
+// Two-Argument Arctangent in Degrees
+template< typename T >
+inline
+T
+erfcx( T const & x )
+{
+	return T( std::exp( x * x ) * std::erfc( x ) );
+}
+
+// Power and Roots /////
 
 // square( x ) == x^2
 template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
@@ -666,7 +1162,7 @@ inline
 T
 root_4( T const x )
 {
-	return std::sqrt( std::sqrt( x ) );
+	return T( std::sqrt( std::sqrt( x ) ) );
 }
 
 // root_8( x ) == x^(1/8)
@@ -675,7 +1171,7 @@ inline
 T
 root_8( T const x )
 {
-	return std::sqrt( std::sqrt( std::sqrt( x ) ) );
+	return T( std::sqrt( std::sqrt( std::sqrt( x ) ) ) );
 }
 
 // square( x ) == x^2
@@ -785,302 +1281,66 @@ pow_9( T const & x )
 	return t * t * t;
 }
 
-// sign( x )
-template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
-inline
-int
-sign( T const & x )
-{
-	return ( x >= T( 0 ) ? +1 : -1 );
-}
+// Tolerant Comparisons /////
 
-// Sign Transfer from Second Argument to First Argument
-template< typename X, typename Y, class = typename std::enable_if< std::is_arithmetic< X >::value && std::is_arithmetic< Y >::value, X >::type >
-inline
-X
-sign( X const & x, Y const & y )
-{
-	return ( y >= Y( 0 ) ? abs( x ) : -abs( x ) );
-}
-
-// Positive Difference
-template< typename T >
-inline
-T
-dim( T const & x, T const & y )
-{
-	return max( x - y, T( 0 ) );
-}
-
-// Nearest function selector class for R non-integer or T integer
-template< typename R, typename T, bool >
-struct NearestSelector
-{
-	static
-	R
-	nearest( T const & x )
-	{
-		return R( x );
-	}
-};
-
-// Nearest function selector class for R integer and T non-integer
-template< typename R, typename T >
-struct NearestSelector< R, T, true >
-{
-	static
-	R
-	nearest( T const & x )
-	{
-		return R( x + ( sign( x ) * T( 0.5 ) ) );
-	}
-};
-
-// nearest< R >( x ): Nearest R
-template< typename R, typename T >
-inline
-R
-nearest( T const & x )
-{
-	return NearestSelector< R, T, ( ( std::numeric_limits< R >::is_integer ) && ( ! std::numeric_limits< T >::is_integer ) ) >::nearest( x );
-}
-
-// nearest_size( x ): Nearest std::size_t
-template< typename T >
-inline
-std::size_t
-nearest_size( T const & x )
-{
-	return std::size_t( x > T( 0 ) ? x + ( sign( x ) * T( 0.5 ) ) : 0 );
-}
-
-// nearest_ssize( x ): Nearest SSize
-template< typename T >
-inline
-SSize
-nearest_ssize( T const & x )
-{
-	return SSize( x + ( sign( x ) * T( 0.5 ) ) );
-}
-
-// nearest_int( x ): Nearest int
-template< typename T >
-inline
-int
-nearest_int( T const & x )
-{
-	return static_cast< int >( x + ( sign( x ) * T( 0.5 ) ) );
-}
-
-// nint( x ): Nearest int
-template< typename T >
-inline
-int
-nint( T const & x )
-{
-	return static_cast< int >( x + ( sign( x ) * T( 0.5 ) ) );
-}
-
-// nsint( x ): Nearest short int
-template< typename T >
-inline
-short int
-nsint( T const & x )
-{
-	return static_cast< short int >( x + ( sign( x ) * T( 0.5 ) ) );
-}
-
-// nlint( x ): Nearest long int
-template< typename T >
-inline
-long int
-nlint( T const & x )
-{
-	return static_cast< long int >( x + ( sign( x ) * T( 0.5 ) ) );
-}
-
-// nlint( x ): Nearest long int
-template< typename T >
-inline
-int64_t
-nint64( T const & x )
-{
-	return static_cast< int64_t >( x + ( sign( x ) * T( 0.5 ) ) );
-}
-
-// Mod function selector class for non-integer types
-template< typename T, bool >
-struct ModSelector
-{
-	static
-	T
-	mod( T const & x, T const & y )
-	{
-		return ( y != T( 0 ) ? x - ( T( static_cast< SSize >( x / y ) ) * y ) : T( 0 ) );
-	}
-};
-
-// Mod function selector class for integer types
-//  When used with negative integer arguments this assumes integer division
-//   rounds towards zero (de facto and future official standard)
-template< typename T >
-struct ModSelector< T, true >
-{
-	static
-	T
-	mod( T const & x, T const & y )
-	{
-		return ( y != T( 0 ) ? x - ( ( x / y ) * y ) : T( 0 ) );
-	}
-};
-
-// x(mod y) computational modulo returning magnitude < | y | and sign of x
-//  When used with negative integer arguments this assumes integer division
-//   rounds towards zero (de facto and future official standard)
-template< typename T >
-inline
-T
-mod( T const & x, T const & y )
-{
-	return ModSelector< T, std::numeric_limits< T >::is_integer >::mod( x, y );
-}
-
-// i(mod n) : float Arguments
-inline
-float
-mod( float const i, float const n )
-{
-	assert( n != 0.0f );
-	return ( n == 0.0f ? 0.0f : std::fmod( i, n ) );
-}
-
-// i(mod n) : double Arguments
-inline
-double
-mod( double const i, double const n )
-{
-	assert( n != 0.0 );
-	return ( n == 0.0 ? 0.0 : std::fmod( i, n ) );
-}
-
-// i(mod n) : long double Arguments
-inline
-long double
-mod( long double const & i, long double const & n )
-{
-	assert( n != 0.0l );
-	return ( n == 0.0l ? 0.0l : std::fmod( i, n ) );
-}
-
-// Modulo function selector class for non-integer types
-template< typename T, bool >
-struct ModuloSelector
-{
-	static
-	T
-	modulo( T const & x, T const & y )
-	{
-		return ( y != T( 0 ) ? x - ( std::floor( x / y ) * y ) : T( 0 ) );
-	}
-};
-
-// Modulo function selector class for integer types
-template< typename T >
-struct ModuloSelector< T, true >
-{
-	static
-	T
-	modulo( T const & x, T const & y )
-	{
-		return ( y != T( 0 ) ? x - ( T( std::floor( static_cast< long double >( x ) / y ) ) * y ) : T( 0 ) );
-	}
-};
-
-// x(mod y) mathematical modulo returning magnitude < | y | and sign of y
-template< typename T >
-inline
-T
-modulo( T const & x, T const & y )
-{
-	return ModuloSelector< T, std::numeric_limits< T >::is_integer >::modulo( x, y );
-}
-
-// Greatest Common Divisor
-template< typename T >
-inline
-T
-gcd( T const & m, T const & n )
-{
-	T lo( min( m, n ) );
-	T hi( max( m, n ) );
-	while ( lo > T( 0 ) ) {
-		T const rem( mod( hi, lo ) );
-		hi = lo;
-		lo = rem;
-	}
-	return hi;
-}
-
-// Comparison-with-Tolerance Functions
-
-// Equal within specified relative and absolute tolerances?
+// x == y Within Specified Relative or Absolute Tolerances?
 template< typename T >
 inline
 bool
-eq_tol( T const & x, T const & y, T const & r_tol, T const & a_tol )
+eq_tol( T const & x, T const & y, T const & r_tol, T const & a_tol = T( 0 ) )
 {
 	using std::abs; // Can use std::abs or user-defined abs
 	assert( r_tol >= T( 0 ) );
 	assert( a_tol >= T( 0 ) );
-	return ( abs( x - y ) <= min( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
+	return ( abs( x - y ) <= max( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
 }
 
-// Less than within specified relative and absolute tolerances?
+// x < y Within Specified Relative or Absolute Tolerances?
 template< typename T >
 inline
 bool
-lt_tol( T const & x, T const & y, T const & r_tol, T const & a_tol )
+lt_tol( T const & x, T const & y, T const & r_tol, T const & a_tol = T( 0 ) )
 {
 	using std::abs; // Can use std::abs or user-defined abs
 	assert( r_tol >= T( 0 ) );
 	assert( a_tol >= T( 0 ) );
-	return ( x < y + min( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
+	return ( x < y + max( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
 }
 
-// Less than or equal within specified relative and absolute tolerances?
+// x <= y Within Specified Relative or Absolute Tolerances?
 template< typename T >
 inline
 bool
-le_tol( T const & x, T const & y, T const & r_tol, T const & a_tol )
+le_tol( T const & x, T const & y, T const & r_tol, T const & a_tol = T( 0 ) )
 {
 	using std::abs; // Can use std::abs or user-defined abs
 	assert( r_tol >= T( 0 ) );
 	assert( a_tol >= T( 0 ) );
-	return ( x <= y + min( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
+	return ( x <= y + max( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
 }
 
-// Greater than or equal within specified relative and absolute tolerances?
+// x >= y Within Specified Relative or Absolute Tolerances?
 template< typename T >
 inline
 bool
-ge_tol( T const & x, T const & y, T const & r_tol, T const & a_tol )
+ge_tol( T const & x, T const & y, T const & r_tol, T const & a_tol = T( 0 ) )
 {
 	using std::abs; // Can use std::abs or user-defined abs
 	assert( r_tol >= T( 0 ) );
 	assert( a_tol >= T( 0 ) );
-	return ( x >= y - min( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
+	return ( x >= y - max( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
 }
 
-// Greater than within specified relative and absolute tolerances?
+// x > y Within Specified Relative or Absolute Tolerances?
 template< typename T >
 inline
 bool
-gt_tol( T const & x, T const & y, T const & r_tol, T const & a_tol )
+gt_tol( T const & x, T const & y, T const & r_tol, T const & a_tol = T( 0 ) )
 {
 	using std::abs; // Can use std::abs or user-defined abs
 	assert( r_tol >= T( 0 ) );
 	assert( a_tol >= T( 0 ) );
-	return ( x > y - min( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
+	return ( x > y - max( r_tol * max( abs( x ), abs( y ) ), a_tol ) );
 }
 
 } // ObjexxFCL

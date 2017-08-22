@@ -56,7 +56,7 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <CommandLineInterface.hh>
@@ -7596,7 +7596,7 @@ Label9999: ;
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, "(' ',A,$)" ) << "Site:GroundReflectance";
 		for ( I = 1; I <= 12; ++I ) {
-			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I ); 
+			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I );
 		}
 		gio::write( OutputFileInits );
 

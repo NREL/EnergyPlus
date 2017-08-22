@@ -1564,6 +1564,11 @@ namespace SimulationManager {
 		}
 		mtr_stream = nullptr;
 
+		// Close the External Shading Output File
+
+		if ( OutputFileShadingFrac > 0 ) {
+			gio::close( OutputFileShadingFrac );
+		}
 	}
 
 	void
