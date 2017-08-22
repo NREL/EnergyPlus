@@ -2289,7 +2289,7 @@ namespace OutputReportPredefined {
 	{
 		for ( int iTableEntry = 1; iTableEntry <= numTableEntry; ++iTableEntry ) {
 			if ( tableEntry( iTableEntry ).indexColumn == columnIndex && tableEntry( iTableEntry ).objectName == objName ){
-				return trimmed( left_justified(tableEntry( iTableEntry ).charEntry) );
+				return trimmed( ljustified(tableEntry( iTableEntry ).charEntry) );
 				break;
 			}
 		}

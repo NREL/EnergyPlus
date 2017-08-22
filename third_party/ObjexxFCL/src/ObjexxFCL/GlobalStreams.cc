@@ -1,8 +1,8 @@
 // Global Streams Collection
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -83,7 +83,7 @@ namespace gio {
 			return true;
 		} else {
 			auto i( fix_unit_streams_.find( unit ) );
-			return ( i != fix_unit_streams_.end() ? true : false );
+			return ( i != fix_unit_streams_.end() );
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace gio {
 			return true;
 		} else {
 			auto i( fix_name_streams_.find( name ) );
-			return ( i != fix_name_streams_.end() ? true : false );
+			return ( i != fix_name_streams_.end() );
 		}
 	}
 

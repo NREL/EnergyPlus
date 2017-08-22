@@ -913,7 +913,7 @@ namespace DaylightingDevices {
 		Real64 const N( 100000.0 ); // Number of integration points
 		Real64 const xTol( 150.0 ); // Tolerance factor to skip iterations where dT is approximately 0
 		// Must be >= 1.0, increase this number to decrease the execution time
-		Real64 const myLocalTiny( tiny( 1.0 ) );
+		Real64 const myLocalTiny( TINY( 1.0 ) );
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 i; // Integration interval between points
