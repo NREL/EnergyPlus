@@ -679,8 +679,8 @@ bool KivaManager::setupKivaInstances()
 			// Calculate total exposed perimeter attributes
 			std::vector<bool> isExposedPerimeter;
 
-			bool userSetExposedPerimeter;
-			bool useDetailedExposedPerimeter;
+			bool userSetExposedPerimeter = false;
+			bool useDetailedExposedPerimeter = false;
 			Real64 exposedFraction;
 
 			auto& expPerimMap = SurfaceGeometry::exposedFoundationPerimeter.surfaceMap;
