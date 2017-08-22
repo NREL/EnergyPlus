@@ -57,7 +57,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.8;
+  Version,8.7;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -886,4 +886,3 @@
     None,                    !- Heat Recovery Type
     0.7,                     !- Sensible Heat Recovery Effectiveness {dimensionless}
     0.65;                    !- Latent Heat Recovery Effectiveness {dimensionless}
-

@@ -43,7 +43,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.8;
+  Version,8.7;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

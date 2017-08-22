@@ -7745,7 +7745,7 @@ namespace SurfaceGeometry {
 				}
 			} alpF++;
 
-			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.deepGroundDepth = rNumericArgs( numF );} numF++;
+			if ( lNumericFieldBlanks( numF ) || rNumericArgs( numF ) == AutoCalculate ) { kivaManager.settings.deepGroundDepth = 40.0; } else {kivaManager.settings.deepGroundDepth = rNumericArgs( numF );} numF++;
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.minCellDim = rNumericArgs( numF );} numF++;
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.maxGrowthCoeff = rNumericArgs( numF );} numF++;
 

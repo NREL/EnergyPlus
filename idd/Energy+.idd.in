@@ -16518,7 +16518,6 @@ SurfaceProperty:ExposedFoundationPerimeter,
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
-       \default 1.0
   A3 , \field Surface Segment 1 Exposed
        \note Surface Segment N is the perimeter between the Nth and (N+1)th
        \note vertices
@@ -41374,11 +41373,11 @@ AirTerminal:SingleDuct:Mixer,
        \type object-list
        \object-list DesignSpecificationOutdoorAirNames
        \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
-       \note unit will adjust flow to meet this outdoor air requirement. 
+       \note unit will adjust flow to meet this outdoor air requirement.
        \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
        \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
-       \note If this field is blank, then the terminal unit will be controlled using the  
-       \note DesignSpecification:OutdoorAir objec referenced in the Sizing:Zone object.   
+       \note If this field is blank, then the terminal unit will be controlled using the
+       \note DesignSpecification:OutdoorAir objec referenced in the Sizing:Zone object.
 
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.

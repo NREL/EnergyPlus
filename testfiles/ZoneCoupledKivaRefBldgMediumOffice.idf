@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,8.8;
+  Version,8.7;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -7949,4 +7949,3 @@
     0,                       !- Nuclear High Level Emission Factor {g/MJ}
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
-
