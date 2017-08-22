@@ -11,7 +11,7 @@ This will eventually become a more structured file, but currently it isn't clear
 
 The existing Zone Component Loads Summary report has been enhanced and new reports titled AirLoop Component Loads Summary and Facility Component Loads Summary reports have been added. The main "Estimated Peak Load Components" subtables has two new columns for related areas and total per area. These show values for the envelope related rows of the table and for the internal loads (which use the floor area). The "Peak Conditions" subtable has additional temperatures such as the supply air temperature. The "Peak Conditions" subtable has main fan air flow and outdoor airflow. A new "Engineering Checks" subtable that shows the percent outside air, airflow per floor area, airflow per  capacity, area per capacity and number of people. AirLoop Component Loads Summary table shows similar results that are based on the combined airloop results and shows which zones are included in the results. Similarly, the Facility Component Loads Summary report shows the results for the entire facility being modeled.
 
-See [5923] (https://github.com/NREL/EnergyPlus/pull/5923)
+See [5923](https://github.com/NREL/EnergyPlus/pull/5923)
 
 ### Adds additional records of User-Specified component sizing output to SQLite output file. 
 
