@@ -3732,7 +3732,7 @@ namespace SolarShading {
 		}
 		
 		if ( UseScheduledSunlitFrac ) {
-			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).SchedExternalShadingFrac ) {
 					SunlitFrac( iTimeStep, iHour, SurfNum ) = LookUpScheduleValue( Surface( SurfNum ).ExternalShadingSchInd, iHour, iTimeStep );
 				}
@@ -3742,7 +3742,7 @@ namespace SolarShading {
 			} 
 		} else {
 			SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
-			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).Area >= 1.e-10 ) {
 					SurfArea = Surface( SurfNum ).NetAreaShadowCalc;
 					if ( ! DetailedSolarTimestepIntegration ) {
@@ -8463,17 +8463,7 @@ namespace SolarShading {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int SurfNum; // Surface counter
-		int IPhi; // Altitude step counter
-		int ITheta; // Azimuth step counter
 		int SrdSurfsNum; // Srd surface counter
-		Real64 DPhi; // Altitude step size
-		Real64 DTheta; // Azimuth step size
-		Real64 DThetaDPhi; // Product of DTheta and DPhi
-		Real64 PhiMin; // Minimum altitude
-		Real64 Phi; // Altitude angle
-		Real64 Theta; // Azimuth angle
-		Real64 CosPhi; // Cosine of Phi
 		Real64 Fac1WoShdg; // Intermediate calculation factor, without shading
 		Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
 		Real64 Fac1WithShdg; // Intermediate calculation factor, with shading
