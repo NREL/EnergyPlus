@@ -187,7 +187,10 @@ namespace OutAirNodeManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using ScheduleManager::GetScheduleIndex;
+<<<<<<< HEAD
 		using CurveManager::GetCurveIndex;
+=======
+>>>>>>> f10e6417ac7090163d483acfc64d285ebe8e5a61
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -451,10 +454,22 @@ namespace OutAirNodeManager {
 			}
 			if ( Node( NodeNum ).OutAirWindSpeedSchedNum != 0 ) {
 				Node( NodeNum ).OutAirWindSpeed = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindSpeedSchedNum );
+<<<<<<< HEAD
+=======
+			}
+			if ( Node( NodeNum ).OutAirWindDirSchedNum != 0 ) {
+				Node( NodeNum ).OutAirWindDir = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindDirSchedNum );
+>>>>>>> f10e6417ac7090163d483acfc64d285ebe8e5a61
 			}
 			if ( Node( NodeNum ).OutAirWindDirSchedNum != 0 ) {
 				Node( NodeNum ).OutAirWindDir = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindDirSchedNum );
 			}
+
+			// Set node data to EMS overwritten values if defined
+			if ( Node( NodeNum ).EMSOverrideOutAirDryBulb ) Node( NodeNum ).OutAirDryBulb = Node( NodeNum ).EMSValueForOutAirDryBulb;
+			if ( Node( NodeNum ).EMSOverrideOutAirWetBulb ) Node( NodeNum ).OutAirWetBulb = Node( NodeNum ).EMSValueForOutAirWetBulb;
+			if ( Node( NodeNum ).EMSOverrideOutAirWindSpeed ) Node( NodeNum ).OutAirWindSpeed = Node( NodeNum ).EMSValueForOutAirWindSpeed;
+			if ( Node( NodeNum ).EMSOverrideOutAirWindDir ) Node( NodeNum ).OutAirWindDir = Node( NodeNum ).EMSValueForOutAirWindDir;
 
 			// Set node data to EMS overwritten values if defined
 			if ( Node( NodeNum ).EMSOverrideOutAirDryBulb ) Node( NodeNum ).OutAirDryBulb = Node( NodeNum ).EMSValueForOutAirDryBulb;
