@@ -1,7 +1,7 @@
 ! HybridZoneModel.idf
 ! Basic file description:  Small, 4 zone model to illustrate simple rectangular building using 4ZoneWithShading_Simple_1.idf
 !
-! Highlights:              Hybrid model use measured zone air temperature data to inversely calculate zone air infiltration air change per hour (ach) and zone internal !                          thermal mass 
+! Highlights:              Hybrid model use measured zone air temperature data to inversely calculate zone air infiltration air change per hour (ach) and zone internal !                          thermal mass
 !
 ! External file:           HybridZoneModel_TemperatureData.csv for zone air temperature data input
 !
@@ -82,41 +82,41 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL ===========
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
-    Multiplier1,             !- MultiplierName
+  ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier1,             !- Name
     ZONE 1,                  !- Zone or ZoneList Name
     ,                        !- Temperature Capacity Multiplier
     ,                        !- Humidity Capacity Multiplier
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
-    Multiplier2,             !- MultiplierName
+  ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier2,             !- Name
     ZONE 2,                  !- Zone or ZoneList Name
     5,                       !- Temperature Capacity Multiplier
     ,                        !- Humidity Capacity Multiplier
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
-    Multiplier3,             !- MultiplierName
+  ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier3,             !- Name
     ZONE 3,                  !- Zone or ZoneList Name
     8,                       !- Temperature Capacity Multiplier
     ,                        !- Humidity Capacity Multiplier
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
-    Multiplier4,             !- MultiplierName
+  ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier4,             !- Name
     ZONE 4,                  !- Zone or ZoneList Name
     12,                      !- Temperature Capacity Multiplier
     ,                        !- Humidity Capacity Multiplier
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
-  
+
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION:DESIGNFLOWRATE ===========
-  
-ZoneInfiltration:DesignFlowRate,
+
+  ZoneInfiltration:DesignFlowRate,
     ZONE 1 Infil,            !- Name
     ZONE 1,                  !- Zone or ZoneList Name
     INFIL-SCHED,             !- Schedule Name
@@ -129,8 +129,8 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Temperature Term Coefficient
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
-  
-ZoneInfiltration:DesignFlowRate,
+
+  ZoneInfiltration:DesignFlowRate,
     ZONE 2 Infil,            !- Name
     ZONE 2,                  !- Zone or ZoneList Name
     INFIL-SCHED,             !- Schedule Name
@@ -144,7 +144,7 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     ZONE 3 Infil,            !- Name
     ZONE 3,                  !- Zone or ZoneList Name
     INFIL-SCHED,             !- Schedule Name
@@ -158,7 +158,7 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     ZONE 4 Infil,            !- Name
     ZONE 4,                  !- Zone or ZoneList Name
     INFIL-SCHED,             !- Schedule Name
@@ -172,28 +172,22 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-Schedule:Compact,
+  Schedule:Compact,
     INFIL-SCHED,             !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 06:00,            !- Field 3
-    1,                       !- Field 4
-    Until: 09:00,            !- Field 5
-    0.5,                     !- Field 6
-    Until: 19:00,            !- Field 7
-    0.25,                    !- Field 8
-    Until: 22:00,            !- Field 9
-    0.5,                     !- Field 10
-    Until: 24:00,            !- Field 11
-    1;                       !- Field 12
-
+    Until: 06:00,1,          !- Field 3
+    Until: 09:00,0.5,        !- Field 5
+    Until: 19:00,0.25,       !- Field 7
+    Until: 22:00,0.5,        !- Field 9
+    Until: 24:00,1;          !- Field 11
 
 !-   ===========  ALL OBJECTS IN CLASS: HYBRIDMODEL:ZONE ===========
 
-HybridModel:Zone,
+  HybridModel:Zone,
     ZONE 1 HybridModel,      !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone Name
     NO,                      !- Calculate Zone Internal Thermal Mass
     NO,                      !- Calculate Zone Air Infiltration Rate
     ZONE 1_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
@@ -202,9 +196,9 @@ HybridModel:Zone,
     12,                      !- End Month
     31;                      !- End Day of Month
 
-HybridModel:Zone,
+  HybridModel:Zone,
     ZONE 2 HybridModel,      !- Name
-    ZONE 2,                  !- Zone or ZoneList Name
+    ZONE 2,                  !- Zone Name
     NO,                      !- Calculate Zone Internal Thermal Mass
     YES,                     !- Calculate Zone Air Infiltration Rate
     ZONE 2_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
@@ -213,9 +207,9 @@ HybridModel:Zone,
     12,                      !- End Month
     31;                      !- End Day of Month
 
-HybridModel:Zone,
+  HybridModel:Zone,
     ZONE 3 HybridModel,      !- Name
-    ZONE 3,                  !- Zone or ZoneList Name
+    ZONE 3,                  !- Zone Name
     YES,                     !- Calculate Zone Internal Thermal Mass
     NO,                      !- Calculate Zone Air Infiltration Rate
     ZONE 3_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
@@ -224,9 +218,9 @@ HybridModel:Zone,
     12,                      !- End Month
     31;                      !- End Day of Month
 
-HybridModel:Zone,
+  HybridModel:Zone,
     ZONE 4 HybridModel,      !- Name
-    ZONE 4,                  !- Zone or ZoneList Name
+    ZONE 4,                  !- Zone Name
     YES,                     !- Calculate Zone Internal Thermal Mass
     NO,                      !- Calculate Zone Air Infiltration Rate
     ZONE 4_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
@@ -237,7 +231,7 @@ HybridModel:Zone,
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:FILE ===========
 
-Schedule:File,
+  Schedule:File,
     ZONE 1_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
     HybridZoneModel_TemperatureData.csv,  !- File Name
@@ -248,7 +242,7 @@ Schedule:File,
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Schedule:File,
+  Schedule:File,
     ZONE 2_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
     HybridZoneModel_TemperatureData.csv,  !- File Name
@@ -259,7 +253,7 @@ Schedule:File,
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Schedule:File,
+  Schedule:File,
     ZONE 3_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
     HybridZoneModel_TemperatureData.csv,  !- File Name
@@ -270,7 +264,7 @@ Schedule:File,
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Schedule:File,
+  Schedule:File,
     ZONE 4_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
     HybridZoneModel_TemperatureData.csv,  !- File Name
@@ -281,11 +275,15 @@ Schedule:File,
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
-Output:Variable,*,Zone Mean Air Temperature,Timestep;
-Output:Table:SummaryReports,AllSummaryAndMonthly;
+  Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
 
-OutputControl:Table:Style,Comma;
+  Output:Variable,*,Zone Mean Air Temperature,Timestep;
+
+  Output:Table:SummaryReports,
+    AllSummaryAndMonthly;    !- Report 1 Name
+
+  OutputControl:Table:Style,
+    Comma;                   !- Column Separator
 
   Building,
     BUILDING #1,             !- Name
@@ -303,13 +301,11 @@ OutputControl:Table:Style,Comma;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
- Lead Input;
-
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    No,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   Site:Location,
@@ -620,9 +616,6 @@ OutputControl:Table:Style,Comma;
     CONTINUOUS;              !- Numeric Type
 
   Site:GroundTemperature:BuildingSurface,20,20,20,20,20,20,20,20,20,20,20,20;
-
- End Lead Input;
- Simulation Data;
 
   Zone,
     ZONE 1,                  !- Name
@@ -1202,11 +1195,11 @@ OutputControl:Table:Style,Comma;
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays WinterDesignDay, !- Field 2
-    Until: 7:00,-100.00,       !- Field 3
-    Until: 17:00,-100.00,      !- Field 5
-    Until: 24:00,-100.00,      !- Field 7
+    Until: 7:00,-100.00,     !- Field 3
+    Until: 17:00,-100.00,    !- Field 5
+    Until: 24:00,-100.00,    !- Field 7
     For: AllOtherDays,       !- Field 9
-    Until: 24:00,-100.00;      !- Field 10
+    Until: 24:00,-100.00;    !- Field 10
 
   SCHEDULE:COMPACT,
     ZONE COOLING SETPOINTS,  !- Name
@@ -1214,7 +1207,7 @@ OutputControl:Table:Style,Comma;
     Through: 12/31,          !- Field 1
     For: Weekdays SummerDesignDay, !- Field 2
     Until: 7:00,100.00,      !- Field 3
-    Until: 17:00,100.00,      !- Field 5
+    Until: 17:00,100.00,     !- Field 5
     Until: 24:00,100.00,     !- Field 7
     For: AllOtherDays,       !- Field 9
     Until: 24:00,100.00;     !- Field 10
@@ -1459,5 +1452,3 @@ OutputControl:Table:Style,Comma;
     ZONE 4 INLETS,           !- Name
     ZONE 4 INLET;            !- Node 1 Name
 
-
- End Simulation Data;

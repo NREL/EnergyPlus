@@ -3,9 +3,9 @@
 
 // Formatted Read Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -339,7 +339,7 @@ public: // Operators
 	operator >>( Array< T > & t )
 	{
 		if ( stream_ && format_ ) {
-			for ( typename Array< T >::size_type i = 0; i < t.size(); ++i ) {
+			for ( BArray::size_type i = 0; i < t.size(); ++i ) {
 				*this >> t[ i ];
 				if ( ! stream_ ) break;
 			}
@@ -1148,7 +1148,7 @@ public: // Operators
 	operator >>( Array< T > & t )
 	{
 		if ( stream_ && format_ ) {
-			for ( typename Array< T >::size_type i = 0; i < t.size(); ++i ) {
+			for ( BArray::size_type i = 0; i < t.size(); ++i ) {
 				*this >> t[ i ];
 				if ( ! stream_ ) break;
 			}

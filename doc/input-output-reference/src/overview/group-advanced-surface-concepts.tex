@@ -399,7 +399,9 @@ The boundary condition values are determined dynamically by the program using in
 
 It should be noted that when other side conditions models are used, solar effects are removed from the surface's outside face heat balance, but are used in modeling the component adjacent to that surface.
 
-In addition, the other side conditions model has been modified to include underground piping system interaction. The PipingSystem:Underground:Domain object represents a mass of ground which may include interaction with, for example, basement surfaces. In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
+The other side conditions model also includes underground piping system interaction. The PipingSystem:Underground:Domain object represents a mass of ground which may include interaction with, for example, basement surfaces. In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
+
+The other side conditions model also includes an underwater boundary condition connection.  By specifying ``ConvectiveUnderwater'' as the boundary type, and including any number of ``SurfaceProperty:Underwater'' objects in the input, the user can connect sufaces to water such as for a moving vessel.
 
 \subsubsection{Inputs}\label{inputs-5}
 
@@ -409,7 +411,7 @@ This is the string referenced in the Surface statement that is using OtherSideMo
 
 \paragraph{Field: Type of Modeling}\label{field-type-of-modeling}
 
-This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ''GapConvectionRadiation,'' ``UndergroundPipingSystemSurface,'' and ``GroundCoupledSurface.''
+This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ''GapConvectionRadiation,'' ``UndergroundPipingSystemSurface,'' ``GroundCoupledSurface,'' and ``ConvectiveUnderwater.''
 
 \begin{figure}[hbtp] % fig 42
 \centering
@@ -454,6 +456,52 @@ This is the effective temperature exposed to the other side of the surface for t
 \paragraph{Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient {[}W/m2-K{]}}\label{surface-other-side-conditions-modeled-radiation-heat-transfer-coefficient-wm2-k}
 
 This is the effective (Linearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
+
+\subsection{SurfaceProperty:Underwater}\label{surfacepropertyunderwater}
+
+This object captures the inputs required to model a water-connected boundary condition for a surface.
+This model is useful for either statically positioned buildings with natural convection to the water boundary condition, or a moving building (vessel).
+
+\subsubsection{Inputs}\label{surfacepropertyunderwater-inputs}
+
+\paragraph{Field: Name}\label{surfacepropertyunderwater-inputs-name}
+
+This is the string referenced in the Surface statement that is using this OtherSideModel as the Exterior Environment.
+
+\paragraph{Field: Distance from Surface Centroid to Leading Edge of Boundary Layer}\label{surfacepropertyunderwater-inputs-boundarylayerdistance}
+
+This distance represents the distance from the centroid of this particular surface to leading edge of the boundary layer.
+For a surface with zero velocity, this field will be irrelevant, because there is no forced boundary layer, and convection will be buoyantly driven.
+For a moving vessel, this distance should be the nominal distance from the leading edge of the vessel, assuming a nearly flat surface along that path.
+
+\paragraph{Field: Free Stream Water Temperature Schedule}\label{surfacepropertyunderwater-inputs-temperatureschedule}
+
+This schedule defines the temperature of the free stream water used in the convection calculations.
+
+\paragraph{Field: Free Stream Water Velocity Schedule}\label{surfacepropertyunderwater-inputs-velocityschedule}
+
+This schedule defines the average velocity of the free stream water used in the convection calculations.
+This schedule could be the water velocity as it moves past stationary surface, the surface velocity as it moves past stationary water, or an effective velocity as a result of the combination.
+
+An example specification is:
+
+\begin{lstlisting}
+  SurfaceProperty:Underwater,
+    Underwater,              !- Name
+    140,                     !- Distance from Surface Centroid to Leading Edge of Boundary Layer
+    WaterTempSchedule,       !- Free Stream Water Temperature Schedule
+    VelocitySchedule;        !- Free Stream Water Velocity Schedule
+
+  Schedule:Constant,
+    WaterTempSchedule,
+    Any Number,
+    23;
+
+  Schedule:Constant,
+    VelocitySchedule,
+    Any Number,
+    10.2;
+\end{lstlisting}
 
 \subsection{Foundation:Kiva}\label{foundationkiva}
 

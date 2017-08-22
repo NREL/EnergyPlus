@@ -359,6 +359,7 @@ namespace DataHVACGlobals {
 	Real64 HPWHCrankcaseDBTemp( 0.0 ); // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
 	bool AirLoopInit( false ); // flag for whether InitAirLoops has been called
 	bool AirLoopsSimOnce( false ); // True means that the air loops have been simulated once in this environment
+	bool GetAirPathDataDone( false ); // True means that air loops inputs have been processed
 
 	// Hybrid ventilation control part
 	int NumHybridVentSysAvailMgrs( 0 ); // Number of hybrid ventilation control
@@ -556,6 +557,7 @@ namespace DataHVACGlobals {
 		HPWHCrankcaseDBTemp = 0.0;
 		AirLoopInit = false;
 		AirLoopsSimOnce = false;
+		GetAirPathDataDone = false;
 		NumHybridVentSysAvailMgrs = 0;
 		HybridVentSysAvailAirLoopNum.deallocate();
 		HybridVentSysAvailVentCtrl.deallocate();

@@ -1802,7 +1802,7 @@
     CW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name
     98,                      !- Maximum Loop Temperature {C}
     1,                       !- Minimum Loop Temperature {C}
-    autosize,                  !- Maximum Loop Flow Rate {m3/s}
+    autosize,                !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     CW Supply Inlet Node,    !- Plant Side Inlet Node Name
@@ -1813,12 +1813,12 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
@@ -1872,9 +1872,9 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    SequentialLoad,         !- Load Distribution Scheme
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    SequentialLoad,          !- Load Distribution Scheme
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Chilled Water Condenser Loop,  !- Plant or Condenser Loop Name
@@ -1901,12 +1901,12 @@
     Heat Recovery Demand Outlet Node,  !- Demand Side Outlet Node Name
     Heat Recovery Demand Side Branches,  !- Demand Side Branch List Name
     Heat Recovery Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Heat Recovery Water Loop,!- Plant or Condenser Loop Name

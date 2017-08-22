@@ -236,6 +236,7 @@ namespace DataAirSystems {
 		// Members
 		std::string Name; // name of the system
 		Real64 DesignVolFlowRate; // the design total supply air flow rate (m3/s)
+		Real64 DesignReturnFlowFraction; // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
 		int NumControllers; // number of controllers on this air path
 		Array1D_string ControllerName; // name of each controller on this system
 		Array1D_string ControllerType; // type of each controller on this system
@@ -278,6 +279,7 @@ namespace DataAirSystems {
 		// Default Constructor
 		DefinePrimaryAirSystem() :
 			DesignVolFlowRate( 0.0 ),
+			DesignReturnFlowFraction( 1.0 ),
 			NumControllers( 0 ),
 			NumBranches( 0 ),
 			NumOutletBranches( 0 ),

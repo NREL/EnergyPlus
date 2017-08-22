@@ -190,7 +190,7 @@ namespace HVACControllers {
 	// MODULE PARAMETER DEFINITIONS
 	// Number of significant digits to display in error messages for floating-point numbers
 	Real64 const SomeFloatingPoint( 1.0 );
-	int const NumSigDigits( precision( SomeFloatingPoint ) );
+	int const NumSigDigits( PRECISION( SomeFloatingPoint ) );
 
 	static std::string const BlankString;
 
@@ -937,7 +937,7 @@ namespace HVACControllers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   July 1998
-		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC), 
+		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC),
 		//       MODIFIED       Feb. 2006, Dimitri Curtil (LBNL), Moved first call convergence test code to ResetController()
 		//                      Jul. 2016, R. Zhang (LBNL), Applied the water coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
@@ -1204,7 +1204,7 @@ namespace HVACControllers {
 			if ( ! ControllerProps( ControlNum ).IsSetPointDefinedFlag ) {
 				ControllerProps( ControlNum ).SetPointValue = Node( SensedNode ).TempSetPoint;
 				ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
-				
+
 				//If there is a fault of water coil SAT sensor (zrp_Jul2016)
 				if( ControllerProps( ControlNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 					//calculate the sensor offset using fault information
