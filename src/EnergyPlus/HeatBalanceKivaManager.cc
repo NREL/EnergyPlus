@@ -681,7 +681,7 @@ bool KivaManager::setupKivaInstances()
 
 			bool userSetExposedPerimeter = false;
 			bool useDetailedExposedPerimeter = false;
-			Real64 exposedFraction;
+			Real64 exposedFraction = 0.0;
 
 			auto& expPerimMap = SurfaceGeometry::exposedFoundationPerimeter.surfaceMap;
 			if ( expPerimMap.count( surfNum ) == 1 ) {
