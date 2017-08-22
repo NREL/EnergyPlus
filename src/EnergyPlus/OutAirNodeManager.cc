@@ -59,6 +59,7 @@
 #include <ScheduleManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
+#include <CurveManager.hh>
 
 namespace EnergyPlus {
 
@@ -186,6 +187,7 @@ namespace OutAirNodeManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using ScheduleManager::GetScheduleIndex;
+		using CurveManager::GetCurveIndex;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -333,25 +335,46 @@ namespace OutAirNodeManager {
 				// Set additional node properties
 				if ( NumNums > 0 ) Node( NodeNums( 1 ) ).Height = Numbers( 1 );
 
-				if ( NumAlphas > 1 ) {
+				if ( NumAlphas > 1 && !lAlphaBlanks( 2 ) ) {
 					Node( NodeNums( 1 ) ).OutAirDryBulbSchedNum = GetScheduleIndex( Alphas( 2 ) );
 				}
 
-				if ( NumAlphas > 2 ) {
+				if ( NumAlphas > 2 && !lAlphaBlanks( 3 ) ) {
 					Node( NodeNums( 1 ) ).OutAirWetBulbSchedNum = GetScheduleIndex( Alphas( 3 ) );
 				}
 
-				if ( NumAlphas > 3 ) {
+				if ( NumAlphas > 3 && !lAlphaBlanks( 4 ) ) {
 					Node( NodeNums( 1 ) ).OutAirWindSpeedSchedNum = GetScheduleIndex( Alphas( 4 ) );
 				}
 
-				if ( NumAlphas > 4 ) {
+				if ( NumAlphas > 4 && !lAlphaBlanks( 5 ) ) {
 					Node( NodeNums( 1 ) ).OutAirWindDirSchedNum = GetScheduleIndex( Alphas( 5 ) );
 				}
 
-				if ( NumAlphas > 5 ) {
+				if ( NumAlphas > 5 && !lAlphaBlanks( 6 ) ) {
+					Node( NodeNums( 1 ) ).WindCoefCurveNum = GetCurveIndex( Alphas( 6 ) );
+				}
+
+				if ( NumAlphas > 6 && !lAlphaBlanks( 7 ) ) {
+					if ( SameString( Alphas( 3 ), "Yes" ) ) {
+						Node( NodeNums( 1 ) ).symmetricCurve = true;
+					} else if ( !SameString(Alphas( 3 ), "No" ) ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+						ShowContinueError( "The default value is assigned as No." );
+					}
+				}
+
+				if ( NumAlphas > 7 && !lAlphaBlanks( 8 ) ) {
+					if ( SameString( Alphas( 4 ), "Relative" ) ) {
+						Node( NodeNums( 1 ) ).useRelativeAngle = true;
+					} else if ( !SameString(Alphas( 4 ), "Absolute" ) ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+						ShowContinueError( "The default value is assigned as Absolute." );
+					}
+				}
+				if ( NumAlphas > 8 ) {
 					ShowSevereError( CurrentModuleObject + ", " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
-					ShowContinueError( "Object Definition indicates more that 5 Alpha Objects." );
+					ShowContinueError( "Object Definition indicates more than 7 Alpha Objects." );
 					ErrorsFound = true;
 					continue;
 				}

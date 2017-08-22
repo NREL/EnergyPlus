@@ -173,6 +173,10 @@ namespace DataLoopNode {
 		Real64 GenContamSetPoint; // {ppm}
 		bool SPMNodeWetBulbRepReq; // Set to true when node has SPM which follows wetbulb
 
+		int  WindCoefCurveNum; // Wind coefficient Curve ID, replace with pointer after curve refactor
+		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
+		bool useRelativeAngle;  // Determines whether the wind angle is relative to the surface or absolute
+
 		// Default Constructor
 		NodeData() :
 			FluidType( 0 ),
@@ -220,7 +224,10 @@ namespace DataLoopNode {
 			CO2SetPoint( 0.0 ),
 			GenContam( 0.0 ),
 			GenContamSetPoint( 0.0 ),
-			SPMNodeWetBulbRepReq( false )
+			SPMNodeWetBulbRepReq( false ),
+			WindCoefCurveNum( 0 ),
+			symmetricCurve( false ),
+			useRelativeAngle( false )
 		{}
 
 		// Member Constructor
@@ -270,7 +277,10 @@ namespace DataLoopNode {
 			Real64 const CO2SetPoint, // {ppm}
 			Real64 const GenContam, // {ppm}
 			Real64 const GenContamSetPoint, // {ppm}
-			bool const SPMNodeWetBulbRepReq // Set to true when node has SPM which follows wetbulb
+			bool   const SPMNodeWetBulbRepReq, // Set to true when node has SPM which follows wetbulb
+			int    const WindCoefCurveNum, // Wind coefficient Curve ID, replace with pointer after curve refactor
+			bool   const symmetricCurve, // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
+			bool   const useRelativeAngle // Determines whether the wind angle is relative to the surface or absolute
 		) :
 			FluidType( FluidType ),
 			FluidIndex( FluidIndex ),
@@ -317,7 +327,10 @@ namespace DataLoopNode {
 			CO2SetPoint( CO2SetPoint ),
 			GenContam( GenContam ),
 			GenContamSetPoint( GenContamSetPoint ),
-			SPMNodeWetBulbRepReq( SPMNodeWetBulbRepReq )
+			SPMNodeWetBulbRepReq( SPMNodeWetBulbRepReq ),
+			WindCoefCurveNum( WindCoefCurveNum ),
+			symmetricCurve( symmetricCurve ),
+			useRelativeAngle( useRelativeAngle )
 		{}
 
 	};
