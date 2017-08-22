@@ -192,6 +192,9 @@ namespace HeatBalanceManager {
 	GetZoneData( bool & ErrorsFound ); // If errors found in input
 
 	void
+	GetZoneLocalEnvData( bool & ErrorsFound ); // If errors found in input
+
+	void
 	ProcessZoneData(
 		std::string const & cCurrentModuleObject,
 		int const ZoneLoop,
@@ -243,6 +246,10 @@ namespace HeatBalanceManager {
 	ReportHeatBalance();
 
 	//        End of Reporting subroutines for the HB Module
+
+
+	void
+	OpenShadingFile();
 
 	void
 	GetFrameAndDividerData( bool & ErrorsFound ); // set to true if errors found in input

@@ -197,6 +197,7 @@ namespace DataGlobals {
 	int OutputFileSysSizing( 0 ); // Unit number of system sizing calc output file
 	int OutputFileMeters( 0 ); // Unit number for meters output
 	std::ostream * mtr_stream( nullptr ); // Internal stream used for mtr output (used for performance)
+	int OutputFileShadingFrac( 0 ); // Unit number for shading output
 	int StdMeterRecordCount( 0 ); // Count of Meter output records
 	int OutputFileBNDetails( 0 ); // Unit number for Branch-Node Details
 	int OutputDElightIn( 0 ); // Unit number for the DElight In file
@@ -234,6 +235,7 @@ namespace DataGlobals {
 	bool RedoSizesHVACSimulation( false ); // doing kick off simulation for redoing sizes as part of sizing
 	bool FinalSizingHVACSizingSimIteration( false ); //when doing HVAC sizing Simulation
 	bool AnyEnergyManagementSystemInModel( false ); // true if there is any EMS or Erl in model.  otherwise false
+	bool AnyLocalEnvironmentsInModel( false ); //true if there is any local environmental data objected defined in model, otherwise false
 	bool AnyPlantInModel( false ); // true if there are any plant or condenser loops in model, otherwise false
 	int CacheIPErrorFile( 0 ); // Cache IP errors until IDF processing done.
 	bool AnyIdealCondEntSetPointInModel( false ); // true if there is any ideal condenser entering set point manager in model.
@@ -289,6 +291,7 @@ namespace DataGlobals {
 		OutputFileZoneSizing = 0;
 		OutputFileSysSizing = 0;
 		OutputFileMeters = 0;
+		OutputFileShadingFrac = 0;
 		StdMeterRecordCount = 0;
 		OutputFileBNDetails = 0;
 		ZoneSizingCalc = false;
@@ -324,6 +327,7 @@ namespace DataGlobals {
 		RedoSizesHVACSimulation = false;
 		FinalSizingHVACSizingSimIteration = false;
 		AnyEnergyManagementSystemInModel = false;
+		AnyLocalEnvironmentsInModel = false;
 		AnyPlantInModel = false;
 		CacheIPErrorFile = 0;
 		AnyIdealCondEntSetPointInModel = false;

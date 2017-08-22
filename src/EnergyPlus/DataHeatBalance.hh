@@ -1336,9 +1336,23 @@ namespace DataHeatBalance {
 		Real64 MaximumY; // Maximum Y value for entire zone
 		Real64 MinimumZ; // Minimum Z value for entire zone
 		Real64 MaximumZ; // Maximum Z value for entire zone
+
 		Real64 OutDryBulbTemp; // Zone outside dry bulb air temperature (C)
+		bool OutDryBulbTempEMSOverrideOn; // if true, EMS is calling to override the surface's outdoor air temp
+		Real64 OutDryBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air drybulb temp (C)
 		Real64 OutWetBulbTemp; // Zone outside wet bulb air temperature (C)
+		bool OutWetBulbTempEMSOverrideOn; // if true, EMS is calling to override the surface's outdoor wetbulb
+		Real64 OutWetBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air wetbulb temp (C)
 		Real64 WindSpeed; // Zone outside wind speed (m/s)
+		bool WindSpeedEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind speed
+		Real64 WindSpeedEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
+		Real64 WindDir; // Zone outside wind direction (degree)
+		bool WindDirEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind direction
+		Real64 WindDirEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
+
+		bool HasLinkedOutAirNode; // true if an OutdoorAir::Node is linked to the surface
+		int LinkedOutAirNode; // Index of the an OutdoorAir:Node
+
 		bool isPartOfTotalArea; // Count the zone area when determining the building total floor area
 		bool isNominalOccupied; // has occupancy nominally specified
 		bool isNominalControlled; // has Controlled Zone Equip Configuration reference
@@ -1419,9 +1433,21 @@ namespace DataHeatBalance {
 			MaximumY( 0.0 ),
 			MinimumZ( 0.0 ),
 			MaximumZ( 0.0 ),
+
 			OutDryBulbTemp( 0.0 ),
+			OutDryBulbTempEMSOverrideOn( false ),
+			OutDryBulbTempEMSOverrideValue( 0.0 ),
 			OutWetBulbTemp( 0.0 ),
+			OutWetBulbTempEMSOverrideOn( false ),
+			OutWetBulbTempEMSOverrideValue( 0.0 ),
 			WindSpeed( 0.0 ),
+			WindSpeedEMSOverrideOn( false ),
+			WindSpeedEMSOverrideValue( 0.0 ),
+			WindDir( 0.0 ),
+			WindDirEMSOverrideOn( false ),
+			WindDirEMSOverrideValue( 0.0 ),
+			HasLinkedOutAirNode( false ),
+			LinkedOutAirNode( 0.0 ),
 			isPartOfTotalArea( true ),
 			isNominalOccupied( false ),
 			isNominalControlled( false ),
@@ -1457,6 +1483,10 @@ namespace DataHeatBalance {
 
 		void
 		SetWindSpeedAt( Real64 const fac );
+
+		void
+		SetWindDirAt( Real64 const fac );
+
 
 	};
 
@@ -3084,6 +3114,21 @@ namespace DataHeatBalance {
 
 	};
 
+	struct ZoneLocalEnvironmentData
+	{
+		// Members
+		std::string Name;
+		int ZonePtr; // surface pointer
+		int OutdoorAirNodePtr; // schedule pointer
+
+		// Default Constructor
+		ZoneLocalEnvironmentData() :
+			ZonePtr( 0 ),
+			OutdoorAirNodePtr( 0 )
+		{}
+
+	};
+
 	struct ZoneReportVars // Zone level.
 	{
 		// Members
@@ -3411,6 +3456,7 @@ namespace DataHeatBalance {
 	extern Array1D< GlobalInternalGainMiscObject > VentilationObjects;
 	extern Array1D< ZoneReportVars > ZnRpt;
 	extern Array1D< ZoneMassConservationData > MassConservation;
+	extern Array1D< ZoneLocalEnvironmentData > ZoneLocalEnvironment;
 	extern ZoneAirMassFlowConservation ZoneAirMassFlow;
 
 	// Functions
@@ -3428,6 +3474,9 @@ namespace DataHeatBalance {
 
 	void
 	SetZoneWindSpeedAt();
+
+	void
+	SetZoneWindDirAt();
 
 	void
 	CheckAndSetConstructionProperties(
