@@ -4580,7 +4580,7 @@ namespace HeatBalanceManager {
 		//               ZoneProperty:LocalEnvironment
 		//-----------------------------------------------------------------------
 
-		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";		
+		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";
 		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotZoneEnv > 0 ) {
@@ -4635,7 +4635,7 @@ namespace HeatBalanceManager {
 					if ( ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
 						Zone( ZoneLoop ).HasLinkedOutAirNode = true;
 						Zone( ZoneLoop ).LinkedOutAirNode = ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr;
-						
+
 					}
 				}
 			}
@@ -4971,7 +4971,7 @@ namespace HeatBalanceManager {
 			}
 		}
 
-		// Overwriting surface and zone level environmental data with EMS override value 
+		// Overwriting surface and zone level environmental data with EMS override value
 		if ( AnyEnergyManagementSystemInModel ) {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn ) {
@@ -5534,7 +5534,7 @@ namespace HeatBalanceManager {
 		// Time step level reporting:
 
 		ReportScheduleValues();
-		
+
 		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
@@ -5877,6 +5877,7 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > CosPhiIndepVar( 10 ); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
 		int IPhi; // Incidence angle counter
 		Real64 Phi; // Incidence angle (deg)
+		Array1D< Real64 >CosPhi( 10 ); // Cosine of incidence angle
 		Array1D< Real64 > tsolFit( 10 ); // Fitted solar transmittance vs incidence angle
 		Array1D< Real64 > tvisFit( 10 ); // Fitted visible transmittance vs incidence angle
 		Array1D< Real64 > rfsolFit( 10 ); // Fitted solar front reflectance vs incidence angle
@@ -6307,11 +6308,10 @@ Label20: ;
 			}
 
 			// Pre-calculate constants
-			std::vector< Real64 >CosPhi;
 			for( IPhi = 1; IPhi <= 10; ++IPhi ) {
 				Phi = double( IPhi - 1 ) * 10.0;
-				CosPhi.push_back( std::cos( Phi * DegToRadians ) );
-				if ( std::abs( CosPhi[ IPhi - 1 ] ) < 0.0001 ) CosPhi[ IPhi - 1 ] = 0.0;
+				CosPhi( IPhi ) =  std::cos( Phi * DegToRadians );
+				if ( std::abs( CosPhi( IPhi ) ) < 0.0001 ) CosPhi( IPhi ) = 0.0;
 			}
 
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
@@ -6503,12 +6503,12 @@ Label20: ;
 				}
 
 				// For comparing fitted vs. input distribution in incidence angle
-				for ( IPhi = 0; IPhi < 10; ++IPhi ) {
-					tsolFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).TransSolBeamCoef );
-					tvisFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).TransVisBeamCoef );
-					rfsolFit( IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).ReflSolBeamFrontCoef );
+				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+					tsolFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).TransSolBeamCoef );
+					tvisFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).TransVisBeamCoef );
+					rfsolFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).ReflSolBeamFrontCoef );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
-						solabsFit( IGlass, IPhi ) = POLYF( CosPhi[IPhi], Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
+						solabsFit( IGlass, IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
 				}
 				// end
