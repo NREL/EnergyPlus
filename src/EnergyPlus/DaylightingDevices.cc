@@ -1074,10 +1074,9 @@ namespace DaylightingDevices {
 			Real64 const dTH = 180.0 * DegToRadians / NTH;  // Azimuth angle increment
 			Real64 TH = THMIN + 0.5 * dTH;                  // Azimuth angle of sky horizon element
 
-			// Calculate incident angle between dome outward normal and horizon element
-			Real64 COSI = CosPhi * std::cos( TH - Theta );  // Cosine of the incident angle
-
 			for ( int N = 1; N <= NTH; ++N ) {
+				// Calculate incident angle between dome outward normal and horizon element
+				Real64 COSI = CosPhi * std::cos( TH - Theta );  // Cosine of the incident angle
 
 				// Calculate total TDD transmittance for given angle
 				Real64 trans = TransTDD( PipeNum, COSI, SolarBeam ); // Total beam solar transmittance of TDD
