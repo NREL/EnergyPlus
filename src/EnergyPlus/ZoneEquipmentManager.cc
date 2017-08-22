@@ -4411,7 +4411,6 @@ namespace ZoneEquipmentManager {
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutEnthalpy;
 		using DataEnvironment::WindSpeed;
-		using DataEnvironment::WindDir;
 		using namespace DataHeatBalFanSys;
 		using namespace DataHeatBalance;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
