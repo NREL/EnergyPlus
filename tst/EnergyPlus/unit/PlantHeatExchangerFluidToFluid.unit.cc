@@ -2362,7 +2362,7 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride ) {
-		// this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride. 
+		// this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride.
 		// unit test checks that the change for #5626 adjusts the temperature value used in central plant dispatch routines by the tolerance value.
 
 		PlantHeatExchangerFluidToFluid::FluidHX.allocate(1);
@@ -2481,7 +2481,7 @@ namespace EnergyPlus {
 		// check value in FreeCoolCntrlMinCntrlTemp
 		EXPECT_NEAR( DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 2 ).Comp( 1 ).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001 );
 
-		// change the tolerance and check the result, issue 5626 fix subtracts tolerance 
+		// change the tolerance and check the result, issue 5626 fix subtracts tolerance
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).TempControlTol = 1.5;
 		PlantHeatExchangerFluidToFluid::InitFluidHeatExchanger( 1, 1 );
 

@@ -180,6 +180,7 @@ namespace DataAirflowNetwork {
 
 	struct AirflowNetworkSimuProp // Basic parameters for AirflowNetwork simulation
 	{
+		enum class Solver {SkylineLU, ConjugateGradient};
 		// Members
 		std::string AirflowNetworkSimuName; // Provide a unique object name
 		std::string Control; // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
@@ -192,6 +193,7 @@ namespace DataAirflowNetwork {
 		std::string HeightOption; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
 		int MaxIteration; // Maximum number of iteration, default 500
 		int InitFlag; // Initialization flag
+		Solver solver;
 		Real64 RelTol; // Relative airflow convergence
 		Real64 AbsTol; // Absolute airflow convergence
 		Real64 ConvLimit; // Convergence acceleration limit
@@ -213,6 +215,7 @@ namespace DataAirflowNetwork {
 			WPCCntr( "Input" ),
 			MaxIteration( 500 ),
 			InitFlag( 0 ),
+			solver( Solver::SkylineLU ),
 			RelTol( 1.0e-5 ),
 			AbsTol( 1.0e-5 ),
 			ConvLimit( -0.5 ),
@@ -250,6 +253,7 @@ namespace DataAirflowNetwork {
 			int const OpenFactorErrCount, // Large opening error count at Open factor > 1.0
 			int const OpenFactorErrIndex, // Large opening error error index at Open factor > 1.0
 			std::string const & InitType, // Initialization flag type:
+			Solver solver, // Solver type
 			bool const TExtHeightDep // Choice of height dependence of external node temperature
 		) :
 			AirflowNetworkSimuName( AirflowNetworkSimuName ),
@@ -260,6 +264,7 @@ namespace DataAirflowNetwork {
 			HeightOption( HeightOption ),
 			MaxIteration( MaxIteration ),
 			InitFlag( InitFlag ),
+			solver( solver ),
 			RelTol( RelTol ),
 			AbsTol( AbsTol ),
 			ConvLimit( ConvLimit ),

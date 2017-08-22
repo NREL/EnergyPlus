@@ -229,6 +229,7 @@ namespace DataGlobals {
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
+	extern int OutputFileShadingFrac; // Unit number for shading output
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
 	extern int OutputDElightIn; // Unit number for the DElight In file
@@ -266,6 +267,7 @@ namespace DataGlobals {
 	extern bool RedoSizesHVACSimulation; // doing kick off simulation for redoing sizes as part of sizing
 	extern bool FinalSizingHVACSizingSimIteration; // true if this will be no more HVAC sizing sim iterations
 	extern bool AnyEnergyManagementSystemInModel; // true if there is any EMS or Erl in model.  otherwise false
+	extern bool AnyLocalEnvironmentsInModel; //true if there is any local environmental data objected defined in model, otherwise false
 	extern bool AnyPlantInModel; // true if there are any plant or condenser loops in model, otherwise false
 	extern int CacheIPErrorFile; // Cache IP errors until IDF processing done.
 	extern bool AnyIdealCondEntSetPointInModel; // true if there is any ideal condenser entering set point manager in model.

@@ -570,6 +570,9 @@ ADD_SIMULATION_TEST(IDF_FILE _SingleZoneTestCondFDTwoDD.idf EPW_FILE USA_IL_Chic
 ADD_SIMULATION_TEST(IDF_FILE _SmallOffice_Dulles.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE _VAVSingleDuctConstFlowBoiler_otherfuel.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE gasAbsorptionChillerHeater.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SurfaceTest_SurfLWR.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SurfaceTest_SurfZoneMicroclimate.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SolarShadingTest_ExtShdFracIO.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 
 # Additional files in subdirectories
 ADD_SIMULATION_TEST(IDF_FILE AdvancedOutput/ExerciseOutput1.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

@@ -277,6 +277,7 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileBNDetails, flags );
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
 			gio::close( DataGlobals::OutputDElightIn, flags );
+			gio::close( DataGlobals::OutputFileShadingFrac, flags );
 
 		}
 	}
@@ -452,12 +453,24 @@ namespace EnergyPlus {
 		return compare_text.str();
 	}
 
+<<<<<<< HEAD
 	bool EnergyPlusFixture::compare_json_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->json_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
 		if ( reset_stream ) this->json_stream->str( std::string() );
 		return are_equal;
+=======
+	std::vector< std::string > EnergyPlusFixture::read_lines_in_file( std::string const & filePath ) {
+		std::ifstream infile( filePath );
+		std::vector< std::string > lines;
+		std::string line;
+		while ( std::getline( infile, line ) )
+		{
+			lines.push_back( line );
+		}
+		return lines;
+>>>>>>> input_processor_refactor
 	}
 
 	bool EnergyPlusFixture::compare_eso_stream( std::string const & expected_string, bool reset_stream ) {

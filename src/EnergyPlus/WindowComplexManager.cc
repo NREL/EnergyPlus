@@ -77,6 +77,7 @@
 #include <TARCOGParams.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
+#include <ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -2976,6 +2977,7 @@ namespace WindowComplexManager {
 		using General::InterpSlatAng; // Function for slat angle interpolation
 		using General::InterpSw;
 		using DataHeatBalSurface::HcExtSurf;
+		using DataHeatBalSurface::QRadLWOutSrdSurfs;
 		using DataGlobals::StefanBoltzmann;
 		using TARCOGGassesParams::maxgas;
 		using TARCOGParams::maxlay;
@@ -2983,6 +2985,8 @@ namespace WindowComplexManager {
 		using DataHeatBalance::GasCoeffsAir;
 		using DataHeatBalance::SupportPillar;
 		using TARCOGMain::TARCOG90;
+		using ScheduleManager::GetCurrentScheduleValue;
+		using DataGlobals::AnyLocalEnvironmentsInModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3276,6 +3280,11 @@ namespace WindowComplexManager {
 		Real64 Ebout;
 		Real64 dominantGapWidth; // store value for dominant gap width.  Used for airflow calculations
 
+		int SrdSurfsNum; // Surrounding surfaces list number
+		int SrdSurfNum; // Surrounding surface number DO loop counter
+		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
+		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+
 		// fill local vars
 
 		CalcDeflection = 0;
@@ -3408,7 +3417,24 @@ namespace WindowComplexManager {
 				outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QCoolingPanelSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
-
+				// Calculate LWR from surrounding surfaces if defined for an exterior window
+				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				if ( AnyLocalEnvironmentsInModel ) {
+					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							Surface( SurfNum ).ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+						}
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+						}					
+						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+							QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+						}
+					}
+				}
 				if ( Surface( SurfNum ).ExtWind ) { // Window is exposed to wind (and possibly rain)
 					if ( IsRain ) { // Raining: since wind exposed, outside window surface gets wet
 						tout = Surface( SurfNum ).OutWetBulbTemp + KelvinConv;
@@ -3421,7 +3447,7 @@ namespace WindowComplexManager {
 				//tsky = SkyTemp + TKelvin
 				tsky = SkyTempKelvin;
 				Ebout = sigma * pow_4( tout );
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
 
 			}
 

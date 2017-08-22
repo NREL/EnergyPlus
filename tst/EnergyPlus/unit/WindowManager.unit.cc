@@ -540,7 +540,7 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	DataHeatBalSurface::QdotRadOutRep.allocate( 3 );
 	DataHeatBalSurface::QdotRadOutRepPerArea.allocate( 3 );
 	DataHeatBalSurface::QRadOutReport.allocate( 3 );
-
+	DataHeatBalSurface::QRadLWOutSrdSurfs.allocate( 3 );
 
 	DataHeatBalance::QRadSWOutIncident = 0.0;
 	DataHeatBalance::QRadSWwinAbs = 0.0;

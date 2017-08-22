@@ -12,6 +12,7 @@ set( test_src
   Fixtures/SQLiteFixture.hh
   PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
+  AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
