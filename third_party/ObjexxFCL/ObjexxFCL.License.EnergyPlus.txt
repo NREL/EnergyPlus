@@ -1,12 +1,12 @@
-Software License Agreement for the Objexx Fortran Compatibility Library
+Software License Agreement for the Objexx Fortran-C++ Library
 
 Addendum for EnergyPlus
 
-The Objexx Fortran Compatibility Library License is amended to define as a
-Licensee any authorized licensee of all current and future versions of the
-EnergyPlus application distributed by the US Department of Energy and any
-application designed to work with EnergyPlus or substantially derived from
-EnergyPlus. Licensee's with rights to the EnergyPlus source code are granted
-rights defined here to the Software source code. Licensee's with rights to use
-the EnergyPlus executable program are granted the same rights to use the
+The Objexx Fortran-C++ Library License is amended to define as a Licensee
+any authorized licensee of all current and future versions of the EnergyPlus
+application distributed by the US Department of Energy and any application
+designed to work with EnergyPlus or substantially derived from EnergyPlus.
+Licensee's with rights to the EnergyPlus source code are granted rights
+defined here to the Software source code. Licensee's with rights to use the
+EnergyPlus executable program are granted the same rights to use the
 Software executable components linked to the EnergyPlus executable.
