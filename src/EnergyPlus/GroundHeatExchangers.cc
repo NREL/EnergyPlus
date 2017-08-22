@@ -576,15 +576,15 @@ namespace GroundHeatExchangers {
 		Real64 const cos_eta = std::cos( eta );
 
 		Real64 x = X0( n ) + cos_theta * ( coilDiameter / 2.0 );
-		Real64 EP_UNUSED( y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 ) );
+		// Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );
 		Real64 z = Z0 + sin_theta * ( coilDiameter / 2.0 ) + 2 * coilDepth;
 
 		Real64 xIn = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
-		Real64 EP_UNUSED( yIn = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius ) );
+		//Real64 yIn = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
 		Real64 zIn = Z0 + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
 
 		Real64 xOut = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
-		Real64 EP_UNUSED( yOut = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius ) );
+		//Real64 yOut = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 		Real64 zOut = Z0 + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 		return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) )

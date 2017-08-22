@@ -1070,8 +1070,8 @@ namespace DaylightingDevices {
 		if ( CosPhi > 0.01 ) { // Dome has a view of the horizon
 			// Integrate over the semicircle
 			Real64 const THMIN = Theta - PiOvr2;            // Minimum azimuth integration limit
-			Real64 const EP_UNUSED(THMAX = Theta + PiOvr2); // Maximum azimuth integration limit
-			Real64 const dTH = 180.0 * DegToRadians / NTH ; // Azimuth angle increment
+			// Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
+			Real64 const dTH = 180.0 * DegToRadians / NTH;  // Azimuth angle increment
 			Real64 TH = THMIN + 0.5 * dTH;                  // Azimuth angle of sky horizon element
 
 			// Calculate incident angle between dome outward normal and horizon element

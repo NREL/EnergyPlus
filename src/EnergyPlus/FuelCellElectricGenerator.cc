@@ -2889,7 +2889,7 @@ namespace FuelCellElectricGenerator {
 		Real64 const D = 2474.455; // shomate coeff
 		Real64 const E = 3.85533; // shomate coeff
 		Real64 const F = -256.5478; // shomate coeff
-        // Real64 const H = -285.8304; // shomate coeff (currently unused)
+		// Real64 const H = -285.8304; // shomate coeff (currently unused)
 
 		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
