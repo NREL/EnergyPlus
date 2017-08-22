@@ -38,6 +38,10 @@ Shift all later fields down by one.
 
 This object is now required for any floor surface with a Foundation Outside Boundary Condition.
 
+# Object Change: `Foundation:Kiva:Settings`
+
+If field 8 (A1) was "Autocalculate" change to "Autoselect" (to match choice key).
+
 # Object Change: `UnitarySystemPerformance:Multispeed`
 
 Fields 1-4 remain the same.  
