@@ -12372,7 +12372,7 @@ WindowProperty:AirflowControl,
        \note Required if Airflow Is Scheduled = Yes.
        \note Schedule values are 0.0 or 1.0 and multiply Maximum Air Flow.
   A7 ; \field Airflow Return Air Node Name
-       \note Name of the return air node for this airflow window if the Airflow Destination is ReturnAir. 
+       \note Name of the return air node for this airflow window if the Airflow Destination is ReturnAir.
        \note If left blank, defaults to the first return air node for the zone of the window surface.
        \type node
 
@@ -16255,7 +16255,7 @@ SurfaceProperty:Underwater,
        \reference SurfacePropUnderWaterNames
        \type alpha
   N1,  \field Distance from Surface Centroid to Leading Edge of Boundary Layer
-       \note This is the distance from the leading edge of the boundary layer development 
+       \note This is the distance from the leading edge of the boundary layer development
        \note to the centroid of the surface of interest.  The value of this field is used
        \note as the distance in the Reynolds number for evaluating the local convection coefficient.
        \type real
@@ -16540,7 +16540,6 @@ Foundation:Kiva:Settings,
        \default Autoselect
   N8,  \field Deep-Ground Depth
        \type real
-       \default 40
        \units m
        \minimum> 0.0
        \autocalculatable
@@ -17880,7 +17879,7 @@ SurfaceProperty:SolarIncidentInside,
        \required-field
        \type object-list
        \object-list ScheduleNames
-	   
+
 SurfaceProperty:LocalEnvironment,
        \min-fields 3
        \memo This object defines the local environment properties of an exterior surface.
@@ -17951,10 +17950,10 @@ SurfaceProperty:SurroundingSurfaces,
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
        \note optional
-   A4, \field Surrounding Surface 1 Name    
-       \begin-extensible   
+   A4, \field Surrounding Surface 1 Name
+       \begin-extensible
        \required-field
-       \type alpha 
+       \type alpha
    N3, \field Surrounding Surface 1 View Factor
        \required-field
        \minimum 0.0
@@ -17965,8 +17964,8 @@ SurfaceProperty:SurroundingSurfaces,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
-   A6, \field Surrounding Surface 2 Name       
-       \type alpha 
+   A6, \field Surrounding Surface 2 Name
+       \type alpha
    N4, \field Surrounding Surface 2 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -17975,8 +17974,8 @@ SurfaceProperty:SurroundingSurfaces,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
-   A8, \field Surrounding Surface 3 Name       
-       \type alpha 
+   A8, \field Surrounding Surface 3 Name
+       \type alpha
    N5, \field Surrounding Surface 3 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -17985,8 +17984,8 @@ SurfaceProperty:SurroundingSurfaces,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
-   A10,\field Surrounding Surface 4 Name       
-       \type alpha 
+   A10,\field Surrounding Surface 4 Name
+       \type alpha
    N6, \field Surrounding Surface 4 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -17994,9 +17993,9 @@ SurfaceProperty:SurroundingSurfaces,
    A11,\field Surrounding Surface 4 Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
-   A12,\field Surrounding Surface 5 Name       
-       \type alpha 
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A12,\field Surrounding Surface 5 Name
+       \type alpha
    N7, \field Surrounding Surface 5 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -18004,9 +18003,9 @@ SurfaceProperty:SurroundingSurfaces,
    A13,\field Surrounding Surface 5 Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
-   A14,\field Surrounding Surface 6 Name       
-       \type alpha 
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A14,\field Surrounding Surface 6 Name
+       \type alpha
    N8, \field Surrounding Surface 6 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -18014,9 +18013,9 @@ SurfaceProperty:SurroundingSurfaces,
    A15,\field Surrounding Surface 6 Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
-   A16,\field Surrounding Surface 7 Name       
-       \type alpha 
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A16,\field Surrounding Surface 7 Name
+       \type alpha
    N9, \field Surrounding Surface 7 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -18024,9 +18023,9 @@ SurfaceProperty:SurroundingSurfaces,
    A17,\field Surrounding Surface 7 Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
-   A18,\field Surrounding Surface 8 Name       
-       \type alpha 
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A18,\field Surrounding Surface 8 Name
+       \type alpha
    N10,\field Surrounding Surface 8 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -18034,9 +18033,9 @@ SurfaceProperty:SurroundingSurfaces,
    A19,\field Surrounding Surface 8 Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
-   A20, \field Surrounding Surface 9 Name       
-       \type alpha 
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A20, \field Surrounding Surface 9 Name
+       \type alpha
    N11,\field Surrounding Surface 9 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -18044,9 +18043,9 @@ SurfaceProperty:SurroundingSurfaces,
    A21,\field Surrounding Surface 9 Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
-   A22,\field Surrounding Surface 10 Name       
-       \type alpha 
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A22,\field Surrounding Surface 10 Name
+       \type alpha
    N12,\field Surrounding Surface 10 View Factor
        \minimum 0.0
        \maximum 1.0
@@ -32478,28 +32477,28 @@ DesignSpecification:AirTerminal:Sizing,
       \type alpha
       \reference DesignSpecificationAirTerminalSizingName
   N1, \field Fraction of Design Cooling Load
-      \note The fraction of the design sensible cooling load to be met by this terminal unit. 
+      \note The fraction of the design sensible cooling load to be met by this terminal unit.
       \note This fraction is applied after the Zone Cooling Sizing Factor (see Sizing:Zone).
       \type real
       \units dimensionless
       \minimum 0.0
       \default 1.0
   N2, \field Cooling Design Supply Air Temperature Difference Ratio
-      \note This ratio adjusts the supply air temperature difference used to calculate 
+      \note This ratio adjusts the supply air temperature difference used to calculate
       \note the cooling design supply air flow rate for this terminal unit.
       \type real
       \units dimensionless
       \minimum> 0.0
       \default 1.0
   N3, \field Fraction of Design Heating Load
-      \note The fraction of the design sensible heating load to be met by this terminal unit. 
+      \note The fraction of the design sensible heating load to be met by this terminal unit.
       \note This fraction is applied after the Zone Heating Sizing Factor (see Sizing:Zone).
       \type real
       \units dimensionless
       \minimum 0.0
       \default 1.0
   N4, \field Heating Design Supply Air Temperature Difference Ratio
-      \note This ratio adjusts the supply air temperature difference used to calculate 
+      \note This ratio adjusts the supply air temperature difference used to calculate
       \note the heating design supply air flow rate for this terminal unit.
       \type real
       \units dimensionless
@@ -40617,8 +40616,8 @@ AirTerminal:SingleDuct:Uncontrolled,
        \note CurrentOccupancy models demand controlled ventilation using the current number of people
        \note DesignOccupancy uses the total Number of People in the zone and is constant
    A6; \field Design Specification Air Terminal Sizing Object Name
-       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object 
-       \note which specifies sizing adjustments to be made for this terminal unit. 
+       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object
+       \note which specifies sizing adjustments to be made for this terminal unit.
        \type object-list
        \object-list DesignSpecificationAirTerminalSizingName
 
@@ -41838,8 +41837,8 @@ ZoneHVAC:AirDistributionUnit,
        \maximum 0.3
        \default 0
   A5 ; \field Design Specification Air Terminal Sizing Object Name
-       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object 
-       \note which specifies sizing adjustments to be made for this terminal unit. 
+       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object
+       \note which specifies sizing adjustments to be made for this terminal unit.
        \type object-list
        \object-list DesignSpecificationAirTerminalSizingName
 
@@ -61689,7 +61688,7 @@ OutdoorAir:Node,
   A2 , \field Drybulb Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Schedule values are real numbers, -100.0 to 100.0, units C 
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
   A3 , \field Wetbulb Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -61698,7 +61697,7 @@ OutdoorAir:Node,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, 0.0 to 40.0, units m/s
-  A5 , \field Wind Direction Schedule Name 
+  A5 , \field Wind Direction Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, 0.0 to 360.0, units degree
@@ -76515,7 +76514,7 @@ Refrigeration:Case,
         \type real
         \default 0.0
   A15; \field Under Case HVAC Return Air Node Name
-       \note Name of the return air node for this case. 
+       \note Name of the return air node for this case.
        \note If left blank, defaults to the first return air node for this zone.
        \type node
 
