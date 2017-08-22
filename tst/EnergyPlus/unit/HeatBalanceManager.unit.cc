@@ -621,4 +621,87 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input
 
 	}
+	
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest )
+	{
+
+		WarmupFlag = false;
+		DayOfSim = 7;
+		MinNumberOfWarmupDays = 25;
+		NumOfZones = 1;
+		WarmupConvergenceValues.allocate( NumOfZones );
+		TempConvergTol = 0.01;
+		LoadsConvergTol = 0.01;
+		MaxTempPrevDay.allocate( NumOfZones );
+		MaxTempPrevDay( 1 ) = 23.0;
+		MaxTempZone.allocate( NumOfZones );
+		MaxTempZone( 1 ) = 23.0;
+		MinTempPrevDay.allocate( NumOfZones );
+		MinTempPrevDay( 1 ) = 23.0;
+		MinTempZone.allocate( NumOfZones );
+		MinTempZone( 1 ) = 23.0;
+		MaxHeatLoadZone.allocate( NumOfZones );
+		MaxHeatLoadPrevDay.allocate( NumOfZones );
+		WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue = 0.0;
+		MaxCoolLoadZone.allocate( NumOfZones );
+		MaxCoolLoadPrevDay.allocate( NumOfZones );
+		WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue = 0.0;
+		
+		// Test 1: All Maxs both less than MinLoad (100.0)
+		MaxHeatLoadZone( 1 ) = 50.0;
+		MaxHeatLoadPrevDay( 1 ) = 90.0;
+		MaxCoolLoadZone( 1 ) = 50.0;
+		MaxCoolLoadPrevDay( 1 ) = 90.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.0, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.0, 0.0001 );
+		
+		// Test 2: Max Previous Day both less than MinLoad
+		MaxHeatLoadZone( 1 ) = 100.5;
+		MaxHeatLoadPrevDay( 1 ) = 90.0;
+		MaxCoolLoadZone( 1 ) = 100.5;
+		MaxCoolLoadPrevDay( 1 ) = 90.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 3: Max Current Day both less than MinLoad
+		MaxHeatLoadZone( 1 ) = 90.0;
+		MaxHeatLoadPrevDay( 1 ) = 100.5;
+		MaxCoolLoadZone( 1 ) = 90.0;
+		MaxCoolLoadPrevDay( 1 ) = 100.5;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 4: Everything greater than MinLoad (pass convergence test)
+		MaxHeatLoadZone( 1 ) = 201.0;
+		MaxHeatLoadPrevDay( 1 ) = 200.0;
+		MaxCoolLoadZone( 1 ) = 201.0;
+		MaxCoolLoadPrevDay( 1 ) = 200.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 5: Everything greater than MinLoad (fail convergence test)
+		MaxHeatLoadZone( 1 ) = 210.0;
+		MaxHeatLoadPrevDay( 1 ) = 200.0;
+		MaxCoolLoadZone( 1 ) = 210.0;
+		MaxCoolLoadPrevDay( 1 ) = 200.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 1 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 1 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.05, 0.005 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.05, 0.005 );
+
+	}
+
 }
