@@ -49,12 +49,13 @@
 
 #include <cstdint>
 #include <utility>
+#include <cstddef>
 
 namespace EnergyPlus {
 
 namespace EmbeddedEpJSONSchema {
 
-	std::pair< std::uint8_t const *, size_t > embeddedEpJSONSchema();
+	std::pair< std::uint8_t const *, std::size_t > embeddedEpJSONSchema();
 
 }
 

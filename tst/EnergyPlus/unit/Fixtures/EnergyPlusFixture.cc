@@ -446,6 +446,17 @@ namespace EnergyPlus {
 		return compare_text.str();
 	}
 
+	std::vector< std::string > EnergyPlusFixture::read_lines_in_file( std::string const & filePath ) {
+		std::ifstream infile( filePath );
+		std::vector< std::string > lines;
+		std::string line;
+		while ( std::getline( infile, line ) )
+		{
+			lines.push_back( line );
+		}
+		return lines;
+	}
+
 	bool EnergyPlusFixture::compare_eso_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->eso_stream->str();
 		EXPECT_EQ( expected_string, stream_str );

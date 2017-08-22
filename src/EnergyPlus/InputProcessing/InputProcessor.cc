@@ -135,10 +135,6 @@ namespace EnergyPlus {
 	json const &
 	InputProcessor::getFields( std::string const & objectType, std::string const & objectName )
 	{
-		// auto const found_type = objectTypeMap.find( objectType );
-		// if ( found_type == objectTypeMap.end() ) {
-		// 	ShowFatalError( "ObjectType (" + std::to_string( static_cast< int >( objectType ) ) + ") is not yet implemented" );
-		// }
 		auto const it = epJSON.find( objectType );
 		if ( it == epJSON.end() ) {
 			ShowFatalError( "ObjectType (" + objectType + ") requested was not found in input" );
@@ -161,10 +157,6 @@ namespace EnergyPlus {
 	InputProcessor::getFields( std::string const & objectType )
 	{
 		static const std::string blankString;
-		// auto const found_type = objectTypeMap.find( objectType );
-		// if ( found_type == objectTypeMap.end() ) {
-		// 	ShowFatalError( "ObjectType (" + std::to_string( static_cast< int >( objectType ) ) + ") is not yet implemented" );
-		// }
 		auto const it = epJSON.find( objectType );
 		if ( it == epJSON.end() ) {
 			ShowFatalError( "ObjectType (" + objectType + ") requested was not found in input" );
@@ -239,35 +231,19 @@ namespace EnergyPlus {
 
 	void
 	InputProcessor::processInput() {
-		// std::ifstream epJSON_schema_stream( DataStringGlobals::inputEpJSONSchemaFileName , std::ifstream::in);
-		// if ( !epJSON_schema_stream.is_open() ) {
-		// 	ShowFatalError( "epJSON Schema file path " + DataStringGlobals::inputEpJSONSchemaFileName + " not found" );
-		// 	return;
-		// }
-		// schema = json::parse(epJSON_schema_stream);
-		// schema = json::from_cbor( embeddedEpJSONSchema );
-
-		// const json & loc = schema[ "properties" ];
-		// caseInsensitiveObjectMap.reserve( loc.size() );
-		// for ( auto it = loc.begin(); it != loc.end(); ++it ) {
-		// 	std::string key = it.key();
-		// 	for ( char & c : key ) c = toupper( c );
-		// 	caseInsensitiveObjectMap.emplace( std::move( key ), it.key() );
-		// }
-
 		std::ifstream input_stream( DataStringGlobals::inputFileName , std::ifstream::in );
 		if ( !input_stream.is_open() ) {
 			ShowFatalError( "Input file path " + DataStringGlobals::inputFileName + " not found" );
 			return;
 		}
 
-		// TODO: Check which file read approach works properly on windows
 		std::string input_file;
 		std::string line;
 		while (std::getline(input_stream, line))
 		{
 			input_file.append(line + DataStringGlobals::NL);
 		}
+		// For some reason this does not work properly on Windows. This will be faster so should investigate in future.
 		// std::ifstream::pos_type size = input_stream.tellg();
 		// char *memblock = new char[(size_t) size + 1];
 		// input_stream.seekg(0, std::ios::beg);
@@ -276,6 +252,16 @@ namespace EnergyPlus {
 		// input_stream.close();
 		// std::string input_file = memblock;
 		// delete[] memblock;
+
+		// Potential C approach to reading file
+		// std::vector<char> v;
+		// if (FILE *fp = fopen("filename", "r"))
+		// {
+		// 	char buf[1024];
+		// 	while (size_t len = fread(buf, 1, sizeof(buf), fp))
+		// 		v.insert(v.end(), buf, buf + len);
+		// 	fclose(fp);
+		// }
 
 		if (input_file.empty()) {
 			ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
@@ -294,8 +280,6 @@ namespace EnergyPlus {
 				input_file = input_file_json.dump( 4 );
 			}
 		}
-
-		// state->initialize( & schema );
 
 		epJSON = json::parse( input_file );
 
@@ -338,7 +322,7 @@ namespace EnergyPlus {
 		// METHODOLOGY EMPLOYED:
 		// Look up section in list of sections.  If there, return the
 		// number of sections of that kind found in the current input.  If not, return -1.
-		// if ( epJSON.is_null() ) return -1;
+
 		auto const & SectionWord_iter = epJSON.find( SectionWord );
 		if ( SectionWord_iter == epJSON.end() ) return -1;
 		return static_cast< int >( SectionWord_iter.value().size() );

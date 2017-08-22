@@ -54,7 +54,7 @@ namespace EmbeddedEpJSONSchema {
 
 ${embedded_epJSON_schema}
 
-	std::pair< std::uint8_t const *, size_t > embeddedEpJSONSchema() {
+	std::pair< std::uint8_t const *, std::size_t > embeddedEpJSONSchema() {
 		return std::make_pair( embeddedSchema.data(), embeddedSchema.size() );
 	}
 
