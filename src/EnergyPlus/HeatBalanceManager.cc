@@ -4312,12 +4312,6 @@ namespace HeatBalanceManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -4343,8 +4337,6 @@ namespace HeatBalanceManager {
 		int ZoneLoop;
 		int ZoneNum; // DO loop counter for zones
 		int TotZoneEnv;
-		bool ErrorInName;
-		bool IsBlank;
 		int IOStat;
 		int NodeNum;
 
@@ -4352,8 +4344,8 @@ namespace HeatBalanceManager {
 		//               ZoneProperty:LocalEnvironment
 		//-----------------------------------------------------------------------
 
-		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";		
-		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
+		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";
+		TotZoneEnv = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotZoneEnv > 0 ) {
 			// Check if IDD definition is correct
@@ -4364,21 +4356,13 @@ namespace HeatBalanceManager {
 			}
 
 			for ( Loop = 1; Loop <= TotZoneEnv; ++Loop ) {
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				ErrorInName = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), ZoneLocalEnvironment, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
-					ShowContinueError( "...each ZoneProperty:LocalEnvironment name must not duplicate other SurfaceProperty:LocalEnvironment name" );
-					ErrorsFound = true;
-					continue;
-				}
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 
 				ZoneLocalEnvironment( Loop ).Name = cAlphaArgs( 1 );
 
 				// Assign zone number
-				ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+				ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 				if ( ZoneNum == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
 					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding zone has been found in the input file." );
@@ -4407,7 +4391,7 @@ namespace HeatBalanceManager {
 					if ( ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
 						Zone( ZoneLoop ).HasLinkedOutAirNode = true;
 						Zone( ZoneLoop ).LinkedOutAirNode = ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr;
-						
+
 					}
 				}
 			}
@@ -4743,7 +4727,7 @@ namespace HeatBalanceManager {
 			}
 		}
 
-		// Overwriting surface and zone level environmental data with EMS override value 
+		// Overwriting surface and zone level environmental data with EMS override value
 		if ( AnyEnergyManagementSystemInModel ) {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn ) {
@@ -5306,7 +5290,7 @@ namespace HeatBalanceManager {
 		// Time step level reporting:
 
 		ReportScheduleValues();
-		
+
 		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );

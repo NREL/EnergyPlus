@@ -655,11 +655,11 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 4 ) {
-			if ( SameString( cAlphaArgs( 4 ), "ScheduledShading" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "ScheduledShading" ) ) {
 				UseScheduledSunlitFrac = true;
 				cAlphaArgs( 4 ) = "ScheduledShading";
 			}
-			else if ( SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
 				UseScheduledSunlitFrac = false;
 				cAlphaArgs( 4 ) = "InternalCalculation";
 			}
@@ -674,11 +674,11 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 5 ) {
-			if ( SameString( cAlphaArgs( 5 ), "Yes" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Yes" ) ) {
 				ReportExtShadingSunlitFrac = true;
 				cAlphaArgs( 5 ) = "Yes";
 			}
-			else if ( SameString( cAlphaArgs( 5 ), "No" ) ) {
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "No" ) ) {
 				ReportExtShadingSunlitFrac = false;
 				cAlphaArgs( 5 ) = "No";
 			}
@@ -3698,7 +3698,7 @@ namespace SolarShading {
 			}
 			CosIncAng( iTimeStep, iHour, SurfNum ) = CTHETA( SurfNum );
 		}
-		
+
 		if ( UseScheduledSunlitFrac ) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).SchedExternalShadingFrac ) {
@@ -3707,7 +3707,7 @@ namespace SolarShading {
 				else {
 					SunlitFrac( iTimeStep, iHour, SurfNum ) = 1.0;
 				}
-			} 
+			}
 		} else {
 			SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -7947,7 +7947,7 @@ namespace SolarShading {
 					} else {
 						SurfaceWindow( ISurf ).SlatAngThisTSDeg = 0.0;
 					}
-				}				
+				}
 			}
 			if ( Surface( ISurf ).Class != SurfaceClass_Window ) continue;
 			if ( Surface( ISurf ).ExtBoundCond != ExternalEnvironment ) continue;

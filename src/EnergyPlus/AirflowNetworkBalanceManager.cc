@@ -980,9 +980,9 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( lAlphaBlanks( 8 ) ) {
 			AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::SkylineLU;
-		} else if ( SameString( Alphas( 8 ), "SkylineLU" ) ) {
+		} else if ( UtilityRoutines::SameString( Alphas( 8 ), "SkylineLU" ) ) {
 			AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::SkylineLU;
-		} else if ( SameString( Alphas( 8 ), "ConjugateGradient" ) ) {
+		} else if ( UtilityRoutines::SameString( Alphas( 8 ), "ConjugateGradient" ) ) {
 			AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::ConjugateGradient;
 		} else {
 			AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::SkylineLU;

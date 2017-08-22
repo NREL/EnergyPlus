@@ -5667,15 +5667,10 @@ namespace SurfaceGeometry {
 		using namespace DataIPShortCuts;
 		using namespace DataErrorTracking;
 
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
-		
+
 		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfLocalEnv;
@@ -5697,8 +5692,6 @@ namespace SurfaceGeometry {
 		int NumNumeric;
 		int Loop;
 		int SurfLoop;
-		bool ErrorInName;
-		bool IsBlank;
 		int IOStat;
 		int SurfNum;
 		int NodeNum;
@@ -5710,7 +5703,7 @@ namespace SurfaceGeometry {
 		//-----------------------------------------------------------------------
 
 		cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
-		TotSurfLocalEnv = GetNumObjectsFound( cCurrentModuleObject );
+		TotSurfLocalEnv = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotSurfLocalEnv > 0 ) {
 
@@ -5721,20 +5714,13 @@ namespace SurfaceGeometry {
 			}
 
 			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				ErrorInName = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurfLocalEnvironment, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
-					ShowContinueError( "...each SurfaceProperty:LocalEnvironment name must not duplicate other SurfaceProperty:LocalEnvironment name" );
-					ErrorsFound = true;
-					continue;
-				}
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				SurfLocalEnvironment( Loop ).Name = cAlphaArgs( 1 );
 
 				// Assign surface number
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 				if ( SurfNum == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
 					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file." );
@@ -5759,7 +5745,7 @@ namespace SurfaceGeometry {
 
 				//Assign surrounding surfaces object number;
 				if ( !lAlphaFieldBlanks( 4 ) ) {
-					SurroundingSurfsNum = FindItemInList( cAlphaArgs( 4 ), SurroundingSurfsProperty );
+					SurroundingSurfsNum = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), SurroundingSurfsProperty );
 					if ( SurroundingSurfsNum == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 4 ) + " has been found." );
 						ShowContinueError( cAlphaFieldNames( 4 ) + " entered value = \"" + cAlphaArgs( 4 ) + "\" no corresponding surrounding surfaces properties has been found in the input file." );
@@ -5786,7 +5772,7 @@ namespace SurfaceGeometry {
 		}
 		// Link surface properties to surface object
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
-			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {			
+			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {
 				if ( SurfLocalEnvironment( Loop ).SurfPtr == SurfLoop ) {
 					if ( SurfLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
 						Surface( SurfLoop ).HasLinkedOutAirNode = true;
@@ -5824,11 +5810,6 @@ namespace SurfaceGeometry {
 		using namespace DataIPShortCuts;
 		using namespace DataErrorTracking;
 
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -5853,8 +5834,6 @@ namespace SurfaceGeometry {
 		int NumAlpha;
 		int NumNumeric;
 		int Loop;
-		bool ErrorInName;
-		bool IsBlank;
 		int IOStat;
 
 		int TotSrdSurfProperties;
@@ -5869,7 +5848,7 @@ namespace SurfaceGeometry {
 		//-----------------------------------------------------------------------
 
 		cCurrentModuleObject = "SurfaceProperty:SurroundingSurfaces";
-		TotSrdSurfProperties = GetNumObjectsFound( cCurrentModuleObject );
+		TotSrdSurfProperties = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotSrdSurfProperties > 0 ) {
 
@@ -5878,15 +5857,8 @@ namespace SurfaceGeometry {
 			}
 
 			for ( Loop = 1; Loop <= TotSrdSurfProperties; ++Loop ) {
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				ErrorInName = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurroundingSurfsProperty, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
-					ShowContinueError( "...each SurfaceProperty:SurroundingSurfaces name must not duplicate other SurfaceProperty:SurroundingSurfaces names" );
-					ErrorsFound = true;
-					continue;
-				}
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 
 				// A1: Name
 				SurroundingSurfsProperty( Loop ).Name = cAlphaArgs( 1 );
