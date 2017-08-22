@@ -535,7 +535,7 @@ ShadowCalculation,
        \key ConvexWeilerAtherton
        \key SutherlandHodgman
        \default SutherlandHodgman
-  A3 ; \field Sky Diffuse Modeling Algorithm
+  A3 , \field Sky Diffuse Modeling Algorithm
        \note Advanced Feature.  Internal default is SimpleSkyDiffuseModeling
        \note If you have shading elements that change transmittance over the
        \note year, you may wish to choose the detailed method.
@@ -544,6 +544,18 @@ ShadowCalculation,
        \key SimpleSkyDiffuseModeling
        \key DetailedSkyDiffuseModeling
        \default SimpleSkyDiffuseModeling
+  A4 , \field External Shading Calculation Method
+       \type choice
+       \key ScheduledShading
+       \key InternalCalculation
+       \default InternalCalculation
+       \note If ScheduledShading is chosen, the External Shading Fraction Schedule Name is required.
+  A5 ; \field Output External Shading Calculation Results
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note If Yes is chosen, the calculated external shading fraction results will be saved to an external CSV file with surface names as the column headers.
 
 SurfaceConvectionAlgorithm:Inside,
        \memo Default indoor surface heat transfer convection algorithm to be used for all zones
@@ -17868,6 +17880,181 @@ SurfaceProperty:SolarIncidentInside,
        \required-field
        \type object-list
        \object-list ScheduleNames
+	   
+SurfaceProperty:LocalEnvironment,
+       \min-fields 3
+       \memo This object defines the local environment properties of an exterior surface.
+       \memo One or more environment properties have to be defined and linked to the exterior surface.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference SurfaceLocalEnvironmentNames
+   A2, \field Exterior Surface Name
+       \type object-list
+       \object-list SurfaceNames
+       \note Enter the name of an exterior surface object
+   A3, \field External Shading Fraction Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Enter the name of a Schedule object
+   A4, \field Surrounding Surfaces Object Name
+       \type object-list
+       \object-list SurroundingSurfacesNames
+       \note Enter the name of a SurfaceProperty:SurroundingSurfaces object
+   A5; \field Outdoor Air Node Name
+       \type object-list
+       \object-list OutdoorAirNodeNames
+       \note Enter the name of an OutdoorAir:Node object
+
+ZoneProperty:LocalEnvironment,
+       \min-fields 3
+       \memo This object defines the local environment properties of a zone object.
+       \memo A corresponding outdoor air node should be defined and linked to the zone object.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference ZoneLocalEnvironmentNames
+   A2, \field Zone Name
+       \type object-list
+       \object-list ZoneNames
+       \note Enter the name of a zone object
+   A3; \field Outdoor Air Node Name
+       \type object-list
+       \object-list OutdoorAirNodeNames
+       \note Enter the name of an OutdoorAir:Node object
+
+SurfaceProperty:SurroundingSurfaces,
+       \min-fields 8
+       \memo This object defines a list of surrounding surfaces for an exterior surface.
+       \extensible:3 -- duplicate last set of surrounding surface properties (the last three fields), remembering to remove ; from "inner" fields.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference SurroundingSurfacesNames
+   N1, \field Sky View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.5
+       \note optional
+   A2, \field Sky Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+   N2, \field Ground View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.5
+       \note optional
+   A3, \field Ground Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+   A4, \field Surrounding Surface 1 Name    
+       \begin-extensible   
+       \required-field
+       \type alpha 
+   N3, \field Surrounding Surface 1 View Factor
+       \required-field
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A5, \field Surrounding Surface 1 Temperature Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A6, \field Surrounding Surface 2 Name       
+       \type alpha 
+   N4, \field Surrounding Surface 2 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A7, \field Surrounding Surface 2 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A8, \field Surrounding Surface 3 Name       
+       \type alpha 
+   N5, \field Surrounding Surface 3 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A9, \field Surrounding Surface 3 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A10,\field Surrounding Surface 4 Name       
+       \type alpha 
+   N6, \field Surrounding Surface 4 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A11,\field Surrounding Surface 4 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A12,\field Surrounding Surface 5 Name       
+       \type alpha 
+   N7, \field Surrounding Surface 5 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A13,\field Surrounding Surface 5 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A14,\field Surrounding Surface 6 Name       
+       \type alpha 
+   N8, \field Surrounding Surface 6 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A15,\field Surrounding Surface 6 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A16,\field Surrounding Surface 7 Name       
+       \type alpha 
+   N9, \field Surrounding Surface 7 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A17,\field Surrounding Surface 7 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A18,\field Surrounding Surface 8 Name       
+       \type alpha 
+   N10,\field Surrounding Surface 8 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A19,\field Surrounding Surface 8 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A20, \field Surrounding Surface 9 Name       
+       \type alpha 
+   N11,\field Surrounding Surface 9 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A21,\field Surrounding Surface 9 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C	   
+   A22,\field Surrounding Surface 10 Name       
+       \type alpha 
+   N12,\field Surrounding Surface 10 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A23;\field Surrounding Surface 10 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
 
 ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Used to provide solar radiation absorbed in fenestration layers. References surface-construction pair
@@ -61490,14 +61677,53 @@ OutdoorAir:Node,
        \memo specified.  This object may be used more than once.
        \memo The same node name may not appear in both an OutdoorAir:Node object and
        \memo an OutdoorAir:NodeList object.
+       \memo This object defines local outdoor air environmental conditions.
   A1,  \field Name
        \required-field
        \type node
-  N1 ; \field Height Above Ground
+  N1,  \field Height Above Ground
        \note A value less than zero indicates that the height will be ignored and the weather file conditions will be used.
        \type real
        \units m
        \default -1.0
+  A2 , \field Drybulb Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C 
+  A3 , \field Wetbulb Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+  A4 , \field Wind Speed Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, 0.0 to 40.0, units m/s
+  A5 , \field Wind Direction Schedule Name 
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, 0.0 to 360.0, units degree
+  A6 , \field Wind Pressure Coefficient Curve Name
+       \type object-list
+       \object-list WPCValueNames
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+       \note The name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues, curve, or table object specifying the wind pressure coefficient.
+  A7 , \field Symmetric Wind Pressure Coefficient Curve
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note Specify whether the pressure curve is symmetric or not.
+       \note Specify Yes for curves that should be evaluated from 0 to 180 degrees
+       \note Specify No for curves that should be evaluated from 0 to 360 degrees
+  A8 ; \field Wind Angle Type
+       \type choice
+       \key Absolute
+       \key Relative
+       \default Absolute
+       \note Specify whether the angle used to compute the wind pressure coefficient is absolute or relative
+       \note Specify Relative to compute the angle between the wind direction and the surface azimuth
+       \note Specify Absolute to use the wind direction angle directly
 
 OutdoorAir:NodeList,
        \extensible:1 Just duplicate last field and comments (changing numbering, please)
