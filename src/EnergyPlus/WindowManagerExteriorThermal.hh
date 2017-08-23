@@ -60,100 +60,100 @@
 #define WindowManagerExteriorThermal_hh_INCLUDED
 
 namespace EnergyPlus {
-  
-  namespace DataSurfaces {
-    struct SurfaceData;
-  }
-  
-  namespace DataHeatBalance {
-    struct MaterialProperties;
-  }
+
+	namespace DataSurfaces {
+		struct SurfaceData;
+	}
+
+	namespace DataHeatBalance {
+		struct MaterialProperties;
+	}
 
 }
 
 namespace Tarcog {
 
-  class CBaseIGULayer;
-  class CEnvironment;
-  class CIGU;
-  class CSingleSystem;
+	class CBaseIGULayer;
+	class CEnvironment;
+	class CIGU;
+	class CSingleSystem;
 
 }
 
 namespace Gases {
 
-  class CGas;
+	class CGas;
 
 }
 
 namespace EnergyPlus {
 
-  namespace WindowManager {
+	namespace WindowManager {
 
-    enum class ShadePosition { NoShade, Interior, Exterior, Between };
+		enum class ShadePosition { NoShade, Interior, Exterior, Between };
 
-    // Routine that calculates heat transfer balance by using Windows-CalcEngine routines
-    void CalcWindowHeatBalanceExternalRoutines(
-      int const SurfNum, // Surface number
-      Real64 const HextConvCoeff, // Outside air film conductance coefficient
-      Real64 & SurfInsideTemp, // Inside window surface temperature
-      Real64 & SurfOutsideTemp // Outside surface temperature (C)
-    );
+		// Routine that calculates heat transfer balance by using Windows-CalcEngine routines
+		void CalcWindowHeatBalanceExternalRoutines(
+			int const SurfNum, // Surface number
+			Real64 const HextConvCoeff, // Outside air film conductance coefficient
+			Real64& SurfInsideTemp, // Inside window surface temperature
+			Real64& SurfOutsideTemp // Outside surface temperature (C)
+		);
 
-    // Class that is used to create layers for Windows-CalcEngine
-    class CWCEHeatTransferFactory {
-    public:
+		// Class that is used to create layers for Windows-CalcEngine
+		class CWCEHeatTransferFactory {
+		public:
 
-      CWCEHeatTransferFactory( EnergyPlus::DataSurfaces::SurfaceData const & surface, int const t_SurfNum );
-      
-      std::shared_ptr< Tarcog::CSingleSystem > getTarcogSystem( double const t_HextConvCoeff );
+			CWCEHeatTransferFactory( EnergyPlus::DataSurfaces::SurfaceData const& surface, int const t_SurfNum );
 
-      std::shared_ptr< Tarcog::CBaseIGULayer > getIGULayer( int const t_Index );
-      std::shared_ptr< Tarcog::CEnvironment > getIndoor() const;
-      std::shared_ptr< Tarcog::CEnvironment > getOutdoor( double const t_Hext ) const;
-      std::shared_ptr< Tarcog::CIGU > getIGU( );
+			std::shared_ptr< Tarcog::CSingleSystem > getTarcogSystem( double const t_HextConvCoeff );
 
-      // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
-      // It probably needs to be removed since calculation is no different from any other case. It is left over from
-      // old EnergyPlus code and it needs to be checked.
-      bool isInteriorShade() const;
+			std::shared_ptr< Tarcog::CBaseIGULayer > getIGULayer( int const t_Index );
+			std::shared_ptr< Tarcog::CEnvironment > getIndoor() const;
+			std::shared_ptr< Tarcog::CEnvironment > getOutdoor( double const t_Hext ) const;
+			std::shared_ptr< Tarcog::CIGU > getIGU();
 
-    private:
-      DataSurfaces::SurfaceData m_Surface;
-      DataSurfaces::SurfaceWindowCalc m_Window;
-      ShadePosition m_ShadePosition;
-      int m_SurfNum;
-      size_t m_SolidLayerIndex;
-      int m_ConstructionNumber;
-      int m_TotLay;
+			// This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
+			// It probably needs to be removed since calculation is no different from any other case. It is left over from
+			// old EnergyPlus code and it needs to be checked.
+			bool isInteriorShade() const;
 
-      // Next two booleans are to keep track of order for shading devices. Some variables
-      // are kept in separate arrays for specular glazings and shading devices and it is 
-      // important to keep index numbering in order to extract correct results
-      bool m_InteriorBSDFShade;
-      bool m_ExteriorShade;
+		private:
+			DataSurfaces::SurfaceData m_Surface;
+			DataSurfaces::SurfaceWindowCalc m_Window;
+			ShadePosition m_ShadePosition;
+			int m_SurfNum;
+			size_t m_SolidLayerIndex;
+			int m_ConstructionNumber;
+			int m_TotLay;
 
-      int getNumOfLayers() const;
+			// Next two booleans are to keep track of order for shading devices. Some variables
+			// are kept in separate arrays for specular glazings and shading devices and it is 
+			// important to keep index numbering in order to extract correct results
+			bool m_InteriorBSDFShade;
+			bool m_ExteriorShade;
 
-      std::shared_ptr< Tarcog::CBaseIGULayer > getSolidLayer(
-        DataSurfaces::SurfaceData const & surface,
-        DataHeatBalance::MaterialProperties const & material,
-        int const t_Index, int const t_SurfNum );
+			int getNumOfLayers() const;
 
-      std::shared_ptr< Tarcog::CBaseIGULayer > getGapLayer(
-        DataHeatBalance::MaterialProperties const & material ) const;
+			std::shared_ptr< Tarcog::CBaseIGULayer > getSolidLayer(
+				DataSurfaces::SurfaceData const& surface,
+				DataHeatBalance::MaterialProperties const& material,
+				int const t_Index, int const t_SurfNum );
 
-      std::shared_ptr< Tarcog::CBaseIGULayer > getShadeToGlassLayer( int const t_Index ) const;
+			std::shared_ptr< Tarcog::CBaseIGULayer > getGapLayer(
+				DataHeatBalance::MaterialProperties const& material ) const;
 
-      std::shared_ptr< Tarcog::CBaseIGULayer > getComplexGapLayer(
-        DataHeatBalance::MaterialProperties const & material ) const;
+			std::shared_ptr< Tarcog::CBaseIGULayer > getShadeToGlassLayer( int const t_Index ) const;
 
-      std::shared_ptr< Gases::CGas > getGas( DataHeatBalance::MaterialProperties const & material ) const;
-      std::shared_ptr< Gases::CGas > getAir() const;
-      DataHeatBalance::MaterialProperties* getLayerMaterial( int const t_Index ) const;
+			std::shared_ptr< Tarcog::CBaseIGULayer > getComplexGapLayer(
+				DataHeatBalance::MaterialProperties const& material ) const;
 
-    };        
-  }
+			std::shared_ptr< Gases::CGas > getGas( DataHeatBalance::MaterialProperties const& material ) const;
+			std::shared_ptr< Gases::CGas > getAir() const;
+			DataHeatBalance::MaterialProperties* getLayerMaterial( int const t_Index ) const;
+
+		};
+	}
 
 }
 

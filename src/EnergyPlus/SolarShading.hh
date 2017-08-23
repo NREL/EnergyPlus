@@ -386,14 +386,14 @@ namespace SolarShading {
 	void
 	CalcInteriorSolarDistribution();
 
-  void
-  CalcAborbedOnExteriorOpaqueSurfaces();
-
-  void
-  CalcInteriorSolarDistributionWCE();
-
-  void
-  CalcInteriorSolarDistributionWCESimple();
+	void
+	CalcAborbedOnExteriorOpaqueSurfaces();
+	
+	void
+	CalcInteriorSolarDistributionWCE();
+	
+	void
+	CalcInteriorSolarDistributionWCESimple();
 
 	int
 	WindowScheduledSolarAbs(

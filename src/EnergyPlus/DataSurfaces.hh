@@ -887,29 +887,29 @@ namespace DataSurfaces {
 		void
 		SetWindSpeedAt( Real64 const fac );
 
-    double
-    getInsideAirTemperature( const int t_SurfNum ) const;
+		double
+		getInsideAirTemperature( const int t_SurfNum ) const;
 
-	  static double
-    getInsideIR( const int t_SurfNum );
+		static double
+		getInsideIR( const int t_SurfNum );
 
-    double
-    getOutsideAirTemperature( const int t_SurfNum ) const;
+		double
+		getOutsideAirTemperature( const int t_SurfNum ) const;
 
-    double
-    getOutsideIR( const int t_SurfNum ) const;
+		double
+		getOutsideIR( const int t_SurfNum ) const;
 
-	  static double
-    getSWIncident( const int t_SurfNum );
+		static double
+		getSWIncident( const int t_SurfNum );
 
-	  static double
-    getSWBeamIncident( const int t_SurfNum );
+		static double
+		getSWBeamIncident( const int t_SurfNum );
 
-	  static double
-    getSWDiffuseIncident( const int t_SurfNum );
+		static double
+		getSWDiffuseIncident( const int t_SurfNum );
 
-    int
-    getTotLayers() const;
+		int
+		getTotLayers() const;
 
 	private: // Methods
 
@@ -1398,23 +1398,23 @@ namespace DataSurfaces {
 			GndSolarInc = 0.0;
 		}
 
-    double
-    AbsorptanceFromExteriorFrontSide() const;
+		double
+		AbsorptanceFromExteriorFrontSide() const;
 
-    double
-    AbsorptanceFromInteriorFrontSide() const;
+		double
+		AbsorptanceFromInteriorFrontSide() const;
 
-    double
-    AbsFrontSide() const;
+		double
+		AbsFrontSide() const;
 
-    double
-    AbsorptanceFromExteriorBackSide() const;
+		double
+		AbsorptanceFromExteriorBackSide() const;
 
-    double
-    AbsorptanceFromInteriorBackSide() const;
+		double
+		AbsorptanceFromInteriorBackSide() const;
 
-    double
-    AbsBackSide() const;
+		double
+		AbsBackSide() const;
 	};
 
 	struct FrameDividerProperties

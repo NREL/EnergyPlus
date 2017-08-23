@@ -725,8 +725,8 @@ namespace SurfaceGeometry {
 		BmToDiffReflFacObs.dimension( TotSurfaces, 0.0 );
 		BmToDiffReflFacGnd.dimension( TotSurfaces, 0.0 );
 		AWinSurf.dimension( CFSMAXNL + 1, TotSurfaces, 0.0 );
-    AWinSurfDiffFront.dimension( CFSMAXNL + 1, TotSurfaces, 0.0 );
-    AWinSurfDiffBack.dimension( CFSMAXNL + 1, TotSurfaces, 0.0 );
+		AWinSurfDiffFront.dimension( CFSMAXNL + 1, TotSurfaces, 0.0 );
+		AWinSurfDiffBack.dimension( CFSMAXNL + 1, TotSurfaces, 0.0 );
 		AWinCFOverlap.dimension( MaxSolidWinLayers, TotSurfaces, 0.0 );
 
 	}

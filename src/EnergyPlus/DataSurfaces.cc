@@ -94,13 +94,13 @@ namespace DataSurfaces {
 	using namespace DataPrecisionGlobals;
 	using namespace DataVectorTypes;
 	using namespace DataBSDFWindow;
-  using namespace DataHeatBalance;
-  using namespace DataHeatBalFanSys;
-  using namespace DataZoneEquipment;
-  using namespace DataLoopNode;
-  using namespace Psychrometrics;
-  using namespace DataEnvironment;
-  using namespace WindowManager;
+	using namespace DataHeatBalance;
+	using namespace DataHeatBalFanSys;
+	using namespace DataZoneEquipment;
+	using namespace DataLoopNode;
+	using namespace Psychrometrics;
+	using namespace DataEnvironment;
+	using namespace WindowManager;
 
 
 	// Data
@@ -400,9 +400,9 @@ namespace DataSurfaces {
 	Array2D< Real64 > AWinSurf; // Time step value of factor for beam
 	// absorbed in window glass layers
 
-  // Time step value of factor for diffuse absorbed in window layers
-  Array2D< Real64 > AWinSurfDiffFront;
-  Array2D< Real64 > AWinSurfDiffBack;
+	// Time step value of factor for diffuse absorbed in window layers
+	Array2D< Real64 > AWinSurfDiffFront;
+	Array2D< Real64 > AWinSurfDiffBack;
 
 	Array2D< Real64 > AWinCFOverlap; // Time step value of factor for beam
 	// absorbed in window glass layers which comes from other windows
@@ -685,183 +685,185 @@ namespace DataSurfaces {
 			}
 		}
 
-    double SurfaceData::getInsideAirTemperature( const int t_SurfNum ) const
-    {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   June 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
+		double SurfaceData::getInsideAirTemperature( const int t_SurfNum ) const
+		{
+		  // SUBROUTINE INFORMATION:
+		  //       AUTHOR         Simon Vidanovic
+		  //       DATE WRITTEN   June 2016
+		  //       MODIFIED       na
+		  //       RE-ENGINEERED  na
+		
+		  // PURPOSE OF THIS SUBROUTINE:
+		  // Routine calculates reference air temperature for given surface (refactoring from the code)
+		  //
+		  // NOTE: This routine has been copy/pasted in the past in several different modules with slight
+		  //       modifications at some of those places. It is quite logical that reference air temperature
+		  //       for the surface is calculated as public function of SurfaceData structure (class) and is  
+		  //       later called as needed. Note that SurfaceNum had to be passed to this routine because of
+		  //       access to global array TempEffBulkAir. I would propose refactoring where TempEffBulkAir
+		  //       is part of SurfaceData structure and instead of calling TempEffBulkAir( SurfNum ) it should
+		  //       be called Surface( SurfNum ).TempEffBulkAir (Simon Vidanovic)
+		
+			double RefAirTemp = 0;
+		
+			// determine reference air temperature for this surface
+			{ auto const SELECT_CASE_var( TAirRef );
+			if( SELECT_CASE_var == ZoneMeanAirTemp ) {
+				RefAirTemp = MAT( Zone );
+			} else if( SELECT_CASE_var == AdjacentAirTemp ) {
+				RefAirTemp = DataHeatBalance::TempEffBulkAir( t_SurfNum );
+			} else if( SELECT_CASE_var == ZoneSupplyAirTemp ) {
+				// determine ZoneEquipConfigNum for this zone
+				//            ControlledZoneAirFlag = .FALSE.
+				// ZoneEquipConfigNum = ZoneNum;
+				// check whether this zone is a controlled zone or not
+			if( !DataHeatBalance::Zone( Zone ).IsControlled ) {
+				ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + 
+				DataHeatBalance::Zone( Zone ).Name );
+				// return;
+			}
+			// determine supply air conditions
+			double SumSysMCp = 0;
+			double SumSysMCpT = 0;
+			for( int NodeNum = 1; NodeNum <= ZoneEquipConfig( Zone ).NumInletNodes; ++NodeNum ) {
+				double NodeTemp = Node( ZoneEquipConfig( Zone ).InletNode( NodeNum ) ).Temp;
+				double MassFlowRate = Node( ZoneEquipConfig( Zone ).InletNode( NodeNum ) ).MassFlowRate;
+				double CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( Zone ), NodeTemp );
+				SumSysMCp += MassFlowRate * CpAir;
+				SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+			}
+			// a weighted average of the inlet temperatures.
+			RefAirTemp = SumSysMCpT / SumSysMCp;
+			} else {
+				// currently set to mean air temp but should add error warning here
+				RefAirTemp = MAT( Zone );
+			}}
+		
+			return RefAirTemp;
+		}
 
-      // PURPOSE OF THIS SUBROUTINE:
-      // Routine calculates reference air temperature for given surface (refactoring from the code)
-      //
-      // NOTE: This routine has been copy/pasted in the past in several different modules with slight
-      //       modifications at some of those places. It is quite logical that reference air temperature
-      //       for the surface is calculated as public function of SurfaceData structure (class) and is  
-      //       later called as needed. Note that SurfaceNum had to be passed to this routine because of
-      //       access to global array TempEffBulkAir. I would propose refactoring where TempEffBulkAir
-      //       is part of SurfaceData structure and instead of calling TempEffBulkAir( SurfNum ) it should
-      //       be called Surface( SurfNum ).TempEffBulkAir (Simon Vidanovic)
+		double SurfaceData::getInsideIR( const int t_SurfNum ) {
+			auto& window( SurfaceWindow( t_SurfNum ) );
+			double value = window.IRfromParentZone + QHTRadSysSurf( t_SurfNum ) + QHWBaseboardSurf( t_SurfNum ) +
+				QSteamBaseboardSurf( t_SurfNum ) + QElecBaseboardSurf( t_SurfNum );
+			return value;
+		}
 
-      double RefAirTemp = 0;
+		double SurfaceData::getOutsideAirTemperature( const int t_SurfNum ) const {
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Simon Vidanovic
+			//       DATE WRITTEN   June 2016
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
 
-      // determine reference air temperature for this surface
-      { auto const SELECT_CASE_var( TAirRef );
-      if( SELECT_CASE_var == ZoneMeanAirTemp ) {
-        RefAirTemp = MAT( Zone );
-      } else if( SELECT_CASE_var == AdjacentAirTemp ) {
-        RefAirTemp = DataHeatBalance::TempEffBulkAir( t_SurfNum );
-      } else if( SELECT_CASE_var == ZoneSupplyAirTemp ) {
-        // determine ZoneEquipConfigNum for this zone
-        //            ControlledZoneAirFlag = .FALSE.
-        // ZoneEquipConfigNum = ZoneNum;
-        // check whether this zone is a controlled zone or not
-        if( !DataHeatBalance::Zone( Zone ).IsControlled ) {
-          ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + 
-            DataHeatBalance::Zone( Zone ).Name );
-          // return;
-        }
-        // determine supply air conditions
-        double SumSysMCp = 0;
-        double SumSysMCpT = 0;
-        for( int NodeNum = 1; NodeNum <= ZoneEquipConfig( Zone ).NumInletNodes; ++NodeNum ) {
-          double NodeTemp = Node( ZoneEquipConfig( Zone ).InletNode( NodeNum ) ).Temp;
-          double MassFlowRate = Node( ZoneEquipConfig( Zone ).InletNode( NodeNum ) ).MassFlowRate;
-          double CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( Zone ), NodeTemp );
-          SumSysMCp += MassFlowRate * CpAir;
-          SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-        }
-        // a weighted average of the inlet temperatures.
-        RefAirTemp = SumSysMCpT / SumSysMCp;
-      } else {
-        // currently set to mean air temp but should add error warning here
-        RefAirTemp = MAT( Zone );
-      }}
+			// PURPOSE OF THIS SUBROUTINE:
+			// Routine calculates outside air temperature for given surface.
+			// Routine will return inside air temperature if it is interior surface. (refactoring from the code)
+			//
+			// NOTE: This routine has been copy/pasted in the past in several different modules with slight
+			//       modifications at some of those places. Exterior/interior surface air temperature is tied to surface.
+			double temperature = 0;
 
-      return RefAirTemp;
-    }
+			if ( ExtBoundCond > 0 ) // Interzone window
+			{
+				temperature = getInsideAirTemperature( t_SurfNum );
+			}
+			else {
+				if ( ExtWind ) { // Window is exposed to wind (and possibly rain)
+					if ( IsRain ) { // Raining: since wind exposed, outside window surface gets wet
+						temperature = OutWetBulbTemp;
+					}
+					else { // Dry
+						temperature = OutDryBulbTemp;
+					}
+				}
+				else { // Window not exposed to wind
+					temperature = OutDryBulbTemp;
+				}
+			}
 
-    double SurfaceData::getInsideIR( const int t_SurfNum ) {
-      auto & window( SurfaceWindow( t_SurfNum ) );
-      double value = window.IRfromParentZone + QHTRadSysSurf( t_SurfNum ) + QHWBaseboardSurf( t_SurfNum ) +
-        QSteamBaseboardSurf( t_SurfNum ) + QElecBaseboardSurf( t_SurfNum );
-      return value;
-    }
+			return temperature;
+		}
 
-    double SurfaceData::getOutsideAirTemperature( const int t_SurfNum ) const
-    {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   June 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
+		double SurfaceData::getOutsideIR( const int t_SurfNum ) const {
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Simon Vidanovic
+			//       DATE WRITTEN   July 2016
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
 
-      // PURPOSE OF THIS SUBROUTINE:
-      // Routine calculates outside air temperature for given surface.
-      // Routine will return inside air temperature if it is interior surface. (refactoring from the code)
-      //
-      // NOTE: This routine has been copy/pasted in the past in several different modules with slight
-      //       modifications at some of those places. Exterior/interior surface air temperature is tied to surface.
-      double temperature = 0;
-      
-      if( ExtBoundCond > 0 ) // Interzone window
-      {
-        temperature = getInsideAirTemperature( t_SurfNum );
-      } else {
-        if( ExtWind ) { // Window is exposed to wind (and possibly rain)
-          if( IsRain ) { // Raining: since wind exposed, outside window surface gets wet
-            temperature = OutWetBulbTemp;
-          } else { // Dry
-            temperature = OutDryBulbTemp;
-          }
-        } else { // Window not exposed to wind
-          temperature = OutDryBulbTemp;
-        }
-      }
+			// PURPOSE OF THIS SUBROUTINE:
+			// Calculates outside infrared radiation
+			double value = 0;
+			if ( ExtBoundCond > 0 ) {
+				value = SurfaceWindow( ExtBoundCond ).IRfromParentZone + QHTRadSysSurf( ExtBoundCond ) +
+					QHWBaseboardSurf( ExtBoundCond ) + QSteamBaseboardSurf( ExtBoundCond ) +
+					QElecBaseboardSurf( ExtBoundCond );
+			}
+			else {
+				double tout = getOutsideAirTemperature( t_SurfNum ) + KelvinConv;
+				value = sigma * pow_4( tout );
+				value = ViewFactorSkyIR *
+					( AirSkyRadSplit( t_SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( t_SurfNum ) ) * value ) +
+					ViewFactorGroundIR * value;
+			}
+			return value;
+		}
 
-      return temperature;
-    }
+		double SurfaceData::getSWIncident( const int t_SurfNum ) {
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Simon Vidanovic
+			//       DATE WRITTEN   July 2016
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
 
-    double SurfaceData::getOutsideIR( const int t_SurfNum ) const
-    {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   July 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
+			// PURPOSE OF THIS SUBROUTINE:
+			// Return total short wave incident to the surface
 
-      // PURPOSE OF THIS SUBROUTINE:
-      // Calculates outside infrared radiation
-      double value = 0;
-      if( ExtBoundCond > 0 ) {
-        value = SurfaceWindow( ExtBoundCond ).IRfromParentZone + QHTRadSysSurf( ExtBoundCond ) +
-          QHWBaseboardSurf( ExtBoundCond ) + QSteamBaseboardSurf( ExtBoundCond ) + 
-          QElecBaseboardSurf( ExtBoundCond );
-      } else {
-        double tout = getOutsideAirTemperature( t_SurfNum ) + KelvinConv;
-        value = sigma * pow_4( tout );
-        value = ViewFactorSkyIR *
-          ( AirSkyRadSplit( t_SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( t_SurfNum ) ) * value ) +
-          ViewFactorGroundIR * value;
-      }
-      return value;
-    }
-
-    double SurfaceData::getSWIncident( const int t_SurfNum ) {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   July 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Return total short wave incident to the surface
-      
-      return QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
-    }
+			return QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
+		}
 
 
-    double SurfaceData::getSWBeamIncident( const int t_SurfNum ) {
-	    // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   July 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
+		double SurfaceData::getSWBeamIncident( const int t_SurfNum ) {
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Simon Vidanovic
+			//       DATE WRITTEN   July 2016
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
 
-      // PURPOSE OF THIS SUBROUTINE:
-      // Return total short wave incident from outside beam
-        
-      return QRadSWOutIncidentBeam( t_SurfNum );
-	  }
+			// PURPOSE OF THIS SUBROUTINE:
+			// Return total short wave incident from outside beam
 
-    double SurfaceData::getSWDiffuseIncident( const int t_SurfNum ) {
-	    // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   July 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
+			return QRadSWOutIncidentBeam( t_SurfNum );
+		}
 
-      // PURPOSE OF THIS SUBROUTINE:
-      // Return total short wave diffuse incident to the surface
-        
-      return QRadSWOutIncidentSkyDiffuse( t_SurfNum ) + QRadSWOutIncidentGndDiffuse( t_SurfNum ) + 
-        QS( Surface( t_SurfNum ).Zone );
-	  }
+		double SurfaceData::getSWDiffuseIncident( const int t_SurfNum ) {
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Simon Vidanovic
+			//       DATE WRITTEN   July 2016
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
 
-    int SurfaceData::getTotLayers() const {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   August 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
+			// PURPOSE OF THIS SUBROUTINE:
+			// Return total short wave diffuse incident to the surface
 
-      // PURPOSE OF THIS SUBROUTINE:
-      // Returns total number of layer for current surface
+			return QRadSWOutIncidentSkyDiffuse( t_SurfNum ) + QRadSWOutIncidentGndDiffuse( t_SurfNum ) +
+				QS( Surface( t_SurfNum ).Zone );
+		}
 
-      auto & construction( Construct( Construction ) );
-      return construction.TotLayers;
-    }
+		int SurfaceData::getTotLayers() const {
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Simon Vidanovic
+			//       DATE WRITTEN   August 2016
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Returns total number of layer for current surface
+
+			auto& construction( Construct( Construction ) );
+			return construction.TotLayers;
+		}
 
 		// Computed Shape Category
 		ShapeCat
