@@ -232,6 +232,7 @@ namespace SizingManager {
 		GetOARequirements(); // get the OA requirements object
 		GetZoneAirDistribution(); // get zone air distribution objects
 		GetZoneHVACSizing(); // get zone HVAC sizing object
+		GetAirTerminalSizing(); // get air terminal sizing object
 		GetSizingParams(); // get the building level sizing paramets
 		GetZoneSizingInput(); // get the Zone Sizing input
 		GetSystemSizingInput(); // get the System Sizing input
@@ -2388,6 +2389,7 @@ namespace SizingManager {
 			// Determine SysSizInput electric Cooling design capacity sizing method
 			if ( SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "COOLINGDESIGNCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).CoolingCapMethod = CoolingDesignCapacity;
+				// SysSizInput( SysSizIndex ).ScaledCoolingCapacity = AutoSize can be set to autosize cooling capacity
 				SysSizInput( SysSizIndex ).ScaledCoolingCapacity = rNumericArgs( iCoolDesignCapacityNumericNum );
 				if ( SysSizInput( SysSizIndex ).ScaledCoolingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledCoolingCapacity != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
@@ -2443,7 +2445,7 @@ namespace SizingManager {
 			// Determine SysSizInput electric heating design capacity sizing method
 			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HEATINGDESIGNCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).HeatingCapMethod = HeatingDesignCapacity;
-
+				// SysSizInput( SysSizIndex ).ScaledHeatingCapacity = AutoSize can be set to autosize heating capacity
 				SysSizInput( SysSizIndex ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
 				if ( SysSizInput( SysSizIndex ).ScaledHeatingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledHeatingCapacity != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
@@ -3486,6 +3488,69 @@ namespace SizingManager {
 
 	}
 
+	void
+	GetAirTerminalSizing()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   February 2017
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Obtains input data for the AirTerminal sizing methods object and stores it in
+		// appropriate data structure.
+
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::VerifyName;
+		using InputProcessor::SameString;
+		using namespace DataIPShortCuts;
+		using General::RoundSigDigits;
+		using General::TrimSigDigits;
+
+		static std::string const RoutineName( "GetAirTerminalSizing: " ); // include trailing blank space
+
+		int NumAlphas; // Number of Alphas for each GetObjectItem call
+		int NumNumbers; // Number of Numbers for each GetObjectItem call
+		int TotalArgs; // Total number of alpha and numeric arguments (max) for a
+		int IOStatus; // Used in GetObjectItem
+		bool ErrorsFound( false ); // If errors detected in input
+		bool IsNotOK; // Flag to verify name
+		bool IsBlank; // Flag for blank name
+
+		cCurrentModuleObject = "DesignSpecification:AirTerminal:Sizing";
+		DataSizing::NumAirTerminalSizingSpec = GetNumObjectsFound( cCurrentModuleObject );
+		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		if ( DataSizing::NumAirTerminalSizingSpec > 0 ) {
+			AirTerminalSizingSpec.allocate( DataSizing::NumAirTerminalSizingSpec );
+
+			//Start Loading the System Input
+			for ( int zSIndex = 1; zSIndex <= DataSizing::NumAirTerminalSizingSpec; ++zSIndex ) {
+
+				GetObjectItem( cCurrentModuleObject, zSIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+
+				VerifyName( cAlphaArgs( 1 ), AirTerminalSizingSpec, zSIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				}
+
+				auto & thisATSizing( DataSizing::AirTerminalSizingSpec( zSIndex ) );
+				thisATSizing.Name = cAlphaArgs( 1 );
+				thisATSizing.DesSensCoolingFrac = rNumericArgs( 1 );
+				thisATSizing.DesCoolSATRatio = rNumericArgs( 2 );
+				thisATSizing.DesSensHeatingFrac = rNumericArgs( 3 );
+				thisATSizing.DesHeatSATRatio = rNumericArgs( 4 );
+				thisATSizing.MinOAFrac = rNumericArgs( 5 );
+			}
+		}
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+		}
+
+	}
 
 
 	// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
@@ -3632,7 +3697,62 @@ namespace SizingManager {
 		}
 	}
 
+	void
+	UpdateTermUnitFinalZoneSizing()
+	{
+		// Move data from FinalZoneSizing to TermUnitFinalZoneSizing and apply terminal unit sizing adjustments
+		// Called once to initialize before system sizing, then called again to update after system sizing
+		// M.J. Witte, July 2017
 
+		for ( int termUnitSizingIndex = 1; termUnitSizingIndex <= DataSizing::NumAirTerminalUnits; ++termUnitSizingIndex ) {
+			auto & thisTUFZSizing( TermUnitFinalZoneSizing( termUnitSizingIndex ) );
+			auto const & thisTUSizing( TermUnitSizing( termUnitSizingIndex ) );
+			int ctrlZoneNum = thisTUSizing.CtrlZoneNum;
+			auto const & thisFZSizing( FinalZoneSizing( ctrlZoneNum ) );
+
+			// Copy everything from FinalZoneSizing to TermUnitFinalZoneSizing
+			thisTUFZSizing = thisFZSizing;
+
+			if( DataSizing::NumAirTerminalSizingSpec > 0 ) {
+				// Apply DesignSpecification:AirTerminal:Sizing adjustments - default ratios are 1.0
+				// Cooling
+				Real64 coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
+				Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
+				thisTUFZSizing.DesCoolMinAirFlow = thisFZSizing.DesCoolMinAirFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
+				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolVolFlowMin = thisFZSizing.DesCoolVolFlowMin * coolFlowRatio;
+				thisTUFZSizing.DesCoolMassFlow = thisFZSizing.DesCoolMassFlow * coolFlowRatio;
+				thisTUFZSizing.CoolMassFlow = thisFZSizing.CoolMassFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolMinAirFlow2 = thisFZSizing.DesCoolMinAirFlow2 * coolFlowRatio;
+				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlow * coolFlowRatio;
+				thisTUFZSizing.CoolFlowSeq = thisFZSizing.CoolFlowSeq * coolFlowRatio;
+				thisTUFZSizing.CoolLoadSeq = thisFZSizing.CoolLoadSeq * coolLoadRatio;
+				thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
+				thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
+				// Heating
+				Real64 heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
+				Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
+				thisTUFZSizing.DesHeatMaxAirFlow = thisFZSizing.DesHeatMaxAirFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
+				thisTUFZSizing.DesHeatVolFlow = thisFZSizing.DesHeatVolFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatVolFlowMax = thisFZSizing.DesHeatVolFlowMax * heatFlowRatio;
+				thisTUFZSizing.DesHeatMassFlow = thisFZSizing.DesHeatMassFlow * heatFlowRatio;
+				thisTUFZSizing.HeatMassFlow = thisFZSizing.HeatMassFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatMaxAirFlow2 = thisFZSizing.DesHeatMaxAirFlow2 * heatFlowRatio;
+				thisTUFZSizing.HeatFlowSeq = thisFZSizing.HeatFlowSeq * heatFlowRatio;
+				thisTUFZSizing.HeatLoadSeq = thisFZSizing.HeatLoadSeq * heatLoadRatio;
+				thisTUFZSizing.NonAirSysDesHeatLoad = thisFZSizing.NonAirSysDesHeatLoad * heatLoadRatio;
+				thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
+				// Outdoor air
+				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
+				thisTUFZSizing.DesCoolOAFlowFrac = min(thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0);
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+				thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+			}
+		}
+	}
 } // SizingManager
 
 } // EnergyPlus

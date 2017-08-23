@@ -67,6 +67,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
+#include <DataZoneEquipment.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
@@ -79,6 +80,9 @@
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
 #include <WeatherManager.hh>
+#include <DataLoopNode.hh>
+#include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 
 namespace EnergyPlus {
 
@@ -1923,6 +1927,10 @@ namespace SurfaceGeometry {
 
 		GetSurfaceHeatTransferAlgorithmOverrides( ErrorsFound );
 
+		GetSurfaceSrdSurfsData( ErrorsFound );
+
+		GetSurfaceLocalEnvData( ErrorsFound );
+
 		if ( SurfError || ErrorsFound ) {
 			ErrorsFound = true;
 			ShowFatalError( RoutineName + "Errors discovered, program terminates." );
@@ -3028,6 +3036,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				SurfaceTmp( SurfNum ).Vertex.allocate( SurfaceTmp( SurfNum ).Sides );
+				SurfaceTmp( SurfNum ).NewVertex.allocate( SurfaceTmp( SurfNum ).Sides );
 				GetVertices( SurfNum, SurfaceTmp( SurfNum ).Sides, rNumericArgs( {3,_} ) );
 				if ( SurfaceTmp( SurfNum ).Area <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Surface Area <= 0.0; Entered Area=" + TrimSigDigits( SurfaceTmp( SurfNum ).Area, 2 ) );
@@ -5943,6 +5952,299 @@ namespace SurfaceGeometry {
 	}
 
 	void
+	GetSurfaceLocalEnvData( bool & ErrorsFound ) // Error flag indicator (true if errors found)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X LUO
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// load input data for Outdoor Air Node for exterior surfaces
+
+		// METHODOLOGY EMPLOYED:
+		// usual E+ input processes
+
+		// Using/Aliasing
+		using namespace DataIPShortCuts;
+		using namespace DataErrorTracking;
+
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::VerifyName;
+		using ScheduleManager::GetScheduleIndex;
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
+		
+		using DataSurfaces::TotSurfaces;
+		using DataSurfaces::Surface;
+		using DataSurfaces::TotSurfLocalEnv;
+		using DataSurfaces::SurfLocalEnvironment;
+		using DataLoopNode::NodeType_Air;
+		using DataLoopNode::NodeConnectionType_Inlet;
+		using DataLoopNode::ObjectIsParent;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetSurfaceLocalEnvData: " );
+
+		// INTERFACE BLOCK SPECIFICATIONS:na
+		// DERIVED TYPE DEFINITIONS:na
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumAlpha;
+		int NumNumeric;
+		int Loop;
+		int SurfLoop;
+		bool ErrorInName;
+		bool IsBlank;
+		int IOStat;
+		int SurfNum;
+		int NodeNum;
+		int ExtShadingSchedNum;
+		int SurroundingSurfsNum;
+
+		//-----------------------------------------------------------------------
+		//                SurfaceProperty:LocalEnvironment
+		//-----------------------------------------------------------------------
+
+		cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
+		TotSurfLocalEnv = GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( TotSurfLocalEnv > 0 ) {
+
+			AnyLocalEnvironmentsInModel = true;
+
+			if ( !allocated( SurfLocalEnvironment ) ) {
+				SurfLocalEnvironment.allocate( TotSurfLocalEnv );
+			}
+
+			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {
+				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				ErrorInName = false;
+				IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), SurfLocalEnvironment, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				if ( ErrorInName ) {
+					ShowContinueError( "...each SurfaceProperty:LocalEnvironment name must not duplicate other SurfaceProperty:LocalEnvironment name" );
+					ErrorsFound = true;
+					continue;
+				}
+
+				SurfLocalEnvironment( Loop ).Name = cAlphaArgs( 1 );
+
+				// Assign surface number
+				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				if ( SurfNum == 0 ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
+					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file." );
+					ErrorsFound = true;
+				}
+				else {
+					SurfLocalEnvironment( Loop ).SurfPtr = SurfNum;
+				}
+
+				// Assign External Shading Schedule number
+				if ( !lAlphaFieldBlanks( 3 ) ) {
+					ExtShadingSchedNum = GetScheduleIndex( cAlphaArgs( 3 ) );
+					if ( ExtShadingSchedNum == 0 ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 3 ) + " has been found." );
+						ShowContinueError( cAlphaFieldNames( 3 ) + " entered value = \"" + cAlphaArgs( 3 ) + "\" no corresponding schedule has been found in the input file." );
+						ErrorsFound = true;
+					}
+					else {
+						SurfLocalEnvironment( Loop ).ExtShadingSchedPtr = ExtShadingSchedNum;
+					}
+				}
+
+				//Assign surrounding surfaces object number;
+				if ( !lAlphaFieldBlanks( 4 ) ) {
+					SurroundingSurfsNum = FindItemInList( cAlphaArgs( 4 ), SurroundingSurfsProperty );
+					if ( SurroundingSurfsNum == 0 ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 4 ) + " has been found." );
+						ShowContinueError( cAlphaFieldNames( 4 ) + " entered value = \"" + cAlphaArgs( 4 ) + "\" no corresponding surrounding surfaces properties has been found in the input file." );
+						ErrorsFound = true;
+					}
+					else {
+						SurfLocalEnvironment( Loop ).SurroundingSurfsPtr = SurroundingSurfsNum;
+					}
+				}
+
+				//Assign outdoor air node number;
+				if ( !lAlphaFieldBlanks( 5 ) ) {
+					NodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+					if ( NodeNum == 0 && CheckOutAirNodeNumber( NodeNum ) ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 5 ) + " has been found." );
+						ShowContinueError( cAlphaFieldNames( 5 ) + " entered value = \"" + cAlphaArgs( 5 ) + "\" no corresponding outdoor air node has been found in the input file." );
+						ErrorsFound = true;
+					}
+					else {
+						SurfLocalEnvironment( Loop ).OutdoorAirNodePtr = NodeNum;
+                    }
+		        }
+			}
+		}
+		// Link surface properties to surface object
+		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
+			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {			
+				if ( SurfLocalEnvironment( Loop ).SurfPtr == SurfLoop ) {
+					if ( SurfLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
+						Surface( SurfLoop ).HasLinkedOutAirNode = true;
+						Surface( SurfLoop ).LinkedOutAirNode = SurfLocalEnvironment( Loop ).OutdoorAirNodePtr;
+					}
+					if ( SurfLocalEnvironment( Loop ).ExtShadingSchedPtr != 0 ) {
+						Surface( SurfLoop ).SchedExternalShadingFrac = true;
+						Surface( SurfLoop ).ExternalShadingSchInd = SurfLocalEnvironment( Loop ).ExtShadingSchedPtr;
+					}
+					if ( SurfLocalEnvironment( Loop ).SurroundingSurfsPtr != 0 ) {
+						Surface( SurfLoop ).HasSurroundingSurfProperties = true;
+						Surface( SurfLoop ).SurroundingSurfacesNum = SurfLocalEnvironment( Loop ).SurroundingSurfsPtr;
+					}
+				}
+			}
+		}
+	}
+
+	void
+	GetSurfaceSrdSurfsData( bool & ErrorsFound ) // Error flag indicator (true if errors found)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X LUO
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// load input data for surrounding surfaces properties for exterior surfaces
+
+		// METHODOLOGY EMPLOYED:
+		// usual E+ input processes
+
+		// Using/Aliasing
+		using namespace DataIPShortCuts;
+		using namespace DataErrorTracking;
+
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::VerifyName;
+		using ScheduleManager::GetScheduleIndex;
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
+
+		using DataSurfaces::TotSurfaces;
+		using DataSurfaces::Surface;
+		using DataSurfaces::TotSurfLocalEnv;
+		using DataSurfaces::SurfLocalEnvironment;
+		using DataLoopNode::NodeType_Air;
+		using DataLoopNode::NodeConnectionType_Inlet;
+		using DataLoopNode::ObjectIsParent;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetSurfaceSrdSurfsData: " );
+
+		// INTERFACE BLOCK SPECIFICATIONS:na
+		// DERIVED TYPE DEFINITIONS:na
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumAlpha;
+		int NumNumeric;
+		int Loop;
+		bool ErrorInName;
+		bool IsBlank;
+		int IOStat;
+
+		int TotSrdSurfProperties;
+		int TotSrdSurf;
+		int SurfLoop;
+		int SurfNameArg;
+		int SurfVFArg;
+		int SurfTempArg;
+
+		//-----------------------------------------------------------------------
+		//                SurfaceProperty:SurroundingSurfaces
+		//-----------------------------------------------------------------------
+
+		cCurrentModuleObject = "SurfaceProperty:SurroundingSurfaces";
+		TotSrdSurfProperties = GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( TotSrdSurfProperties > 0 ) {
+
+			if ( !allocated( SurroundingSurfsProperty ) ) {
+				SurroundingSurfsProperty.allocate( TotSrdSurfProperties );
+			}
+
+			for ( Loop = 1; Loop <= TotSrdSurfProperties; ++Loop ) {
+				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				ErrorInName = false;
+				IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), SurroundingSurfsProperty, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				if ( ErrorInName ) {
+					ShowContinueError( "...each SurfaceProperty:SurroundingSurfaces name must not duplicate other SurfaceProperty:SurroundingSurfaces names" );
+					ErrorsFound = true;
+					continue;
+				}
+
+				// A1: Name
+				SurroundingSurfsProperty( Loop ).Name = cAlphaArgs( 1 );
+
+				// N1: sky view factor
+				if ( !lNumericFieldBlanks( 1 ) ) {
+					SurroundingSurfsProperty( Loop ).SkyViewFactor = rNumericArgs( 1 );
+				}
+
+				// A2: sky temp sch name
+				if ( !lAlphaFieldBlanks( 2 ) ) {
+					SurroundingSurfsProperty( Loop ).SkyTempSchNum = GetScheduleIndex( cAlphaArgs( 2 ) );
+				}
+
+				// N2: ground view factor
+				if ( !lNumericFieldBlanks( 2 ) ) {
+					SurroundingSurfsProperty( Loop ).GroundViewFactor = rNumericArgs( 2 );
+				}
+
+				// A3: ground temp sch name
+				if ( !lAlphaFieldBlanks( 3 ) ) {
+					SurroundingSurfsProperty( Loop ).GroundTempSchNum = GetScheduleIndex( cAlphaArgs( 4 ) );
+				}
+
+				// The object requires at least one srd surface input, each surface requires a set of 3 fields (2 Alpha fields Name and Temp Sch Name and 1 Num fields View Factor)
+				if ( NumAlpha < 5 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
+					ShowContinueError( "At lease one set of surrounding surface properties should be defined.");
+					ErrorsFound = true;
+					continue;
+				}
+				if ( ( NumAlpha - 3 ) / 2 != ( NumNumeric - 2 ) ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
+					ShowContinueError( "Check number of input fields for each surrounding surface." );
+					ErrorsFound = true;
+					continue;
+				}
+				//Read surrounding surfaces properties
+				TotSrdSurf = NumNumeric - 2;
+				SurroundingSurfsProperty( Loop ).TotSurroundingSurface = TotSrdSurf;
+				SurroundingSurfsProperty( Loop ).SurroundingSurfs.allocate( TotSrdSurf );
+				for ( SurfLoop = 1; SurfLoop <= TotSrdSurf; ++SurfLoop ) {
+					SurfNameArg = SurfLoop * 2 + 2; //A4, A6, A8, ...
+					SurfVFArg = SurfLoop + 2; //N3, N4, N5, ...
+					SurfTempArg = SurfLoop * 2 + 3; //A5, A7, A9, ...
+					SurroundingSurfsProperty( Loop ).SurroundingSurfs( SurfLoop ).Name = cAlphaArgs( SurfNameArg );
+					SurroundingSurfsProperty( Loop ).SurroundingSurfs( SurfLoop ).ViewFactor = rNumericArgs( SurfVFArg );
+					SurroundingSurfsProperty( Loop ).SurroundingSurfs( SurfLoop ).TempSchNum = GetScheduleIndex( cAlphaArgs( SurfTempArg ) );
+				}
+			}
+		}
+	}
+
+
+	void
 	GetSurfaceHeatTransferAlgorithmOverrides( bool & ErrorsFound )
 	{
 
@@ -7493,15 +7795,7 @@ namespace SurfaceGeometry {
 		using InputProcessor::SameString;
 		using ScheduleManager::GetScheduleIndex;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName("GetWindowGapAirflowControlData");
 		int IOStat; // IO Status when calling get input subroutine
 		int ControlNumAlpha; // Number of control alpha names being passed
 		int ControlNumProp; // Number of control properties being passed
@@ -7610,6 +7904,21 @@ namespace SurfaceGeometry {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_OutdoorAir;
 				} else if ( SameString( cAlphaArgs( 3 ), "ReturnAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_ReturnAir;
+					int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex( Surface( SurfNum ).ZoneName );
+					if( controlledZoneNum > 0 ) DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+					// Set return air node number
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = 0;
+					std::string retNodeName = "";
+					if ( !lAlphaFieldBlanks( 7 ) ) {
+						retNodeName = cAlphaArgs( 7 );
+					}
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName );
+					if ( SurfaceWindow(SurfNum).AirflowReturnNodePtr == 0 ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Surface( SurfNum ).Name + "\", airflow window return air node not found for " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+						if ( !lAlphaFieldBlanks( 7 ) ) ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" did not find a matching return air node." );
+						ShowContinueError( "..Airflow windows with Airflow Destination = ReturnAir must reference a controlled Zone (appear in a ZoneHVAC:EquipmentConnections object) with at least one return air node." );
+						ErrorsFound = true;
+					}
 				}
 				if ( SameString( cAlphaArgs( 4 ), "AlwaysOnAtMaximumFlow" ) ) {
 					SurfaceWindow( SurfNum ).AirflowControlType = AirFlowWindow_ControlType_MaxFlow;

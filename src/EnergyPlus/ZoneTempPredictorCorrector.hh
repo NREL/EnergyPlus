@@ -375,6 +375,16 @@ namespace ZoneTempPredictorCorrector {
 	void
 	OverrideAirSetPointsforEMSCntrl();
 
+	void
+	FillPredefinedTableOnThermostatSetpoints();
+
+	std::tuple< Real64, int, std::string >
+	temperatureAndCountInSch(
+		int const & scheduleIndex,
+		bool const & isSummer,
+		int const & dayOfWeek,
+		int const & hourOfDay
+	);
 
 } // ZoneTempPredictorCorrector
 

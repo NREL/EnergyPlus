@@ -2853,6 +2853,9 @@ namespace WaterThermalTanks {
 							ErrorsFound = true;
 						}
 					}
+					if ( NumAlphas > 19 ) {
+						WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName = cAlphaArgs( 20 );
+					}
 
 				} // WaterThermalTankNum
 

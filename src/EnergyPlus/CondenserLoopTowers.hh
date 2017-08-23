@@ -276,7 +276,8 @@ namespace CondenserLoopTowers {
 		bool FaultyTowerFoulingFlag; // True if the tower has fouling fault
 		int FaultyTowerFoulingIndex;  // Index of the fouling fault object corresponding to the condenser
 		Real64 FaultyTowerFoulingFactor; // Tower fouling factor
-		
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
+
 		// Default Constructor
 		Towerspecs() :
 			TowerType_Num( 0 ),

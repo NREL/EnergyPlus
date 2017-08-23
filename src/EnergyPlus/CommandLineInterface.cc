@@ -292,6 +292,7 @@ ProcessArgs(int argc, const char * argv[])
 	std::string sqliteSuffix;
 	std::string adsSuffix;
 	std::string screenSuffix;
+	std::string shdSuffix;
 
 	if (suffixType == "L" || suffixType == "l")	{
 
@@ -304,6 +305,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "sqlite";
 		adsSuffix = "ADS";
 		screenSuffix = "screen";
+		shdSuffix = "shading";
 
 	} else if (suffixType == "D" || suffixType == "d") {
 
@@ -316,6 +318,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "-sqlite";
 		adsSuffix = "-ads";
 		screenSuffix = "-screen";
+		shdSuffix = "-shading";
 
 	} else if (suffixType == "C" || suffixType == "c") {
 
@@ -328,6 +331,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "Sqlite";
 		adsSuffix = "Ads";
 		screenSuffix = "Screen";
+		shdSuffix = "Shading";
 
 	} else {
 		DisplayString("ERROR: Unrecognized argument for output suffix style: " + suffixType);
@@ -371,6 +375,7 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
+	outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
 	if (suffixType == "L" || suffixType == "l") {
 		outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
 	}
