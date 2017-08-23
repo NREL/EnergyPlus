@@ -222,40 +222,40 @@
     GroundCoupledSurface;    !- Type of Modeling
 
   Site:GroundDomain:Slab,
-    IngradeCoupledSlab, !- Name
-    5,                  !- Ground Domain Depth {m}
-    1,                  !- Aspect Ratio
-    5,                  !- Domain Perimeter Offset {m}
-    1.8,                !- Soil Thermal Conductivity {W/m-K}
-    3200,               !- Soil Density {kg/m3}
-    836,                !- Soil Specific Heat {J/kg-K}
-    30,                 !- Soil Moisture Content Volume Fraction {percent}
-    50,                 !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Model
-    KATemps,            !- Name of Undisturbed Ground Temperature Model
-    1,                  !- Evapotranspiration Ground Cover Parameter
-    GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
-    InGrade,            !- Slab Location (InGrade/OnGrade)
-    Slab Material-In-grade, !- Slab Material Name
-    Yes,                !- Horizontal Insulation (Yes/No)
-    Slab Insulation, !- Horizontal Insulation Material Name
-    Full,               !- Full Horizontal or Perimeter Only (Full/Perimeter)
-    ,                   !- Perimeter insulation width (m)
-    Yes,                !- Vertical Insulation (Yes/No)
-    Slab Insulation,    !- Vertical Insulation Name
-    2,                  !- Vertical perimeter insulation depth from surface (m)
-    Timestep,           !- Domain Simulation Interval. (Timestep/Hourly)
-    ,                   !- Geometric Mesh Coefficient
-    ;                   !- Mesh Density Parameter
+    IngradeCoupledSlab,      !- Name
+    5,                       !- Ground Domain Depth {m}
+    1,                       !- Aspect Ratio
+    5,                       !- Perimeter Offset {m}
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    KATemps,                 !- Undisturbed Ground Temperature Model Name
+    1,                       !- Evapotranspiration Ground Cover Parameter
+    GroundCoupledOSCM,       !- Slab Boundary Condition Model Name
+    InGrade,                 !- Slab Location
+    Slab Material-In-grade,  !- Slab Material Name
+    Yes,                     !- Horizontal Insulation
+    Slab Insulation,         !- Horizontal Insulation Material Name
+    Full,                    !- Horizontal Insulation Extents
+    ,                        !- Perimeter Insulation Width {m}
+    Yes,                     !- Vertical Insulation
+    Slab Insulation,         !- Vertical Insulation Material Name
+    2,                       !- Vertical Insulation Depth {m}
+    Timestep,                !- Simulation Timestep
+    ,                        !- Geometric Mesh Coefficient
+    ;                        !- Mesh Density Parameter
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
-    KATemps,    !- Name of object
-    1.8,        !- Soil Thermal Conductivity {W/m-K}
-    3200,       !- Soil Density {kg/m3}
-    836,        !- Soil Specific Heat {J/kg-K}
-    15.5,       !- Annual average surface temperature {C}
-    12.8,       !- Annual amplitude of surface temperature {delta C}
-    17.3;       !- Phase shift of minimum surface temperature {days}
+    KATemps,                 !- Name
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    15.5,                    !- Average Soil Surface Temperature {C}
+    12.8,                    !- Average Amplitude of Surface Temperature {deltaC}
+    17.3;                    !- Phase Shift of Minimum Surface Temperature {days}
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
@@ -1525,7 +1525,7 @@
     Coil:Cooling:Water,      !- Cooling Coil Object Type
     CW Cooling Coil,         !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -1567,6 +1567,7 @@
     4,                       !- Number of Speeds for Heating
     4,                       !- Number of Speeds for Cooling
     No,                      !- Single Mode Operation
+    ,                        !- No Load Supply Air Flow Rate Ratio
     0.25,                    !- Heating Speed 1 Supply Air Flow Ratio
     0.25,                    !- Cooling Speed 1 Supply Air Flow Ratio
     0.50,                    !- Heating Speed 2 Supply Air Flow Ratio

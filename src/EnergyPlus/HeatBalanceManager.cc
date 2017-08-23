@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <HeatBalanceManager.hh>
 #include <ConductionTransferFunctionCalc.hh>
+#include <CurveManager.hh>
 #include <DataBSDFWindow.hh>
 #include <DataComplexFenestration.hh>
 #include <DataContaminantBalance.hh>
@@ -68,6 +69,7 @@
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
+#include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
@@ -99,6 +101,8 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
+#include <OutAirNodeManager.hh>
 
 namespace EnergyPlus {
 
@@ -385,7 +389,6 @@ namespace HeatBalanceManager {
 		if ( ! WarmupFlag && EndDayFlag && DayOfSim == 1 && ! DoingSizing ) {
 			ReportWarmupConvergence();
 		}
-
 	}
 
 	// Get Input Section of the Module
@@ -700,6 +703,7 @@ namespace HeatBalanceManager {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::lMinimalShadowing;
+		using DataHVACGlobals::HVACSystemRootFinding;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1225,6 +1229,43 @@ namespace HeatBalanceManager {
 			gio::write( OutputFileInits, Format_733 ) << "No" << "N/A" << "N/A" << "N/A";
 		}
 
+		// A new object is added by L. Gu, 4/17
+		CurrentModuleObject = "HVACSystemRootFindingAlgorithm";
+		NumObjects = GetNumObjectsFound( CurrentModuleObject );
+		if ( NumObjects > 0 ) {
+			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( NumAlpha > 0 ) {
+				HVACSystemRootFinding.Algorithm = AlphaName( 1 );
+				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
+				if ( ( SELECT_CASE_var == "REGULAFALSI" ) ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+				} else if ( SELECT_CASE_var == "BiSECTION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
+				} else if ( SELECT_CASE_var == "BISECTIONTHENREGULAFALSI" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
+				} else if ( SELECT_CASE_var == "REGULAFALSITHENBISECTION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
+				} else if ( SELECT_CASE_var == "ALTERNATION" ) {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation;
+				} else {
+					HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames( 1 ) + ". The default choice is assigned = " + AlphaName( 1 ) );
+					ShowContinueError( "Valid choices are: RegulaFalsi, Bisection, BisectionThenRegulaFalsi, RegulaFalsiThenBisection, or Alternation." );
+				}}
+			}
+			if ( NumNumber > 0 ) {
+				HVACSystemRootFinding.NumOfIter = BuildingNumbers( 1 );
+			}
+		}
+		else {
+			HVACSystemRootFinding.Algorithm = "RegulaFalsi";
+			HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+		}
+
+		// Write Solution Algorithm to the initialization output file for User Verification
+		gio::write( OutputFileInits, Format_726 );
+		gio::write( OutputFileInits, Format_727 ) << AlphaName( 1 );
+
 	}
 
 	void
@@ -1331,6 +1372,17 @@ namespace HeatBalanceManager {
 		using General::RoundSigDigits;
 		using General::ScanForReports;
 		using General::TrimSigDigits;
+		using WindowEquivalentLayer::lscNONE;
+		using WindowEquivalentLayer::lscVBPROF;
+		using WindowEquivalentLayer::lscVBNOBM;
+		using CurveManager::PerfCurve;
+		using CurveManager::GetCurveIndex;
+		using CurveManager::GetCurveObjectTypeNum;
+		using CurveManager::GetCurveMinMaxValues;
+		using CurveManager::CurveType_TableTwoIV;
+		using CurveManager::GetCurveInterpolationMethodNum;
+		using CurveManager::LinearInterpolationOfTable;
+		using CurveManager::SetSameIndeVariableValues;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1347,7 +1399,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int IOStat; // IO Status when calling get input subroutine
-		Array1D_string MaterialNames( 5 ); // Number of Material Alpha names defined
+		Array1D_string MaterialNames( 7 ); // Number of Material Alpha names defined
 		int MaterNum; // Counter to keep track of the material number
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
@@ -1376,6 +1428,10 @@ namespace HeatBalanceManager {
 		static bool DoReport( false );
 		Real64 DenomRGas; // Denominator for WindowGas calculations of NominalR
 		Real64 Openness; // insect screen oppenness fraction = (1-d/s)^2
+		Real64 minAngValue; // minimum value of angle
+		Real64 maxAngValue; // maximum value of angle
+		Real64 minLamValue; // minimum value of wavelength
+		Real64 maxLamValue; // maximum value of wavelength
 
 		// Added TH 1/9/2009 to read the thermochromic glazings
 		static int iTC( 0 );
@@ -1684,13 +1740,15 @@ namespace HeatBalanceManager {
 			Material( MaterNum ).Roughness = VerySmooth;
 			Material( MaterNum ).ROnly = true;
 			Material( MaterNum ).Thickness = MaterialProps( 1 );
-			Material( MaterNum ).Trans = MaterialProps( 2 );
-			Material( MaterNum ).ReflectSolBeamFront = MaterialProps( 3 );
-			Material( MaterNum ).ReflectSolBeamBack = MaterialProps( 4 );
-			Material( MaterNum ).TransVis = MaterialProps( 5 );
-			Material( MaterNum ).ReflectVisBeamFront = MaterialProps( 6 );
-			Material( MaterNum ).ReflectVisBeamBack = MaterialProps( 7 );
-			Material( MaterNum ).TransThermal = MaterialProps( 8 );
+			if ( !SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
+				Material( MaterNum ).Trans = MaterialProps( 2 );
+				Material( MaterNum ).ReflectSolBeamFront = MaterialProps( 3 );
+				Material( MaterNum ).ReflectSolBeamBack = MaterialProps( 4 );
+				Material( MaterNum ).TransVis = MaterialProps( 5 );
+				Material( MaterNum ).ReflectVisBeamFront = MaterialProps( 6 );
+				Material( MaterNum ).ReflectVisBeamBack = MaterialProps( 7 );
+				Material( MaterNum ).TransThermal = MaterialProps( 8 );
+			}
 			Material( MaterNum ).AbsorpThermalFront = MaterialProps( 9 );
 			Material( MaterNum ).AbsorpThermalBack = MaterialProps( 10 );
 			Material( MaterNum ).Conductivity = MaterialProps( 11 );
@@ -1715,6 +1773,8 @@ namespace HeatBalanceManager {
 			if ( SameString( MaterialNames( 2 ), "SpectralAverage" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
 			// No need for spectral data for BSDF either
 			if ( SameString( MaterialNames( 2 ), "BSDF" ) ) Material( MaterNum ).GlassSpectralDataPtr = 0;
+			if ( SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) Material( MaterNum ).GlassSpectralAndAngle = true;
+
 			if ( Material( MaterNum ).GlassSpectralDataPtr == 0 && SameString( MaterialNames( 2 ), "Spectral" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + Material( MaterNum ).Name + "\" has " + cAlphaFieldNames( 2 ) + " = Spectral but has no matching MaterialProperty:GlazingSpectralData set" );
@@ -1725,10 +1785,10 @@ namespace HeatBalanceManager {
 				}
 			}
 
-			if ( ! SameString( MaterialNames( 2 ), "SpectralAverage" ) && ! SameString( MaterialNames( 2 ), "Spectral" ) && ! SameString( MaterialNames( 2 ), "BSDF" ) ) {
+			if ( ! SameString( MaterialNames( 2 ), "SpectralAverage" ) && ! SameString( MaterialNames( 2 ), "Spectral" ) && ! SameString( MaterialNames( 2 ), "BSDF" ) && ! SameString( MaterialNames( 2 ), "SpectralAndAngle" ) ) {
 				ErrorsFound = true;
 				ShowSevereError( CurrentModuleObject + "=\"" + Material( MaterNum ).Name + "\", invalid specification." );
-				ShowContinueError( cAlphaFieldNames( 2 ) + " must be SpectralAverage, Spectral or BSDF, value=" + MaterialNames( 2 ) );
+				ShowContinueError( cAlphaFieldNames( 2 ) + " must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value=" + MaterialNames( 2 ) );
 			}
 
 			// TH 8/24/2011, allow glazing properties MaterialProps(2 to 10) to equal 0 or 1: 0.0 =< Prop <= 1.0
@@ -1867,7 +1927,150 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value." );
 				ShowContinueError( cNumericFieldNames( 4 ) + " must be Yes or No, entered value=" + MaterialNames( 4 ) );
 			}
-
+			// Get SpectralAndAngle table names 
+			if ( Material( MaterNum ).GlassSpectralAndAngle ) {
+				if ( lAlphaFieldBlanks( 5 ) ) {
+					ErrorsFound = true;
+					ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", blank field." );
+					ShowContinueError( " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type." );
+				} else {
+					Material( MaterNum ).GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex( MaterialNames( 5 ) );
+					if ( Material( MaterNum ).GlassSpecAngTransDataPtr == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid name." );
+						ShowContinueError( cAlphaFieldNames( 5 ) + " requires a valid table object name, entered input=" + MaterialNames( 5 ) );
+					} else {
+						if ( GetCurveObjectTypeNum( Material( MaterNum ).GlassSpecAngTransDataPtr ) != CurveType_TableTwoIV ) {
+							ErrorsFound = true;
+							ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid table type." );
+							ShowContinueError( cAlphaFieldNames( 5 ) + " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames( 5 ) );
+						} else {
+							if ( GetCurveInterpolationMethodNum( Material( MaterNum ).GlassSpecAngTransDataPtr ) != LinearInterpolationOfTable ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( !PerfCurve( Material( MaterNum ).GlassSpecAngTransDataPtr ).OpticalProperty) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Table input." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires X unit is Angle and Y unit is Wavelength, entered table name=" + MaterialNames( 5 ) );
+							}
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( abs( maxAngValue - 90.0) > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
+							}
+						}
+					}
+				}
+				if ( lAlphaFieldBlanks( 6 ) ) {
+					ErrorsFound = true;
+					ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", blank field." );
+					ShowContinueError( " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type." );
+				} else {
+					Material( MaterNum ).GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex( MaterialNames( 6 ) );
+					if ( Material( MaterNum ).GlassSpecAngFRefleDataPtr == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid name." );
+						ShowContinueError( cAlphaFieldNames( 6 ) + " requires a valid table object name, entered input=" + MaterialNames( 6 ) );
+					} else {
+						if ( GetCurveObjectTypeNum( Material( MaterNum ).GlassSpecAngFRefleDataPtr ) != CurveType_TableTwoIV ) {
+							ErrorsFound = true;
+							ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid table type." );
+							ShowContinueError( cAlphaFieldNames( 6 ) + " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames( 6 ) );
+						} else {
+							if ( GetCurveInterpolationMethodNum( Material( MaterNum ).GlassSpecAngFRefleDataPtr ) != LinearInterpolationOfTable ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
+								ShowContinueError( cAlphaFieldNames( 6 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 6 ) );
+							}
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( abs( maxAngValue - 90.0 ) > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
+							}
+						}
+					}
+				}
+				if ( lAlphaFieldBlanks( 7 ) ) {
+					ErrorsFound = true;
+					ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", blank field." );
+					ShowContinueError( " Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type." );
+				} else {
+					Material( MaterNum ).GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex( MaterialNames( 7 ) );
+					if ( Material( MaterNum ).GlassSpecAngBRefleDataPtr == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid name." );
+						ShowContinueError( cAlphaFieldNames( 7 ) + " requires a valid table object name, entered input=" + MaterialNames( 7 ) );
+					} else {
+						if ( GetCurveObjectTypeNum( Material( MaterNum ).GlassSpecAngBRefleDataPtr ) != CurveType_TableTwoIV ) {
+							ErrorsFound = true;
+							ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid table type." );
+							ShowContinueError( cAlphaFieldNames( 7 ) + " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames( 7 ) );
+						} else {
+							if ( GetCurveInterpolationMethodNum( Material( MaterNum ).GlassSpecAngBRefleDataPtr ) != LinearInterpolationOfTable ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid Interpolation Method." );
+								ShowContinueError( cAlphaFieldNames( 7 ) + " requires LinearInterpolationOfTable, entered table name=" + MaterialNames( 7 ) );
+							}
+							GetCurveMinMaxValues( Material( MaterNum ).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue );
+							if ( minAngValue > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of angle = " + RoundSigDigits( minAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( abs( maxAngValue - 90.0 ) > 1.0e-6 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of angle = " + RoundSigDigits( maxAngValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 90.0 in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( minLamValue < 0.1 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid minimum value of wavelength = " + RoundSigDigits( minLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames( 5 ) );
+							}
+							if ( maxLamValue > 4.0 ) {
+								ErrorsFound = true;
+								ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Invalid maximum value of wavelength = " + RoundSigDigits( maxLamValue, 2 ) + "." );
+								ShowContinueError( cAlphaFieldNames( 5 ) + " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames( 5 ) );
+							}
+						}
+					}
+				}
+				SetSameIndeVariableValues( Material( MaterNum ).GlassSpecAngTransDataPtr, Material( MaterNum ).GlassSpecAngFRefleDataPtr, Material( MaterNum ).GlassSpecAngBRefleDataPtr );
+			}
 		}
 
 		// Glass materials, alternative input: index of refraction and extinction coefficient
@@ -3124,11 +3327,11 @@ namespace HeatBalanceManager {
 			//  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
 				if ( SameString( MaterialNames( 3 ), "FixedSlatAngle" ) ) {
-					Material( MaterNum ).SlatAngleType = 0;
+					Material( MaterNum ).SlatAngleType = lscNONE;
 				} else if ( SameString( MaterialNames( 3 ), "MaximizeSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 1;
+					Material( MaterNum ).SlatAngleType = lscVBPROF;
 				} else if ( SameString( MaterialNames( 3 ), "BlockBeamSolar" ) ) {
-					Material( MaterNum ).SlatAngleType = 2;
+					Material( MaterNum ).SlatAngleType = lscVBNOBM;
 				} else {
 					Material( MaterNum ).SlatAngleType = 0;
 				}
@@ -3405,6 +3608,11 @@ namespace HeatBalanceManager {
 				SetupEMSActuator( "Material", Material( MaterNum ).Name, "Surface Property Thermal Absorptance", "[ ]", Material( MaterNum ).AbsorpThermalEMSOverrideOn, Material( MaterNum ).AbsorpThermalEMSOverride );
 				SetupEMSActuator( "Material", Material( MaterNum ).Name, "Surface Property Visible Absorptance", "[ ]", Material( MaterNum ).AbsorpVisibleEMSOverrideOn, Material( MaterNum ).AbsorpVisibleEMSOverride );
 			}
+		}
+
+		// try assigning phase change material properties for each material, won't do anything for non pcm surfaces
+		for ( auto & m : Material ) {
+			m.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory( m.Name );
 		}
 
 	}
@@ -4307,10 +4515,133 @@ namespace HeatBalanceManager {
 			} // GroupNum
 		}
 
+		GetZoneLocalEnvData( ErrorsFound );
+
 		//allocate the array the holds the predefined report data
 		ZonePreDefRep.allocate( NumOfZones );
 
 	}
+
+	void
+	GetZoneLocalEnvData( bool & ErrorsFound ) // Error flag indicator (true if errors found)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X LUO
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// load input data for Outdoor Air Node for zones
+
+		// METHODOLOGY EMPLOYED:
+		// usual E+ input processes
+
+
+		// Using/Aliasing
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::VerifyName;
+
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
+
+		using DataHeatBalance::ZoneLocalEnvironment;
+		using DataLoopNode::NodeType_Air;
+		using DataLoopNode::NodeConnectionType_Inlet;
+		using DataLoopNode::ObjectIsParent;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetZoneLocalEnvData: " );
+
+		// INTERFACE BLOCK SPECIFICATIONS:na
+		// DERIVED TYPE DEFINITIONS:na
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumAlpha;
+		int NumNumeric;
+
+		int Loop;
+		int ZoneLoop;
+		int ZoneNum; // DO loop counter for zones
+		int TotZoneEnv;
+		bool ErrorInName;
+		bool IsBlank;
+		int IOStat;
+		int NodeNum;
+
+		//-----------------------------------------------------------------------
+		//               ZoneProperty:LocalEnvironment
+		//-----------------------------------------------------------------------
+
+		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";		
+		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( TotZoneEnv > 0 ) {
+			// Check if IDD definition is correct
+			AnyLocalEnvironmentsInModel = true;
+
+			if ( !allocated( ZoneLocalEnvironment ) ) {
+				ZoneLocalEnvironment.allocate( TotZoneEnv );
+			}
+
+			for ( Loop = 1; Loop <= TotZoneEnv; ++Loop ) {
+				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				ErrorInName = false;
+				IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), ZoneLocalEnvironment, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				if ( ErrorInName ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
+					ShowContinueError( "...each ZoneProperty:LocalEnvironment name must not duplicate other SurfaceProperty:LocalEnvironment name" );
+					ErrorsFound = true;
+					continue;
+				}
+
+				ZoneLocalEnvironment( Loop ).Name = cAlphaArgs( 1 );
+
+				// Assign zone number
+				ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+				if ( ZoneNum == 0 ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
+					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding zone has been found in the input file." );
+					ErrorsFound = true;
+				}
+				else {
+					ZoneLocalEnvironment( Loop ).ZonePtr = ZoneNum;
+				}
+
+				//Assign outdoor air node number;
+				NodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+				if ( NodeNum == 0 && CheckOutAirNodeNumber( NodeNum ) ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 3 ) + " has been found." );
+					ShowContinueError( cAlphaFieldNames( 3 ) + " entered value = \"" + cAlphaArgs( 3 ) + "\" no corresponding schedule has been found in the input file." );
+					ErrorsFound = true;
+				}
+				else {
+					ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr = NodeNum;
+				}
+			}
+		}
+		// Link zone properties to zone object
+		for ( ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) {
+			for ( Loop = 1; Loop <= TotZoneEnv; ++Loop ) {
+				if ( ZoneLocalEnvironment( Loop ).ZonePtr == ZoneLoop ) {
+					if ( ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
+						Zone( ZoneLoop ).HasLinkedOutAirNode = true;
+						Zone( ZoneLoop ).LinkedOutAirNode = ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr;
+						
+					}
+				}
+			}
+		}
+	}
+
 
 	void
 	ProcessZoneData(
@@ -4458,6 +4789,8 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wind Direction [degree]", Zone( ZoneLoop ).WindDir, "Zone", "Average", Zone( ZoneLoop ).Name );
+
 
 		if ( FlagHybridModel ){
 			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
@@ -4497,6 +4830,8 @@ namespace HeatBalanceManager {
 		using namespace ConductionTransferFunctionCalc;
 		using namespace WindowManager;
 		using namespace SolarShading;
+		using DataLoopNode::Node;
+		using OutAirNodeManager::SetOutAirNodes;
 		using DaylightingDevices::InitDaylightingDevices;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		//  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -4518,6 +4853,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StormWinNum; // Number of StormWindow object
 		int SurfNum; // Surface number
+		int ZoneNum;
 		static bool ChangeSet( true ); // Toggle for checking storm windows
 
 		// FLOW:
@@ -4582,6 +4918,10 @@ namespace HeatBalanceManager {
 			}
 		}
 
+		if ( BeginSimFlag && DataSystemVariables::ReportExtShadingSunlitFrac ) {
+			OpenShadingFile();
+		}
+
 		if ( BeginDayFlag ) {
 			if ( ! WarmupFlag ) {
 				if ( DayOfSim == 1 ) {
@@ -4599,6 +4939,56 @@ namespace HeatBalanceManager {
 		if ( DetailedSolarTimestepIntegration ) { // always redo solar calcs
 			PerformSolarCalculations();
 		}
+
+		// Initialize zone outdoor environmental variables
+		// Bulk Initialization for Temperatures & WindSpeed
+		// using the zone, modify the zone  Dry/Wet BulbTemps
+		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
+
+		// set zone level wind dir to global value
+		SetZoneWindSpeedAt();
+		SetZoneWindDirAt();
+
+		// Set zone data to linked air node value if defined.
+		if ( AnyLocalEnvironmentsInModel ) {
+			SetOutAirNodes();
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum != 0 ) {
+						Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum != 0 ) {
+						Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum != 0 ) {
+						Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum != 0 ) {
+						Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
+					}
+				}
+			}
+		}
+
+		// Overwriting surface and zone level environmental data with EMS override value 
+		if ( AnyEnergyManagementSystemInModel ) {
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				if ( Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn ) {
+					Zone( ZoneNum ).OutDryBulbTemp = Zone( ZoneNum ).OutDryBulbTempEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).OutWetBulbTempEMSOverrideOn ) {
+					Zone( ZoneNum ).OutWetBulbTemp = Zone( ZoneNum ).OutWetBulbTempEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).WindSpeedEMSOverrideOn ) {
+					Zone( ZoneNum ).WindSpeed = Zone( ZoneNum ).WindSpeedEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).WindDirEMSOverrideOn ) {
+					Zone( ZoneNum ).WindDir = Zone( ZoneNum ).WindDirEMSOverrideValue;
+				}
+			}
+		}
+
 
 	}
 
@@ -4695,6 +5085,7 @@ namespace HeatBalanceManager {
 		MCPTE.dimension( NumOfZones, 0.0 );
 		MCPE.dimension( NumOfZones, 0.0 );
 		EAMFL.dimension( NumOfZones, 0.0 );
+		EAMFLxHumRat.dimension( NumOfZones, 0.0 );
 		MCPTC.dimension( NumOfZones, 0.0 );
 		MCPC.dimension( NumOfZones, 0.0 );
 		CTMFL.dimension( NumOfZones, 0.0 );
@@ -5128,6 +5519,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
 		static gio::Fmt EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
+		static gio::Fmt EndOfDataFormat( "(\"End of Data\")" ); // Signifies the end of the data block in the output file
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5137,12 +5529,12 @@ namespace HeatBalanceManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  LOGICAL, SAVE :: PrintEnvrnStamp=.FALSE.
-
 		// FLOW:
 
 		// Time step level reporting:
 
 		ReportScheduleValues();
+		
 		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
@@ -5192,6 +5584,41 @@ namespace HeatBalanceManager {
 
 	//        End of Reporting subroutines for the HB Module
 
+	void
+	OpenShadingFile()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X Luo
+		//       DATE WRITTEN   August 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Open and set up headers for a external shading fraction export file.
+
+		// Using/Aliasing
+		using DataSurfaces::Surface;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int write_stat;
+		int SurfNum;
+		static gio::Fmt ShdFracFmtName("(A, A)");
+		static gio::Fmt fmtN("('\n')");
+
+		OutputFileShadingFrac = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags ); write_stat = flags.ios(); }
+		if ( write_stat != 0 ) {
+			ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write)." );
+		}
+		gio::write( OutputFileShadingFrac, fmtA ) << "This file contains external shading fractions for all shading surfaces of all zones.";
+		{ IOFlags flags; flags.ADVANCE("No"); gio::write( OutputFileShadingFrac, fmtA, flags ) << "Surface Name,"; }
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			{ IOFlags flags; flags.ADVANCE("No"); gio::write( OutputFileShadingFrac, ShdFracFmtName, flags ) << Surface( SurfNum ).Name << ","; }
+		}
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, fmtN, flags ); }
+
+	}
 	void
 	GetFrameAndDividerData( bool & ErrorsFound ) // set to true if errors found in input
 	{

@@ -117,6 +117,9 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
 	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	Node.allocate( 5 );
 
@@ -149,6 +152,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL.allocate( 1 );
 	VAMFL.allocate( 1 );
 	EAMFL.allocate( 1 );
+	EAMFLxHumRat.allocate( 1 );
 	CTMFL.allocate( 1 );
 
 	SumHmARaW.allocate( 1 );
@@ -173,6 +177,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	Node( 3 ).MassFlowRate = 0.00; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.03; // Zone return node
 	Node( 4 ).HumRat = 0.000;
@@ -181,6 +186,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.008;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -198,6 +204,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.01; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -206,6 +213,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -223,6 +231,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.02;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.03; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -231,6 +240,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.02 * 0.008;
@@ -248,6 +258,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Node( 2 ).HumRat = 0.008;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.02;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	ZoneEquipConfig( 1 ).ZoneExh = Node( 3 ).MassFlowRate;
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.01; // Zone return node
 	Node( 4 ).HumRat = ZoneW1( 1 );
@@ -256,6 +267,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL( 1 ) = 0.0;
 	VAMFL( 1 ) = 0.0;
 	EAMFL( 1 ) = 0.0;
+	EAMFLxHumRat( 1 ) = 0.0;
 	CTMFL( 1 ) = 0.0;
 	OutHumRat = 0.004;
 	MixingMassFlowXHumRat( 1 ) = 0.0;
@@ -263,7 +275,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MDotOA( 1 ) = 0.0;
 
 	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
-	EXPECT_FALSE( (0.008 == Node( 5 ).HumRat) );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
+
+	// Add a section to check #6119 by L. Gu on 5/16/17
+	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Deallocate everything
 	ZoneEquipConfig( 1 ).InletNode.deallocate();
@@ -281,6 +297,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	OAMFL.deallocate();
 	VAMFL.deallocate();
 	EAMFL.deallocate();
+	EAMFLxHumRat.deallocate();
 	CTMFL.deallocate();
 	SumHmARaW.deallocate();
 	SumHmARa.deallocate();
@@ -1082,6 +1099,156 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	TempEffBulkAir.deallocate( );
 	Node.deallocate( );
 	DataHeatBalSurface::TempSurfInTmp.deallocate( );
+
+}
+
+TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest )
+{
+	// AUTHOR: L. Gu, FSEC
+	// DATE WRITTEN: Jun. 2017
+	// #5870 EMS actuators for Zone Temperature Control not working
+
+	NumTempControlledZones = 1;
+	NumComfortControlledZones = 0;
+	TempControlledZone.allocate( 1 );
+	TempControlledZone( 1 ).EMSOverrideHeatingSetPointOn = true;
+	TempControlledZone( 1 ).EMSOverrideCoolingSetPointOn = true;
+	TempControlledZone( 1 ).ActualZoneNum = 1;
+	TempControlledZone( 1 ).EMSOverrideHeatingSetPointValue = 23;
+	TempControlledZone( 1 ).EMSOverrideCoolingSetPointValue = 26;
+
+	TempControlType.allocate( 1 );
+	TempZoneThermostatSetPoint.allocate( 1 );
+	ZoneThermostatSetPointLo.allocate( 1 );
+	ZoneThermostatSetPointHi.allocate( 1 );
+	TempControlType( 1 ) = DualSetPointWithDeadBand;
+
+	OverrideAirSetPointsforEMSCntrl( );
+	EXPECT_EQ( 23.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+
+	NumTempControlledZones = 0;
+	NumComfortControlledZones = 1;
+	ComfortControlledZone.allocate( 1 );
+	ComfortControlType.allocate( 1 );
+	ComfortControlledZone( 1 ).ActualZoneNum = 1;
+	ComfortControlledZone( 1 ).EMSOverrideHeatingSetPointOn = true;
+	ComfortControlledZone( 1 ).EMSOverrideCoolingSetPointOn = true;
+	ComfortControlType( 1 ) = DualSetPointWithDeadBand;
+	ComfortControlledZone( 1 ).EMSOverrideHeatingSetPointValue = 22;
+	ComfortControlledZone( 1 ).EMSOverrideCoolingSetPointValue = 25;
+
+	OverrideAirSetPointsforEMSCntrl( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 25.0, ZoneThermostatSetPointHi( 1 ) );
+
+}
+
+TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
+{
+	// J.Glazer - August 2017
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.7;",
+		" ",
+		"ScheduleTypeLimits,",
+		"  Any Number;              !- Name",
+		" ",
+		"Schedule:Compact,",
+		" Sched1,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 20.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" Sched2,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 1/31,            !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 24.0,        !- Field 26",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 26.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" Sched3,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 1/31,            !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 09:00, 24.0,        !- Field 26",
+		" Until: 17:00, 26.0,        !- Field 26",
+		" Until: 24:00, 24.0,        !- Field 26",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 26.0;        !- Field 26",
+
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 15;
+	DataEnvironment::CurrentYearIsLeapYear = false;
+
+	Real64 valueAtTime;
+	int numDays;
+	std::string monthAssumed;
+	const int wednesday = 4;
+
+	DataEnvironment::Latitude = 30.; //northern hemisphere
+	int sched1Index = GetScheduleIndex( "SCHED1" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 20, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	// test month selected based on hemisphere and isSummer flag.
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, true, wednesday, 11 );
+	EXPECT_EQ( "July", monthAssumed );
+
+	DataEnvironment::Latitude = -30.; //southern hemisphere
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, false, wednesday, 11 );
+	EXPECT_EQ( "July", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, true, wednesday, 11 );
+	EXPECT_EQ( "January", monthAssumed );
+
+	DataEnvironment::Latitude = 30.; //northern hemisphere
+	int sched2Index = GetScheduleIndex( "SCHED2" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched2Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 24, valueAtTime );
+	EXPECT_EQ( 31, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched2Index, true, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 334, numDays );
+	EXPECT_EQ( "July", monthAssumed );
+
+	int sched3Index = GetScheduleIndex( "SCHED3" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, true, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "July", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, false, wednesday, 19 );
+
+	EXPECT_EQ( 24, valueAtTime );
+	EXPECT_EQ( 31, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
 
 }
 

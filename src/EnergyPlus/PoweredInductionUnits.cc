@@ -148,7 +148,13 @@ namespace PoweredInductionUnits {
 
 	// MODULE VARIABLE DECLARATIONS:
 	Array1D_bool CheckEquipName;
-	bool GetPIUInputFlag( true ); // First time, input is "gotten"
+
+	namespace {
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetPIUInputFlag( true ); // First time, input is "gotten"
+	}
 
 	int NumPIUs( 0 );
 	int NumSeriesPIUs( 0 );
@@ -156,6 +162,16 @@ namespace PoweredInductionUnits {
 
 	// Object Data
 	Array1D< PowIndUnitData > PIU;
+
+	void
+	clear_state()
+	{
+		NumPIUs = 0;
+		NumSeriesPIUs = 0;
+		NumParallelPIUs = 0;
+		GetPIUInputFlag = true;
+		PIU.deallocate();
+	}
 
 	void
 	SimPIU(
@@ -231,6 +247,7 @@ namespace PoweredInductionUnits {
 			}
 		}
 
+		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum;
 		// initialize the unit
 		InitPIU( PIUNum, FirstHVACIteration );
 
@@ -456,25 +473,39 @@ namespace PoweredInductionUnits {
 			// Register component set data
 			TestCompSet( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, NodeID( PIU( PIUNum ).PriAirInNode ), NodeID( PIU( PIUNum ).OutAirNode ), "Air Nodes" );
 
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
 			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
-						AirNodeFound = true;
-						break;
-					}
+			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
+				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
+					PIU( PIUNum ).ADUNum = ADUNum;
 				}
 			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " Unit = " + PIU( PIUNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs( 5 ) );
+			// one assumes if there isn't one assigned, it's an error?
+			if ( PIU( PIUNum ).ADUNum == 0 ) {
+				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for PIU = [" + PIU( PIUNum ).UnitType + ',' + PIU( PIUNum ).Name + "]." );
+				ShowContinueError( "...should have outlet node = " + NodeID( PIU( PIUNum ).OutAirNode ) );
 				ErrorsFound = true;
-			}
+			} else {
 
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							AirNodeFound = true;
+							break;
+						}
+					}
+				}
+				if ( ! AirNodeFound ) {
+					ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " Unit = " + PIU( PIUNum ).Name );
+					ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs( 5 ) );
+					ErrorsFound = true;
+				}
+			}
 		}
 
 		for ( PIUIndex = 1; PIUIndex <= NumParallelPIUs; ++PIUIndex ) {
@@ -603,27 +634,7 @@ namespace PoweredInductionUnits {
 			// Register component set data
 			TestCompSet( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, NodeID( PIU( PIUNum ).PriAirInNode ), NodeID( PIU( PIUNum ).OutAirNode ), "Air Nodes" );
 
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
 			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
-						AirNodeFound = true;
-					}
-				}
-			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " Unit = " + PIU( PIUNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs( 5 ) );
-				ErrorsFound = true;
-			}
-
-		}
-
-		for ( PIUNum = 1; PIUNum <= NumPIUs; ++PIUNum ) {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					//      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
@@ -634,7 +645,28 @@ namespace PoweredInductionUnits {
 			if ( PIU( PIUNum ).ADUNum == 0 ) {
 				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for PIU = [" + PIU( PIUNum ).UnitType + ',' + PIU( PIUNum ).Name + "]." );
 				ShowContinueError( "...should have outlet node = " + NodeID( PIU( PIUNum ).OutAirNode ) );
-				//          ErrorsFound=.TRUE.
+				ErrorsFound = true;
+			} else {
+
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				AirNodeFound = false;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							AirNodeFound = true;
+						}
+					}
+				}
+				if ( ! AirNodeFound ) {
+					ShowSevereError( "The outlet air node from the " + cCurrentModuleObject + " Unit = " + PIU( PIUNum ).Name );
+					ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node = " + cAlphaArgs( 5 ) );
+					ErrorsFound = true;
+				}
 			}
 		}
 
@@ -935,14 +967,14 @@ namespace PoweredInductionUnits {
 		if ( PIU( PIUNum ).MaxPriAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( PIU( PIUNum ).MaxPriAirVolFlow > 0.0 ) {
 					ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "User-Specified Maximum Primary Air Flow Rate [m3/s]", PIU( PIUNum ).MaxPriAirVolFlow );
 				}
 			} else {
 				CheckZoneSizing( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name );
-				MaxPriAirVolFlowDes = max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+				MaxPriAirVolFlowDes = max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow );
 				if ( MaxPriAirVolFlowDes < SmallAirVolFlow ) {
 					MaxPriAirVolFlowDes = 0.0;
 				}
@@ -972,14 +1004,14 @@ namespace PoweredInductionUnits {
 		if ( PIU( PIUNum ).MaxTotAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( PIU( PIUNum ).MaxTotAirVolFlow > 0.0 ) {
 					ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "User-Specified Maximum Air Flow Rate [m3/s]", PIU( PIUNum ).MaxTotAirVolFlow );
 				}
 			} else {
 				CheckZoneSizing( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name );
-				MaxTotAirVolFlowDes = max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+				MaxTotAirVolFlowDes = max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow );
 				if ( MaxTotAirVolFlowDes < SmallAirVolFlow ) {
 					MaxTotAirVolFlowDes = 0.0;
 				}
@@ -1008,14 +1040,14 @@ namespace PoweredInductionUnits {
 		if ( PIU( PIUNum ).MaxSecAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( PIU( PIUNum ).MaxSecAirVolFlow > 0.0 ) {
 					ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "User-Specified Maximum Secondary Air Flow Rate [m3/s]", PIU( PIUNum ).MaxSecAirVolFlow );
 				}
 			} else {
 				CheckZoneSizing( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name );
-				MaxSecAirVolFlowDes = max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+				MaxSecAirVolFlowDes = max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow );
 				if ( MaxSecAirVolFlowDes < SmallAirVolFlow ) {
 					MaxSecAirVolFlowDes = 0.0;
 				}
@@ -1044,15 +1076,15 @@ namespace PoweredInductionUnits {
 		if ( PIU( PIUNum ).MinPriAirFlowFrac == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( PIU( PIUNum ).MinPriAirFlowFrac > 0.0 ) {
 					ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "User-Specified Minimum Primary Air Flow Fraction", PIU( PIUNum ).MinPriAirFlowFrac );
 				}
 			} else {
 				CheckZoneSizing( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name );
-				if ( PIU( PIUNum ).MaxPriAirVolFlow >= SmallAirVolFlow && TermUnitFinalZoneSizing( CurZoneEqNum ).MinOA >= SmallAirVolFlow ) {
-					MinPriAirFlowFracDes = TermUnitFinalZoneSizing( CurZoneEqNum ).MinOA / PIU( PIUNum ).MaxPriAirVolFlow;
+				if ( PIU( PIUNum ).MaxPriAirVolFlow >= SmallAirVolFlow && TermUnitFinalZoneSizing( CurTermUnitSizingNum ).MinOA >= SmallAirVolFlow ) {
+					MinPriAirFlowFracDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).MinOA / PIU( PIUNum ).MaxPriAirVolFlow;
 				} else {
 					MinPriAirFlowFracDes = 0.0;
 				}
@@ -1077,12 +1109,12 @@ namespace PoweredInductionUnits {
 			}
 		}
 
-		if ( CurZoneEqNum > 0 ) {
+		if ( CurTermUnitSizingNum > 0 ) {
 			{ auto const SELECT_CASE_var( PIU( PIUNum ).UnitType_Num );
 			if ( SELECT_CASE_var == SingleDuct_SeriesPIU_Reheat ) {
-				TermUnitSizing( CurZoneEqNum ).AirVolFlow = PIU( PIUNum ).MaxTotAirVolFlow;
+				TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = PIU( PIUNum ).MaxTotAirVolFlow;
 			} else if ( SELECT_CASE_var == SingleDuct_ParallelPIU_Reheat ) {
-				TermUnitSizing( CurZoneEqNum ).AirVolFlow = PIU( PIUNum ).MaxSecAirVolFlow + PIU( PIUNum ).MinPriAirFlowFrac * PIU( PIUNum ).MaxPriAirVolFlow;
+				TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = PIU( PIUNum ).MaxSecAirVolFlow + PIU( PIUNum ).MinPriAirFlowFrac * PIU( PIUNum ).MaxPriAirVolFlow;
 			}}
 		}
 
@@ -1123,7 +1155,7 @@ namespace PoweredInductionUnits {
 		if ( PIU( PIUNum ).MaxVolHotWaterFlow == AutoSize ) { //.or.()) THEN
 			IsAutoSize = true;
 		}
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( PIU( PIUNum ).MaxVolHotWaterFlow > 0.0 ) {
 					ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "User-Specified Maximum Reheat Water Flow Rate [m3/s]", PIU( PIUNum ).MaxVolHotWaterFlow );
@@ -1138,11 +1170,11 @@ namespace PoweredInductionUnits {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", PIU( PIUNum ).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						if ( PltSizHeatNum > 0 ) {
 
-							if ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-								CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU * PIU( PIUNum ).MinPriAirFlowFrac + TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak * ( 1.0 - PIU( PIUNum ).MinPriAirFlowFrac );
-								CoilOutTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-								CoilOutHumRat = TermUnitFinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-								DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
+							if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
+								CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * PIU( PIUNum ).MinPriAirFlowFrac + TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak * ( 1.0 - PIU( PIUNum ).MinPriAirFlowFrac );
+								CoilOutTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesTemp;
+								CoilOutHumRat = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesHumRat;
+								DesMassFlow = StdRhoAir * TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow;
 								DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 
 								rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
@@ -1161,8 +1193,8 @@ namespace PoweredInductionUnits {
 					if ( IsAutoSize ) {
 						PIU( PIUNum ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes );
-						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
-						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
+						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInHumRatTU );
 					} else { // Hardsize with sizing data
 						if ( PIU( PIUNum ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = PIU( PIUNum ).MaxVolHotWaterFlow;
@@ -1188,7 +1220,7 @@ namespace PoweredInductionUnits {
 		if ( PIU( PIUNum ).MaxVolHotSteamFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) )  {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( PIU( PIUNum ).MaxVolHotWaterFlow > 0.0 ) {
 					ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", PIU( PIUNum ).MaxVolHotWaterFlow );
@@ -1202,11 +1234,11 @@ namespace PoweredInductionUnits {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Steam", PIU( PIUNum ).HCoil, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound );
 						if ( PltSizHeatNum > 0 ) {
 
-							if ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-								CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU * PIU( PIUNum ).MinPriAirFlowFrac + TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak * ( 1.0 - PIU( PIUNum ).MinPriAirFlowFrac );
-								CoilOutTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-								CoilOutHumRat = TermUnitFinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-								DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
+							if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
+								CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * PIU( PIUNum ).MinPriAirFlowFrac + TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak * ( 1.0 - PIU( PIUNum ).MinPriAirFlowFrac );
+								CoilOutTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesTemp;
+								CoilOutHumRat = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesHumRat;
+								DesMassFlow = StdRhoAir * TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow;
 								DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 								TempSteamIn = 100.00;
 								EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, PIU( PIUNum ).HCoil_FluidIndex, RoutineName );
@@ -1248,13 +1280,13 @@ namespace PoweredInductionUnits {
 			}
 		}
 
-		if ( CurZoneEqNum > 0 ) {
-			TermUnitSizing( CurZoneEqNum ).MinFlowFrac = PIU( PIUNum ).MinPriAirFlowFrac;
-			TermUnitSizing( CurZoneEqNum ).MaxHWVolFlow = PIU( PIUNum ).MaxVolHotWaterFlow;
-			TermUnitSizing( CurZoneEqNum ).MaxSTVolFlow = PIU( PIUNum ).MaxVolHotSteamFlow;
-			TermUnitSizing( CurZoneEqNum ).InducesPlenumAir = PIU( PIUNum ).InducesPlenumAir;
+		if ( CurTermUnitSizingNum > 0 ) {
+			TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac = PIU( PIUNum ).MinPriAirFlowFrac;
+			TermUnitSizing( CurTermUnitSizingNum ).MaxHWVolFlow = PIU( PIUNum ).MaxVolHotWaterFlow;
+			TermUnitSizing( CurTermUnitSizingNum ).MaxSTVolFlow = PIU( PIUNum ).MaxVolHotSteamFlow;
+			TermUnitSizing( CurTermUnitSizingNum ).InducesPlenumAir = PIU( PIUNum ).InducesPlenumAir;
 			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_SimpleHeating ) {
-				SetCoilDesFlow( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
+				SetCoilDesFlow( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow, ErrorsFound );
 			}
 		}
 

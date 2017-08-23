@@ -1552,6 +1552,13 @@ namespace MixedAir {
 						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
 					}
+				} else if ( SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONDESIGNOARATE" ) { // Proportional Control based on design OA rate
+					thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOARate;
+					if ( !Contaminant.CO2Simulation ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
+						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+						ErrorsFound = true;
+					}
 				} else if ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDUREGENERICCONTAMINANT" ) { // Indoor Air Quality Procedure based on generic contaminant setpoint
 					thisVentilationMechanical.SystemOAMethod = SOAM_IAQPGC;
 					if ( ! Contaminant.GenericContamSimulation ) {
@@ -1646,6 +1653,7 @@ namespace MixedAir {
 				thisVentilationMechanical.ZoneOAACHRate.dimension( MechVentZoneCount, 0.0 );
 				thisVentilationMechanical.ZoneOAFlowMethod.dimension( MechVentZoneCount, 0 );
 				thisVentilationMechanical.ZoneOASchPtr.dimension( MechVentZoneCount, 0 );
+				thisVentilationMechanical.OAPropCtlMinRateSchPtr.dimension( MechVentZoneCount, 0 );
 
 				// added for new DCV, 2/12/2009
 				thisVentilationMechanical.ZoneADEffCooling.dimension( MechVentZoneCount, 1.0 );
@@ -1768,6 +1776,14 @@ namespace MixedAir {
 						thisVentilationMechanical.ZoneOAACHRate( ventMechZoneNum ) = curOARequirements.OAFlowACH;
 						thisVentilationMechanical.ZoneOAFlowMethod( ventMechZoneNum ) = curOARequirements.OAFlowMethod;
 						thisVentilationMechanical.ZoneOASchPtr( ventMechZoneNum ) = curOARequirements.OAFlowFracSchPtr;
+						thisVentilationMechanical.OAPropCtlMinRateSchPtr( ventMechZoneNum ) = curOARequirements.OAPropCtlMinRateSchPtr;
+						if ( thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+							if ( thisVentilationMechanical.ZoneOAPeopleRate( ventMechZoneNum ) == 0.0 && thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) == 0.0 ) {
+								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid input with System Outdoor Air Method = ProportionalControlBasedOnDesignOARate." );
+								ShowContinueError( " The values of Outdoor Air Flow per Person and Outdoor Air Flow per Zone Floor Area in the same object can not be zero." );
+								ErrorsFound = true;
+							}
+						}
 					} else { // use defaults
 						thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) = 0.0;
 						// since this is case with no DesSpcOA object, cannot determine the method and default would be Flow/Person which should default to this flow rate
@@ -1912,6 +1928,8 @@ namespace MixedAir {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedonOccupancySchedule,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedOnDesignOccupancy,"; }
+				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedOnDesignOARate,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQPGC ) {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "IndoorAirQualityGenericContaminant,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQPCOM ) {
@@ -3753,7 +3771,7 @@ namespace MixedAir {
 				}
 
 				// get system supply air flow rate
-				if ( this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+				if ( this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
 
 					// System supply air flow rate is always greater than or equal the system outdoor air flow rate
 					if ( ( SysSA > 0.0 ) && ( SysSA < ( SysOAuc * StdRhoAir ) ) ) SysSA = SysOAuc * StdRhoAir;
@@ -3849,7 +3867,7 @@ namespace MixedAir {
 							// the VRP case
 							ZoneOA = ZoneOABZ / ZoneEz;
 
-						} else if ( this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+						} else if ( this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
 							// Check whether "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController is specified
 							if ( curZone.ZoneContamControllerSchedIndex > 0.0 ) {
 								// Check the availability schedule value for ZoneControl:ContaminantController
@@ -3857,6 +3875,26 @@ namespace MixedAir {
 								if ( ZoneContamControllerSched > 0.0 ) {
 									ZoneOAMin = ZoneOAArea / ZoneEz;
 									ZoneOAMax = ( ZoneOAArea + ZoneOAPeople ) / ZoneEz;
+									if ( this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+										ZoneOAMax = ZoneOABZ / ZoneEz;
+										if ( this->OAPropCtlMinRateSchPtr( ZoneIndex ) > 0 ) {
+											ZoneOAMin = ZoneOAMax * GetCurrentScheduleValue( this->OAPropCtlMinRateSchPtr( ZoneIndex ) );
+										} else {
+											ZoneOAMin = ZoneOAMax;
+										}
+										if ( ZoneOAMax < ZoneOAMin ) {
+											ZoneOAMin = ZoneOAMax;
+											++this->OAMaxMinLimitErrorCount;
+											if ( this->OAMaxMinLimitErrorCount < 2 ) {
+												ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + this->Name + "\"." );
+												ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone outdoor air rate (" + RoundSigDigits( ZoneOAMax, 4 ) + "), is not greater than minimum zone outdoor air rate (" + RoundSigDigits( ZoneOAMin, 4 ) + ")." );
+												ShowContinueError( " The minimum zone outdoor air rate is set to the maximum zone outdoor air rate. Simulation continues..." );
+												ShowContinueErrorTimeStamp( "" );
+											} else {
+												ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + this->Name + "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone outdoor air rate is not greater than minimum zone outdoor air rate. Error continues...", this->OAMaxMinLimitErrorIndex );
+											}
+										}
+									}
 
 									if ( ZoneOAPeople > 0.0 ) {
 										if ( ZoneCO2GainFromPeople( ZoneNum ) > 0.0 ) {
@@ -3871,6 +3909,8 @@ namespace MixedAir {
 											// Calculate zone maximum target CO2 concentration in PPM
 											if ( this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
 												ZoneMaxCO2 = OutdoorCO2 + ( CO2PeopleGeneration * curZone.Multiplier * curZone.ListMultiplier * 1.0e6 ) / ZoneOAMax;
+											} else if ( curZone.ZoneMaxCO2SchedIndex > 0.0 ) {
+												ZoneMaxCO2 = GetCurrentScheduleValue( curZone.ZoneMaxCO2SchedIndex );
 											} else {
 												ZoneMaxCO2 = OutdoorCO2 + ( ZoneCO2GainFromPeople( ZoneNum ) * curZone.Multiplier * curZone.ListMultiplier * 1.0e6 ) / ZoneOAMax;
 											}
@@ -3895,6 +3935,17 @@ namespace MixedAir {
 														ShowContinueErrorTimeStamp( "" );
 													} else {
 														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + this->Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", this->CO2MaxMinLimitErrorIndex );
+													}
+												}
+												if ( this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+													if ( this->CO2MaxMinLimitErrorCount < 2 ) {
+														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + this->Name + "\"." );
+														ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+														ShowContinueError( "\"ProportionalControlBasedOnDesignOARate\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+														ShowContinueErrorTimeStamp( "" );
+													}
+													else {
+														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + this->Name + "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", this->CO2MaxMinLimitErrorIndex );
 													}
 												}
 
@@ -4047,7 +4098,7 @@ namespace MixedAir {
 					if ( SysEv <= 0.0 ) SysEv = 1.0;
 
 					// Calc system outdoor air requirement
-					if ( this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+					if ( this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
 						SysOA = SysOA / SysEv;
 					} else {
 						SysOA = SysOAuc / SysEv;
@@ -4076,7 +4127,7 @@ namespace MixedAir {
 		using DataAirLoop::OutsideAirSys;
 		using DataLoopNode::Node;
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using SetPointManager::GetCoilFreezingCheckFlag;
 
 		static std::string const RoutineName("CalcOAEconomizer: ");
@@ -4277,7 +4328,7 @@ namespace MixedAir {
 					Par( 2 ) = this->RetNode;
 					Par( 3 ) = this->InletNode;
 					Par( 4 ) = this->MixMassFlow;
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
+					SolveRoot( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
 					if( SolFla < 0 ) {
 						OASignal = OutAirSignal;
 					}
@@ -4313,7 +4364,7 @@ namespace MixedAir {
 						if( FirstHVACIteration ) Par( 5 ) = 1.0;
 						Par( 6 ) = double( AirLoopNum );
 
-						SolveRegulaFalsi( ( Acc / 10.0 ), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par );
+						SolveRoot( ( Acc / 10.0 ), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par );
 						if( SolFla < 0 ) { // if RegulaFalsi fails to find a solution, returns -1 or -2, set to existing OutAirSignal
 							OASignal = OutAirSignal;
 						}
@@ -4326,7 +4377,7 @@ namespace MixedAir {
 				Par( 2 ) = this->RetNode;
 				Par( 3 ) = this->InletNode;
 				Par( 4 ) = this->MixMassFlow;
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
+				SolveRoot( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
 				if( SolFla < 0 ) {
 					OASignal = OutAirSignal;
 				}

@@ -2286,9 +2286,9 @@
 
   Construction,
     Light Exterior Wall,     !- Name
-    I02 50mm insulation board,  !- Layer 2
-    F04 Wall air space resistance,  !- Layer 3
-    G01a 19mm gypsum board;  !- Layer 4
+    I02 50mm insulation board,  !- Outside Layer
+    F04 Wall air space resistance,  !- Layer 2
+    G01a 19mm gypsum board;  !- Layer 3
 
   Construction,
     Light Roof/Ceiling,      !- Name
@@ -2485,10 +2485,10 @@
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.095983,6.096017,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,6.096,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,3.048,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,0,3.048,  !- X,Y,Z ==> Vertex 2 {m}
+    6.095983,6.096017,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,3.048;  !- X,Y,Z ==> Vertex 4 {m}
 
 ! =========================
 
@@ -2552,6 +2552,7 @@
     ,                        !- Availability Schedule Name
     SouthZone-Inlet,         !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     48.88889,                !- Maximum Heating Supply Air Temperature {C}
     48.88889,                !- Minimum Cooling Supply Air Temperature {C}
     7.202976E-02,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

@@ -459,6 +459,38 @@
     0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
     0.0000000E+00,0.0000000E+00,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR SLAB 8 IN,         !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zn001:Flr001,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF34,                  !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,0,4.572,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,15.24,4.572,  !- X,Y,Z ==> Vertex 3 {m}
+    0,15.24,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
   ZoneControl:Thermostat,
     Zone 1 Thermostat,       !- Name
     ZONE ONE,                !- Zone or ZoneList Name
@@ -496,6 +528,7 @@
     ,                        !- Availability Schedule Name
     NODE_1,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

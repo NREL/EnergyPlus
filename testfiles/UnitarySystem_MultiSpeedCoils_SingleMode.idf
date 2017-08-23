@@ -1476,7 +1476,7 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    Fan:SystemModel,               !- Supply Fan Object Type
+    Fan:SystemModel,         !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     CyclingFanSchedule,      !- Supply Air Fan Operating Mode Schedule Name
@@ -1486,7 +1486,7 @@
     Coil:Cooling:DX:MultiSpeed,  !- Cooling Coil Object Type
     Heat Pump ACDXCoil 2,    !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
@@ -1528,6 +1528,7 @@
     4,                       !- Number of Speeds for Heating
     4,                       !- Number of Speeds for Cooling
     Yes,                     !- Single Mode Operation
+    ,                        !- No Load Supply Air Flow Rate Ratio
     0.24,                    !- Heating Speed 1 Supply Air Flow Ratio
     0.24,                    !- Cooling Speed 1 Supply Air Flow Ratio
     0.47,                    !- Heating Speed 2 Supply Air Flow Ratio
@@ -1625,25 +1626,23 @@
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
-
-Fan:SystemModel,
-  Supply Fan 1, !- Name
-   FanAndCoilAvailSched , !- Availability Schedule Name
-  Mixed Air Node,  !- Air Inlet Node Name
-  DX Cooling Coil Air Inlet Node,  !- Air Outlet Node Name
-  1.7 , !- Design Maximum Air Flow Rate
-  Continuous , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.7,  !- Fan Total Efficiency 
-  PowerRatioCurve; !- Electric Power Function of Flow Fraction Curve Name
-
+  Fan:SystemModel,
+    Supply Fan 1,            !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Mixed Air Node,          !- Air Inlet Node Name
+    DX Cooling Coil Air Inlet Node,  !- Air Outlet Node Name
+    1.7,                     !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7,                     !- Fan Total Efficiency
+    PowerRatioCurve;         !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:DX:MultiSpeed,
     Heat Pump DX Heating Coil 2,  !- Name
@@ -2028,6 +2027,7 @@ Fan:SystemModel,
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Outdoor Condenser Air Node,  !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
