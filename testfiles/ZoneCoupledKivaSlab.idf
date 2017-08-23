@@ -362,6 +362,16 @@
     10.0,0.0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
     10.0,10.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
+  SurfaceProperty:ExposedFoundationPerimeter,
+    Zone Floor,              !- Surface Name
+    BySegment,               !- Exposed Perimeter Calculation Method
+    ,                        !- Total Exposed Perimeter {m}
+    ,                        !- Exposed Perimeter Fraction {dimensionless}
+    Yes,                     !- Surface Segment 1 Exposed
+    Yes,                     !- Surface Segment 2 Exposed
+    Yes,                     !- Surface Segment 3 Exposed
+    Yes;                     !- Surface Segment 4 Exposed
+
   BuildingSurface:Detailed,
     Zone Floor,              !- Name
     Floor,                   !- Surface Type
@@ -406,7 +416,7 @@
     0.9,                     !- Ground Thermal Absorptivity {dimensionless}
     0.03,                    !- Ground Surface Roughness {m}
     40,                      !- Far-Field Width {m}
-    Autocalculate;           !- Deep-Ground Boundary Condition
+    Autoselect;           !- Deep-Ground Boundary Condition
 
 !***********************************************************
 !****** IDEAL AIR SYSTEM************************************
@@ -512,4 +522,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-

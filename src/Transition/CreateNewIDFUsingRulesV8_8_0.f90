@@ -67,6 +67,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
   INTEGER IoS
   INTEGER DotPos
+  INTEGER Status
   INTEGER NA
   INTEGER NN
   INTEGER CurArgs
@@ -97,6 +98,20 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL LatestVersion
   CHARACTER(len=10) :: LocalFileExtension=' '
   LOGICAL :: WildMatch
+
+  ! For exposed foundation perimeter objects
+  INTEGER NumPerimObjs
+  INTEGER PArgs
+  INTEGER PerimNum
+  CHARACTER(len=MaxNameLength*2), ALLOCATABLE, DIMENSION(:) :: PFldNames
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: PFldDefaults
+  CHARACTER(len=20), ALLOCATABLE, DIMENSION(:) :: PFldUnits
+  INTEGER PObjMinFlds
+  LOGICAL, ALLOCATABLE, DIMENSION(:) :: PAOrN
+  LOGICAL, ALLOCATABLE, DIMENSION(:) :: PReqFld
+  INTEGER PNumArgs   ! Number of Arguments in a definition
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
+
   LOGICAL :: ConnComp
   LOGICAL :: ConnCompCtrl
   LOGICAL :: FileExist
@@ -216,12 +231,20 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           IF(ALLOCATED(NwFldDefaults)) DEALLOCATE(NwFldDefaults)
           IF(ALLOCATED(NwFldUnits)) DEALLOCATE(NwFldUnits)
           IF(ALLOCATED(OutArgs)) DEALLOCATE(OutArgs)
+          IF(ALLOCATED(PAorN)) DEALLOCATE(PAorN)
+          IF(ALLOCATED(PReqFld)) DEALLOCATE(PReqFld)
+          IF(ALLOCATED(PFldNames)) DEALLOCATE(PFldNames)
+          IF(ALLOCATED(PFldDefaults)) DEALLOCATE(PFldDefaults)
+          IF(ALLOCATED(PFldUnits)) DEALLOCATE(PFldUnits)
+          IF(ALLOCATED(POutArgs)) DEALLOCATE(POutArgs)
           IF(ALLOCATED(MatchArg)) DEALLOCATE(MatchArg)
           ALLOCATE(Alphas(MaxAlphaArgsFound),Numbers(MaxNumericArgsFound))
           ALLOCATE(InArgs(MaxTotalArgs))
           ALLOCATE(AorN(MaxTotalArgs),ReqFld(MaxTotalArgs),FldNames(MaxTotalArgs),FldDefaults(MaxTotalArgs),FldUnits(MaxTotalArgs))
           ALLOCATE(NwAorN(MaxTotalArgs),NwReqFld(MaxTotalArgs),NwFldNames(MaxTotalArgs),NwFldDefaults(MaxTotalArgs),NwFldUnits(MaxTotalArgs))
+          ALLOCATE(PAorN(MaxTotalArgs),PReqFld(MaxTotalArgs),PFldNames(MaxTotalArgs),PFldDefaults(MaxTotalArgs),PFldUnits(MaxTotalArgs))
           ALLOCATE(OutArgs(MaxTotalArgs))
+          ALLOCATE(POutArgs(MaxTotalArgs))
           ALLOCATE(MatchArg(MaxTotalArgs))
           ALLOCATE(DeleteThisRecord(NumIDFRecords))
           DeleteThisRecord=.false.
@@ -352,7 +375,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ObjectName='Output:Surfaces:List'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs=InArgs 
+                 OutArgs=InArgs
                  IF (SameString(InArgs(1), 'DecayCurvesfromZoneComponentLoads')) THEN
                    OutArgs(1) = 'DecayCurvesFromComponentLoadsSummary'
                  ENDIF
@@ -365,6 +388,75 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(14)=''           ! Add 1 New Input Field, blank
                  OutArgs(15:CurArgs+1)=InArgs(14:CurArgs)  !
                  CurArgs = CurArgs + 1
+
+             CASE ('BUILDINGSURFACE:DETAILED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 IF ( SameString(InArgs(5), 'Foundation' ) .and. SameString(InArgs(2), 'Floor' ) ) THEN
+                   NumPerimObjs = GetNumObjectsFound('SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER')
+                   PerimNum = 0
+                   DO xcount=1,NumPerimObjs
+                     CALL GetObjectItem('SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER',xcount,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                     IF ( SameString( TRIM(Alphas(1)), TRIM(InArgs(1)) ) ) THEN
+                       PerimNum = xcount
+                       EXIT
+                     ENDIF
+                   ENDDO
+                   IF ( PerimNum == 0 ) THEN
+                     ! Create new SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER object
+                     PArgs = (CurArgs - 10)/3 + 4
+                     CALL GetNewObjectDefInIDD('SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                     POutArgs(1) = InArgs(1)
+                     POutArgs(2) = 'BySegment'
+                     POutArgs(3) = ''
+                     POutArgs(4) = ''
+                     DO xcount=1,(CurArgs - 10)/3
+                       POutArgs(4 + xcount) = 'Yes'
+                     ENDDO
+                     CALL WriteOutIDFLines(DifLfn,'SurfaceProperty:ExposedFoundationPerimeter',PArgs,POutArgs,PFldNames,PFldUnits)
+                     CALL ShowWarningError('Foundation floors now require a SurfaceProperty:ExposedFoundationPerimeter object. One was added with each segment of the floor surface exposed. Please check your inputs to make sure this reflects your foundation.')
+
+                   ENDIF
+                 ENDIF
+                 OutArgs=InArgs
+
+             CASE ('FLOOR:DETAILED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 IF ( SameString(InArgs(4), 'Foundation' ) ) THEN
+                   PerimNum = GetObjectItemNum('SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER',InArgs(1))
+                   IF ( PerimNum == 0 ) THEN
+                     ! Create new SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER object
+                     PArgs = (CurArgs - 9)/3 + 4
+                     CALL GetNewObjectDefInIDD('SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                     POutArgs(1) = InArgs(1)
+                     POutArgs(2) = 'BySegment'
+                     POutArgs(3) = ''
+                     POutArgs(4) = ''
+                     DO xcount=1,(CurArgs - 9)/3
+                       POutArgs(4 + xcount) = 'Yes'
+                     ENDDO
+                     CALL WriteOutIDFLines(DifLfn,'SurfaceProperty:ExposedFoundationPerimeter',PArgs,POutArgs,PFldNames,PFldUnits)
+                     CALL ShowWarningError("Foundation floors now require a SurfaceProperty:ExposedFoundationPerimeter object. One was added with each segment of the floor surface exposed. Please check your inputs to make sure this reflects your foundation.")
+                   ENDIF
+                 ENDIF
+                 OutArgs=InArgs
+
+             CASE ('SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1)=InArgs(1)  ! No change
+                 OutArgs(2)='BySegment'  ! Add 1 New Input Field, "BySegment"
+                 OutArgs(3:CurArgs+1)=InArgs(2:CurArgs)
+                 CurArgs = CurArgs + 1
+
+             CASE ('FOUNDATION:KIVA:SETTINGS')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs=InArgs
+                 IF ( SameString(InArgs(8), 'Autocalculate' ) ) THEN
+                   OutArgs(8) = 'Autoselect'
+                 ENDIF
 
              CASE('UNITARYSYSTEMPERFORMANCE:MULTISPEED')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -431,7 +523,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
              CASE('ZONECONTROL:CONTAMINANTCONTROLLER')
                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-               IF(CurArgs .GT. 4) THEN  
+               IF(CurArgs .GT. 4) THEN
                  nodiff=.false.
                  OutArgs(1:5)=InArgs(1:5)
                  OutArgs(6) = ''
@@ -895,7 +987,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(6) = TrimTrailZeros(SaveNumber)
                    ENDIF
                  ENDIF
- 
+
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
                     WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'
