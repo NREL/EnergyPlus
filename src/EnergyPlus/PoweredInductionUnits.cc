@@ -1651,7 +1651,7 @@ namespace PoweredInductionUnits {
 						SecAirMassFlow = 0.0;
 						PIUTurnFansOn = false;
 					} else {
-				SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+						SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
 						PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );
 					}
 				} else {
@@ -1662,7 +1662,7 @@ namespace PoweredInductionUnits {
 				PriAirMassFlow = PriAirMassFlowMin;
 				// PIU fan off if FanOnFlowFrac is 0.0 and reheat is not needed, also reset fan flag if fan should be off
 				if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && ReheatRequired ) {
-				SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
 					PIUTurnFansOn = true;
 				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
 					SecAirMassFlow = 0.0;
