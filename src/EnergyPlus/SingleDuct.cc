@@ -1791,11 +1791,8 @@ namespace SingleDuct {
 		//Do a check and make sure that the max and min available(control) flow is
 		//  between the physical max and min while operating.
 		SysInlet( SysNum ).AirMassFlowRateMaxAvail = min( Sys( SysNum ).AirMassFlowRateMax, Node( InletNode ).MassFlowRateMaxAvail );
-		if ( Sys( SysNum ).SysType_Num == SingleDuctConstVolReheat ) { // AirTerminal:SingleDuct:ConstantVolume:Reheat
-			SysInlet( SysNum ).AirMassFlowRateMinAvail = min( max( Node( OutletNode ).MassFlowRateMin, Node( InletNode ).MassFlowRateMinAvail ), SysInlet( SysNum ).AirMassFlowRateMaxAvail );
-		} else { // #6173
-			SysInlet( SysNum ).AirMassFlowRateMinAvail = min( Node( OutletNode ).MassFlowRateMin, SysInlet( SysNum ).AirMassFlowRateMaxAvail );
-		}
+		SysInlet( SysNum ).AirMassFlowRateMinAvail = min( max( Node( OutletNode ).MassFlowRateMin, Node( InletNode ).MassFlowRateMinAvail ), SysInlet( SysNum ).AirMassFlowRateMaxAvail );
+
 		// Do the following initializations (every time step): This should be the info from
 		// the previous components outlets or the node data in this section.
 		// Load the node data in this section for the component simulation

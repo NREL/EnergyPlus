@@ -224,7 +224,6 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
 	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
 
-	// #6173
 	// VAV terminal
 	int OutletNodeNum = 3;
 	SingleDuct::Sys( SysNum ).AirMassFlowRateMax = SysMaxMassFlow;
@@ -232,7 +231,6 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	DataLoopNode::Node( OutletNodeNum ).MassFlowRateMin = 0.2 * SysMaxMassFlow;
 	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
 	EXPECT_EQ(SysMaxMassFlow, SingleDuct::SysInlet( SysNum ).AirMassFlowRateMaxAvail);
-	EXPECT_EQ(DataLoopNode::Node( OutletNodeNum ).MassFlowRateMin, SingleDuct::SysInlet( SysNum ).AirMassFlowRateMinAvail );
 
 	// Constant volume terminal
 	SingleDuct::Sys( SysNum ).SysType_Num = DataDefineEquip::SingleDuctConstVolReheat;

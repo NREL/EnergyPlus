@@ -337,5 +337,19 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( EAFanPower, 75.0 );
 		EXPECT_DOUBLE_EQ( SAFanPower + EAFanPower, OutAirUnit( OAUnitNum ).ElecFanRate );
 
+		// #6173
+		OutAirUnit( OAUnitNum ).ExtAirMassFlow = 0.0;
+		CalcOutdoorAirUnit( OAUnitNum, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided );
+
+		std::string const error_string = delimited_string( {
+			"   ** Warning ** Air mass flow between zone supply and exhaust is not balanced",
+			"   **   ~~~   ** Occurs in ZoneHVAC:OutdoorAirUnit Object= ZONE1OUTAIR",
+			"   **   ~~~   ** Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or other air flow control inputs.",
+			"   **   ~~~   ** The outdoor mass flow rate = 0.602 and the exhaust mass flow rate = 0.000.",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+		} );
+
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
 	}
 }
