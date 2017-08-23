@@ -177,7 +177,7 @@ namespace BoilerSteam {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subrountine controls the boiler component simulation
+		// This subroutine controls the boiler component simulation
 
 		// METHODOLOGY EMPLOYED: na
 
@@ -383,6 +383,10 @@ namespace BoilerSteam {
 
 			// INPUTS from the IDF file
 			Boiler( BoilerNum ).BoilerMaxOperPress = rNumericArgs( 1 );
+			if ( Boiler( BoilerNum ).BoilerMaxOperPress < 1e5 ) {
+				ShowWarningMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
+				ShowContinueError( "Field: Maximum Operation Pressure units are Pa. Verify units." );
+			}
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			Boiler( BoilerNum ).TempUpLimitBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).NomCap = rNumericArgs( 4 );
@@ -430,6 +434,11 @@ namespace BoilerSteam {
 
 			Boiler( BoilerNum ).FluidIndex = SteamFluidIndex;
 
+			if ( NumAlphas > 4 ) {
+				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 5 );
+			} else {
+				Boiler( BoilerNum ).EndUseSubcategory = "General"; 
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -444,7 +453,7 @@ namespace BoilerSteam {
 			} else {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", _, "Plant" );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", Boiler( BoilerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Boiler Steam Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Steam Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Steam Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );

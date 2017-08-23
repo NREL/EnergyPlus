@@ -120,6 +120,9 @@ namespace SizingManager {
 	GetZoneHVACSizing();
 
 	void
+	GetAirTerminalSizing();
+
+	void
 	GetSizingParams();
 
 	void
@@ -182,6 +185,9 @@ namespace SizingManager {
 	UpdateFacilitySizing(
 		int const CallIndicator
 	);
+
+	void
+	UpdateTermUnitFinalZoneSizing();
 
 } // SizingManager
 

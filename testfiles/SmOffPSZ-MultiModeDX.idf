@@ -968,7 +968,6 @@
     0,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
-
   FenestrationSurface:Detailed,
     EWWndw,                  !- Name
     WINDOW,                  !- Surface Type
