@@ -231,7 +231,7 @@ namespace PlantPressureSystem {
 						loop.HasPressureComponents = true;
 
 						//Setup output variable
-						SetupOutputVariable( "Plant Branch Pressure Difference", Unit::Pa, branch.PressureDrop, "Plant", "Average", branch.Name );
+						SetupOutputVariable( "Plant Branch Pressure Difference", OutputProcessor::Unit::Pa, branch.PressureDrop, "Plant", "Average", branch.Name );
 
 					}
 
@@ -241,11 +241,11 @@ namespace PlantPressureSystem {
 				if ( loop_side.HasPressureComponents ) {
 					if ( LoopSideNum == DemandSide ) {
 
-						SetupOutputVariable( "Plant Demand Side Loop Pressure Difference", Unit::Pa, loop_side.PressureDrop, "Plant", "Average", loop.Name );
+						SetupOutputVariable( "Plant Demand Side Loop Pressure Difference", OutputProcessor::Unit::Pa, loop_side.PressureDrop, "Plant", "Average", loop.Name );
 
 					} else if ( LoopSideNum == SupplySide ) {
 
-						SetupOutputVariable( "Plant Supply Side Loop Pressure Difference", Unit::Pa, loop_side.PressureDrop, "Plant", "Average", loop.Name );
+						SetupOutputVariable( "Plant Supply Side Loop Pressure Difference", OutputProcessor::Unit::Pa, loop_side.PressureDrop, "Plant", "Average", loop.Name );
 
 					}
 				}
@@ -257,7 +257,7 @@ namespace PlantPressureSystem {
 
 				//Set up loop level variables if applicable
 
-				SetupOutputVariable( "Plant Loop Pressure Difference", Unit::Pa, loop.PressureDrop, "Plant", "Average", loop.Name );
+				SetupOutputVariable( "Plant Loop Pressure Difference", OutputProcessor::Unit::Pa, loop.PressureDrop, "Plant", "Average", loop.Name );
 
 				//Check for illegal configurations on this plant loop
 				for ( int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {

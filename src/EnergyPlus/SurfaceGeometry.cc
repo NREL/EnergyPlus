@@ -5847,12 +5847,12 @@ namespace SurfaceGeometry {
 			}
 			ExtVentedCavity( Item ).ActualArea = ExtVentedCavity( Item ).ProjArea * ExtVentedCavity( Item ).AreaRatio;
 
-			SetupOutputVariable( "Surface Exterior Cavity Baffle Surface Temperature", Unit::C, ExtVentedCavity( Item ).Tbaffle, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Air Drybulb Temperature", Unit::C, ExtVentedCavity( Item ).TAirCav, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Air Change Rate", Unit::ACH, ExtVentedCavity( Item ).PassiveACH, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate", Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotVent, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate", Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotWind, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate", Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotTherm, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Baffle Surface Temperature", OutputProcessor::Unit::C, ExtVentedCavity( Item ).Tbaffle, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Air Drybulb Temperature", OutputProcessor::Unit::C, ExtVentedCavity( Item ).TAirCav, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Air Change Rate", OutputProcessor::Unit::ACH, ExtVentedCavity( Item ).PassiveACH, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotVent, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotWind, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotTherm, "System", "Average", ExtVentedCavity( Item ).Name );
 
 		}
 
@@ -8242,7 +8242,7 @@ namespace SurfaceGeometry {
 			}
 			if ( OSC( Loop ).SurfFilmCoef > 0.0 ) {
 				cAlphaArgs( 1 ) = RoundSigDigits( OSC( Loop ).SurfFilmCoef, 3 );
-				SetupOutputVariable( "Surface Other Side Coefficients Exterior Air Drybulb Temperature", Unit::C, OSC( Loop ).OSCTempCalc, "System", "Average", OSC( Loop ).Name );
+				SetupOutputVariable( "Surface Other Side Coefficients Exterior Air Drybulb Temperature", OutputProcessor::Unit::C, OSC( Loop ).OSCTempCalc, "System", "Average", OSC( Loop ).Name );
 			} else {
 				cAlphaArgs( 1 ) = "N/A";
 			}
@@ -8338,10 +8338,10 @@ namespace SurfaceGeometry {
 			// Note no validation of the below at this time:
 			OSCM( OSCMNum ).Class = cAlphaArgs( 2 );
 			// setup output vars for modeled coefficients
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Air Temperature", Unit::C, OSCM( OSCMNum ).TConv, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient", Unit::W_m2K, OSCM( OSCMNum ).HConv, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Temperature", Unit::C, OSCM( OSCMNum ).TRad, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient", Unit::W_m2K, OSCM( OSCMNum ).HRad, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Air Temperature", OutputProcessor::Unit::C, OSCM( OSCMNum ).TConv, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, OSCM( OSCMNum ).HConv, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Temperature", OutputProcessor::Unit::C, OSCM( OSCMNum ).TRad, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, OSCM( OSCMNum ).HRad, "System", "Average", OSCM( OSCMNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Other Side Boundary Conditions", OSCM( OSCMNum ).Name, "Convection Bulk Air Temperature", "[C]", OSCM( OSCMNum ).EMSOverrideOnTConv, OSCM( OSCMNum ).EMSOverrideTConvValue );

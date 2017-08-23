@@ -1856,9 +1856,9 @@ namespace RoomAirModelManager {
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed ) {
 					if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
 						for ( Loop = 1; Loop <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++Loop ) {
-							SetupOutputVariable( "RoomAirflowNetwork Node Temperature", Unit::C, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).AirTemp, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
-							SetupOutputVariable( "RoomAirflowNetwork Node Humidity Ratio", Unit::kgWater_kgDryAir, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).HumRat, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
-							SetupOutputVariable( "RoomAirflowNetwork Node Relative Humidity", Unit::Perc, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).RelHumidity, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+							SetupOutputVariable( "RoomAirflowNetwork Node Temperature", OutputProcessor::Unit::C, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).AirTemp, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+							SetupOutputVariable( "RoomAirflowNetwork Node Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).HumRat, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
+							SetupOutputVariable( "RoomAirflowNetwork Node Relative Humidity", OutputProcessor::Unit::Perc, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).RelHumidity, "HVAC", "Average", RoomAirflowNetworkZoneInfo( ZoneNum ).Node( Loop ).Name );
 						}
 					}
 				}
@@ -2367,16 +2367,16 @@ namespace RoomAirModelManager {
 				for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 					if ( AirModel( Loop ).AirModelType != RoomAirModel_UCSDDV ) continue; //don't set these up if they don't make sense
 					//CurrentModuleObject='RoomAirSettings:ThreeNodeDisplacementVentilation'
-					SetupOutputVariable( "Room Air Zone Mixed Subzone Temperature", Unit::C, ZTMX( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Occupied Subzone Temperature", Unit::C, ZTOC( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Floor Subzone Temperature", Unit::C, ZTFloor( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Transition Height", Unit::m, HeightTransition( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Recommended Minimum Flow Fraction", Unit::None, FracMinFlow( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Is Mixed Status", Unit::None, ZoneDVMixedFlagRep( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Average Temperature Gradient", Unit::K_m, AvgTempGrad( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Maximum Temperature Gradient", Unit::K_m, MaxTempGrad( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Thermal Comfort Effective Air Temperature", Unit::C, TCMF( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Thermostat Temperature", Unit::C, TempTstatAir( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Occupied Subzone Temperature", OutputProcessor::Unit::C, ZTOC( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Floor Subzone Temperature", OutputProcessor::Unit::C, ZTFloor( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Transition Height", OutputProcessor::Unit::m, HeightTransition( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Recommended Minimum Flow Fraction", OutputProcessor::Unit::None, FracMinFlow( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Is Mixed Status", OutputProcessor::Unit::None, ZoneDVMixedFlagRep( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Average Temperature Gradient", OutputProcessor::Unit::K_m, AvgTempGrad( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Maximum Temperature Gradient", OutputProcessor::Unit::K_m, MaxTempGrad( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Thermal Comfort Effective Air Temperature", OutputProcessor::Unit::C, TCMF( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, TempTstatAir( Loop ), "HVAC", "State", Zone( Loop ).Name );
 				}
 
 			}
@@ -2398,16 +2398,16 @@ namespace RoomAirModelManager {
 				for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 					if ( AirModel( Loop ).AirModelType != RoomAirModel_UCSDUFI ) continue; //don't set these up if they don't make sense
 					//CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionInterior'
-					SetupOutputVariable( "Room Air Zone Mixed Subzone Temperature", Unit::C, ZTMX( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Occupied Subzone Temperature", Unit::C, ZTOC( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Transition Height", Unit::m, HeightTransition( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Is Mixed Status", Unit::None, ZoneUFMixedFlagRep( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Average Temperature Gradient", Unit::K_m, AvgTempGrad( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Effective Comfort Air Temperature", Unit::C, TCMF( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Thermostat Temperature", Unit::C, TempTstatAir( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Transition Height Gamma Value", Unit::None, ZoneUFGamma( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Plume Heat Transfer Rate", Unit::W, ZoneUFPowInPlumes( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Temperature Stratification Fraction", Unit::None, Phi( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Occupied Subzone Temperature", OutputProcessor::Unit::C, ZTOC( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Transition Height", OutputProcessor::Unit::m, HeightTransition( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Is Mixed Status", OutputProcessor::Unit::None, ZoneUFMixedFlagRep( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Average Temperature Gradient", OutputProcessor::Unit::K_m, AvgTempGrad( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Effective Comfort Air Temperature", OutputProcessor::Unit::C, TCMF( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, TempTstatAir( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Transition Height Gamma Value", OutputProcessor::Unit::None, ZoneUFGamma( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Plume Heat Transfer Rate", OutputProcessor::Unit::W, ZoneUFPowInPlumes( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Temperature Stratification Fraction", OutputProcessor::Unit::None, Phi( Loop ), "HVAC", "State", Zone( Loop ).Name );
 
 					// set zone equip pointer in the UCSDUI data structure
 					for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
@@ -2420,17 +2420,17 @@ namespace RoomAirModelManager {
 				for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 					if ( AirModel( Loop ).AirModelType != RoomAirModel_UCSDUFE ) continue; //don't set these up if they don't make sense
 					//CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionExterior'
-					SetupOutputVariable( "Room Air Zone Mixed Subzone Temperature", Unit::C, ZTMX( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Occupied Subzone Temperature", Unit::C, ZTOC( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Transition Height", Unit::m, HeightTransition( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Is Mixed Status", Unit::None, ZoneUFMixedFlagRep( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Average Temperature Gradient", Unit::K_m, AvgTempGrad( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Effective Comfort Air Temperature", Unit::C, TCMF( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Thermostat Temperature", Unit::C, TempTstatAir( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Transition Height Gamma Value", Unit::None, ZoneUFGamma( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Plume Heat Transfer Rate", Unit::W, ZoneUFPowInPlumes( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Window Plume Heat Transfer Rate", Unit::W, ZoneUFPowInPlumesfromWindows( Loop ), "HVAC", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Temperature Stratification Fraction", Unit::None, Phi( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Occupied Subzone Temperature", OutputProcessor::Unit::C, ZTOC( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Transition Height", OutputProcessor::Unit::m, HeightTransition( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Is Mixed Status", OutputProcessor::Unit::None, ZoneUFMixedFlagRep( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Average Temperature Gradient", OutputProcessor::Unit::K_m, AvgTempGrad( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Effective Comfort Air Temperature", OutputProcessor::Unit::C, TCMF( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, TempTstatAir( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Transition Height Gamma Value", OutputProcessor::Unit::None, ZoneUFGamma( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Plume Heat Transfer Rate", OutputProcessor::Unit::W, ZoneUFPowInPlumes( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Window Plume Heat Transfer Rate", OutputProcessor::Unit::W, ZoneUFPowInPlumesfromWindows( Loop ), "HVAC", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Temperature Stratification Fraction", OutputProcessor::Unit::None, Phi( Loop ), "HVAC", "State", Zone( Loop ).Name );
 					// set zone equip pointer in the UCSDUE data structure
 					for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
 						if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum == Loop ) {
@@ -2497,20 +2497,20 @@ namespace RoomAirModelManager {
 						continue;
 					}
 					//CurrentModuleObject='RoomAirSettings:CrossVentilation'
-					SetupOutputVariable( "Room Air Zone Jet Region Temperature", Unit::C, ZTJET( Loop ), "Zone", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Recirculation Region Temperature", Unit::C, ZTREC( Loop ), "Zone", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Jet Region Average Air Velocity", Unit::m_s, Ujet( Loop ), "Zone", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Recirculation Region Average Air Velocity", Unit::m_s, Urec( Loop ), "Zone", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Recirculation and Inflow Rate Ratio", Unit::None, RecInflowRatio( Loop ), "Zone", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Inflow Opening Area", Unit::m2, Ain( Loop ), "Zone", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Room Length", Unit::m, Dstar( Loop ), "Zone", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Is Mixing Status", Unit::None, ZoneCVisMixing( Loop ), "Zone", "State", Zone( Loop ).Name );
-					SetupOutputVariable( "Room Air Zone Is Recirculating Status", Unit::None, ZoneCVhasREC( Loop ), "Zone", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Jet Region Temperature", OutputProcessor::Unit::C, ZTJET( Loop ), "Zone", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Recirculation Region Temperature", OutputProcessor::Unit::C, ZTREC( Loop ), "Zone", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Jet Region Average Air Velocity", OutputProcessor::Unit::m_s, Ujet( Loop ), "Zone", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Recirculation Region Average Air Velocity", OutputProcessor::Unit::m_s, Urec( Loop ), "Zone", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Recirculation and Inflow Rate Ratio", OutputProcessor::Unit::None, RecInflowRatio( Loop ), "Zone", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Inflow Opening Area", OutputProcessor::Unit::m2, Ain( Loop ), "Zone", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Room Length", OutputProcessor::Unit::m, Dstar( Loop ), "Zone", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Is Mixing Status", OutputProcessor::Unit::None, ZoneCVisMixing( Loop ), "Zone", "State", Zone( Loop ).Name );
+					SetupOutputVariable( "Room Air Zone Is Recirculating Status", OutputProcessor::Unit::None, ZoneCVhasREC( Loop ), "Zone", "State", Zone( Loop ).Name );
 					for ( i = 1; i <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++i ) {
 						N = AirflowNetworkLinkageData( i ).CompNum;
 						if ( AirflowNetworkCompData( N ).CompTypeNum == CompTypeNum_DOP ) {
 							SurfNum = MultizoneSurfaceData( i ).SurfNum;
-							SetupOutputVariable( "Room Air Window Jet Region Average Air Velocity", Unit::m_s, CVJetRecFlows( i, Loop ).Ujet, "Zone", "Average", MultizoneSurfaceData( i ).SurfName );
+							SetupOutputVariable( "Room Air Window Jet Region Average Air Velocity", OutputProcessor::Unit::m_s, CVJetRecFlows( i, Loop ).Ujet, "Zone", "Average", MultizoneSurfaceData( i ).SurfName );
 						}
 					}
 				}

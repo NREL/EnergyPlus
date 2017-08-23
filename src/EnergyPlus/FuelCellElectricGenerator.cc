@@ -1037,76 +1037,76 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
-				SetupOutputVariable( "Generator Produced Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.ACPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Electric Energy", Unit::J, FuelCell( GeneratorNum ).Report.ACEnergyGen, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
-				SetupOutputVariable( "Generator Produced Thermal Rate", Unit::W, FuelCell( GeneratorNum ).Report.qHX, "System", "Average", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Thermal Energy", Unit::J, FuelCell( GeneratorNum ).Report.HXenergy, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "ENERGYTRANSFER", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.ACPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.ACEnergyGen, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.qHX, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.HXenergy, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "ENERGYTRANSFER", "COGENERATION", _, "Plant" );
 
-				SetupOutputVariable( "Generator Fuel HHV Basis Energy", Unit::J, FuelCell( GeneratorNum ).Report.FuelEnergyHHV, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "Gas", "COGENERATION", _, "Plant" );
-				SetupOutputVariable( "Generator Fuel HHV Basis Rate", Unit::W, FuelCell( GeneratorNum ).Report.FuelEnergyUseRateHHV, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.FuelEnergyHHV, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "Gas", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.FuelEnergyUseRateHHV, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Rate", Unit::W, FuelCell( GeneratorNum ).Report.SkinLossPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Energy", Unit::J, FuelCell( GeneratorNum ).Report.SkinLossEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Convection Heat Transfer Rate", Unit::W, FuelCell( GeneratorNum ).Report.SkinLossConvect, "System", "Average", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Radiation Heat Transfer Rate", Unit::W, FuelCell( GeneratorNum ).Report.SkinLossRadiat, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.SkinLossPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.SkinLossEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Convection Heat Transfer Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.SkinLossConvect, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Radiation Heat Transfer Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.SkinLossRadiat, "System", "Average", FuelCell( GeneratorNum ).Name );
 
 				SetupZoneInternalGain( FuelCell( GeneratorNum ).FCPM.ZoneID, "Generator:FuelCell", FuelCell( GeneratorNum ).Name, IntGainTypeOf_GeneratorFuelCell, FuelCell( GeneratorNum ).Report.SkinLossConvect, _, FuelCell( GeneratorNum ).Report.SkinLossRadiat );
 
 				if ( DisplayAdvancedReportVariables ) { // show extra data originally needed for detailed comparative testing
-					SetupOutputVariable( "Generator Air Inlet Temperature", Unit::C, FuelCell( GeneratorNum ).Report.TairInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Power Module Entering Air Temperature", Unit::C, FuelCell( GeneratorNum ).Report.TairIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Air Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotAir, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Power Module Entering Air Enthalpy", Unit::W, FuelCell( GeneratorNum ).Report.TotAirInEnthalphy, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Blower Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.BlowerPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Blower Electric Energy", Unit::J, FuelCell( GeneratorNum ).Report.BlowerEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Blower Skin Heat Loss Rate", Unit::W, FuelCell( GeneratorNum ).Report.BlowerSkinLoss, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Air Inlet Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TairInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Air Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TairIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Air Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotAir, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Air Enthalpy", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.TotAirInEnthalphy, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Blower Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.BlowerPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Blower Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.BlowerEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Blower Skin Heat Loss Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.BlowerSkinLoss, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Fuel Inlet Temperature", Unit::C, FuelCell( GeneratorNum ).Report.TfuelInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Power Module Entering Fuel Temperature", Unit::C, FuelCell( GeneratorNum ).Report.TfuelIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotFuel, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Consumption LHV Basis Energy", Unit::J, FuelCell( GeneratorNum ).Report.FuelEnergyLHV, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Consumption Rate LHV Basis", Unit::W, FuelCell( GeneratorNum ).Report.FuelEnergyUseRateLHV, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Inlet Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TfuelInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Fuel Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TfuelIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotFuel, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Consumption LHV Basis Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.FuelEnergyLHV, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Consumption Rate LHV Basis", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.FuelEnergyUseRateLHV, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Power Module Entering Fuel Enthalpy", Unit::W, FuelCell( GeneratorNum ).Report.TotFuelInEnthalpy, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Compressor Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.FuelCompressPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Compressor Electric Energy", Unit::J, FuelCell( GeneratorNum ).Report.FuelCompressEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Compressor Skin Heat Loss Rate", Unit::W, FuelCell( GeneratorNum ).Report.FuelCompressSkinLoss, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Fuel Enthalpy", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.TotFuelInEnthalpy, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Compressor Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.FuelCompressPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Compressor Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.FuelCompressEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Compressor Skin Heat Loss Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.FuelCompressSkinLoss, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Fuel Reformer Water Inlet Temperature", Unit::C, FuelCell( GeneratorNum ).Report.TwaterInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Power Module Entering Reforming Water Temperature", Unit::C, FuelCell( GeneratorNum ).Report.TwaterIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Reformer Water Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotWater, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Reformer Water Pump Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.WaterPumpPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Reformer Water Pump Electric Energy", Unit::J, FuelCell( GeneratorNum ).Report.WaterPumpEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Reformer Water Inlet Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TwaterInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Reforming Water Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TwaterIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Reformer Water Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotWater, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Reformer Water Pump Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.WaterPumpPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Reformer Water Pump Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.WaterPumpEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Power Module Entering Reforming Water Enthalpy", Unit::W, FuelCell( GeneratorNum ).Report.WaterIntoFCPMEnthalpy, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Reforming Water Enthalpy", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.WaterIntoFCPMEnthalpy, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Product Gas Temperature", Unit::C, FuelCell( GeneratorNum ).Report.TprodGas, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas Enthalpy", Unit::W, FuelCell( GeneratorNum ).Report.EnthalProdGas, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdGas, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas Ar Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdAr, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas CO2 Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdCO2, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas H2O Vapor Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdH2O, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas N2 Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdN2, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas O2 Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdO2, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TprodGas, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas Enthalpy", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.EnthalProdGas, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdGas, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas Ar Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdAr, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas CO2 Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdCO2, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas H2O Vapor Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdH2O, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas N2 Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdN2, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas O2 Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdO2, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Heat Recovery Exit Gas Temperature", Unit::C, FuelCell( GeneratorNum ).Report.THXexh, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Heat Recovery Exit Gas H2O Vapor Fraction", Unit::None, FuelCell( GeneratorNum ).Report.WaterVaporFractExh, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Heat Recovery Water Condensate Molar Flow Rate", Unit::kmol_s, FuelCell( GeneratorNum ).Report.CondensateRate, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Heat Recovery Exit Gas Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.THXexh, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Heat Recovery Exit Gas H2O Vapor Fraction", OutputProcessor::Unit::None, FuelCell( GeneratorNum ).Report.WaterVaporFractExh, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Heat Recovery Water Condensate Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.CondensateRate, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Inverter Loss Power", Unit::W, FuelCell( GeneratorNum ).Report.PCUlosses, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Produced DC Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.DCPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Power Efficiency", Unit::None, FuelCell( GeneratorNum ).Report.DCPowerEff, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Inverter Loss Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.PCUlosses, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Produced DC Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.DCPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Power Efficiency", OutputProcessor::Unit::None, FuelCell( GeneratorNum ).Report.DCPowerEff, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Electric Storage Charge State", Unit::J, FuelCell( GeneratorNum ).Report.ElectEnergyinStorage, "System", "Average", FuelCell( GeneratorNum ).Name ); //? 'Sum'
-					SetupOutputVariable( "Generator DC Storage Charging Power", Unit::W, FuelCell( GeneratorNum ).Report.StoredPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Charging Energy", Unit::J, FuelCell( GeneratorNum ).Report.StoredEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Discharging Power", Unit::W, FuelCell( GeneratorNum ).Report.DrawnPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Discharging Energy", Unit::J, FuelCell( GeneratorNum ).Report.DrawnEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Ancillary AC Electric Power", Unit::W, FuelCell( GeneratorNum ).Report.ACancillariesPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Ancillary AC Electric Energy", Unit::J, FuelCell( GeneratorNum ).Report.ACancillariesEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Electric Storage Charge State", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.ElectEnergyinStorage, "System", "Average", FuelCell( GeneratorNum ).Name ); //? 'Sum'
+					SetupOutputVariable( "Generator DC Storage Charging Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.StoredPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Charging Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.StoredEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Discharging Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.DrawnPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Discharging Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.DrawnEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Ancillary AC Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.ACancillariesPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Ancillary AC Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.ACancillariesEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count", Unit::None, FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Root Solver Iteration Count", Unit::None, FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count", OutputProcessor::Unit::None, FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Root Solver Iteration Count", OutputProcessor::Unit::None, FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
 				}
 			}
 

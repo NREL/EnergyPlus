@@ -1623,62 +1623,62 @@ namespace PackagedThermalStorageCoil {
 
 		// setup reporting
 		for ( item = 1; item <= NumTESCoils; ++item ) {
-			SetupOutputVariable( "Cooling Coil Operating Mode Index", Unit::None, TESCoil( item ).CurControlMode, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Operating Mode Index", OutputProcessor::Unit::None, TESCoil( item ).CurControlMode, "System", "Average", TESCoil( item ).Name );
 
 			// cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage"
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate", Unit::W, TESCoil( item ).EvapTotCoolingRate, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy", Unit::J, TESCoil( item ).EvapTotCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", Unit::W, TESCoil( item ).EvapSensCoolingRate, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", Unit::J, TESCoil( item ).EvapSensCoolingEnergy, "System", "Sum", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Rate", Unit::W, TESCoil( item ).EvapLatCoolingRate, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy", Unit::J, TESCoil( item ).EvapLatCoolingEnergy, "System", "Sum", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Power", Unit::W, TESCoil( item ).ElecCoolingPower, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Energy", Unit::J, TESCoil( item ).ElecCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", _, "System" );
+			SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, TESCoil( item ).EvapTotCoolingRate, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, TESCoil( item ).EvapTotCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, TESCoil( item ).EvapSensCoolingRate, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, TESCoil( item ).EvapSensCoolingEnergy, "System", "Sum", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, TESCoil( item ).EvapLatCoolingRate, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, TESCoil( item ).EvapLatCoolingEnergy, "System", "Sum", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Electric Power", OutputProcessor::Unit::W, TESCoil( item ).ElecCoolingPower, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Electric Energy", OutputProcessor::Unit::J, TESCoil( item ).ElecCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", _, "System" );
 
-			SetupOutputVariable( "Cooling Coil Runtime Fraction", Unit::None, TESCoil( item ).RuntimeFraction, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Cold Weather Protection Electric Energy", Unit::J, TESCoil( item ).ElectColdWeatherEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", "Thermal Protection", "System" );
-			SetupOutputVariable( "Cooling Coil Cold Weather Protection Electric Power", Unit::W, TESCoil( item ).ElectColdWeatherPower, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, TESCoil( item ).RuntimeFraction, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Cold Weather Protection Electric Energy", OutputProcessor::Unit::J, TESCoil( item ).ElectColdWeatherEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", "Thermal Protection", "System" );
+			SetupOutputVariable( "Cooling Coil Cold Weather Protection Electric Power", OutputProcessor::Unit::W, TESCoil( item ).ElectColdWeatherPower, "System", "Average", TESCoil( item ).Name );
 
-			SetupOutputVariable( "Cooling Coil Thermal Storage Mechanical Heat Transfer Rate", Unit::W, TESCoil( item ).QdotTES, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Thermal Storage Mechanical Heat Transfer Rate", OutputProcessor::Unit::W, TESCoil( item ).QdotTES, "System", "Average", TESCoil( item ).Name );
 
-			SetupOutputVariable( "Cooling Coil Thermal Storage Mechanical Heat Transfer Energy", Unit::J, TESCoil( item ).Q_TES, "System", "Sum", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Thermal Storage Mechanical Heat Transfer Energy", OutputProcessor::Unit::J, TESCoil( item ).Q_TES, "System", "Sum", TESCoil( item ).Name );
 
-			SetupOutputVariable( "Cooling Coil Thermal Storage Ambient Heat Transfer Rate", Unit::W, TESCoil( item ).QdotAmbient, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Thermal Storage Ambient Heat Transfer Rate", OutputProcessor::Unit::W, TESCoil( item ).QdotAmbient, "System", "Average", TESCoil( item ).Name );
 
-			SetupOutputVariable( "Cooling Coil Thermal Storage Ambient Heat Transfer Energy", Unit::J, TESCoil( item ).Q_Ambient, "System", "Sum", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Thermal Storage Ambient Heat Transfer Energy", OutputProcessor::Unit::J, TESCoil( item ).Q_Ambient, "System", "Sum", TESCoil( item ).Name );
 
 			if ( TESCoil( item ).TESPlantConnectionAvailable ) {
-				SetupOutputVariable( "Cooling Coil Thermal Storage Plant Heat Transfer Rate", Unit::W, TESCoil( item ).QdotPlant, "System", "Average", TESCoil( item ).Name );
-				SetupOutputVariable( "Cooling Coil Thermal Storage Plant Heat Transfer Energy", Unit::J, TESCoil( item ).Q_Plant, "System", "Sum", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Thermal Storage Plant Heat Transfer Rate", OutputProcessor::Unit::W, TESCoil( item ).QdotPlant, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Thermal Storage Plant Heat Transfer Energy", OutputProcessor::Unit::J, TESCoil( item ).Q_Plant, "System", "Sum", TESCoil( item ).Name );
 
 			}
 
 			if ( TESCoil( item ).CondenserType == EvapCooled ) {
-				SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature", Unit::C, TESCoil( item ).CondInletTemp, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, TESCoil( item ).CondInletTemp, "System", "Average", TESCoil( item ).Name );
 
 				if ( TESCoil( item ).EvapWaterSupplyMode == WaterSupplyFromMains ) {
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume", Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume", Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "MainsWater", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "MainsWater", "Cooling", _, "System" );
 				} else if ( TESCoil( item ).EvapWaterSupplyMode == WaterSupplyFromTank ) {
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Storage Tank Water Volume", Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Starved Water Volume", Unit::m3, TESCoil( item ).EvapWaterStarvMakup, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Starved Mains Water Volume", Unit::m3, TESCoil( item ).EvapWaterStarvMakup, "System", "Sum", TESCoil( item ).Name, _, "MainsWater", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Storage Tank Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Starved Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterStarvMakup, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Starved Mains Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterStarvMakup, "System", "Sum", TESCoil( item ).Name, _, "MainsWater", "Cooling", _, "System" );
 
 				}
 
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power", Unit::W, TESCoil( item ).EvapCondPumpElecPower, "System", "Average", TESCoil( item ).Name );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy", Unit::J, TESCoil( item ).EvapCondPumpElecConsumption, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", _, "System" );
+				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power", OutputProcessor::Unit::W, TESCoil( item ).EvapCondPumpElecPower, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy", OutputProcessor::Unit::J, TESCoil( item ).EvapCondPumpElecConsumption, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", _, "System" );
 
-				SetupOutputVariable( "Cooling Coil Basin Heater Electric Power", Unit::W, TESCoil( item ).ElectEvapCondBasinHeaterPower, "System", "Average", TESCoil( item ).Name );
-				SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy", Unit::J, TESCoil( item ).ElectEvapCondBasinHeaterEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", "Thermal Protection", "System" );
+				SetupOutputVariable( "Cooling Coil Basin Heater Electric Power", OutputProcessor::Unit::W, TESCoil( item ).ElectEvapCondBasinHeaterPower, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy", OutputProcessor::Unit::J, TESCoil( item ).ElectEvapCondBasinHeaterEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", "Thermal Protection", "System" );
 
 			}
 
 			if ( TESCoil( item ).StorageMedia == FluidBased ) {
-				SetupOutputVariable( "Cooling Coil Fluid Thermal Storage End Temperature", Unit::C, TESCoil( item ).FluidTankTempFinal, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Fluid Thermal Storage End Temperature", OutputProcessor::Unit::C, TESCoil( item ).FluidTankTempFinal, "System", "Average", TESCoil( item ).Name );
 
 			} else if ( TESCoil( item ).StorageMedia == IceBased ) {
-				SetupOutputVariable( "Cooling Coil Ice Thermal Storage End Fraction", Unit::None, TESCoil( item ).IceFracRemain, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, TESCoil( item ).IceFracRemain, "System", "Average", TESCoil( item ).Name );
 			}
 
 		}

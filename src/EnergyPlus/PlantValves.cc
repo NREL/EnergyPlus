@@ -287,7 +287,7 @@ namespace PlantValves {
 
 		for ( Item = 1; Item <= NumTemperingValves; ++Item ) {
 
-			SetupOutputVariable( "Tempering Valve Flow Fraction", Unit::None, TemperValve( Item ).FlowDivFract, "System", "Average", TemperValve( Item ).Name );
+			SetupOutputVariable( "Tempering Valve Flow Fraction", OutputProcessor::Unit::None, TemperValve( Item ).FlowDivFract, "System", "Average", TemperValve( Item ).Name );
 		}
 
 		if ( ErrorsFound ) {

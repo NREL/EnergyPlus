@@ -357,15 +357,15 @@ namespace DaylightingDevices {
 				TDDPipe( PipeNum ).ExtLength = TDDPipe( PipeNum ).TotLength - SumTZoneLengths;
 
 				// Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
-				SetupOutputVariable( "Tubular Daylighting Device Transmitted Solar Radiation Rate", Unit::W, TDDPipe( PipeNum ).TransmittedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate", Unit::W, TDDPipe( PipeNum ).PipeAbsorbedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Heat Gain Rate", Unit::W, TDDPipe( PipeNum ).HeatGain, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Heat Loss Rate", Unit::W, TDDPipe( PipeNum ).HeatLoss, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Transmitted Solar Radiation Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).TransmittedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).PipeAbsorbedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Heat Gain Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).HeatGain, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Heat Loss Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).HeatLoss, "Zone", "Average", TDDPipe( PipeNum ).Name );
 
-				SetupOutputVariable( "Tubular Daylighting Device Beam Solar Transmittance", Unit::None, TDDPipe( PipeNum ).TransSolBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Beam Visible Transmittance", Unit::None, TDDPipe( PipeNum ).TransVisBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Diffuse Solar Transmittance", Unit::None, TDDPipe( PipeNum ).TransSolDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Diffuse Visible Transmittance", Unit::None, TDDPipe( PipeNum ).TransVisDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Beam Solar Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransSolBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Beam Visible Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransVisBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Diffuse Solar Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransSolDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Diffuse Visible Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransVisDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
 
 			} // PipeNum
 

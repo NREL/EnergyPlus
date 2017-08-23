@@ -568,16 +568,16 @@ namespace HVACFan {
 			ShowFatalError( routineName + "Errors found in input for fan name = " + name + ".  Program terminates." );
 		}
 
-		SetupOutputVariable( "Fan Electric Power", Unit::W, m_fanPower, "System", "Average", name );
-		SetupOutputVariable( "Fan Rise in Air Temperature", Unit::deltaC, m_deltaTemp, "System", "Average", name );
-		SetupOutputVariable( "Fan Heat Gain to Air", Unit::W, m_powerLossToAir, "System", "Average", name );
-		SetupOutputVariable( "Fan Electric Energy", Unit::J, m_fanEnergy, "System", "Sum", name, _, "Electric", "Fans", m_endUseSubcategoryName, "System" );
-		SetupOutputVariable( "Fan Air Mass Flow Rate", Unit::kg_s, m_outletAirMassFlowRate, "System", "Average", name );
+		SetupOutputVariable( "Fan Electric Power", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name );
+		SetupOutputVariable( "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name );
+		SetupOutputVariable( "Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name );
+		SetupOutputVariable( "Fan Electric Energy", OutputProcessor::Unit::J, m_fanEnergy, "System", "Sum", name, _, "Electric", "Fans", m_endUseSubcategoryName, "System" );
+		SetupOutputVariable( "Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, m_outletAirMassFlowRate, "System", "Average", name );
 		if ( speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1 ) {
-			SetupOutputVariable( "Fan Runtime Fraction", Unit::None, m_fanRunTimeFractionAtSpeed[ 0 ], "System", "Average", name );
+			SetupOutputVariable( "Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[ 0 ], "System", "Average", name );
 		} else if ( speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1 ) {
 			for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
-				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + "", Unit::None, m_fanRunTimeFractionAtSpeed[ speedLoop ], "System", "Average", name );
+				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + "", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[ speedLoop ], "System", "Average", name );
 			}
 		}
 

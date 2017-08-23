@@ -712,41 +712,41 @@ namespace WeatherManager {
 
 			// SetupOutputVariables, CurrentModuleObject='All Simulations'
 
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", Unit::C, OutDryBulbTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Dewpoint Temperature", Unit::C, OutDewPointTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Wetbulb Temperature", Unit::C, OutWetBulbTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Humidity Ratio", Unit::kgWater_kgDryAir, OutHumRat, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Relative Humidity", Unit::Perc, OutRelHum, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Barometric Pressure", Unit::Pa, OutBaroPress, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Wind Speed", Unit::m_s, WindSpeed, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Wind Direction", Unit::deg, WindDir, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Sky Temperature", Unit::C, SkyTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Horizontal Infrared Radiation Rate per Area", Unit::W_m2, HorizIRSky, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Diffuse Solar Radiation Rate per Area", Unit::W_m2, DifSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Direct Solar Radiation Rate per Area", Unit::W_m2, BeamSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Precipitation Depth", Unit::m, LiquidPrecipitation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Site Ground Reflected Solar Radiation Rate per Area", Unit::W_m2, GndSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Ground Temperature", Unit::C, GroundTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Surface Ground Temperature", Unit::C, GroundTemp_Surface, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Deep Ground Temperature", Unit::C, GroundTemp_Deep, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Simple Factor Model Ground Temperature", Unit::C, GroundTempFC, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Enthalpy", Unit::J_kg, OutEnthalpy, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Density", Unit::kg_m3, OutAirDensity, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Azimuth Angle", Unit::deg, SolarAzimuthAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Altitude Angle", Unit::deg, SolarAltitudeAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Hour Angle", Unit::deg, HrAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Rain Status", Unit::None, RptIsRain, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Snow on Ground Status", Unit::None, RptIsSnow, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Horizontal Sky Illuminance", Unit::lux, HISKF, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Horizontal Beam Illuminance", Unit::lux, HISUNF, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Beam Normal Illuminance", Unit::lux, HISUNFnorm, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Sky Diffuse Solar Radiation Luminous Efficacy", Unit::lum_W, PDIFLW, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Beam Solar Radiation Luminous Efficacy", Unit::lum_W, PDIRLW, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylighting Model Sky Clearness", Unit::None, SkyClearness, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylighting Model Sky Brightness", Unit::None, SkyBrightness, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylight Saving Time Status", Unit::None, DSTIndicator, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Site Day Type Index", Unit::None, RptDayType, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Site Mains Water Temperature", Unit::C, WaterMainsTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Dewpoint Temperature", OutputProcessor::Unit::C, OutDewPointTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, OutWetBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, OutHumRat, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Relative Humidity", OutputProcessor::Unit::Perc, OutRelHum, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Barometric Pressure", OutputProcessor::Unit::Pa, OutBaroPress, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Wind Speed", OutputProcessor::Unit::m_s, WindSpeed, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Wind Direction", OutputProcessor::Unit::deg, WindDir, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Sky Temperature", OutputProcessor::Unit::C, SkyTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Horizontal Infrared Radiation Rate per Area", OutputProcessor::Unit::W_m2, HorizIRSky, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Diffuse Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, DifSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Direct Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, BeamSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Precipitation Depth", OutputProcessor::Unit::m, LiquidPrecipitation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Site Ground Reflected Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, GndSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Ground Temperature", OutputProcessor::Unit::C, GroundTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Surface Ground Temperature", OutputProcessor::Unit::C, GroundTemp_Surface, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Deep Ground Temperature", OutputProcessor::Unit::C, GroundTemp_Deep, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Simple Factor Model Ground Temperature", OutputProcessor::Unit::C, GroundTempFC, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, OutEnthalpy, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Density", OutputProcessor::Unit::kg_m3, OutAirDensity, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Azimuth Angle", OutputProcessor::Unit::deg, SolarAzimuthAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Altitude Angle", OutputProcessor::Unit::deg, SolarAltitudeAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Hour Angle", OutputProcessor::Unit::deg, HrAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Rain Status", OutputProcessor::Unit::None, RptIsRain, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Snow on Ground Status", OutputProcessor::Unit::None, RptIsSnow, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Horizontal Sky Illuminance", OutputProcessor::Unit::lux, HISKF, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Horizontal Beam Illuminance", OutputProcessor::Unit::lux, HISUNF, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Beam Normal Illuminance", OutputProcessor::Unit::lux, HISUNFnorm, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Sky Diffuse Solar Radiation Luminous Efficacy", OutputProcessor::Unit::lum_W, PDIFLW, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Beam Solar Radiation Luminous Efficacy", OutputProcessor::Unit::lum_W, PDIRLW, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylighting Model Sky Clearness", OutputProcessor::Unit::None, SkyClearness, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylighting Model Sky Brightness", OutputProcessor::Unit::None, SkyBrightness, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylight Saving Time Status", OutputProcessor::Unit::None, DSTIndicator, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Site Day Type Index", OutputProcessor::Unit::None, RptDayType, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Site Mains Water Temperature", OutputProcessor::Unit::C, WaterMainsTemp, "Zone", "Average", "Environment" );
 
 
 			if ( AnyEnergyManagementSystemInModel ) {
@@ -6429,6 +6429,7 @@ Label9999: ;
 		int DDLoop;
 		std::string envTitle;
 		std::string units;
+		OutputProcessor::Unit unitType;
 		int schPtr;
 		bool MaxDryBulbEntered;
 		bool PressureEntered;
@@ -6547,10 +6548,12 @@ Label9999: ;
 				cAlphaArgs( 3 ) = "MultiplierSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Multiplier;
 				units = "[]";
+				unitType = OutputProcessor::Unit::None;
 			} else if ( SameString( cAlphaArgs( 3 ), "Difference" ) || SameString( cAlphaArgs( 3 ), "Delta" ) || SameString( cAlphaArgs( 3 ), "DifferenceSchedule" ) || SameString( cAlphaArgs( 3 ), "DeltaSchedule" ) ) {
 				cAlphaArgs( 3 ) = "DifferenceSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Difference;
 				units = "[deltaC]";
+				unitType = OutputProcessor::Unit::deltaC;
 			} else if ( SameString( cAlphaArgs( 3 ), "DefaultMultipliers" ) ) {
 				cAlphaArgs( 3 ) = "DefaultMultipliers";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Default;
@@ -6559,6 +6562,7 @@ Label9999: ;
 				cAlphaArgs( 3 ) = "TemperatureProfileSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Profile;
 				units = "[C]";
+				unitType = OutputProcessor::Unit::C;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
 				ShowContinueError( "..invalid field: " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -6599,12 +6603,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).TempRangeSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value " + units, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
+							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value ", unitType, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).TempRangeSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value " + units, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
+							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value ", unitType, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
 						}
 						if ( cAlphaArgs( 3 ) == "MultiplierSchedule" ) {
 							if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).TempRangeSchPtr, 0.0, ">=", 1.0, "<=" ) ) {
@@ -6731,10 +6735,12 @@ Label9999: ;
 				cAlphaArgs( 5 ) = "RelativeHumiditySchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_RelHumSch;
 				units = "[%]";
+				unitType = OutputProcessor::Unit::Perc;
 			} else if ( SameString( cAlphaArgs( 5 ), "WetBulbProfileMultiplierSchedule" ) ) {
 				cAlphaArgs( 5 ) = "WetBulbProfileMultiplierSchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WBProfMul;
 				units = "[]";
+				unitType = OutputProcessor::Unit::None;
 				if ( ! lNumericFieldBlanks( 5 ) ) {
 					DesDayInput( EnvrnNum ).HumIndValue = rNumericArgs( 5 ); // Humidity Indicating Conditions at Max Dry-Bulb
 				} else {
@@ -6747,6 +6753,7 @@ Label9999: ;
 				cAlphaArgs( 5 ) = "WetBulbProfileDifferenceSchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WBProfDif;
 				units = "[]";
+				unitType = OutputProcessor::Unit::None;
 				if ( ! lNumericFieldBlanks( 5 ) ) {
 					DesDayInput( EnvrnNum ).HumIndValue = rNumericArgs( 5 ); // Humidity Indicating Conditions at Max Dry-Bulb
 				} else {
@@ -6799,12 +6806,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).HumIndSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value " + units, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
+							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value ", unitType, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).HumIndSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value " + units, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
+							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value ", unitType, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
 						}
 
 						{ auto const SELECT_CASE_var( DesDayInput( EnvrnNum ).HumIndType );
@@ -6898,16 +6905,17 @@ Label9999: ;
 						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).BeamSolarSchPtr, DDBeamSolarValues( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).BeamSolarSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						units = "[W/m2]";
+						unitType = OutputProcessor::Unit::W_m2;
 						if ( schPtr == 0 ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).BeamSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value " + units, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
+							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value ", unitType, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).BeamSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value " + units, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
+							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value ", unitType, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
 						}
 						if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).BeamSolarSchPtr, 0.0, ">=" ) ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
@@ -6933,16 +6941,17 @@ Label9999: ;
 						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, DDDiffuseSolarValues( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						units = "[W/m2]";
+						unitType = OutputProcessor::Unit::W_m2;
 						if ( schPtr == 0 ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).DiffuseSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value " + units, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
+							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value ", unitType, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).DiffuseSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value " + units, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
+							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value ", unitType, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
 						}
 						if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, 0.0, ">=" ) ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
@@ -7185,6 +7194,7 @@ Label9999: ;
 		int schPtr;
 		bool MultipleEnvironments;
 		std::string units;
+		OutputProcessor::Unit unitType;
 
 		cCurrentModuleObject = "WeatherProperty:SkyTemperature";
 		NumWPSkyTemperatures = GetNumObjectsFound( cCurrentModuleObject );
@@ -7255,14 +7265,17 @@ Label9999: ;
 				WPSkyTemperature( Item ).CalculationType = WP_ScheduleValue;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[C]";
+				unitType = OutputProcessor::Unit::C;
 			} else if ( SameString( cAlphaArgs( 2 ), "DifferenceScheduleDryBulbValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_DryBulbDelta;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[deltaC]";
+				unitType = OutputProcessor::Unit::deltaC;
 			} else if ( SameString( cAlphaArgs( 2 ), "DifferenceScheduleDewPointValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_DewPointDelta;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[deltaC]";
+				unitType = OutputProcessor::Unit::deltaC;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + '.' );
 				ShowContinueError( "...entered value=\"" + cAlphaArgs( 2 ) + "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue." );
@@ -7297,12 +7310,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = Found;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value " + units, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
+							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value ", unitType, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = Found;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value " + units, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
+							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value ", unitType, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
 						}
 						WPSkyTemperature( Item ).IsSchedule = true;
 						WPSkyTemperature( Item ).SchedulePtr = Found;

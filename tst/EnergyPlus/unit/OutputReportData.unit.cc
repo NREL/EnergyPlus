@@ -82,12 +82,12 @@ TEST_F( EnergyPlusFixture, OutputReportData_getVariableKeys )
 	Real64 extLitPow;
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Power", Unit::W, extLitPow, "Zone", "Average", "Lite1" );
-	SetupOutputVariable( "Exterior Lights Electric Power", Unit::W, extLitPow, "Zone", "Average", "Lite2" );
-	SetupOutputVariable( "Exterior Lights Electric Power", Unit::W, extLitPow, "Zone", "Average", "Lite3" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1" );
+	SetupOutputVariable( "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2" );
+	SetupOutputVariable( "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3" );
 
 	int keyCount = 0;
 	int typeVar = 0;

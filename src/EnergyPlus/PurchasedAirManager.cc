@@ -722,67 +722,67 @@ namespace PurchasedAirManager {
 
 			// Setup Output variables
 			//    energy variables
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Heating Energy", Unit::J, PurchAir( PurchAirNum ).SenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Heating Energy", Unit::J, PurchAir( PurchAirNum ).LatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy", Unit::J, PurchAir( PurchAirNum ).TotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Cooling Energy", Unit::J, PurchAir( PurchAirNum ).SenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Cooling Energy", Unit::J, PurchAir( PurchAirNum ).LatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Cooling Energy", Unit::J, PurchAir( PurchAirNum ).TotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name, _, "DISTRICTCOOLING", "Cooling", _, "System" );
-			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Heating Energy", Unit::J, PurchAir( PurchAirNum ).ZoneSenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Latent Heating Energy", Unit::J, PurchAir( PurchAirNum ).ZoneLatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Total Heating Energy", Unit::J, PurchAir( PurchAirNum ).ZoneTotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Cooling Energy", Unit::J, PurchAir( PurchAirNum ).ZoneSenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Latent Cooling Energy", Unit::J, PurchAir( PurchAirNum ).ZoneLatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Total Cooling Energy", Unit::J, PurchAir( PurchAirNum ).ZoneTotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Heating Energy", Unit::J, PurchAir( PurchAirNum ).OASenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Heating Energy", Unit::J, PurchAir( PurchAirNum ).OALatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Heating Energy", Unit::J, PurchAir( PurchAirNum ).OATotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Cooling Energy", Unit::J, PurchAir( PurchAirNum ).OASenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Cooling Energy", Unit::J, PurchAir( PurchAirNum ).OALatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Cooling Energy", Unit::J, PurchAir( PurchAirNum ).OATotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Heating Energy", Unit::J, PurchAir( PurchAirNum ).HtRecSenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Heating Energy", Unit::J, PurchAir( PurchAirNum ).HtRecLatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Heating Energy", Unit::J, PurchAir( PurchAirNum ).HtRecTotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Cooling Energy", Unit::J, PurchAir( PurchAirNum ).HtRecSenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Cooling Energy", Unit::J, PurchAir( PurchAirNum ).HtRecLatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Cooling Energy", Unit::J, PurchAir( PurchAirNum ).HtRecTotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).SenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).LatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).TotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).SenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).LatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).TotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name, _, "DISTRICTCOOLING", "Cooling", _, "System" );
+			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneSenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Latent Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneLatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Total Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneTotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneSenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Latent Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneLatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Total Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneTotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OASenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OALatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OATotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OASenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OALatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OATotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecSenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecLatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecTotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecSenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecLatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecTotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
 
 			//    rate variables
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Heating Rate", Unit::W, PurchAir( PurchAirNum ).SenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Heating Rate", Unit::W, PurchAir( PurchAirNum ).LatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Rate", Unit::W, PurchAir( PurchAirNum ).TotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Cooling Rate", Unit::W, PurchAir( PurchAirNum ).SenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Cooling Rate", Unit::W, PurchAir( PurchAirNum ).LatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Cooling Rate", Unit::W, PurchAir( PurchAirNum ).TotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Heating Rate", Unit::W, PurchAir( PurchAirNum ).ZoneSenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Latent Heating Rate", Unit::W, PurchAir( PurchAirNum ).ZoneLatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Total Heating Rate", Unit::W, PurchAir( PurchAirNum ).ZoneTotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Cooling Rate", Unit::W, PurchAir( PurchAirNum ).ZoneSenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Latent Cooling Rate", Unit::W, PurchAir( PurchAirNum ).ZoneLatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Total Cooling Rate", Unit::W, PurchAir( PurchAirNum ).ZoneTotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Heating Rate", Unit::W, PurchAir( PurchAirNum ).OASenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Heating Rate", Unit::W, PurchAir( PurchAirNum ).OALatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Heating Rate", Unit::W, PurchAir( PurchAirNum ).OATotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Cooling Rate", Unit::W, PurchAir( PurchAirNum ).OASenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Cooling Rate", Unit::W, PurchAir( PurchAirNum ).OALatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Cooling Rate", Unit::W, PurchAir( PurchAirNum ).OATotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Heating Rate", Unit::W, PurchAir( PurchAirNum ).HtRecSenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Heating Rate", Unit::W, PurchAir( PurchAirNum ).HtRecLatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Heating Rate", Unit::W, PurchAir( PurchAirNum ).HtRecTotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Cooling Rate", Unit::W, PurchAir( PurchAirNum ).HtRecSenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Cooling Rate", Unit::W, PurchAir( PurchAirNum ).HtRecLatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Cooling Rate", Unit::W, PurchAir( PurchAirNum ).HtRecTotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).SenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).LatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).TotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).SenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).LatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).TotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneSenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Latent Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneLatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Total Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneTotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneSenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Latent Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneLatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Total Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneTotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OASenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OALatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OATotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OASenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OALatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OATotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecSenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecLatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecTotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecSenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecLatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecTotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
 
-			SetupOutputVariable( "Zone Ideal Loads Economizer Active Time", Unit::hr, PurchAir( PurchAirNum ).TimeEconoActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Active Time", Unit::hr, PurchAir( PurchAirNum ).TimeHtRecActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Economizer Active Time", OutputProcessor::Unit::hr, PurchAir( PurchAirNum ).TimeEconoActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Active Time", OutputProcessor::Unit::hr, PurchAir( PurchAirNum ).TimeHtRecActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
 
-			SetupOutputVariable( "Zone Ideal Loads Hybrid Ventilation Available Status", Unit::None, PurchAir( PurchAirNum ).AvailStatus, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Hybrid Ventilation Available Status", OutputProcessor::Unit::None, PurchAir( PurchAirNum ).AvailStatus, "System", "Average", PurchAir( PurchAirNum ).Name );
 
 			//air flows
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Mass Flow Rate", Unit::kg_s, PurchAir( PurchAirNum ).OutdoorAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate", Unit::m3_s, PurchAir( PurchAirNum ).OutdoorAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Mass Flow Rate", Unit::kg_s, PurchAir( PurchAirNum ).SupplyAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate", Unit::m3_s, PurchAir( PurchAirNum ).SupplyAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Mass Flow Rate", OutputProcessor::Unit::kg_s, PurchAir( PurchAirNum ).OutdoorAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, PurchAir( PurchAirNum ).OutdoorAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Mass Flow Rate", OutputProcessor::Unit::kg_s, PurchAir( PurchAirNum ).SupplyAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, PurchAir( PurchAirNum ).SupplyAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Ideal Loads Air System", PurchAir( PurchAirNum ).Name, "Air Mass Flow Rate", "[kg/s]", PurchAir( PurchAirNum ).EMSOverrideMdotOn, PurchAir( PurchAirNum ).EMSValueMassFlowRate );

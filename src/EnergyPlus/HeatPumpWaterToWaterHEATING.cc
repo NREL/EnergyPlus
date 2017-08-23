@@ -428,21 +428,21 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			SetupOutputVariable( "Water to Water Heat Pump Electric Power", Unit::W, GSHPReport( GSHPNum ).Power, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Electric Energy", Unit::J, GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Power", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).Power, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
 
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate", Unit::W, GSHPReport( GSHPNum ).QLoad, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy", Unit::J, GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).QLoad, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate", Unit::W, GSHPReport( GSHPNum ).QSource, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy", Unit::J, GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).QSource, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature", Unit::C, GSHPReport( GSHPNum ).LoadSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature", Unit::C, GSHPReport( GSHPNum ).LoadSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature", Unit::C, GSHPReport( GSHPNum ).SourceSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature", Unit::C, GSHPReport( GSHPNum ).SourceSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate", Unit::kg_s, GSHPReport( GSHPNum ).LoadSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate", Unit::kg_s, GSHPReport( GSHPNum ).SourceSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).LoadSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).LoadSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).SourceSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).SourceSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, GSHPReport( GSHPNum ).LoadSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, GSHPReport( GSHPNum ).SourceSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
 
 			//scan for loop connection data
 			errFlag = false;

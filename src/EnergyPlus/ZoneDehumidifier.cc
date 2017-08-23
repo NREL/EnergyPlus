@@ -526,21 +526,21 @@ namespace ZoneDehumidifier {
 
 		for ( ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex ) {
 			// Set up report variables for the dehumidifiers
-			SetupOutputVariable( "Zone Dehumidifier Sensible Heating Rate", Unit::W, ZoneDehumid( ZoneDehumidIndex ).SensHeatingRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Sensible Heating Energy", Unit::J, ZoneDehumid( ZoneDehumidIndex ).SensHeatingEnergy, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Removed Water Mass Flow Rate", Unit::kg_s, ZoneDehumid( ZoneDehumidIndex ).WaterRemovalRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Removed Water Mass", Unit::kg, ZoneDehumid( ZoneDehumidIndex ).WaterRemoved, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Electric Power", Unit::W, ZoneDehumid( ZoneDehumidIndex ).ElecPower, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Electric Energy", Unit::J, ZoneDehumid( ZoneDehumidIndex ).ElecConsumption, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name, _, "Electric", "COOLING", _, "System" );
-			SetupOutputVariable( "Zone Dehumidifier Off Cycle Parasitic Electric Power", Unit::W, ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticElecPower, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Off Cycle Parasitic Electric Energy", Unit::J, ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticElecCons, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Part Load Ratio", Unit::None, ZoneDehumid( ZoneDehumidIndex ).DehumidPLR, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Runtime Fraction", Unit::None, ZoneDehumid( ZoneDehumidIndex ).DehumidRTF, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Outlet Air Temperature", Unit::C, ZoneDehumid( ZoneDehumidIndex ).OutletAirTemp, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Sensible Heating Rate", OutputProcessor::Unit::W, ZoneDehumid( ZoneDehumidIndex ).SensHeatingRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Sensible Heating Energy", OutputProcessor::Unit::J, ZoneDehumid( ZoneDehumidIndex ).SensHeatingEnergy, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Removed Water Mass Flow Rate", OutputProcessor::Unit::kg_s, ZoneDehumid( ZoneDehumidIndex ).WaterRemovalRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Removed Water Mass", OutputProcessor::Unit::kg, ZoneDehumid( ZoneDehumidIndex ).WaterRemoved, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Electric Power", OutputProcessor::Unit::W, ZoneDehumid( ZoneDehumidIndex ).ElecPower, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Electric Energy", OutputProcessor::Unit::J, ZoneDehumid( ZoneDehumidIndex ).ElecConsumption, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name, _, "Electric", "COOLING", _, "System" );
+			SetupOutputVariable( "Zone Dehumidifier Off Cycle Parasitic Electric Power", OutputProcessor::Unit::W, ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticElecPower, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Off Cycle Parasitic Electric Energy", OutputProcessor::Unit::J, ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticElecCons, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Part Load Ratio", OutputProcessor::Unit::None, ZoneDehumid( ZoneDehumidIndex ).DehumidPLR, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Runtime Fraction", OutputProcessor::Unit::None, ZoneDehumid( ZoneDehumidIndex ).DehumidRTF, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Outlet Air Temperature", OutputProcessor::Unit::C, ZoneDehumid( ZoneDehumidIndex ).OutletAirTemp, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
 
 			if ( ZoneDehumid( ZoneDehumidIndex ).CondensateCollectMode == CondensateToTank ) {
-				SetupOutputVariable( "Zone Dehumidifier Condensate Volume Flow Rate", Unit::m3_s, ZoneDehumid( ZoneDehumidIndex ).DehumidCondVolFlowRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-				SetupOutputVariable( "Zone Dehumidifier Condensate Volume", Unit::m3, ZoneDehumid( ZoneDehumidIndex ).DehumidCondVol, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name, _, "OnSiteWater", "Condensate", _, "System" );
+				SetupOutputVariable( "Zone Dehumidifier Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneDehumid( ZoneDehumidIndex ).DehumidCondVolFlowRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+				SetupOutputVariable( "Zone Dehumidifier Condensate Volume", OutputProcessor::Unit::m3, ZoneDehumid( ZoneDehumidIndex ).DehumidCondVol, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name, _, "OnSiteWater", "Condensate", _, "System" );
 			}
 
 		}

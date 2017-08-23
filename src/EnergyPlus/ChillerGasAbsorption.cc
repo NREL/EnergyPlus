@@ -495,59 +495,59 @@ namespace ChillerGasAbsorption {
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
 			ChillerName = GasAbsorber( AbsorberNum ).Name;
 
-			SetupOutputVariable( "Chiller Heater Evaporator Cooling Rate", Unit::W, GasAbsorberReport( AbsorberNum ).CoolingLoad, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Evaporator Cooling Energy", Unit::J, GasAbsorberReport( AbsorberNum ).CoolingEnergy, "System", "Sum", ChillerName, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).CoolingLoad, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Evaporator Cooling Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).CoolingEnergy, "System", "Sum", ChillerName, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater Heating Rate", Unit::W, GasAbsorberReport( AbsorberNum ).HeatingLoad, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Heating Energy", Unit::J, GasAbsorberReport( AbsorberNum ).HeatingEnergy, "System", "Sum", ChillerName, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Heating Rate", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).HeatingLoad, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Heating Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).HeatingEnergy, "System", "Sum", ChillerName, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Rate", Unit::W, GasAbsorberReport( AbsorberNum ).TowerLoad, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Energy", Unit::J, GasAbsorberReport( AbsorberNum ).TowerEnergy, "System", "Sum", ChillerName, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Rate", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).TowerLoad, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).TowerEnergy, "System", "Sum", ChillerName, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater " + GasAbsorber( AbsorberNum ).FuelType + " Rate", Unit::W, GasAbsorberReport( AbsorberNum ).FuelUseRate, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater " + GasAbsorber( AbsorberNum ).FuelType + " Rate", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).FuelUseRate, "System", "Average", ChillerName );
 			// Do not include this on meters, this would duplicate the cool fuel and heat fuel
-			SetupOutputVariable( "Chiller Heater " + GasAbsorber( AbsorberNum ).FuelType + " Energy", Unit::J, GasAbsorberReport( AbsorberNum ).FuelEnergy, "System", "Sum", ChillerName );
+			SetupOutputVariable( "Chiller Heater " + GasAbsorber( AbsorberNum ).FuelType + " Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).FuelEnergy, "System", "Sum", ChillerName );
 
-			SetupOutputVariable( "Chiller Heater Cooling " + GasAbsorber( AbsorberNum ).FuelType + " Rate", Unit::W, GasAbsorberReport( AbsorberNum ).CoolFuelUseRate, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Cooling " + GasAbsorber( AbsorberNum ).FuelType + " Energy", Unit::J, GasAbsorberReport( AbsorberNum ).CoolFuelEnergy, "System", "Sum", ChillerName, _, GasAbsorber( AbsorberNum ).FuelType, "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Cooling " + GasAbsorber( AbsorberNum ).FuelType + " Rate", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).CoolFuelUseRate, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Cooling " + GasAbsorber( AbsorberNum ).FuelType + " Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).CoolFuelEnergy, "System", "Sum", ChillerName, _, GasAbsorber( AbsorberNum ).FuelType, "Cooling", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater Cooling COP", Unit::W_W, GasAbsorberReport( AbsorberNum ).FuelCOP, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Cooling COP", OutputProcessor::Unit::W_W, GasAbsorberReport( AbsorberNum ).FuelCOP, "System", "Average", ChillerName );
 
-			SetupOutputVariable( "Chiller Heater Heating " + GasAbsorber( AbsorberNum ).FuelType + " Rate", Unit::W, GasAbsorberReport( AbsorberNum ).HeatFuelUseRate, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Heating " + GasAbsorber( AbsorberNum ).FuelType + " Energy", Unit::J, GasAbsorberReport( AbsorberNum ).HeatFuelEnergy, "System", "Sum", ChillerName, _, GasAbsorber( AbsorberNum ).FuelType, "Heating", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Heating " + GasAbsorber( AbsorberNum ).FuelType + " Rate", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).HeatFuelUseRate, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Heating " + GasAbsorber( AbsorberNum ).FuelType + " Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).HeatFuelEnergy, "System", "Sum", ChillerName, _, GasAbsorber( AbsorberNum ).FuelType, "Heating", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater Electric Power", Unit::W, GasAbsorberReport( AbsorberNum ).ElectricPower, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Electric Power", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).ElectricPower, "System", "Average", ChillerName );
 			// Do not include this on meters, this would duplicate the cool electric and heat electric
-			SetupOutputVariable( "Chiller Heater Electric Energy", Unit::J, GasAbsorberReport( AbsorberNum ).ElectricEnergy, "System", "Sum", ChillerName );
+			SetupOutputVariable( "Chiller Heater Electric Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).ElectricEnergy, "System", "Sum", ChillerName );
 
-			SetupOutputVariable( "Chiller Heater Cooling Electric Power", Unit::W, GasAbsorberReport( AbsorberNum ).CoolElectricPower, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Cooling Electric Energy", Unit::J, GasAbsorberReport( AbsorberNum ).CoolElectricEnergy, "System", "Sum", ChillerName, _, "Electricity", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Cooling Electric Power", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).CoolElectricPower, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Cooling Electric Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).CoolElectricEnergy, "System", "Sum", ChillerName, _, "Electricity", "Cooling", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater Heating Electric Power", Unit::W, GasAbsorberReport( AbsorberNum ).HeatElectricPower, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Heating Electric Energy", Unit::J, GasAbsorberReport( AbsorberNum ).HeatElectricEnergy, "System", "Sum", ChillerName, _, "Electricity", "Heating", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater Heating Electric Power", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).HeatElectricPower, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Heating Electric Energy", OutputProcessor::Unit::J, GasAbsorberReport( AbsorberNum ).HeatElectricEnergy, "System", "Sum", ChillerName, _, "Electricity", "Heating", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater Evaporator Inlet Temperature", Unit::C, GasAbsorberReport( AbsorberNum ).ChillReturnTemp, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Evaporator Outlet Temperature", Unit::C, GasAbsorberReport( AbsorberNum ).ChillSupplyTemp, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Evaporator Mass Flow Rate", Unit::kg_s, GasAbsorberReport( AbsorberNum ).ChillWaterFlowRate, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Evaporator Inlet Temperature", OutputProcessor::Unit::C, GasAbsorberReport( AbsorberNum ).ChillReturnTemp, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Evaporator Outlet Temperature", OutputProcessor::Unit::C, GasAbsorberReport( AbsorberNum ).ChillSupplyTemp, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, GasAbsorberReport( AbsorberNum ).ChillWaterFlowRate, "System", "Average", ChillerName );
 
 			if ( GasAbsorber( AbsorberNum ).isWaterCooled ) {
-				SetupOutputVariable( "Chiller Heater Condenser Inlet Temperature", Unit::C, GasAbsorberReport( AbsorberNum ).CondReturnTemp, "System", "Average", ChillerName );
-				SetupOutputVariable( "Chiller Heater Condenser Outlet Temperature", Unit::C, GasAbsorberReport( AbsorberNum ).CondSupplyTemp, "System", "Average", ChillerName );
-				SetupOutputVariable( "Chiller Heater Condenser Mass Flow Rate", Unit::kg_s, GasAbsorberReport( AbsorberNum ).CondWaterFlowRate, "System", "Average", ChillerName );
+				SetupOutputVariable( "Chiller Heater Condenser Inlet Temperature", OutputProcessor::Unit::C, GasAbsorberReport( AbsorberNum ).CondReturnTemp, "System", "Average", ChillerName );
+				SetupOutputVariable( "Chiller Heater Condenser Outlet Temperature", OutputProcessor::Unit::C, GasAbsorberReport( AbsorberNum ).CondSupplyTemp, "System", "Average", ChillerName );
+				SetupOutputVariable( "Chiller Heater Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, GasAbsorberReport( AbsorberNum ).CondWaterFlowRate, "System", "Average", ChillerName );
 			} else {
-				SetupOutputVariable( "Chiller Heater Condenser Inlet Temperature", Unit::C, GasAbsorberReport( AbsorberNum ).CondReturnTemp, "System", "Average", ChillerName );
+				SetupOutputVariable( "Chiller Heater Condenser Inlet Temperature", OutputProcessor::Unit::C, GasAbsorberReport( AbsorberNum ).CondReturnTemp, "System", "Average", ChillerName );
 			}
 
-			SetupOutputVariable( "Chiller Heater Heating Inlet Temperature", Unit::C, GasAbsorberReport( AbsorberNum ).HotWaterReturnTemp, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Heating Outlet Temperature", Unit::C, GasAbsorberReport( AbsorberNum ).HotWaterSupplyTemp, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Heating Mass Flow Rate", Unit::kg_s, GasAbsorberReport( AbsorberNum ).HotWaterFlowRate, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Heating Inlet Temperature", OutputProcessor::Unit::C, GasAbsorberReport( AbsorberNum ).HotWaterReturnTemp, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Heating Outlet Temperature", OutputProcessor::Unit::C, GasAbsorberReport( AbsorberNum ).HotWaterSupplyTemp, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, GasAbsorberReport( AbsorberNum ).HotWaterFlowRate, "System", "Average", ChillerName );
 
-			SetupOutputVariable( "Chiller Heater Cooling Part Load Ratio", Unit::None, GasAbsorberReport( AbsorberNum ).CoolPartLoadRatio, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Maximum Cooling Rate", Unit::W, GasAbsorberReport( AbsorberNum ).CoolingCapacity, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Heating Part Load Ratio", Unit::None, GasAbsorberReport( AbsorberNum ).HeatPartLoadRatio, "System", "Average", ChillerName );
-			SetupOutputVariable( "Chiller Heater Maximum Heating Rate", Unit::W, GasAbsorberReport( AbsorberNum ).HeatingCapacity, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Cooling Part Load Ratio", OutputProcessor::Unit::None, GasAbsorberReport( AbsorberNum ).CoolPartLoadRatio, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Maximum Cooling Rate", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).CoolingCapacity, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Heating Part Load Ratio", OutputProcessor::Unit::None, GasAbsorberReport( AbsorberNum ).HeatPartLoadRatio, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Maximum Heating Rate", OutputProcessor::Unit::W, GasAbsorberReport( AbsorberNum ).HeatingCapacity, "System", "Average", ChillerName );
 
-			SetupOutputVariable( "Chiller Heater Runtime Fraction", Unit::None, GasAbsorberReport( AbsorberNum ).FractionOfPeriodRunning, "System", "Average", ChillerName );
+			SetupOutputVariable( "Chiller Heater Runtime Fraction", OutputProcessor::Unit::None, GasAbsorberReport( AbsorberNum ).FractionOfPeriodRunning, "System", "Average", ChillerName );
 
 		}
 	}

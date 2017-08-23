@@ -355,13 +355,13 @@ namespace OutsideEnergySources {
 		EnergySourceNum = 0;
 		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsHeat; ++IndexCounter ) {
 			++EnergySourceNum;
-			SetupOutputVariable( "District Heating Hot Water Energy", Unit::J, EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictHeating", "Heating", _, "Plant" );
-			SetupOutputVariable( "District Heating Hot Water Rate", Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Hot Water Energy", OutputProcessor::Unit::J, EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictHeating", "Heating", _, "Plant" );
+			SetupOutputVariable( "District Heating Hot Water Rate", OutputProcessor::Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
 
-			SetupOutputVariable( "District Heating Rate", Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Inlet Temperature", Unit::C, EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Outlet Temperature", Unit::C, EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Mass Flow Rate", Unit::kg_s, EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Rate", OutputProcessor::Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Inlet Temperature", OutputProcessor::Unit::C, EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Outlet Temperature", OutputProcessor::Unit::C, EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
 		}
 
 		cCurrentModuleObject = "DistrictCooling";
@@ -419,13 +419,13 @@ namespace OutsideEnergySources {
 		EnergySourceNum = NumDistrictUnitsHeat; //To initialize counter
 		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsCool; ++IndexCounter ) {
 			++EnergySourceNum;
-			SetupOutputVariable( "District Cooling Chilled Water Energy", Unit::J, EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictCooling", "Cooling", _, "Plant" );
-			SetupOutputVariable( "District Cooling Chilled Water Rate", Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Chilled Water Energy", OutputProcessor::Unit::J, EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictCooling", "Cooling", _, "Plant" );
+			SetupOutputVariable( "District Cooling Chilled Water Rate", OutputProcessor::Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
 
-			SetupOutputVariable( "District Cooling Rate", Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Inlet Temperature", Unit::C, EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Outlet Temperature", Unit::C, EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Mass Flow Rate", Unit::kg_s, EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Rate", OutputProcessor::Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Inlet Temperature", OutputProcessor::Unit::C, EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Outlet Temperature", OutputProcessor::Unit::C, EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Mass Flow Rate", OutputProcessor::Unit::kg_s, EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
 		}
 
 	}

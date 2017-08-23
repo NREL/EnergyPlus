@@ -645,14 +645,14 @@ namespace UnitHeater {
 
 		// Setup Report variables for the Unit Heaters, CurrentModuleObject='ZoneHVAC:UnitHeater'
 		for ( UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum ) {
-			SetupOutputVariable( "Zone Unit Heater Heating Rate", Unit::W, UnitHeat( UnitHeatNum ).HeatPower, "System", "Average", UnitHeat( UnitHeatNum ).Name );
-			SetupOutputVariable( "Zone Unit Heater Heating Energy", Unit::J, UnitHeat( UnitHeatNum ).HeatEnergy, "System", "Sum", UnitHeat( UnitHeatNum ).Name );
-			SetupOutputVariable( "Zone Unit Heater Fan Electric Power", Unit::W, UnitHeat( UnitHeatNum ).ElecPower, "System", "Average", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Heating Rate", OutputProcessor::Unit::W, UnitHeat( UnitHeatNum ).HeatPower, "System", "Average", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Heating Energy", OutputProcessor::Unit::J, UnitHeat( UnitHeatNum ).HeatEnergy, "System", "Sum", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Fan Electric Power", OutputProcessor::Unit::W, UnitHeat( UnitHeatNum ).ElecPower, "System", "Average", UnitHeat( UnitHeatNum ).Name );
 			// Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
-			SetupOutputVariable( "Zone Unit Heater Fan Electric Energy", Unit::J, UnitHeat( UnitHeatNum ).ElecEnergy, "System", "Sum", UnitHeat( UnitHeatNum ).Name );
-			SetupOutputVariable( "Zone Unit Heater Fan Availability Status", Unit::None, UnitHeat( UnitHeatNum ).AvailStatus, "System", "Average", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Fan Electric Energy", OutputProcessor::Unit::J, UnitHeat( UnitHeatNum ).ElecEnergy, "System", "Sum", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Fan Availability Status", OutputProcessor::Unit::None, UnitHeat( UnitHeatNum ).AvailStatus, "System", "Average", UnitHeat( UnitHeatNum ).Name );
 			if ( UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff ) {
-				SetupOutputVariable( "Zone Unit Heater Fan Part Load Ratio", Unit::None, UnitHeat( UnitHeatNum ).FanPartLoadRatio, "System", "Average", UnitHeat( UnitHeatNum ).Name );
+				SetupOutputVariable( "Zone Unit Heater Fan Part Load Ratio", OutputProcessor::Unit::None, UnitHeat( UnitHeatNum ).FanPartLoadRatio, "System", "Average", UnitHeat( UnitHeatNum ).Name );
 			}
 		}
 

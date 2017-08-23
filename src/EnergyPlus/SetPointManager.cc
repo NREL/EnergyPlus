@@ -2640,8 +2640,8 @@ namespace SetPointManager {
 		}
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
-			SetupOutputVariable( "Setpoint Manager Warmest Temperature Critical Zone Number", Unit::None, WarmestSetPtMgrTempFlow( SetPtMgrNum ).CritZoneNum, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
-			SetupOutputVariable( "Setpoint Manager Warmest Temperature Turndown Flow Fraction", Unit::None, WarmestSetPtMgrTempFlow( SetPtMgrNum ).Turndown, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
+			SetupOutputVariable( "Setpoint Manager Warmest Temperature Critical Zone Number", OutputProcessor::Unit::None, WarmestSetPtMgrTempFlow( SetPtMgrNum ).CritZoneNum, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
+			SetupOutputVariable( "Setpoint Manager Warmest Temperature Turndown Flow Fraction", OutputProcessor::Unit::None, WarmestSetPtMgrTempFlow( SetPtMgrNum ).Turndown, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
 		}
 
 		// Input the Condenser Entering Set Point Managers

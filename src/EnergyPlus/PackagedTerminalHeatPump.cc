@@ -2859,66 +2859,66 @@ namespace PackagedTerminalHeatPump {
 
 		for ( PTUnitNum = 1; PTUnitNum <= NumPTHP; ++PTUnitNum ) {
 			// Setup Report variables for the Packaged Terminal Heat Psmps,   CurrentModuleObject = 'ZoneHVAC:PackagedTerminalHeatPump'
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Heating Rate", Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Heating Energy", Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Cooling Rate", Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Cooling Energy", Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Heating Rate", Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Heating Energy", Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Cooling Rate", Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Cooling Energy", Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Heating Rate", Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Heating Energy", Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Cooling Rate", Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Cooling Energy", Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Electric Power", Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Electric Energy", Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Fan Part Load Ratio", Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Compressor Part Load Ratio", Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Fan Availability Status", Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Electric Power", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Electric Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Fan Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Compressor Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Fan Availability Status", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
 		}
 
 		for ( PTUnitNum = 1 + NumPTHP; PTUnitNum <= NumPTHP + NumPTAC; ++PTUnitNum ) {
 			// Setup Report variables for the Packaged Terminal Air Conditioners,
 			// CurrentModuleObject = 'ZoneHVAC:PackagedTerminalAirConditioner'
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Heating Rate", Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Heating Energy", Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Cooling Rate", Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Cooling Energy", Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Heating Rate", Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Heating Energy", Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Cooling Rate", Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Cooling Energy", Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Heating Rate", Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Heating Energy", Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Cooling Rate", Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Cooling Energy", Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Electric Power", Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Electric Energy", Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Fan Part Load Ratio", Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio", Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Fan Availability Status", Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Electric Power", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Electric Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Fan Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Fan Availability Status", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
 		}
 
 		for ( PTUnitNum = 1 + NumPTHP + NumPTAC; PTUnitNum <= NumPTUs; ++PTUnitNum ) {
 			// Setup Report variables for the Zone Water Source Heat Pumps, CurrentModuleObject='ZoneHVAC:WaterToAirHeatPump'
-			SetupOutputVariable( "Zone Water to Air Heat Pump Total Heating Rate", Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Total Heating Energy", Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Total Cooling Rate", Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Total Cooling Energy", Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Heating Rate", Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Heating Energy", Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Cooling Rate", Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Cooling Energy", Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Heating Rate", Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Heating Energy", Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Cooling Rate", Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Cooling Energy", Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Electric Power", Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Electric Energy", Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Part Load Ratio", Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Compressor Part Load Ratio", Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Availability Status", Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Total Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Total Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Total Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Total Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Electric Power", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Electric Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Compressor Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Availability Status", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
 		}
 	}
 

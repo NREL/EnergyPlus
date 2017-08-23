@@ -403,13 +403,13 @@ namespace BaseboardElectric {
 
 			// Setup Report variables for the Electric Baseboards
 			// CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Electric'
-			SetupOutputVariable( "Baseboard Total Heating Energy", Unit::J, Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipName, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Total Heating Energy", OutputProcessor::Unit::J, Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipName, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
 
-			SetupOutputVariable( "Baseboard Total Heating Rate", Unit::W, Baseboard( BaseboardNum ).Power, "System", "Average", Baseboard( BaseboardNum ).EquipName );
+			SetupOutputVariable( "Baseboard Total Heating Rate", OutputProcessor::Unit::W, Baseboard( BaseboardNum ).Power, "System", "Average", Baseboard( BaseboardNum ).EquipName );
 
-			SetupOutputVariable( "Baseboard Electric Energy", Unit::J, Baseboard( BaseboardNum ).ElecUseLoad, "System", "Sum", Baseboard( BaseboardNum ).EquipName, _, "Electric", "HEATING", _, "System" );
+			SetupOutputVariable( "Baseboard Electric Energy", OutputProcessor::Unit::J, Baseboard( BaseboardNum ).ElecUseLoad, "System", "Sum", Baseboard( BaseboardNum ).EquipName, _, "Electric", "HEATING", _, "System" );
 
-			SetupOutputVariable( "Baseboard Electric Power", Unit::W, Baseboard( BaseboardNum ).ElecUseRate, "System", "Average", Baseboard( BaseboardNum ).EquipName );
+			SetupOutputVariable( "Baseboard Electric Power", OutputProcessor::Unit::W, Baseboard( BaseboardNum ).ElecUseRate, "System", "Average", Baseboard( BaseboardNum ).EquipName );
 
 		}
 

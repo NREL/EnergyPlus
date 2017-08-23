@@ -1339,9 +1339,9 @@ namespace HVACInterfaceManager {
 
 			} else if ( SELECT_CASE_var == CommonPipe_Single ) { //Uncontrolled ('single') common pipe
 				PlantCommonPipe( CurLoopNum ).CommonPipeType = CommonPipe_Single;
-				SetupOutputVariable( "Plant Common Pipe Mass Flow Rate", Unit::Kg_s, PlantCommonPipe( CurLoopNum ).Flow, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Temperature", Unit::C, PlantCommonPipe( CurLoopNum ).Temp, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Flow Direction Status", Unit::None, PlantCommonPipe( CurLoopNum ).FlowDir, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Mass Flow Rate", OutputProcessor::Unit::Kg_s, PlantCommonPipe( CurLoopNum ).Flow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Temperature", OutputProcessor::Unit::C, PlantCommonPipe( CurLoopNum ).Temp, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Flow Direction Status", OutputProcessor::Unit::None, PlantCommonPipe( CurLoopNum ).FlowDir, "System", "Average", PlantLoop( CurLoopNum ).Name );
 
 				if ( first_supply_component_typenum == TypeOf_PumpVariableSpeed ) {
 					// If/when the model supports variable-pumping primary, this can be removed.
@@ -1354,10 +1354,10 @@ namespace HVACInterfaceManager {
 
 			} else if ( SELECT_CASE_var == CommonPipe_TwoWay ) { //Controlled ('two-way') common pipe
 				PlantCommonPipe( CurLoopNum ).CommonPipeType = CommonPipe_TwoWay;
-				SetupOutputVariable( "Plant Common Pipe Primary Mass Flow Rate", Unit::kg_s, PlantCommonPipe( CurLoopNum ).PriCPLegFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Secondary Mass Flow Rate", Unit::kg_s, PlantCommonPipe( CurLoopNum ).SecCPLegFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Primary to Secondary Mass Flow Rate", Unit::kg_s, PlantCommonPipe( CurLoopNum ).PriToSecFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Secondary to Primary Mass Flow Rate", Unit::kg_s, PlantCommonPipe( CurLoopNum ).SecToPriFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Primary Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).PriCPLegFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Secondary Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).SecCPLegFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Primary to Secondary Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).PriToSecFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Secondary to Primary Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).SecToPriFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
 
 				// check type of pump on supply side inlet
 				if ( first_supply_component_typenum == TypeOf_PumpConstantSpeed ) {

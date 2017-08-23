@@ -190,6 +190,58 @@ namespace OutputProcessor {
 	//PUBLIC  SetReportNow
 
 	// Types
+	enum class Unit {
+		kg_s,
+		C,
+		kgWater_kgDryAir,
+		ppm,
+		Pa,
+		m3_s,
+		None,
+		min,
+		W,
+		J,
+		m3,
+		kg,
+		ach,
+		W_W,
+		lux,
+		lum_W,
+		hr,
+		cd_m2,
+		J_kgWater,
+		m_s,
+		W_m2,
+		m,
+		Ah,
+		A,
+		V,
+		deltaC,
+		kmol_s,
+		Kg_s,
+		rev_min,
+		Btu_h_W,
+		W_m2K,
+		J_kg,
+		kg_kg,
+		Perc,
+		deg,
+		s,
+		kg_m3,
+		kg_m2s,
+		J_kgK,
+		L,
+		Kg,
+		K_m,
+		m2,
+		W_m2C,
+		rad,
+		ACH,
+		J_m2,
+		clo,
+		W_K,
+		kgWater_s
+	};
 
 	struct TimeSteps
 	{
@@ -314,7 +366,7 @@ namespace OutputProcessor {
 		int Next; // Next variable of same name (different units)
 		bool ReportedOnDDFile; // true after written to .rdd/.mdd file
 		std::string VarNameOnly; // Name of Variable
-		std::string UnitsString; // Units for Variable (no brackets)
+		OutputProcessor::Unit units; // Units for Variable
 
 		// Default Constructor
 		VariableTypeForDDOutput() :
@@ -322,7 +374,8 @@ namespace OutputProcessor {
 			StoreType( 0 ),
 			VariableType( VarType_NotFound ),
 			Next( 0 ),
-			ReportedOnDDFile( false )
+			ReportedOnDDFile( false ),
+			units( OutputProcessor::Unit::None )
 		{}
 
 	};
@@ -338,14 +391,15 @@ namespace OutputProcessor {
 		std::string VarNameOnly; // Name of Variable
 		std::string VarNameOnlyUC; // Name of Variable with out key in uppercase
 		std::string KeyNameOnlyUC; // Name of key only witht out variable in uppercase
-		std::string UnitsString; // Units for Variable (no brackets)
+		OutputProcessor::Unit units; // Units for Variable
 		Reference< RealVariables > VarPtr; // Pointer used to real Variables structure
 
 		// Default Constructor
 		RealVariableType() :
 			IndexType( 0 ),
 			StoreType( 0 ),
-			ReportID( 0 )
+			ReportID( 0 ),
+			units( OutputProcessor::Unit::None )
 		{}
 
 	};
@@ -359,14 +413,15 @@ namespace OutputProcessor {
 		std::string VarName; // Name of Variable
 		std::string VarNameUC; // Name of Variable
 		std::string VarNameOnly; // Name of Variable
-		std::string UnitsString; // Units for Variable (no brackets)
+		OutputProcessor::Unit units; // Units for Variable
 		Reference< IntegerVariables > VarPtr; // Pointer used to integer Variables structure
 
 		// Default Constructor
 		IntegerVariableType() :
 			IndexType( 0 ),
 			StoreType( 0 ),
-			ReportID( 0 )
+			ReportID( 0 ),
+			units( OutputProcessor::Unit::None )
 		{}
 
 	};
@@ -417,7 +472,7 @@ namespace OutputProcessor {
 		std::string EndUse; // End Use of the meter
 		std::string EndUseSub; // End Use subcategory of the meter
 		std::string Group; // Group of the meter
-		std::string Units; // Units for the Meter
+		OutputProcessor::Unit Units; // Units for the Meter
 		int RT_forIPUnits; // Resource type number for IP Units (tabular) reporting
 		int TypeOfMeter; // type of meter
 		int SourceMeter; // for custom decrement meters, this is the meter number for the subtraction
@@ -493,6 +548,7 @@ namespace OutputProcessor {
 
 		// Default Constructor
 		MeterType() :
+			Units( OutputProcessor::Unit::None ),
 			RT_forIPUnits( 0 ),
 			TypeOfMeter( MeterType_Normal ),
 			SourceMeter( 0 ),
@@ -716,7 +772,7 @@ namespace OutputProcessor {
 	void
 	AddMeter(
 		std::string const & Name, // Name for the meter
-		std::string const & MtrUnits, // Units for the meter
+		OutputProcessor::Unit const & MtrUnits, // Units for the meter
 		std::string const & ResourceType, // ResourceType for the meter
 		std::string const & EndUse, // EndUse for the meter
 		std::string const & EndUseSub, // EndUse subcategory for the meter
@@ -725,7 +781,7 @@ namespace OutputProcessor {
 
 	void
 	AttachMeters(
-		std::string const & MtrUnits, // Units for this meter
+		Unit const & MtrUnits, // Units for this meter
 		std::string & ResourceType, // Electricity, Gas, etc.
 		std::string & EndUse, // End-use category (Lights, Heating, etc.)
 		std::string & EndUseSub, // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
@@ -747,7 +803,7 @@ namespace OutputProcessor {
 
 	void
 	ValidateNStandardizeMeterTitles(
-		std::string const & MtrUnits, // Units for the meter
+		OutputProcessor::Unit const & MtrUnits, // Units for the meter
 		std::string & ResourceType, // Electricity, Gas, etc.
 		std::string & EndUse, // End Use Type (Lights, Heating, etc.)
 		std::string & EndUseSub, // End Use Sub Type (General Lights, Task Lights, etc.)
@@ -866,7 +922,7 @@ namespace OutputProcessor {
 		std::string const & keyedValue, // The key name for the data
 		std::string const & variableName, // The variable's actual name
 		int const indexType,
-		std::string const & UnitsString, // The variables units
+		OutputProcessor::Unit const & unitsForVar, // The variables units
 		Optional_string_const ScheduleName = _
 	);
 
@@ -978,6 +1034,12 @@ namespace OutputProcessor {
 		int const SetIntVal // integer value to set if type is integer
 	);
 
+
+	std::string
+	unitEnumToString(
+		OutputProcessor::Unit const & unitIn
+	);
+
 } // OutputProcessor
 
 //==============================================================================================
@@ -988,68 +1050,12 @@ namespace OutputProcessor {
 // within the OutputProcessor.
 // *****************************************************************************
 
-enum class Unit {
-	kg_s,
-	C,
-	kgWater_kgDryAir,
-	ppm,
-	Pa,
-	m3_s,
-	None,
-	min,
-	W,
-	J,
-	m3,
-	kg,
-	ach,
-	W_W,
-	lux,
-	lum_W,
-	hr,
-	cd_m2,
-	J_kgWater,
-	m_s,
-	W_m2,
-	m,
-	Ah,
-	A,
-	V,
-	deltaC,
-	kmol_s,
-	Kg_s,
-	rev_min,
-	Btu_h_W,
-	W_m2K,
-	J_kg,
-	kg_kg,
-	Perc,
-	deg,
-	s,
-	kg_m3,
-	kg_m2s,
-	J_kgK,
-	L,
-	Kg,
-	K_m,
-	m2,
-	W_m2C,
-	rad,
-	ACH,
-	J_m2,
-	clo,
-	W_K,
-	kgWater_s
-};
 
-std::string
-unitEnumToString(
-	Unit const & unitIn
-);
 
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable (with units)
-	Unit const & VariableUnit, // Actual units corresponding to the actual variable
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -1066,29 +1072,10 @@ SetupOutputVariable(
 );
 
 
-
-void
-SetupOutputVariable(
-	std::string const & VariableName, // String Name of variable (with units)
-	Real64 & ActualVariable, // Actual Variable, used to set up pointer
-	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
-	std::string const & KeyedValue, // Associated Key for this variable
-	Optional_string_const ReportFreq = _, // Internal use -- causes reporting at this freqency
-	Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
-	Optional_string_const EndUseKey = _, // Meter End Use Key (Lights, Heating, Cooling, etc)
-	Optional_string_const EndUseSubKey = _, // Meter End Use Sub Key (General Lights, Task Lights, etc)
-	Optional_string_const GroupKey = _, // Meter Super Group Key (Building, System, Plant)
-	Optional_string_const ZoneKey = _, // Meter Zone Key (zone name)
-	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
-	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
-	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
-);
-
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable
-	Unit const & VariableUnit, // Actual units corresponding to the actual variable
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	int & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -1100,17 +1087,7 @@ SetupOutputVariable(
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable
-	int & ActualVariable, // Actual Variable, used to set up pointer
-	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
-	std::string const & KeyedValue, // Associated Key for this variable
-	Optional_string_const ReportFreq = _, // Internal use -- causes reporting at this freqency
-	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
-);
-
-void
-SetupOutputVariable(
-	std::string const & VariableName, // String Name of variable
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -1231,7 +1208,7 @@ AddToOutputVariableList(
 	int const IndexType,
 	int const StateType,
 	int const VariableType,
-	std::string const & UnitsString
+	OutputProcessor::Unit const unitsForVar
 );
 
 

@@ -421,13 +421,13 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( ZoneContamGenericConstant( Loop ).ActualZoneNum <= 0 ) continue; // Error, will be caught and terminated later
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Constant Source Generation Volume Flow Rate", Unit::m3_s, ZoneContamGenericConstant( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericConstant( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Constant Source Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericConstant( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericConstant( Loop ).Name );
 
 			// Zone total report variables
 			ZonePtr = ZoneContamGenericConstant( Loop ).ActualZoneNum;
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericConstant( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericConstant( Loop ).GCGenRate );
 
@@ -509,7 +509,7 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate", Unit::m3_s, ZoneContamGenericPDriven( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericPDriven( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericPDriven( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericPDriven( Loop ).Name );
 
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum > 0 ) {
 				ZonePtr = Surface( MultizoneSurfaceData( ZoneContamGenericPDriven( Loop ).SurfNum ).SurfNum ).Zone;
@@ -519,7 +519,7 @@ namespace ZoneContaminantPredictorCorrector {
 			// Zone total report variables
 			if ( ZonePtr > 0 && RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			if ( ZonePtr > 0 ) SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericPDriven( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericPDriven( Loop ).GCGenRate );
 		}
@@ -589,13 +589,13 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Cutoff Model Generation Volume Flow Rate", Unit::m3_s, ZoneContamGenericCutoff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericCutoff( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Cutoff Model Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericCutoff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericCutoff( Loop ).Name );
 
 			// Zone total report variables
 			ZonePtr = ZoneContamGenericCutoff( Loop ).ActualZoneNum;
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericCutoff( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericCutoff( Loop ).GCGenRate );
 		}
@@ -665,14 +665,14 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Decay Model Generation Volume Flow Rate", Unit::m3_s, ZoneContamGenericDecay( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDecay( Loop ).Name );
-			SetupOutputVariable( "Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time", Unit::s, ZoneContamGenericDecay( Loop ).GCTime, "Zone", "Average", ZoneContamGenericDecay( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Decay Model Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericDecay( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDecay( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time", OutputProcessor::Unit::s, ZoneContamGenericDecay( Loop ).GCTime, "Zone", "Average", ZoneContamGenericDecay( Loop ).Name );
 
 			// Zone total report variables
 			ZonePtr = ZoneContamGenericDecay( Loop ).ActualZoneNum;
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDecay( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDecay( Loop ).GCGenRate );
 		}
@@ -741,16 +741,16 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate", Unit::m3_s, ZoneContamGenericBLDiff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericBLDiff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).Name );
 			if ( ZoneContamGenericBLDiff( Loop ).SurfNum > 0 ) {
-				SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration", Unit::ppm, Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).GenericContam, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).SurfName );
+				SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration", OutputProcessor::Unit::ppm, Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).GenericContam, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).SurfName );
 			}
 
 			ZonePtr = Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).Zone;
 			// Zone total report variables
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericBLDiff( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericBLDiff( Loop ).GCGenRate );
 		}
@@ -813,13 +813,13 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate", Unit::m3_s, ZoneContamGenericDVS( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDVS( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericDVS( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDVS( Loop ).Name );
 
 			ZonePtr = Surface( ZoneContamGenericDVS( Loop ).SurfNum ).Zone;
 			// Zone total report variables
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDVS( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDVS( Loop ).GCGenRate );
 		}
@@ -883,13 +883,13 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Deposition Rate Removal Volume Flow Rate", Unit::m3_s, ZoneContamGenericDRS( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDRS( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Deposition Rate Removal Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericDRS( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDRS( Loop ).Name );
 
 			ZonePtr = ZoneContamGenericDRS( Loop ).ActualZoneNum;
 			// Zone total report variables
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDRS( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDRS( Loop ).GCGenRate );
 		}
@@ -1226,10 +1226,10 @@ namespace ZoneContaminantPredictorCorrector {
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				// Zone CO2
 				if ( Contaminant.CO2Simulation ) {
-					SetupOutputVariable( "Zone Air CO2 Concentration", Unit::ppm, ZoneAirCO2( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate", Unit::kg_s, CO2PredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Air CO2 Setpoint Concentration", Unit::ppm, ZoneCO2SetPoint( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Air CO2 Internal Gain Volume Flow Rate", Unit::m3_s, ZoneCO2Gain( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air CO2 Concentration", OutputProcessor::Unit::ppm, ZoneAirCO2( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate", OutputProcessor::Unit::kg_s, CO2PredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air CO2 Setpoint Concentration", OutputProcessor::Unit::ppm, ZoneCO2SetPoint( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air CO2 Internal Gain Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneCO2Gain( Loop ), "System", "Average", Zone( Loop ).Name );
 				}
 
 			} // Loop
@@ -1269,9 +1269,9 @@ namespace ZoneContaminantPredictorCorrector {
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				// Zone CO2
 				if ( Contaminant.GenericContamSimulation ) {
-					SetupOutputVariable( "Zone Air Generic Air Contaminant Concentration", Unit::ppm, ZoneAirGC( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate", Unit::kg_s, GCPredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Generic Air Contaminant Setpoint Concentration", Unit::ppm, ZoneGCSetPoint( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air Generic Air Contaminant Concentration", OutputProcessor::Unit::ppm, ZoneAirGC( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate", OutputProcessor::Unit::kg_s, GCPredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Generic Air Contaminant Setpoint Concentration", OutputProcessor::Unit::ppm, ZoneGCSetPoint( Loop ), "System", "Average", Zone( Loop ).Name );
 				}
 			} // Loop
 

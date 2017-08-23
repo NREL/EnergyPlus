@@ -526,20 +526,20 @@ namespace Boilers {
 		}
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			SetupOutputVariable( "Boiler Heating Rate", Unit::W, BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Heating Energy", Unit::J, BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
+			SetupOutputVariable( "Boiler Heating Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Heating Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
 			if ( SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
-				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power", Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			} else {
-				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate", Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy", Unit::J, BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", "Boiler", "Plant" );
-			SetupOutputVariable( "Boiler Inlet Temperature", Unit::C, BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Outlet Temperature", Unit::C, BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Mass Flow Rate", Unit::kg_s, BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Ancillary Electric Power", Unit::W, BoilerReport( BoilerNum ).ParasiticElecPower, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Ancillary Electric Energy", Unit::J, BoilerReport( BoilerNum ).ParasiticElecConsumption, "System", "Sum", Boiler( BoilerNum ).Name, _, "ELECTRICITY", "Heating", "Boiler Parasitic", "Plant" );
-			SetupOutputVariable( "Boiler Part Load Ratio", Unit::None, BoilerReport( BoilerNum ).BoilerPLR, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", "Boiler", "Plant" );
+			SetupOutputVariable( "Boiler Inlet Temperature", OutputProcessor::Unit::C, BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Outlet Temperature", OutputProcessor::Unit::C, BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Ancillary Electric Power", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).ParasiticElecPower, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Ancillary Electric Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).ParasiticElecConsumption, "System", "Sum", Boiler( BoilerNum ).Name, _, "ELECTRICITY", "Heating", "Boiler Parasitic", "Plant" );
+			SetupOutputVariable( "Boiler Part Load Ratio", OutputProcessor::Unit::None, BoilerReport( BoilerNum ).BoilerPLR, "System", "Average", Boiler( BoilerNum ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Boiler Nominal Capacity", Boiler( BoilerNum ).Name, "[W]", Boiler( BoilerNum ).NomCap );
 			}

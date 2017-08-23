@@ -969,19 +969,19 @@ namespace IceThermalStorage {
 		//********************************************
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
-			SetupOutputVariable( "Ice Thermal Storage Requested Load", Unit::W, IceStorageReport( IceNum ).MyLoad, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Requested Load", OutputProcessor::Unit::W, IceStorageReport( IceNum ).MyLoad, "System", "Average", IceStorage( IceNum ).Name );
 
 			// Ice fraction
-			SetupOutputVariable( "Ice Thermal Storage End Fraction", Unit::None, IceStorageReport( IceNum ).IceFracRemain, "Zone", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, IceStorageReport( IceNum ).IceFracRemain, "Zone", "Average", IceStorage( IceNum ).Name );
 
 			// Discharge: ITS Information
-			SetupOutputVariable( "Ice Thermal Storage Mass Flow Rate", Unit::kg_s, IceStorageReport( IceNum ).ITSmdot, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Inlet Temperature", Unit::C, IceStorageReport( IceNum ).ITSInletTemp, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Outlet Temperature", Unit::C, IceStorageReport( IceNum ).ITSOutletTemp, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Rate", Unit::W, IceStorageReport( IceNum ).ITSCoolingRate, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Energy", Unit::J, IceStorageReport( IceNum ).ITSCoolingEnergy, "System", "Sum", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Rate", Unit::W, IceStorageReport( IceNum ).ITSChargingRate, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Energy", Unit::J, IceStorageReport( IceNum ).ITSChargingEnergy, "System", "Sum", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, IceStorageReport( IceNum ).ITSmdot, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Inlet Temperature", OutputProcessor::Unit::C, IceStorageReport( IceNum ).ITSInletTemp, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Outlet Temperature", OutputProcessor::Unit::C, IceStorageReport( IceNum ).ITSOutletTemp, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, IceStorageReport( IceNum ).ITSCoolingRate, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, IceStorageReport( IceNum ).ITSCoolingEnergy, "System", "Sum", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, IceStorageReport( IceNum ).ITSChargingRate, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, IceStorageReport( IceNum ).ITSChargingEnergy, "System", "Sum", IceStorage( IceNum ).Name );
 
 		} // IceNum
 
@@ -1176,26 +1176,26 @@ namespace IceThermalStorage {
 		//********************************************
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
-			SetupOutputVariable( "Ice Thermal Storage Cooling Rate", Unit::W, DetIceStor( IceNum ).CompLoad, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Rate", OutputProcessor::Unit::W, DetIceStor( IceNum ).CompLoad, "System", "Average", DetIceStor( IceNum ).Name );
 
 			// Ice fraction
-			SetupOutputVariable( "Ice Thermal Storage Change Fraction", Unit::None, DetIceStor( IceNum ).IceFracChange, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage End Fraction", Unit::None, DetIceStor( IceNum ).IceFracRemaining, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage On Coil Fraction", Unit::None, DetIceStor( IceNum ).IceFracOnCoil, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Change Fraction", OutputProcessor::Unit::None, DetIceStor( IceNum ).IceFracChange, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, DetIceStor( IceNum ).IceFracRemaining, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage On Coil Fraction", OutputProcessor::Unit::None, DetIceStor( IceNum ).IceFracOnCoil, "System", "Average", DetIceStor( IceNum ).Name );
 
 			// Discharge: ITS Information
-			SetupOutputVariable( "Ice Thermal Storage Mass Flow Rate", Unit::kg_s, DetIceStor( IceNum ).MassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Bypass Mass Flow Rate", Unit::kg_s, DetIceStor( IceNum ).BypassMassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Tank Mass Flow Rate", Unit::kg_s, DetIceStor( IceNum ).TankMassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Fluid Inlet Temperature", Unit::C, DetIceStor( IceNum ).InletTemp, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Blended Outlet Temperature", Unit::C, DetIceStor( IceNum ).OutletTemp, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Tank Outlet Temperature", Unit::C, DetIceStor( IceNum ).TankOutletTemp, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Rate", Unit::W, DetIceStor( IceNum ).DischargingRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Energy", Unit::J, DetIceStor( IceNum ).DischargingEnergy, "System", "Sum", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Rate", Unit::W, DetIceStor( IceNum ).ChargingRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Energy", Unit::J, DetIceStor( IceNum ).ChargingEnergy, "System", "Sum", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Ancillary Electric Power", Unit::W, DetIceStor( IceNum ).ParasiticElecRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Ancillary Electric Energy", Unit::J, DetIceStor( IceNum ).ParasiticElecEnergy, "System", "Sum", DetIceStor( IceNum ).Name, _, "ELECTRICITY", _, _, "System" );
+			SetupOutputVariable( "Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, DetIceStor( IceNum ).MassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Bypass Mass Flow Rate", OutputProcessor::Unit::kg_s, DetIceStor( IceNum ).BypassMassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Tank Mass Flow Rate", OutputProcessor::Unit::kg_s, DetIceStor( IceNum ).TankMassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Fluid Inlet Temperature", OutputProcessor::Unit::C, DetIceStor( IceNum ).InletTemp, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Blended Outlet Temperature", OutputProcessor::Unit::C, DetIceStor( IceNum ).OutletTemp, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Tank Outlet Temperature", OutputProcessor::Unit::C, DetIceStor( IceNum ).TankOutletTemp, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, DetIceStor( IceNum ).DischargingRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, DetIceStor( IceNum ).DischargingEnergy, "System", "Sum", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, DetIceStor( IceNum ).ChargingRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, DetIceStor( IceNum ).ChargingEnergy, "System", "Sum", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Ancillary Electric Power", OutputProcessor::Unit::W, DetIceStor( IceNum ).ParasiticElecRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Ancillary Electric Energy", OutputProcessor::Unit::J, DetIceStor( IceNum ).ParasiticElecEnergy, "System", "Sum", DetIceStor( IceNum ).Name, _, "ELECTRICITY", _, _, "System" );
 
 		} // ...over detailed ice storage units
 

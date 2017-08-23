@@ -790,93 +790,93 @@ namespace PlantCentralGSHP {
 
 		//Set up output variables
 		for ( WrapperNum = 1; WrapperNum <= NumWrappers; ++WrapperNum ) {
-			SetupOutputVariable( "Chiller Heater System Cooling Electric Energy", Unit::J, WrapperReport( WrapperNum ).TotElecCooling, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater System Cooling Electric Energy", OutputProcessor::Unit::J, WrapperReport( WrapperNum ).TotElecCooling, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater System Heating Electric Energy", Unit::J, WrapperReport( WrapperNum ).TotElecHeating, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ELECTRICITY", "Heating", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater System Heating Electric Energy", OutputProcessor::Unit::J, WrapperReport( WrapperNum ).TotElecHeating, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ELECTRICITY", "Heating", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater System Cooling Electric Power", Unit::W, WrapperReport( WrapperNum ).TotElecCoolingPwr, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Cooling Electric Power", OutputProcessor::Unit::W, WrapperReport( WrapperNum ).TotElecCoolingPwr, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Heating Electric Power", Unit::W, WrapperReport( WrapperNum ).TotElecHeatingPwr, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Heating Electric Power", OutputProcessor::Unit::W, WrapperReport( WrapperNum ).TotElecHeatingPwr, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Cooling Energy", Unit::J, WrapperReport( WrapperNum ).CoolingEnergy, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater System Cooling Energy", OutputProcessor::Unit::J, WrapperReport( WrapperNum ).CoolingEnergy, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater System Heating Energy", Unit::J, WrapperReport( WrapperNum ).HeatingEnergy, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ENERGYTRANSFER", "BOILER", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater System Heating Energy", OutputProcessor::Unit::J, WrapperReport( WrapperNum ).HeatingEnergy, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ENERGYTRANSFER", "BOILER", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater System Source Heat Transfer Energy", Unit::J, WrapperReport( WrapperNum ).GLHEEnergy, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
+			SetupOutputVariable( "Chiller Heater System Source Heat Transfer Energy", OutputProcessor::Unit::J, WrapperReport( WrapperNum ).GLHEEnergy, "System", "Sum", Wrapper( WrapperNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
 
-			SetupOutputVariable( "Chiller Heater System Cooling Rate", Unit::W, WrapperReport( WrapperNum ).CoolingRate, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Cooling Rate", OutputProcessor::Unit::W, WrapperReport( WrapperNum ).CoolingRate, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Heating Rate", Unit::W, WrapperReport( WrapperNum ).HeatingRate, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Heating Rate", OutputProcessor::Unit::W, WrapperReport( WrapperNum ).HeatingRate, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Source Heat Transfer Rate", Unit::W, WrapperReport( WrapperNum ).GLHERate, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Source Heat Transfer Rate", OutputProcessor::Unit::W, WrapperReport( WrapperNum ).GLHERate, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Cooling Mass Flow Rate", Unit::kg_s, WrapperReport( WrapperNum ).CHWmdot, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Cooling Mass Flow Rate", OutputProcessor::Unit::kg_s, WrapperReport( WrapperNum ).CHWmdot, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Heating Mass Flow Rate", Unit::kg_s, WrapperReport( WrapperNum ).HWmdot, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, WrapperReport( WrapperNum ).HWmdot, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Source Mass Flow Rate", Unit::kg_s, WrapperReport( WrapperNum ).GLHEmdot, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Source Mass Flow Rate", OutputProcessor::Unit::kg_s, WrapperReport( WrapperNum ).GLHEmdot, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Cooling Inlet Temperature", Unit::C, WrapperReport( WrapperNum ).CHWInletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Cooling Inlet Temperature", OutputProcessor::Unit::C, WrapperReport( WrapperNum ).CHWInletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Heating Inlet Temperature", Unit::C, WrapperReport( WrapperNum ).HWInletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Heating Inlet Temperature", OutputProcessor::Unit::C, WrapperReport( WrapperNum ).HWInletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Source Inlet Temperature", Unit::C, WrapperReport( WrapperNum ).GLHEInletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Source Inlet Temperature", OutputProcessor::Unit::C, WrapperReport( WrapperNum ).GLHEInletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Cooling Outlet Temperature", Unit::C, WrapperReport( WrapperNum ).CHWOutletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Cooling Outlet Temperature", OutputProcessor::Unit::C, WrapperReport( WrapperNum ).CHWOutletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Heating Outlet Temperature", Unit::C, WrapperReport( WrapperNum ).HWOutletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Heating Outlet Temperature", OutputProcessor::Unit::C, WrapperReport( WrapperNum ).HWOutletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
 
-			SetupOutputVariable( "Chiller Heater System Source Outlet Temperature", Unit::C, WrapperReport( WrapperNum ).GLHEOutletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
+			SetupOutputVariable( "Chiller Heater System Source Outlet Temperature", OutputProcessor::Unit::C, WrapperReport( WrapperNum ).GLHEOutletTemp, "System", "Average", Wrapper( WrapperNum ).Name );
 
 			if ( Wrapper( WrapperNum ).ChillerHeaterNums > 0 ) {
 
 				for ( ChillerHeaterNum = 1; ChillerHeaterNum <= Wrapper( WrapperNum ).ChillerHeaterNums; ++ChillerHeaterNum ) {
 
-					SetupOutputVariable( "Chiller Heater Operation Mode Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CurrentMode, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Operation Mode Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CurrentMode, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Part Load Ratio Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerPartLoadRatio, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Part Load Ratio Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerPartLoadRatio, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cycling Ratio Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerCyclingRatio, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cycling Ratio Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerCyclingRatio, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cooling Electric Power Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CoolingPower, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cooling Electric Power Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CoolingPower, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Heating Electric Power Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).HeatingPower, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Heating Electric Power Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).HeatingPower, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cooling Electric Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CoolingEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cooling Electric Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CoolingEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Heating Electric Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).HeatingEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Heating Electric Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).HeatingEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cooling Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QEvap, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cooling Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QEvap, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Cooling Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Cooling Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater False Load Heat Transfer Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerFalseLoadRate, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater False Load Heat Transfer Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerFalseLoadRate, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater False Load Heat Transfer Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerFalseLoad, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater False Load Heat Transfer Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerFalseLoad, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Evaporator Inlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::C, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapInletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Evaporator Inlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::C, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapInletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Evaporator Outlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::C, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapOutletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Evaporator Outlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::C, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).EvapOutletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Evaporator Mass Flow Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::kg_s, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).Evapmdot, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Evaporator Mass Flow Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::kg_s, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).Evapmdot, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QCond, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QCond, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Heat Transfer Energy Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::J, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondEnergy, "System", "Sum", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater COP Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::W_W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ActualCOP, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater COP Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::W_W, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ActualCOP, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Capacity Temperature Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerCapFT, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Capacity Temperature Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerCapFT, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater EIR Temperature Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerEIRFT, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater EIR Temperature Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerEIRFT, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater EIR Part Load Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerEIRFPLR, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater EIR Part Load Modifier Multiplier Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::None, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).ChillerEIRFPLR, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Inlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::C, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondInletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Inlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::C, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondInletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Outlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::C, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondOutletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Outlet Temperature Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::C, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).CondOutletTemp, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 
-					SetupOutputVariable( "Chiller Heater Condenser Mass Flow Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", Unit::kg_s, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).Condmdot, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
+					SetupOutputVariable( "Chiller Heater Condenser Mass Flow Rate Unit " + TrimSigDigits( ChillerHeaterNum ) + "", OutputProcessor::Unit::kg_s, Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).Condmdot, "System", "Average", Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
 				} // End of individual chiller heater count for current wrapper
 
 			} // End of individual chiller heater output

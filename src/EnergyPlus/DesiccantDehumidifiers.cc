@@ -1402,27 +1402,27 @@ namespace DesiccantDehumidifiers {
 		// SET UP OUTPUTS
 		for ( DesicDehumNum = 1; DesicDehumNum <= NumSolidDesicDehums; ++DesicDehumNum ) {
 			// Setup Report variables for the Desiccant Dehumidifiers
-			SetupOutputVariable( "Dehumidifier Removed Water Mass", Unit::kg, DesicDehum( DesicDehumNum ).WaterRemove, "System", "Sum", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Removed Water Mass Flow Rate", Unit::kg_s, DesicDehum( DesicDehumNum ).WaterRemoveRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Part Load Ratio", Unit::None, DesicDehum( DesicDehumNum ).PartLoad, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Electric Power", Unit::W, DesicDehum( DesicDehumNum ).ElecUseRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Electric Energy", Unit::J, DesicDehum( DesicDehumNum ).ElecUseEnergy, "System", "Sum", DesicDehum( DesicDehumNum ).Name, _, "Electricity", "Cooling", _, "System" );
-			SetupOutputVariable( "Dehumidifier Regeneration Specific Energy", Unit::J_kgWater, DesicDehum( DesicDehumNum ).SpecRegenEnergy, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Regeneration Rate", Unit::W, DesicDehum( DesicDehumNum ).QRegen, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Regeneration Energy", Unit::J, DesicDehum( DesicDehumNum ).RegenEnergy, "System", "Sum", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Regeneration Air Speed", Unit::m_s, DesicDehum( DesicDehumNum ).RegenAirVel, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Regeneration Air Mass Flow Rate", Unit::kg_s, DesicDehum( DesicDehumNum ).RegenAirInMassFlowRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Process Air Mass Flow Rate", Unit::kg_s, DesicDehum( DesicDehumNum ).ProcAirInMassFlowRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Removed Water Mass", OutputProcessor::Unit::kg, DesicDehum( DesicDehumNum ).WaterRemove, "System", "Sum", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Removed Water Mass Flow Rate", OutputProcessor::Unit::kg_s, DesicDehum( DesicDehumNum ).WaterRemoveRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Part Load Ratio", OutputProcessor::Unit::None, DesicDehum( DesicDehumNum ).PartLoad, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Electric Power", OutputProcessor::Unit::W, DesicDehum( DesicDehumNum ).ElecUseRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Electric Energy", OutputProcessor::Unit::J, DesicDehum( DesicDehumNum ).ElecUseEnergy, "System", "Sum", DesicDehum( DesicDehumNum ).Name, _, "Electricity", "Cooling", _, "System" );
+			SetupOutputVariable( "Dehumidifier Regeneration Specific Energy", OutputProcessor::Unit::J_kgWater, DesicDehum( DesicDehumNum ).SpecRegenEnergy, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Regeneration Rate", OutputProcessor::Unit::W, DesicDehum( DesicDehumNum ).QRegen, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Regeneration Energy", OutputProcessor::Unit::J, DesicDehum( DesicDehumNum ).RegenEnergy, "System", "Sum", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Regeneration Air Speed", OutputProcessor::Unit::m_s, DesicDehum( DesicDehumNum ).RegenAirVel, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Regeneration Air Mass Flow Rate", OutputProcessor::Unit::kg_s, DesicDehum( DesicDehumNum ).RegenAirInMassFlowRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Process Air Mass Flow Rate", OutputProcessor::Unit::kg_s, DesicDehum( DesicDehumNum ).ProcAirInMassFlowRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
 		}
 
 		for ( DesicDehumNum = 1; DesicDehumNum <= NumGenericDesicDehums; ++DesicDehumNum ) {
 			// Setup Report variables for the Desiccant Dehumidifiers
-			SetupOutputVariable( "Dehumidifier Removed Water Mass", Unit::kg, DesicDehum( DesicDehumNum ).WaterRemove, "System", "Sum", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Removed Water Mass Flow Rate", Unit::kg_s, DesicDehum( DesicDehumNum ).WaterRemoveRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-			SetupOutputVariable( "Dehumidifier Part Load Ratio", Unit::None, DesicDehum( DesicDehumNum ).PartLoad, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Removed Water Mass", OutputProcessor::Unit::kg, DesicDehum( DesicDehumNum ).WaterRemove, "System", "Sum", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Removed Water Mass Flow Rate", OutputProcessor::Unit::kg_s, DesicDehum( DesicDehumNum ).WaterRemoveRate, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+			SetupOutputVariable( "Dehumidifier Part Load Ratio", OutputProcessor::Unit::None, DesicDehum( DesicDehumNum ).PartLoad, "System", "Average", DesicDehum( DesicDehumNum ).Name );
 			if ( DesicDehum( DesicDehumNum ).ExhaustFanMaxVolFlowRate > 0 ) {
-				SetupOutputVariable( "Dehumidifier Exhaust Fan Electric Power", Unit::W, DesicDehum( DesicDehumNum ).ExhaustFanPower, "System", "Average", DesicDehum( DesicDehumNum ).Name );
-				SetupOutputVariable( "Dehumidifier Exhaust Fan Electric Energy", Unit::J, DesicDehum( DesicDehumNum ).ExhaustFanElecConsumption, "System", "Sum", DesicDehum( DesicDehumNum ).Name, _, "Electricity", "Cooling", _, "System" );
+				SetupOutputVariable( "Dehumidifier Exhaust Fan Electric Power", OutputProcessor::Unit::W, DesicDehum( DesicDehumNum ).ExhaustFanPower, "System", "Average", DesicDehum( DesicDehumNum ).Name );
+				SetupOutputVariable( "Dehumidifier Exhaust Fan Electric Energy", OutputProcessor::Unit::J, DesicDehum( DesicDehumNum ).ExhaustFanElecConsumption, "System", "Sum", DesicDehum( DesicDehumNum ).Name, _, "Electricity", "Cooling", _, "System" );
 			}
 		}
 

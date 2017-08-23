@@ -364,25 +364,25 @@ namespace EcoRoofManager {
 
 			// DJS NOVEMBER 2010 - Make calls to SetupOutput Variable to allow for reporting of ecoroof variables
 
-			SetupOutputVariable( "Green Roof Soil Temperature", Unit::C, Tg, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Vegetation Temperature", Unit::C, Tf, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Root Moisture Ratio", Unit::None, MeanRootMoisture, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Near Surface Moisture Ratio", Unit::None, Moisture, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Sensible Heat Transfer Rate per Area", Unit::W_m2, sensibleg, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Vegetation Sensible Heat Transfer Rate per Area", Unit::W_m2, sensiblef, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Vegetation Moisture Transfer Rate", Unit::m_s, Vfluxf, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Moisture Transfer Rate", Unit::m_s, Vfluxg, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Vegetation Latent Heat Transfer Rate per Area", Unit::W_m2, Lf, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Latent Heat Transfer Rate per Area", Unit::W_m2, Lg, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Temperature", OutputProcessor::Unit::C, Tg, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Vegetation Temperature", OutputProcessor::Unit::C, Tf, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Root Moisture Ratio", OutputProcessor::Unit::None, MeanRootMoisture, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Near Surface Moisture Ratio", OutputProcessor::Unit::None, Moisture, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensibleg, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Vegetation Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensiblef, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Vegetation Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxf, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxg, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Vegetation Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lf, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lg, "Zone", "State", "Environment" );
 
-			SetupOutputVariable( "Green Roof Cumulative Precipitation Depth", Unit::m, CumPrecip, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Cumulative Irrigation Depth", Unit::m, CumIrrigation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Cumulative Runoff Depth", Unit::m, CumRunoff, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Cumulative Evapotranspiration Depth", Unit::m, CumET, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Current Precipitation Depth", Unit::m, CurrentPrecipitation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Current Irrigation Depth", Unit::m, CurrentIrrigation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Current Runoff Depth", Unit::m, CurrentRunoff, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Current Evapotranspiration Depth", Unit::m, CurrentET, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Cumulative Precipitation Depth", OutputProcessor::Unit::m, CumPrecip, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Cumulative Irrigation Depth", OutputProcessor::Unit::m, CumIrrigation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, CumRunoff, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Cumulative Evapotranspiration Depth", OutputProcessor::Unit::m, CumET, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Current Precipitation Depth", OutputProcessor::Unit::m, CurrentPrecipitation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Current Irrigation Depth", OutputProcessor::Unit::m, CurrentIrrigation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Current Runoff Depth", OutputProcessor::Unit::m, CurrentRunoff, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Current Evapotranspiration Depth", OutputProcessor::Unit::m, CurrentET, "Zone", "Sum", "Environment" );
 
 			// DJS NOVEMBER 2010 - end of calls to setup output of ecoroof variables
 

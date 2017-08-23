@@ -716,9 +716,9 @@ namespace SingleDuct {
 			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 7 ), Alphas( 8 ), Alphas( 3 ), Alphas( 9 ) );
 
 			//Setup the Average damper Position output variable
-			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
-			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction", Unit::None, Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
-			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate", Unit::m3_s, Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", OutputProcessor::Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction", OutputProcessor::Unit::None, Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate", OutputProcessor::Unit::m3_s, Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of Sys Loop
 
@@ -881,7 +881,7 @@ namespace SingleDuct {
 			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), Alphas( 3 ), Alphas( 7 ) );
 
 			//Setup the Average damper Position output variable
-			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", OutputProcessor::Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of VAVHeatandCool Sys Loop
 
@@ -1173,9 +1173,9 @@ namespace SingleDuct {
 			}
 
 			//Setup the Average damper Position output variable
-			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
-			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction", Unit::None, Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
-			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate", Unit::m3_s, Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", OutputProcessor::Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction", OutputProcessor::Unit::None, Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate", OutputProcessor::Unit::m3_s, Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of Sys Loop
 
@@ -1256,7 +1256,7 @@ namespace SingleDuct {
 			}
 
 			//Setup the Average damper Position output variable
-			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", OutputProcessor::Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of VAVHeatandCool:NoReheat Sys Loop
 
@@ -1491,7 +1491,7 @@ namespace SingleDuct {
 			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).OutletNodeNum ) );
 
 			//Setup the Average damper Position output variable
-			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal VAV Damper Position", OutputProcessor::Unit::None, Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
 
 		}
 

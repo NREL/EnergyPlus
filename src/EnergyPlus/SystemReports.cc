@@ -2034,72 +2034,72 @@ namespace SystemReports {
 
 				//CurrentModuleObject='AirloopHVAC'
 				//SYSTEM LOADS REPORT
-				SetupOutputVariable( "Air System Total Heating Energy", Unit::J, SysTotHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Total Heating Energy", OutputProcessor::Unit::J, SysTotHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Total Cooling Energy", Unit::J, SysTotCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Total Cooling Energy", OutputProcessor::Unit::J, SysTotCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				//SYSTEM ENERGY USE REPORT
-				SetupOutputVariable( "Air System Hot Water Energy", Unit::J, SysTotH2OHOT( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Hot Water Energy", OutputProcessor::Unit::J, SysTotH2OHOT( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Steam Energy", Unit::J, SysTotSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Steam Energy", OutputProcessor::Unit::J, SysTotSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Chilled Water Energy", Unit::J, SysTotH2OCOLD( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Chilled Water Energy", OutputProcessor::Unit::J, SysTotH2OCOLD( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Electric Energy", Unit::J, SysTotElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Electric Energy", OutputProcessor::Unit::J, SysTotElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Gas Energy", Unit::J, SysTotGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Gas Energy", OutputProcessor::Unit::J, SysTotGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Water Volume", Unit::m3, SysDomesticH20( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Water Volume", OutputProcessor::Unit::m3, SysDomesticH20( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				//SYSTEM COMPONENT LOAD REPORT
-				SetupOutputVariable( "Air System Fan Air Heating Energy", Unit::J, SysFANCompHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Fan Air Heating Energy", OutputProcessor::Unit::J, SysFANCompHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Cooling Coil Total Cooling Energy", Unit::J, SysCCCompCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, SysCCCompCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Total Heating Energy", Unit::J, SysHCCompHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Total Heating Energy", OutputProcessor::Unit::J, SysHCCompHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heat Exchanger Total Heating Energy", Unit::J, SysHeatExHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heat Exchanger Total Heating Energy", OutputProcessor::Unit::J, SysHeatExHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heat Exchanger Total Cooling Energy", Unit::J, SysHeatExCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heat Exchanger Total Cooling Energy", OutputProcessor::Unit::J, SysHeatExCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Solar Collector Total Heating Energy", Unit::J, SysSolarCollectHeating( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Solar Collector Total Heating Energy", OutputProcessor::Unit::J, SysSolarCollectHeating( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Solar Collector Total Cooling Energy", Unit::J, SysSolarCollectCooling( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Solar Collector Total Cooling Energy", OutputProcessor::Unit::J, SysSolarCollectCooling( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System User Defined Air Terminal Total Heating Energy", Unit::J, SysUserDefinedTerminalHeating( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System User Defined Air Terminal Total Heating Energy", OutputProcessor::Unit::J, SysUserDefinedTerminalHeating( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System User Defined Air Terminal Total Cooling Energy", Unit::J, SysUserDefinedTerminalCooling( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System User Defined Air Terminal Total Cooling Energy", OutputProcessor::Unit::J, SysUserDefinedTerminalCooling( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Humidifier Total Heating Energy", Unit::J, SysHumidHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Humidifier Total Heating Energy", OutputProcessor::Unit::J, SysHumidHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Evaporative Cooler Total Cooling Energy", Unit::J, SysEvapCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Evaporative Cooler Total Cooling Energy", OutputProcessor::Unit::J, SysEvapCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Desiccant Dehumidifier Total Cooling Energy", Unit::J, DesDehumidCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Desiccant Dehumidifier Total Cooling Energy", OutputProcessor::Unit::J, DesDehumidCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				//SYSTEM COMPONENT ENERGY REPORT
-				SetupOutputVariable( "Air System Fan Electric Energy", Unit::J, SysFANCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Fan Electric Energy", OutputProcessor::Unit::J, SysFANCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Hot Water Energy", Unit::J, SysHCCompH2OHOT( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Hot Water Energy", OutputProcessor::Unit::J, SysHCCompH2OHOT( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Cooling Coil Chilled Water Energy", Unit::J, SysCCCompH2OCOLD( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Cooling Coil Chilled Water Energy", OutputProcessor::Unit::J, SysCCCompH2OCOLD( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System DX Heating Coil Electric Energy", Unit::J, SysHCCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System DX Heating Coil Electric Energy", OutputProcessor::Unit::J, SysHCCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System DX Cooling Coil Electric Energy", Unit::J, SysCCCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System DX Cooling Coil Electric Energy", OutputProcessor::Unit::J, SysCCCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Electric Energy", Unit::J, SysHCCompElecRes( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Electric Energy", OutputProcessor::Unit::J, SysHCCompElecRes( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Gas Energy", Unit::J, SysHCCompGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Gas Energy", OutputProcessor::Unit::J, SysHCCompGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Steam Energy", Unit::J, SysHCCompSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Steam Energy", OutputProcessor::Unit::J, SysHCCompSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Humidifier Electric Energy", Unit::J, SysHumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Humidifier Electric Energy", OutputProcessor::Unit::J, SysHumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Humidifier Gas Energy", Unit::J, SysHumidGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Humidifier Gas Energy", OutputProcessor::Unit::J, SysHumidGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Evaporative Cooler Electric Energy", Unit::J, SysEvapElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Evaporative Cooler Electric Energy", OutputProcessor::Unit::J, SysEvapElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Desiccant Dehumidifier Electric Energy", Unit::J, DesDehumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Desiccant Dehumidifier Electric Energy", OutputProcessor::Unit::J, DesDehumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 			}
 		}
@@ -2109,36 +2109,36 @@ namespace SystemReports {
 			// CurrentModuleObject='Zones(Controlled)'
 			if ( VentLoadsReportEnabled ) {
 				//Cooling Loads
-				SetupOutputVariable( "Zone Mechanical Ventilation No Load Heat Removal Energy", Unit::J, MaxNoLoadCoolingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation No Load Heat Removal Energy", OutputProcessor::Unit::J, MaxNoLoadCoolingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Increase Energy", Unit::J, MaxCoolingLoadAddedByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Increase Energy", OutputProcessor::Unit::J, MaxCoolingLoadAddedByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy", Unit::J, MaxOverheatingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy", OutputProcessor::Unit::J, MaxOverheatingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Decrease Energy", Unit::J, MaxCoolingLoadMetByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Decrease Energy", OutputProcessor::Unit::J, MaxCoolingLoadMetByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 				//Heating Loads
-				SetupOutputVariable( "Zone Mechanical Ventilation No Load Heat Addition Energy", Unit::J, MaxNoLoadHeatingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation No Load Heat Addition Energy", OutputProcessor::Unit::J, MaxNoLoadHeatingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Increase Energy", Unit::J, MaxHeatingLoadAddedByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Increase Energy", OutputProcessor::Unit::J, MaxHeatingLoadAddedByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy", Unit::J, MaxOvercoolingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy", OutputProcessor::Unit::J, MaxOvercoolingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Decrease Energy", Unit::J, MaxHeatingLoadMetByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Decrease Energy", OutputProcessor::Unit::J, MaxHeatingLoadMetByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 			}
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Mass Flow Rate", Unit::kg_s, ZoneOAMassFlow( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, ZoneOAMassFlow( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Mass", Unit::kg, ZoneOAMass( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Mass", OutputProcessor::Unit::kg, ZoneOAMass( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Standard Density Volume Flow Rate", Unit::m3_s, ZoneOAVolFlowStdRho( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneOAVolFlowStdRho( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Standard Density Volume", Unit::m3, ZoneOAVolStdRho( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Standard Density Volume", OutputProcessor::Unit::m3, ZoneOAVolStdRho( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Current Density Volume Flow Rate", Unit::m3_s, ZoneOAVolFlowCrntRho( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneOAVolFlowCrntRho( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Current Density Volume", Unit::m3, ZoneOAVolCrntRho( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Current Density Volume", OutputProcessor::Unit::m3, ZoneOAVolCrntRho( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Air Changes per Hour", Unit::ach, ZoneMechACH( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Air Changes per Hour", OutputProcessor::Unit::ach, ZoneMechACH( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
 		}
 
 	}

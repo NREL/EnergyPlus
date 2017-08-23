@@ -1434,12 +1434,12 @@ namespace GroundHeatExchangers {
 
 			//Set up report variables
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
-				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature", Unit::C, verticalGLHE( GLHENum ).boreholeTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate", Unit::W, verticalGLHE( GLHENum ).QGLHE, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature", Unit::C, verticalGLHE( GLHENum ).inletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", Unit::C, verticalGLHE( GLHENum ).outletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", Unit::kg_s, verticalGLHE( GLHENum ).massFlowRate, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature", Unit::C, verticalGLHE( GLHENum ).aveFluidTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, verticalGLHE( GLHENum ).boreholeTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, verticalGLHE( GLHENum ).QGLHE, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, verticalGLHE( GLHENum ).inletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, verticalGLHE( GLHENum ).outletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, verticalGLHE( GLHENum ).massFlowRate, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, verticalGLHE( GLHENum ).aveFluidTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
 			}
 
 		}
@@ -1584,12 +1584,12 @@ namespace GroundHeatExchangers {
 
 			//Set up report variables
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
-				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature", Unit::C, slinkyGLHE( GLHENum ).boreholeTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate", Unit::W, slinkyGLHE( GLHENum ).QGLHE, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature", Unit::C, slinkyGLHE( GLHENum ).inletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", Unit::C, slinkyGLHE( GLHENum ).outletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", Unit::kg_s, slinkyGLHE( GLHENum ).massFlowRate, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature", Unit::C, slinkyGLHE( GLHENum ).aveFluidTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, slinkyGLHE( GLHENum ).boreholeTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, slinkyGLHE( GLHENum ).QGLHE, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, slinkyGLHE( GLHENum ).inletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, slinkyGLHE( GLHENum ).outletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, slinkyGLHE( GLHENum ).massFlowRate, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, slinkyGLHE( GLHENum ).aveFluidTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
 			}
 		}
 

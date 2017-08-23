@@ -613,18 +613,18 @@ namespace SteamBaseboardRadiator {
 		// Setup Report variables for the Coils
 		for ( BaseboardNum = 1; BaseboardNum <= NumSteamBaseboards; ++BaseboardNum ) {
 			// CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Steam'
-			SetupOutputVariable( "Baseboard Total Heating Rate", Unit::W, SteamBaseboard( BaseboardNum ).TotPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).TotPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Convective Heating Rate", Unit::W, SteamBaseboard( BaseboardNum ).ConvPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Radiant Heating Rate", Unit::W, SteamBaseboard( BaseboardNum ).RadPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Total Heating Energy", Unit::J, SteamBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
-			SetupOutputVariable( "Baseboard Convective Heating Energy", Unit::J, SteamBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Radiant Heating Energy", Unit::J, SteamBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Energy", Unit::J, SteamBaseboard( BaseboardNum ).Energy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
-			SetupOutputVariable( "Baseboard Steam Rate", Unit::W, SteamBaseboard( BaseboardNum ).Power, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Mass Flow Rate", Unit::kg_s, SteamBaseboard( BaseboardNum ).SteamMassFlowRate, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Inlet Temperature", Unit::C, SteamBaseboard( BaseboardNum ).SteamInletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Outlet Temperature", Unit::C, SteamBaseboard( BaseboardNum ).SteamOutletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Convective Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).ConvPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).RadPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Convective Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).Energy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Steam Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).Power, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, SteamBaseboard( BaseboardNum ).SteamMassFlowRate, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Inlet Temperature", OutputProcessor::Unit::C, SteamBaseboard( BaseboardNum ).SteamInletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Outlet Temperature", OutputProcessor::Unit::C, SteamBaseboard( BaseboardNum ).SteamOutletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
 		}
 
 	}

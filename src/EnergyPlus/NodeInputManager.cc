@@ -427,47 +427,47 @@ namespace NodeInputManager {
 				MoreNodeInfo.allocate( NumOfUniqueNodeNames );
 				for ( NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode ) {
 					// Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
-					SetupOutputVariable( "System Node Temperature", Unit::C, Node( NumNode ).Temp, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Mass Flow Rate", Unit::kg_s, Node( NumNode ).MassFlowRate, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Humidity Ratio", Unit::kgWater_kgDryAir, Node( NumNode ).HumRat, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Setpoint Temperature", Unit::C, Node( NumNode ).TempSetPoint, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Setpoint High Temperature", Unit::C, Node( NumNode ).TempSetPointHi, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Setpoint Low Temperature", Unit::C, Node( NumNode ).TempSetPointLo, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Setpoint Humidity Ratio", Unit::kgWater_kgDryAir, Node( NumNode ).HumRatSetPoint, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Setpoint Minimum Humidity Ratio", Unit::kgWater_kgDryAir, Node( NumNode ).HumRatMin, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Setpoint Maximum Humidity Ratio", Unit::kgWater_kgDryAir, Node( NumNode ).HumRatMax, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Relative Humidity", Unit::Perc, MoreNodeInfo( NumNode ).RelHumidity, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Pressure", Unit::Pa, Node( NumNode ).Press, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Standard Density Volume Flow Rate", Unit::m3_s, MoreNodeInfo( NumNode ).VolFlowRateStdRho, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Temperature", OutputProcessor::Unit::C, Node( NumNode ).Temp, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Mass Flow Rate", OutputProcessor::Unit::kg_s, Node( NumNode ).MassFlowRate, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, Node( NumNode ).HumRat, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Setpoint Temperature", OutputProcessor::Unit::C, Node( NumNode ).TempSetPoint, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Setpoint High Temperature", OutputProcessor::Unit::C, Node( NumNode ).TempSetPointHi, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Setpoint Low Temperature", OutputProcessor::Unit::C, Node( NumNode ).TempSetPointLo, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Setpoint Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, Node( NumNode ).HumRatSetPoint, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Setpoint Minimum Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, Node( NumNode ).HumRatMin, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Setpoint Maximum Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, Node( NumNode ).HumRatMax, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Relative Humidity", OutputProcessor::Unit::Perc, MoreNodeInfo( NumNode ).RelHumidity, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Pressure", OutputProcessor::Unit::Pa, Node( NumNode ).Press, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, MoreNodeInfo( NumNode ).VolFlowRateStdRho, "System", "Average", NodeID( NumNode ) );
 					if ( Node( NumNode ).FluidType == NodeType_Air || Node( NumNode ).FluidType == NodeType_Water ) { // setup volume flow rate report for actual/current density
-						SetupOutputVariable( "System Node Current Density Volume Flow Rate", Unit::m3_s, MoreNodeInfo( NumNode ).VolFlowRateCrntRho, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Current Density", Unit::kg_m3, MoreNodeInfo( NumNode ).Density, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Specific Heat", Unit::J_kgK, MoreNodeInfo( NumNode ).SpecificHeat, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, MoreNodeInfo( NumNode ).VolFlowRateCrntRho, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Current Density", OutputProcessor::Unit::kg_m3, MoreNodeInfo( NumNode ).Density, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Specific Heat", OutputProcessor::Unit::J_kgK, MoreNodeInfo( NumNode ).SpecificHeat, "System", "Average", NodeID( NumNode ) );
 					}
 
-					SetupOutputVariable( "System Node Enthalpy", Unit::J_kg, MoreNodeInfo( NumNode ).ReportEnthalpy, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Wetbulb Temperature", Unit::C, MoreNodeInfo( NumNode ).WetBulbTemp, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Dewpoint Temperature", Unit::C, MoreNodeInfo( NumNode ).AirDewPointTemp, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Quality", Unit::None, Node( NumNode ).Quality, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Height", Unit::m, Node( NumNode ).Height, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Enthalpy", OutputProcessor::Unit::J_kg, MoreNodeInfo( NumNode ).ReportEnthalpy, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Wetbulb Temperature", OutputProcessor::Unit::C, MoreNodeInfo( NumNode ).WetBulbTemp, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Dewpoint Temperature", OutputProcessor::Unit::C, MoreNodeInfo( NumNode ).AirDewPointTemp, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Quality", OutputProcessor::Unit::None, Node( NumNode ).Quality, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Height", OutputProcessor::Unit::m, Node( NumNode ).Height, "System", "Average", NodeID( NumNode ) );
 					if ( DisplayAdvancedReportVariables ) {
-						SetupOutputVariable( "System Node Minimum Temperature", Unit::C, Node( NumNode ).TempMin, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Maximum Temperature", Unit::C, Node( NumNode ).TempMax, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Minimum Limit Mass Flow Rate", Unit::kg_s, Node( NumNode ).MassFlowRateMin, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Maximum Limit Mass Flow Rate", Unit::kg_s, Node( NumNode ).MassFlowRateMax, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Minimum Available Mass Flow Rate", Unit::kg_s, Node( NumNode ).MassFlowRateMinAvail, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Maximum Available Mass Flow Rate", Unit::kg_s, Node( NumNode ).MassFlowRateMaxAvail, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Setpoint Mass Flow Rate", Unit::kg_s, Node( NumNode ).MassFlowRateSetPoint, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Requested Mass Flow Rate", Unit::kg_s, Node( NumNode ).MassFlowRateRequest, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Last Timestep Temperature", Unit::C, Node( NumNode ).TempLastTimestep, "System", "Average", NodeID( NumNode ) );
-						SetupOutputVariable( "System Node Last Timestep Enthalpy", Unit::J_kg, Node( NumNode ).EnthalpyLastTimestep, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Minimum Temperature", OutputProcessor::Unit::C, Node( NumNode ).TempMin, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Maximum Temperature", OutputProcessor::Unit::C, Node( NumNode ).TempMax, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Minimum Limit Mass Flow Rate", OutputProcessor::Unit::kg_s, Node( NumNode ).MassFlowRateMin, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Maximum Limit Mass Flow Rate", OutputProcessor::Unit::kg_s, Node( NumNode ).MassFlowRateMax, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Minimum Available Mass Flow Rate", OutputProcessor::Unit::kg_s, Node( NumNode ).MassFlowRateMinAvail, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Maximum Available Mass Flow Rate", OutputProcessor::Unit::kg_s, Node( NumNode ).MassFlowRateMaxAvail, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Setpoint Mass Flow Rate", OutputProcessor::Unit::kg_s, Node( NumNode ).MassFlowRateSetPoint, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Requested Mass Flow Rate", OutputProcessor::Unit::kg_s, Node( NumNode ).MassFlowRateRequest, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Last Timestep Temperature", OutputProcessor::Unit::C, Node( NumNode ).TempLastTimestep, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Last Timestep Enthalpy", OutputProcessor::Unit::J_kg, Node( NumNode ).EnthalpyLastTimestep, "System", "Average", NodeID( NumNode ) );
 
 					}
 					if ( Contaminant.CO2Simulation ) {
-						SetupOutputVariable( "System Node CO2 Concentration", Unit::ppm, Node( NumNode ).CO2, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node CO2 Concentration", OutputProcessor::Unit::ppm, Node( NumNode ).CO2, "System", "Average", NodeID( NumNode ) );
 					}
 					if ( Contaminant.GenericContamSimulation ) {
-						SetupOutputVariable( "System Node Generic Air Contaminant Concentration", Unit::ppm, Node( NumNode ).GenContam, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Generic Air Contaminant Concentration", OutputProcessor::Unit::ppm, Node( NumNode ).GenContam, "System", "Average", NodeID( NumNode ) );
 					}
 				}
 			}

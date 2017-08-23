@@ -3468,9 +3468,9 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 0.25;
@@ -3506,9 +3506,9 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 1.0;
@@ -6004,9 +6004,9 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 0.25;

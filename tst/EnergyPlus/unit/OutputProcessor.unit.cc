@@ -2425,7 +2425,8 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 1 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 1 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Drybulb Temperature", DDVariableTypes( 1 ).VarNameOnly );
-			EXPECT_EQ( "C", DDVariableTypes( 1 ).UnitsString );
+//ou			EXPECT_EQ( "C", DDVariableTypes( 1 ).UnitsString );
+			EXPECT_EQ( OutputProcessor::Unit::C, DDVariableTypes( 1 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 2 ).IndexType );
 			EXPECT_EQ( 1, DDVariableTypes( 2 ).StoreType );
@@ -2433,7 +2434,8 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 2 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 2 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Wetbulb Temperature", DDVariableTypes( 2 ).VarNameOnly );
-			EXPECT_EQ( "C", DDVariableTypes( 2 ).UnitsString );
+//ou			EXPECT_EQ( "C", DDVariableTypes( 2 ).UnitsString );
+			EXPECT_EQ( OutputProcessor::Unit::C, DDVariableTypes( 2 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 3 ).IndexType );
 			EXPECT_EQ( 1, DDVariableTypes( 3 ).StoreType );
@@ -2441,7 +2443,8 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 3 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 3 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Humidity Ratio", DDVariableTypes( 3 ).VarNameOnly );
-			EXPECT_EQ( "kgWater/kgDryAir", DDVariableTypes( 3 ).UnitsString );
+//ou			EXPECT_EQ( "kgWater/kgDryAir", DDVariableTypes( 3 ).UnitsString );
+			EXPECT_EQ( OutputProcessor::Unit::kgWater_kgDryAir, DDVariableTypes( 3 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 4 ).IndexType );
 			EXPECT_EQ( 1, DDVariableTypes( 4 ).StoreType );
@@ -2449,7 +2452,8 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 4 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 4 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Relative Humidity", DDVariableTypes( 4 ).VarNameOnly );
-			EXPECT_EQ( "%", DDVariableTypes( 4 ).UnitsString );
+//ou			EXPECT_EQ( "%", DDVariableTypes( 4 ).UnitsString );
+			EXPECT_EQ( OutputProcessor::Unit::Perc, DDVariableTypes( 4 ).units );
 
 		}
 
@@ -2463,7 +2467,7 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -2503,9 +2507,9 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler3" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -2542,9 +2546,9 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler3" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -2579,9 +2583,9 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler3" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -2617,10 +2621,10 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 vol_flow = 999;
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002:Win001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall003" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002:Win001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall003" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
@@ -2658,10 +2662,10 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 vol_flow = 999;
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002:WIN001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL003" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002:WIN001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL003" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
@@ -2784,17 +2788,17 @@ namespace EnergyPlus {
 			ASSERT_FALSE( process_idf( idf_objects ) );
 
 			Real64 light_consumption = 0;
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
 			Real64 zone_infil_total_loss = 0;
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
 
 			bool errors_found = false;
 
@@ -2939,19 +2943,19 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
 			Real64 zone_infil_total_loss = 999;
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
 
 			UpdateMeterReporting();
 
@@ -3121,23 +3125,23 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
 			Real64 zone_infil_total_loss = 999;
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
 			Real64 fuel_used = 999;
 			Real64 boiler_load = 999;
-			SetupOutputVariable( "Boiler Heating Rate", Unit::W, boiler_load, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 
 			UpdateMeterReporting();
 
@@ -3316,23 +3320,23 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
 			Real64 zone_infil_total_loss = 999;
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
 			Real64 fuel_used = 999;
 			Real64 boiler_load = 999;
-			SetupOutputVariable( "Boiler Heating Rate", Unit::W, boiler_load, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate", Unit::W, fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 
 			UpdateMeterReporting();
 
@@ -3462,7 +3466,7 @@ namespace EnergyPlus {
 			GetReportVariableInput();
 			Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
 			PurchAir.allocate( 1 );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy", Unit::J, PurchAir( 1 ).TotHeatEnergy, "System", "Sum", PurchAir( 1 ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy", OutputProcessor::Unit::J, PurchAir( 1 ).TotHeatEnergy, "System", "Sum", PurchAir( 1 ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
 
 			PurchAir( 1 ).TotHeatEnergy = 1.1;
 			UpdateMeterReporting();
@@ -3586,9 +3590,9 @@ namespace EnergyPlus {
 			TimeValue (2).CurMinute = 50;
 
 			GetReportVariableInput ();
-			SetupOutputVariable ("Site Outdoor Air Drybulb Temperature", Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+			SetupOutputVariable ("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
 			Real64 light_consumption = 999;
-			SetupOutputVariable ("Lights Electric Energy", Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
+			SetupOutputVariable ("Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
 			UpdateMeterReporting ();
 			UpdateDataandReport (DataGlobals::ZoneTSReporting);
 

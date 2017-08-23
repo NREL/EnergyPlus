@@ -450,7 +450,7 @@ namespace HVACDXHeatPumpSystem {
 
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {
 			// Setup Report variables for the DXHeatingSystem that is not reported in the components themselves
-			SetupOutputVariable( "Coil System Part Load Ratio", Unit::None, DXHeatPumpSystem( DXHeatSysNum ).PartLoadFrac, "System", "Average", DXHeatPumpSystem( DXHeatSysNum ).Name );
+			SetupOutputVariable( "Coil System Part Load Ratio", OutputProcessor::Unit::None, DXHeatPumpSystem( DXHeatSysNum ).PartLoadFrac, "System", "Average", DXHeatPumpSystem( DXHeatSysNum ).Name );
 		}
 
 		Alphas.deallocate();

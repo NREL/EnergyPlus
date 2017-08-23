@@ -1709,7 +1709,7 @@ namespace ZoneTempPredictorCorrector {
 						}
 
 						// CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
-						SetupOutputVariable( "Zone Thermostat Operative Temperature", Unit::C, ZnAirRpt( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).ThermOperativeTemp, "Zone", "Average", Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).Name );
+						SetupOutputVariable( "Zone Thermostat Operative Temperature", OutputProcessor::Unit::C, ZnAirRpt( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).ThermOperativeTemp, "Zone", "Average", Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).Name );
 					}
 				} else {
 					for ( Item = 1; Item <= TStatObjects( found ).NumOfZones; ++Item ) {
@@ -1783,7 +1783,7 @@ namespace ZoneTempPredictorCorrector {
 						}
 
 						// CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
-						SetupOutputVariable( "Zone Thermostat Operative Temperature", Unit::C, ZnAirRpt( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).ThermOperativeTemp, "Zone", "Average", Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).Name );
+						SetupOutputVariable( "Zone Thermostat Operative Temperature", OutputProcessor::Unit::C, ZnAirRpt( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).ThermOperativeTemp, "Zone", "Average", Zone( TempControlledZone( TempControlledZoneNum ).ActualZoneNum ).Name );
 					} // TStat Objects Loop
 				} // found thermostat referene
 			} //loop over NumOpTempControlledZones
@@ -2460,33 +2460,33 @@ namespace ZoneTempPredictorCorrector {
 
 			// CurrentModuleObject='Zone'
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
-				SetupOutputVariable( "Zone Air System Sensible Heating Energy", Unit::J, SNLoadHeatEnergy( Loop ), "System", "Sum", Zone( Loop ).Name, _, "ENERGYTRANSFER", "Heating", _, "Building", Zone( Loop ).Name, Zone( Loop ).Multiplier, Zone( Loop ).ListMultiplier );
-				SetupOutputVariable( "Zone Air System Sensible Cooling Energy", Unit::J, SNLoadCoolEnergy( Loop ), "System", "Sum", Zone( Loop ).Name, _, "ENERGYTRANSFER", "Cooling", _, "Building", Zone( Loop ).Name, Zone( Loop ).Multiplier, Zone( Loop ).ListMultiplier );
-				SetupOutputVariable( "Zone Air System Sensible Heating Rate", Unit::W, SNLoadHeatRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air System Sensible Cooling Rate", Unit::W, SNLoadCoolRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air Temperature", Unit::C, ZT( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Thermostat Air Temperature", Unit::C, TempTstatAir( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air Humidity Ratio", Unit::None, ZoneAirHumRat( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air Relative Humidity", Unit::Perc, ZoneAirRelHum( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Air System Sensible Heating Energy", OutputProcessor::Unit::J, SNLoadHeatEnergy( Loop ), "System", "Sum", Zone( Loop ).Name, _, "ENERGYTRANSFER", "Heating", _, "Building", Zone( Loop ).Name, Zone( Loop ).Multiplier, Zone( Loop ).ListMultiplier );
+				SetupOutputVariable( "Zone Air System Sensible Cooling Energy", OutputProcessor::Unit::J, SNLoadCoolEnergy( Loop ), "System", "Sum", Zone( Loop ).Name, _, "ENERGYTRANSFER", "Cooling", _, "Building", Zone( Loop ).Name, Zone( Loop ).Multiplier, Zone( Loop ).ListMultiplier );
+				SetupOutputVariable( "Zone Air System Sensible Heating Rate", OutputProcessor::Unit::W, SNLoadHeatRate( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Air System Sensible Cooling Rate", OutputProcessor::Unit::W, SNLoadCoolRate( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Air Temperature", OutputProcessor::Unit::C, ZT( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Thermostat Air Temperature", OutputProcessor::Unit::C, TempTstatAir( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Air Humidity Ratio", OutputProcessor::Unit::None, ZoneAirHumRat( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Air Relative Humidity", OutputProcessor::Unit::Perc, ZoneAirRelHum( Loop ), "System", "Average", Zone( Loop ).Name );
 				// This output variable is for the predicted Heating/Cooling load for the zone which can be compared to actual load
 				// These report variables are not multiplied by zone and group multipliers
-				SetupOutputVariable( "Zone Predicted Sensible Load to Setpoint Heat Transfer Rate", Unit::W, SNLoadPredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate", Unit::W, SNLoadPredictedHSPRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate", Unit::W, SNLoadPredictedCSPRate( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Predicted Sensible Load to Setpoint Heat Transfer Rate", OutputProcessor::Unit::W, SNLoadPredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate", OutputProcessor::Unit::W, SNLoadPredictedHSPRate( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate", OutputProcessor::Unit::W, SNLoadPredictedCSPRate( Loop ), "System", "Average", Zone( Loop ).Name );
 				// This output variable is for the predicted moisture load for the zone with humidity controlled specified.
-				SetupOutputVariable( "Zone Predicted Moisture Load Moisture Transfer Rate", Unit::kgWater_s, MoisturePredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate", Unit::kgWater_s, ZoneSysMoistureDemand( Loop ).OutputRequiredToHumidifyingSP, "System", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate", Unit::kgWater_s, ZoneSysMoistureDemand( Loop ).OutputRequiredToDehumidifyingSP, "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Predicted Moisture Load Moisture Transfer Rate", OutputProcessor::Unit::kgWater_s, MoisturePredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate", OutputProcessor::Unit::kgWater_s, ZoneSysMoistureDemand( Loop ).OutputRequiredToHumidifyingSP, "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate", OutputProcessor::Unit::kgWater_s, ZoneSysMoistureDemand( Loop ).OutputRequiredToDehumidifyingSP, "System", "Average", Zone( Loop ).Name );
 				// Zone thermostat setpoints
-				SetupOutputVariable( "Zone Thermostat Control Type", Unit::None, TempControlType( Loop ), "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Thermostat Heating Setpoint Temperature", Unit::C, ZoneThermostatSetPointLo( Loop ), "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Thermostat Cooling Setpoint Temperature", Unit::C, ZoneThermostatSetPointHi( Loop ), "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Adaptive Comfort Operative Temperature Set Point", Unit::C, AdapComfortCoolingSetPoint( Loop ), "Zone", "Average", Zone( Loop ).Name);
-				SetupOutputVariable( "Zone Predicted Sensible Load Room Air Correction Factor", Unit::None, LoadCorrectionFactor( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Thermostat Control Type", OutputProcessor::Unit::None, TempControlType( Loop ), "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Thermostat Heating Setpoint Temperature", OutputProcessor::Unit::C, ZoneThermostatSetPointLo( Loop ), "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Thermostat Cooling Setpoint Temperature", OutputProcessor::Unit::C, ZoneThermostatSetPointHi( Loop ), "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Adaptive Comfort Operative Temperature Set Point", OutputProcessor::Unit::C, AdapComfortCoolingSetPoint( Loop ), "Zone", "Average", Zone( Loop ).Name);
+				SetupOutputVariable( "Zone Predicted Sensible Load Room Air Correction Factor", OutputProcessor::Unit::None, LoadCorrectionFactor( Loop ), "System", "Average", Zone( Loop ).Name );
 
 				if ( allocated( StageZoneLogic ) ) {
 					if ( StageZoneLogic( Loop ) ) {
-						SetupOutputVariable( "Zone Thermostat Staged Number", Unit::None, ZoneSysEnergyDemand( Loop ).StageNum, "System", "Average", Zone( Loop ).Name );
+						SetupOutputVariable( "Zone Thermostat Staged Number", OutputProcessor::Unit::None, ZoneSysEnergyDemand( Loop ).StageNum, "System", "Average", Zone( Loop ).Name );
 					}
 				}
 
@@ -2497,26 +2497,26 @@ namespace ZoneTempPredictorCorrector {
 				// CurrentModuleObject='ZoneControl:Thermostat:ThermalComfort'
 				for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
 					ZoneNum = ComfortControlledZone( Loop ).ActualZoneNum;
-					SetupOutputVariable( "Zone Thermal Comfort Control Type", Unit::None, ComfortControlType( ZoneNum ), "Zone", "Average", Zone( ZoneNum ).Name );
-					SetupOutputVariable( "Zone Thermal Comfort Control Fanger Low Setpoint PMV", Unit::None, ZoneComfortControlsFanger( ZoneNum ).LowPMV, "Zone", "Average", Zone( ZoneNum ).Name );
-					SetupOutputVariable( "Zone Thermal Comfort Control Fanger High Setpoint PMV", Unit::None, ZoneComfortControlsFanger( ZoneNum ).HighPMV, "Zone", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Thermal Comfort Control Type", OutputProcessor::Unit::None, ComfortControlType( ZoneNum ), "Zone", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Thermal Comfort Control Fanger Low Setpoint PMV", OutputProcessor::Unit::None, ZoneComfortControlsFanger( ZoneNum ).LowPMV, "Zone", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Thermal Comfort Control Fanger High Setpoint PMV", OutputProcessor::Unit::None, ZoneComfortControlsFanger( ZoneNum ).HighPMV, "Zone", "Average", Zone( ZoneNum ).Name );
 				}
 			}
 
 			// CurrentModuleObject='ZoneList'
 			for ( Loop = 1; Loop <= NumOfZoneLists; ++Loop ) {
-				SetupOutputVariable( "Zone List Sensible Heating Energy", Unit::J, ListSNLoadHeatEnergy( Loop ), "System", "Sum", ZoneList( Loop ).Name );
-				SetupOutputVariable( "Zone List Sensible Cooling Energy", Unit::J, ListSNLoadCoolEnergy( Loop ), "System", "Sum", ZoneList( Loop ).Name );
-				SetupOutputVariable( "Zone List Sensible Heating Rate", Unit::W, ListSNLoadHeatRate( Loop ), "System", "Average", ZoneList( Loop ).Name );
-				SetupOutputVariable( "Zone List Sensible Cooling Rate", Unit::W, ListSNLoadCoolRate( Loop ), "System", "Average", ZoneList( Loop ).Name );
+				SetupOutputVariable( "Zone List Sensible Heating Energy", OutputProcessor::Unit::J, ListSNLoadHeatEnergy( Loop ), "System", "Sum", ZoneList( Loop ).Name );
+				SetupOutputVariable( "Zone List Sensible Cooling Energy", OutputProcessor::Unit::J, ListSNLoadCoolEnergy( Loop ), "System", "Sum", ZoneList( Loop ).Name );
+				SetupOutputVariable( "Zone List Sensible Heating Rate", OutputProcessor::Unit::W, ListSNLoadHeatRate( Loop ), "System", "Average", ZoneList( Loop ).Name );
+				SetupOutputVariable( "Zone List Sensible Cooling Rate", OutputProcessor::Unit::W, ListSNLoadCoolRate( Loop ), "System", "Average", ZoneList( Loop ).Name );
 			} // Loop
 
 			// CurrentModuleObject='ZoneGroup'
 			for ( Loop = 1; Loop <= NumOfZoneGroups; ++Loop ) {
-				SetupOutputVariable( "Zone Group Sensible Heating Energy", Unit::J, GroupSNLoadHeatEnergy( Loop ), "System", "Sum", ZoneGroup( Loop ).Name );
-				SetupOutputVariable( "Zone Group Sensible Cooling Energy", Unit::J, GroupSNLoadCoolEnergy( Loop ), "System", "Sum", ZoneGroup( Loop ).Name );
-				SetupOutputVariable( "Zone Group Sensible Heating Rate", Unit::W, GroupSNLoadHeatRate( Loop ), "System", "Average", ZoneGroup( Loop ).Name );
-				SetupOutputVariable( "Zone Group Sensible Cooling Rate", Unit::W, GroupSNLoadCoolRate( Loop ), "System", "Average", ZoneGroup( Loop ).Name );
+				SetupOutputVariable( "Zone Group Sensible Heating Energy", OutputProcessor::Unit::J, GroupSNLoadHeatEnergy( Loop ), "System", "Sum", ZoneGroup( Loop ).Name );
+				SetupOutputVariable( "Zone Group Sensible Cooling Energy", OutputProcessor::Unit::J, GroupSNLoadCoolEnergy( Loop ), "System", "Sum", ZoneGroup( Loop ).Name );
+				SetupOutputVariable( "Zone Group Sensible Heating Rate", OutputProcessor::Unit::W, GroupSNLoadHeatRate( Loop ), "System", "Average", ZoneGroup( Loop ).Name );
+				SetupOutputVariable( "Zone Group Sensible Cooling Rate", OutputProcessor::Unit::W, GroupSNLoadCoolRate( Loop ), "System", "Average", ZoneGroup( Loop ).Name );
 			} // Loop
 
 			InitZoneAirSetPointsOneTimeFlag = false;
@@ -5739,10 +5739,10 @@ namespace ZoneTempPredictorCorrector {
 			//set up zone by zone variables
 			// CurrentModuleObject='Zone'
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-				SetupOutputVariable( "Zone Oscillating Temperatures Time", Unit::hr, ZoneTempOscillate( iZone ), "System", "Sum", Zone( iZone ).Name );
+				SetupOutputVariable( "Zone Oscillating Temperatures Time", OutputProcessor::Unit::hr, ZoneTempOscillate( iZone ), "System", "Sum", Zone( iZone ).Name );
 			}
 			//set up a variable covering all zones
-			SetupOutputVariable( "Facility Any Zone Oscillating Temperatures Time", Unit::hr, AnyZoneTempOscillate, "System", "Sum", "Facility" );
+			SetupOutputVariable( "Facility Any Zone Oscillating Temperatures Time", OutputProcessor::Unit::hr, AnyZoneTempOscillate, "System", "Sum", "Facility" );
 			SetupOscillationOutputFlag = false;
 		}
 		//precalc the negative value for performance

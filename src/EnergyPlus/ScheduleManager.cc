@@ -4540,7 +4540,7 @@ namespace ScheduleManager {
 		if ( DoScheduleReportingSetup ) { // CurrentModuleObject='Any Schedule'
 			for ( ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex ) {
 				// Set Up Reporting
-				SetupOutputVariable( "Schedule Value", Unit::None, Schedule( ScheduleIndex ).CurrentValue, "Zone", "Average", Schedule( ScheduleIndex ).Name );
+				SetupOutputVariable( "Schedule Value", OutputProcessor::Unit::None, Schedule( ScheduleIndex ).CurrentValue, "Zone", "Average", Schedule( ScheduleIndex ).Name );
 			}
 			DoScheduleReportingSetup = false;
 		}

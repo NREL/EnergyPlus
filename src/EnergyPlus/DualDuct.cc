@@ -405,8 +405,8 @@ namespace DualDuct {
 
 				//Setup the Average damper Position output variable
 				// CurrentModuleObject='AirTerminal:DualDuct:ConstantVolume'
-				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position", Unit::None, Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position", Unit::None, Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
 
 			} // end Number of Damper Loop
 		}
@@ -479,9 +479,9 @@ namespace DualDuct {
 
 				//Setup the Average damper Position output variable
 				// CurrentModuleObject='AirTerminal:DualDuct:VAV'
-				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position", Unit::None, Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position", Unit::None, Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate", Unit::m3_s, Damper( DamperNum ).OutdoorAirFlowRate, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate", OutputProcessor::Unit::m3_s, Damper( DamperNum ).OutdoorAirFlowRate, "System", "Average", Damper( DamperNum ).DamperName );
 			} // end Number of Damper Loop
 		}
 
@@ -606,9 +606,9 @@ namespace DualDuct {
 				}
 
 				//Setup the Average damper Position output variable
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Duct Damper Position", Unit::None, Damper( DamperNum ).OADamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Recirculated Air Duct Damper Position", Unit::None, Damper( DamperNum ).RecircAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Fraction", Unit::None, Damper( DamperNum ).OAFraction, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).OADamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Recirculated Air Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).RecircAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Fraction", OutputProcessor::Unit::None, Damper( DamperNum ).OAFraction, "System", "Average", Damper( DamperNum ).DamperName );
 
 			} // end Number of Damper Loop
 		}

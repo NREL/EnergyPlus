@@ -411,9 +411,9 @@ namespace HeatPumpWaterToWaterSimple {
 			}
 
 			// CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Cooling'
-			SetupOutputVariable( "Water to Water Heat Pump Electric Energy", Unit::J, GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Cooling", _, "Plant" );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy", Unit::J, GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy", Unit::J, GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 		}
 
 		//Load data structure for heating coil
@@ -503,9 +503,9 @@ namespace HeatPumpWaterToWaterSimple {
 			TestCompSet( HPEqFitHeatingUC, DataIPShortCuts::cAlphaArgs( 1 ), DataIPShortCuts::cAlphaArgs( 4 ), DataIPShortCuts::cAlphaArgs( 5 ), "Hot Water Nodes" );
 
 			// CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Heating'
-			SetupOutputVariable( "Water to Water Heat Pump Electric Energy", Unit::J, GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy", Unit::J, GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy", Unit::J, GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 		}
 
 
@@ -528,15 +528,15 @@ namespace HeatPumpWaterToWaterSimple {
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			//setup output variables
-			SetupOutputVariable( "Water to Water Heat Pump Electric Power", Unit::W, GSHPReport( GSHPNum ).Power, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate", Unit::W, GSHPReport( GSHPNum ).QLoad, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate", Unit::W, GSHPReport( GSHPNum ).QSource, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature", Unit::C, GSHPReport( GSHPNum ).LoadSideOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature", Unit::C, GSHPReport( GSHPNum ).LoadSideInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature", Unit::C, GSHPReport( GSHPNum ).SourceSideOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature", Unit::C, GSHPReport( GSHPNum ).SourceSideInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate", Unit::kg_s, GSHPReport( GSHPNum ).LoadSideMassFlowRate, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate", Unit::kg_s, GSHPReport( GSHPNum ).SourceSideMassFlowRate, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Power", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).Power, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).QLoad, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).QSource, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).LoadSideOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).LoadSideInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).SourceSideOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).SourceSideInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, GSHPReport( GSHPNum ).LoadSideMassFlowRate, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, GSHPReport( GSHPNum ).SourceSideMassFlowRate, "System", "Average", GSHP( GSHPNum ).Name );
 
 			//scan for loop connection data
 			errFlag = false;

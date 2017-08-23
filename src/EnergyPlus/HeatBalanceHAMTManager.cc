@@ -973,12 +973,12 @@ namespace HeatBalanceHAMTManager {
 			surftemp( sid ) = 0.0;
 			surfexttemp( sid ) = 0.0;
 			surfvp( sid ) = 0.0;
-			SetupOutputVariable( "HAMT Surface Average Water Content Ratio", Unit::kg_kg, watertot( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Inside Face Temperature", Unit::C, surftemp( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Inside Face Relative Humidity", Unit::Perc, surfrh( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Inside Face Vapor Pressure", Unit::Pa, surfvp( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Outside Face Temperature", Unit::C, surfexttemp( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Outside Face Relative Humidity", Unit::Perc, surfextrh( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Average Water Content Ratio", OutputProcessor::Unit::kg_kg, watertot( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Inside Face Temperature", OutputProcessor::Unit::C, surftemp( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Inside Face Relative Humidity", OutputProcessor::Unit::Perc, surfrh( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Inside Face Vapor Pressure", OutputProcessor::Unit::Pa, surfvp( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Outside Face Temperature", OutputProcessor::Unit::C, surfexttemp( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Outside Face Relative Humidity", OutputProcessor::Unit::Perc, surfextrh( sid ), "Zone", "State", Surface( sid ).Name );
 
 			// write cell origins to initilisation output file
 			conid = Surface( sid ).Construction;
@@ -994,13 +994,13 @@ namespace HeatBalanceHAMTManager {
 			gio::write( OutputFileInits );
 
 			for ( int cellid = Extcell( sid ), concell = 1; cellid <= Intcell( sid ); ++cellid, ++concell ) {
-				SetupOutputVariable( "HAMT Surface Temperature Cell " + TrimSigDigits( concell ) + "", Unit::C, cells( cellid ).temp, "Zone", "State", Surface( sid ).Name );
+				SetupOutputVariable( "HAMT Surface Temperature Cell " + TrimSigDigits( concell ) + "", OutputProcessor::Unit::C, cells( cellid ).temp, "Zone", "State", Surface( sid ).Name );
 			}
 			for ( int cellid = Extcell( sid ), concell = 1; cellid <= Intcell( sid ); ++cellid, ++concell ) {
-				SetupOutputVariable( "HAMT Surface Water Content Cell " + TrimSigDigits( concell ) + "", Unit::kg_kg, cells( cellid ).wreport, "Zone", "State", Surface( sid ).Name );
+				SetupOutputVariable( "HAMT Surface Water Content Cell " + TrimSigDigits( concell ) + "", OutputProcessor::Unit::kg_kg, cells( cellid ).wreport, "Zone", "State", Surface( sid ).Name );
 			}
 			for ( int cellid = Extcell( sid ), concell = 1; cellid <= Intcell( sid ); ++cellid, ++concell ) {
-				SetupOutputVariable( "HAMT Surface Relative Humidity Cell " + TrimSigDigits( concell ) + "", Unit::Perc, cells( cellid ).rhp, "Zone", "State", Surface( sid ).Name );
+				SetupOutputVariable( "HAMT Surface Relative Humidity Cell " + TrimSigDigits( concell ) + "", OutputProcessor::Unit::Perc, cells( cellid ).rhp, "Zone", "State", Surface( sid ).Name );
 			}
 		}
 

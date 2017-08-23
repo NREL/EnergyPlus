@@ -631,19 +631,19 @@ namespace CoolingPanelSimple {
 		// Setup Report variables for the Coils
 		for ( CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum ) {
 			// CurrentModuleObject='ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-			SetupOutputVariable( "Cooling Panel Total Cooling Rate", Unit::W, CoolingPanel( CoolingPanelNum ).Power, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Total System Cooling Rate", Unit::W, CoolingPanel( CoolingPanelNum ).TotPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Convective Cooling Rate", Unit::W, CoolingPanel( CoolingPanelNum ).ConvPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Radiant Cooling Rate", Unit::W, CoolingPanel( CoolingPanelNum ).RadPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Total Cooling Rate", OutputProcessor::Unit::W, CoolingPanel( CoolingPanelNum ).Power, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Total System Cooling Rate", OutputProcessor::Unit::W, CoolingPanel( CoolingPanelNum ).TotPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Convective Cooling Rate", OutputProcessor::Unit::W, CoolingPanel( CoolingPanelNum ).ConvPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Radiant Cooling Rate", OutputProcessor::Unit::W, CoolingPanel( CoolingPanelNum ).RadPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
 
-			SetupOutputVariable( "Cooling Panel Total Cooling Energy", Unit::J, CoolingPanel( CoolingPanelNum ).Energy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
-			SetupOutputVariable( "Cooling Panel Total System Cooling Energy", Unit::J, CoolingPanel( CoolingPanelNum ).TotEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
-			SetupOutputVariable( "Cooling Panel Convective Cooling Energy", Unit::J, CoolingPanel( CoolingPanelNum ).ConvEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Radiant Cooling Energy", Unit::J, CoolingPanel( CoolingPanelNum ).RadEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Total Cooling Energy", OutputProcessor::Unit::J, CoolingPanel( CoolingPanelNum ).Energy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
+			SetupOutputVariable( "Cooling Panel Total System Cooling Energy", OutputProcessor::Unit::J, CoolingPanel( CoolingPanelNum ).TotEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
+			SetupOutputVariable( "Cooling Panel Convective Cooling Energy", OutputProcessor::Unit::J, CoolingPanel( CoolingPanelNum ).ConvEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Radiant Cooling Energy", OutputProcessor::Unit::J, CoolingPanel( CoolingPanelNum ).RadEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
 
-			SetupOutputVariable( "Cooling Panel Water Mass Flow Rate", Unit::kg_s, CoolingPanel( CoolingPanelNum ).WaterMassFlowRate, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Water Inlet Temperature", Unit::C, CoolingPanel( CoolingPanelNum ).WaterInletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Water Outlet Temperature", Unit::C, CoolingPanel( CoolingPanelNum ).WaterOutletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Water Mass Flow Rate", OutputProcessor::Unit::kg_s, CoolingPanel( CoolingPanelNum ).WaterMassFlowRate, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Water Inlet Temperature", OutputProcessor::Unit::C, CoolingPanel( CoolingPanelNum ).WaterInletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Water Outlet Temperature", OutputProcessor::Unit::C, CoolingPanel( CoolingPanelNum ).WaterOutletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
 		}
 
 	}
