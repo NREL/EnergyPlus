@@ -16563,15 +16563,26 @@ Foundation:Kiva:Settings,
 SurfaceProperty:ExposedFoundationPerimeter,
        \memo Defines the perimeter of a foundation floor that is exposed to the
        \memo exterior environment through the floor. User may either define the
-       \memo total exposed perimeter or individually define which segments of
-       \memo the floor surface perimeter are exposed. This object is optional.
-       \memo by default it is assumed that the entire perimeter of each
-       \memo foundation is exposed.
+       \memo total exposed perimeter, fraction of perimeter exposed or
+       \memo individually define which segments of the floor surface perimeter
+       \memo are exposed.
        \extensible:1
   A1 , \field Surface Name
        \required-field
        \type object-list
        \object-list FloorSurfaceNames
+  A2 , \field Exposed Perimeter Calculation Method
+       \note Choices: TotalExposedPerimeter => total exposed perimeter in meters
+       \note ExposedPerimeterFraction => fraction of total perimeter that is
+       \note exposed. Value * Fraction = Total exposed perimeter
+       \note BySegment => define whether the segment between each set of
+       \note consecutive vertices of the floor surface is exposed.
+       \note SUM(exposed segement lengths) = Total exposed perimeter
+       \required-field
+       \type choice
+       \key TotalExposedPerimeter
+       \key ExposedPerimeterFraction
+       \key BySegment
   N1 , \field Total Exposed Perimeter
        \type real
        \units m
@@ -16581,58 +16592,47 @@ SurfaceProperty:ExposedFoundationPerimeter,
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
-       \default 1.0
-  A2 , \field Surface Segment 1 Exposed
+  A3 , \field Surface Segment 1 Exposed
        \note Surface Segment N is the perimeter between the Nth and (N+1)th
        \note vertices
        \begin-extensible
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A3 , \field Surface Segment 2 Exposed
+  A4 , \field Surface Segment 2 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A4 , \field Surface Segment 3 Exposed
+  A5 , \field Surface Segment 3 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A5 , \field Surface Segment 4 Exposed
+  A6 , \field Surface Segment 4 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A6 , \field Surface Segment 5 Exposed
+  A7 , \field Surface Segment 5 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A7 , \field Surface Segment 6 Exposed
+  A8 , \field Surface Segment 6 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A8 , \field Surface Segment 7 Exposed
+  A9 , \field Surface Segment 7 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A9 , \field Surface Segment 8 Exposed
+  A10, \field Surface Segment 8 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A10, \field Surface Segment 9 Exposed
+  A11, \field Surface Segment 9 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A11; \field Surface Segment 10 Exposed
+  A12; \field Surface Segment 10 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
 
@@ -61679,6 +61679,7 @@ OutdoorAir:Node,
        \memo This object defines local outdoor air environmental conditions.
   A1,  \field Name
        \required-field
+       \reference OutdoorAirNodeNames
        \type node
   N1,  \field Height Above Ground
        \note A value less than zero indicates that the height will be ignored and the weather file conditions will be used.
