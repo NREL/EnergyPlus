@@ -83,7 +83,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -100,7 +100,7 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                     !- Run Simulation for Weather File Run Periods
+    No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
     ,                        !- Name
@@ -202,7 +202,7 @@
     1.6;                     !- Z Origin {m}
 
   Zone,
-    Occupied Thermal Zone,       !- Name
+    Occupied Thermal Zone,   !- Name
     -0,                      !- Direction of Relative North {deg}
     0,                       !- X Origin {m}
     0,                       !- Y Origin {m}
@@ -322,7 +322,7 @@
     Floor,                   !- Name
     Floor,                   !- Surface Type
     FLOOR:LIVING,            !- Construction Name
-    Occupied Thermal Zone,       !- Zone Name
+    Occupied Thermal Zone,   !- Zone Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -893,7 +893,7 @@
     300000.0;                !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor {deltaJ/kg}
 
   AirflowNetwork:MultiZone:Zone,
-    Occupied Thermal Zone,       !- Zone Name
+    Occupied Thermal Zone,   !- Zone Name
     NoVent,                  !- Ventilation Control Mode
     ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
     0.00001,                 !- Minimum Venting Open Factor {dimensionless}
@@ -1222,13 +1222,13 @@
     Temperature,             !- Control Variable
     13.,                     !- Minimum Supply Air Temperature {C}
     45.,                     !- Maximum Supply Air Temperature {C}
-    Occupied Thermal Zone,       !- Control Zone Name
+    Occupied Thermal Zone,   !- Control Zone Name
     Zone Node,               !- Zone Node Name
     Zone Inlet Node,         !- Zone Inlet Node Name
     Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
-    Occupied Thermal Zone,       !- Zone Name
+    Occupied Thermal Zone,   !- Zone Name
     ZoneEquipment,           !- Zone Conditioning Equipment List Name
     ZoneInlets,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
@@ -1259,7 +1259,7 @@
 
   ZoneControl:Thermostat,
     Zone Thermostat,         !- Name
-    Occupied Thermal Zone,       !- Zone or ZoneList Name
+    Occupied Thermal Zone,   !- Zone or ZoneList Name
     New Zone Control Type Sched,  !- Control Type Schedule Name
     ThermostatSetpoint:SingleHeatingOrCooling,  !- Control 1 Object Type
     Setpoints;               !- Control 1 Name

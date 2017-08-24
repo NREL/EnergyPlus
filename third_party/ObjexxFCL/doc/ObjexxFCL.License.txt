@@ -1,14 +1,14 @@
-Software License Agreement for the Objexx Fortran Compatibility Library
+Software License Agreement for the Objexx Fortran-C++ Library
 
-The following License Agreement applies to any user of the Objexx Fortran
-Compatibility Library (ObjexxFCL). By use of the software, you indicate your
-acceptance of the following Software License Agreement. If you do not agree to
-the terms of this Agreement, promptly return any media and printed materials to
-Objexx Engineering, Inc. for a full refund.
+The following License Agreement applies to any user of the Objexx Fortran-C++
+Library (ObjexxFCL). By use of the software, you indicate your acceptance of the
+following Software License Agreement. If you do not agree to the terms of this
+Agreement, promptly return any media and printed materials to Objexx
+Engineering, Inc. for a full refund.
 
 1. This is a legal agreement between Objexx Engineering, Inc. ("Licensor") and
-the Licensee, who is being licensed to use the Objexx Fortran Compatibility
-Library computer software and associated documentation ("Software").
+the Licensee, who is being licensed to use the Objexx Fortran-C++ Library
+computer software and associated documentation ("Software").
 
 2. Licensee acknowledges that this is only a limited nonexclusive license.
 Licensor is and remains the owner of all titles, rights, and interests in the
@@ -138,4 +138,4 @@ Objexx Engineering, Inc.
 192 South Street
 Needham MA 02492
 USA
-Telephone: 1.781.455.1150
+Telephone: +1 781 455 1150

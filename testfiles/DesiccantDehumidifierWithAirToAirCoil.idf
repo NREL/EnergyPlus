@@ -1,7 +1,6 @@
 ! DesiccantDehumidifierWithAirToAirCoil.idf
-!                           
+!
 !                          derived from the file DesiccantDehumifierWithCompanionCoil.idf, but with VS coil model.
-
 ! Highlights:              Packaged VAV system with variable speed compressor for exterior (perimeter) zones.
 !                          The perimeter zone air system also has a desiccant dehumidifier to treat outdoor air.
 !
@@ -104,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -2764,7 +2763,7 @@
     Main Cooling Coil 1 Condenser Node;  !- Condenser Air Inlet Node Name
 
   Coil:Cooling:DX:VariableSpeed,
-    Desiccant DXSystem VS Cooling Coil,    !- Name
+    Desiccant DXSystem VS Cooling Coil,  !- Name
     Desiccant DXSystem Mixed Air Node,  !- Indoor Air Inlet Node Name
     HX Process Inlet Node,   !- Indoor Air Outlet Node Name
     1.0,                     !- Number of Speeds {dimensionless}
@@ -2795,7 +2794,7 @@
     HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp4,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF;                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-   
+
   Curve:Cubic,
     HPACFFF,                 !- Name
     1.0,                     !- Coefficient1 Constant
@@ -2804,7 +2803,7 @@
     0.0,                     !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
-    
+
   Curve:Biquadratic,
     HPCoolingEIRFTemp4,      !- Name
     0.0001514017,            !- Coefficient1 Constant

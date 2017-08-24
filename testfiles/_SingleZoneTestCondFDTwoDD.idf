@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.7;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 !========================
@@ -2286,9 +2286,9 @@
 
   Construction,
     Light Exterior Wall,     !- Name
-    I02 50mm insulation board,  !- Layer 2
-    F04 Wall air space resistance,  !- Layer 3
-    G01a 19mm gypsum board;  !- Layer 4
+    I02 50mm insulation board,  !- Outside Layer
+    F04 Wall air space resistance,  !- Layer 2
+    G01a 19mm gypsum board;  !- Layer 3
 
   Construction,
     Light Roof/Ceiling,      !- Name

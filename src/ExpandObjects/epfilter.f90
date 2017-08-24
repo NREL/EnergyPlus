@@ -1498,7 +1498,7 @@ INTEGER,PARAMETER :: gndTempSurfDecOff = 12
 INTEGER,PARAMETER :: blrhwNameOff = 1
 INTEGER,PARAMETER :: blrhwInletNodeOff = 12
 INTEGER,PARAMETER :: blrhwOutletNodeOff = 13
-INTEGER,PARAMETER :: blrhwLastFieldOff = 17
+INTEGER,PARAMETER :: blrhwLastFieldOff = 18
 
   ! Chiller:Electric:EIR (for use with HVACTemplate:Plant:Chiller:ObjectReference)
 INTEGER,PARAMETER :: chleirNameOff = 1
@@ -1507,7 +1507,7 @@ INTEGER,PARAMETER :: chleirChWOutletNodeOff = 16
 INTEGER,PARAMETER :: chleirCondInletNodeOff = 17
 INTEGER,PARAMETER :: chleirCondOutletNodeOff = 18
 INTEGER,PARAMETER :: chleirCondTypeOff = 19
-INTEGER,PARAMETER :: chleirLastFieldOff = 30
+INTEGER,PARAMETER :: chleirLastFieldOff = 34
 
   ! Chiller:Electric:ReformulatedEIR (for use with HVACTemplate:Plant:Chiller:ObjectReference)
 INTEGER,PARAMETER :: chlreirNameOff = 1
@@ -1515,25 +1515,25 @@ INTEGER,PARAMETER :: chlreirChWInletNodeOff = 16
 INTEGER,PARAMETER :: chlreirChWOutletNodeOff = 17
 INTEGER,PARAMETER :: chlreirCondInletNodeOff = 18
 INTEGER,PARAMETER :: chlreirCondOutletNodeOff = 19
-INTEGER,PARAMETER :: chlreirLastFieldOff = 26
+INTEGER,PARAMETER :: chlreirLastFieldOff = 30
 
   ! CoolingTower:SingleSpeed (for use with HVACTemplate:Plant:Tower:ObjectReference)
 INTEGER,PARAMETER :: twrssNameOff = 1
 INTEGER,PARAMETER :: twrssInletNodeOff = 2
 INTEGER,PARAMETER :: twrssOutletNodeOff = 3
-INTEGER,PARAMETER :: twrssLastFieldOff = 37
+INTEGER,PARAMETER :: twrssLastFieldOff = 38
 
   ! CoolingTower:TwoSpeed (for use with HVACTemplate:Plant:Tower:ObjectReference)
 INTEGER,PARAMETER :: twrtsNameOff = 1
 INTEGER,PARAMETER :: twrtsInletNodeOff = 2
 INTEGER,PARAMETER :: twrtsOutletNodeOff = 3
-INTEGER,PARAMETER :: twrtsLastFieldOff = 44
+INTEGER,PARAMETER :: twrtsLastFieldOff = 45
 
   ! CoolingTower:VariableSpeed (for use with HVACTemplate:Plant:Tower:ObjectReference)
 INTEGER,PARAMETER :: twrvsNameOff = 1
 INTEGER,PARAMETER :: twrvsInletNodeOff = 2
 INTEGER,PARAMETER :: twrvsOutletNodeOff = 3
-INTEGER,PARAMETER :: twrvsLastFieldOff = 34
+INTEGER,PARAMETER :: twrvsLastFieldOff = 31
 
 !following objects are identified just by the first and last fields
 INTEGER,PARAMETER :: ghtBsSimParamFirstOff = 1

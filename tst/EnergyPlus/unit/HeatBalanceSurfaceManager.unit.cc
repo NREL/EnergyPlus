@@ -67,12 +67,13 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/DataOutputs.hh>
 
 using namespace EnergyPlus::HeatBalanceSurfaceManager;
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp )
 	{
 
 		int SurfNum; // Surface number DO loop counter
@@ -115,8 +116,10 @@ namespace EnergyPlus {
 		DataHeatBalSurface::TempSurfIn( SurfNum ) = 1.0;
 		DataHeatBalSurface::QRadSWOutMvIns.allocate( SurfNum );
 		DataHeatBalSurface::QRadSWOutMvIns( SurfNum ) = 1.0;
+		DataHeatBalSurface::QRadLWOutSrdSurfs.allocate( SurfNum );
+		DataHeatBalSurface::QRadLWOutSrdSurfs( SurfNum ) = 1.0;
 		
-		DataHeatBalSurface::TH.allocate(2,2,1);
+		DataHeatBalSurface::TH.allocate( 2,2,1 );
 		DataSurfaces::Surface.allocate( SurfNum );
 		DataSurfaces::Surface( SurfNum ).Class = 1;
 		DataSurfaces::Surface( SurfNum ).Area = 10.0;
@@ -326,7 +329,7 @@ namespace EnergyPlus {
 	{
 
 		std::string const idf_objects = delimited_string( {
-			"  Version,8.7;",
+			"  Version,8.8;",
 
 			"  Building,",
 			"    House with AirflowNetwork simulation,  !- Name",
@@ -815,6 +818,49 @@ namespace EnergyPlus {
 		DataHeatBalance::ZoneWinHeatGainRep.deallocate( );
 		DataHeatBalance::ZoneWinHeatGainRepEnergy.deallocate( );
 
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest )
+	{
+
+		std::string const idf_objects = delimited_string( {
+			"  Version,8.7;",
+			" Output:Variable,Perimeter_ZN_1_wall_south_Window_1,Surface Window Transmitted Solar Radiation Rate,timestep;",
+			" Output:Variable,*,SURFACE CONSTRUCTION INDEX,timestep;",
+			" Output:Diagnostics, DisplayAdvancedReportVariables;",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::DisplayAdvancedReportVariables = true;
+
+		DataSurfaces::TotSurfaces = 1;
+		DataGlobals::NumOfZones = 1;
+		DataHeatBalance::TotConstructs = 1;
+		DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
+		DataSurfaces::Surface.allocate( DataSurfaces::TotSurfaces );
+		DataSurfaces::SurfaceWindow.allocate( DataSurfaces::TotSurfaces );
+		DataHeatBalance::Construct.allocate( DataHeatBalance::TotConstructs );
+		DataHeatBalance::AnyConstructInternalSourceInInput = true;
+
+		DataSurfaces::Surface( 1 ).Class = DataSurfaces::SurfaceClass_Wall;
+		DataSurfaces::Surface( 1 ).HeatTransSurf = true;
+		DataSurfaces::Surface( 1 ).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+		DataSurfaces::Surface( 1 ).ExtBoundCond = 1;
+		DataSurfaces::Surface( 1 ).Construction = 1;
+
+		DataHeatBalance::Construct( 1 ).NumCTFTerms = 2;
+		DataHeatBalance::Construct( 1 ).SourceSinkPresent = true;
+		DataHeatBalance::Construct( 1 ).NumHistories = 1;
+		DataHeatBalance::Construct( 1 ).CTFTUserOut( 0 ) = 0.5;
+		DataHeatBalance::Construct( 1 ).CTFTUserIn( 0 ) = 0.25;
+		DataHeatBalance::Construct( 1 ).CTFTUserSource( 0 ) = 0.25;
+
+		AllocateSurfaceHeatBalArrays( ); // allocates a host of variables related to CTF calculations
+		OutputProcessor::GetReportVariableInput( );
+
+		EXPECT_EQ( OutputProcessor::ReqRepVars( 2 ).VarName, "SURFACE CONSTRUCTION INDEX" );
 
 	}
 }

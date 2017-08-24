@@ -107,6 +107,7 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -135,6 +136,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -260,6 +262,7 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileBNDetails, flags );
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
 			gio::close( DataGlobals::OutputDElightIn, flags );
+			gio::close( DataGlobals::OutputFileShadingFrac, flags );
 
 		}
 	}
@@ -317,6 +320,7 @@ namespace EnergyPlus {
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
 		clearFacilityElectricPowerServiceObject();
+		EarthTube::clear_state();
 		EconomicLifeCycleCost::clear_state();
 		EconomicTariff::clear_state();
 		EMSManager::clear_state();
@@ -343,6 +347,7 @@ namespace EnergyPlus {
 		HVACDXSystem::clear_state();
 		HVACFan::clearHVACFanObjects();
 		HVACManager::clear_state();
+		HVACSingleDuctInduc::clear_state();
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();

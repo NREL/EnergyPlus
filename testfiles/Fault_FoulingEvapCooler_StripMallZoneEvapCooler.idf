@@ -53,7 +53,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,8.7;
+  Version,8.8;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -5228,18 +5228,18 @@
 !*** OPERATIONAL FAULTS ***
 
   FaultModel:Fouling:EvaporativeCooler,
-    Fault_Fouling_EvapCooler1,!- Name
+    Fault_Fouling_EvapCooler1,  !- Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    EvaporativeCooler:Indirect:WetCoil, !- Evaporative Cooler Object Type
-    SMstore6 Evaporative Cooler, !- Evaporative Cooler Object Name
-    0.7;                     !- Reference Efficiency Reduction Factor
+    EvaporativeCooler:Indirect:WetCoil,  !- Evaporative Cooler Object Type
+    SMstore6 Evaporative Cooler,  !- Evaporative Cooler Object Name
+    0.7;                     !- Fouling Factor {dimensionless}
 
   FaultModel:Fouling:EvaporativeCooler,
-    Fault_Fouling_EvapCooler2,!- Name
+    Fault_Fouling_EvapCooler2,  !- Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    EvaporativeCooler:Indirect:WetCoil, !- Evaporative Cooler Object Type
-    SMstore7 Indirect Evaporative Cooler, !- Evaporative Cooler Object Name
-    0.6;                     !- Reference Efficiency Reduction Factor
+    EvaporativeCooler:Indirect:WetCoil,  !- Evaporative Cooler Object Type
+    SMstore7 Indirect Evaporative Cooler,  !- Evaporative Cooler Object Name
+    0.6;                     !- Fouling Factor {dimensionless}
 
