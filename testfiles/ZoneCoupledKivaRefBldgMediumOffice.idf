@@ -902,6 +902,7 @@
 
   SurfaceProperty:ExposedFoundationPerimeter,
     Core_bot_ZN_5_Floor,     !- Surface Name
+    BySegment,               !- Exposed Perimeter Calculation Method
     ,                        !- Total Exposed Perimeter {m}
     ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
@@ -1599,6 +1600,7 @@
 
   SurfaceProperty:ExposedFoundationPerimeter,
     Perimeter_bot_ZN_1_Floor,!- Surface Name
+    BySegment,               !- Exposed Perimeter Calculation Method
     ,                        !- Total Exposed Perimeter {m}
     ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
@@ -1704,6 +1706,7 @@
 
   SurfaceProperty:ExposedFoundationPerimeter,
     Perimeter_bot_ZN_2_Floor,!- Surface Name
+    BySegment,               !- Exposed Perimeter Calculation Method
     ,                        !- Total Exposed Perimeter {m}
     ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
@@ -1809,6 +1812,7 @@
 
   SurfaceProperty:ExposedFoundationPerimeter,
     Perimeter_bot_ZN_3_Floor,!- Surface Name
+    BySegment,               !- Exposed Perimeter Calculation Method
     ,                        !- Total Exposed Perimeter {m}
     ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
@@ -1914,6 +1918,7 @@
 
   SurfaceProperty:ExposedFoundationPerimeter,
     Perimeter_bot_ZN_4_Floor,!- Surface Name
+    BySegment,               !- Exposed Perimeter Calculation Method
     ,                        !- Total Exposed Perimeter {m}
     ,                        !- Exposed Perimeter Fraction {dimensionless}
     No,                      !- Surface Segment 1 Exposed
@@ -4527,7 +4532,8 @@
     3.28186528141147,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
     Measured_LowSpeedCoolCapLSFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
-    Measured_LowSpeedCoolEIRLSFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    Measured_LowSpeedCoolEIRLSFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
   Coil:Cooling:DX:TwoSpeed,
     VAV_2_CoolC DXCoil,      !- Name
@@ -4549,7 +4555,8 @@
     3.28186528141147,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
     Measured_LowSpeedCoolCapLSFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
-    Measured_LowSpeedCoolEIRLSFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    Measured_LowSpeedCoolEIRLSFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
   Coil:Cooling:DX:TwoSpeed,
     VAV_3_CoolC DXCoil,      !- Name
@@ -4571,7 +4578,8 @@
     3.28186528141147,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
     Measured_LowSpeedCoolCapLSFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
-    Measured_LowSpeedCoolEIRLSFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    Measured_LowSpeedCoolEIRLSFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
   Coil:Heating:Electric,
     Core_bottom VAV Box Reheat Coil,  !- Name
@@ -7941,4 +7949,3 @@
     0,                       !- Nuclear High Level Emission Factor {g/MJ}
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
-

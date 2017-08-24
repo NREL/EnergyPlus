@@ -103,8 +103,6 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
- Lead Input;
-
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
@@ -420,9 +418,6 @@
     CONTINUOUS;              !- Numeric Type
 
   Site:GroundTemperature:BuildingSurface,20,20,20,20,20,20,20,20,20,20,20,20;
-
- End Lead Input;
- Simulation Data;
 
   Zone,
     ZONE 1,                  !- Name
@@ -1283,4 +1278,3 @@
 
   Output:Meter,DistrictCooling:Facility,hourly;
 
- End Simulation Data;

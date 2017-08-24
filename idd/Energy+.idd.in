@@ -535,7 +535,7 @@ ShadowCalculation,
        \key ConvexWeilerAtherton
        \key SutherlandHodgman
        \default SutherlandHodgman
-  A3 ; \field Sky Diffuse Modeling Algorithm
+  A3 , \field Sky Diffuse Modeling Algorithm
        \note Advanced Feature.  Internal default is SimpleSkyDiffuseModeling
        \note If you have shading elements that change transmittance over the
        \note year, you may wish to choose the detailed method.
@@ -544,6 +544,18 @@ ShadowCalculation,
        \key SimpleSkyDiffuseModeling
        \key DetailedSkyDiffuseModeling
        \default SimpleSkyDiffuseModeling
+  A4 , \field External Shading Calculation Method
+       \type choice
+       \key ScheduledShading
+       \key InternalCalculation
+       \default InternalCalculation
+       \note If ScheduledShading is chosen, the External Shading Fraction Schedule Name is required.
+  A5 ; \field Output External Shading Calculation Results
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note If Yes is chosen, the calculated external shading fraction results will be saved to an external CSV file with surface names as the column headers.
 
 SurfaceConvectionAlgorithm:Inside,
        \memo Default indoor surface heat transfer convection algorithm to be used for all zones
@@ -12360,7 +12372,7 @@ WindowProperty:AirflowControl,
        \note Required if Airflow Is Scheduled = Yes.
        \note Schedule values are 0.0 or 1.0 and multiply Maximum Air Flow.
   A7 ; \field Airflow Return Air Node Name
-       \note Name of the return air node for this airflow window if the Airflow Destination is ReturnAir. 
+       \note Name of the return air node for this airflow window if the Airflow Destination is ReturnAir.
        \note If left blank, defaults to the first return air node for the zone of the window surface.
        \type node
 
@@ -16243,7 +16255,7 @@ SurfaceProperty:Underwater,
        \reference SurfacePropUnderWaterNames
        \type alpha
   N1,  \field Distance from Surface Centroid to Leading Edge of Boundary Layer
-       \note This is the distance from the leading edge of the boundary layer development 
+       \note This is the distance from the leading edge of the boundary layer development
        \note to the centroid of the surface of interest.  The value of this field is used
        \note as the distance in the Reynolds number for evaluating the local convection coefficient.
        \type real
@@ -16528,7 +16540,6 @@ Foundation:Kiva:Settings,
        \default Autoselect
   N8,  \field Deep-Ground Depth
        \type real
-       \default 40
        \units m
        \minimum> 0.0
        \autocalculatable
@@ -16552,15 +16563,26 @@ Foundation:Kiva:Settings,
 SurfaceProperty:ExposedFoundationPerimeter,
        \memo Defines the perimeter of a foundation floor that is exposed to the
        \memo exterior environment through the floor. User may either define the
-       \memo total exposed perimeter or individually define which segments of
-       \memo the floor surface perimeter are exposed. This object is optional.
-       \memo by default it is assumed that the entire perimeter of each
-       \memo foundation is exposed.
+       \memo total exposed perimeter, fraction of perimeter exposed or
+       \memo individually define which segments of the floor surface perimeter
+       \memo are exposed.
        \extensible:1
   A1 , \field Surface Name
        \required-field
        \type object-list
        \object-list FloorSurfaceNames
+  A2 , \field Exposed Perimeter Calculation Method
+       \note Choices: TotalExposedPerimeter => total exposed perimeter in meters
+       \note ExposedPerimeterFraction => fraction of total perimeter that is
+       \note exposed. Value * Fraction = Total exposed perimeter
+       \note BySegment => define whether the segment between each set of
+       \note consecutive vertices of the floor surface is exposed.
+       \note SUM(exposed segement lengths) = Total exposed perimeter
+       \required-field
+       \type choice
+       \key TotalExposedPerimeter
+       \key ExposedPerimeterFraction
+       \key BySegment
   N1 , \field Total Exposed Perimeter
        \type real
        \units m
@@ -16570,58 +16592,47 @@ SurfaceProperty:ExposedFoundationPerimeter,
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
-       \default 1.0
-  A2 , \field Surface Segment 1 Exposed
+  A3 , \field Surface Segment 1 Exposed
        \note Surface Segment N is the perimeter between the Nth and (N+1)th
        \note vertices
        \begin-extensible
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A3 , \field Surface Segment 2 Exposed
+  A4 , \field Surface Segment 2 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A4 , \field Surface Segment 3 Exposed
+  A5 , \field Surface Segment 3 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A5 , \field Surface Segment 4 Exposed
+  A6 , \field Surface Segment 4 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A6 , \field Surface Segment 5 Exposed
+  A7 , \field Surface Segment 5 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A7 , \field Surface Segment 6 Exposed
+  A8 , \field Surface Segment 6 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A8 , \field Surface Segment 7 Exposed
+  A9 , \field Surface Segment 7 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A9 , \field Surface Segment 8 Exposed
+  A10, \field Surface Segment 8 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A10, \field Surface Segment 9 Exposed
+  A11, \field Surface Segment 9 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
-  A11; \field Surface Segment 10 Exposed
+  A12; \field Surface Segment 10 Exposed
        \type choice
-       \default Yes
        \key Yes
        \key No
 
@@ -17868,6 +17879,181 @@ SurfaceProperty:SolarIncidentInside,
        \required-field
        \type object-list
        \object-list ScheduleNames
+
+SurfaceProperty:LocalEnvironment,
+       \min-fields 3
+       \memo This object defines the local environment properties of an exterior surface.
+       \memo One or more environment properties have to be defined and linked to the exterior surface.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference SurfaceLocalEnvironmentNames
+   A2, \field Exterior Surface Name
+       \type object-list
+       \object-list SurfaceNames
+       \note Enter the name of an exterior surface object
+   A3, \field External Shading Fraction Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Enter the name of a Schedule object
+   A4, \field Surrounding Surfaces Object Name
+       \type object-list
+       \object-list SurroundingSurfacesNames
+       \note Enter the name of a SurfaceProperty:SurroundingSurfaces object
+   A5; \field Outdoor Air Node Name
+       \type object-list
+       \object-list OutdoorAirNodeNames
+       \note Enter the name of an OutdoorAir:Node object
+
+ZoneProperty:LocalEnvironment,
+       \min-fields 3
+       \memo This object defines the local environment properties of a zone object.
+       \memo A corresponding outdoor air node should be defined and linked to the zone object.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference ZoneLocalEnvironmentNames
+   A2, \field Zone Name
+       \type object-list
+       \object-list ZoneNames
+       \note Enter the name of a zone object
+   A3; \field Outdoor Air Node Name
+       \type object-list
+       \object-list OutdoorAirNodeNames
+       \note Enter the name of an OutdoorAir:Node object
+
+SurfaceProperty:SurroundingSurfaces,
+       \min-fields 8
+       \memo This object defines a list of surrounding surfaces for an exterior surface.
+       \extensible:3 -- duplicate last set of surrounding surface properties (the last three fields), remembering to remove ; from "inner" fields.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference SurroundingSurfacesNames
+   N1, \field Sky View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.5
+       \note optional
+   A2, \field Sky Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+   N2, \field Ground View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.5
+       \note optional
+   A3, \field Ground Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+       \note optional
+   A4, \field Surrounding Surface 1 Name
+       \begin-extensible
+       \required-field
+       \type alpha
+   N3, \field Surrounding Surface 1 View Factor
+       \required-field
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A5, \field Surrounding Surface 1 Temperature Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A6, \field Surrounding Surface 2 Name
+       \type alpha
+   N4, \field Surrounding Surface 2 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A7, \field Surrounding Surface 2 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A8, \field Surrounding Surface 3 Name
+       \type alpha
+   N5, \field Surrounding Surface 3 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A9, \field Surrounding Surface 3 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A10,\field Surrounding Surface 4 Name
+       \type alpha
+   N6, \field Surrounding Surface 4 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A11,\field Surrounding Surface 4 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A12,\field Surrounding Surface 5 Name
+       \type alpha
+   N7, \field Surrounding Surface 5 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A13,\field Surrounding Surface 5 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A14,\field Surrounding Surface 6 Name
+       \type alpha
+   N8, \field Surrounding Surface 6 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A15,\field Surrounding Surface 6 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A16,\field Surrounding Surface 7 Name
+       \type alpha
+   N9, \field Surrounding Surface 7 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A17,\field Surrounding Surface 7 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A18,\field Surrounding Surface 8 Name
+       \type alpha
+   N10,\field Surrounding Surface 8 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A19,\field Surrounding Surface 8 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A20, \field Surrounding Surface 9 Name
+       \type alpha
+   N11,\field Surrounding Surface 9 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A21,\field Surrounding Surface 9 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+   A22,\field Surrounding Surface 10 Name
+       \type alpha
+   N12,\field Surrounding Surface 10 View Factor
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+   A23;\field Surrounding Surface 10 Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
 
 ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Used to provide solar radiation absorbed in fenestration layers. References surface-construction pair
@@ -23252,13 +23438,19 @@ AirflowNetwork:SimulationControl,
       \maximum 1.0
       \default 1.0
       \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
- A7 ; \field Height Dependence of External Node Temperature
+ A7 , \field Height Dependence of External Node Temperature
       \note If Yes, external node temperature is height dependent.
       \note If No, external node temperature is based on zero height.
       \type choice
       \key Yes
       \key No
       \default No
+ A8 ; \field Solver
+      \note Select the solver to use for the pressure network solution
+      \type choice
+      \key SkylineLU
+      \key ConjugateGradient
+      \default SkylineLU
 
 AirflowNetwork:MultiZone:Zone,
       \min-fields 8
@@ -32285,28 +32477,28 @@ DesignSpecification:AirTerminal:Sizing,
       \type alpha
       \reference DesignSpecificationAirTerminalSizingName
   N1, \field Fraction of Design Cooling Load
-      \note The fraction of the design sensible cooling load to be met by this terminal unit. 
+      \note The fraction of the design sensible cooling load to be met by this terminal unit.
       \note This fraction is applied after the Zone Cooling Sizing Factor (see Sizing:Zone).
       \type real
       \units dimensionless
       \minimum 0.0
       \default 1.0
   N2, \field Cooling Design Supply Air Temperature Difference Ratio
-      \note This ratio adjusts the supply air temperature difference used to calculate 
+      \note This ratio adjusts the supply air temperature difference used to calculate
       \note the cooling design supply air flow rate for this terminal unit.
       \type real
       \units dimensionless
       \minimum> 0.0
       \default 1.0
   N3, \field Fraction of Design Heating Load
-      \note The fraction of the design sensible heating load to be met by this terminal unit. 
+      \note The fraction of the design sensible heating load to be met by this terminal unit.
       \note This fraction is applied after the Zone Heating Sizing Factor (see Sizing:Zone).
       \type real
       \units dimensionless
       \minimum 0.0
       \default 1.0
   N4, \field Heating Design Supply Air Temperature Difference Ratio
-      \note This ratio adjusts the supply air temperature difference used to calculate 
+      \note This ratio adjusts the supply air temperature difference used to calculate
       \note the heating design supply air flow rate for this terminal unit.
       \type real
       \units dimensionless
@@ -40424,8 +40616,8 @@ AirTerminal:SingleDuct:Uncontrolled,
        \note CurrentOccupancy models demand controlled ventilation using the current number of people
        \note DesignOccupancy uses the total Number of People in the zone and is constant
    A6; \field Design Specification Air Terminal Sizing Object Name
-       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object 
-       \note which specifies sizing adjustments to be made for this terminal unit. 
+       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object
+       \note which specifies sizing adjustments to be made for this terminal unit.
        \type object-list
        \object-list DesignSpecificationAirTerminalSizingName
 
@@ -41645,8 +41837,8 @@ ZoneHVAC:AirDistributionUnit,
        \maximum 0.3
        \default 0
   A5 ; \field Design Specification Air Terminal Sizing Object Name
-       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object 
-       \note which specifies sizing adjustments to be made for this terminal unit. 
+       \note This optional field is the name of a DesignSpecification:AirTerminal:Sizing object
+       \note which specifies sizing adjustments to be made for this terminal unit.
        \type object-list
        \object-list DesignSpecificationAirTerminalSizingName
 
@@ -61484,14 +61676,54 @@ OutdoorAir:Node,
        \memo specified.  This object may be used more than once.
        \memo The same node name may not appear in both an OutdoorAir:Node object and
        \memo an OutdoorAir:NodeList object.
+       \memo This object defines local outdoor air environmental conditions.
   A1,  \field Name
        \required-field
+       \reference OutdoorAirNodeNames
        \type node
-  N1 ; \field Height Above Ground
+  N1,  \field Height Above Ground
        \note A value less than zero indicates that the height will be ignored and the weather file conditions will be used.
        \type real
        \units m
        \default -1.0
+  A2 , \field Drybulb Temperature Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+  A3 , \field Wetbulb Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, -100.0 to 100.0, units C
+  A4 , \field Wind Speed Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, 0.0 to 40.0, units m/s
+  A5 , \field Wind Direction Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Schedule values are real numbers, 0.0 to 360.0, units degree
+  A6 , \field Wind Pressure Coefficient Curve Name
+       \type object-list
+       \object-list WPCValueNames
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+       \note The name of the AirflowNetwork:MultiZone:WindPressureCoefficientValues, curve, or table object specifying the wind pressure coefficient.
+  A7 , \field Symmetric Wind Pressure Coefficient Curve
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note Specify whether the pressure curve is symmetric or not.
+       \note Specify Yes for curves that should be evaluated from 0 to 180 degrees
+       \note Specify No for curves that should be evaluated from 0 to 360 degrees
+  A8 ; \field Wind Angle Type
+       \type choice
+       \key Absolute
+       \key Relative
+       \default Absolute
+       \note Specify whether the angle used to compute the wind pressure coefficient is absolute or relative
+       \note Specify Relative to compute the angle between the wind direction and the surface azimuth
+       \note Specify Absolute to use the wind direction angle directly
 
 OutdoorAir:NodeList,
        \extensible:1 Just duplicate last field and comments (changing numbering, please)
@@ -76283,7 +76515,7 @@ Refrigeration:Case,
         \type real
         \default 0.0
   A15; \field Under Case HVAC Return Air Node Name
-       \note Name of the return air node for this case. 
+       \note Name of the return air node for this case.
        \note If left blank, defaults to the first return air node for this zone.
        \type node
 
