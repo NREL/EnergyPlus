@@ -3,9 +3,9 @@
 
 // Optional Argument Wrapper
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -25,7 +25,11 @@ namespace ObjexxFCL {
 
 // Optional Argument Wrapper
 template< typename T, typename Enable >
-class Optional
+class Optional;
+
+// Optional Argument Wrapper: Concrete Type Specialization
+template< typename T >
+class Optional< T, typename std::enable_if< ! std::is_abstract< T >::value >::type >
 {
 
 private: // Friend
@@ -35,6 +39,7 @@ private: // Friend
 public: // Types
 
 	typedef  T  Value;
+	typedef  typename std::enable_if< ! std::is_abstract< T >::value >::type  EnableType;
 	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
 	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
@@ -52,9 +57,9 @@ public: // Creation
 	 own_( o.own_ )
 	{}
 
-	// Optional Constructor Template
+	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
-	Optional( Optional< U, Enable > const & o ) :
+	Optional( Optional< U, EnableType > const & o ) :
 	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
 	 own_( o.own_ )
 	{}
@@ -119,7 +124,7 @@ public: // Assignment
 	operator =( U const & val )
 	{
 		assert( ptr_ != nullptr );
-		*ptr_ = val;
+		*ptr_ = T( val );
 		return *this;
 	}
 
@@ -288,7 +293,7 @@ public: // Creation
 	 ptr_( o.ptr_ )
 	{}
 
-	// Optional Constructor Template
+	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
 	Optional( Optional< U, EnableType > const & o ) :
 	 ptr_( o.ptr_ )
@@ -478,6 +483,15 @@ bool
 PRESENT( Optional< T > const & o )
 {
 	return o.present();
+}
+
+// Optional Maker
+template< typename T >
+inline
+Optional< T >
+make_Optional( T const & val )
+{
+	return Optional< T >( val );
 }
 
 } // ObjexxFCL

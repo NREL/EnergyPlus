@@ -841,7 +841,7 @@
     3.7,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Sp01-RIGHT,                 !- Name
+    Sp01-RIGHT,              !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE1-1,                !- Zone Name
@@ -857,7 +857,7 @@
     30.5,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Sp01-LEFT,                 !- Name
+    Sp01-LEFT,               !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE1-1,                !- Zone Name
@@ -1065,7 +1065,7 @@
     26.8,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Sp03-RIGHT,                 !- Name
+    Sp03-RIGHT,              !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE3-1,                !- Zone Name
@@ -1081,7 +1081,7 @@
     30.5,15.2,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Sp03-LEFT,                 !- Name
+    Sp03-LEFT,               !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE3-1,                !- Zone Name
@@ -1095,7 +1095,6 @@
     0.0,15.2,0.0,  !- X,Y,Z ==> Vertex 2 {m}
     0.0,11.6,0.0,  !- X,Y,Z ==> Vertex 3 {m}
     0.0,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   BuildingSurface:Detailed,
     LEFT-1,                  !- Name
@@ -3206,7 +3205,7 @@
   Boiler:Steam,
     Steam Boiler Plant Boiler,  !- Name
     NaturalGas,              !- Fuel Type
-    160000,                  !- Maximum Operating Pressure {Kpa}
+    160000,                  !- Maximum Operating Pressure {Pa}
     0.8,                     !- Theoretical Efficiency
     115,                     !- Design Outlet Steam Temperature {C}
     autosize,                !- Nominal Capacity {W}
