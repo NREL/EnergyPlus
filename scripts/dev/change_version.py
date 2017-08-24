@@ -12,7 +12,7 @@ import sys
 def usage():
     print("""Call this script with three command line arguments:
  $ change_version.py <path to repo> <old version number> <new version number>
- $ change_version.py /repos/eplus 8.4 8.5""")
+ $ change_version.py /repos/eplus 8.7 8.8""")
 
 
 # check the command line argument status
@@ -26,16 +26,27 @@ repo = sys.argv[1]
 v_old = sys.argv[2]
 v_new = sys.argv[3]
 
-# walk across
+# walk across the idf and imf files
 for extension in ['*.idf', '*.imf']:
     for folder in ['testfiles', 'performance_tests', 'datasets', os.path.join('testfiles', 'BasicsFiles')]:
-        thisdir = os.path.join(repo, folder)
-        for root, dirnames, filenames in os.walk(thisdir):
-            for filename in fnmatch.filter(filenames, extension):
-                filedata = None
-                with open(os.path.join(root, filename)) as fil:
-                    filedata = fil.read()
-                filedata = filedata.replace('Version,' + v_old, 'Version,' + v_new)
-                filedata = filedata.replace('VERSION,' + v_old, 'Version,' + v_new)
-                with open(os.path.join(root, filename), 'w') as fil:
-                    fil.write(filedata)
+        this_dir = os.path.join(repo, folder)
+        for root, dir_names, file_names in os.walk(this_dir):
+            for filename in fnmatch.filter(file_names, extension):
+                with open(os.path.join(root, filename)) as input_file:
+                    file_data = input_file.read()
+                    file_data = file_data.replace('Version,' + v_old, 'Version,' + v_new)
+                    file_data = file_data.replace('VERSION,' + v_old, 'Version,' + v_new)
+                with open(os.path.join(root, filename), 'w') as output_file:
+                    output_file.write(file_data)
+
+# then walk across all the unit test files too
+for folder in [os.path.join('tst', 'EnergyPlus', 'unit')]:
+    this_dir = os.path.join(repo, folder)
+    for root, dir_names, file_names in os.walk(this_dir):
+        for filename in fnmatch.filter(file_names, 'cc'):
+            with open(os.path.join(root, filename)) as input_file:
+                file_data = input_file.read()
+                file_data = file_data.replace('Version,' + v_old, 'Version,' + v_new)
+                file_data = file_data.replace('VERSION,' + v_old, 'Version,' + v_new)
+            with open(os.path.join(root, filename), 'w') as output_file:
+                output_file.write(file_data)
