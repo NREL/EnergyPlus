@@ -329,7 +329,7 @@ namespace EnergyPlus {
 	{
 
 		std::string const idf_objects = delimited_string( {
-			"  Version,8.7;",
+			"  Version,8.8;",
 
 			"  Building,",
 			"    House with AirflowNetwork simulation,  !- Name",
