@@ -71,7 +71,6 @@
 #include <SingleDuct.hh>
 #include <ZoneAirLoopEquipmentManager.hh>
 #include <DataSizing.hh>
-#include <DataDefineEquip.hh>
 
 using namespace EnergyPlus;
 using namespace SimulationManager;
@@ -223,20 +222,6 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	SingleDuct::SimVAV( SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum );
 	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRateMaxAvail );
 	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysOutlet( SysNum ).AirMassFlowRate );
-
-	// VAV terminal
-	int OutletNodeNum = 3;
-	SingleDuct::Sys( SysNum ).AirMassFlowRateMax = SysMaxMassFlow;
-	DataLoopNode::Node( InletNodeNum ).MassFlowRateMinAvail = 0.3 * SysMaxMassFlow;
-	DataLoopNode::Node( OutletNodeNum ).MassFlowRateMin = 0.2 * SysMaxMassFlow;
-	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-	EXPECT_EQ(SysMaxMassFlow, SingleDuct::SysInlet( SysNum ).AirMassFlowRateMaxAvail);
-
-	// Constant volume terminal
-	SingleDuct::Sys( SysNum ).SysType_Num = DataDefineEquip::SingleDuctConstVolReheat;
-	SingleDuct::InitSys( SysNum, FirstHVACIteration ); // Run thru init once with FirstHVACIteration set to true
-	EXPECT_EQ( SysMaxMassFlow, SingleDuct::SysInlet( SysNum ).AirMassFlowRateMaxAvail );
-	EXPECT_EQ( DataLoopNode::Node( InletNodeNum ).MassFlowRateMinAvail, SingleDuct::SysInlet( SysNum ).AirMassFlowRateMinAvail );
 
 	// Cleanup
 	DataHeatBalFanSys::TempControlType.deallocate();
