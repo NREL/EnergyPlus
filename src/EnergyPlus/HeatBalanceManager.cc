@@ -1927,7 +1927,7 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value." );
 				ShowContinueError( cNumericFieldNames( 4 ) + " must be Yes or No, entered value=" + MaterialNames( 4 ) );
 			}
-			// Get SpectralAndAngle table names 
+			// Get SpectralAndAngle table names
 			if ( Material( MaterNum ).GlassSpectralAndAngle ) {
 				if ( lAlphaFieldBlanks( 5 ) ) {
 					ErrorsFound = true;
@@ -4580,7 +4580,7 @@ namespace HeatBalanceManager {
 		//               ZoneProperty:LocalEnvironment
 		//-----------------------------------------------------------------------
 
-		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";		
+		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";
 		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( TotZoneEnv > 0 ) {
@@ -4635,7 +4635,7 @@ namespace HeatBalanceManager {
 					if ( ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
 						Zone( ZoneLoop ).HasLinkedOutAirNode = true;
 						Zone( ZoneLoop ).LinkedOutAirNode = ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr;
-						
+
 					}
 				}
 			}
@@ -4971,7 +4971,7 @@ namespace HeatBalanceManager {
 			}
 		}
 
-		// Overwriting surface and zone level environmental data with EMS override value 
+		// Overwriting surface and zone level environmental data with EMS override value
 		if ( AnyEnergyManagementSystemInModel ) {
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn ) {
@@ -5291,6 +5291,7 @@ namespace HeatBalanceManager {
 
 				if ( MaxHeatLoadZone( ZoneNum ) > 1.0e-4 ) { // make sure load big enough to divide
 					MaxHeatLoadZone( ZoneNum ) = std::abs( max( MaxHeatLoadZone( ZoneNum ), MinLoad ) );
+					MaxHeatLoadPrevDay( ZoneNum ) = std::abs( max( MaxHeatLoadPrevDay( ZoneNum ), MinLoad ) );
 					WarmupConvergenceValues( ZoneNum ).TestMaxHeatLoadValue = std::abs( ( MaxHeatLoadZone( ZoneNum ) - MaxHeatLoadPrevDay( ZoneNum ) ) / MaxHeatLoadZone( ZoneNum ) );
 					if ( WarmupConvergenceValues( ZoneNum ).TestMaxHeatLoadValue <= LoadsConvergTol ) {
 						WarmupConvergenceValues( ZoneNum ).PassFlag( 3 ) = 2;
@@ -5304,6 +5305,7 @@ namespace HeatBalanceManager {
 
 				if ( MaxCoolLoadZone( ZoneNum ) > 1.0e-4 ) {
 					MaxCoolLoadZone( ZoneNum ) = std::abs( max( MaxCoolLoadZone( ZoneNum ), MinLoad ) );
+					MaxCoolLoadPrevDay( ZoneNum ) = std::abs( max( MaxCoolLoadPrevDay( ZoneNum ), MinLoad ) );
 					WarmupConvergenceValues( ZoneNum ).TestMaxCoolLoadValue = std::abs( ( MaxCoolLoadZone( ZoneNum ) - MaxCoolLoadPrevDay( ZoneNum ) ) / MaxCoolLoadZone( ZoneNum ) );
 					if ( WarmupConvergenceValues( ZoneNum ).TestMaxCoolLoadValue <= LoadsConvergTol ) {
 						WarmupConvergenceValues( ZoneNum ).PassFlag( 4 ) = 2;
@@ -5534,7 +5536,7 @@ namespace HeatBalanceManager {
 		// Time step level reporting:
 
 		ReportScheduleValues();
-		
+
 		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
@@ -5877,7 +5879,7 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > CosPhiIndepVar( 10 ); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
 		int IPhi; // Incidence angle counter
 		Real64 Phi; // Incidence angle (deg)
-		Real64 CosPhi; // Cosine of incidence angle
+		Array1D< Real64 >CosPhi( 10 ); // Cosine of incidence angle
 		Array1D< Real64 > tsolFit( 10 ); // Fitted solar transmittance vs incidence angle
 		Array1D< Real64 > tvisFit( 10 ); // Fitted visible transmittance vs incidence angle
 		Array1D< Real64 > rfsolFit( 10 ); // Fitted solar front reflectance vs incidence angle
@@ -6302,6 +6304,18 @@ Label20: ;
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
 			++FileLineCount;
 
+			// Pre-calculate constants
+			for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
+			}
+
+			// Pre-calculate constants
+			for( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				Phi = double( IPhi - 1 ) * 10.0;
+				CosPhi( IPhi ) =  std::cos( Phi * DegToRadians );
+				if ( std::abs( CosPhi( IPhi ) ) < 0.0001 ) CosPhi( IPhi ) = 0.0;
+			}
+
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				ConstrNum = TotConstructs - NGlSys + IGlSys;
 				if ( IGlSys == 1 ) {
@@ -6382,10 +6396,6 @@ Label20: ;
 				Construct( ConstrNum ).W5FileMullionWidth = MullionWidth;
 
 				// Fill Construct with system transmission, reflection and absorption properties
-
-				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
-				}
 
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
@@ -6496,20 +6506,17 @@ Label20: ;
 
 				// For comparing fitted vs. input distribution in incidence angle
 				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					Phi = double( IPhi - 1 ) * 10.0;
-					CosPhi = std::cos( Phi * DegToRadians );
-					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
-					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef );
-					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef );
-					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef );
+					tsolFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).TransSolBeamCoef );
+					tvisFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).TransVisBeamCoef );
+					rfsolFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).ReflSolBeamFrontCoef );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
-						solabsFit( IGlass, IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
+						solabsFit( IGlass, IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
 				}
 				// end
 
 				// NominalRforNominalUCalculation of this construction (actually the total resistance of all of its layers; gas layer
-				// conductivity here ignores convective efffects in gap.)
+				// conductivity here ignores convective effects in gap.)
 				NominalRforNominalUCalculation( ConstrNum ) = 0.0;
 				for ( loop = 1; loop <= NGlass( IGlSys ) + NGaps( IGlSys ); ++loop ) {
 					MatNum = Construct( ConstrNum ).LayerPoint( loop );
