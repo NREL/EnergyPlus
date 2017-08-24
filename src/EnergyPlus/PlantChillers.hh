@@ -269,6 +269,7 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
 
 		// Default Constructor
 		ElectricChillerSpecs() :

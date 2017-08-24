@@ -117,7 +117,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -151,7 +151,7 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    Jan14,                        !- Name
+    Jan14,                   !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     1,                       !- End Month
@@ -164,7 +164,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    July7,                        !- Name
+    July7,                   !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     7,                       !- End Month
@@ -3434,7 +3434,7 @@
     0.05,                    !- Zone Minimum Air Flow Fraction
     SPACE1-1 ATU In Node,    !- Air Inlet Node Name
     SPACE1-1 In Node,        !- Air Outlet Node Name
-    Fan:SystemModel,      !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     SPACE1-1 Zone Fan,       !- Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     SPACE1-1 Zone Coil,      !- Heating Coil Name
@@ -3450,7 +3450,7 @@
     0.05,                    !- Zone Minimum Air Flow Fraction
     SPACE2-1 ATU In Node,    !- Air Inlet Node Name
     SPACE2-1 In Node,        !- Air Outlet Node Name
-    Fan:SystemModel,      !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     SPACE2-1 Zone Fan,       !- Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     SPACE2-1 Zone Coil,      !- Heating Coil Name
@@ -3466,7 +3466,7 @@
     0.05,                    !- Zone Minimum Air Flow Fraction
     SPACE3-1 ATU In Node,    !- Air Inlet Node Name
     SPACE3-1 In Node,        !- Air Outlet Node Name
-    Fan:SystemModel,      !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     SPACE3-1 Zone Fan,       !- Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     SPACE3-1 Zone Coil,      !- Heating Coil Name
@@ -3482,7 +3482,7 @@
     0.05,                    !- Zone Minimum Air Flow Fraction
     SPACE4-1 ATU In Node,    !- Air Inlet Node Name
     SPACE4-1 In Node,        !- Air Outlet Node Name
-    Fan:SystemModel,      !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     SPACE4-1 Zone Fan,       !- Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     SPACE4-1 Zone Coil,      !- Heating Coil Name
@@ -3854,111 +3854,110 @@
     Main Cooling Coil 1 Outlet Node;  !- Air Outlet Node Name
 
   Fan:SystemModel,
-    SPACE1-1 Zone Fan , !- Name
-    FanAvailSched , !- Availability Schedule Name
-    SPACE1-1 ATU In Node,  !- Air Inlet Node Name
+    SPACE1-1 Zone Fan,       !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE1-1 ATU In Node,    !- Air Inlet Node Name
     SPACE1-1 Zone Coil Air In Node,  !- Air Outlet Node Name
-    AUTOSIZE , !- Design Maximum Air Flow Rate
-    Continuous , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    125.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.7,  !- Fan Total Efficiency 
-    VAV Fan Curve, !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    ATU Fan Energy; !- End-Use Subcategory
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    125.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7,                     !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    ATU Fan Energy;          !- End-Use Subcategory
 
   Curve:Quartic,
-    VAV Fan Curve ,   !- Name
-    0.00153028 ,      !- Coefficient1 Constant
-    0.00520806 ,      !- Coefficient2 x
-    1.1086242 ,       !- Coefficient3 x**2
-    -.11635563 ,      !- Coefficient4 x**3
-    0.0 ,             !- Coefficient5 x**4
-    0.0 ,             !- Minimum Value of x
-    1.0 ,             !- Maximum Value of x
-    0.0 ,             !- Minimum Curve Output
-    1.0 ,             !- Maximum Curve Output
-    Dimensionless ,  !- Input Unit Type for X
-    Dimensionless ;  !- Output Unit Type
+    VAV Fan Curve,           !- Name
+    0.00153028,              !- Coefficient1 Constant
+    0.00520806,              !- Coefficient2 x
+    1.1086242,               !- Coefficient3 x**2
+    -.11635563,              !- Coefficient4 x**3
+    0.0,                     !- Coefficient5 x**4
+    0.0,                     !- Minimum Value of x
+    1.0,                     !- Maximum Value of x
+    0.0,                     !- Minimum Curve Output
+    1.0,                     !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   Fan:SystemModel,
-    SPACE2-1 Zone Fan ,              !- Name
-    FanAvailSched ,                  !- Availability Schedule Name
-    SPACE2-1 ATU In Node,            !- Air Inlet Node Name
+    SPACE2-1 Zone Fan,       !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE2-1 ATU In Node,    !- Air Inlet Node Name
     SPACE2-1 Zone Coil Air In Node,  !- Air Outlet Node Name
-    AUTOSIZE ,                       !- Design Maximum Air Flow Rate
-    Continuous ,                     !- Speed Control Method
-    0.0,                             !- Electric Power Minimum Flow Rate Fraction
-    125.0,                           !- Design Pressure Rise
-    0.9 ,                            !- Motor Efficiency
-    1.0 ,                            !- Motor In Air Stream Fraction
-    AUTOSIZE,                        !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure,      !- Design Power Sizing Method
-    ,                                !- Electric Power Per Unit Flow Rate
-    ,                                !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.7,                             !- Fan Total Efficiency 
-    VAV Fan Curve,                   !- Electric Power Function of Flow Fraction Curve Name
-    ,                                !- Night Ventilation Mode Pressure Rise
-    ,                                !- Night Ventilation Mode Flow Fraction
-    ,                                !- Motor Loss Zone Name
-    ,                                !- Motor Loss Radiative Fraction 
-    ATU Fan Energy;                  !- End-Use Subcategory
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    125.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7,                     !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    ATU Fan Energy;          !- End-Use Subcategory
 
   Fan:SystemModel,
-    SPACE3-1 Zone Fan ,              !- Name
-    FanAvailSched ,                  !- Availability Schedule Name
-    SPACE3-1 ATU In Node,            !- Air Inlet Node Name
+    SPACE3-1 Zone Fan,       !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE3-1 ATU In Node,    !- Air Inlet Node Name
     SPACE3-1 Zone Coil Air In Node,  !- Air Outlet Node Name
-    AUTOSIZE ,                       !- Design Maximum Air Flow Rate
-    Continuous ,                     !- Speed Control Method
-    0.0,                             !- Electric Power Minimum Flow Rate Fraction
-    125.0,                           !- Design Pressure Rise
-    0.9 ,                            !- Motor Efficiency
-    1.0 ,                            !- Motor In Air Stream Fraction
-    AUTOSIZE,                        !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure,      !- Design Power Sizing Method
-    ,                                !- Electric Power Per Unit Flow Rate
-    ,                                !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.7,                             !- Fan Total Efficiency 
-    VAV Fan Curve,                   !- Electric Power Function of Flow Fraction Curve Name
-    ,                                !- Night Ventilation Mode Pressure Rise
-    ,                                !- Night Ventilation Mode Flow Fraction
-    ,                                !- Motor Loss Zone Name
-    ,                                !- Motor Loss Radiative Fraction 
-    ATU Fan Energy;                  !- End-Use Subcategory
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    125.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7,                     !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    ATU Fan Energy;          !- End-Use Subcategory
 
   Fan:SystemModel,
-    SPACE4-1 Zone Fan ,              !- Name
-    FanAvailSched ,                  !- Availability Schedule Name
-    SPACE4-1 ATU In Node,            !- Air Inlet Node Name
+    SPACE4-1 Zone Fan,       !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE4-1 ATU In Node,    !- Air Inlet Node Name
     SPACE4-1 Zone Coil Air In Node,  !- Air Outlet Node Name
-    AUTOSIZE ,                       !- Design Maximum Air Flow Rate
-    Continuous ,                     !- Speed Control Method
-    0.0,                             !- Electric Power Minimum Flow Rate Fraction
-    125.0,                           !- Design Pressure Rise
-    0.9 ,                            !- Motor Efficiency
-    1.0 ,                            !- Motor In Air Stream Fraction
-    AUTOSIZE,                        !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure,      !- Design Power Sizing Method
-    ,                                !- Electric Power Per Unit Flow Rate
-    ,                                !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.7,                             !- Fan Total Efficiency 
-    VAV Fan Curve,                   !- Electric Power Function of Flow Fraction Curve Name
-    ,                                !- Night Ventilation Mode Pressure Rise
-    ,                                !- Night Ventilation Mode Flow Fraction
-    ,                                !- Motor Loss Zone Name
-    ,                                !- Motor Loss Radiative Fraction 
-    ATU Fan Energy;                  !- End-Use Subcategory
-
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    125.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7,                     !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    ATU Fan Energy;          !- End-Use Subcategory
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name

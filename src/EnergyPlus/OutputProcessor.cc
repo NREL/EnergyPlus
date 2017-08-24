@@ -6182,8 +6182,9 @@ GenOutputVariablesAuditReport()
 			OpaqSurfWarned = true;
 		}
 		if ( ! Rept ) {
-			ShowWarningError( "The following Report Variables were requested but not generated" );
-			ShowContinueError( "because IDF did not contain these elements or misspelled variable name -- check .rdd file" );
+			ShowWarningError( "The following Report Variables were requested but not generated -- check.rdd file" );
+			ShowContinueError( "Either the IDF did not contain these elements, the variable name is misspelled," );
+			ShowContinueError( "or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;" );
 			Rept = true;
 		}
 		ShowMessage( "Key=" + ReqRepVars( Loop ).Key + ", VarName=" + ReqRepVars( Loop ).VarName + ", Frequency=" + ReportFrequency( ReqRepVars( Loop ).ReportFreq ) );

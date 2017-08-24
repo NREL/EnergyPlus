@@ -82,10 +82,10 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,4;
-  
+
   Building,
     BUILDING WITH MANY SHADING EFFECTS,  !- Name
     0.0000000E+00,           !- North Axis {deg}

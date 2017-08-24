@@ -7,6 +7,9 @@
 ! See the example input file 5ZoneAutoDXVAV for an example of their use.
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Curve:Biquadratic,
     VarSpeedCoolCapFT,       !- Name
     0.476428E+00,            !- Coefficient1 Constant

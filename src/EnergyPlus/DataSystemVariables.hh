@@ -127,6 +127,9 @@ namespace DataSystemVariables {
 	extern bool ReportDuringHVACSizingSimulation; // true when reporting outputs during HVAC sizing Simulation
 	extern bool ReportDetailedWarmupConvergence; // True when the detailed warmup convergence is requested
 	extern bool UpdateDataDuringWarmupExternalInterface; // variable sets in the external interface.
+	extern bool UseScheduledSunlitFrac; // when true, the external shading calculation results will be exported
+	extern bool ReportExtShadingSunlitFrac; // when true, the sunlit fraction for all surfaces are exported as a csv format output
+
 	// This update the value during the warmup added for FMI
 	extern Real64 Elapsed_Time; // For showing elapsed time at end of run
 	extern Real64 Time_Start; // Call to CPU_Time for start time of simulation

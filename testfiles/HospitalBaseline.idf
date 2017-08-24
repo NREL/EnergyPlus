@@ -100,7 +100,7 @@
 ! End SimMetaData
 ! Number of Zones: 130
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -2114,7 +2114,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     1.7636,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Cafe VAV Box Reheat Coil,  !- Name
@@ -2843,7 +2843,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0193,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Clean VAV Box Reheat Coil,  !- Name
@@ -3289,7 +3289,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.9000,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Conference VAV Box Reheat Coil,  !- Name
@@ -3719,7 +3719,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     1.6370,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Dining VAV Box Reheat Coil,  !- Name
@@ -4149,7 +4149,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1784,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Elevator VAV Box Reheat Coil,  !- Name
@@ -4579,7 +4579,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1059,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Exam VAV Box Reheat Coil,  !- Name
@@ -5021,7 +5021,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6637,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Food Storage VAV Box Reheat Coil,  !- Name
@@ -5600,7 +5600,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.3927,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Gas Storage VAV Box Reheat Coil,  !- Name
@@ -6023,7 +6023,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0610,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Imaging VAV Box Reheat Coil,  !- Name
@@ -6483,7 +6483,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     11.1400,                 !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Kitchen VAV Box Reheat Coil,  !- Name
@@ -6926,7 +6926,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0803,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Lab 1 VAV Box Reheat Coil,  !- Name
@@ -7384,7 +7384,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1966,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Lab 2 VAV Box Reheat Coil,  !- Name
@@ -7851,7 +7851,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     1.7588,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Laundry VAV Box Reheat Coil,  !- Name
@@ -8323,7 +8323,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.3717,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Lobby VAV Box Reheat Coil,  !- Name
@@ -8708,7 +8708,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0514,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Lounge VAV Box Reheat Coil,  !- Name
@@ -9117,7 +9117,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.4590,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Mech 1 VAV Box Reheat Coil,  !- Name
@@ -9574,7 +9574,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6120,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Mech 2 VAV Box Reheat Coil,  !- Name
@@ -10004,7 +10004,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.2962,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Office 1 VAV Box Reheat Coil,  !- Name
@@ -10434,7 +10434,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.2281,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Office 2 VAV Box Reheat Coil,  !- Name
@@ -10880,7 +10880,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7944,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Office 3 VAV Box Reheat Coil,  !- Name
@@ -11310,7 +11310,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1159,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Office 3 Perimeter 1 VAV Box Reheat Coil,  !- Name
@@ -11740,7 +11740,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0734,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Office 3 Perimeter 2 VAV Box Reheat Coil,  !- Name
@@ -12186,7 +12186,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1159,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Office 3 Perimeter 3 VAV Box Reheat Coil,  !- Name
@@ -12616,7 +12616,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.2832,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Patient VAV Box Reheat Coil,  !- Name
@@ -13001,7 +13001,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6510,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Pharmacy VAV Box Reheat Coil,  !- Name
@@ -13386,7 +13386,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6036,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Physical Therapy VAV Box Reheat Coil,  !- Name
@@ -13795,7 +13795,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1267,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Receiving VAV Box Reheat Coil,  !- Name
@@ -14225,7 +14225,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0555,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Reception VAV Box Reheat Coil,  !- Name
@@ -14590,7 +14590,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.3776,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Soil VAV Box Reheat Coil,  !- Name
@@ -14948,7 +14948,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.3060,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Storage VAV Box Reheat Coil,  !- Name
@@ -15333,7 +15333,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1507,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 1 Waiting VAV Box Reheat Coil,  !- Name
@@ -15779,7 +15779,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0819,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Chapel VAV Box Reheat Coil,  !- Name
@@ -16164,7 +16164,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0194,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Clean 1 VAV Box Reheat Coil,  !- Name
@@ -16549,7 +16549,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0128,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Clean 2 VAV Box Reheat Coil,  !- Name
@@ -16958,7 +16958,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1473,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Corridor VAV Box Reheat Coil,  !- Name
@@ -17388,7 +17388,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1784,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Elevator VAV Box Reheat Coil,  !- Name
@@ -17834,7 +17834,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1686,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Exam 1 VAV Box Reheat Coil,  !- Name
@@ -18219,7 +18219,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0542,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Exam 2 VAV Box Reheat Coil,  !- Name
@@ -18604,7 +18604,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1625,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Exam 3 VAV Box Reheat Coil,  !- Name
@@ -19005,7 +19005,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1605,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Exam 4 VAV Box Reheat Coil,  !- Name
@@ -19435,7 +19435,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0722,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Gift Shop VAV Box Reheat Coil,  !- Name
@@ -19848,7 +19848,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0927,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Imaging 1 VAV Box Reheat Coil,  !- Name
@@ -20322,7 +20322,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1364,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Imaging 2 VAV Box Reheat Coil,  !- Name
@@ -20796,7 +20796,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1605,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Imaging 3 VAV Box Reheat Coil,  !- Name
@@ -21215,7 +21215,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0915,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Lab 1 VAV Box Reheat Coil,  !- Name
@@ -21644,7 +21644,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1364,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Lab 2 VAV Box Reheat Coil,  !- Name
@@ -22037,7 +22037,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.5899,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Lockers VAV Box Reheat Coil,  !- Name
@@ -22432,7 +22432,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0482,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Lounge 1 VAV Box Reheat Coil,  !- Name
@@ -22878,7 +22878,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0351,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Lounge 2 VAV Box Reheat Coil,  !- Name
@@ -23291,7 +23291,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0518,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Nurse Station 1 VAV Box Reheat Coil,  !- Name
@@ -23765,7 +23765,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1605,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Nurse Station 2 VAV Box Reheat Coil,  !- Name
@@ -24150,7 +24150,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0939,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Office 1 VAV Box Reheat Coil,  !- Name
@@ -24580,7 +24580,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0771,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Office 2 VAV Box Reheat Coil,  !- Name
@@ -24965,7 +24965,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1204,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Office 3 VAV Box Reheat Coil,  !- Name
@@ -25411,7 +25411,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1405,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Office 4 VAV Box Reheat Coil,  !- Name
@@ -25939,7 +25939,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     6.0648,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Operating VAV Box Reheat Coil,  !- Name
@@ -26413,7 +26413,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6371,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 PACU VAV Box Reheat Coil,  !- Name
@@ -26843,7 +26843,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.5361,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Patient 1 VAV Box Reheat Coil,  !- Name
@@ -27228,7 +27228,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.4414,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Patient 2 VAV Box Reheat Coil,  !- Name
@@ -27641,7 +27641,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.5947,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Procedure 1 VAV Box Reheat Coil,  !- Name
@@ -28054,7 +28054,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.3209,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Procedure 2 VAV Box Reheat Coil,  !- Name
@@ -28484,7 +28484,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1735,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Reception VAV Box Reheat Coil,  !- Name
@@ -28922,7 +28922,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.5034,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Restroom 1 VAV Box Reheat Coil,  !- Name
@@ -29370,7 +29370,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7079,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Restroom 2 VAV Box Reheat Coil,  !- Name
@@ -29745,7 +29745,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.3799,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Soil 1 VAV Box Reheat Coil,  !- Name
@@ -30120,7 +30120,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.2517,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Soil 2 VAV Box Reheat Coil,  !- Name
@@ -30543,7 +30543,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     1.0697,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Sterilizing VAV Box Reheat Coil,  !- Name
@@ -30901,7 +30901,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0850,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Storage 1 VAV Box Reheat Coil,  !- Name
@@ -31249,7 +31249,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0363,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Storage 2 VAV Box Reheat Coil,  !- Name
@@ -31662,7 +31662,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     1.0572,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Trauma VAV Box Reheat Coil,  !- Name
@@ -32106,7 +32106,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.8259,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Triage VAV Box Reheat Coil,  !- Name
@@ -32562,7 +32562,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.3866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 2 Waiting VAV Box Reheat Coil,  !- Name
@@ -32947,7 +32947,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0201,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Clean VAV Box Reheat Coil,  !- Name
@@ -33409,7 +33409,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1784,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Elevator VAV Box Reheat Coil,  !- Name
@@ -33794,7 +33794,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1084,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Exam VAV Box Reheat Coil,  !- Name
@@ -34274,7 +34274,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.3304,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 ICU VAV Box Reheat Coil,  !- Name
@@ -34732,7 +34732,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1207,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Nurse Station 1 VAV Box Reheat Coil,  !- Name
@@ -35206,7 +35206,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0963,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Nurse Station 2 VAV Box Reheat Coil,  !- Name
@@ -35636,7 +35636,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1557,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Nursery VAV Box Reheat Coil,  !- Name
@@ -36066,7 +36066,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1084,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Office VAV Box Reheat Coil,  !- Name
@@ -36524,7 +36524,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.5664,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Operating VAV Box Reheat Coil,  !- Name
@@ -36970,7 +36970,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Patient 1 VAV Box Reheat Coil,  !- Name
@@ -37416,7 +37416,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Patient 2 VAV Box Reheat Coil,  !- Name
@@ -37878,7 +37878,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6214,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Patient 3 VAV Box Reheat Coil,  !- Name
@@ -38324,7 +38324,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6214,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Patient 4 VAV Box Reheat Coil,  !- Name
@@ -38733,7 +38733,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0948,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Patient Corridor 1 VAV Box Reheat Coil,  !- Name
@@ -39142,7 +39142,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0948,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Patient Corridor 2 VAV Box Reheat Coil,  !- Name
@@ -39600,7 +39600,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1699,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Procedure VAV Box Reheat Coil,  !- Name
@@ -39965,7 +39965,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Soil VAV Box Reheat Coil,  !- Name
@@ -40368,7 +40368,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.2085,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Supply VAV Box Reheat Coil,  !- Name
@@ -40812,7 +40812,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     1.4158,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Triage VAV Box Reheat Coil,  !- Name
@@ -41252,7 +41252,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0981,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 3 Waiting VAV Box Reheat Coil,  !- Name
@@ -41637,7 +41637,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0201,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Clean VAV Box Reheat Coil,  !- Name
@@ -42099,7 +42099,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1784,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Elevator VAV Box Reheat Coil,  !- Name
@@ -42557,7 +42557,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1207,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Nurse Station VAV Box Reheat Coil,  !- Name
@@ -42987,7 +42987,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0602,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Office VAV Box Reheat Coil,  !- Name
@@ -43433,7 +43433,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Patient 1 VAV Box Reheat Coil,  !- Name
@@ -43879,7 +43879,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Patient 2 VAV Box Reheat Coil,  !- Name
@@ -44325,7 +44325,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6214,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Patient 3 VAV Box Reheat Coil,  !- Name
@@ -44771,7 +44771,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6214,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Patient 4 VAV Box Reheat Coil,  !- Name
@@ -45180,7 +45180,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0948,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Patient Corridor 1 VAV Box Reheat Coil,  !- Name
@@ -45589,7 +45589,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0948,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Patient Corridor 2 VAV Box Reheat Coil,  !- Name
@@ -45954,7 +45954,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Soil VAV Box Reheat Coil,  !- Name
@@ -46357,7 +46357,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.2085,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 4-6 Supply VAV Box Reheat Coil,  !- Name
@@ -46742,7 +46742,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0201,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Clean VAV Box Reheat Coil,  !- Name
@@ -47204,7 +47204,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1784,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Elevator VAV Box Reheat Coil,  !- Name
@@ -47662,7 +47662,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.1207,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Nurse Station VAV Box Reheat Coil,  !- Name
@@ -48092,7 +48092,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0602,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Office VAV Box Reheat Coil,  !- Name
@@ -48538,7 +48538,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Patient 1 VAV Box Reheat Coil,  !- Name
@@ -48984,7 +48984,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Patient 2 VAV Box Reheat Coil,  !- Name
@@ -49430,7 +49430,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6214,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Patient 3 VAV Box Reheat Coil,  !- Name
@@ -49876,7 +49876,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.6214,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Patient 4 VAV Box Reheat Coil,  !- Name
@@ -50285,7 +50285,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0948,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Patient Corridor 1 VAV Box Reheat Coil,  !- Name
@@ -50694,7 +50694,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0948,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Patient Corridor 2 VAV Box Reheat Coil,  !- Name
@@ -51059,7 +51059,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.7866,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Soil VAV Box Reheat Coil,  !- Name
@@ -51462,7 +51462,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.2085,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     Floor 7 Supply VAV Box Reheat Coil,  !- Name
@@ -51847,7 +51847,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.5528,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 1 Core VAV Box Reheat Coil,  !- Name
@@ -52277,7 +52277,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0918,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 1 Perimeter 1 VAV Box Reheat Coil,  !- Name
@@ -52707,7 +52707,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0662,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 1 Perimeter 2 VAV Box Reheat Coil,  !- Name
@@ -53137,7 +53137,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0918,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 1 Perimeter 3 VAV Box Reheat Coil,  !- Name
@@ -53522,7 +53522,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.4956,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 2-4 Core VAV Box Reheat Coil,  !- Name
@@ -53952,7 +53952,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0873,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 2-4 Perimeter 1 VAV Box Reheat Coil,  !- Name
@@ -54382,7 +54382,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0662,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 2-4 Perimeter 2 VAV Box Reheat Coil,  !- Name
@@ -54812,7 +54812,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0873,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 2-4 Perimeter 3 VAV Box Reheat Coil,  !- Name
@@ -55242,7 +55242,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0662,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 2-4 Perimeter 4 VAV Box Reheat Coil,  !- Name
@@ -55627,7 +55627,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.4956,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 5 Core VAV Box Reheat Coil,  !- Name
@@ -56057,7 +56057,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0873,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 5 Perimeter 1 VAV Box Reheat Coil,  !- Name
@@ -56487,7 +56487,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0662,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 5 Perimeter 2 VAV Box Reheat Coil,  !- Name
@@ -56917,7 +56917,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0873,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 5 Perimeter 3 VAV Box Reheat Coil,  !- Name
@@ -57369,7 +57369,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0662,                  !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Coil:Heating:Water,
     MOB Floor 5 Perimeter 4 VAV Box Reheat Coil,  !- Name
@@ -64769,10 +64769,10 @@
     ,                        !- Low Speed Nominal Capacity Sizing Factor
     ,                        !- Free Convection Nominal Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
-    ,                        !- Design Inlet Air Dry-Bulb Temperature
-    ,                        !- Design Inlet Air Wet-Bulb Temperature
-    ,                        !- Design Approach Temperature
-    ,                        !- Design Range Temperature
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
     0.0,                     !- Basin Heater Capacity {W/K}
     2.0,                     !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name

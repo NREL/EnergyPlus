@@ -3,9 +3,9 @@
 
 // Array2: Row-Major 2D Array Abstract Base Class
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -908,7 +908,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, IS const & s2 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		k += slice_k( I1_, i1, z2_ );
 		DS const d2( I2_, s2 );
 		return Array1S< T >( data_, k, d2 );
@@ -918,7 +918,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( IS const & s1, int const i2 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		DS const d1( I1_, s1, z2_ );
 		k += slice_k( I2_, i2 );
 		return Array1S< T >( data_, k, d1 );
@@ -937,7 +937,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, IS const & s2 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		k += slice_k( I1_, i1, z2_ );
 		DS const d2( I2_, s2 );
 		return Array1S< T >( data_, k, d2 );
@@ -947,7 +947,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( IS const & s1, int const i2 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		DS const d1( I1_, s1, z2_ );
 		k += slice_k( I2_, i2 );
 		return Array1S< T >( data_, k, d1 );

@@ -3,9 +3,9 @@
 
 // Global I/O Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -36,7 +36,6 @@ namespace gio {
 // Types
 typedef  int  Unit;
 typedef  std::string  Name;
-typedef  char const *  c_cstring;
 
 // Data
 extern std::string const LF; // Linefeed
@@ -55,7 +54,7 @@ open( Unit const unit, Name const & name, IOFlags & flags );
 // Open File on Specified Unit
 inline
 bool
-open( Unit const unit, c_cstring const name, IOFlags & flags )
+open( Unit const unit, char const * const name, IOFlags & flags )
 {
 	return open( unit, std::string( name ), flags );
 }
@@ -67,7 +66,7 @@ open( Unit const unit, Name const & name, std::ios_base::openmode const mode );
 // Open File on Specified Unit
 inline
 bool
-open( Unit const unit, c_cstring const name, std::ios_base::openmode const mode )
+open( Unit const unit, char const * const name, std::ios_base::openmode const mode )
 {
 	return open( unit, std::string( name ), mode );
 }
@@ -79,7 +78,7 @@ open( Unit const unit, Name const & name );
 // Open File on Specified Unit
 inline
 bool
-open( Unit const unit, c_cstring const name )
+open( Unit const unit, char const * const name )
 {
 	return open( unit, std::string( name ) );
 }
@@ -103,7 +102,7 @@ open( Name const & name, IOFlags & flags );
 // Open File and Return Unit
 inline
 Unit
-open( c_cstring const name, IOFlags & flags )
+open( char const * const name, IOFlags & flags )
 {
 	return open( std::string( name ), flags );
 }
@@ -116,7 +115,7 @@ open( Name const & name, std::ios_base::openmode const mode );
 // Open File and Return Unit
 inline
 Unit
-open( c_cstring const name, std::ios_base::openmode const mode )
+open( char const * const name, std::ios_base::openmode const mode )
 {
 	return open( std::string( name ), mode );
 }
@@ -128,7 +127,7 @@ open( Name const & name );
 // Open File and Return Unit
 inline
 Unit
-open( c_cstring const name )
+open( char const * const name )
 {
 	return open( std::string( name ) );
 }
@@ -401,7 +400,7 @@ inquire( Name const & name, IOFlags & flags );
 
 // Inquire by Name
 void
-inquire( c_cstring const name, IOFlags & flags );
+inquire( char const * const name, IOFlags & flags );
 
 // File Exists?
 bool
@@ -409,7 +408,7 @@ file_exists( std::string const & file_name );
 
 // File Exists?
 bool
-file_exists( c_cstring const file_name );
+file_exists( char const * const file_name );
 
 // File Openable?
 bool
@@ -417,7 +416,7 @@ file_openable( std::string const & file_name );
 
 // File Openable?
 bool
-file_openable( c_cstring const file_name );
+file_openable( char const * const file_name );
 
 // Backspace /////
 

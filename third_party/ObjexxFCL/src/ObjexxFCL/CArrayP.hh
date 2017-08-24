@@ -3,9 +3,9 @@
 
 // CArrayP: Memory-Managed C Array Wrapper Supporting Proxies
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -645,7 +645,8 @@ public: // Modifier
 	clear()
 	{
 		size_ = 0u;
-		if ( owner_ ) delete[] data_; data_ = nullptr;
+		if ( owner_ ) delete[] data_;
+		data_ = nullptr;
 		owner_ = true;
 		return *this;
 	}
@@ -665,7 +666,8 @@ public: // Modifier
 	attach( CArrayP const & a )
 	{
 		size_ = a.size_;
-		if ( owner_ ) delete[] data_; data_ = a.data_;
+		if ( owner_ ) delete[] data_;
+		data_ = a.data_;
 		owner_ = false;
 		return *this;
 	}
@@ -675,7 +677,8 @@ public: // Modifier
 	attach( CArrayP & a )
 	{
 		size_ = a.size_;
-		if ( owner_ ) delete[] data_; data_ = a.data_;
+		if ( owner_ ) delete[] data_;
+		data_ = a.data_;
 		owner_ = false;
 		return *this;
 	}
