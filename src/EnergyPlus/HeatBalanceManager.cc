@@ -5291,6 +5291,7 @@ namespace HeatBalanceManager {
 
 				if ( MaxHeatLoadZone( ZoneNum ) > 1.0e-4 ) { // make sure load big enough to divide
 					MaxHeatLoadZone( ZoneNum ) = std::abs( max( MaxHeatLoadZone( ZoneNum ), MinLoad ) );
+					MaxHeatLoadPrevDay( ZoneNum ) = std::abs( max( MaxHeatLoadPrevDay( ZoneNum ), MinLoad ) );
 					WarmupConvergenceValues( ZoneNum ).TestMaxHeatLoadValue = std::abs( ( MaxHeatLoadZone( ZoneNum ) - MaxHeatLoadPrevDay( ZoneNum ) ) / MaxHeatLoadZone( ZoneNum ) );
 					if ( WarmupConvergenceValues( ZoneNum ).TestMaxHeatLoadValue <= LoadsConvergTol ) {
 						WarmupConvergenceValues( ZoneNum ).PassFlag( 3 ) = 2;
@@ -5304,6 +5305,7 @@ namespace HeatBalanceManager {
 
 				if ( MaxCoolLoadZone( ZoneNum ) > 1.0e-4 ) {
 					MaxCoolLoadZone( ZoneNum ) = std::abs( max( MaxCoolLoadZone( ZoneNum ), MinLoad ) );
+					MaxCoolLoadPrevDay( ZoneNum ) = std::abs( max( MaxCoolLoadPrevDay( ZoneNum ), MinLoad ) );
 					WarmupConvergenceValues( ZoneNum ).TestMaxCoolLoadValue = std::abs( ( MaxCoolLoadZone( ZoneNum ) - MaxCoolLoadPrevDay( ZoneNum ) ) / MaxCoolLoadZone( ZoneNum ) );
 					if ( WarmupConvergenceValues( ZoneNum ).TestMaxCoolLoadValue <= LoadsConvergTol ) {
 						WarmupConvergenceValues( ZoneNum ).PassFlag( 4 ) = 2;
