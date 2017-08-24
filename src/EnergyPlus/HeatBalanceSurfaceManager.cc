@@ -1733,7 +1733,7 @@ namespace HeatBalanceSurfaceManager {
 		}
 		CondFDRelaxFactor = CondFDRelaxFactorInput;
 
-    // This is already initialized in SurfaceWindow structure constructor. Do not do it again here. Simon
+    // This is already initialized in SurfaceWindow structure constructor. Do not do it again here (Simon)
 		// for ( auto & e : SurfaceWindow ) {
 		// 	// Initialize window frame and divider temperatures
 		// 	e.FrameTempSurfIn = 23.0;
@@ -3401,13 +3401,13 @@ namespace HeatBalanceSurfaceManager {
 							AbsDiffLayWin = Construct( ConstrNum ).AbsDiffBack( Lay );
 
 							// Window with shade, screen or blind
-              				if ( ConstrNumSh != 0 ) {
-							  if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
-							  	AbsDiffLayWin = Construct( ConstrNumSh ).AbsDiffBack( Lay );
-							  } else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-							  	AbsDiffLayWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( _, Lay ) );
-							  }
-              				}
+							if ( ConstrNumSh != 0 ) {
+								if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
+									AbsDiffLayWin = Construct( ConstrNumSh ).AbsDiffBack( Lay );
+								} else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
+									AbsDiffLayWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( _, Lay ) );
+								}
+							}
 
 							// Switchable glazing
 							if ( ShadeFlag == SwitchableGlazing ) AbsDiffLayWin = InterpSw( SwitchFac, AbsDiffLayWin, Construct( ConstrNumSh ).AbsDiffBack( Lay ) );
@@ -3420,15 +3420,16 @@ namespace HeatBalanceSurfaceManager {
 
 						// Window with shade, screen or blind
 
-            			if ( ConstrNumSh != 0 ) {
-						  if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
-						  	TransDiffWin = Construct( ConstrNumSh ).TransDiff;
-						  	DiffAbsShade = Construct( ConstrNumSh ).AbsDiffBackShade;
-						  } else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-						  	TransDiffWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
-						  	DiffAbsShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
-						  }
-           				}
+						if ( ConstrNumSh != 0 ) {
+							if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
+								TransDiffWin = Construct( ConstrNumSh ).TransDiff;
+								DiffAbsShade = Construct( ConstrNumSh ).AbsDiffBackShade;
+							}
+							else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
+								TransDiffWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
+								DiffAbsShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
+							}
+						}
 
 						// Switchable glazing
 
@@ -5697,10 +5698,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								if ( shading_flag == ExtShadeOn || shading_flag == ExtBlindOn || shading_flag == ExtScreenOn ) {
 									// Exterior shade in place
 									ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
-                  					if( ConstrNumSh != 0 ) {
-									  RoughSurf = Material( Construct( ConstrNumSh ).LayerPoint( 1 ) ).Roughness;
-									  EmisOut = Material( Construct( ConstrNumSh ).LayerPoint( 1 ) ).AbsorpThermal;
-                  					}
+									if ( ConstrNumSh != 0 ) {
+										RoughSurf = Material( Construct( ConstrNumSh ).LayerPoint( 1 ) ).Roughness;
+										EmisOut = Material( Construct( ConstrNumSh ).LayerPoint( 1 ) ).AbsorpThermal;
+									}
 								}
 
 								// Get the outside effective emissivity for Equivalent layer model

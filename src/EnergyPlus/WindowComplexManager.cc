@@ -3292,7 +3292,7 @@ namespace WindowComplexManager {
 		Real64 outir;
 		Real64 Ebout;
 		Real64 dominantGapWidth; // store value for dominant gap width.  Used for airflow calculations
-    	Real64 edgeGlCorrFac;
+		Real64 edgeGlCorrFac;
 
 		int SrdSurfsNum; // Surrounding surfaces list number
 		int SrdSurfNum; // Surrounding surface number DO loop counter
@@ -3719,10 +3719,10 @@ namespace WindowComplexManager {
 			theta = 273.15;
 		}
 
-    	if( SurfNum != 0 )
-      		edgeGlCorrFac = SurfaceWindow( SurfNum ).EdgeGlCorrFac;
-	    else
-      		edgeGlCorrFac = 1;
+		if ( SurfNum != 0 )
+			edgeGlCorrFac = SurfaceWindow( SurfNum ).EdgeGlCorrFac;
+		else
+			edgeGlCorrFac = 1;
 
 		//  call TARCOG
 		TARCOG90( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, 
@@ -3940,8 +3940,8 @@ namespace WindowComplexManager {
 				//                    SurfaceWindow(SurfNum)%EffShBlindEmiss)
 				//  EffGlEmiss   = InterpSlatAng(SurfaceWindow(SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum)%MovableSlats, &
 				//                    SurfaceWindow(SurfNum)%EffGlassEmiss)
-        		Real64 EffShBlEmiss = SurfaceWindow( SurfNum ).EffShBlindEmiss[ 0 ];
-        		Real64 EffGlEmiss = SurfaceWindow( SurfNum ).EffGlassEmiss[ 0 ];
+				Real64 EffShBlEmiss = SurfaceWindow( SurfNum ).EffShBlindEmiss[ 0 ];
+				Real64 EffGlEmiss = SurfaceWindow( SurfNum ).EffGlassEmiss[ 0 ];
 				SurfaceWindow( SurfNum ).EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( theta( 2 * ngllayer ) - KelvinConv ) ) / ( EffShBlEmiss + EffGlEmiss );
         // SurfInsideTemp = SurfaceWindow( SurfNum ).EffInsSurfTemp;
 			  //ELSE
