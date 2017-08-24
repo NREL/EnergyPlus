@@ -3320,7 +3320,11 @@ namespace HVACVariableRefrigerantFlow {
 								DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).VRFIUPtr = VRFTUNum;
 								DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).VRFOUPtr = VRFTU( VRFTUNum ).VRFSysNum;
 								DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).SupplyFanIndex = VRFTU( VRFTUNum ).FanIndex;
-								DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).RatedAirVolFlowRate( 1 ) = EnergyPlus::Fans::Fan( VRFTU( VRFTUNum ).FanIndex ).MaxAirFlowRate;
+								if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+									DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).RatedAirVolFlowRate( 1 ) = HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->designAirVolFlowRate;
+								} else {
+									DXCoils::DXCoil( VRFTU( VRFTUNum ).CoolCoilIndex ).RatedAirVolFlowRate( 1 ) = EnergyPlus::Fans::Fan( VRFTU( VRFTUNum ).FanIndex ).MaxAirFlowRate;
+								}
 
 							} else {
 								ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
@@ -3428,7 +3432,11 @@ namespace HVACVariableRefrigerantFlow {
 								DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).VRFIUPtr = VRFTUNum;
 								DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).VRFOUPtr = VRFTU( VRFTUNum ).VRFSysNum;
 								DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).SupplyFanIndex = VRFTU( VRFTUNum ).FanIndex;
-								DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).RatedAirVolFlowRate( 1 ) = EnergyPlus::Fans::Fan( VRFTU( VRFTUNum ).FanIndex ).MaxAirFlowRate;
+								if ( VRFTU( VRFTUNum ).fanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+									DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).RatedAirVolFlowRate( 1 ) = HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->designAirVolFlowRate;
+								} else {
+									DXCoils::DXCoil( VRFTU( VRFTUNum ).HeatCoilIndex ).RatedAirVolFlowRate( 1 ) = EnergyPlus::Fans::Fan( VRFTU( VRFTUNum ).FanIndex ).MaxAirFlowRate;
+								}
 
 								// Terminal unit heating to cooling sizing ratio has precedence over VRF system sizing ratio
 								if ( VRFTU( VRFTUNum ).HeatingCapacitySizeRatio > 1.0 ) {
