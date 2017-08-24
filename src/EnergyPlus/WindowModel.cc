@@ -37,7 +37,7 @@ namespace EnergyPlus {
 			int NumAlphas;
 			int IOStat;
 
-			std::unique_ptr< CWindowModel > aModel = std::unique_ptr< CWindowModel >();
+			std::unique_ptr< CWindowModel > aModel = std::unique_ptr< CWindowModel >( new CWindowModel() );
 			int numCurrModels = InputProcessor::GetNumObjectsFound( objectName );
 			if ( numCurrModels > 0 ) {
 				InputProcessor::GetObjectItem( objectName, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
@@ -67,7 +67,7 @@ namespace EnergyPlus {
 		std::unique_ptr< CWindowOpticalModel > CWindowOpticalModel::WindowOpticalModelFactory() {
 			// Process input data and counts if number of complex fenestration objects is greater
 			// than zero in which case it will use BSDF window model
-			std::unique_ptr< CWindowOpticalModel > aModel = std::unique_ptr< CWindowOpticalModel >();
+			std::unique_ptr< CWindowOpticalModel > aModel = std::unique_ptr< CWindowOpticalModel >( new CWindowOpticalModel() );
 			int numCurrModels = InputProcessor::GetNumObjectsFound( "Construction:ComplexFenestrationState" );
 
 			if ( numCurrModels > 0 ) {
