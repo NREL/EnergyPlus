@@ -304,7 +304,7 @@ namespace EnergyPlus {
 		bool FirstHVACIteration( false );
 
 		std::string const idf_objects = delimited_string( {
-			" Version,8.7;",
+			" Version,8.8;",
 
 			"  Zone,",
 			"    SPACE2-1,                !- Name",
