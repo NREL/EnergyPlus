@@ -1136,6 +1136,9 @@ namespace ReportSizingManager {
 							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 						} else {
 							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+							// DELETE THIS MESSAGE: only testing to see if any example files use this line of code
+							// can probably combine the ZoneEqFanCoil code above and this to consolidate?
+							ShowWarningMessage( CallingRoutine + ": Sizing for " + CompType + ' ' + CompName + " using DesHeatCoilInTemp without checking for OA fraction. " );
 						}
 						if ( ( TermUnitSingDuct || TermUnitPIU ) && ( CurTermUnitSizingNum > 0 ) ) {
 							CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
@@ -1258,7 +1261,7 @@ namespace ReportSizingManager {
 							OutAirFrac = 0.0;
 						}
 						CoilInTemp = ( 1.0 - OutAirFrac ) * FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak + OutAirFrac * FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak;
-						CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
+						CoilInHumRat = ( 1.0 - OutAirFrac ) * FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak + OutAirFrac * FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak;
 						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 						AutosizeDes = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
