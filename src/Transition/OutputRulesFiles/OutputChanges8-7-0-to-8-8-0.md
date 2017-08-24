@@ -35,6 +35,6 @@ A number of changes have been implemented in the LEED Summary tabular report:
 
 
 
-See [6147](https://github.com/NREL/EnergyPlus/pull/6150)
+See [6150](https://github.com/NREL/EnergyPlus/pull/6150)
 
 
