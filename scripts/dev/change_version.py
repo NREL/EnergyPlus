@@ -43,7 +43,7 @@ for extension in ['*.idf', '*.imf']:
 for folder in [os.path.join('tst', 'EnergyPlus', 'unit')]:
     this_dir = os.path.join(repo, folder)
     for root, dir_names, file_names in os.walk(this_dir):
-        for filename in fnmatch.filter(file_names, 'cc'):
+        for filename in fnmatch.filter(file_names, '*.cc'):
             with open(os.path.join(root, filename)) as input_file:
                 file_data = input_file.read()
                 file_data = file_data.replace('Version,' + v_old, 'Version,' + v_new)

@@ -7942,7 +7942,7 @@ namespace EnergyPlus {
 
 	TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided) {
 		std::string const idf_objects = delimited_string({
-			"Version,8.7;",
+			"Version,8.8;",
 			"SimulationControl,",
 			"  No,                      !- Do Zone Sizing Calculation",
 			"  No,                      !- Do System Sizing Calculation",

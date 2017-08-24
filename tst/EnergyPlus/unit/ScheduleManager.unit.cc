@@ -88,7 +88,7 @@ TEST_F( EnergyPlusFixture, ScheduleAnnualFullLoadHours_test )
 	// J.Glazer - August 2017
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.7;",
+		"Version,8.8;",
 		" ",
 		"ScheduleTypeLimits,",
 		"  Any Number;              !- Name",
@@ -162,7 +162,7 @@ TEST_F( EnergyPlusFixture, ScheduleAverageHoursPerWeek_test )
 	// J.Glazer - August 2017
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.7;",
+		"Version,8.8;",
 		" ",
 		"ScheduleTypeLimits,",
 		"  Any Number;              !- Name",
@@ -236,7 +236,7 @@ TEST_F( EnergyPlusFixture, ScheduleHoursGT1perc_test )
 	// J.Glazer - August 2017
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.7;",
+		"Version,8.8;",
 		" ",
 		"ScheduleTypeLimits,",
 		"  Any Number;              !- Name",

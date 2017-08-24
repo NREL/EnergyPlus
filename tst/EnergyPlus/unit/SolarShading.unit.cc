@@ -297,7 +297,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_polygon_contains_point )
 TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 {
 	std::string const idf_objects = delimited_string( {
-		"  Version,8.7;                                                                       ",
+		"  Version,8.8;                                                                       ",
 		"  Building,                                                                          ",
 		"    DemoFDT,                 !- Name                                                 ",
 		"    0,                       !- North Axis {deg}                                     ",
