@@ -463,18 +463,12 @@ namespace OutAirNodeManager {
 			if ( Node( NodeNum ).EMSOverrideOutAirWindSpeed ) Node( NodeNum ).OutAirWindSpeed = Node( NodeNum ).EMSValueForOutAirWindSpeed;
 			if ( Node( NodeNum ).EMSOverrideOutAirWindDir ) Node( NodeNum ).OutAirWindDir = Node( NodeNum ).EMSValueForOutAirWindDir;
 
-			// Set node data to EMS overwritten values if defined
-			if ( Node( NodeNum ).EMSOverrideOutAirDryBulb ) Node( NodeNum ).OutAirDryBulb = Node( NodeNum ).EMSValueForOutAirDryBulb;
-			if ( Node( NodeNum ).EMSOverrideOutAirWetBulb ) Node( NodeNum ).OutAirWetBulb = Node( NodeNum ).EMSValueForOutAirWetBulb;
-			if ( Node( NodeNum ).EMSOverrideOutAirWindSpeed ) Node( NodeNum ).OutAirWindSpeed = Node( NodeNum ).EMSValueForOutAirWindSpeed;
-			if ( Node( NodeNum ).EMSOverrideOutAirWindDir ) Node( NodeNum ).OutAirWindDir = Node( NodeNum ).EMSValueForOutAirWindDir;
-
 			Node( NodeNum ).Temp = Node( NodeNum ).OutAirDryBulb;
 			if ( Node( NodeNum ).OutAirDryBulbSchedNum != 0 || Node( NodeNum ).OutAirWetBulbSchedNum != 0 ) {
 				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );				
 			}
 			else {
-				Node(NodeNum).HumRat = OutHumRat;
+				Node( NodeNum ).HumRat = OutHumRat;
 			}
 			Node( NodeNum ).Enthalpy = PsyHFnTdbW( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).HumRat );
 			Node( NodeNum ).Press = OutBaroPress;
