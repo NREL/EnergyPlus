@@ -2,7 +2,6 @@
 #define WindowModel_H
 
 #include <memory>
-#include <iostream>
 #include <map>
 
 namespace EnergyPlus {
@@ -24,7 +23,7 @@ namespace EnergyPlus {
 
 	namespace WindowManager {
 
-		enum WindowsModel { BuiltIn, External };
+		enum class WindowsModel { BuiltIn, External };
 
 		// Class that reads IDF object and decides if interior or exterior window models
 		// will be used.
@@ -32,7 +31,7 @@ namespace EnergyPlus {
 		public:
 			CWindowModel();
 
-			static std::shared_ptr< CWindowModel > WindowModelFactory( std::string objectName );
+			static std::unique_ptr< CWindowModel > WindowModelFactory( std::string const & objectName );
 
 			WindowsModel getWindowsModel() const;
 			bool isExternalLibraryModel() const;
@@ -42,13 +41,13 @@ namespace EnergyPlus {
 
 		};
 
-		enum WindowsOpticalModel { Simplified, BSDF };
+		enum class WindowsOpticalModel { Simplified, BSDF };
 
 		class CWindowOpticalModel {
 		public:
 			CWindowOpticalModel();
 
-			static std::shared_ptr< CWindowOpticalModel > WindowOpticalModelFactory();
+			static std::unique_ptr< CWindowOpticalModel > WindowOpticalModelFactory();
 
 			WindowsOpticalModel getWindowsOpticalModel() const;
 			bool isSimplifiedModel() const;

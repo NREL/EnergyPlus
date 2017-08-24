@@ -47,8 +47,6 @@
 #ifndef WindowManager_hh_INCLUDED
 #define WindowManager_hh_INCLUDED
 
-#include <memory>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1A.hh>
@@ -189,8 +187,8 @@ namespace WindowManager {
   class CWindowModel;
   class CWindowOpticalModel;
 
-  extern std::shared_ptr< CWindowModel > inExtWindowModel;
-  extern std::shared_ptr< CWindowOpticalModel > winOpticalModel;
+  extern std::unique_ptr< CWindowModel > inExtWindowModel;
+  extern std::unique_ptr< CWindowOpticalModel > winOpticalModel;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
 	//   Optical Calculation Routines

@@ -3,12 +3,10 @@
 
 #include "WindowModel.hh"
 
-using namespace std;
-
 namespace EnergyPlus {
 
 	template < >
-	EnumParser< EnergyPlus::WindowManager::WindowsModel >::EnumParser() {
+	EnumParser< WindowManager::WindowsModel >::EnumParser() {
 		m_Map[ "BUILTINWINDOWSMODEL" ] = WindowManager::WindowsModel::BuiltIn;
 		m_Map[ "EXTERNALWINDOWSMODEL" ] = WindowManager::WindowsModel::External;
 	}
@@ -24,7 +22,7 @@ namespace EnergyPlus {
 		}
 
 
-		shared_ptr< CWindowModel > CWindowModel::WindowModelFactory( string objectName ) {
+		std::unique_ptr< CWindowModel > CWindowModel::WindowModelFactory( std::string const & objectName ) {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Simon Vidanovic
 			//       DATE WRITTEN   July 2016
@@ -39,7 +37,7 @@ namespace EnergyPlus {
 			int NumAlphas;
 			int IOStat;
 
-			shared_ptr< CWindowModel > aModel = make_shared< CWindowModel >();
+			std::unique_ptr< CWindowModel > aModel = std::unique_ptr< CWindowModel >();
 			int numCurrModels = InputProcessor::GetNumObjectsFound( objectName );
 			if ( numCurrModels > 0 ) {
 				InputProcessor::GetObjectItem( objectName, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
@@ -55,7 +53,7 @@ namespace EnergyPlus {
 		}
 
 		bool CWindowModel::isExternalLibraryModel() const {
-			return m_Model == External;
+			return m_Model == WindowsModel::External;
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////
@@ -66,14 +64,14 @@ namespace EnergyPlus {
 
 		}
 
-		shared_ptr< CWindowOpticalModel > CWindowOpticalModel::WindowOpticalModelFactory() {
+		std::unique_ptr< CWindowOpticalModel > CWindowOpticalModel::WindowOpticalModelFactory() {
 			// Process input data and counts if number of complex fenestration objects is greater
 			// than zero in which case it will use BSDF window model
-			auto aModel = make_shared< CWindowOpticalModel >();
+			std::unique_ptr< CWindowOpticalModel > aModel = std::unique_ptr< CWindowOpticalModel >();
 			int numCurrModels = InputProcessor::GetNumObjectsFound( "Construction:ComplexFenestrationState" );
 
 			if ( numCurrModels > 0 ) {
-				aModel->m_Model = BSDF;
+				aModel->m_Model = WindowsOpticalModel::BSDF;
 			}
 
 			return aModel;

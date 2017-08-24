@@ -116,11 +116,11 @@ namespace EnergyPlus {
 
 		// Converts world coordinates (E+) into local surface coordinates that suites better for 
 		// WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
-		std::pair< double, double > getWCECoordinates( const int t_SurfNum,
+		std::pair< Real64, Real64 > getWCECoordinates( const int t_SurfNum,
 		                                               const DataVectorTypes::Vector& t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction );
 
 		// Returns Theta and Phi coordinates of surface BSDF for current Sun position
-		std::pair< double, double > getSunWCEAngles( const int t_SurfNum,
+		std::pair< Real64, Real64 > getSunWCEAngles( const int t_SurfNum,
 		                                             const SingleLayerOptics::BSDFHemisphere t_Direction );
 
 		///////////////////////////////////////////////////////////////////////////////
@@ -152,7 +152,7 @@ namespace EnergyPlus {
 
 		private:
 			CWindowConstructionsBSDF();
-			std::shared_ptr< std::vector< double > > getCommonWavelengths(
+			std::shared_ptr< std::vector< Real64 > > getCommonWavelengths(
 				FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum ) const;
 			std::shared_ptr< IGU_BSDFLayers > getLayers( FenestrationCommon::WavelengthRange const t_Range,
 			                                             int const t_ConstrNum ) const;

@@ -685,7 +685,7 @@ namespace DataSurfaces {
 			}
 		}
 
-		double SurfaceData::getInsideAirTemperature( const int t_SurfNum ) const
+		Real64 SurfaceData::getInsideAirTemperature( const int t_SurfNum ) const
 		{
 		  // SUBROUTINE INFORMATION:
 		  //       AUTHOR         Simon Vidanovic
@@ -704,7 +704,7 @@ namespace DataSurfaces {
 		  //       is part of SurfaceData structure and instead of calling TempEffBulkAir( SurfNum ) it should
 		  //       be called Surface( SurfNum ).TempEffBulkAir (Simon Vidanovic)
 		
-			double RefAirTemp = 0;
+			Real64 RefAirTemp = 0;
 		
 			// determine reference air temperature for this surface
 			{ auto const SELECT_CASE_var( TAirRef );
@@ -723,12 +723,12 @@ namespace DataSurfaces {
 				// return;
 			}
 			// determine supply air conditions
-			double SumSysMCp = 0;
-			double SumSysMCpT = 0;
+			Real64 SumSysMCp = 0;
+			Real64 SumSysMCpT = 0;
 			for( int NodeNum = 1; NodeNum <= ZoneEquipConfig( Zone ).NumInletNodes; ++NodeNum ) {
-				double NodeTemp = Node( ZoneEquipConfig( Zone ).InletNode( NodeNum ) ).Temp;
-				double MassFlowRate = Node( ZoneEquipConfig( Zone ).InletNode( NodeNum ) ).MassFlowRate;
-				double CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( Zone ), NodeTemp );
+				Real64 NodeTemp = Node( ZoneEquipConfig( Zone ).InletNode( NodeNum ) ).Temp;
+				Real64 MassFlowRate = Node( ZoneEquipConfig( Zone ).InletNode( NodeNum ) ).MassFlowRate;
+				Real64 CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( Zone ), NodeTemp );
 				SumSysMCp += MassFlowRate * CpAir;
 				SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 			}
@@ -742,14 +742,14 @@ namespace DataSurfaces {
 			return RefAirTemp;
 		}
 
-		double SurfaceData::getInsideIR( const int t_SurfNum ) {
+		Real64 SurfaceData::getInsideIR( const int t_SurfNum ) {
 			auto& window( SurfaceWindow( t_SurfNum ) );
-			double value = window.IRfromParentZone + QHTRadSysSurf( t_SurfNum ) + QHWBaseboardSurf( t_SurfNum ) +
+			Real64 value = window.IRfromParentZone + QHTRadSysSurf( t_SurfNum ) + QHWBaseboardSurf( t_SurfNum ) +
 				QSteamBaseboardSurf( t_SurfNum ) + QElecBaseboardSurf( t_SurfNum );
 			return value;
 		}
 
-		double SurfaceData::getOutsideAirTemperature( const int t_SurfNum ) const {
+		Real64 SurfaceData::getOutsideAirTemperature( const int t_SurfNum ) const {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Simon Vidanovic
 			//       DATE WRITTEN   June 2016
@@ -762,7 +762,7 @@ namespace DataSurfaces {
 			//
 			// NOTE: This routine has been copy/pasted in the past in several different modules with slight
 			//       modifications at some of those places. Exterior/interior surface air temperature is tied to surface.
-			double temperature = 0;
+			Real64 temperature = 0;
 
 			if ( ExtBoundCond > 0 ) // Interzone window
 			{
@@ -785,7 +785,7 @@ namespace DataSurfaces {
 			return temperature;
 		}
 
-		double SurfaceData::getOutsideIR( const int t_SurfNum ) const {
+		Real64 SurfaceData::getOutsideIR( const int t_SurfNum ) const {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Simon Vidanovic
 			//       DATE WRITTEN   July 2016
@@ -794,14 +794,14 @@ namespace DataSurfaces {
 
 			// PURPOSE OF THIS SUBROUTINE:
 			// Calculates outside infrared radiation
-			double value = 0;
+			Real64 value = 0;
 			if ( ExtBoundCond > 0 ) {
 				value = SurfaceWindow( ExtBoundCond ).IRfromParentZone + QHTRadSysSurf( ExtBoundCond ) +
 					QHWBaseboardSurf( ExtBoundCond ) + QSteamBaseboardSurf( ExtBoundCond ) +
 					QElecBaseboardSurf( ExtBoundCond );
 			}
 			else {
-				double tout = getOutsideAirTemperature( t_SurfNum ) + KelvinConv;
+				Real64 tout = getOutsideAirTemperature( t_SurfNum ) + KelvinConv;
 				value = sigma * pow_4( tout );
 				value = ViewFactorSkyIR *
 					( AirSkyRadSplit( t_SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( t_SurfNum ) ) * value ) +
@@ -810,7 +810,7 @@ namespace DataSurfaces {
 			return value;
 		}
 
-		double SurfaceData::getSWIncident( const int t_SurfNum ) {
+		Real64 SurfaceData::getSWIncident( const int t_SurfNum ) {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Simon Vidanovic
 			//       DATE WRITTEN   July 2016
@@ -824,7 +824,7 @@ namespace DataSurfaces {
 		}
 
 
-		double SurfaceData::getSWBeamIncident( const int t_SurfNum ) {
+		Real64 SurfaceData::getSWBeamIncident( const int t_SurfNum ) {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Simon Vidanovic
 			//       DATE WRITTEN   July 2016
@@ -837,7 +837,7 @@ namespace DataSurfaces {
 			return QRadSWOutIncidentBeam( t_SurfNum );
 		}
 
-		double SurfaceData::getSWDiffuseIncident( const int t_SurfNum ) {
+		Real64 SurfaceData::getSWDiffuseIncident( const int t_SurfNum ) {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Simon Vidanovic
 			//       DATE WRITTEN   July 2016
@@ -1209,29 +1209,29 @@ namespace DataSurfaces {
 
 	}
 
-  double SurfaceWindowCalc::AbsorptanceFromInteriorFrontSide() const {
-    return ( IntBeamAbsByShade + IntSWAbsByShade ) * ShadeAbsFacFace( 2 );
-  }
+	Real64 SurfaceWindowCalc::AbsorptanceFromInteriorFrontSide() const {
+		return ( IntBeamAbsByShade + IntSWAbsByShade ) * ShadeAbsFacFace( 2 );
+	}
 
-  double SurfaceWindowCalc::AbsorptanceFromExteriorFrontSide() const {
-    return ( ExtBeamAbsByShade + ExtDiffAbsByShade ) * ShadeAbsFacFace( 1 );
-  }
+	Real64 SurfaceWindowCalc::AbsorptanceFromExteriorFrontSide() const {
+		return ( ExtBeamAbsByShade + ExtDiffAbsByShade ) * ShadeAbsFacFace( 1 );
+	}
 
-  double SurfaceWindowCalc::AbsFrontSide() const {
-    return AbsorptanceFromExteriorFrontSide() + AbsorptanceFromInteriorFrontSide();
-  }
+	Real64 SurfaceWindowCalc::AbsFrontSide() const {
+		return AbsorptanceFromExteriorFrontSide() + AbsorptanceFromInteriorFrontSide();
+	}
 
-  double SurfaceWindowCalc::AbsorptanceFromInteriorBackSide() const {
-    return ( IntBeamAbsByShade + IntSWAbsByShade ) * ShadeAbsFacFace( 1 );
-  }
+	Real64 SurfaceWindowCalc::AbsorptanceFromInteriorBackSide() const {
+		return ( IntBeamAbsByShade + IntSWAbsByShade ) * ShadeAbsFacFace( 1 );
+	}
 
-  double SurfaceWindowCalc::AbsorptanceFromExteriorBackSide() const {
-    return ( ExtBeamAbsByShade + ExtDiffAbsByShade ) * ShadeAbsFacFace( 2 );
-  }
+	Real64 SurfaceWindowCalc::AbsorptanceFromExteriorBackSide() const {
+		return ( ExtBeamAbsByShade + ExtDiffAbsByShade ) * ShadeAbsFacFace( 2 );
+	}
 
-  double SurfaceWindowCalc::AbsBackSide() const {
-    return AbsorptanceFromExteriorBackSide() + AbsorptanceFromInteriorBackSide();
-  }
+	Real64 SurfaceWindowCalc::AbsBackSide() const {
+		return AbsorptanceFromExteriorBackSide() + AbsorptanceFromInteriorBackSide();
+	}
 
 } // DataSurfaces
 

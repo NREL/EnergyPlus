@@ -260,8 +260,8 @@ namespace WindowManager {
 	Array1D< int > LayerNum( 5, 0 ); // Glass layer number
 	Array1D< int > AngleNum( 5, 0 ); // Glass layer number for spectral and angular data only
 
-  std::shared_ptr< CWindowModel > inExtWindowModel = nullptr; // Information about windows model (interior or exterior)
-  std::shared_ptr< CWindowOpticalModel > winOpticalModel = nullptr; // Information about windows optical model (Simplified or BSDF)
+	std::unique_ptr< CWindowModel > inExtWindowModel; // Information about windows model (interior or exterior)
+	std::unique_ptr< CWindowOpticalModel > winOpticalModel; // Information about windows optical model (Simplified or BSDF)
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
 	//   Optical Calculation Routines
@@ -616,11 +616,12 @@ namespace WindowManager {
 			TotLay = Construct( ConstrNum ).TotLayers;
 
 			// First layer must be glass, shade, screen or blind to be a glazing construction
-			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass && 
-           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade && 
-           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen && 
-           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind && 
-           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
+			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass &&
+				Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade &&
+				Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen &&
+				Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind &&
+				Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing )
+				continue;
 
 			ShadeLayNum = 0;
 			ExtShade = false;
@@ -895,7 +896,7 @@ namespace WindowManager {
 
 			for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
 				// 10 degree increment for incident angle is only value for a construction without a layer = SpectralAndAngle
-				Phi = double( IPhi - 1 ) * 10.0;
+				Phi = Real64( IPhi - 1 ) * 10.0;
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					// Override 10 degeee icrement for incident angle for a construction with a layer = SpectralAndAngle
 					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
@@ -1084,7 +1085,7 @@ namespace WindowManager {
 			// but exclude the effect of a shade or blind if present in the construction.
 			// When a construction has a layer = SpectralAndAngle, the 10 degree increment will be overridden.
 			for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
-				Phi = double( IPhi - 1 ) * 10.0;
+				Phi = Real64( IPhi - 1 ) * 10.0;
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
 					if ( Material( LayPtr ).GlassSpecAngTransDataPtr ) {
@@ -1584,7 +1585,7 @@ namespace WindowManager {
 					tsolPhiFit( IPhi ) = 0.0;
 					tvisPhiFit( IPhi ) = 0.0;
 
-					Phi = double( IPhi - 1 ) * 10.0;
+					Phi = Real64( IPhi - 1 ) * 10.0;
 					for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 						LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
 						if ( Material( LayPtr ).GlassSpecAngTransDataPtr ) {
@@ -2265,30 +2266,30 @@ namespace WindowManager {
 	// Window Thermal Calculation Subroutines
 	//***********************************************************************************
 
-  void
-  CalcWindowHeatBalance(
-    int const SurfNum, // Surface number
+	void
+	CalcWindowHeatBalance(
+		int const SurfNum, // Surface number
 		Real64 const HextConvCoeff, // Outside air film conductance coefficient
-		Real64 & SurfInsideTemp, // Inside window surface temperature
-		Real64 & SurfOutsideTemp // Outside surface temperature (C)
-  ) 
-  {
-    // SUBROUTINE INFORMATION:
+		Real64& SurfInsideTemp, // Inside window surface temperature
+		Real64& SurfOutsideTemp // Outside surface temperature (C)
+	) {
+		// SUBROUTINE INFORMATION:
 		//       AUTHOR         S. Vidanovic
 		//       DATE WRITTEN   June 2016
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-    //
-    // PURPOSE OF THIS SUBROUTINE:
-    // Subroutine to direct wheter to use exterior or interior window routines
-    if( KickOffSizing || KickOffSimulation ) return;
-    
-    if( inExtWindowModel->isExternalLibraryModel() ) {
-      CalcWindowHeatBalanceExternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
-    } else {
-      CalcWindowHeatBalanceInternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
-    }
-  }
+		//
+		// PURPOSE OF THIS SUBROUTINE:
+		// Subroutine to direct wheter to use exterior or interior window routines
+		if ( KickOffSizing || KickOffSimulation ) return;
+
+		if ( inExtWindowModel->isExternalLibraryModel() ) {
+			CalcWindowHeatBalanceExternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+		}
+		else {
+			CalcWindowHeatBalanceInternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+		}
+	}
 
 	void
 	CalcWindowHeatBalanceInternalRoutines(
@@ -2441,7 +2442,7 @@ namespace WindowManager {
 
 			//Simon: Complex fenestration state works only with tarcog
 			CalcComplexWindowThermal( SurfNum, temp, HextConvCoeff, SurfInsideTemp, 
-        SurfOutsideTemp, SurfOutsideEmiss, noCondition );
+				SurfOutsideTemp, SurfOutsideEmiss, noCondition );
 
 			ConstrNum = surface.Construction;
 			TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
@@ -3228,7 +3229,7 @@ namespace WindowManager {
 		if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn ) {
 			nglfacep = nglface + 2;
 			AbsRadShadeFace( 1 ) = SurfaceWindow( SurfNum ).AbsFrontSide();
-      AbsRadShadeFace( 2 ) = SurfaceWindow( SurfNum ).AbsBackSide();
+			AbsRadShadeFace( 2 ) = SurfaceWindow( SurfNum ).AbsBackSide();
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) AbsRadShadeFace( 2 ) += SurfaceWindow( SurfNum ).IntLWAbsByShade;
 			sconsh = scon( ngllayer + 1 );
 			TauShIR = tir( nglface + 1 );
@@ -9209,11 +9210,11 @@ Label99999: ;
 
 	//*****************************************************************************************
 
-  void initWindowModel() {
-    const std::string objectName = "WindowsCalculationEngine";
-    inExtWindowModel = CWindowModel::WindowModelFactory( objectName );
-    winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory();
-  }
+	void initWindowModel() {
+		const std::string objectName = "WindowsCalculationEngine";
+		inExtWindowModel = CWindowModel::WindowModelFactory( objectName );
+		winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory();
+	}
 
   //*****************************************************************************************
 

@@ -84,18 +84,18 @@ namespace EnergyPlus {
 	namespace WindowManager {
 
 		bool isSurfaceHit( const int t_SurfNum, const Vector& t_Ray ) {
-			double DotProd = dot( t_Ray, Surface( t_SurfNum ).NewellSurfaceNormalVector );
+			Real64 DotProd = dot( t_Ray, Surface( t_SurfNum ).NewellSurfaceNormalVector );
 			return ( DotProd > 0 );
 		}
 
-		std::pair< double, double > getWCECoordinates( int const t_SurfNum, Vector const& t_Ray,
+		std::pair< Real64, Real64 > getWCECoordinates( int const t_SurfNum, Vector const& t_Ray,
 		                                               const BSDFHemisphere t_Direction ) {
-			double Theta = 0;
-			double Phi = 0;
+			Real64 Theta = 0;
+			Real64 Phi = 0;
 
 			//get window tilt and azimuth
-			double Gamma = DegToRadians * Surface( t_SurfNum ).Tilt;
-			double Alpha = DegToRadians * Surface( t_SurfNum ).Azimuth;
+			Real64 Gamma = DegToRadians * Surface( t_SurfNum ).Tilt;
+			Real64 Alpha = DegToRadians * Surface( t_SurfNum ).Azimuth;
 
 			int RadType = Front_Incident;
 
@@ -113,8 +113,8 @@ namespace EnergyPlus {
 
 		}
 
-		std::pair< double, double > getSunWCEAngles( const int t_SurfNum, const BSDFHemisphere t_Direction ) {
-			std::pair< double, double > Angles;
+		std::pair< Real64, Real64 > getSunWCEAngles( const int t_SurfNum, const BSDFHemisphere t_Direction ) {
+			std::pair< Real64, Real64 > Angles;
 			return getWCECoordinates( t_SurfNum, DataBSDFWindow::SUNCOSTS( TimeStep, HourOfDay, { 1, 3 } ),
 			                          t_Direction );
 		}
@@ -174,10 +174,10 @@ namespace EnergyPlus {
 			auto spectralData = SpectralData( t_SampleDataPtr );
 			int numOfWl = spectralData.NumOfWavelengths;
 			for ( auto i = 1; i <= numOfWl; ++i ) {
-				double wl = spectralData.WaveLength( i );
-				double T = spectralData.Trans( i );
-				double Rf = spectralData.ReflFront( i );
-				double Rb = spectralData.ReflBack( i );
+				Real64 wl = spectralData.WaveLength( i );
+				Real64 T = spectralData.Trans( i );
+				Real64 Rf = spectralData.ReflFront( i );
+				Real64 Rb = spectralData.ReflBack( i );
 				aSampleData->addRecord( wl, T, Rf, Rb );
 			}
 
@@ -187,23 +187,23 @@ namespace EnergyPlus {
 		///////////////////////////////////////////////////////////////////////////////
 		std::shared_ptr< CSpectralSampleData > CWCESpecturmProperties::getSpectralSample(
 			MaterialProperties const& t_MaterialProperties ) {
-			double Tsol = t_MaterialProperties.Trans;
-			double Rfsol = t_MaterialProperties.ReflectSolBeamFront;
-			double Rbsol = t_MaterialProperties.ReflectSolBeamBack;
+			Real64 Tsol = t_MaterialProperties.Trans;
+			Real64 Rfsol = t_MaterialProperties.ReflectSolBeamFront;
+			Real64 Rbsol = t_MaterialProperties.ReflectSolBeamBack;
 			std::shared_ptr< CMaterial > aSolMat =
 				std::make_shared< CMaterialSingleBand >( Tsol, Tsol, Rfsol, Rbsol, 0.3, 2.5 );
 
-			double Tvis = t_MaterialProperties.TransVis;
-			double Rfvis = t_MaterialProperties.ReflectVisBeamFront;
-			double Rbvis = t_MaterialProperties.ReflectVisBeamBack;
+			Real64 Tvis = t_MaterialProperties.TransVis;
+			Real64 Rfvis = t_MaterialProperties.ReflectVisBeamFront;
+			Real64 Rbvis = t_MaterialProperties.ReflectVisBeamBack;
 			std::shared_ptr< CMaterial > aVisMat =
 				std::make_shared< CMaterialSingleBand >( Tvis, Tvis, Rfvis, Rbvis, 0.38, 0.78 );
 
 			CMaterialDualBand aMat = CMaterialDualBand( aVisMat, aSolMat, 0.49 );
-			std::vector< double > aWl = *aMat.getBandWavelengths();
-			std::vector< double > aTf = *aMat.getBandProperties( Property::T, Side::Front );
-			std::vector< double > aRf = *aMat.getBandProperties( Property::R, Side::Front );
-			std::vector< double > aRb = *aMat.getBandProperties( Property::R, Side::Back );
+			std::vector< Real64 > aWl = *aMat.getBandWavelengths();
+			std::vector< Real64 > aTf = *aMat.getBandProperties( Property::T, Side::Front );
+			std::vector< Real64 > aRf = *aMat.getBandProperties( Property::R, Side::Front );
+			std::vector< Real64 > aRb = *aMat.getBandProperties( Property::R, Side::Back );
 			std::shared_ptr< CSpectralSampleData > aSampleData = std::make_shared< CSpectralSampleData >();
 			for ( size_t i = 0; i < aWl.size(); ++i ) {
 				aSampleData->addRecord( aWl[ i ], aTf[ i ], aRf[ i ], aRb[ i ] );
@@ -225,7 +225,7 @@ namespace EnergyPlus {
 			m_Layers[ WavelengthRange::Visible ] = std::make_shared< LayersBSDF_Map >();
 		}
 
-		std::shared_ptr< std::vector< double > > CWindowConstructionsBSDF::getCommonWavelengths( WavelengthRange const t_Range,
+		std::shared_ptr< std::vector< Real64 > > CWindowConstructionsBSDF::getCommonWavelengths( WavelengthRange const t_Range,
 		                                                                                         int const t_ConstrNum ) const {
 			std::shared_ptr< IGU_BSDFLayers > iguLayers = getLayers( t_Range, t_ConstrNum );
 			CCommonWavelengths aCommonWL;

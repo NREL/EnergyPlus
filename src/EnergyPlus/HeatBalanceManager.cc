@@ -1136,7 +1136,7 @@ namespace HeatBalanceManager {
 			AlphaName( 3 ) = "NO";
 		}
 
-    WindowManager::initWindowModel();
+		WindowManager::initWindowModel();
 
 		gio::write( OutputFileInits, Format_728 );
 		if ( Contaminant.SimulateContaminants && Contaminant.CO2Simulation ) {
@@ -4743,7 +4743,7 @@ namespace HeatBalanceManager {
 			DisplayString( "Initializing Window Optical Properties" );
 			InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
 			// InitGlassOpticalCalculations(); // Initialize the window optical properties
-      InitWindowOpticalCalculations();
+			InitWindowOpticalCalculations();
 			InitDaylightingDevices(); // Initialize any daylighting devices
 			DisplayString( "Initializing Solar Calculations" );
 			InitSolarCalculations(); // Initialize the shadowing calculations

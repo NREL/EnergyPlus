@@ -3686,16 +3686,16 @@ namespace WindowComplexManager {
 		}
 
 		//  call TARCOG
-		TARCOG90( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, 
-      VacuumMaxGapThickness, CalcDeflection, Pa, Pini, Tini, gap, GapDefMax, thick, scon, YoungsMod, PoissonsRat, 
-      tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, gcon, gvis, gcp, wght, gama, 
-      nmix, SupportPlr, PillarSpacing, PillarRadius, theta, LayerDef, q, qv, ufactor, sc, hflux, hcin, hcout, 
-      hrin, hrout, hin, hout, hcgap, hrgap, shgc, nperr, tarcogErrorMessage, shgct, tamb, troom, ibc, 
-      Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, 
-      LayerType, nslice, LaminateA, LaminateB, sumsol, hg, hr, hs, he, hi, Ra, Nu, standard, ThermalMod, 
-      Debug_mode, Debug_dir, Debug_file, Window_ID, IGU_ID, 
-      ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, 
-      Keff, ShadeGapKeffConv, SDScalar, CalcSHGC, NumOfIterations );
+		TARCOG90( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure,
+		          VacuumMaxGapThickness, CalcDeflection, Pa, Pini, Tini, gap, GapDefMax, thick, scon, YoungsMod, PoissonsRat,
+		          tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, gcon, gvis, gcp, wght, gama,
+		          nmix, SupportPlr, PillarSpacing, PillarRadius, theta, LayerDef, q, qv, ufactor, sc, hflux, hcin, hcout,
+		          hrin, hrout, hin, hout, hcgap, hrgap, shgc, nperr, tarcogErrorMessage, shgct, tamb, troom, ibc,
+		          Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent,
+		          LayerType, nslice, LaminateA, LaminateB, sumsol, hg, hr, hs, he, hi, Ra, Nu, standard, ThermalMod,
+		          Debug_mode, Debug_dir, Debug_file, Window_ID, IGU_ID,
+		          ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn,
+		          Keff, ShadeGapKeffConv, SDScalar, CalcSHGC, NumOfIterations );
 
 		// process results from TARCOG
 		if ( ( nperr > 0 ) && ( nperr < 1000 ) ) { // process error signal from tarcog

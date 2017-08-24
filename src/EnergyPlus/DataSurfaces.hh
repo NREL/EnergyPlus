@@ -385,9 +385,9 @@ namespace DataSurfaces {
 	extern Array2D< Real64 > AWinSurf; // Time step value of factor for beam
 	// absorbed in window glass layers
 
-  // Time step value of factor for diffuse absorbed in window layers
-  extern Array2D< Real64 > AWinSurfDiffFront;
-  extern Array2D< Real64 > AWinSurfDiffBack;
+	// Time step value of factor for diffuse absorbed in window layers
+	extern Array2D< Real64 > AWinSurfDiffFront;
+	extern Array2D< Real64 > AWinSurfDiffBack;
 
 	extern Array2D< Real64 > AWinCFOverlap; // Time step value of factor for beam
 	// absorbed in window glass layers which comes from other windows
@@ -887,25 +887,25 @@ namespace DataSurfaces {
 		void
 		SetWindSpeedAt( Real64 const fac );
 
-		double
+		Real64
 		getInsideAirTemperature( const int t_SurfNum ) const;
 
-		static double
+		static Real64
 		getInsideIR( const int t_SurfNum );
 
-		double
+		Real64
 		getOutsideAirTemperature( const int t_SurfNum ) const;
 
-		double
+		Real64
 		getOutsideIR( const int t_SurfNum ) const;
 
-		static double
+		static Real64
 		getSWIncident( const int t_SurfNum );
 
-		static double
+		static Real64
 		getSWBeamIncident( const int t_SurfNum );
 
-		static double
+		static Real64
 		getSWDiffuseIncident( const int t_SurfNum );
 
 		int
@@ -1398,22 +1398,22 @@ namespace DataSurfaces {
 			GndSolarInc = 0.0;
 		}
 
-		double
+		Real64
 		AbsorptanceFromExteriorFrontSide() const;
 
-		double
+		Real64
 		AbsorptanceFromInteriorFrontSide() const;
 
-		double
+		Real64
 		AbsFrontSide() const;
 
-		double
+		Real64
 		AbsorptanceFromExteriorBackSide() const;
 
-		double
+		Real64
 		AbsorptanceFromInteriorBackSide() const;
 
-		double
+		Real64
 		AbsBackSide() const;
 	};
 

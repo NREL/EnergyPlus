@@ -114,7 +114,7 @@ namespace EnergyPlus {
 			aSystem->setTolerance( solutionTolerance );
 
 			// get previous timestep temperatures solution for faster iterations
-			std::vector< double > Guess;
+			std::vector< Real64 > Guess;
 			auto totSolidLayers = construction.TotSolidLayers;
 
 			// Interior and exterior shading layers have gas between them and IGU but that gas
@@ -135,7 +135,7 @@ namespace EnergyPlus {
 			auto aLayers = aSystem->getSolidLayers();
 			auto i = 1;
 			for ( auto aLayer : aLayers ) {
-				double aTemp = 0;
+				Real64 aTemp = 0;
 				for ( auto aSide : EnumSide() ) {
 					aTemp = aLayer->getTemperature( aSide );
 					thetas( i ) = aTemp;
@@ -171,7 +171,6 @@ namespace EnergyPlus {
 				auto TauShIR = frontSurface->getTransmittance();
 				auto RhoShIR1 = max( 0.0, 1.0 - TauShIR - EpsShIR1 );
 				auto RhoShIR2 = max( 0.0, 1.0 - TauShIR - EpsShIR2 );
-				// double RhoGlIR2 = 1.0 - emis( 2 * ngllayer );
 				auto glassEmiss = aGlassLayer->getSurface( Side::Back )->getEmissivity();
 				auto RhoGlIR2 = 1.0 - glassEmiss;
 				auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
@@ -197,7 +196,6 @@ namespace EnergyPlus {
 				SurfaceWindow( SurfNum ).EffGlassEmiss = EffGlEmiss;
 
 				auto glassTemperature = aGlassLayer->getSurface( Side::Back )->getTemperature();
-				//double EffShBlEmiss = EpsShIR2 * ( 1.0 + RhoGlIR2 * TauShIR / ( 1.0 - RhoGlIR2 * RhoShIR2 ) );
 				SurfaceWindow( SurfNum ).EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp +
 					EffGlEmiss * ( glassTemperature - KelvinConv ) ) / ( EffShBlEmiss + EffGlEmiss );
 
@@ -206,7 +204,7 @@ namespace EnergyPlus {
 			else {
 				// Another adoptation to old source that looks suspicious. Check if heat flow through
 				// window is actually matching these values. (Simon)
-				// double heatFlow = aSystem->getHeatFlow() * surface.Area;
+				
 				// 
 				auto totLayers = aLayers.size();
 				auto aGlassLayer = aLayers[ totLayers - 1 ];
@@ -283,7 +281,7 @@ namespace EnergyPlus {
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////
-		std::shared_ptr< CSingleSystem > CWCEHeatTransferFactory::getTarcogSystem( double const t_HextConvCoeff ) {
+		std::shared_ptr< CSingleSystem > CWCEHeatTransferFactory::getTarcogSystem( Real64 const t_HextConvCoeff ) {
 			auto Indoor = getIndoor();
 			auto Outdoor = getOutdoor( t_HextConvCoeff );
 			auto aIGU = getIGU();
@@ -614,7 +612,7 @@ namespace EnergyPlus {
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////
-		std::shared_ptr< CEnvironment > CWCEHeatTransferFactory::getOutdoor( double const t_Hext ) const {
+		std::shared_ptr< CEnvironment > CWCEHeatTransferFactory::getOutdoor( const Real64 t_Hext ) const {
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Simon Vidanovic
 			//       DATE WRITTEN   July 2016
