@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 	People( 1 ).AdaptiveCEN15251 = true;
 
 	std::string const idf_objects = delimited_string({
-		"Version,8.7;",
+		"Version,8.8;",
 		"Schedule:Constant,OnSch,,1.0;",
 		"Schedule:Constant,FreeRunningSeason,,0.0;",
 		"Schedule:Constant,Sempre 21,,21.0;",
@@ -214,7 +214,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 	People( 1 ).AdaptiveCEN15251 = true;
 
 	std::string const idf_objects = delimited_string({
-		"Version,8.7;",
+		"Version,8.8;",
 		"Schedule:Constant,OnSch,,1.0;",
 		"Schedule:Constant,FreeRunningSeason,,0.0;",
 		"Schedule:Constant,Sempre 21,,21.0;",

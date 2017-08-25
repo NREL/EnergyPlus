@@ -2401,6 +2401,7 @@ Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Ene
 Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate [W]
+Zone,Average,Surface Construction Index []
 \end{lstlisting}
 
 Output variables applicable to all exterior heat transfer surfaces:
@@ -2725,6 +2726,18 @@ As of Version 2.1, diffuse solar transmitted through exterior and interior windo
 
 As of Version 2.1, the previous variable plus absorbed shortwave radiation from uniformly distributed initially-reflected diffuse solar, reflected beam solar, and shortwave radiation from lights. This sum is the power of all sources of solar and visible radiation absorbed by the surface at the inside face.
 
+\subsubsection{Surface Construction Index {[]}}\label{surface-construction-index}
+
+The variable reports an index that points to specific Construction. The variable is an additional output variable when Output:Diagnostics, DisplayAdvancedReportVariables; is given in an input file.
+
+In order to find a corresponding construction using the index, following steps are suggested:
+
+1. Find a surface name from Surface Construction Index in the .csv file
+
+2. Search the surface name in lines starting with HeatTransfer Surface in the .eio file
+
+3. The seventh item is the construction name with matched surface name. 
+ 
 \subsection{Surface Output Variables (exterior heat transfer surfaces)}\label{surface-output-variables-exterior-heat-transfer-surfaces}
 
 \subsubsection{Surface Outside Face Outdoor Air Drybulb Temperature {[}C{]}}\label{surface-outside-face-outdoor-air-drybulb-temperature-c}
